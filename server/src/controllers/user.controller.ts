@@ -1,10 +1,10 @@
 import { Response } from 'express';
-import { body, param, query, validationResult } from 'express-validator';
+import { body, param,  validationResult } from 'express-validator';
 import { UserService } from '../services/user.service';
 import { AuditService } from '../services/audit.service';
 import { AuthRequest } from '../types';
-import { createApiResponse } from '../utils/response';
 import { logger } from '../utils/logger';
+import { createApiResponse } from '../utils/response';
 
 export class UserController {
   private userService = new UserService();
@@ -247,7 +247,7 @@ export class UserController {
     }
   };
 
-  getAllRoles = async (req: AuthRequest, res: Response): Promise<void> => {
+  getAllRoles = async (_req: AuthRequest, res: Response): Promise<void> => {
     try {
       const roles = await this.userService.getAllRoles();
 

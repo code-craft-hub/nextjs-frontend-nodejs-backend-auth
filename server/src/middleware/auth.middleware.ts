@@ -1,6 +1,6 @@
-import { Request, Response, NextFunction } from 'express';
+import { Response, NextFunction } from 'express';
 import { jwtVerify } from 'jose';
-import { auth, db } from '../config/firebase';
+import {  db } from '../config/firebase';
 import { AuthRequest, JWTPayload, User } from '../types';
 import { logger } from '../utils/logger';
 import { createApiResponse } from '../utils/response';
@@ -14,7 +14,7 @@ export const authenticateToken = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const authHeader = req.headers.authorization;
+    const authHeader = req.headers["authorization"] as string | undefined;
     const token = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
 
     if (!token) {
@@ -161,31 +161,9 @@ export const authRateLimit = createRateLimiter({
   message: 'Too many authentication attempts, please try again later'
 });
 
-export const generalRateLimit = createRateLimiter({
+export const generalRateLimit = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // 100 requests per window
   message: 'Too many requests from this IP, please try again later'
 });
 
-// Security middleware
-import helmet from 'helmet';
-import cors from 'cors';
-
-export const securityMiddleware = [
-  helmet({
-    contentSecurityPolicy: {
-      directives: {
-        defaultSrc: ["'self'"],
-        styleSrc: ["'self'", "'unsafe-inline'"],
-        scriptSrc: ["'self'"],
-        imgSrc: ["'self'", "data:", "https:"],
-      },
-    },
-  }),
-  cors({
-    origin: process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:3000'],
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-  }),
-];

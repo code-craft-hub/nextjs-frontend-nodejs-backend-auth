@@ -47,6 +47,7 @@ export default function RegisterForm() {
 
       const { confirmPassword, ...registerData } = data;
       const result = await registerUser(registerData);
+      console.log('Registration result:', result);
 
       if (result.success) {
         router.push('/dashboard');

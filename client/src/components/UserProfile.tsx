@@ -2,11 +2,12 @@
 
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { apiClient } from '@/lib/firebase';
+import { apiClient } from '@/lib/api';
+import { SessionData } from '@/types';
 
 export default function UserProfile() {
   const { user, logout } = useAuth();
-  const [sessions, setSessions] = useState([]);
+  const [sessions, setSessions] = useState<SessionData[]>([]);
   const [showSessions, setShowSessions] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [passwordForm, setPasswordForm] = useState({

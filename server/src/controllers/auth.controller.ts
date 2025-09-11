@@ -1,14 +1,12 @@
 import { Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
 import { AuthService } from '../services/auth.service';
-import { UserService } from '../services/user.service';
 import { AuthRequest, LoginRequest, RegisterRequest } from '../types';
-import { createApiResponse } from '../utils/response';
 import { logger } from '../utils/logger';
+import { createApiResponse } from '../utils/response';
 
 export class AuthController {
   private authService = new AuthService();
-  private userService = new UserService();
 
   // Validation rules
   static registerValidation = [
@@ -37,6 +35,7 @@ export class AuthController {
 
   register = async (req: Request, res: Response): Promise<void> => {
     try {
+      console.log("Register controller hit", req.body);
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         res.status(400).json(createApiResponse(false, null, {

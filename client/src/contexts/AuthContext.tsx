@@ -1,15 +1,23 @@
-'use client';
+"use client";
 
-import { apiClient } from '@/lib/api';
-import { LoginData, RegisterData, User } from '@/types';
-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import { apiClient } from "@/lib/api";
+import { LoginData, RegisterData, User } from "@/types";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+} from "react";
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
   error: string | null;
   login: (data: LoginData) => Promise<{ success: boolean; error?: string }>;
-  register: (data: RegisterData) => Promise<{ success: boolean; error?: string }>;
+  register: (
+    data: RegisterData
+  ) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
   clearError: () => void;
@@ -27,6 +35,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const refreshUser = useCallback(async () => {
+    console.log("Refreshing user...", apiClient.isAuthenticated());
     if (!apiClient.isAuthenticated()) {
       setUser(null);
       setLoading(false);
@@ -35,7 +44,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     try {
       const response = await apiClient.getProfile();
-      
+
+      console.log("Profile response:", response);
       if (response.success && response.data) {
         setUser(response.data.user);
       } else {
@@ -43,7 +53,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         apiClient.clearAuth();
       }
     } catch (error) {
-      console.error('Failed to refresh user:', error);
+      console.error("Failed to refresh user:", error);
       setUser(null);
       apiClient.clearAuth();
     } finally {
@@ -63,12 +73,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(response.data.user);
         return { success: true };
       } else {
-        const errorMessage = response.error?.message || 'Login failed';
+        const errorMessage = response.error?.message || "Login failed";
         setError(errorMessage);
         return { success: false, error: errorMessage };
       }
     } catch (error) {
-      const errorMessage = 'Network error. Please try again.';
+      const errorMessage = "Network error. Please try again.";
       setError(errorMessage);
       return { success: false, error: errorMessage };
     } finally {
@@ -80,20 +90,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       setLoading(true);
       setError(null);
-
+      console.log("Registering user with data:", data);
       const response = await apiClient.register(data);
-
+      console.log("Register response:", response);
       if (response.success && response.data) {
         apiClient.setAuthTokens(response.data.tokens);
         setUser(response.data.user);
         return { success: true };
       } else {
-        const errorMessage = response.error?.message || 'Registration failed';
+        const errorMessage = response.error?.message || "Registration failed";
         setError(errorMessage);
         return { success: false, error: errorMessage };
       }
     } catch (error) {
-      const errorMessage = 'Network error. Please try again.';
+      const errorMessage = "Network error. Please try again.";
       setError(errorMessage);
       return { success: false, error: errorMessage };
     } finally {
@@ -106,7 +116,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoading(true);
       await apiClient.logout();
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error("Logout error:", error);
     } finally {
       setUser(null);
       setLoading(false);
@@ -135,8 +145,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 }
-

@@ -1,4 +1,5 @@
 import ProtectedRoute from "@/components/ProtectedRoute";
+import UserProfile from "@/components/UserProfile";
 
 
 
@@ -8,7 +9,7 @@ export default function DashboardPage() {
       <div>
         <h1>Dashboard</h1>
         <p>Welcome to your secure dashboard!</p>
-        <p>User profile</p>
+        <UserProfile />
       </div>
     </ProtectedRoute>
   );
