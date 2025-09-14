@@ -1,151 +1,411 @@
 "use client";
 
-import { apiClient } from "@/lib/api";
-import { LoginData, RegisterData, User } from "@/types";
 import React, {
   createContext,
   useContext,
+  useReducer,
   useEffect,
-  useState,
   useCallback,
+  useMemo,
+  ReactNode,
 } from "react";
 
-interface AuthContextType {
-  user: User | null;
-  loading: boolean;
-  error: string | null;
-  login: (data: LoginData) => Promise<{ success: boolean; error?: string }>;
-  register: (
-    data: RegisterData
-  ) => Promise<{ success: boolean; error?: string }>;
-  logout: () => Promise<void>;
-  refreshUser: () => Promise<void>;
-  clearError: () => void;
+import {
+  AuthContextValue,
+  AuthState,
+  AuthAction,
+  AuthUser,
+  UserProfile,
+  ROLES,
+  Permission,
+} from "../types/auth";
+import { authService, AuthServiceError } from "../lib/services/auth.service";
+import { getFirebaseAuth } from "@/lib/firebase/config";
+
+// Initial auth state
+const initialAuthState: AuthState = {
+  user: null,
+  isLoading: true,
+  isAuthenticated: false,
+  hasRole: () => false,
+  hasPermission: () => false,
+  isAdmin: false,
+};
+
+
+// Auth reducer for state management
+function authReducer(state: AuthState, action: AuthAction): AuthState {
+  switch (action.type) {
+    case "AUTH_STATE_CHANGED":
+      const { user, isLoading } = action.payload;
+      return {
+        ...state,
+        user,
+        isLoading,
+        isAuthenticated: !!user,
+        isAdmin:
+          user?.customClaims?.role === ROLES.SUPER_ADMIN ||
+          user?.customClaims?.role === ROLES.ADMIN ||
+          user?.profile?.roles?.some(
+            (role) =>
+              role.name === ROLES.SUPER_ADMIN || role.name === ROLES.ADMIN
+          ) ||
+          false,
+      };
+
+    case "SET_LOADING":
+      return {
+        ...state,
+        isLoading: action.payload,
+      };
+
+    case "SET_PROFILE":
+      if (!state.user) return state;
+      return {
+        ...state,
+        user: {
+          ...state.user,
+          profile: action.payload || undefined,
+        },
+        isAdmin:
+          action.payload?.roles?.some(
+            (role) =>
+              role.name === ROLES.SUPER_ADMIN || role.name === ROLES.ADMIN
+          ) ||
+          state.user.customClaims?.role === ROLES.SUPER_ADMIN ||
+          state.user.customClaims?.role === ROLES.ADMIN ||
+          false,
+      };
+
+    case "SET_CUSTOM_CLAIMS":
+      if (!state.user) return state;
+      return {
+        ...state,
+        user: {
+          ...state.user,
+          customClaims: action.payload || {},
+        },
+        isAdmin:
+          action.payload?.role === ROLES.SUPER_ADMIN ||
+          action.payload?.role === ROLES.ADMIN ||
+          state.user.profile?.roles?.some(
+            (role) =>
+              role.name === ROLES.SUPER_ADMIN || role.name === ROLES.ADMIN
+          ) ||
+          false,
+      };
+
+    case "SIGN_OUT":
+      return {
+        ...initialAuthState,
+        isLoading: false,
+      };
+
+    default:
+      return state;
+  }
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+// Auth context
+const AuthContext = createContext<AuthContextValue | null>(null);
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+// Auth provider props
+interface AuthProviderProps {
+  children: ReactNode;
+}
 
-  const clearError = useCallback(() => {
-    setError(null);
+/**
+ * Enterprise-grade Authentication Provider
+ * Manages authentication state with Firebase integration,
+ * role-based access control, and permission checking.
+ */
+export function AuthProvider({ children }: AuthProviderProps) {
+  const [state, dispatch] = useReducer(authReducer, initialAuthState);
+
+  // Create helper functions with proper access to current state
+  const createHelperFunctions = useCallback((currentUser: AuthUser | null) => {
+    const hasRole = (roleId: string): boolean => {
+      if (!currentUser) return false;
+
+      // Check custom claims first
+      if (currentUser.customClaims?.role === roleId) return true;
+
+      // Check profile roles
+      return (
+        currentUser.profile?.roles?.some((role) => role.name === roleId) ||
+        false
+      );
+    };
+
+    const hasPermission = (
+      resource: string,
+      action: Permission["action"],
+      scope?: Permission["scope"]
+    ): boolean => {
+      if (!currentUser) return false;
+
+      // Super admin has all permissions
+      if (hasRole(ROLES.SUPER_ADMIN)) return true;
+
+      // Check profile permissions
+      return (
+        currentUser.profile?.roles?.some((role) =>
+          role.permissions.some(
+            (permission) =>
+              permission.resource === resource &&
+              permission.action === action &&
+              (!scope ||
+                permission.scope === scope ||
+                permission.scope === "global")
+          )
+        ) || false
+      );
+    };
+
+    return { hasRole, hasPermission };
   }, []);
 
-  const refreshUser = useCallback(async () => {
-    console.log("Refreshing user...", apiClient.isAuthenticated());
-    if (!apiClient.isAuthenticated()) {
-      setUser(null);
-      setLoading(false);
-      return;
-    }
+  // Update helper functions when user changes
+  const helperFunctions = useMemo(
+    () => createHelperFunctions(state.user),
+    [state.user, createHelperFunctions]
+  );
 
+  // Enhanced state with helper functions
+  const enhancedState: AuthState = useMemo(
+    () => ({
+      ...state,
+      ...helperFunctions,
+    }),
+    [state, helperFunctions]
+  );
+
+  // Authentication methods
+  const signIn = useCallback(
+    async (email: string, password: string): Promise<void> => {
+      dispatch({ type: "SET_LOADING", payload: true });
+
+      try {
+        const result = await authService.signIn(email, password);
+
+        if (!result.success || !result.data) {
+          throw result.error || new Error("Sign in failed");
+        }
+
+        // State will be updated by auth state observer
+      } catch (error) {
+        dispatch({ type: "SET_LOADING", payload: false });
+
+        if (error instanceof AuthServiceError) {
+          throw error;
+        }
+
+        throw new Error("Failed to sign in. Please try again.");
+      }
+    },
+    []
+  );
+
+  const signUp = useCallback(
+    async (
+      email: string,
+      password: string,
+      displayName?: string
+    ): Promise<void> => {
+      dispatch({ type: "SET_LOADING", payload: true });
+
+      try {
+        const result = await authService.signUp(email, password, displayName);
+
+        if (!result.success || !result.data) {
+          throw result.error || new Error("Sign up failed");
+        }
+
+        // State will be updated by auth state observer
+      } catch (error) {
+        dispatch({ type: "SET_LOADING", payload: false });
+
+        if (error instanceof AuthServiceError) {
+          throw error;
+        }
+
+        throw new Error("Failed to create account. Please try again.");
+      }
+    },
+    []
+  );
+
+  const signOut = useCallback(async (): Promise<void> => {
     try {
-      const response = await apiClient.getProfile();
+      const result = await authService.signOut();
 
-      console.log("Profile response:", response);
-      if (response.success && response.data) {
-        setUser(response.data.user);
-      } else {
-        setUser(null);
-        apiClient.clearAuth();
+      if (!result.success) {
+        throw result.error || new Error("Sign out failed");
+      }
+
+      dispatch({ type: "SIGN_OUT" });
+    } catch (error) {
+      console.error("Sign out error:", error);
+      // Even if sign out fails, clear local state
+      dispatch({ type: "SIGN_OUT" });
+    }
+  }, []);
+
+  const resetPassword = useCallback(async (email: string): Promise<void> => {
+    try {
+      const result = await authService.resetPassword(email);
+
+      if (!result.success) {
+        throw result.error || new Error("Password reset failed");
       }
     } catch (error) {
-      console.error("Failed to refresh user:", error);
-      setUser(null);
-      apiClient.clearAuth();
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const login = useCallback(async (data: LoginData) => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const response = await apiClient.login(data);
-
-      if (response.success && response.data) {
-        apiClient.setAuthTokens(response.data.tokens);
-        setUser(response.data.user);
-        return { success: true };
-      } else {
-        const errorMessage = response.error?.message || "Login failed";
-        setError(errorMessage);
-        return { success: false, error: errorMessage };
+      if (error instanceof AuthServiceError) {
+        throw error;
       }
-    } catch (error) {
-      const errorMessage = "Network error. Please try again.";
-      setError(errorMessage);
-      return { success: false, error: errorMessage };
-    } finally {
-      setLoading(false);
+
+      throw new Error("Failed to send password reset email. Please try again.");
     }
   }, []);
 
-  const register = useCallback(async (data: RegisterData) => {
-    try {
-      setLoading(true);
-      setError(null);
-      console.log("Registering user with data:", data);
-      const response = await apiClient.register(data);
-      console.log("Register response:", response);
-      if (response.success && response.data) {
-        apiClient.setAuthTokens(response.data.tokens);
-        setUser(response.data.user);
-        return { success: true };
-      } else {
-        const errorMessage = response.error?.message || "Registration failed";
-        setError(errorMessage);
-        return { success: false, error: errorMessage };
+  const updateProfile = useCallback(
+    async (updates: Partial<UserProfile>): Promise<void> => {
+      if (!state.user) {
+        throw new Error("User must be authenticated to update profile");
       }
-    } catch (error) {
-      const errorMessage = "Network error. Please try again.";
-      setError(errorMessage);
-      return { success: false, error: errorMessage };
-    } finally {
-      setLoading(false);
-    }
-  }, []);
 
-  const logout = useCallback(async () => {
+      try {
+        const result = await authService.updateProfile(state.user.uid, updates);
+
+        if (!result.success || !result.data) {
+          throw result.error || new Error("Profile update failed");
+        }
+
+        dispatch({ type: "SET_PROFILE", payload: result.data });
+      } catch (error) {
+        if (error instanceof AuthServiceError) {
+          throw error;
+        }
+
+        throw new Error("Failed to update profile. Please try again.");
+      }
+    },
+    [state.user]
+  );
+
+  const refreshCustomClaims = useCallback(async (): Promise<void> => {
+    if (!state.user) {
+      throw new Error("User must be authenticated to refresh claims");
+    }
+
     try {
-      setLoading(true);
-      await apiClient.logout();
-    } catch (error) {
-      console.error("Logout error:", error);
-    } finally {
-      setUser(null);
-      setLoading(false);
-    }
-  }, []);
+      const result = await authService.refreshCustomClaims(state.user.uid);
 
-  // Initialize auth state
+      if (!result.success) {
+        throw result.error || new Error("Failed to refresh claims");
+      }
+
+      dispatch({ type: "SET_CUSTOM_CLAIMS", payload: result.data || null });
+    } catch (error) {
+      console.error("Failed to refresh custom claims:", error);
+      // Don't throw error for claims refresh failure
+    }
+  }, [state.user]);
+
+  // Setup auth state observer
   useEffect(() => {
-    refreshUser();
-  }, [refreshUser]);
+    const unsubscribe = authService.createAuthStateObserver(
+      (user: AuthUser | null) => {
+        dispatch({
+          type: "AUTH_STATE_CHANGED",
+          payload: { user, isLoading: false },
+        });
+      }
+    );
 
-  const value: AuthContextType = {
-    user,
-    loading,
-    error,
-    login,
-    register,
-    logout,
-    refreshUser,
-    clearError,
-  };
+    return unsubscribe;
+  }, []);
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  // Context value
+  const contextValue: AuthContextValue = useMemo(
+    () => ({
+      ...enhancedState,
+      signIn,
+      signUp,
+      signOut,
+      resetPassword,
+      updateProfile,
+      refreshCustomClaims,
+    }),
+    [
+      enhancedState,
+      signIn,
+      signUp,
+      signOut,
+      resetPassword,
+      updateProfile,
+      refreshCustomClaims,
+    ]
+  );
+
+  return (
+    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
+  );
 }
 
-export function useAuth() {
+/**
+ * Hook to use authentication context
+ * Throws error if used outside of AuthProvider
+ */
+export function useAuth(): AuthContextValue {
   const context = useContext(AuthContext);
-  if (context === undefined) {
+
+  if (!context) {
     throw new Error("useAuth must be used within an AuthProvider");
   }
+
   return context;
+}
+
+/**
+ * Hook to get current user with type safety
+ */
+export function useUser(): AuthUser | null {
+  const { user } = useAuth();
+  return user;
+}
+
+/**
+ * Hook to check if user is authenticated
+ */
+export function useIsAuthenticated(): boolean {
+  const { isAuthenticated } = useAuth();
+  return isAuthenticated;
+}
+
+/**
+ * Hook to check if user has specific role
+ */
+export function useHasRole(roleId: string): boolean {
+  const { hasRole } = useAuth();
+  return hasRole(roleId);
+}
+
+/**
+ * Hook to check if user has specific permission
+ */
+export function useHasPermission(
+  resource: string,
+  action: Permission["action"],
+  scope?: Permission["scope"]
+): boolean {
+  const { hasPermission } = useAuth();
+  return hasPermission(resource, action, scope);
+}
+
+/**
+ * Hook to check if user is admin
+ */
+export function useIsAdmin(): boolean {
+  const { isAdmin } = useAuth();
+  return isAdmin;
 }

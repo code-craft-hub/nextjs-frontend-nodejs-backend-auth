@@ -11,6 +11,7 @@ import { requestLogger } from "./middleware/requestLogger";
 import { createApiResponse } from "./utils/response";
 // import { generalRateLimit } from "./middleware/auth.middleware";
 import { errorHandler, notFoundHandler } from "./middleware/errorHandler";
+import { userRouter } from "./routes/user.routes";
 
 
 const app = express();
@@ -58,6 +59,7 @@ async function startServer(): Promise<void> {
 
     // API routes
     app.use(`/api/${API_VERSION}/auth`, authRoutes);
+    app.use(`/api/user`, userRouter);
 
     // 404 handler
     app.use(notFoundHandler);

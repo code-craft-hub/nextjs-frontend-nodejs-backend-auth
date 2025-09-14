@@ -40,3 +40,6 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 vite-d4a85-firebase-adminsdk-xgrjq-d052dfea8b.json
+
+logs/
+logs/*.log
