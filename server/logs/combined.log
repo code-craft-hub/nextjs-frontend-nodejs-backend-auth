@@ -683,3 +683,9 @@
 {"level":"info","message":"Server running on port 5001","service":"secure-auth-api","timestamp":"2025-09-14T09:42:15.455Z"}
 {"level":"info","message":"API version: v1","service":"secure-auth-api","timestamp":"2025-09-14T09:42:15.455Z"}
 {"level":"info","message":"Environment: development","service":"secure-auth-api","timestamp":"2025-09-14T09:42:15.456Z"}
+{"level":"info","message":"Connected to Redis","service":"secure-auth-api","timestamp":"2025-09-14T09:44:40.508Z"}
+{"level":"info","message":"Database connection established","service":"secure-auth-api","timestamp":"2025-09-14T09:44:44.547Z"}
+{"level":"info","message":"Default roles initialized","service":"secure-auth-api","timestamp":"2025-09-14T09:44:47.341Z"}
+{"level":"info","message":"Server running on port 5001","service":"secure-auth-api","timestamp":"2025-09-14T09:44:47.360Z"}
+{"level":"info","message":"API version: v1","service":"secure-auth-api","timestamp":"2025-09-14T09:44:47.361Z"}
+{"level":"info","message":"Environment: development","service":"secure-auth-api","timestamp":"2025-09-14T09:44:47.362Z"}

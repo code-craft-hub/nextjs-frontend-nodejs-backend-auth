@@ -1,11 +1,12 @@
-import React from 'react'
+import Link from 'next/link';
 
-const HomePage = () => {
+export default function Home() {
   return (
-    <div className=''>
-      Home
+    <div>
+      <h1>Welcome</h1>
+      <Link href="/login">Login</Link>
+      <br />
+      <Link href="/register">Register</Link>
     </div>
-  )
+  );
 }
-
-export default HomePage

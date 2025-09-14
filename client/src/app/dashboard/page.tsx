@@ -1,24 +1,22 @@
-import { ProtectedRoute } from '../../components/ProtectedRoute';
-import { ROUTE_PROTECTIONS } from '../../config/routes';
+import { requireOnboarding } from '@/lib/server-auth';
+import DashboardClient from './dashboard-client';
+import type { Metadata } from 'next';
 
-export default function DashboardPage() {
-  return (
-    <ProtectedRoute protection={ROUTE_PROTECTIONS['/dashboard']}>
-      <div className="min-h-screen bg-gray-50">
-        <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-          <div className="px-4 py-6 sm:px-0">
-            <h1 className="text-3xl font-bold text-gray-900 mb-6">Dashboard</h1>
-            {/* Dashboard content will go here */}
-            <div className="border-4 border-dashed border-gray-200 rounded-lg h-96 flex items-center justify-center">
-              <p className="text-gray-500">Dashboard content placeholder</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </ProtectedRoute>
+export const metadata: Metadata = {
+  title: 'Dashboard - Next.js Firebase Auth',
+  description: 'User dashboard',
+};
+
+export default async function DashboardPage() {
+  const session = await requireOnboarding();
+    return (
+    <DashboardClient 
+      initialUser={{
+        uid: session.uid,
+        email: session.email,
+        emailVerified: session.emailVerified,
+        onboardingComplete: session.onboardingComplete,
+      }}
+    />
   );
 }
-
-
-
-
