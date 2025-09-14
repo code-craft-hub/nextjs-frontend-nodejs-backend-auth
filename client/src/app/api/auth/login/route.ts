@@ -1,6 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { adminAuth } from '@/lib/firebase-admin';
-import { createSessionToken, setSessionCookie, signInWithPassword } from '@/lib/auth-utils';
+import { NextRequest, NextResponse } from "next/server";
+import { adminAuth } from "@/lib/firebase-admin";
+import {
+  createSessionToken,
+  setSessionCookie,
+  signInWithPassword,
+} from "@/lib/auth-utils";
 
 export async function POST(request: NextRequest) {
   try {
@@ -8,17 +12,20 @@ export async function POST(request: NextRequest) {
 
     if (!email || !password) {
       return NextResponse.json(
-        { error: 'Email and password are required' },
+        { error: "Email and password are required" },
         { status: 400 }
       );
     }
 
     // Sign in using Firebase REST API
     const signInResponse = await signInWithPassword(email, password);
-    console.log('signInResponse:', signInResponse);
-    
+    console.log("signInResponse:", signInResponse);
+
     if (signInResponse.error) {
-      return NextResponse.json({ error: signInResponse.error }, { status: 401 });
+      return NextResponse.json(
+        { error: signInResponse.error },
+        { status: 401 }
+      );
     }
 
     // Get user details from Firebase Admin
@@ -39,15 +46,17 @@ export async function POST(request: NextRequest) {
         uid: user.uid,
         email: user.email,
         onboardingComplete: user.customClaims?.onboardingComplete || false,
+        emailVerified: user.emailVerified,
+        customClaims: user.customClaims,
       },
     });
 
     setSessionCookie(response, sessionToken);
     return response;
   } catch (error: any) {
-    console.error('Login error:', error);
+    console.error("Login error:", error);
     return NextResponse.json(
-      { error: error.message || 'Login failed' },
+      { error: error.message || "Login failed" },
       { status: 401 }
     );
   }

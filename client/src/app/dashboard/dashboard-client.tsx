@@ -26,6 +26,7 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
       console.error('Logout failed:', error);
     }
   };
+ 
 
   return (
     <div>

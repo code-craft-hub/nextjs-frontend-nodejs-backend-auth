@@ -27,6 +27,7 @@ export async function middleware(request: NextRequest) {
   if (publicPaths.includes(pathname)) {
     if (session) {
       // Check email verification first
+      console.log("Session found in MIDDLEWARE:", session);
       if (!session.emailVerified) {
         return NextResponse.redirect(new URL(verifyEmailPath, request.url));
       }

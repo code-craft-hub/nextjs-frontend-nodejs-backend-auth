@@ -41,6 +41,7 @@ const authApi = {
       throw new Error(error.error || "Login failed");
     }
 
+    console.log("Response from login API:", response);
     return response.json();
   },
 
@@ -149,6 +150,7 @@ export function useAuth(initialUser?: User) {
     onSuccess: (data) => {
       queryClient.setQueryData(["auth", "user"], { user: data.user });
       // Check email verification first, then onboarding
+      console.log("Login successful in login mutation", data.user);
       if (!data.user.emailVerified) {
         router.push("/verify-email");
       } else if (!data.user.onboardingComplete) {
