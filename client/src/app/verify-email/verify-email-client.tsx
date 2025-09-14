@@ -135,7 +135,7 @@ export default function VerifyEmailClient({ initialUser }: VerifyEmailClientProp
             fontSize: '16px',
             lineHeight: '1.5'
           }}>
-            We've sent a 5-digit verification code to<br />
+            We&apos;ve sent a 5-digit verification code to<br />
             <strong>{currentUser.email}</strong>
           </p>
         </div>
@@ -264,7 +264,7 @@ export default function VerifyEmailClient({ initialUser }: VerifyEmailClientProp
             margin: '0',
             lineHeight: '1.5'
           }}>
-            <strong>💡 Tip:</strong> Check your spam folder if you don't see the email. 
+            <strong>💡 Tip:</strong> Check your spam folder if you don&apos;t see the email. 
             The verification code expires in 10 minutes.
           </p>
         </div>

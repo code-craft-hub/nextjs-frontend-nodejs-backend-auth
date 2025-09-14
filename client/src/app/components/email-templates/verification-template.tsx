@@ -159,7 +159,7 @@ export const EmailVerificationTemplate: React.FC<
                       margin: "30px 0 0 0",
                     }}
                   >
-                    If you didn't create an account with us, you can safely
+                    If you didn&apos;t create an account with us, you can safely
                     ignore this email.
                   </p>
                 </td>
