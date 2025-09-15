@@ -30,6 +30,13 @@ export interface UserProfile {
   preferences: Record<string, unknown>;
 }
 
+export interface User {
+  uid: string;
+  email: string;
+  emailVerified: boolean;
+  onboardingComplete: boolean;
+}
+
 export interface AuthUser extends Omit<FirebaseUser, 'metadata'> {
   profile?: UserProfile;
   customClaims?: Record<string, unknown>;

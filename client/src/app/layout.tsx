@@ -1,15 +1,21 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Providers from "./providers";
 
 export const metadata: Metadata = {
-  title: "Next.js Firebase Auth",
-  description: "Enterprise-grade authentication with Next.js and Firebase",
+  title: "Cver AI - Job document generator",
+  description: "Cver By Falt Technology & codecrafthub",
   manifest: "/manifest.json",
   icons: {
     icon: "/favicon.ico",
     apple: "/apple-touch-icon.png",
   },
   viewport: "width=device-width, initial-scale=1",
+  themeColor: "#000000",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
   themeColor: "#000000",
 };
 

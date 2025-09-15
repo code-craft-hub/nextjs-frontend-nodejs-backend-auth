@@ -1,4 +1,4 @@
-import { EmailVerificationTemplate } from "@/app/components/email-templates/verification-template";
+import { EmailVerificationTemplate } from "@/components/email-templates/verification-template";
 import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
