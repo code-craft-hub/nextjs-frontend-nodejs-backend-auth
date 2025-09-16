@@ -1,16 +1,39 @@
-import { verifySessionToken } from "@/lib/auth-utils";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { UserSession } from "./lib/auth-utils";
+import { jwtVerify } from "jose";
 
+async function verifySessionToken(token: string): Promise<UserSession | null> {
+  try {
+    const secret = new TextEncoder().encode(process.env.JWT_SECRET);
+    const { payload } = await jwtVerify(token, secret, {
+      issuer: "nextjs-app", 
+    });
+
+    console.log("Decoded JWT payload inside middleware:", payload);
+    return {
+      uid: payload.uid as string,
+      email: payload.email as string,
+      emailVerified: payload.emailVerified as boolean,
+      onboardingComplete: payload.onboardingComplete as boolean,
+      customClaims: payload.customClaims as Record<string, any> | undefined,
+    };
+  } catch (err) {
+    console.error("JWT verification failed:", err);
+    return null;
+  }
+}
+
+console.log("MIDDLEWARE LOADED");
 const publicPaths = ["/login", "/register", "/"];
 const protectedPaths = ["/dashboard"];
 const verifyEmailPath = "/verify-email";
 const onboardingPath = "/onboarding";
 
 export async function middleware(request: NextRequest) {
+  console.log("MIDDLEWARE FUNCTION CALLED");
   const { pathname } = request.nextUrl;
 
-  // Skip middleware for API routes, static files, and Next.js internals
   if (
     pathname.startsWith("/api/") ||
     pathname.startsWith("/_next/") ||
@@ -23,6 +46,8 @@ export async function middleware(request: NextRequest) {
   const sessionToken = request.cookies.get("session")?.value;
   const session = sessionToken ? await verifySessionToken(sessionToken) : null;
 
+  console.log("Session Token in MIDDLEWARE:", sessionToken);
+  console.log("Session in MIDDLEWARE:", session);
   // Public paths - redirect authenticated users based on their status
   if (publicPaths.includes(pathname)) {
     if (session) {

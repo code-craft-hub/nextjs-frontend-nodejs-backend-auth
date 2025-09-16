@@ -1,9 +1,10 @@
-// lib/auth-utils.ts
 import { adminAuth } from "./firebase-admin";
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import jwt from "jsonwebtoken";
-
+import { jwtVerify, SignJWT } from "jose";
+const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_ISSUER = "nextjs-app";
+const JWT_EXPIRY = "7d";
 export interface UserSession {
   uid: string;
   email: string;
@@ -16,26 +17,34 @@ export interface UserSession {
 export async function createSessionToken(
   userSession: UserSession
 ): Promise<string> {
-  return jwt.sign(userSession, process.env.JWT_SECRET!, {
-    expiresIn: "7d",
-    issuer: "nextjs-app",
-  });
+   const secret = new TextEncoder().encode(JWT_SECRET);
+
+  return await new SignJWT({ ...userSession })
+    .setProtectedHeader({ alg: "HS256" })
+    .setIssuedAt()
+    .setExpirationTime(JWT_EXPIRY)
+    .setIssuer(JWT_ISSUER)
+    .sign(secret);
 }
 
 // Verify session token
-export async function verifySessionToken(
-  token: string
-): Promise<UserSession | null> {
+export async function verifySessionToken(token: string): Promise<UserSession | null> {
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as UserSession;
+    const secret = new TextEncoder().encode(process.env.JWT_SECRET);
+
+    const { payload } = await jwtVerify(token, secret, {
+      issuer: JWT_ISSUER,
+    });
+
     return {
-      uid: decoded.uid,
-      email: decoded.email,
-      emailVerified: decoded.emailVerified,
-      onboardingComplete: decoded.onboardingComplete,
-      customClaims: decoded.customClaims,
+      uid: payload.uid as string,
+      email: payload.email as string,
+      emailVerified: payload.emailVerified as boolean,
+      onboardingComplete: payload.onboardingComplete as boolean,
+      customClaims: payload.customClaims as Record<string, any> | undefined,
     };
-  } catch {
+  } catch (err) {
+    console.error("JWT verification failed:", err);
     return null;
   }
 }
@@ -68,6 +77,8 @@ export async function getSessionFromRequest(
 // Get session from cookies (for server components)
 export async function getSessionFromCookies(): Promise<UserSession | null> {
   const cookieStore = await cookies();
+  console.log("COOKIES IN THE REQUEST : ", cookieStore, cookieStore.get("session"));
+
   const sessionToken = cookieStore.get("session")?.value;
   if (!sessionToken) return null;
   return verifySessionToken(sessionToken);
@@ -97,7 +108,6 @@ export async function updateUserClaims(
   await adminAuth.setCustomUserClaims(uid, claims);
 }
 
-// Sign in with password using Firebase REST API
 export async function signInWithPassword(email: string, password: string) {
   const response = await fetch(
     `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${process.env.NEXT_PUBLIC_FIREBASE_API_KEY}`,
@@ -119,8 +129,6 @@ export async function signInWithPassword(email: string, password: string) {
 
   return response.json();
 }
-
-
 
 // Mark email as verified in Firebase
 export async function markEmailAsVerified(uid: string) {

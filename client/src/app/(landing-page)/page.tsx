@@ -1,0 +1,37 @@
+import React, { Suspense } from "react";
+import LandingPageClient from "./LandingPageClient";
+import { getQueryClient } from "@/lib/query-client";
+import { getServerSession } from "@/lib/server-auth";
+import { getCurrentUser } from "@/lib/firebase/api.firebase";
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
+
+const LandingPage = async () => {
+  async function prefetchUserData() {
+    const queryClient = getQueryClient();
+    const user = await getServerSession();
+  
+    console.log("User in layout:", user);
+    const userPromise = queryClient.prefetchQuery({
+      queryKey: ["getCurrentUser"],
+      queryFn: () => getCurrentUser(user),
+      staleTime: 5 * 60 * 1000, // 5 minutes
+    });
+  
+    userPromise.catch(console.error);
+  
+    return queryClient;
+  }
+  
+  const queryClient = await prefetchUserData();
+  return (
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <div className="dashboard-layout">
+        <Suspense fallback={<div>Loading ...</div>}>
+          <LandingPageClient />
+        </Suspense>
+      </div>
+    </HydrationBoundary>
+  );
+};
+
+export default LandingPage;

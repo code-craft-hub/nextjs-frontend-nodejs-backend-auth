@@ -1,23 +1,23 @@
-import type { Metadata, Viewport } from "next";
+// import type { Metadata, Viewport } from "next";
 import Providers from "./providers";
 
-export const metadata: Metadata = {
-  title: "Cver AI - Job document generator",
-  description: "Cver By Falt Technology & codecrafthub",
-  manifest: "/manifest.json",
-  icons: {
-    icon: "/favicon.ico",
-    apple: "/apple-touch-icon.png",
-  },
-  viewport: "width=device-width, initial-scale=1",
-  themeColor: "#000000",
-};
+// export const metadata: Metadata = {
+//   title: "Cver AI - Job document generator",
+//   description: "Cver By Falt Technology & codecrafthub",
+//   manifest: "/manifest.json",
+//   icons: {
+//     icon: "/favicon.ico",
+//     apple: "/apple-touch-icon.png",
+//   },
+//   viewport: "width=device-width, initial-scale=1",
+//   themeColor: "#000000",
+// };
 
-export const viewport: Viewport = {
-  width: "device-width",
-  initialScale: 1,
-  themeColor: "#000000",
-};
+// export const viewport: Viewport = {
+//   width: "device-width",
+//   initialScale: 1,
+//   themeColor: "#000000",
+// };
 
 export default function RootLayout({
   children,

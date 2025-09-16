@@ -1,5 +1,6 @@
 "use client";
 
+import authClient from "@/lib/axios/auth-api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
@@ -30,19 +31,17 @@ interface AuthResponse {
 // Auth API functions
 const authApi = {
   login: async (email: string, password: string): Promise<AuthResponse> => {
-    const response = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
+    try {
+      const { data } = await authClient.post("/auth/login", {
+        email,
+        password,
+      });
 
-    if (!response.ok) {
-      const error = await response.json();
+      console.log("response : ", data);
+      return data;
+    } catch (error: any) {
       throw new Error(error.error || "Login failed");
     }
-
-    console.log("Response from login API:", response);
-    return response.json();
   },
 
   register: async (
@@ -50,79 +49,66 @@ const authApi = {
     password: string,
     name?: string
   ): Promise<AuthResponse> => {
-    const response = await fetch("/api/auth/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password, name }),
-    });
+    try {
+      const { data } = await authClient.post("/auth/register", {
+        email,
+        password,
+        name,
+      });
 
-    if (!response.ok) {
-      const error = await response.json();
+      return data;
+    } catch (error: any) {
       throw new Error(error.error || "Registration failed");
     }
-
-    return response.json();
   },
 
   logout: async (): Promise<{ success: boolean }> => {
-    const response = await fetch("/api/auth/logout", {
-      method: "POST",
-    });
-    return response.json();
+    try {
+      const { data } = await authClient("/auth/logout");
+      return data;
+    } catch (error: any) {
+      throw new Error(error.error || "Logout failed");
+    }
   },
 
   getUser: async (): Promise<{ user: User }> => {
-    const response = await fetch("/api/auth/me");
-
-    if (!response.ok) {
-      throw new Error("Not authenticated");
+    try {
+      const { data } = await authClient.get("/auth/profile");
+      return data;
+    } catch (error: any) {
+      throw new Error(error.error || "Login failed");
     }
-
-    return response.json();
   },
 
   sendVerificationEmail: async (): Promise<{
     success: boolean;
     message: string;
   }> => {
-    const response = await fetch("/api/auth/send-verification", {
-      method: "POST",
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || "Failed to send verification email");
+    try {
+      const { data } = await authClient.post("/auth/send-verification");
+      return data;
+    } catch (error: any) {
+      throw new Error(error.error || "Login failed");
     }
-
-    return response.json();
   },
 
   verifyEmail: async (code: string): Promise<AuthResponse> => {
-    const response = await fetch("/api/auth/verify-email", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ code }),
-    });
+    try {
+      const { data } = await authClient.post("/auth/verify-email", { code });
 
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || "Email verification failed");
+      return data;
+    } catch (error: any) {
+      throw new Error(error.error || "Login failed");
     }
-
-    return response.json();
   },
 
   completeOnboarding: async (): Promise<AuthResponse> => {
-    const response = await fetch("/api/auth/complete-onboarding", {
-      method: "POST",
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || "Failed to complete onboarding");
+    try {
+      const { data } = await authClient.post("/auth/complete-onboarding");
+      return data;
+    } catch (error: any) {
+      throw new Error(error.error || "Login failed");
     }
-
-    return response.json();
   },
 };
 

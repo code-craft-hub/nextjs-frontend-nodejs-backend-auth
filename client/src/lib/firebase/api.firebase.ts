@@ -206,7 +206,6 @@ export async function signOutAccount() {
 
 export async function getCurrentUser(user: any) {
   const email = user?.email;
-  console.log("user email in getCurrentUser", email, user);
   try {
     if (!email) return null;
 
