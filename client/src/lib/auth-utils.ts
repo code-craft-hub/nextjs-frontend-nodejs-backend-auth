@@ -77,8 +77,6 @@ export async function getSessionFromRequest(
 // Get session from cookies (for server components)
 export async function getSessionFromCookies(): Promise<UserSession | null> {
   const cookieStore = await cookies();
-  console.log("COOKIES IN THE REQUEST : ", cookieStore, cookieStore.get("session"));
-
   const sessionToken = cookieStore.get("session")?.value;
   if (!sessionToken) return null;
   return verifySessionToken(sessionToken);

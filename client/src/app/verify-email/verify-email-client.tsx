@@ -39,13 +39,17 @@ export default function VerifyEmailClient({
     }
   }, [timeLeft]);
 
+  useEffect(() => {
+    sendVerificationCode()
+  }, []);
+
   const sendVerificationCode = async () => {
     setIsSending(true);
     setError("");
     setSuccess("");
 
     try {
-      const { data } = await authClient.post("/auth/send-verification");
+      const { data } = await authClient.post("/send-verification");
 
       console.log("sendVerificationCode response:", data);
 
@@ -76,7 +80,7 @@ export default function VerifyEmailClient({
     setError("");
 
     try {
-      const { data } = await authClient.post("/auth/verify-email", { code });
+      const { data } = await authClient.post("/verify-email", { code });
 
       console.log("verifyCode response:", data);
       window.location.href = "/onboarding";

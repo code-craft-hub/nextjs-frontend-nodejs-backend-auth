@@ -1,8 +1,10 @@
 "use client";
 
+import { CreateUserSchema } from "@/app/(auth)/register/register-client";
 import authClient from "@/lib/axios/auth-api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 interface User {
   uid: string;
@@ -32,7 +34,7 @@ interface AuthResponse {
 const authApi = {
   login: async (email: string, password: string): Promise<AuthResponse> => {
     try {
-      const { data } = await authClient.post("/auth/login", {
+      const { data } = await authClient.post("/login", {
         email,
         password,
       });
@@ -44,27 +46,23 @@ const authApi = {
     }
   },
 
-  register: async (
-    email: string,
-    password: string,
-    name?: string
-  ): Promise<AuthResponse> => {
+  register: async (user: CreateUserSchema): Promise<AuthResponse> => {
     try {
-      const { data } = await authClient.post("/auth/register", {
-        email,
-        password,
-        name,
-      });
+      console.log("USER IN REGISTER FUNCTION : ", user);
+      const { data } = await authClient.post("/register", user);
+      toast.success("Registration successful! Please verify your email.");
 
       return data;
     } catch (error: any) {
-      throw new Error(error.error || "Registration failed");
+      console.log("ERROR IN REGISTER FUNCTION : ", error);
+      toast.error(error?.response?.data?.error || "Registration failed");
+      throw new Error(error?.response.data.error || "Registration failed");
     }
   },
 
   logout: async (): Promise<{ success: boolean }> => {
     try {
-      const { data } = await authClient("/auth/logout");
+      const { data } = await authClient("/logout");
       return data;
     } catch (error: any) {
       throw new Error(error.error || "Logout failed");
@@ -73,7 +71,7 @@ const authApi = {
 
   getUser: async (): Promise<{ user: User }> => {
     try {
-      const { data } = await authClient.get("/auth/profile");
+      const { data } = await authClient.get("/profile");
       return data;
     } catch (error: any) {
       throw new Error(error.error || "Login failed");
@@ -85,7 +83,7 @@ const authApi = {
     message: string;
   }> => {
     try {
-      const { data } = await authClient.post("/auth/send-verification");
+      const { data } = await authClient.post("/send-verification");
       return data;
     } catch (error: any) {
       throw new Error(error.error || "Login failed");
@@ -94,7 +92,7 @@ const authApi = {
 
   verifyEmail: async (code: string): Promise<AuthResponse> => {
     try {
-      const { data } = await authClient.post("/auth/verify-email", { code });
+      const { data } = await authClient.post("/verify-email", { code });
 
       return data;
     } catch (error: any) {
@@ -104,7 +102,7 @@ const authApi = {
 
   completeOnboarding: async (): Promise<AuthResponse> => {
     try {
-      const { data } = await authClient.post("/auth/complete-onboarding");
+      const { data } = await authClient.post("/complete-onboarding");
       return data;
     } catch (error: any) {
       throw new Error(error.error || "Login failed");
@@ -152,24 +150,16 @@ export function useAuth(initialUser?: User) {
 
   // Register mutation
   const registerMutation = useMutation({
-    mutationFn: ({
-      email,
-      password,
-      name,
-    }: {
-      email: string;
-      password: string;
-      name?: string;
-    }) => authApi.register(email, password, name),
+    mutationFn: (user: CreateUserSchema) => authApi.register(user),
     onSuccess: (data) => {
       queryClient.setQueryData(["auth", "user"], { user: data.user });
-      // New users need to verify email first
       router.push("/verify-email");
     },
     onError: (error) => {
       console.error("Registration failed:", error.message);
     },
   });
+
 
   // Send verification email mutation
   const sendVerificationMutation = useMutation({
@@ -229,7 +219,7 @@ export function useAuth(initialUser?: User) {
     isLogoutLoading: logoutMutation.isPending,
     isOnboardingLoading: completeOnboardingMutation.isPending,
     loginError: loginMutation.error?.message,
-    registerError: registerMutation.error?.message,
+    registerError: registerMutation.error,
     verificationError: sendVerificationMutation.error?.message,
     verifyEmailError: verifyEmailMutation.error?.message,
   };

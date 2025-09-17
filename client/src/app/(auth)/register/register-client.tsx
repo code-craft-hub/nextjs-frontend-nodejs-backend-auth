@@ -1,59 +1,134 @@
-'use client';
-
-import { useState } from 'react';
-import { useAuth } from '@/hooks/use-auth';
-import Link from 'next/link';
+"use client";
+import { useAuth } from "@/hooks/use-auth";
+import Link from "next/link";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { registerUserSchema, RegisterUserSchema } from "@/lib/schema-validations";
 
 export default function RegisterClient() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
-  const { register, isRegisterLoading, registerError } = useAuth();
+  const { register, isRegisterLoading } = useAuth();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      await register({ email, password, name });
-    } catch (error) {
-      console.error('Registration failed:', error);
-    }
+  const form = useForm<RegisterUserSchema>({
+    resolver: zodResolver(registerUserSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+      firstName: "",
+      lastName: "",
+      phoneNumber: "",
+    },
+  });
+
+  const onSubmit = async (values: RegisterUserSchema) => {
+    await register(values);
   };
 
   return (
     <div>
       <h1>Register</h1>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          placeholder="Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          autoComplete="name"
-        />
-        <br />
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          autoComplete="email"
-        />
-        <br />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          autoComplete="new-password"
-        />
-        <br />
-        <button type="submit" disabled={isRegisterLoading}>
-          {isRegisterLoading ? 'Creating account...' : 'Register'}
-        </button>
-      </form>
-      {registerError && <p className='text-red-400'>{registerError}</p>}
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <FormField
+            control={form.control}
+            name="firstName"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>FirstName</FormLabel>
+                <FormControl>
+                  <Input
+                    disabled={isRegisterLoading}
+                    placeholder="John"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="lastName"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>LastName</FormLabel>
+                <FormControl>
+                  <Input
+                    disabled={isRegisterLoading}
+                    placeholder="lastName"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="phoneNumber"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>PhoneNumber</FormLabel>
+                <FormControl>
+                  <Input
+                    disabled={isRegisterLoading}
+                    placeholder="+2349071234567"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />{" "}
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input
+                    disabled={isRegisterLoading}
+                    placeholder="john@gmail.com"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Password</FormLabel>
+                <FormControl>
+                  <Input
+                    disabled={isRegisterLoading}
+                    type="password"
+                    placeholder="************"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button disabled={isRegisterLoading} type="submit">
+            Submit
+          </Button>
+        </form>
+      </Form>
       <p>
         Already have an account? <Link href="/login">Login</Link>
       </p>

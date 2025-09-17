@@ -1,6 +1,6 @@
 // import type { Metadata, Viewport } from "next";
 import Providers from "./providers";
-
+import "./globals.css";
 // export const metadata: Metadata = {
 //   title: "Cver AI - Job document generator",
 //   description: "Cver By Falt Technology & codecrafthub",
@@ -25,7 +25,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning={true}>
       <head>
         <link rel="preconnect" href="https://identitytoolkit.googleapis.com" />
         <link

@@ -1,53 +1,86 @@
-'use client';
+"use client";
+import { Input } from "@/components/ui/input";
+import { useAuth } from "@/hooks/use-auth";
+import Link from "next/link";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { LoginSchema, loginSchema } from "@/lib/schema-validations";
 
-import { useState } from 'react';
-import { useAuth } from '@/hooks/use-auth';
-import Link from 'next/link';
+export const LoginClient = () => {
+  const { login, isLoginLoading } = useAuth();
 
-export default function LoginClient() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const { login, isLoginLoading, loginError } = useAuth();
+  const form = useForm<LoginSchema>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      await login({ email, password });
-    } catch (error) {
-      console.error('Login failed:', error);
-    }
+  const onSubmit = async (values: LoginSchema) => {
+    await login(values);
   };
 
   return (
     <div>
-      <h1>Login</h1>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          autoComplete="email"
-        />
-        <br />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          autoComplete="current-password"
-        />
-        <br />
-        <button type="submit" disabled={isLoginLoading}>
-          {isLoginLoading ? 'Logging in...' : 'Login'}
-        </button>
-      </form>
-      {loginError && <p className='text-red-400'>{loginError}</p>}
-      <p>
-        Don&apos;t have an account? <Link href="/register">Register</Link>
-      </p>
+      <h1>Register</h1>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input
+                    disabled={isLoginLoading}
+                    placeholder="john@gmail.com"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Password</FormLabel>
+                <FormControl>
+                  <Input
+                    disabled={isLoginLoading}
+                    type="password"
+                    placeholder="************"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button disabled={isLoginLoading} type="submit">
+            Submit
+          </Button>
+        </form>
+      </Form>
+      <div className="mt-4 text-center text-sm">
+        Don&apos;t have an account?{" "}
+        <Link href="/register" className="underline underline-offset-4">
+          Sign Up
+        </Link>
+      </div>
     </div>
   );
-}
+};

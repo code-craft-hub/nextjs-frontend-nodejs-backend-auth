@@ -10,9 +10,6 @@ import {
 import { addDays } from "date-fns";
 import { DocumentData } from "firebase/firestore";
 
-export interface FirestoreDocument extends DocumentData {
-  id: string;
-}
 
 import { auth, db } from "./index";
 import { googleLogout } from "@react-oauth/google";
@@ -44,6 +41,10 @@ import {
 import { createdAt, parseUntilObjectOrArray } from "../utils/helpers";
 import { create } from "zustand";
 import { EachUserT } from "@/types";
+
+export interface FirestoreDocument extends DocumentData {
+  id: string;
+}
 
 interface JobState<T extends FirestoreDocument> {
   jobs: T[];
@@ -78,7 +79,7 @@ export async function createUserAccount(user: signUpT) {
           provider: user.provider,
           expiryTime: addDays(new Date(), 1),
           firestoreProfileImage: "",
-          dataSource: [], // leave this as an empty array, don't add quotes inside the empty array pls
+          dataSource: [], 
           firstName: user.firstName || "",
           lastName: user.lastName || "",
           coverLetterHistory: [],
