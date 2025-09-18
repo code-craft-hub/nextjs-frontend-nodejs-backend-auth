@@ -38,7 +38,7 @@ import { moreJobInfo, userDocDefaultInfo } from "@/constants/jobs-data";
 import { Textarea } from "../ui/textarea";
 import { useRouter } from "next/navigation";
 import { ScrollArea } from "../ui/scroll-area";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/hooks/use-auth";
 
 const descSchema = z.object({
   desc: z.string().min(2, {
@@ -47,8 +47,7 @@ const descSchema = z.object({
 });
 
 const SelectJobDescription = () => {
-  const {user} = useAuth();
-  const { data: dbUser } = useGetCurrentUser(user);
+  const {user:dbUser} = useAuth();
   const router = useRouter();
   const [jobDialog, setJobDialog] = useState(false);
   const [_moreDialog, setMoreDialog] = useState(false);

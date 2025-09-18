@@ -1,7 +1,8 @@
 "use client";
 
-import { CreateUserSchema } from "@/app/(auth)/register/register-client";
 import authClient from "@/lib/axios/auth-api";
+import { RegisterUserSchema } from "@/lib/schema-validations";
+import { IUser } from "@/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -18,12 +19,7 @@ interface AuthResponse {
   user: User;
 }
 
-interface User {
-  uid: string;
-  email: string;
-  emailVerified: boolean;
-  onboardingComplete: boolean;
-}
+
 
 interface AuthResponse {
   success: boolean;
@@ -46,7 +42,7 @@ const authApi = {
     }
   },
 
-  register: async (user: CreateUserSchema): Promise<AuthResponse> => {
+  register: async (user: RegisterUserSchema): Promise<AuthResponse> => {
     try {
       console.log("USER IN REGISTER FUNCTION : ", user);
       const { data } = await authClient.post("/register", user);
@@ -62,19 +58,20 @@ const authApi = {
 
   logout: async (): Promise<{ success: boolean }> => {
     try {
-      const { data } = await authClient("/logout");
+      const { data } = await authClient.post("/logout");
       return data;
     } catch (error: any) {
       throw new Error(error.error || "Logout failed");
     }
   },
 
-  getUser: async (): Promise<{ user: User }> => {
+  getUser: async (): Promise< IUser> => {
     try {
       const { data } = await authClient.get("/profile");
+      console.log("GET USER DATA : ", data);
       return data;
     } catch (error: any) {
-      throw new Error(error.error || "Login failed");
+      throw new Error("Failed to fetch user data:", error.error || "Fetch failed");
     }
   },
 
@@ -114,7 +111,6 @@ export function useAuth(initialUser?: User) {
   const router = useRouter();
   const queryClient = useQueryClient();
 
-  // Get current user with optional initial data
   const {
     data: user,
     isLoading,
@@ -124,7 +120,7 @@ export function useAuth(initialUser?: User) {
     queryFn: authApi.getUser,
     retry: false,
     staleTime: 1000 * 60 * 5, // 5 minutes
-    initialData: initialUser ? { user: initialUser } : undefined,
+    initialData: initialUser ?? undefined,
   });
 
   // Login mutation
@@ -150,7 +146,7 @@ export function useAuth(initialUser?: User) {
 
   // Register mutation
   const registerMutation = useMutation({
-    mutationFn: (user: CreateUserSchema) => authApi.register(user),
+    mutationFn: (user: RegisterUserSchema) => authApi.register(user),
     onSuccess: (data) => {
       queryClient.setQueryData(["auth", "user"], { user: data.user });
       router.push("/verify-email");
@@ -202,9 +198,9 @@ export function useAuth(initialUser?: User) {
   });
 
   return {
-    user: user?.user,
+    user,
     isLoading,
-    isAuthenticated: !!user?.user,
+    isAuthenticated: !!user,
     error,
     login: loginMutation.mutateAsync,
     register: registerMutation.mutateAsync,

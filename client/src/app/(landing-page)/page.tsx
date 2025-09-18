@@ -2,8 +2,8 @@ import React, { Suspense } from "react";
 import LandingPageClient from "./LandingPageClient";
 import { getQueryClient } from "@/lib/query-client";
 import { getServerSession } from "@/lib/server-auth";
-import { getCurrentUser } from "@/lib/firebase/api.firebase";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
+import { getUser } from "@/lib/server-fetch.utils";
 
 const LandingPage = async () => {
   async function prefetchUserData() {
@@ -13,7 +13,7 @@ const LandingPage = async () => {
     console.log("User in layout:", user);
     const userPromise = queryClient.prefetchQuery({
       queryKey: ["getCurrentUser"],
-      queryFn: () => getCurrentUser(user),
+      queryFn: () => getUser(),
       staleTime: 5 * 60 * 1000, // 5 minutes
     });
   

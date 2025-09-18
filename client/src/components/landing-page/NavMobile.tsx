@@ -11,14 +11,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/hooks/use-auth";
 
 const NavMobile = () => {
   const router = useRouter();
   const { user } = useAuth();
-  const email = user?.email;
   const [position, setPosition] = useState("top");
-
+  console.log("USER IN NAV MOBILE : ", user);
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -63,7 +62,8 @@ const NavMobile = () => {
             })}
           </div>
           <div className="w-full p-4">
-            {email ? (
+            {}
+            {!!user ? (
               <Button
                 onClick={() => {
                   router.push("/dashboard");

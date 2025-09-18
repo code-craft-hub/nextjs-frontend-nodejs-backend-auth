@@ -1,16 +1,10 @@
-'use client';
+"use client";
 
-import { useAuth } from '@/hooks/use-auth';
-
-interface User {
-  uid: string;
-  email: string;
-  emailVerified: boolean;
-  onboardingComplete: boolean;
-}
+import { useAuth } from "@/hooks/use-auth";
+import { IUser } from "@/types";
 
 interface DashboardClientProps {
-  initialUser: User;
+  initialUser: IUser;
 }
 
 export default function DashboardClient({ initialUser }: DashboardClientProps) {
@@ -23,19 +17,19 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
     try {
       await logout();
     } catch (error) {
-      console.error('Logout failed:', error);
+      console.error("Logout failed:", error);
     }
   };
- 
 
   return (
     <div>
       <h1>Dashboard</h1>
       <p>Welcome, {currentUser.email}!</p>
       <p>UID: {currentUser.uid}</p>
-      <p>Email Verified: {currentUser.emailVerified ? 'Yes' : 'No'}</p>
+      {JSON.stringify(currentUser)}
+      <p>Email Verified: {currentUser.emailVerified ? "Yes" : "No"}</p>
       <button onClick={handleLogout} disabled={isLogoutLoading}>
-        {isLogoutLoading ? 'Logging out...' : 'Logout'}
+        {isLogoutLoading ? "Logging out..." : "Logout"}
       </button>
     </div>
   );

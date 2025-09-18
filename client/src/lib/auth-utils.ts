@@ -61,9 +61,9 @@ export function setSessionCookie(response: NextResponse, sessionToken: string) {
 }
 
 // Clear session cookie
-export function clearSessionCookie(response: NextResponse) {
-  response.cookies.delete("session");
-}
+// export function clearSessionCookie(response: NextResponse) {
+//   response.cookies.delete("session");
+// }
 
 // Get session from request (for API routes)
 export async function getSessionFromRequest(

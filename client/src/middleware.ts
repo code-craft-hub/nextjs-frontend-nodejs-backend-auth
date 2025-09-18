@@ -7,7 +7,7 @@ async function verifySessionToken(token: string): Promise<UserSession | null> {
   try {
     const secret = new TextEncoder().encode(process.env.JWT_SECRET);
     const { payload } = await jwtVerify(token, secret, {
-      issuer: "nextjs-app", 
+      issuer: "nextjs-app",
     });
 
     console.log("Decoded JWT payload inside middleware:", payload);
@@ -25,7 +25,7 @@ async function verifySessionToken(token: string): Promise<UserSession | null> {
 }
 
 console.log("MIDDLEWARE LOADED");
-const publicPaths = ["/login", "/register", "/"];
+const publicPaths = ["/login", "/register"];
 const protectedPaths = ["/dashboard"];
 const verifyEmailPath = "/verify-email";
 const onboardingPath = "/onboarding";
@@ -48,6 +48,11 @@ export async function middleware(request: NextRequest) {
 
   console.log("Session Token in MIDDLEWARE:", sessionToken);
   console.log("Session in MIDDLEWARE:", session);
+
+  if (pathname === "/") {
+    return NextResponse.next();
+  }
+
   // Public paths - redirect authenticated users based on their status
   if (publicPaths.includes(pathname)) {
     if (session) {

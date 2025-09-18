@@ -5,7 +5,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useEffect, useRef } from "react";
-import { DBUserT } from "@/types";
 import { v4 as uuid } from "uuid";
 
 import "swiper/css/pagination";
@@ -13,10 +12,10 @@ import Typewriter from "typewriter-effect";
 import { toast } from "sonner";
 import FeaturesJob from "./FeaturesJob";
 import { Textarea } from "../ui/textarea";
-import { useGetCurrentUser } from "@/lib/queries";
 import SelectJobDescription from "./SeleteJobDescription";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/hooks/use-auth";
+import { IUser } from "@/types";
 
 const FormSchema = z.object({
   profileDescription: z
@@ -26,16 +25,15 @@ const FormSchema = z.object({
 
 type FormSchemaType = z.infer<typeof FormSchema>;
 const Hero = () => {
-  const {user} = useAuth();
-  const { data: dbUser } = useGetCurrentUser(user);
+  const { user: dbUser } = useAuth();
   const selectedProfileRef = useRef<string>("");
   const dataSrcRef = useRef<any>("");
-  const dataRef = useRef<DBUserT>({});
+  const dataRef = useRef<IUser>({});
 
   useEffect(() => {
     try {
-      selectedProfileRef.current = dbUser?.dataSource[0]?.data;
-      dataSrcRef.current = dbUser?.dataSource[0];
+      selectedProfileRef.current = dbUser?.dataSource?.[0]?.data ?? "";
+      dataSrcRef.current = dbUser?.dataSource?.[0];
       dataRef.current = dbUser!;
     } catch (error) {
       console.error(error);
@@ -52,14 +50,17 @@ const Hero = () => {
   } = useForm<FormSchemaType>({
     resolver: zodResolver(FormSchema),
   });
-  const email = user?.email;
+  const email = dbUser?.email;
   const onSubmit = async (data: FormSchemaType) => {
     if (!email) {
       router.push("/sign-in");
       return;
     }
     localStorage?.removeItem("hasResumeAPICalled");
-    if (dbUser?.credit === 0 || dbUser?.credit <= 0) {
+    if (
+      typeof dbUser?.credit === "number" &&
+      (dbUser.credit === 0 || dbUser.credit <= 0)
+    ) {
       toast.error("You've used up your create. Top up here.");
       setTimeout(() => {
         router.push("/dashboard/credit");
