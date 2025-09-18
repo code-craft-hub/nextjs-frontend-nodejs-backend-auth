@@ -46,7 +46,7 @@ import {
 import { collection, getDocs, limit, query } from "firebase/firestore";
 import { db } from "../firebase/index";
 import { fetchArticles, healthCheck } from "../api/queries";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/hooks/use-auth";
 import { User } from "firebase/auth";
 import { queryClient } from "./QueryProvider";
 
@@ -350,7 +350,7 @@ export const useAllPaidUser = () => {
     queryKey: [QUERY_KEYS.GET_ALL_PAID_USER],
     queryFn: allPaidUser,
     enabled: false,
-    staleTime: Infinity,
+    // staleTime: Infinity,
   });
 };
 export const useAllUsersByDate = (range: { from: Date; to: Date } | null) => {
@@ -360,7 +360,7 @@ export const useAllUsersByDate = (range: { from: Date; to: Date } | null) => {
       if (!range) return [];
       return await allUsersByDate(range);
     },
-    staleTime: Infinity,
+    // staleTime: Infinity,
   });
 };
 
@@ -415,7 +415,7 @@ export const getBlogPostWithRelatedQuery = (id: string) => {
     queryKey: ["getBlogPostWithRelated", id],
     queryFn: () => getBlogPostWithRelated(id),
     enabled: !!id,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    // staleTime: 5 * 60 * 1000, // 5 minutes
     retry: 1, // Only retry once on failure
   });
 };

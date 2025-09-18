@@ -14,10 +14,9 @@ import { useGetCurrentUser, useSignOutAccount } from "@/lib/queries";
 import { useRouter } from "next/navigation";
 import { contextUser } from "@/lib/utils/constants";
 import { menuItems } from "@/constants/jobs-data";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/hooks/use-auth";
 export default function AvatarComponent() {
-  const { user } = useAuth();
-  const { data: dbUser } = useGetCurrentUser(user);
+  const { user:dbUser } = useAuth();
   const router = useRouter();
   const { mutateAsync: signOutAccount } = useSignOutAccount();
   const signOut = async () => {
@@ -30,7 +29,7 @@ export default function AvatarComponent() {
       console.error(error);
     }
   };
-  const email = user?.email;
+  const email = dbUser?.email;
   const adminEmail = ["onlinehassle1234@gmail.com", "odafe25@gmail.com"];
   const Email = email?.split("@");
   const firstName = dbUser?.firstName?.substring(0, 1);

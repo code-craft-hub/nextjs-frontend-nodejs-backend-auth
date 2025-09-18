@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ModeToggle } from "../ui/toggle-theme";
 
-const Footer = () => {
+export const Footer = () => {
   const router = useRouter();
 
   return (
@@ -121,5 +121,3 @@ const Footer = () => {
     </footer>
   );
 };
-
-export default Footer;

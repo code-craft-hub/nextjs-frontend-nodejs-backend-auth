@@ -28,7 +28,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/hooks/use-auth";
 
 const Action = ({
   documentType,
@@ -38,7 +38,7 @@ const Action = ({
   documentIndex,
 }: ActionProps) => {
   const navigate = useNavigate();
-const {user} = useAuth();
+  const { user:dbUser } = useAuth();
   const [deleteActionDialog, setDeleteActionDialog] = useState(false);
   const handleDeleteActionDialog = () => {
     setDeleteActionDialog(!deleteActionDialog);
@@ -51,7 +51,6 @@ const {user} = useAuth();
   const { mutateAsync: QMutation } = useQuestions();
   const { mutateAsync: CLMutation } = useCoverLetter();
   const { mutateAsync: CVMutation } = UseCV();
-  const { data: dbUser } = useGetCurrentUser(user);
   const deletePro = async () => {
     try {
       setAlertActionDialog(true);

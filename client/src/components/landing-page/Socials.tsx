@@ -6,16 +6,15 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useGetCurrentUser, useSignOutAccount } from "@/lib/queries";
+import { useSignOutAccount } from "@/lib/queries";
 import Link from "next/link";
 import { Button } from "../ui/button";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/hooks/use-auth";
 
 const Socials = () => {
-  const { user } = useAuth();
+  const { user:dbUser } = useAuth();
   const { mutate: signOutAccount } = useSignOutAccount();
-  const { data: dbUser } = useGetCurrentUser(user);
   const handleLogout = async () => {
     try {
       signOutAccount();

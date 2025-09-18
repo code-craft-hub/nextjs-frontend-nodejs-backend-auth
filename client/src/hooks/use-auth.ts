@@ -119,8 +119,10 @@ export function useAuth(initialUser?: User) {
     queryKey: ["auth", "user"],
     queryFn: authApi.getUser,
     retry: false,
-    staleTime: 1000 * 60 * 5, // 5 minutes
-    initialData: initialUser ?? undefined,
+    staleTime: 1000 * 60 * 60 * 5, // 5 minutes
+    gcTime: 1000 * 60 * 60 * 5, // 5 minutes
+    refetchOnWindowFocus: false,
+    initialData: initialUser || undefined,
   });
 
   // Login mutation

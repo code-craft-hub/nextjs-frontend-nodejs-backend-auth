@@ -34,8 +34,8 @@ export function useUserProfileQuery(uid?: string): UseQueryResult<UserProfile | 
       return result;
     },
     enabled: !!uid,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000, // 10 minutes
+    // staleTime: 5 * 60 * 1000, // 5 minutes
+    // gcTime: 10 * 60 * 1000, // 10 minutes
     retry: (failureCount, error) => {
       // Don't retry on authentication errors
       if (error instanceof AuthServiceError && error.code.includes('AUTH')) {
@@ -60,8 +60,8 @@ export function useCustomClaimsQuery(uid?: string): UseQueryResult<Record<string
       return result.success ? result.data || {} : {};
     },
     enabled: !!uid,
-    staleTime: 2 * 60 * 1000, // 2 minutes
-    gcTime: 5 * 60 * 1000, // 5 minutes
+    // staleTime: 2 * 60 * 1000, // 2 minutes
+    // gcTime: 5 * 60 * 1000, // 5 minutes
     retry: 1,
   });
 }
@@ -340,7 +340,7 @@ export function usePrefetchUserData() {
         const result = await authService.getUserProfile(uid);
         return result;
       },
-      staleTime: 5 * 60 * 1000,
+      // staleTime: 5 * 60 * 1000,
     });
   };
 
@@ -353,7 +353,7 @@ export function usePrefetchUserData() {
         const result = await authService.refreshCustomClaims(uid);
         return result.success ? result.data || {} : {};
       },
-      staleTime: 2 * 60 * 1000,
+      // staleTime: 2 * 60 * 1000,
     });
   };
 

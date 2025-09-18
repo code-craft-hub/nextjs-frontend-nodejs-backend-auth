@@ -23,15 +23,13 @@ import {
 import { useUserLocation } from "@/hooks/get-user-location";
 import { ThemeToggle } from "./mode-toggle-navbar";
 import { useRouter } from "next/navigation";
-import { useGetCurrentUser } from "@/lib/queries";
 import { signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase/index";
 import { useGetPageUrl } from "@/hooks/use-page-url";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/hooks/use-auth";
 
 export const UserMenu = () => {
-  const {user} = useAuth();
-  const { data: dbUser } = useGetCurrentUser(user);
+  const { user:dbUser } = useAuth();
   console.log("dbUser in user menu", dbUser);
   const { country, flag } = useUserLocation();
   const router = useRouter();
@@ -111,7 +109,7 @@ export const UserMenu = () => {
           <button className="flex">
             <Avatar className="size-10">
               <AvatarImage src={dbUser?.photoURL as string} alt="@avatar" />
-              <AvatarFallback>{dbUser?.firstName.charAt(0)}</AvatarFallback>
+              <AvatarFallback>{dbUser?.firstName?.charAt(0)}</AvatarFallback>
             </Avatar>
             <div className="max-w-[100px] overflow-hidden">
               <div className="text-nowrap font-bold text-sm text-left w-full overflow-hidden max-w-[100px]">
@@ -136,7 +134,7 @@ export const UserMenu = () => {
             <div className="flex items-center gap-3  p-4">
               <Avatar className="size-10">
                 <AvatarImage src={dbUser?.photoURL as string} alt="@avatar" />
-                <AvatarFallback>{dbUser?.firstName.charAt(0)}</AvatarFallback>
+                <AvatarFallback>{dbUser?.firstName?.charAt(0)}</AvatarFallback>
               </Avatar>
               <div className="flex-1">
                 <div className="flex items-center gap-2 max-w-[190px] overflow-hidden">

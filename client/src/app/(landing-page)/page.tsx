@@ -14,7 +14,7 @@ const LandingPage = async () => {
     const userPromise = queryClient.prefetchQuery({
       queryKey: ["getCurrentUser"],
       queryFn: () => getUser(),
-      staleTime: 5 * 60 * 1000, // 5 minutes
+      // staleTime: 5 * 60 * 1000, // 5 minutes
     });
   
     userPromise.catch(console.error);
