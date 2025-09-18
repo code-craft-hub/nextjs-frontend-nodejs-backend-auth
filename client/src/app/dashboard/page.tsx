@@ -1,5 +1,5 @@
 import { requireOnboarding } from '@/lib/server-auth';
-import DashboardClient from './dashboard-client';
+import {DashboardClient} from './dashboard-client';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {

@@ -4,26 +4,21 @@ import { useState } from "react";
 import ReactGA from "react-ga4";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { VscChecklist } from "react-icons/vsc";
-import { useCreditInfo } from "@/lib/queries";
-import { dashboardSliderContent } from "@/constants/jobs-data";
-import { contextUser } from "@/lib/utils/constants";
-import { useQueryClient } from "@tanstack/react-query";
-import { auth } from "@/lib/firebase";
+import { dashboardSliderContent, IDashboardSliderContent } from "@/constants/jobs-data";
 import { useAuth } from "@/hooks/use-auth";
 import HorizontalCardSlider from "./components/HorizontalCardSlider";
 import { AreaChartComponent } from "./components/chart/AreaChartComponent";
 import Activities from "./components/Activities";
 
-export default function Dashboard() {
+export const DashboardClient = () => {
   const { user: dbUser, isLoading } = useAuth();
-  const queryClient = useQueryClient();
-  queryClient.clear();
-  auth.signOut();
-  const { mutateAsync: creditUpdateMutation } = useCreditInfo();
-
-  console.log("dbUser in dashboard", dbUser);
-  // TODO: Replace with context user data
-
+  const [userResumes] = useState<IDashboardSliderContent>([
+    ...dashboardSliderContent,
+  ]);
+  const AllDocs = dbUser?.CV?.concat(
+    dbUser?.coverLetterHistory,
+    dbUser?.questions
+  );
   useEffect(() => {
     ReactGA.send({
       hitType: "pageview",
@@ -36,41 +31,6 @@ export default function Dashboard() {
       label: "Dashboard page view",
     });
   }, []);
-
-  const [userResumes, setUserResumes] = useState<userDocProps[]>([
-    ...dashboardSliderContent,
-  ]);
-  const adminEmail = ["odafe25@gmail.com"];
-
-  useEffect(() => {
-    if (adminEmail?.includes(dbUser?.email!)) {
-      if (dbUser && dbUser.credit < 1000) {
-        const updateAdminCredit = async () =>
-          await creditUpdateMutation({
-            credits: 10000,
-            expiryTime: new Date().toString().split("T")[0],
-          });
-        updateAdminCredit();
-      }
-    }
-  }, [dbUser]);
-  useEffect(() => {
-    setUserResumes((prev) => [
-      { ...prev[0], total: dbUser?.CV?.length ?? prev[0].total },
-      {
-        ...prev[1],
-        total: dbUser?.coverLetterHistory?.length ?? prev[1].total,
-      },
-      { ...prev[2], total: dbUser?.questions?.length ?? prev[2].total },
-    ]);
-  }, [dbUser]);
-
-  const AllDocs = dbUser?.CV.concat(
-    dbUser?.coverLetterHistory,
-    dbUser?.questions
-  );
-  const emailName = dbUser?.email?.split("@");
-
   return (
     <>
       <div key="showHiddenContent" className="overflow-x-hidden grid">
@@ -99,13 +59,7 @@ export default function Dashboard() {
         </a>
         <div className="p-4 sm:p-8">
           <span className="text-3xl font-bold break-all line-clamp-1">
-            Hello{" "}
-            {dbUser?.firstName ||
-              contextUser.firstName ||
-              contextUser.lastName ||
-              dbUser?.lastName ||
-              (emailName && emailName[0])}
-            !
+            Hello dbUser?.firstName || dbUser?.lastName
           </span>
           <p className="sm:text-xl ">
             Here is a quick overview of your activity.
@@ -121,4 +75,4 @@ export default function Dashboard() {
       </div>
     </>
   );
-}
+};

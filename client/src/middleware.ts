@@ -31,12 +31,13 @@ const verifyEmailPath = "/verify-email";
 const onboardingPath = "/onboarding";
 
 export async function middleware(request: NextRequest) {
-  console.log("MIDDLEWARE FUNCTION CALLED");
   const { pathname } = request.nextUrl;
+  console.log("MIDDLEWARE FUNCTION CALLED", pathname);
 
   if (
     pathname.startsWith("/api/") ||
     pathname.startsWith("/_next/") ||
+    pathname.startsWith("/assets/") ||
     pathname.includes(".") ||
     pathname.startsWith("/favicon")
   ) {
@@ -102,6 +103,7 @@ export async function middleware(request: NextRequest) {
 
   // Protected paths
   if (protectedPaths.some((path) => pathname.startsWith(path))) {
+    console.log("Accessing protected path:", pathname, protectedPaths);
     if (!session) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
@@ -114,9 +116,9 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Default: allow access
+  console.log("All checks passed, allowing access to:", pathname);
   return NextResponse.next();
 }
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico|assets).*)"],
 };

@@ -38,6 +38,7 @@ const authApi = {
       console.log("response : ", data);
       return data;
     } catch (error: any) {
+      console.log("ERROR IN LOGIN FUNCTION : ", error);
       throw new Error(error.error || "Login failed");
     }
   },
@@ -133,6 +134,7 @@ export function useAuth(initialUser?: User) {
       queryClient.setQueryData(["auth", "user"], { user: data.user });
       // Check email verification first, then onboarding
       console.log("Login successful in login mutation", data.user);
+      toast.success("Login successful!");
       if (!data.user.emailVerified) {
         router.push("/verify-email");
       } else if (!data.user.onboardingComplete) {
@@ -142,7 +144,8 @@ export function useAuth(initialUser?: User) {
       }
     },
     onError: (error) => {
-      console.error("Login failed:", error.message);
+      toast.error("Login failed. Please check your credentials.");
+      console.error("Login failed:", error);
     },
   });
 

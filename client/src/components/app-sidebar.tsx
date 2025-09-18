@@ -23,65 +23,67 @@ import { VscCreditCard } from "react-icons/vsc";
 import { CgFileDocument } from "react-icons/cg";
 import { BiHome } from "react-icons/bi";
 import { LuFileQuestion } from "react-icons/lu";
+import { useAuth } from "@/hooks/use-auth";
 
-const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-  teams: [
-    {
-      name: "Cver AI",
-      logo: GalleryVerticalEnd,
-      plan: "Enterprise",
-    },
-  ],
-  menus: [
-    {
-      title: "Dashboard",
-      icon: BiHome,
-      link: "/dashboard",
-    },
-    {
-      title: "My Resumes",
-      icon: CgFileDocument,
-      link: "/dashboard/resumes",
-    },
-    {
-      title: "My Cover Letters",
-      icon: IoDocumentTextOutline,
-      link: "/dashboard/cover-letters",
-    },
-    {
-      title: "My Interview Questions",
-      icon: LuFileQuestion,
-      link: "/dashboard/interview-questions",
-    },
-    {
-      title: "Job Listings",
-      icon: Briefcase,
-      link: "/dashboard/job-listings",
-    },
-    {
-      title: "Profiles",
-      icon: FaUser,
-      link: "/dashboard/profile",
-    },
-    {
-      title: "Credits",
-      icon: VscCreditCard,
-      link: "/dashboard/credit",
-    },
-    {
-      title: "Account",
-      icon: MdManageAccounts,
-      link: "/dashboard/account",
-    },
-  ],
-};
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const {user} = useAuth();
+  const data = {
+    user: {
+      name: user?.firstName ?? "",
+      email: user?.email ?? "",
+      avatar: user?.photoURL ?? "",
+    },
+    teams: [
+      {
+        name: "Cver AI",
+        logo: GalleryVerticalEnd,
+        plan: "Enterprise",
+      },
+    ],
+    menus: [
+      {
+        title: "Dashboard",
+        icon: BiHome,
+        link: "/dashboard",
+      },
+      {
+        title: "My Resumes",
+        icon: CgFileDocument,
+        link: "/dashboard/resumes",
+      },
+      {
+        title: "My Cover Letters",
+        icon: IoDocumentTextOutline,
+        link: "/dashboard/cover-letters",
+      },
+      {
+        title: "My Interview Questions",
+        icon: LuFileQuestion,
+        link: "/dashboard/interview-questions",
+      },
+      {
+        title: "Job Listings",
+        icon: Briefcase,
+        link: "/dashboard/job-listings",
+      },
+      {
+        title: "Profiles",
+        icon: FaUser,
+        link: "/dashboard/profile",
+      },
+      {
+        title: "Credits",
+        icon: VscCreditCard,
+        link: "/dashboard/credit",
+      },
+      {
+        title: "Account",
+        icon: MdManageAccounts,
+        link: "/dashboard/account",
+      },
+    ],
+  };
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>

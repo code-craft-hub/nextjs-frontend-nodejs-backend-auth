@@ -1,4 +1,3 @@
-import { NewResumeTemplate } from "@/types";
 import { CgFileDocument } from "react-icons/cg";
 import { IoSettingsOutline, IoBriefcaseOutline } from "react-icons/io5";
 import { LayoutDashboard, LogOut, Database } from "lucide-react";
@@ -229,6 +228,8 @@ export const dashboardSliderContent = [
     link: "/dashboard/question",
   },
 ];
+
+export type IDashboardSliderContent = typeof dashboardSliderContent;
 
 export const menuItems = [
   {
