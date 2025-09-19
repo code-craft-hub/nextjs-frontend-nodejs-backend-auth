@@ -4,7 +4,7 @@ import { ResumeId } from './components/ResumeId'
 const ResumeIdPage = () => {
   return (
     <div>
-      <ResumeId />
+     <ResumeTemplate />
     </div>
   )
 }

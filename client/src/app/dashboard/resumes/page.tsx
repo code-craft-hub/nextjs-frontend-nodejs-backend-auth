@@ -1,12 +1,10 @@
 import React from 'react'
-// import Resume from './components/Resume'
-import { ResumeDetailPage } from './generate/page'
+import Resume from './components/Resume'
 
 const ResumePage = () => {
   return (
     <div>
-      {/* <Resume /> */}
-      <ResumeDetailPage />
+      <Resume />
     </div>
   )
 }

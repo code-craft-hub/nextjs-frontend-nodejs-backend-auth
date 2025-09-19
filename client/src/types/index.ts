@@ -65,6 +65,158 @@ export interface IDataSource  {
   key: string;
   genTableId: string;
 };
+
+
+
+export interface ResumeSection {
+  type:
+    | "profile"
+    | "education"
+    | "workExperience"
+    | "certifications"
+    | "projects"
+    | "skills";
+  content: string;
+  isComplete: boolean;
+  isStreaming: boolean;
+  error?: string;
+}
+
+export interface StreamEvent {
+  type:
+    | "sectionStarted"
+    | "sectionContent"
+    | "sectionCompleted"
+    | "sectionError"
+    | "generationComplete"
+    | "error";
+  section?: string;
+  content?: string;
+  fullContent?: string;
+  error?: string;
+  sections?: Record<string, string>;
+  timestamp: string;
+}
+
+
+
+
+
+export const intialData = {
+    profile: {
+      type: "profile",
+      content: "",
+      isComplete: false,
+      isStreaming: false,
+    },
+    education: {
+      type: "education",
+      content: "",
+      isComplete: false,
+      isStreaming: false,
+    },
+    workExperience: {
+      type: "workExperience",
+      content: "",
+      isComplete: false,
+      isStreaming: false,
+    },
+    certifications: {
+      type: "certifications",
+      content: "",
+      isComplete: false,
+      isStreaming: false,
+    },
+    projects: {
+      type: "projects",
+      content: "",
+      isComplete: false,
+      isStreaming: false,
+    },
+    skills: {
+      type: "skills",
+      content: "",
+      isComplete: false,
+      isStreaming: false,
+    },
+  }
+
+
+
+
+
+
+  // Sample data - replace with your form inputs
+  export const sampleUserProfile = {
+    name: "John Doe",
+    email: "john.doe@email.com",
+    phone: "+1-555-0123",
+    location: "San Francisco, CA",
+    linkedIn: "linkedin.com/in/johndoe",
+    github: "github.com/johndoe",
+    currentRole: "Full Stack Developer",
+    yearsOfExperience: 5,
+    skills: ["JavaScript", "React", "Node.js", "Python", "AWS", "Docker"],
+    education: [
+      {
+        degree: "Bachelor of Science in Computer Science",
+        institution: "University of California, Berkeley",
+        year: "2019",
+        gpa: "3.8",
+      },
+    ],
+    workExperience: [
+      {
+        title: "Senior Software Engineer",
+        company: "Tech Innovations Inc.",
+        duration: "2022 - Present",
+        description:
+          "Led development of microservices architecture, improved system performance by 40%",
+      },
+    ],
+    projects: [
+      {
+        name: "E-commerce Platform",
+        description:
+          "Built a full-stack e-commerce platform using React, Node.js, and MongoDB",
+        technologies: ["React", "Node.js", "MongoDB", "Stripe API"],
+      },
+    ],
+    certifications: [
+      {
+        name: "AWS Solutions Architect",
+        issuer: "Amazon Web Services",
+        date: "2023",
+      },
+    ],
+  };
+
+  export const sampleJobDescription = {
+    title: "Senior Full Stack Developer",
+    company: "Innovative Tech Solutions",
+    requirements: [
+      "5+ years of experience in full-stack development",
+      "Proficiency in React, Node.js, and modern JavaScript",
+      "Experience with cloud platforms (AWS preferred)",
+      "Strong understanding of RESTful APIs and microservices",
+      "Bachelor's degree in Computer Science or related field",
+    ],
+    responsibilities: [
+      "Lead development of scalable web applications",
+      "Collaborate with cross-functional teams",
+      "Mentor junior developers",
+      "Drive technical decision-making",
+    ],
+    preferredSkills: ["Docker", "Kubernetes", "GraphQL", "TypeScript"],
+    experience: "5+ years",
+    education: "Bachelor's degree preferred",
+    industry: "Technology",
+  };
+
+
+  
+
+
 // import { LucideIcon } from "lucide-react";
 // import { IconType } from "react-icons";
 // import { z } from "zod";

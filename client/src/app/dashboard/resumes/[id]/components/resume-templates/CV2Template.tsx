@@ -94,7 +94,6 @@ export default function CV2Template({
             </div>
           ))}
       </section>
-
       <section>
         <h2 className="text-3xl font-bold border-b border-gray-300 pb-1 mb-2 font-ebGaramond">
           Skills

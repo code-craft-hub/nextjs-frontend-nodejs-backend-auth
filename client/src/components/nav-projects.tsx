@@ -9,8 +9,8 @@ import {
 import { IconType } from "react-icons";
 import Link from "next/link";
 import { LucideIcon } from "lucide-react";
-import { useGetPageUrl } from "@/hooks/use-page-url";
 import { cn } from "@/lib/utils";
+import { usePathname } from "next/navigation";
 
 export function NavProjects({
   projects,
@@ -21,7 +21,9 @@ export function NavProjects({
     icon: LucideIcon | IconType;
   }[];
 }) {
-  const pathname = useGetPageUrl()?.pathname;
+
+  const pathname = usePathname()
+  
   // const { isMobile } = useSidebar();
 
   const activeLink = (link: string) => {
@@ -44,7 +46,6 @@ export function NavProjects({
                 <item.icon />
                 <span>
                   {item.title}
-                  {/* {JSON.stringify(pathname)} {item.link}{" "} */}
                 </span>
               </Link>
             </SidebarMenuButton>
