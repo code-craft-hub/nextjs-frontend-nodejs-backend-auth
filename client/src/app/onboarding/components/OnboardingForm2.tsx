@@ -18,6 +18,8 @@ import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import { FileUpload } from "./file-upload";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useAuth } from "@/hooks/use-auth";
+import { toast } from "sonner";
 
 const formSchema = z.object({
   scratch: z.boolean().default(false).optional(),
@@ -40,14 +42,8 @@ const ACCEPTED_FILE_TYPES = [
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 ];
 
-export const OnBoardingForm2 = ({
-  onNext,
-  onPrev,
-}: any) => {
-  const handleStartOnboarding = () => {
-    console.log("Starting onboarding...");
-    onNext();
-  };
+export const OnBoardingForm2 = ({ onNext, onPrev }: any) => {
+  const { updateUser, isUpdatingUserLoading, user } = useAuth();
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -57,8 +53,22 @@ export const OnBoardingForm2 = ({
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     console.log("Form submitted:", values);
+    const { resume, ...rest } = values;
+    try {
+      await updateUser(rest);
+      toast.success(`${user?.firstName} Your data has be saved!`);
+      onNext();
+    } catch (error) {
+      toast.error(`${user?.firstName} please try again.`);
+      toast("Skip this process", {
+        action: {
+          label: "Skip",
+          onClick: () => () => onNext(),
+        },
+      });
+    }
   }
 
   const tabs = [
@@ -85,11 +95,13 @@ export const OnBoardingForm2 = ({
   ];
 
   return (
-     <motion.div
-    initial={{ opacity: 0, x: 100 }}
-    animate={{ opacity: 1, x: 0 }}
-    exit={{ opacity: 0, x: -100 }}
-    transition={{ duration: 0.3, ease: "easeInOut" }} className="min-h-screen flex flex-col font-poppins">
+    <motion.div
+      initial={{ opacity: 0, x: 100 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -100 }}
+      transition={{ duration: 0.3, ease: "easeInOut" }}
+      className="min-h-screen flex flex-col font-poppins"
+    >
       <div
         className="h-32 w-full fixed"
         style={{
@@ -138,7 +150,10 @@ export const OnBoardingForm2 = ({
             </div>
 
             <Form {...form}>
-              <div className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
+              <form
+                className="space-y-6"
+                onSubmit={form.handleSubmit(onSubmit)}
+              >
                 <FormField
                   control={form.control}
                   name="resume"
@@ -181,14 +196,22 @@ export const OnBoardingForm2 = ({
                 />
 
                 <div className="flex gap-4">
-                  <Button type="button" variant={"outline"} onClick={() => onPrev()}>
+                  <Button
+                    type="button"
+                    variant={"outline"}
+                    onClick={() => onPrev()}
+                  >
                     Previous
                   </Button>
-                  <Button type="button" className="" onClick={handleStartOnboarding}>
-                    Save and Continue
+                  <Button
+                    type="submit"
+                    disabled={isUpdatingUserLoading}
+                    className=""
+                  >
+                    {isUpdatingUserLoading ? "Saving..." : "Save and Continue"}{" "}
                   </Button>
                 </div>
-              </div>
+              </form>
             </Form>
           </div>
         </div>

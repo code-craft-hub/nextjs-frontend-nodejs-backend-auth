@@ -7,13 +7,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
-// interface User {
-//   uid: string;
-//   email: string;
-//   emailVerified: boolean;
-//   role?: string;
-//   onboardingComplete: boolean;
-// }
+
 
 interface AuthResponse {
   success: boolean;
@@ -108,9 +102,9 @@ const authApi = {
       throw new Error(error.error || "Login failed");
     }
   },
-  updateUser: async (): Promise<AuthResponse> => {
+  updateUser: async (input: any): Promise<AuthResponse> => {
     try {
-      const { data } = await authClient.post("/update");
+      const { data } = await authClient.put("/update", input);
       return data;
     } catch (error: any) {
       throw new Error(error.error || "Updating user failed");
@@ -135,7 +129,14 @@ export function useAuth(initialUser?: IUser) {
     refetchOnWindowFocus: false,
     initialData: initialUser || undefined,
   });
-
+  
+  const updateUserMutation = useMutation({
+    mutationFn: (data: any) => authApi.updateUser(data),
+    onSuccess: (data) => {
+      queryClient.setQueryData(["auth", "user"], { user: data.user });
+      // router.push("/dashboard");
+    },
+  });
   // Login mutation
   const loginMutation = useMutation({
     mutationFn: ({ email, password }: { email: string; password: string }) =>
@@ -212,13 +213,6 @@ export function useAuth(initialUser?: IUser) {
   });
 
   // Update user information
-  const updateUserMutation = useMutation({
-    mutationFn: authApi.updateUser,
-    onSuccess: (data) => {
-      queryClient.setQueryData(["auth", "user"], { user: data.user });
-      router.push("/dashboard");
-    },
-  });
 
   return {
     user,

@@ -20,6 +20,8 @@ import { useId, useState } from "react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Input } from "@/components/ui/input";
 import { FloatingLabelInputProps } from "@/types";
+import { useAuth } from "@/hooks/use-auth";
+import { toast } from "sonner";
 const formSchema = z.object({
   type: z
     .enum(["linkedin", "instagram", "tiktok", "google", "friend", "whatsapp"])
@@ -30,10 +32,7 @@ const formSchema = z.object({
 });
 
 export const OnBoardingForm5 = ({ onNext, onPrev }: any) => {
-  const handleStartOnboarding = () => {
-    console.log("Starting onboarding...");
-    onNext();
-  };
+  const { updateUser, isUpdatingUserLoading, user } = useAuth();
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -87,6 +86,7 @@ export const OnBoardingForm5 = ({ onNext, onPrev }: any) => {
         <div className="relative">
           <Input
             id={actualId}
+            disabled={isUpdatingUserLoading}
             className={`
               h-12 pt-4 pb-2 px-3 pr-${showPasswordToggle ? "12" : "3"}
               transition-colors duration-200 font-poppins
@@ -102,8 +102,21 @@ export const OnBoardingForm5 = ({ onNext, onPrev }: any) => {
       </div>
     );
   }
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     console.log("Form submitted:", values);
+    try {
+      await updateUser(values);
+      toast.success(`${user?.firstName} Your data has be saved!`);
+      onNext();
+    } catch (error) {
+      toast.error(`${user?.firstName} please try again.`);
+      toast("Skip this process", {
+        action: {
+          label: "Skip",
+          onClick: () => () => onNext(),
+        },
+      });
+    }
   }
 
   return (
@@ -148,7 +161,10 @@ export const OnBoardingForm5 = ({ onNext, onPrev }: any) => {
             </div>
 
             <Form {...form}>
-              <div className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
+              <form
+                className="space-y-6"
+                onSubmit={form.handleSubmit(onSubmit)}
+              >
                 <FormField
                   control={form.control}
                   name="type"
@@ -287,14 +303,14 @@ export const OnBoardingForm5 = ({ onNext, onPrev }: any) => {
                     Previous
                   </Button>
                   <Button
-                    type="button"
+                    type="submit"
+                    disabled={isUpdatingUserLoading}
                     className=""
-                    onClick={handleStartOnboarding}
                   >
-                    Save and Continue
+                    {isUpdatingUserLoading ? "Saving..." : "Save and Continue"}{" "}
                   </Button>
                 </div>
-              </div>
+              </form>
             </Form>
           </div>
         </div>

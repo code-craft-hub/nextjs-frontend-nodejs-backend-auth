@@ -26,6 +26,8 @@ import { Input } from "@/components/ui/input";
 import { FloatingLabelInputProps } from "@/types";
 import { Checkbox } from "@/components/ui/checkbox";
 import { motion } from "framer-motion";
+import { useAuth } from "@/hooks/use-auth";
+import { toast } from "sonner";
 
 const formSchema = z.object({
   partTime: z.boolean().default(false).optional(),
@@ -39,14 +41,8 @@ const formSchema = z.object({
   role: z.string(),
 });
 
-export const OnBoardingForm3 = ({
-  onNext,
-  onPrev,
-}: any) => {
-  const handleStartOnboarding = () => {
-    console.log("Starting onboarding...");
-    onNext();
-  };
+export const OnBoardingForm3 = ({ onNext, onPrev }: any) => {
+  const { updateUser, isUpdatingUserLoading, user } = useAuth();
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -108,6 +104,7 @@ export const OnBoardingForm3 = ({
         <div className="relative">
           <Input
             id={actualId}
+            disabled={isUpdatingUserLoading}
             className={`
               h-12 pt-4 pb-2 px-3 pr-${showPasswordToggle ? "12" : "3"}
               transition-colors duration-200 font-poppins
@@ -123,8 +120,21 @@ export const OnBoardingForm3 = ({
       </div>
     );
   }
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     console.log("Form submitted:", values);
+    try {
+      await updateUser(values);
+      toast.success(`${user?.firstName} Your data has be saved!`);
+      onNext();
+    } catch (error) {
+      toast.error(`${user?.firstName} please try again.`);
+      toast("Skip this process", {
+        action: {
+          label: "Skip",
+          onClick: () => () => onNext(),
+        },
+      });
+    }
   }
 
   const tabs = [
@@ -160,10 +170,12 @@ export const OnBoardingForm3 = ({
   ];
   return (
     <motion.div
-    initial={{ opacity: 0, x: 100 }}
-    animate={{ opacity: 1, x: 0 }}
-    exit={{ opacity: 0, x: -100 }}
-    transition={{ duration: 0.3, ease: "easeInOut" }} className="min-h-screen flex flex-col font-poppins">
+      initial={{ opacity: 0, x: 100 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -100 }}
+      transition={{ duration: 0.3, ease: "easeInOut" }}
+      className="min-h-screen flex flex-col font-poppins"
+    >
       <div
         className="h-32 w-full fixed"
         style={{
@@ -212,7 +224,7 @@ export const OnBoardingForm3 = ({
             </div>
 
             <Form {...form}>
-              <div className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
+              <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
                 <div className="space-y-4">
                   <h1>Job Type</h1>
                   <div className="grid grid-cols-2 gap-4">
@@ -464,14 +476,22 @@ export const OnBoardingForm3 = ({
                 </div>
 
                 <div className="flex gap-4">
-                  <Button type="button" variant={"outline"} onClick={() => onPrev()}>
+                  <Button
+                    type="button"
+                    variant={"outline"}
+                    onClick={() => onPrev()}
+                  >
                     Previous
                   </Button>
-                  <Button type="button" className="" onClick={handleStartOnboarding}>
-                    Save and Continue
+                  <Button
+                    type="submit"
+                    disabled={isUpdatingUserLoading}
+                    className=""
+                  >
+                    {isUpdatingUserLoading ? "Saving..." : "Save and Continue"}{" "}
                   </Button>
                 </div>
-              </div>
+              </form>
             </Form>
           </div>
         </div>
