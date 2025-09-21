@@ -66,10 +66,10 @@ export const EditResume = () => {
   const router = useRouter();
   //* STATES
   const [switchEdCard, setSwitchEdCard] = useState<boolean>(true);
-  let workIDRef = useRef<number | string | undefined>(undefined);
-  let EduIDRef = useRef<number | string | undefined>(undefined);
-  let EduDeleteIDRef = useRef<number | string | undefined>(undefined);
-  let workDeleteIDRef = useRef<number | string | undefined>(undefined);
+  const workIDRef = useRef<number | string | undefined>(undefined);
+  const EduIDRef = useRef<number | string | undefined>(undefined);
+  const EduDeleteIDRef = useRef<number | string | undefined>(undefined);
+  const workDeleteIDRef = useRef<number | string | undefined>(undefined);
   const [switchExpCard, setSwitchExpCard] = useState<boolean>(true);
   const {
     register: experienceRegister,

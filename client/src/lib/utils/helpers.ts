@@ -201,7 +201,7 @@ export const parseDate = (newDate: any) => {
     "Nov",
     "Dec",
   ];
-  var myDate = new Date(newDate),
+  const myDate = new Date(newDate),
     month = myDate.getMonth(),
     year = myDate.getFullYear();
   const formattedDate = `${months[month]}, ${" "}  ${year}`;
@@ -555,13 +555,13 @@ export const QARegex = (data: QAprops) => {
   // Improved regex pattern
   if (data === undefined) return;
   if ("object" === typeof data) return;
-  let regex =
+  const regex =
     /(Q(\s*)?(\d*)?(\s*)?:\s*[^A]*?|A(\s*)?(\d*)?(\s*)?[^Q]*?)(?=(Q(\s*)?(\d*)?(\s*)?:|A(\s*)?(\d*)?(\s*)?:|$))/gs;
   // let regex = /(Q\d+:\s*[^A]*?|A\d+:\s*[^Q]*?)(?=(Q\d+:|A\d+:|$))/gs;
-  let matches = [...data?.matchAll(regex)];
+  const matches = [...data?.matchAll(regex)];
 
   const matchesFound = matches?.map((match, index) => {
-    let [key, ...value] = match[0].split(":");
+    const [key, ...value] = match[0].split(":");
     return { id: index, [key.trim()]: value.join(":").trim() };
   });
 
@@ -575,7 +575,7 @@ export const removeSpaceUnderscore = (data: string) => {
 export const stripeSpecialCharacters = (text?: string) => {
   if (text === undefined) return;
   const regTest = /[a-zA-Z\s]+/g;
-  let result = text?.match(regTest)?.join(" ").trim();
+  const result = text?.match(regTest)?.join(" ").trim();
   return result as string;
 };
 

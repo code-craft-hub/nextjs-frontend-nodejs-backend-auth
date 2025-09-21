@@ -1,9 +1,8 @@
 "use client";
 
 import { useEffect } from "react";
-import { useAuth } from "@/hooks/use-auth";
 import authClient from "@/lib/axios/auth-api";
-import { useState, useId, JSX } from "react";
+import { useState, useId } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -18,16 +17,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Eye, EyeOff } from "lucide-react";
 import { FloatingLabelInputProps } from "@/types";
-interface User {
-  uid: string;
-  email: string;
-  emailVerified: boolean;
-  onboardingComplete: boolean;
-}
 
-interface VerifyEmailClientProps {
-  initialUser: User;
-}
+
 
 
 
@@ -35,21 +26,17 @@ const formSchema = z.object({
   code: z.string({ message: "Please enter a valid verification code." }),
 });
 
-export default function VerifyEmailClient({
-  initialUser,
-}: VerifyEmailClientProps) {
-  const [code, setCode] = useState("");
-  const [isVerifying, setIsVerifying] = useState(false);
+export default function VerifyEmailClient() {
+  const [_code, setCode] = useState("");
+  const [_isVerifying, setIsVerifying] = useState(false);
   const [isSending, setIsSending] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  const [_error, setError] = useState("");
+  const [_success, setSuccess] = useState("");
   const [completedEmailVerification, setCompletedEmailVerification] =
     useState(false);
   const [canResend, setCanResend] = useState(true);
   const [timeLeft, setTimeLeft] = useState(0);
 
-  const { user } = useAuth();
-  const currentUser = user || initialUser;
 
   function FloatingLabelInput({
     id,
@@ -74,7 +61,7 @@ export default function VerifyEmailClient({
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const code = formatCode(e.target.value);
+     formatCode(e.target.value);
       setHasValue(e.target.value.length > 0);
       props.onChange?.(e);
     };
@@ -129,28 +116,7 @@ export default function VerifyEmailClient({
     );
   }
 
-  // Social Login Button Component
-  function SocialButton({
-    icon,
-    className = "",
-    provider,
-  }: {
-    icon: JSX.Element;
-    className?: string;
-    provider: string;
-  }) {
-    console.log(provider);
-    return (
-      <Button
-        type="button"
-        variant="outline"
-        className={`h-12 flex items-center justify-center border-gray-300 hover:bg-gray-50 transition-colors ${className}`}
-      >
-        {icon}
-      </Button>
-    );
-  }
-
+ 
   // Countdown timer for resend
   useEffect(() => {
     if (timeLeft > 0) {
@@ -190,28 +156,6 @@ export default function VerifyEmailClient({
     }
   };
 
-  const verifyCode = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!code || code.length !== 5) {
-      setError("Please enter the 5-digit verification code");
-      return;
-    }
-
-    setIsVerifying(true);
-    setError("");
-
-    try {
-      const { data } = await authClient.post("/verify-email", { code });
-
-      console.log("verifyCode response:", data);
-      window.location.href = "/onboarding";
-    } catch (error: any) {
-      setError(error.message);
-    } finally {
-      setIsVerifying(false);
-    }
-  };
 
   const formatCode = (value: string) => {
     // Only allow digits and limit to 5 characters

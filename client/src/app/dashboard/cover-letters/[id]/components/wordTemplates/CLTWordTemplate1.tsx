@@ -14,7 +14,7 @@ export const CLTWordTemplate1 = ({
   const handleDownload = async () => {
     const parser = new DOMParser();
     const parsedDoc = parser.parseFromString(allData?.data!, "text/html");
-    let processedData = parsedDoc.body.textContent!;
+    const processedData = parsedDoc.body.textContent!;
     const paragraphs = processedData.split(
       /(?<=\.\s)\n|\.\s{2,}(?=\S)|(?<=\.\s)(?=[A-Z])/g
     );

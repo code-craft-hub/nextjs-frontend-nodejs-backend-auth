@@ -224,7 +224,7 @@ export default function AllResume() {
   const [DataToDelete, setDataToDelete] = useState<any>();
 
   const [selectedValue, setSelectedValue] = useState<any>();
-  const selectedProfileRef = useRef<String>("");
+  const selectedProfileRef = useRef<string>("");
   const dataSrcRef = useRef<any>(undefined);
   const [imgDialog, setImgDialog] = useState(false);
   const handleImgDialog = () => {
@@ -362,8 +362,8 @@ export default function AllResume() {
         "characters entered can't be consecutive. E.g ssssssssssssssss"
       );
 
-    let dataSrc = selectedProfileRef.current;
-    let dataSrcObject = dataSrcRef.current;
+    const dataSrc = selectedProfileRef.current;
+    const dataSrcObject = dataSrcRef.current;
     if (
       dataSrc == undefined ||
       dataSrc == "undefined" ||

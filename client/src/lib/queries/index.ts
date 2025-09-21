@@ -37,16 +37,13 @@ import {
   IUpdateUser,
   IUpdateUserProfile,
   NewResumeTemplate,
-  userDetailsT,
-  signUpT,
-  signInT,
+  IUser,
   ApprovedT,
   cancelledT,
 } from "@/types";
 import { collection, getDocs, limit, query } from "firebase/firestore";
 import { db } from "../firebase/index";
 import { fetchArticles, healthCheck } from "../api/queries";
-import { useAuth } from "@/hooks/use-auth";
 import { User } from "firebase/auth";
 import { queryClient } from "./QueryProvider";
 
@@ -68,7 +65,7 @@ export const useVerifyEmail = (user: User) => {
 };
 export const useCreateUserAccount = () => {
   return useMutation({
-    mutationFn: (user: signUpT) => createUserAccount(user),
+    mutationFn: (user: IUser) => createUserAccount(user),
   });
 };
 export const useDeleteUserAccount = () => {
@@ -91,7 +88,7 @@ export const useUpdateDisplayName = () => {
 
 export const useSignInAccount = () => {
   return useMutation({
-    mutationFn: (user: signInT) => signInAccount(user),
+    mutationFn: (user: IUser) => signInAccount(user),
   });
 };
 
@@ -184,7 +181,7 @@ export const UseUpdateQHistory = () => {
 
 export const UseCV = () => {
   return useMutation({
-    mutationFn: (user: userDetailsT) => setCV(user),
+    mutationFn: (user: IUser) => setCV(user),
     onSuccess: async () => {
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_CURRENT_USER],
@@ -368,7 +365,7 @@ export const getJobsInDB = () => {
   return useQuery({
     queryKey: [QUERY_KEYS.GET_JOBS_IN_DB],
     queryFn: async () => {
-      let allDocs: any[] = [];
+      const allDocs: any[] = [];
       const q = query(collection(db, "jobs"), limit(50));
       const qs = await getDocs(q);
       qs.forEach((doc) => {

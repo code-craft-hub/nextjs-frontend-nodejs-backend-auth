@@ -42,7 +42,7 @@ import { useAuth } from "@/hooks/use-auth";
 export const Credit = () => {
   const { user:dbUser } = useAuth();
   const params = new URLSearchParams(window.location.search);
-  let { lemon, price } = Object.fromEntries(params.entries());
+  const { lemon, price } = Object.fromEntries(params.entries());
 
   const apiKey = process.env.NEXT_PUBLIC_LEMON_SQUEEZY_API_KEY;
   const { continent_code } = useUserLocation();
@@ -145,7 +145,7 @@ export const Credit = () => {
   const { mutateAsync: approvePaymentMutation } = useApprovedPayment();
   const email = dbUser?.email;
 
-  let plans: string[] = dbUser?.plans || [];
+  const plans: string[] = dbUser?.plans || [];
   const router = useRouter();
 
   const handlePayment = async ({

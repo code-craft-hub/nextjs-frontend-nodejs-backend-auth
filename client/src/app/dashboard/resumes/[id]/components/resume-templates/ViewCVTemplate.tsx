@@ -143,7 +143,7 @@ const ViewCVTemplate = ({ userDataDB }: { userDataDB?: DBUserT }) => (
             <Text style={styles.sectionHeader}>Work Experience</Text>
             {userDataDB?.workExperiences?.map((work, index: number) => {
                 const reg = /,/;
-                let checkResp = work?.responsibilities;
+                const checkResp = work?.responsibilities;
                 if (checkResp === "string" && reg.test(checkResp!)) {
                   return checkResp?.split(",");
                 }

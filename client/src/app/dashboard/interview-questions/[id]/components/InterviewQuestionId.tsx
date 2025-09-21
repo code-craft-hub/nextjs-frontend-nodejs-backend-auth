@@ -89,7 +89,7 @@ export const InterviewQuestionId = () => {
           - Focus on crafting questions that explore the candidate's adaptability, cultural fit, and capacity to excel in the specific role outlined. *Important instructions: - Each question must be prefixed with exactly "Q:", and each answer must be prefixed with exactly "A:". - Only use **one* prefix for each question and answer. Do not use any other prefixes or variations. - The "Q:" prefix must only be used for questions, and the "A:" prefix must only be used for answers. Remember: Use *only* "Q:" for questions and *only* "A:" for answers. Strictly follow the specified delimiters. Remember you must return questions first before answers so that the application will not break. REMEMBER DON'T ADD ANY INTRODUCTORY OR ENDING SENTENCE OR WORD, JUST THE QUESTIONS FOLLOWED BY ANWSERS.`
         );
         for await (const part of stream!) {
-          let content = part.choices[0]?.delta?.content || "";
+          const content = part.choices[0]?.delta?.content || "";
           valueQuill += content;
           //@ts-ignore
           QA = organizeQA(
@@ -131,7 +131,7 @@ export const InterviewQuestionId = () => {
           title: stripeSpecialCharacters(jobTitleAI!),
           link: slug,
         });
-        let AIData = {
+        const AIData = {
           key: stripeSpecialCharacters(jobTitleAI!),
           // data: pdfDataRef.current,
           QA,

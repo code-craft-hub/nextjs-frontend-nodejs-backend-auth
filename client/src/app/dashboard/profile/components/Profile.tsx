@@ -333,7 +333,7 @@ export const Profile = () => {
 
     let fileName = file.name;
     if (fileName.length >= 12) {
-      let splitName = fileName.split(".");
+      const splitName = fileName.split(".");
       fileName = splitName[0].substring(0, 13) + "... ." + splitName[1];
     }
     if (file.type === "application/pdf") {
@@ -366,7 +366,7 @@ export const Profile = () => {
 
     let fileName = file.name;
     if (fileName.length >= 12) {
-      let splitName = fileName.split(".");
+      const splitName = fileName.split(".");
       fileName = splitName[0].substring(0, 13) + "... ." + splitName[1];
     }
     if (file.type === "application/pdf") {

@@ -47,7 +47,7 @@ export default function CV1Template({
 
           {userDataDB?.workExperiences?.map((work, index: number) => {
             const reg = /,/;
-            let checkResp = work?.responsibilities;
+            const checkResp = work?.responsibilities;
             if (checkResp === "string" && reg.test(checkResp!)) {
               return checkResp?.split(",");
             }

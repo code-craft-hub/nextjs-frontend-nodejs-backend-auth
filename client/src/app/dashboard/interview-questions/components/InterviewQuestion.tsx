@@ -287,7 +287,7 @@ export const InterviewQuestion = () => {
     const concatData = dbUser?.questions;
     return concatData;
   };
-  const selectedProfileRef = useRef<String>("");
+  const selectedProfileRef = useRef<string>("");
 
   const [data, setData] = useState([]);
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -361,7 +361,7 @@ export const InterviewQuestion = () => {
         "characters entered can't be consecutive. E.g ssssssssssssssss"
       );
 
-    let dataSrc = selectedProfileRef.current;
+    const dataSrc = selectedProfileRef.current;
     if (
       dataSrc == undefined ||
       dataSrc == "undefined" ||

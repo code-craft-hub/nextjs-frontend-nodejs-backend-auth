@@ -84,7 +84,7 @@ export const EditCoverLetterId = () => {
           gptModel
         );
         for await (const part of stream!) {
-          let content = part?.choices[0]?.delta?.content || "";
+          const content = part?.choices[0]?.delta?.content || "";
           valueQuill += content;
           setValueQuill(valueQuill);
         }

@@ -112,7 +112,7 @@ export const Account = () => {
     calling_code,
     capital,
   } = useUserLocation();
-  let userRef = useRef<User | null | undefined>(undefined);
+  const userRef = useRef<User | null | undefined>(undefined);
   const { mutateAsync: updateUserAccount } = useUpdateUserAccount();
   const { mutateAsync: updatePasswordMutation } = UseDefaultGooglePassword();
   const [imgDialog, setImgDialog] = useState(false);
@@ -264,7 +264,7 @@ export const Account = () => {
       return phoneNumber;
     }
   };
-  let defaultGPassword = useRef(false);
+  const defaultGPassword = useRef(false);
   useEffect(() => {
     if (!dbUser) return;
     if (!contextUser || !dbUser) return;
@@ -519,7 +519,7 @@ export const Account = () => {
       setLengthValidated(false);
     }
   };
-  let email = user?.email;
+  const email = user?.email;
   const Email = email?.split("@");
   const firstName = dbUser?.firstName?.substring(0, 1);
 

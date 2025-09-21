@@ -10,7 +10,6 @@ import {
 import { addDays } from "date-fns";
 import { DocumentData } from "firebase/firestore";
 
-
 import { auth, db } from "./index";
 import { googleLogout } from "@react-oauth/google";
 import { toast } from "sonner";
@@ -19,8 +18,6 @@ import {
   IUpdateUserProfile,
   ApprovedT,
   NewResumeTemplate,
-  userDetailsT,
-  signUpT,
   cancelledT,
   Article,
 } from "@/types";
@@ -40,7 +37,7 @@ import {
 } from "firebase/firestore";
 import { createdAt, parseUntilObjectOrArray } from "../utils/helpers";
 import { create } from "zustand";
-import { EachUserT } from "@/types";
+import { IUser } from "@/types";
 
 export interface FirestoreDocument extends DocumentData {
   id: string;
@@ -52,16 +49,16 @@ interface JobState<T extends FirestoreDocument> {
   clearJobs: () => void;
 }
 
-export async function createUserAccount(user: signUpT) {
+export async function createUserAccount(user: IUser) {
   try {
     const createdUser = await createUserWithEmailAndPassword(
       auth,
-      user.email,
-      user.password
+      user.email!,
+      user.password!
     );
     const uid = createdUser.user.uid;
     const { email, password } = user;
-    await signInAccount({ email, password });
+    if (email && password) await signInAccount(user);
     if (user && user.email) {
       const userCollection = doc(db, "users", user.email);
       setDoc(
@@ -79,7 +76,7 @@ export async function createUserAccount(user: signUpT) {
           provider: user.provider,
           expiryTime: addDays(new Date(), 1),
           firestoreProfileImage: "",
-          dataSource: [], 
+          dataSource: [],
           firstName: user.firstName || "",
           lastName: user.lastName || "",
           coverLetterHistory: [],
@@ -125,7 +122,7 @@ export async function createUserAccount(user: signUpT) {
 }
 
 export async function deleteUserAccount() {
-  const { user } = useAuth();
+  const user = { email: "" };
   const email = user?.email;
   try {
     if (email) {
@@ -156,10 +153,8 @@ export async function deleteUserAccount() {
   }
 }
 
-export async function signInAccount(inputUser: {
-  email: string;
-  password: string;
-}) {
+export async function signInAccount(inputUser:IUser) {
+  if(!inputUser.email || !inputUser.password) return;
   console.log("Signing in user:", inputUser);
   try {
     await setPersistence(auth, browserLocalPersistence);
@@ -236,7 +231,7 @@ export const checkUserInDb = async (userEmail: string) => {
   return false;
 };
 export const defaultGooglePassword = async (password: string) => {
-  const { user } = useAuth();
+  const user = { email: "" };
   const email = user?.email;
   try {
     if (email) {
@@ -254,7 +249,7 @@ export const defaultGooglePassword = async (password: string) => {
   }
 };
 
-export const updateOnboarding = async (onBoarding: string, user:User) => {
+export const updateOnboarding = async (onBoarding: string, user: User) => {
   const email = user?.email;
   try {
     if (email) {
@@ -269,7 +264,7 @@ export const updateOnboarding = async (onBoarding: string, user:User) => {
 };
 
 export async function updateQHistory(updateQuestion: { [k: string]: any }) {
-  const { user } = useAuth();
+  const user = { email: "" };
   const email = user?.email;
   try {
     if (email) {
@@ -283,7 +278,7 @@ export async function updateQHistory(updateQuestion: { [k: string]: any }) {
   }
 }
 
-export const verifyEmail = async (user:User) => {
+export const verifyEmail = async (user: User) => {
   const email = user?.email;
   try {
     if (email) {
@@ -298,7 +293,7 @@ export const verifyEmail = async (user:User) => {
 };
 export async function updateCLHistory(updateCLH: { [k: string]: any }) {
   try {
-    const { user } = useAuth();
+    const user = { email: "" };
     const email = user?.email;
     if (email) {
       const userCollection = doc(db, "users", email);
@@ -316,7 +311,7 @@ export async function updateCLHistory(updateCLH: { [k: string]: any }) {
 }
 export async function updateCV(CV: { [k: string]: any }) {
   try {
-    const { user } = useAuth();
+    const user = { email: "" };
     const email = user?.email;
     if (email) {
       const userCollection = doc(db, "users", email);
@@ -333,7 +328,7 @@ export async function updateFirstSection(user: NewResumeTemplate) {
   const userObject = user.resumeSample;
 
   try {
-    const { user } = useAuth();
+    const user = { email: "" };
     const email = user?.email;
     if (email) {
       const userCollection = doc(db, "users", email);
@@ -346,9 +341,9 @@ export async function updateFirstSection(user: NewResumeTemplate) {
   }
 }
 
-export async function setCV(user: userDetailsT) {
+export async function setCV(user: IUser) {
   try {
-    const { user: authUser } = useAuth();
+    const authUser = { email: "" };
     const email = authUser?.email;
     if (email) {
       const userCollection = doc(db, "users", email);
@@ -368,7 +363,7 @@ export async function triggerBackendRefresh() {
     timestamp: serverTimestamp(),
   })
     .then(() => {
-      const { user } = useAuth();
+      const user = { email: "" };
       const email = user?.email;
       if (email) {
         const userCollection = doc(db, "users", email);
@@ -420,8 +415,8 @@ export async function updateUserInfo(user: {
   state: string;
   country: string;
   provider: "google" | "firebase";
-},) {
-  const { user: authUser } = useAuth();
+}) {
+  const authUser = { email: "" };
   const email = authUser?.email;
   try {
     if (user) {
@@ -470,7 +465,7 @@ export async function updateDisplayName({
   displayName: string;
   phoneNumber: string;
 }) {
-  const { user } = useAuth();
+  const user = { email: "" };
   const email = user?.email;
   if (displayName) {
     while (!auth.currentUser) {
@@ -493,7 +488,7 @@ export async function updateDisplayName({
 }
 
 export async function incrementCredit(incrementAmount: number) {
-  const { user } = useAuth();
+  const user = { email: "" };
   const email = user?.email;
   if (!email) return;
   const userDocRef = doc(db, "users", email);
@@ -506,7 +501,7 @@ export async function incrementCredit(incrementAmount: number) {
       }
 
       if (!userDoc.data() && !userDoc) return;
-      let currentCredit = userDoc?.data()?.credit || 0;
+      const currentCredit = userDoc?.data()?.credit || 0;
       const currentMaxCredit = userDoc?.data()?.maxCredit || 0;
       const newCredit = currentCredit + incrementAmount;
       transaction.update(userDocRef, { credit: newCredit });
@@ -531,7 +526,7 @@ export const apiKeys = async () => {
 };
 
 export const subtractCredit = async () => {
-  const { user } = useAuth();
+  const user = { email: "" };
   const email = user?.email;
   try {
     if (!email) return null;
@@ -556,7 +551,7 @@ export const subtractCredit = async () => {
 export const welcomeUserInfo = async (user: NewResumeTemplate) => {
   const userObject = user.resumeSample;
   const uniqueUserObjects = user.uniqueUserObjects;
-  const { user: userEmail } = useAuth();
+  const userEmail = { email: "" };
   const email = userEmail?.email;
   try {
     if (email) {
@@ -582,7 +577,7 @@ export const welcomeUserInfo = async (user: NewResumeTemplate) => {
 };
 
 export async function setQuestions(questions: any) {
-  const { user } = useAuth();
+  const user = { email: "" };
   const email = user?.email;
   try {
     if (email) {
@@ -598,7 +593,7 @@ export async function setQuestions(questions: any) {
   }
 }
 export async function setCoverLetter(coverLetter: any) {
-  const { user } = useAuth();
+  const user = { email: "" };
   const email = user?.email;
   try {
     if (email) {
@@ -614,7 +609,7 @@ export async function setCoverLetter(coverLetter: any) {
   }
 }
 export async function getContent() {
-  const { user } = useAuth();
+  const user = { email: "" };
   const email = user?.email;
   try {
     if (!email) return null;
@@ -638,7 +633,7 @@ export async function getContent() {
 }
 
 export async function setDataSource(dataSource: any) {
-  const { user } = useAuth();
+  const user = { email: "" };
   const email = user?.email;
   try {
     if (email) {
@@ -672,7 +667,7 @@ export async function setCreditInfo(creditInfo: any, user: User) {
 }
 
 export async function setFirstTime(firstTime: any) {
-  const { user } = useAuth();
+  const user = { email: "" };
   const email = user?.email;
   try {
     if (email) {
@@ -694,7 +689,7 @@ export async function approvedPayment({
   payment: ApprovedT;
   plans: any;
 }) {
-  const { user } = useAuth();
+  const user = { email: "" };
   const email = user?.email;
   try {
     if (email) {
@@ -707,7 +702,7 @@ export async function approvedPayment({
   }
 }
 export async function cancelledPayment({ payment }: { payment: cancelledT }) {
-  const { user } = useAuth();
+  const user = { email: "" };
   const email = user?.email;
   try {
     if (email) {
@@ -722,7 +717,7 @@ export async function cancelledPayment({ payment }: { payment: cancelledT }) {
 // allUsersByDate, allPaidUser
 
 export const allUsersByDate = async (date: any) => {
-  let q = query(
+  const q = query(
     collection(db, "users"),
     where("createdAt", ">=", date?.from?.toISOString()?.split("T")[0]),
     where("createdAt", "<=", date?.to?.toISOString()?.split("T")[0]),
@@ -734,7 +729,7 @@ export const allUsersByDate = async (date: any) => {
 };
 
 export const allPaidUser = async () => {
-  let q = query(
+  const q = query(
     collection(db, "users"),
     where("plans", "array-contains-any", ["pro", "basic", "enterprise"]),
     orderBy("createdAt")
@@ -864,12 +859,12 @@ export const useJobStore = create<JobState<FirestoreDocument>>((set) => ({
 }));
 
 interface AppState {
-  data: EachUserT[];
+  data: IUser[];
   timeRange: number;
   totalUserCount: number;
   setTotalUserCount: (totalUserCount: number) => void;
   setTimeRange: (range: number) => void;
-  setData: (data: EachUserT[]) => void;
+  setData: (data: IUser[]) => void;
 }
 
 export const useAppStore = create<AppState>()((set) => ({

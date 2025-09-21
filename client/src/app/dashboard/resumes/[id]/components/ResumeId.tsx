@@ -97,7 +97,7 @@ export const ResumeId = () => {
             `Using the following job description: ${jobDesc}, write a professional summary that I can use to highlight my relevant skills and experiences. Keep the summary within 1200 characters and under 120 words. Focus on aligning it with the job description by incorporating key terms and phrases. The content should create a compelling narrative that emphasizes my qualifications and the potential impact I can bring to the role. Aim to make the summary stand out and grab the recruiter’s attention. Use the job description provided: ${jobDesc} and the additional data source: ${dataSrc} to guide your response. Avoid third-person language and ensure the narrative is written from my perspective.`
           );
           for await (const part of stream!) {
-            let content = part.choices[0]?.delta?.content || "";
+            const content = part.choices[0]?.delta?.content || "";
             profileTitle += content;
             setProfileTitle(profileTitle);
           }
@@ -169,7 +169,7 @@ For example:
             const { user } = useAuth();
 
             const email = user?.email;
-            let resumeUser = {
+            const resumeUser = {
               cvTitle: jobTitleAI!,
               key: jobTitleAI!,
               firstName: dbUser?.firstName || "",
@@ -222,7 +222,7 @@ For example:
   useEffect(() => {
     if (dbUser) {
       try {
-        let slugPageIndex = dbUser?.CV?.findIndex(
+        const slugPageIndex = dbUser?.CV?.findIndex(
           (item: any) => item?.genTableId === slug
         );
         if (slugPageIndex !== -1) {
@@ -238,7 +238,7 @@ For example:
 
   const workDelete = async () => {
     if (!dbUser?.CV) return;
-    let slugPageIndex = dbUser?.CV?.findIndex(
+    const slugPageIndex = dbUser?.CV?.findIndex(
       (item: any) => item?.genTableId === slug
     );
     if (slugPageIndex !== -1) {

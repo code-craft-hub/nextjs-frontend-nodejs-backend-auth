@@ -45,7 +45,7 @@ const CV3Template = ({
         </h2>
         {userDataDB?.workExperiences?.map((work, index: number) => {
           const reg = /,/;
-          let checkResp = work?.responsibilities;
+          const checkResp = work?.responsibilities;
           if (checkResp === "string" && reg.test(checkResp!)) {
             return checkResp?.split(",");
           }

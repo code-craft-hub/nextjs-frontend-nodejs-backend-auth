@@ -198,7 +198,7 @@ export const CoverLetter = () => {
   const { mutateAsync: CL, isPending } = useCoverLetter();
   const [gemininGpt, setGeminiGpt] = useState("gpt35turbo");
   const parser = new DOMParser();
-  const selectedProfileRef = useRef<String>("");
+  const selectedProfileRef = useRef<string>("");
   const [creditAlert, setCreditAlert] = useState(false);
   const [imgDialog, setImgDialog] = useState(false);
   const [tableData, setTableData] = useState<TableDataT[]>([
@@ -322,8 +322,8 @@ export const CoverLetter = () => {
         "characters entered can't be consecutive. E.g ssssssssssssssss"
       );
 
-    let dataSrc = selectedProfileRef.current;
-    let dataSrcObject = dataSrcRef.current;
+    const dataSrc = selectedProfileRef.current;
+    const dataSrcObject = dataSrcRef.current;
     if (
       dataSrc == undefined ||
       dataSrc == "undefined" ||
