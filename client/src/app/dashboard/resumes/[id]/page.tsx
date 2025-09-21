@@ -1,5 +1,6 @@
 import React from 'react'
-import { ResumeId } from './components/ResumeId'
+// import { ResumeId } from './components/ResumeId'
+import { ResumeTemplate } from './components/resume'
 
 const ResumeIdPage = () => {
   return (

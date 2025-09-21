@@ -44,13 +44,21 @@ export const phoneSchema = z
       "Phone number must be a valid E.164 format (e.g., +1234567890, +44207123456, +81312345678)",
   });
 
-export const registerUserSchema = z.object({
-  email: emailSchema,
-  password: passwordSchema,
-  firstName: firstNameSchema,
-  lastName: lastNameSchema,
-  phoneNumber: phoneSchema,
-});
+export const registerUserSchema = z
+  .object({
+    email: emailSchema,
+    password: passwordSchema,
+    firstName: firstNameSchema,
+    lastName: lastNameSchema,
+    confirmPassword: passwordSchema,
+    agreeToTerms: z.boolean().refine((value) => value === true, {
+      message: "You must agree to the terms and privacy policies.",
+    }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  });
 
 export const loginSchema = z.object({
   email: emailSchema,

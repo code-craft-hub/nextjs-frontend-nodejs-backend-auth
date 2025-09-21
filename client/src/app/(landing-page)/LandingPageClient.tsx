@@ -9,7 +9,6 @@ import Pricing from "@/components/landing-page/Pricing";
 import Whatsapp from "@/components/landing-page/Whatsapp";
 import { useAuth } from "@/hooks/use-auth";
 import ReactGA from "react-ga4";
-import Aos from "aos";
 import "aos/dist/aos.css";
 import { useHealthCheckQuery } from "@/lib/queries";
 

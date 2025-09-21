@@ -1,12 +1,8 @@
 "use client";
 import {
-  Contact,
-  CreditCard,
   Home,
   LayoutDashboard,
   LogOut,
-  PiggyBank,
-  Shield,
   User,
   Mail,
 } from "lucide-react";
@@ -21,15 +17,12 @@ import {
 } from "@/components/ui/sheet";
 
 import { useUserLocation } from "@/hooks/get-user-location";
-import { ThemeToggle } from "./mode-toggle-navbar";
 import { useRouter } from "next/navigation";
-import { signOut } from "firebase/auth";
-import { auth } from "@/lib/firebase/index";
-import { useGetPageUrl } from "@/hooks/use-page-url";
 import { useAuth } from "@/hooks/use-auth";
+import { useGetPageUrl } from "@/hooks/use-page-url";
 
 export const UserMenu = () => {
-  const { user:dbUser } = useAuth();
+  const { user: dbUser, logout } = useAuth();
   console.log("dbUser in user menu", dbUser);
   const { country, flag } = useUserLocation();
   const router = useRouter();
@@ -37,7 +30,7 @@ export const UserMenu = () => {
   const { pathname } = useGetPageUrl();
   const Uid = pathname?.split("/")[2];
   console.log(pathname, Uid, dbUser);
-  const isAdmin = dbUser?.role === "superadmin";
+  // const isAdmin = dbUser?.role === "superadmin";
 
   const menuItems = [
     {
@@ -54,38 +47,6 @@ export const UserMenu = () => {
       isAdmin: true,
       onClick: () => {
         router.push("/dashboard");
-      },
-    },
-    {
-      icon: <PiggyBank />,
-      title: "Deposit",
-      isAdmin: true,
-      onClick: () => {
-        router.push("/dashboard/deposit");
-      },
-    },
-    {
-      icon: <CreditCard />,
-      title: "WithDraw",
-      isAdmin: true,
-      onClick: () => {
-        router.push("/dashboard/withdraw");
-      },
-    },
-    {
-      icon: <Shield />,
-      title: "Admin",
-      isAdmin,
-      onClick: () => {
-        router.push("/admin");
-      },
-    },
-    {
-      icon: <Contact />,
-      title: "Send Email",
-      isAdmin,
-      onClick: () => {
-        router.push("/admin/email");
       },
     },
 
@@ -156,17 +117,6 @@ export const UserMenu = () => {
               </div>
             </div>
 
-            {/* <div className="px-4">
-              <div className="flex bg-gray-100 dark:bg-zinc-900 rounded-lg p-1 mb-6 ">
-                <button className="flex-1 py-2 px-4 text-sm font-medium bg-white dark:bg-zinc-800 rounded-md shadow-sm">
-                  Crypto
-                </button>
-                <button className="flex-1 py-2 px-4 text-sm font-medium ">
-                  Bank
-                </button>
-              </div>
-            </div> */}
-
             <SheetClose className="w-full">
               {menuItems?.map((item) => {
                 return item.isAdmin ? (
@@ -181,12 +131,10 @@ export const UserMenu = () => {
                 ) : null;
               })}
             </SheetClose>
-            <div className="flex items-center gap-3 p-3 px-4  hover:bg-muted cursor-pointer border-t">
-              <ThemeToggle />
-            </div>
+
             <div
               onClick={() => {
-                signOut(auth);
+                logout();
               }}
               className="flex items-center gap-3 p-3 px-4  hover:bg-muted cursor-pointer border-t border-b"
             >

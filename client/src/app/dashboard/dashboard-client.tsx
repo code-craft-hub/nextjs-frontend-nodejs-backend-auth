@@ -59,7 +59,7 @@ export const DashboardClient = () => {
         </a>
         <div className="p-4 sm:p-8">
           <span className="text-3xl font-bold break-all line-clamp-1">
-            Hello dbUser?.firstName || dbUser?.lastName
+            Hello {dbUser?.firstName || dbUser?.lastName}
           </span>
           <p className="sm:text-xl ">
             Here is a quick overview of your activity.
@@ -70,7 +70,7 @@ export const DashboardClient = () => {
           <AreaChartComponent dbUser={dbUser} isLoading={isLoading} />
         </div>
         <div className="px-4 md:px-8 pb-8">
-          <Activities isLoading={isLoading} allDocuments={AllDocs} />
+          <Activities isLoading={isLoading} allDocuments={AllDocs!} />
         </div>
       </div>
     </>

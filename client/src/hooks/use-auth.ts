@@ -7,23 +7,22 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
-interface User {
-  uid: string;
-  email: string;
-  emailVerified: boolean;
-  onboardingComplete: boolean;
+// interface User {
+//   uid: string;
+//   email: string;
+//   emailVerified: boolean;
+//   role?: string;
+//   onboardingComplete: boolean;
+// }
+
+interface AuthResponse {
+  success: boolean;
+  user: IUser;
 }
 
 interface AuthResponse {
   success: boolean;
-  user: User;
-}
-
-
-
-interface AuthResponse {
-  success: boolean;
-  user: User;
+  user: IUser;
 }
 
 // Auth API functions
@@ -66,13 +65,16 @@ const authApi = {
     }
   },
 
-  getUser: async (): Promise< IUser> => {
+  getUser: async (): Promise<IUser> => {
     try {
       const { data } = await authClient.get("/profile");
       console.log("GET USER DATA : ", data);
       return data;
     } catch (error: any) {
-      throw new Error("Failed to fetch user data:", error.error || "Fetch failed");
+      throw new Error(
+        "Failed to fetch user data:",
+        error.error || "Fetch failed"
+      );
     }
   },
 
@@ -106,9 +108,17 @@ const authApi = {
       throw new Error(error.error || "Login failed");
     }
   },
+  updateUser: async (): Promise<AuthResponse> => {
+    try {
+      const { data } = await authClient.post("/update");
+      return data;
+    } catch (error: any) {
+      throw new Error(error.error || "Updating user failed");
+    }
+  },
 };
 
-export function useAuth(initialUser?: User) {
+export function useAuth(initialUser?: IUser) {
   const router = useRouter();
   const queryClient = useQueryClient();
 
@@ -161,7 +171,6 @@ export function useAuth(initialUser?: User) {
     },
   });
 
-
   // Send verification email mutation
   const sendVerificationMutation = useMutation({
     mutationFn: authApi.sendVerificationEmail,
@@ -202,6 +211,15 @@ export function useAuth(initialUser?: User) {
     },
   });
 
+  // Update user information
+  const updateUserMutation = useMutation({
+    mutationFn: authApi.updateUser,
+    onSuccess: (data) => {
+      queryClient.setQueryData(["auth", "user"], { user: data.user });
+      router.push("/dashboard");
+    },
+  });
+
   return {
     user,
     isLoading,
@@ -213,12 +231,15 @@ export function useAuth(initialUser?: User) {
     verifyEmail: verifyEmailMutation.mutateAsync,
     logout: logoutMutation.mutateAsync,
     completeOnboarding: completeOnboardingMutation.mutateAsync,
+    updateUser: updateUserMutation.mutateAsync,
+
     isLoginLoading: loginMutation.isPending,
     isRegisterLoading: registerMutation.isPending,
     isSendingVerification: sendVerificationMutation.isPending,
     isVerifyingEmail: verifyEmailMutation.isPending,
     isLogoutLoading: logoutMutation.isPending,
     isOnboardingLoading: completeOnboardingMutation.isPending,
+    isUpdatingUserLoading: updateUserMutation.isPending,
     loginError: loginMutation.error?.message,
     registerError: registerMutation.error,
     verificationError: sendVerificationMutation.error?.message,

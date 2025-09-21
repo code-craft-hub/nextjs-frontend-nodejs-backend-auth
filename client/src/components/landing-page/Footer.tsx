@@ -4,7 +4,6 @@ import { Link as ScrollLink } from "react-scroll";
 import { social } from "@/constants/data";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ModeToggle } from "../ui/toggle-theme";
 
 export const Footer = () => {
   const router = useRouter();
@@ -116,7 +115,6 @@ export const Footer = () => {
             </Link>
           </div>
         </div>
-        <ModeToggle />
       </div>
     </footer>
   );
