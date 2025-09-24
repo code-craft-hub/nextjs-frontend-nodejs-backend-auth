@@ -85,7 +85,7 @@ function FloatingLabelInput({
           id={actualId}
           type={inputType}
           className={`
-            h-12 pt-4 pb-2 px-3 pr-${showPasswordToggle ? "12" : "3"}
+            h-12  px-3 pr-${showPasswordToggle ? "12" : "3"}
             transition-colors duration-200 font-poppins
             border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-[4px]
             ${className}

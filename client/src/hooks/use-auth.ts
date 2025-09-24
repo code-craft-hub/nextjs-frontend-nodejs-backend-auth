@@ -7,16 +7,14 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
-
-
 interface AuthResponse {
   success: boolean;
-  user: IUser;
+  user: Partial<IUser>;
 }
 
 interface AuthResponse {
   success: boolean;
-  user: IUser;
+  user: Partial<IUser>;
 }
 
 // Auth API functions
@@ -112,7 +110,7 @@ const authApi = {
   },
 };
 
-export function useAuth(initialUser?: IUser) {
+export function useAuth(initialUser?: Partial<IUser>) {
   const router = useRouter();
   const queryClient = useQueryClient();
 

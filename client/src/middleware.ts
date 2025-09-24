@@ -17,6 +17,7 @@ async function verifySessionToken(token: string): Promise<UserSession | null> {
       emailVerified: payload.emailVerified as boolean,
       onboardingComplete: payload.onboardingComplete as boolean,
       customClaims: payload.customClaims as Record<string, any> | undefined,
+      displayName: payload?.displayName as string,
     };
   } catch (err) {
     console.error("JWT verification failed:", err);

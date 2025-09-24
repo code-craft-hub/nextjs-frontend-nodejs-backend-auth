@@ -75,7 +75,7 @@ export default function VerifyEmailClient() {
 
     return (
       <div className="group relative">
-        <label
+        {/* <label
           htmlFor={actualId}
           className={`
           absolute left-3 z-10 px-2 text-sm font-medium
@@ -86,31 +86,23 @@ export default function VerifyEmailClient() {
         `}
         >
           {label}
-        </label>
+        </label> */}
         <div className="relative">
           <Input
             id={actualId}
             type={inputType}
             className={`
-            h-12 pt-4 pb-2 px-3 pr-${showPasswordToggle ? "12" : "3"}
+            h-12  px-3 pr-${showPasswordToggle ? "12" : "3"}
             transition-colors duration-200 font-poppins
             border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-[4px]
             ${className}
           `}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
+            // onFocus={handleFocus}
+            // onBlur={handleBlur}
             onChange={handleChange}
             {...props}
           />
-          {showPasswordToggle && (
-            <button
-              type="button"
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors "
-              onClick={() => setShowPassword(!showPassword)}
-            >
-              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-            </button>
-          )}
+        
         </div>
       </div>
     );

@@ -7,6 +7,7 @@ export interface IUser {
   firstName?: string;
   lastName?: string;
   cvJobTitle?: string;
+  customClaims?: Record<string, any> | undefined;
   cvTitle?: string;
   provider?: string;
   password?: string;
@@ -21,7 +22,7 @@ export interface IUser {
   profile?: string;
   dataSource?: IDataSource[];
   credit?: number;
-  onboardingComplete?: string;
+  onboardingComplete?: boolean;
   maxCredit?: number;
   photoURL?: string;
   createdAt?: string | Date;

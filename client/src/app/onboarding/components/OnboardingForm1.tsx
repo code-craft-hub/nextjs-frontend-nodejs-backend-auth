@@ -23,6 +23,7 @@ import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
+import { IUser } from "@/types";
 
 const formSchema = z.object({
   location: z.string({ message: "Please enter a valid country name." }),
@@ -41,8 +42,18 @@ interface FloatingLabelInputProps
   showPasswordToggle?: boolean;
 }
 
-export const OnBoardingForm1 = ({ onNext, onPrev }: any) => {
-  const { updateUser, isUpdatingUserLoading, user } = useAuth();
+export const OnBoardingForm1 = ({
+  onNext,
+  onPrev,
+  initialUser,
+}: {
+  onNext: () => void;
+  onPrev: () => void;
+  initialUser: Partial<IUser>;
+}) => {
+  const { updateUser, isUpdatingUserLoading, user } = useAuth(initialUser);
+
+  console.log(user, initialUser);
 
   function FloatingLabelInput({
     id,
@@ -74,7 +85,7 @@ export const OnBoardingForm1 = ({ onNext, onPrev }: any) => {
             id={actualId}
             disabled={isUpdatingUserLoading}
             className={`
-              h-12 pt-4 pb-2 px-3 pr-${showPasswordToggle ? "12" : "3"}
+              h-12  px-3 pr-${showPasswordToggle ? "12" : "3"}
               transition-colors duration-200 font-poppins
               border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-[4px]
               ${className}
@@ -106,10 +117,12 @@ export const OnBoardingForm1 = ({ onNext, onPrev }: any) => {
     console.log("Form submitted:", values);
     try {
       await updateUser(values);
-      toast.success(`${user?.firstName} Your data has be saved!`);
+      toast.success(
+        ` Your data has be saved! ${user?.firstName}, InitialUser : ${initialUser?.displayName}`
+      );
       onNext();
     } catch (error) {
-      toast.error(`${user?.firstName} please try again.`);
+      toast.error(` please try again.`);
       toast("Skip this process", {
         action: {
           label: "Skip",
@@ -118,7 +131,6 @@ export const OnBoardingForm1 = ({ onNext, onPrev }: any) => {
       });
     }
   }
-  // description: "Sunday, December 03, 2023 at 9:00 AM",
 
   const tabs = [
     {

@@ -2,22 +2,14 @@ import { adminAuth } from "./firebase-admin";
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { jwtVerify, SignJWT } from "jose";
+import { IUser } from "@/types";
+
 const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_ISSUER = "nextjs-app";
 const JWT_EXPIRY = "7d";
-export interface UserSession {
-  uid: string;
-  email: string;
-  emailVerified: boolean;
-  onboardingComplete: boolean;
-  customClaims?: Record<string, any>;
-}
 
-// Create secure session token (not Firebase token)
-export async function createSessionToken(
-  userSession: UserSession
-): Promise<string> {
-   const secret = new TextEncoder().encode(JWT_SECRET);
+export async function createSessionToken(userSession: IUser): Promise<string> {
+  const secret = new TextEncoder().encode(JWT_SECRET);
 
   return await new SignJWT({ ...userSession })
     .setProtectedHeader({ alg: "HS256" })
@@ -28,7 +20,9 @@ export async function createSessionToken(
 }
 
 // Verify session token
-export async function verifySessionToken(token: string): Promise<UserSession | null> {
+export async function verifySessionToken(
+  token: string
+): Promise<Partial<IUser> | null> {
   try {
     const secret = new TextEncoder().encode(process.env.JWT_SECRET);
 
@@ -42,6 +36,9 @@ export async function verifySessionToken(token: string): Promise<UserSession | n
       emailVerified: payload.emailVerified as boolean,
       onboardingComplete: payload.onboardingComplete as boolean,
       customClaims: payload.customClaims as Record<string, any> | undefined,
+      displayName: payload?.displayName as string,
+      firstName: payload?.firstName as string,
+      lastName: payload?.lastName as string,
     };
   } catch (err) {
     console.error("JWT verification failed:", err);
@@ -68,14 +65,14 @@ export function setSessionCookie(response: NextResponse, sessionToken: string) {
 // Get session from request (for API routes)
 export async function getSessionFromRequest(
   request: NextRequest
-): Promise<UserSession | null> {
+): Promise<Partial<IUser> | null> {
   const sessionToken = request.cookies.get("session")?.value;
   if (!sessionToken) return null;
   return verifySessionToken(sessionToken);
 }
 
 // Get session from cookies (for server components)
-export async function getSessionFromCookies(): Promise<UserSession | null> {
+export async function getSessionFromCookies(): Promise<Partial<IUser> | null> {
   const cookieStore = await cookies();
   const sessionToken = cookieStore.get("session")?.value;
   if (!sessionToken) return null;
@@ -85,16 +82,18 @@ export async function getSessionFromCookies(): Promise<UserSession | null> {
 // Verify Firebase ID token and create user session
 export async function verifyFirebaseToken(
   idToken: string
-): Promise<UserSession> {
+): Promise<Partial<IUser>> {
   const decodedToken = await adminAuth.verifyIdToken(idToken);
   const user = await adminAuth.getUser(decodedToken.uid);
-
+  const [firstName, lastName] = user?.displayName?.split(" ") ?? [];
   return {
     uid: user.uid,
     email: user.email!,
     emailVerified: user.emailVerified,
     onboardingComplete: user.customClaims?.onboardingComplete || false,
     customClaims: user.customClaims,
+    firstName,
+    lastName,
   };
 }
 

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
-import { useState, useId, JSX } from "react";
+import { useState, useId, JSX, useEffect } from "react";
 import {
   Form,
   FormControl,
@@ -37,6 +37,7 @@ export default function RegisterClient() {
     type = "text",
     className = "",
     showPasswordToggle = false,
+    value,
     ...props
   }: FloatingLabelInputProps) {
     const [isFocused, setIsFocused] = useState(false);
@@ -46,6 +47,10 @@ export default function RegisterClient() {
     const actualId = id || inputId;
 
     const handleFocus = () => setIsFocused(true);
+
+     useEffect(() => {
+      setHasValue(Boolean(value && String(value).length > 0));
+    }, [value]);
 
     const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
       setIsFocused(false);
@@ -70,7 +75,7 @@ export default function RegisterClient() {
         <label
           htmlFor={actualId}
           className={`
-          absolute left-3 z-10 px-2 text-sm font-medium
+          absolute left-3 z-10 px-1 text-sm font-medium
           bg-background text-muted-foreground
           transition-all duration-200 ease-in-out
           pointer-events-none font-poppins
@@ -84,7 +89,7 @@ export default function RegisterClient() {
             id={actualId}
             type={inputType}
             className={`
-            h-12 pt-4 pb-2 px-3 pr-${showPasswordToggle ? "12" : "3"}
+            h-12  px-3 pr-${showPasswordToggle ? "12" : "3"}
             transition-colors duration-200 font-poppins
             border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-[4px]
             ${className}
@@ -167,7 +172,7 @@ export default function RegisterClient() {
 
           {/* Form */}
           <Form {...form}>
-            <div className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
+            <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
               {/* Name Fields */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
@@ -362,7 +367,7 @@ export default function RegisterClient() {
                   provider="Apple"
                 />
               </div>
-            </div>
+            </form>
           </Form>
         </div>
       </div>

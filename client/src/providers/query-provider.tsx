@@ -1,9 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import Head from "next/head";
+import { Toaster } from "sonner";
 
 // Create a stable query client instance
 const createQueryClient = () => {
@@ -11,8 +10,8 @@ const createQueryClient = () => {
     defaultOptions: {
       queries: {
         // Global query defaults
-        // staleTime: 5 * 60 * 1000, // 5 minutes
-        // gcTime: 10 * 60 * 1000, // 10 minutes (formerly cacheTime)
+        staleTime: 5 * 60 * 1000, // 5 minutes
+        gcTime: 10 * 60 * 1000, // 10 minutes (formerly cacheTime)
         retry: (failureCount, error) => {
           // Don't retry on 4xx errors
           if (error && typeof error === "object" && "status" in error) {
@@ -43,41 +42,18 @@ let queryClient: QueryClient | undefined = undefined;
 function getQueryClient() {
   if (typeof window === "undefined") {
     // Server: always create a new query client
+    console.log("QUERYCLIENT IN QUERYCLIENT IN SERVER CONTEXT");
+
     return createQueryClient();
   }
 
   // Client: create query client if not already created
   if (!queryClient) {
+    console.log("QUERYCLIENT IN QUERYCLIENT IN CLIENT CONTEXT");
     queryClient = createQueryClient();
   }
 
   return queryClient;
-}
-
-interface RootLayoutProps {
-  children: React.ReactNode;
-}
-
-export default function RootLayout({ children }: RootLayoutProps) {
-  const client = getQueryClient();
-
-  return (
-    <html lang="en">
-      <Head>
-        <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>Enterprise Auth App</title>
-      </Head>
-      <body>
-        <QueryClientProvider client={client}>
-          {children}
-          {process.env.NODE_ENV === "development" && (
-            <ReactQueryDevtools initialIsOpen={false} position="right" />
-          )}
-        </QueryClientProvider>
-      </body>
-    </html>
-  );
 }
 
 interface ProvidersProps {
@@ -85,33 +61,7 @@ interface ProvidersProps {
 }
 
 export function Providers({ children }: ProvidersProps) {
-  const [queryClient] = useState(
-    () =>
-      new QueryClient({
-        defaultOptions: {
-          queries: {
-            // staleTime: 5 * 60 * 1000,
-            // gcTime: 10 * 60 * 1000,
-            retry: (failureCount, error) => {
-              if (error && typeof error === "object" && "status" in error) {
-                const status = error.status as number;
-                if (status >= 400 && status < 500) {
-                  return false;
-                }
-              }
-              return failureCount < 3;
-            },
-            refetchOnWindowFocus: false,
-            refetchOnMount: true,
-            refetchOnReconnect: "always",
-          },
-          mutations: {
-            retry: 1,
-            retryDelay: 1000,
-          },
-        },
-      })
-  );
+  const queryClient = getQueryClient();
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -119,6 +69,7 @@ export function Providers({ children }: ProvidersProps) {
       {process.env.NODE_ENV === "development" && (
         <ReactQueryDevtools initialIsOpen={false} position="right" />
       )}
+      <Toaster richColors={true} />
     </QueryClientProvider>
   );
 }

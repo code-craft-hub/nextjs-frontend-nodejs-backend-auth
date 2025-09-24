@@ -42,9 +42,10 @@ const ACCEPTED_FILE_TYPES = [
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 ];
 
-export const OnBoardingForm2 = ({ onNext, onPrev }: any) => {
+export const OnBoardingForm2 = ({ onNext, onPrev, initialUser }: any) => {
   const { updateUser, isUpdatingUserLoading, user } = useAuth();
 
+  console.log(user, initialUser);
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -58,10 +59,10 @@ export const OnBoardingForm2 = ({ onNext, onPrev }: any) => {
     const { resume, ...rest } = values;
     try {
       await updateUser(rest);
-      toast.success(`${user?.firstName} Your data has be saved!`);
+      toast.success(` Your data has be saved!`);
       onNext();
     } catch (error) {
-      toast.error(`${user?.firstName} please try again.`);
+      toast.error(` please try again.`);
       toast("Skip this process", {
         action: {
           label: "Skip",

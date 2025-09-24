@@ -1,5 +1,5 @@
 // import type { Metadata, Viewport } from "next";
-import Providers from "./providers";
+import { Providers } from "@/providers/query-provider";
 import "./globals.css";
 // export const metadata: Metadata = {
 //   title: "Cver AI - Job document generator",

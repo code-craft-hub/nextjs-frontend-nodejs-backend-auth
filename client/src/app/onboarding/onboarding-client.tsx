@@ -8,8 +8,13 @@ import { OnBoardingForm3 } from "./components/OnboardingForm3";
 import { OnBoardingForm4 } from "./components/OnboardingForm4";
 import { OnBoardingForm5 } from "./components/OnboardingForm5";
 import { OnBoardingForm6 } from "./components/OnboardingForm6";
+import { IUser } from "@/types";
 
-export default function OnboardingClient() {
+export default function OnboardingClient({
+  initialUser,
+}: {
+  initialUser: IUser;
+}) {
   const [currentStep, setCurrentStep] = useState(0);
   const steps = [
     OnBoardingForm0,
@@ -37,14 +42,15 @@ export default function OnboardingClient() {
   const CurrentStepComponent = steps[currentStep];
 
   return (
-    <div className="grid grid-cols-1">
+    <div className="grid grid-cols-1 overflow-hidden">
       <AnimatePresence mode="wait">
         <CurrentStepComponent
           key={currentStep}
+          initialUser={initialUser}
           onNext={nextStep}
           onPrev={prevStep}
-          currentStep={currentStep}
-          totalSteps={totalSteps}
+          // currentStep={currentStep}
+          // totalSteps={totalSteps}
         />
       </AnimatePresence>
     </div>
