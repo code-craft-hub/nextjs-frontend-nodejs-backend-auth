@@ -4,13 +4,22 @@ import { useState } from "react";
 import ReactGA from "react-ga4";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { VscChecklist } from "react-icons/vsc";
-import { dashboardSliderContent, IDashboardSliderContent } from "@/constants/jobs-data";
+import {
+  dashboardSliderContent,
+  IDashboardSliderContent,
+} from "@/constants/jobs-data";
 import { useAuth } from "@/hooks/use-auth";
 import HorizontalCardSlider from "./components/HorizontalCardSlider";
 import { AreaChartComponent } from "./components/chart/AreaChartComponent";
 import Activities from "./components/Activities";
+import { IUser } from "@/types";
 
-export const DashboardClient = () => {
+export const DashboardClient = ({
+  initialUser,
+}: {
+  initialUser: Partial<IUser>;
+}) => {
+  console.log("INITIAL USER : ", initialUser);
   const { user: dbUser, isLoading } = useAuth();
   const [userResumes] = useState<IDashboardSliderContent>([
     ...dashboardSliderContent,

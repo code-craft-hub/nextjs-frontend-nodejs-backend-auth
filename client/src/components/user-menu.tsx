@@ -1,11 +1,5 @@
 "use client";
-import {
-  Home,
-  LayoutDashboard,
-  LogOut,
-  User,
-  Mail,
-} from "lucide-react";
+import { Home, LayoutDashboard, LogOut, User, Mail } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 import {
@@ -20,11 +14,13 @@ import { useUserLocation } from "@/hooks/get-user-location";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/use-auth";
 import { useGetPageUrl } from "@/hooks/use-page-url";
+import { IUser } from "@/types";
 
-export const UserMenu = () => {
-  const { user: dbUser, logout } = useAuth();
+export const UserMenu = ({ initialUser }: { initialUser: Partial<IUser> }) => {
+  const { user, logout } = useAuth();
+  const dbUser = { ...initialUser, ...user };
   console.log("dbUser in user menu", dbUser);
-  const { country, flag } = useUserLocation();
+  const { flag } = useUserLocation();
   const router = useRouter();
 
   const { pathname } = useGetPageUrl();
@@ -70,23 +66,11 @@ export const UserMenu = () => {
           <button className="flex">
             <Avatar className="size-10">
               <AvatarImage src={dbUser?.photoURL as string} alt="@avatar" />
-              <AvatarFallback>{dbUser?.firstName?.charAt(0)}</AvatarFallback>
+              <AvatarFallback>
+                {dbUser?.firstName?.charAt(0)}
+                {dbUser?.lastName?.charAt(0)}{" "}
+              </AvatarFallback>
             </Avatar>
-            <div className="max-w-[100px] overflow-hidden">
-              <div className="text-nowrap font-bold text-sm text-left w-full overflow-hidden max-w-[100px]">
-                {dbUser?.firstName} {dbUser?.lastName}
-              </div>
-              <div className="text-xs flex items-center text-nowrap gap-1">
-                {country}{" "}
-                <span className="">
-                  {flag && (
-                    <div className="size-4 shrink-0">
-                      <img loading="lazy" src={flag} alt="" />
-                    </div>
-                  )}
-                </span>
-              </div>
-            </div>
           </button>
         </SheetTrigger>
         <SheetContent className="w-78">
@@ -95,12 +79,15 @@ export const UserMenu = () => {
             <div className="flex items-center gap-3  p-4">
               <Avatar className="size-10">
                 <AvatarImage src={dbUser?.photoURL as string} alt="@avatar" />
-                <AvatarFallback>{dbUser?.firstName?.charAt(0)}</AvatarFallback>
+                <AvatarFallback>
+                  {dbUser?.firstName?.charAt(0)}
+                  {dbUser?.lastName?.charAt(0)}
+                </AvatarFallback>
               </Avatar>
               <div className="flex-1">
                 <div className="flex items-center gap-2 max-w-[190px] overflow-hidden">
                   <h3 className="font-semibold text-nowrap overflow-hidden">
-                    {dbUser?.firstName} {dbUser?.lastName}
+                    {dbUser?.firstName}
                   </h3>
                   <span className="-mb-2">
                     {flag && (

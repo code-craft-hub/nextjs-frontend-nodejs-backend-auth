@@ -7,40 +7,45 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
-interface AuthResponse {
-  success: boolean;
-  user: Partial<IUser>;
-}
+// interface AuthResponse {
+//   success: boolean;
+//   data: Partial<IUser>;
+// }
 
-interface AuthResponse {
-  success: boolean;
-  user: Partial<IUser>;
-}
+// interface AuthResponse {
+//   success: boolean;
+//   data: Partial<IUser>;
+// }
 
 // Auth API functions
-const authApi = {
-  login: async (email: string, password: string): Promise<AuthResponse> => {
+export const authApi = {
+  login: async (email: string, password: string): Promise<Partial<IUser>> => {
     try {
       const { data } = await authClient.post("/login", {
         email,
         password,
       });
 
-      console.log("response : ", data);
-      return data;
+      console.log("response : ", data.data);
+      return data.data;
     } catch (error: any) {
       console.log("ERROR IN LOGIN FUNCTION : ", error);
+      toast.error(
+        error?.response?.data?.error ||
+          "Login failed. Please check your credentials."
+      );
+
       throw new Error(error.error || "Login failed");
     }
   },
 
-  register: async (user: RegisterUserSchema): Promise<AuthResponse> => {
+  register: async (user: RegisterUserSchema): Promise<Partial<IUser>> => {
     try {
       console.log("USER IN REGISTER FUNCTION : ", user);
       const { data } = await authClient.post("/register", user);
       toast.success("Registration successful! Please verify your email.");
 
-      return data;
+      return data.data;
     } catch (error: any) {
       console.log("ERROR IN REGISTER FUNCTION : ", error);
       toast.error(error?.response?.data?.error || "Registration failed");
@@ -51,17 +56,28 @@ const authApi = {
   logout: async (): Promise<{ success: boolean }> => {
     try {
       const { data } = await authClient.post("/logout");
-      return data;
+      return data.data;
     } catch (error: any) {
       throw new Error(error.error || "Logout failed");
+    }
+  },
+  deleteUser: async (): Promise<{ success: boolean }> => {
+    try {
+      const { data } = await authClient.delete("/delete");
+      console.log("DELETED USER : ", data);
+      toast.success("User account deleted successfully");
+      window.location.href = "/register";
+      return data.data;
+    } catch (error: any) {
+      throw new Error(error.error || "Deleting user account failed");
     }
   },
 
   getUser: async (): Promise<IUser> => {
     try {
       const { data } = await authClient.get("/profile");
-      console.log("GET USER DATA : ", data);
-      return data;
+      console.log("GET USER DATA : ", data.data);
+      return data.data;
     } catch (error: any) {
       throw new Error(
         "Failed to fetch user data:",
@@ -76,34 +92,34 @@ const authApi = {
   }> => {
     try {
       const { data } = await authClient.post("/send-verification");
-      return data;
+      return data.data;
     } catch (error: any) {
       throw new Error(error.error || "Login failed");
     }
   },
 
-  verifyEmail: async (code: string): Promise<AuthResponse> => {
+  verifyEmail: async (code: string): Promise<Partial<IUser>> => {
     try {
       const { data } = await authClient.post("/verify-email", { code });
 
-      return data;
+      return data.data;
     } catch (error: any) {
       throw new Error(error.error || "Login failed");
     }
   },
 
-  completeOnboarding: async (): Promise<AuthResponse> => {
+  completeOnboarding: async (): Promise<Partial<IUser>> => {
     try {
       const { data } = await authClient.post("/complete-onboarding");
-      return data;
+      return data.data;
     } catch (error: any) {
       throw new Error(error.error || "Login failed");
     }
   },
-  updateUser: async (input: any): Promise<AuthResponse> => {
+  updateUser: async (input: any): Promise<Partial<IUser>> => {
     try {
       const { data } = await authClient.put("/update", input);
-      return data;
+      return data.data;
     } catch (error: any) {
       throw new Error(error.error || "Updating user failed");
     }
@@ -114,11 +130,7 @@ export function useAuth(initialUser?: Partial<IUser>) {
   const router = useRouter();
   const queryClient = useQueryClient();
 
-  const {
-    data: user,
-    isLoading,
-    error,
-  } = useQuery({
+  const { data: user, isLoading, error } = useQuery({
     queryKey: ["auth", "user"],
     queryFn: authApi.getUser,
     retry: false,
@@ -127,11 +139,12 @@ export function useAuth(initialUser?: Partial<IUser>) {
     refetchOnWindowFocus: false,
     initialData: initialUser || undefined,
   });
-  
+
+  console.log("USER IN USEAUTH", user)
   const updateUserMutation = useMutation({
     mutationFn: (data: any) => authApi.updateUser(data),
     onSuccess: (data) => {
-      queryClient.setQueryData(["auth", "user"], { user: data.user });
+      queryClient.setQueryData(["auth", "user"], data);
       // router.push("/dashboard");
     },
   });
@@ -140,20 +153,19 @@ export function useAuth(initialUser?: Partial<IUser>) {
     mutationFn: ({ email, password }: { email: string; password: string }) =>
       authApi.login(email, password),
     onSuccess: (data) => {
-      queryClient.setQueryData(["auth", "user"], { user: data.user });
+      queryClient.setQueryData(["auth", "user"], data);
       // Check email verification first, then onboarding
-      console.log("Login successful in login mutation", data.user);
+      console.log("Login successful in login mutation", data);
       toast.success("Login successful!");
-      if (!data.user.emailVerified) {
+      if (!data.emailVerified) {
         router.push("/verify-email");
-      } else if (!data.user.onboardingComplete) {
+      } else if (!data.onboardingComplete) {
         router.push("/onboarding");
       } else {
         router.push("/dashboard");
       }
     },
     onError: (error) => {
-      toast.error("Login failed. Please check your credentials.");
       console.error("Login failed:", error);
     },
   });
@@ -162,7 +174,7 @@ export function useAuth(initialUser?: Partial<IUser>) {
   const registerMutation = useMutation({
     mutationFn: (user: RegisterUserSchema) => authApi.register(user),
     onSuccess: (data) => {
-      queryClient.setQueryData(["auth", "user"], { user: data.user });
+      queryClient.setQueryData(["auth", "user"], data);
       router.push("/verify-email");
     },
     onError: (error) => {
@@ -182,7 +194,7 @@ export function useAuth(initialUser?: Partial<IUser>) {
   const verifyEmailMutation = useMutation({
     mutationFn: (code: string) => authApi.verifyEmail(code),
     onSuccess: (data) => {
-      queryClient.setQueryData(["auth", "user"], { user: data.user });
+      queryClient.setQueryData(["auth", "user"], data);
       // After email verification, go to onboarding
       router.push("/onboarding");
     },
@@ -205,12 +217,10 @@ export function useAuth(initialUser?: Partial<IUser>) {
   const completeOnboardingMutation = useMutation({
     mutationFn: authApi.completeOnboarding,
     onSuccess: (data) => {
-      queryClient.setQueryData(["auth", "user"], { user: data.user });
+      queryClient.setQueryData(["auth", "user"], data);
       router.push("/dashboard");
     },
   });
-
-  // Update user information
 
   return {
     user,

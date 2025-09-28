@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { UserSession } from "./lib/auth-utils";
 import { jwtVerify } from "jose";
+import { IUser } from "./types";
 
-async function verifySessionToken(token: string): Promise<UserSession | null> {
+async function verifySessionToken(token: string): Promise<Partial<IUser> | null> {
   try {
     const secret = new TextEncoder().encode(process.env.JWT_SECRET);
     const { payload } = await jwtVerify(token, secret, {
@@ -60,6 +60,7 @@ export async function middleware(request: NextRequest) {
     if (session) {
       // Check email verification first
       console.log("Session found in MIDDLEWARE:", session);
+      // change later: add the ! inside the if condition
       if (!session.emailVerified) {
         return NextResponse.redirect(new URL(verifyEmailPath, request.url));
       }

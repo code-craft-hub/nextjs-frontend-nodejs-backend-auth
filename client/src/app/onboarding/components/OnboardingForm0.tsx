@@ -1,8 +1,14 @@
 "use client";
 import { Button } from "@/components/ui/button";
+import { IUser } from "@/types";
 import { motion } from "framer-motion";
-
-export const OnBoardingForm0 = ({ onNext }: any) => {
+export interface OnboardingFormProps {
+  onNext: () => void;
+  onPrev: () => void;
+  initialUser: Partial<IUser>;
+  children?: React.ReactNode;
+}
+export const OnBoardingForm0 = ({ onNext, children }: OnboardingFormProps) => {
   const handleStartOnboarding = () => {
     console.log("Starting onboarding...");
     onNext();
@@ -14,7 +20,7 @@ export const OnBoardingForm0 = ({ onNext }: any) => {
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -100 }}
       transition={{ duration: 0.3, ease: "easeInOut" }}
-      className=" flex font-poppins h-screen"
+      className="flex font-poppins h-screen relative"
     >
       <div className="flex-1 flex items-center justify-center p-8 bg-white ">
         <div className="w-full max-w-md space-y-8">
@@ -32,6 +38,7 @@ export const OnBoardingForm0 = ({ onNext }: any) => {
           </div>
         </div>
       </div>
+      <div className="absolute right-4 top-2 z-50">{children}</div>
 
       <div className="hidden lg:flex flex-1 relative overflow-hidden bg-blue-500 min-h-screen">
         <img

@@ -23,7 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { FloatingLabelInputProps } from "@/types";
+import { FloatingLabelInputProps, OnboardingFormProps } from "@/types";
 import { Checkbox } from "@/components/ui/checkbox";
 import { motion } from "framer-motion";
 import { useAuth } from "@/hooks/use-auth";
@@ -41,8 +41,10 @@ const formSchema = z.object({
   role: z.string(),
 });
 
-export const OnBoardingForm3 = ({ onNext, onPrev }: any) => {
+export const OnBoardingForm3 = ({ onNext, onPrev,initialUser }: OnboardingFormProps) => {
   const { updateUser, isUpdatingUserLoading, user } = useAuth();
+
+  console.log(user, initialUser);
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -121,7 +123,6 @@ export const OnBoardingForm3 = ({ onNext, onPrev }: any) => {
     );
   }
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log("Form submitted:", values);
     try {
       await updateUser(values);
       toast.success(` Your data has be saved!`);
@@ -224,7 +225,10 @@ export const OnBoardingForm3 = ({ onNext, onPrev }: any) => {
             </div>
 
             <Form {...form}>
-              <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
+              <form
+                className="space-y-6"
+                onSubmit={form.handleSubmit(onSubmit)}
+              >
                 <div className="space-y-4">
                   <h1>Job Type</h1>
                   <div className="grid grid-cols-2 gap-4">

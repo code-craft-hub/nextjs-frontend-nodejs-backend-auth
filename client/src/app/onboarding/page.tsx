@@ -9,15 +9,5 @@ export default async function OnboardingPage() {
     redirect("/dashboard");
   }
 
-  return (
-    <OnboardingClient
-      initialUser={{
-        uid: session.uid,
-        email: session.email,
-        emailVerified: session.emailVerified,
-        onboardingComplete: session.onboardingComplete,
-        displayName: session?.displayName,
-      }}
-    />
-  );
+  return <OnboardingClient initialUser={session} />;
 }

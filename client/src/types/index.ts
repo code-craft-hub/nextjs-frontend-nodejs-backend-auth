@@ -36,6 +36,13 @@ export interface IUser {
   questions: any[];
 }
 
+export interface OnboardingFormProps {
+  onNext: () => void;
+  onPrev: () => void;
+  initialUser: Partial<IUser>;
+  children?: React.ReactNode;
+}
+
 export interface IResume {}
 export interface ICoverLetter {}
 export interface IInterviewQuestions {}

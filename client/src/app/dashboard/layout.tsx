@@ -1,5 +1,3 @@
-"use client";
-import React, { useEffect } from "react";
 import { AppSidebar } from "@/components/app-sidebar";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -8,24 +6,18 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { UserMenu } from "@/components/user-menu";
-import { useRouter } from "next/navigation";
-import { useAuth } from "@/hooks/use-auth";
 import { DynamicBreadcrumb } from "./components/Breadcrumb";
+import { requireAuth } from "@/lib/server-auth";
+
 interface DashboardLayoutProps {
   children: React.ReactNode;
   params?: any;
   searchParams?: any;
 }
 
-const DashboardLayout = ({ children }: DashboardLayoutProps) => {
-  const { user } = useAuth();
-  const router = useRouter();
+const DashboardLayout = async ({ children }: DashboardLayoutProps) => {
+  const session = await requireAuth();
 
-  useEffect(() => {
-    if (!user) {
-      router.replace("/login");
-    }
-  }, []);
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -40,10 +32,10 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
             <DynamicBreadcrumb />
           </div>
           <div className="ml-auto">
-            <UserMenu />
+            <UserMenu initialUser={session}/>
           </div>
         </header>
-        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">{children}</div>
+        <div className="flex flex-1 flex-col gap-4">{children}</div>
       </SidebarInset>
     </SidebarProvider>
   );

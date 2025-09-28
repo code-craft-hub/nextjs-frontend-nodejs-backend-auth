@@ -42,16 +42,19 @@ interface FloatingLabelInputProps
   showPasswordToggle?: boolean;
 }
 
+export interface OnboardingFormProps {
+  onNext: () => void;
+  onPrev: () => void;
+  initialUser: Partial<IUser>;
+  children?: React.ReactNode;
+}
+
 export const OnBoardingForm1 = ({
   onNext,
   onPrev,
   initialUser,
-}: {
-  onNext: () => void;
-  onPrev: () => void;
-  initialUser: Partial<IUser>;
-}) => {
-  const { updateUser, isUpdatingUserLoading, user } = useAuth(initialUser);
+}: OnboardingFormProps) => {
+  const { updateUser, isUpdatingUserLoading, user } = useAuth();
 
   console.log(user, initialUser);
 

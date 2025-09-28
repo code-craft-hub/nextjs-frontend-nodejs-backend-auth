@@ -19,7 +19,7 @@ import { useId, useState } from "react";
 
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Input } from "@/components/ui/input";
-import { FloatingLabelInputProps } from "@/types";
+import { FloatingLabelInputProps, OnboardingFormProps } from "@/types";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
 const formSchema = z.object({
@@ -31,9 +31,13 @@ const formSchema = z.object({
   others: z.string().optional(),
 });
 
-export const OnBoardingForm5 = ({ onNext, onPrev }: any) => {
+export const OnBoardingForm5 = ({
+  onNext,
+  onPrev,
+  initialUser,
+}: OnboardingFormProps) => {
   const { updateUser, isUpdatingUserLoading, user } = useAuth();
-
+  console.log(user, initialUser);
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {

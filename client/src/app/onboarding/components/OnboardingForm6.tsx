@@ -2,8 +2,11 @@
 import { Progress } from "@/components/ui/progress";
 import { motion } from "framer-motion";
 import { useAuth } from "@/hooks/use-auth";
+import { OnboardingFormProps } from "@/types";
 
-export const OnBoardingForm6 = () => {
+export const OnBoardingForm6 = ({ initialUser }: OnboardingFormProps) => {
+  const { user } = useAuth();
+  console.log(user, initialUser);
   const {
     completeOnboarding,
     // isOnboardingLoading,

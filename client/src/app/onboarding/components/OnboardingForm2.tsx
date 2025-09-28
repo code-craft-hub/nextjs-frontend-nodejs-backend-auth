@@ -20,6 +20,7 @@ import { FileUpload } from "./file-upload";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
+import { OnboardingFormProps } from "@/types";
 
 const formSchema = z.object({
   scratch: z.boolean().default(false).optional(),
@@ -42,7 +43,7 @@ const ACCEPTED_FILE_TYPES = [
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 ];
 
-export const OnBoardingForm2 = ({ onNext, onPrev, initialUser }: any) => {
+export const OnBoardingForm2 = ({ onNext, onPrev, initialUser }: OnboardingFormProps) => {
   const { updateUser, isUpdatingUserLoading, user } = useAuth();
 
   console.log(user, initialUser);

@@ -14,7 +14,7 @@ import {
 
 import { Progress } from "@/components/ui/progress";
 import { useId, useState } from "react";
-import { FloatingLabelInputProps } from "@/types";
+import { FloatingLabelInputProps, OnboardingFormProps } from "@/types";
 import { cn } from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -32,9 +32,13 @@ const formSchema = z.object({
   others: z.string(),
 });
 
-export const OnBoardingForm4 = ({ onNext, onPrev }: any) => {
+export const OnBoardingForm4 = ({
+  onNext,
+  onPrev,
+  initialUser,
+}: OnboardingFormProps) => {
   const { updateUser, isUpdatingUserLoading, user } = useAuth();
-
+  console.log(user, initialUser);
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -205,7 +209,10 @@ export const OnBoardingForm4 = ({ onNext, onPrev }: any) => {
             </div>
 
             <Form {...form}>
-              <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
+              <form
+                className="space-y-6"
+                onSubmit={form.handleSubmit(onSubmit)}
+              >
                 <div className="space-y-4">
                   <h1>Job Type</h1>
                   <div className="grid grid-cols-2 gap-4">

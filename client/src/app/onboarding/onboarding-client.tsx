@@ -9,12 +9,20 @@ import { OnBoardingForm4 } from "./components/OnboardingForm4";
 import { OnBoardingForm5 } from "./components/OnboardingForm5";
 import { OnBoardingForm6 } from "./components/OnboardingForm6";
 import { IUser } from "@/types";
+import { authApi } from "@/hooks/use-auth";
+import { useQuery } from "@tanstack/react-query";
+import { Button } from "@/components/ui/button";
+import { X } from "lucide-react";
 
 export default function OnboardingClient({
   initialUser,
 }: {
-  initialUser: IUser;
+  initialUser: Partial<IUser>;
 }) {
+  useQuery({
+    queryKey: ["auth", "user"],
+    queryFn: authApi.getUser,
+  });
   const [currentStep, setCurrentStep] = useState(0);
   const steps = [
     OnBoardingForm0,
@@ -49,9 +57,17 @@ export default function OnboardingClient({
           initialUser={initialUser}
           onNext={nextStep}
           onPrev={prevStep}
-          // currentStep={currentStep}
-          // totalSteps={totalSteps}
-        />
+        >
+          <Button
+            className="text-blue-500 lg:text-white"
+            variant={"ghost"}
+            onClick={async () => {
+              await authApi.deleteUser();
+            }}
+          >
+            <X />
+          </Button>
+        </CurrentStepComponent>
       </AnimatePresence>
     </div>
   );
