@@ -36,6 +36,9 @@ export interface IUser {
   questions: any[];
 }
 
+export interface InitialUser {
+  initialUser: Partial<IUser>;
+}
 export interface OnboardingFormProps {
   onNext: () => void;
   onPrev: () => void;
@@ -283,8 +286,6 @@ export type IResumeSample = {
   cvJobTitle: string;
 };
 
-
-
 export type INavLink = {
   imgURL: string;
   route: string;
@@ -337,7 +338,6 @@ export type IUpdateUserProfile = {
   skills: any[];
   workExperiences: any[];
 };
-
 
 export type INewUser = {
   email: string;
@@ -511,7 +511,6 @@ export type childChartType = {
     question: number;
   }[];
 };
-
 
 export type ApprovedT = {
   duration: string;

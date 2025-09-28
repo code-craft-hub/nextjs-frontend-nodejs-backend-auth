@@ -125,7 +125,7 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
 ];
 
 
-export function DataTable({ data }: { data: z.infer<typeof schema>[] }) {
+export function AIApplyDatatable({ data }: { data: z.infer<typeof schema>[] }) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});

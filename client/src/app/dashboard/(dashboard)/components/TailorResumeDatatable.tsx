@@ -34,7 +34,9 @@ export const schema = z.object({
   id: z.number(),
   jobTitle: z.string(),
   applicationDate: z.string(),
-  applicationMethod: z.string().array(),
+  applicationMethod: z.array(
+    z.object({ value: z.string(), title: z.string() })
+  ),
   action: z.string(),
 });
 
@@ -89,19 +91,21 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
     header: "Application Method",
     cell: ({ row }) => (
       <div className="flex gap-2">
-        {row.original.applicationMethod.map((method, index) => (
-          <div key={method}>
+        {row.original.applicationMethod.map((method) => (
+          <div key={method.title}>
             <Badge
               variant="outline"
-              key={method}
+              key={method.title}
               className={cn(
                 "text-muted-foreground px-1.5 rounded-2xl font-jakarta",
-                index % 2 === 0
-                  ? "bg-primary/10 border-primary/40 text-primary"
-                  : "bg-cverai-green/10 border-cverai-green/40 text-cverai-green"
+                method.value === "resume"
+                  ? "bg-primary/10 border-primary/40 text-primary "
+                  : method.value === "cover-letter"
+                  ? "bg-cverai-green/10 border-cverai-green/40 text-cverai-green"
+                  : "bg-orange-500/10 border-orange-500/40 text-orange-500"
               )}
             >
-              {method}
+              {method.title}
             </Badge>
           </div>
         ))}
@@ -124,8 +128,11 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
   },
 ];
 
-
-export function DataTable({ data }: { data: z.infer<typeof schema>[] }) {
+export function TailorResumeDatatable({
+  data,
+}: {
+  data: z.infer<typeof schema>[];
+}) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
@@ -137,8 +144,6 @@ export function DataTable({ data }: { data: z.infer<typeof schema>[] }) {
     pageIndex: 0,
     pageSize: 10,
   });
-
- 
 
   const table = useReactTable({
     data,

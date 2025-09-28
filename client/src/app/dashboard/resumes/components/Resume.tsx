@@ -4,13 +4,12 @@ import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { v4 as uuid } from "uuid";
 import { useRouter } from "next/navigation";
-import ResumeChatBox from "./ResumeChatBox";
 import InsufficientCreditsModal from "@/components/shared/InsufficientCreditsModal";
 import { useAuth } from "@/hooks/use-auth";
+import { ResumeTemplate } from "../[id]/components/resume";
 
-function Resume() {
-  const { user:dbUser } = useAuth();
-  const [jobDescription, setJobDescription] = useState("");
+function Resume({jobDescription}: {jobDescription: string}) {
+  const { user: dbUser } = useAuth();
 
   const [selectedProfile, setSelectedProfile] = useState<any>(() => {
     if (!dbUser) return null;
@@ -78,16 +77,7 @@ function Resume() {
 
   return (
     <>
-      <section className="px-4 sm:px-8">
-        <ResumeChatBox
-          items={dbUser}
-          selectedProfile={selectedProfile}
-          setSelectedProfile={setSelectedProfile}
-          jobDescription={jobDescription}
-          setJobDescription={setJobDescription}
-          onSubmit={onSubmit}
-        />
-      </section>
+      <ResumeTemplate jobDescription={jobDescription} />
       {creditAlert ? <InsufficientCreditsModal /> : ""}
     </>
   );

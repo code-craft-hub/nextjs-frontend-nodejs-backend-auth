@@ -1,12 +1,11 @@
 "use client";
 import { monthYear, normalizeToString } from "@/lib/utils/helpers";
 import React, { useEffect } from "react";
-import { sampleJobDescription, sampleUserProfile } from "@/types";
+import { sampleUserProfile } from "@/types";
 import { useResumeStream } from "../../hooks/useResumeStream";
 
-export const ResumeTemplate = () => {
+export const ResumeTemplate = ({jobDescription}: {jobDescription: string}) => {
   const userProfile = sampleUserProfile;
-  const jobDescription = sampleJobDescription;
   const endpoint = "http://localhost:8080/api/generate-resume-stream";
   const { streamData, streamStatus, startStream } =
     useResumeStream(endpoint);
@@ -120,7 +119,7 @@ export const ResumeTemplate = () => {
   const projects = processProjects(streamData.projects);
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-black">
+    <div className="max-w-4xl mx-auto p-6">
       {/* Stream Status Indicator */}
       <div className="mb-4 p-3 rounded-lg border">
         <div className="flex items-center gap-2 text-sm">

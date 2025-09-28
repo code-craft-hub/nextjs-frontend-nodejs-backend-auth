@@ -1,7 +1,6 @@
 
 import {
   SidebarGroup,
-  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -34,17 +33,17 @@ export function NavProjects({
   };
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-      <SidebarGroupLabel>Menus</SidebarGroupLabel>
+      {/* <SidebarGroupLabel>Menus</SidebarGroupLabel> */}
       <SidebarMenu>
         {projects.map((item) => (
-          <SidebarMenuItem key={item.title}>
+          <SidebarMenuItem className="" key={item.title}>
             <SidebarMenuButton
-              className={cn(activeLink(item.link) && "bg-accent")}
+              className={cn(activeLink(item.link) && "bg-primary text-white"," hover:text-white hover:bg-primary/80")}
               asChild
             >
-              <Link href={item.link}>
+              <Link href={item.link} className="">
                 <item.icon />
-                <span>
+                <span className="ml-1">
                   {item.title}
                 </span>
               </Link>
