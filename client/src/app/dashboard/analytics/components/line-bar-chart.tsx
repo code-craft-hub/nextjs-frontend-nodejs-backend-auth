@@ -18,12 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   ChartContainer,
   ChartTooltip,
@@ -138,27 +133,30 @@ export const UsageTrendDashboard = (): JSX.Element => {
 
   return (
     <Card className="w-full shadow-lg border border-gray-200 grid grid-cols-1 font-inter">
-      <CardHeader className="flex items-center justify-between gap-4 flex-col md:flex-row">
+      <CardHeader className="flex items-center justify-between gap-4 flex-wrap pr-4">
         <div className="">
           <CardTitle className="text-2xl font-bold text-gray-900 text-nowrap">
             Usage Trend
           </CardTitle>
-         
         </div>
-        <div className="flex justify-center gap-4 ">
+        <div className="flex flex-wrap justify-center gap-4 ">
           <div className="flex items-center gap-2">
             <div
               className="size-2 rounded-full shrink-0"
               style={{ backgroundColor: chartConfig.desktop.color }}
             />
-            <span className="text-sm font-medium text-gray-700 text-nowrap">Auto Applications</span>
+            <span className="text-sm font-medium text-gray-700 text-nowrap">
+              Auto Applications
+            </span>
           </div>
           <div className="flex items-center gap-2">
             <div
               className="size-2 rounded-full shrink-0"
               style={{ backgroundColor: chartConfig.mobile.color }}
             />
-            <span className="text-sm font-medium text-gray-700 text-nowrap">Tailored Documents</span>
+            <span className="text-sm font-medium text-gray-700 text-nowrap">
+              Tailored Documents
+            </span>
           </div>
           <Select defaultValue="last-week">
             <SelectTrigger className="w-">
@@ -230,13 +228,14 @@ export const UsageTrendDashboard = (): JSX.Element => {
               />
               <defs>
                 <linearGradient id="customGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="50%" stopColor="#E6EDFF" stopOpacity={1} />
-                  <stop offset="100%" stopColor="#0F123F" stopOpacity={1} />
+                  <stop offset="0%" stopColor="#E6EDFF" stopOpacity={0.5} />
+                  <stop offset="100%" stopColor="#0F123F" stopOpacity={0.31} />
                 </linearGradient>
               </defs>
               <ChartTooltip
                 content={
                   <CveraiChartTooltipContent
+                    // hideLabel
                     labelFormatter={(value) => {
                       return String(value);
                     }}
@@ -263,6 +262,7 @@ export const UsageTrendDashboard = (): JSX.Element => {
                 dataKey="Total"
                 fill="transparent"
                 stroke="none"
+                barSize={40}
                 shape={CustomBarShape}
               />
             </ComposedChart>
