@@ -129,8 +129,8 @@ export const overviewColumns: ColumnDef<IJobType>[] = [
       );
     },
     cell: ({ row }) => (
-      <div className="bg-slate-200 p-2 flex items-center justify-center">
-        {row.original.companyText}
+      <div className=" flex items-center justify-center">
+        <img src={row.original.companyText} alt={row.original.companyText} />
       </div>
     ),
   },
@@ -147,19 +147,19 @@ export const overviewColumns: ColumnDef<IJobType>[] = [
           </div>
         </div>
         <div className="flex gap-x-4 mt-1">
-          <p className="flex gap-1 text-gray-300">
+          <p className="flex gap-1 text-gray-400">
             <MapPin className="size-3" />
             <span className="text-2xs"> {row.original.location}</span>
           </p>
-          <p className="flex gap-1 text-gray-300">
+          <p className="flex gap-1 text-gray-400">
             <DollarSign className="size-3" />
             <span className="text-2xs"> {row.original.salary}</span>
           </p>
-          <p className="flex gap-1 text-gray-300">
+          <p className="flex gap-1 text-gray-400">
             <Calendar className="size-3" />
             <span className="text-2xs">{row.original.postedTime}</span>
           </p>
-          <p className="text-2xs text-green-300">
+          <p className="text-2xs text-green-400">
             %{row.original.matchPercentage}
           </p>
         </div>

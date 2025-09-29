@@ -1,5 +1,5 @@
 import React from "react";
-import JobListingId from "../dashboard/job-listings/[id]/components/JobID";
+import JobListingId from "../dashboard/jobs/[id]/components/JobID";
 import { Header } from "@/components/landing-page/Header";
 
 const JobListingPage = () => {

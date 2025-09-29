@@ -1,15 +1,14 @@
-
 import {
   SidebarGroup,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { IconType } from "react-icons";
-import Link from "next/link";
 import { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 export function NavProjects({
   projects,
@@ -20,9 +19,8 @@ export function NavProjects({
     icon: LucideIcon | IconType;
   }[];
 }) {
+  const pathname = usePathname();
 
-  const pathname = usePathname()
-  
   // const { isMobile } = useSidebar();
 
   const activeLink = (link: string) => {
@@ -31,6 +29,10 @@ export function NavProjects({
     // const active = !!link?.startsWith(pathname);
     return active;
   };
+
+  const router = useRouter();
+  const { isMobile, toggleSidebar } = useSidebar();
+
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
       {/* <SidebarGroupLabel>Menus</SidebarGroupLabel> */}
@@ -38,15 +40,26 @@ export function NavProjects({
         {projects.map((item) => (
           <SidebarMenuItem className="" key={item.title}>
             <SidebarMenuButton
-              className={cn(activeLink(item.link) && "bg-primary text-white"," hover:text-white hover:bg-primary/80")}
+              className={cn(
+                activeLink(item.link) ? "text-primary": "text-black",
+                "hover:text-white hover:bg-primary/80 group"
+              )}
               asChild
             >
-              <Link href={item.link} className="">
-                <item.icon />
-                <span className="ml-1">
-                  {item.title}
-                </span>
-              </Link>
+              <div
+                onClick={() => {
+                  router.push(item.link);
+                  setTimeout(() => {
+                    if (isMobile) {
+                      toggleSidebar();
+                    }
+                  }, 500);
+                }}
+                className=""
+              >
+                <item.icon className="text-black group-hover:text-white"/>
+                <span className="ml-1">{item.title}</span>
+              </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
         ))}

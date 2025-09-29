@@ -157,9 +157,9 @@ export function useAuth(initialUser?: Partial<IUser>) {
       // Check email verification first, then onboarding
       console.log("Login successful in login mutation", data);
       toast.success("Login successful!");
-      if (!data.emailVerified) {
+      if (!data?.emailVerified) {
         router.push("/verify-email");
-      } else if (!data.onboardingComplete) {
+      } else if (!data?.onboardingComplete) {
         router.push("/onboarding");
       } else {
         router.push("/dashboard");

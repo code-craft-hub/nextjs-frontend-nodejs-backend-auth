@@ -13,7 +13,7 @@ import {
   memo,
   useMemo,
 } from "react";
-import JobDashboard from "./UglyFindJob";
+import JobDashboard from "./FindJobClient";
 
 
 

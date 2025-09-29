@@ -310,11 +310,17 @@ export const LandingPageClient = () => {
               </nav>
               <div className="hidden lg:flex items-center space-x-4">
                 {!!user ? (
-                  <Button onClick={() => router.push(`/dashboard`)} className="bg-blue-600 hover:bg-blue-700 text-white px-6 rounded-lg">
+                  <Button
+                    onClick={() => router.push(`/dashboard`)}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 rounded-lg"
+                  >
                     Dashboard
                   </Button>
                 ) : (
-                  <Button onClick={() => router.push(`/register`)} className="bg-blue-600 hover:bg-blue-700 text-white px-6 rounded-lg">
+                  <Button
+                    onClick={() => router.push(`/register`)}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 rounded-lg"
+                  >
                     Get started
                   </Button>
                 )}
@@ -387,7 +393,7 @@ export const LandingPageClient = () => {
                       </Button>
                     </SheetClose>
                     <SheetClose asChild>
-                      <Button className="bg-blue-600 hover:bg-blue-700 text-white px-6">
+                      <Button onClick={() => {router.push("/dashboard")}} className="bg-blue-600 hover:bg-blue-700 text-white px-6">
                         Get started
                       </Button>
                     </SheetClose>
@@ -398,17 +404,17 @@ export const LandingPageClient = () => {
           </div>
         </header>
         <div className="pt-32 mx-auto">
-          <h1 className="text-4xl text-center font-semibold s:text-red-900 mb-6 font-instrument">
-            AI Assist to Apply
+          <h1 className="text-4xl text-center font-medium s:text-red-900 mb-16 !font-instrument">
+            Never Miss a Job Opportunity Again{" "}
           </h1>
         </div>
       </section>
       <section className="relative overflow-hidden">
         <div className="max-w-4xl mx-auto px-4 pb-20 lg:pb-32 space-y-8">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="flex flex-col xs5:flex-row items-center justify-center mx-auto gap-4">
             {actionButtons.map((option) => (
               <div key={option.name}>
-                <a href="#" className="glass-button !text-black">
+                <a href="#" className="glass-button !text-black w-48">
                   <img src={option.icon} alt={option.name} className="" />
                   {option.name}
                 </a>
@@ -427,7 +433,7 @@ export const LandingPageClient = () => {
                 </div>
                 <textarea
                   placeholder="Let's get started"
-                  className="w-full h-36 border p-2 resize-none rounded-2xl pl-4 pt-2  placeholder:font-medium hover:shadow-2xl transition-all duration-500"
+                  className="w-full h-36 border p-2 resize-none rounded-2xl pl-4 pt-2  placeholder:font-medium shadow-xl shadow-blue-100 transition-all duration-500"
                 ></textarea>
                 <div
                   className="border-blue-500 border-[1px] w-fit rounded-full p-1 absolute bottom-4 right-3 "

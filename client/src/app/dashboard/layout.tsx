@@ -35,7 +35,7 @@ const DashboardLayout = async ({ children }: DashboardLayoutProps) => {
             <UserMenu initialUser={session}/>
           </div>
         </header>
-        <div className="flex flex-1 flex-col gap-4">{children}</div>
+        <div className="flex flex-1 flex-col gap-4 max-w-screen-xl">{children}</div>
       </SidebarInset>
     </SidebarProvider>
   );

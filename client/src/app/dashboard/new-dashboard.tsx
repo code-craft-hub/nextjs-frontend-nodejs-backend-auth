@@ -105,7 +105,7 @@ export const DashboardClient = memo(({ initialUser }: InitialUser) => {
         }}
       />
 
-      <Tabs defaultValue="ai-apply" className="gap-y-13 w-full p-4">
+      <Tabs defaultValue="ai-apply" className="gap-y-13 w-full p-4 sm:p-8">
         <TabsList className="gap-3 justify-center bg-transparent flex flex-row w-full mt-24">
           {TAB_ITEMS.map((item) => (
             <TabsTrigger
