@@ -5,35 +5,30 @@ import "./glass.css";
 import {
   MapPin,
   ChevronDown,
-  Menu,
   ArrowRight,
   Plus,
   ArrowUp,
   Bookmark,
   ChevronRight,
-  Mail,
 } from "lucide-react";
-import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetFooter,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
-import { useAuth } from "@/hooks/use-auth";
-import { useUserLocation } from "@/hooks/get-user-location";
 import { useRouter } from "next/navigation";
 import { Footer } from "@/components/landing-page/Footer";
-import { actionButtons, blogs, coreFeatures, creditCard, faqItems, featuredJobs, howItWorks, navItems, testimonials } from "./constants";
+import {
+  actionButtons,
+  blogs,
+  coreFeatures,
+  creditCard,
+  faqItems,
+  featuredJobs,
+  howItWorks,
+  testimonials,
+} from "./constants";
+import { Header } from "./components/Header";
 
 export const LandingPageClient = () => {
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const router = useRouter();
-  const { user } = useAuth();
-  const { flag } = useUserLocation();
 
   return (
     <div className="min-h-screen bg-white font-poppins">
@@ -45,119 +40,7 @@ export const LandingPageClient = () => {
           backgroundPosition: "center center",
         }}
       >
-        <header className="fixed w-full top-0 z-50  backdrop-blur-sm">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between h-16">
-              <div className="flex items-center space-x-2">
-                <img src="/logo.svg" alt="" />
-              </div>
-
-              <nav className="hidden lg:flex items-center space-x-8">
-                {navItems.map((nav) => (
-                  <a
-                    key={nav.name}
-                    href="#"
-                    className="font-semibold font-poppins text-black hover:text-gray-900 transition-colors hover:bg-accent px-4 py-2 rounded-xl"
-                  >
-                    {nav.name}
-                  </a>
-                ))}
-              </nav>
-              <div className="hidden lg:flex items-center space-x-4">
-                {!!user ? (
-                  <Button
-                    onClick={() => router.push(`/dashboard`)}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 rounded-lg"
-                  >
-                    Dashboard
-                  </Button>
-                ) : (
-                  <Button
-                    onClick={() => router.push(`/register`)}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 rounded-lg"
-                  >
-                    Get started
-                  </Button>
-                )}
-              </div>
-
-              <Sheet>
-                <SheetTrigger asChild className="lg:hidden p-2 rounded-lg">
-                  <Button variant="ghost">
-                    <Menu size={24} />
-                  </Button>
-                </SheetTrigger>
-                <SheetContent className="w-[50%]">
-                  <SheetTitle className="sr-only">mobile nav</SheetTitle>
-                  <div className="flex items-center space-x-2 ml-4 mt-4">
-                    <img src="/logo.svg" alt="" />
-                  </div>
-                  {!!user && (
-                    <div className="flex items-center gap-3  p-4">
-                      <Avatar className="size-10">
-                        <AvatarImage
-                          src={user?.photoURL as string}
-                          alt="@avatar"
-                        />
-                        <AvatarFallback>
-                          {user?.firstName?.charAt(0)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 max-w-[190px] overflow-hidden">
-                          <h3 className="font-semibold text-nowrap overflow-hidden">
-                            {user?.firstName} {user?.lastName}
-                          </h3>
-                          <span className="-mb-2">
-                            {flag && (
-                              <div className="size-4 shrink-0">
-                                <img loading="lazy" src={flag} alt="" />
-                              </div>
-                            )}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2 text-sm text-gray-600">
-                          <span>{user?.email}</span>
-                          <Mail className="w-4 h-4 text-gray-400 cursor-pointer hover:text-gray-600" />
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                  <SheetClose className="">
-                    {navItems?.map((item) => {
-                      return (
-                        <div
-                          key={item.name}
-                          // onClick={() => item.onClick()}
-                          className="flex items-center gap-3 p-3 px-4 hover:bg-muted cursor-pointer border-t"
-                        >
-                          <span className=" font-medium">{item.icon}</span>
-                          <span className=" font-medium">{item.name}</span>
-                        </div>
-                      );
-                    })}
-                  </SheetClose>
-
-                  <SheetFooter>
-                    <SheetClose asChild>
-                      <Button
-                        variant="outline"
-                        className="text-gray-600 hover:text-gray-900"
-                      >
-                        Log in
-                      </Button>
-                    </SheetClose>
-                    <SheetClose asChild>
-                      <Button onClick={() => {router.push("/dashboard")}} className="bg-blue-600 hover:bg-blue-700 text-white px-6">
-                        Get started
-                      </Button>
-                    </SheetClose>
-                  </SheetFooter>
-                </SheetContent>
-              </Sheet>
-            </div>
-          </div>
-        </header>
+        <Header />
         <div className="pt-32 mx-auto">
           <h1 className="text-4xl text-center font-medium s:text-red-900 mb-16 !font-instrument">
             AI Assist To Apply
@@ -494,7 +377,8 @@ export const LandingPageClient = () => {
             </div>
             <div className="">
               <p className="text-xs">
-                Don&apos;t miss out—get the latest job updates and blog insights!
+                Don&apos;t miss out—get the latest job updates and blog
+                insights!
               </p>
               <div className="flex gap-2 items-center mt-1">
                 <p className="text-blue-500 text-[12px]">See more posts</p>
