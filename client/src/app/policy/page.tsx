@@ -1,7 +1,7 @@
 "use client"
 
 import {Footer} from "@/components/landing-page/Footer";
-import { Header } from "@/components/landing-page/Header";
+import { Header } from "../(landing-page)/components/Header";
 
 const Policy = () => {
   return (
