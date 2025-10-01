@@ -202,7 +202,7 @@ export function TailorResumeDatatable({
           <TableBody className="**:data-[slot=table-cell]:first:w-8">
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow>
+                <TableRow key={row.id}>
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id} className="px-6">
                       {flexRender(

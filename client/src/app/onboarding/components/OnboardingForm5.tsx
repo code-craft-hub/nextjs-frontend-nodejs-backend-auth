@@ -48,7 +48,6 @@ export const OnBoardingForm5 = ({
   function FloatingLabelInput({
     id,
     label,
-    type = "text",
     className = "",
     showPasswordToggle = false,
     ...props
@@ -113,6 +112,7 @@ export const OnBoardingForm5 = ({
       toast.success(` Your data has be saved!`);
       onNext();
     } catch (error) {
+      console.error(error)
       toast.error(` please try again.`);
       toast("Skip this process", {
         action: {

@@ -1,16 +1,16 @@
-import Logo from "@/components/navbar-components/logo"
-import { Button } from "@/components/ui/button"
+import Logo from "@/components/navbar-components/logo";
+import { Button } from "@/components/ui/button";
 import {
   NavigationMenu,
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
-} from "@/components/ui/navigation-menu"
+} from "@/components/ui/navigation-menu";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
+} from "@/components/ui/popover";
 
 // Navigation links array to be used in both desktop and mobile menus
 const navigationLinks = [
@@ -18,7 +18,7 @@ const navigationLinks = [
   { href: "#", label: "Features" },
   { href: "#", label: "Pricing" },
   { href: "#", label: "About" },
-]
+];
 
 export default function NavMenu() {
   return (
@@ -41,7 +41,7 @@ export default function NavMenu() {
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
-                  strokeWidth="2"
+                  stroke-width="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   xmlns="http://www.w3.org/2000/svg"
@@ -113,5 +113,5 @@ export default function NavMenu() {
         </div>
       </div>
     </header>
-  )
+  );
 }

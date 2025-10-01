@@ -1,8 +1,5 @@
 import React from "react";
-import { Button } from "@/components/ui/button";
-
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { ArrowRight, SearchIcon } from "lucide-react";
+import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import {
   ColumnFiltersState,
   flexRender,
@@ -15,14 +12,8 @@ import {
   VisibilityState,
 } from "@tanstack/react-table";
 
-import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
-
-import { cn } from "@/lib/utils";
-
-import { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown, Calendar, MapPin } from "lucide-react";
-import { FaRegBookmark, FaBookmark } from "react-icons/fa";
 import { jobsData, overviewColumns } from "./AIRecommendations";
+import { SearchBar } from "../category/category";
 
 export type IJobType = {
   id: number;
@@ -69,41 +60,15 @@ export const ApplicationHistory = () => {
     },
   });
 
-  return (
-    <div className="font-inter flex flex-col xl:flex-row  w-full overflow-hidden gap-4 xl:gap-8">
-      <div className="space-y-4 w-full">
-        <div className="flex flex-col gap-4">
-          <div className="flex justify-between">
-            <div className="">All Jobs</div>
-            <p className="text-xs flex gap-1 text-gray-400">
-              <span className="">View all</span>
-              <ArrowRight className="size-4" />
-            </p>
-          </div>
-        </div>
 
+  return (
+    <div className="font-inter grid grid-cols-1 w-full overflow-hidden gap-4 xl:gap-8">
+      <div className="space-y-4 w-full">
+        <h1 className="text-3xl text-center mb-8 font-medium font-inter">
+          Application History
+        </h1>
+       <SearchBar />
         <div className="w-full flex flex-col gap-6">
-          <div className="bg-white shadow-lg p-4 flex gap-4 justify-between  rounded-lg">
-            <div className="flex items-center gap-2 w-full">
-              <SearchIcon />
-              <input
-                type="text"
-                value={
-                  (table.getColumn("company")?.getFilterValue() as string) ?? ""
-                }
-                onChange={(event) =>
-                  table.getColumn("company")?.setFilterValue(event.target.value)
-                }
-                placeholder="Job title / Company name"
-                className={cn(
-                  "focus-visible:border-none focus-visible:outline-none w-full"
-                )}
-              />
-            </div>
-            <div className="">
-              <Button>Search</Button>
-            </div>
-          </div>
           <div className="overflow-hidden border-none">
             <Table>
               <TableBody className="">

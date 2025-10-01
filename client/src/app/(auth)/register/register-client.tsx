@@ -164,7 +164,7 @@ export default function RegisterClient() {
             <div>
               <h1 className="text-3xl font-bold text-gray-900 mb-2">Sign up</h1>
               <p className="text-gray-600">
-                Let's get you all set up so you can access your personal
+                Let&apos;s get you all set up so you can access your personal
                 account.
               </p>
             </div>

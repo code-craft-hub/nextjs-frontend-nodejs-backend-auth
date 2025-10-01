@@ -15,7 +15,7 @@ export const AILoader = () => {
             <p className="font-bold  text-dark-400">
               Cver is processing your request
             </p>
-            <p className="text-sm text-gray-300">She'll get the best results for you.</p>
+            <p className="text-sm text-gray-300">She&apos;ll get the best results for you.</p>
           </div>
 
           {/* <AlertDialogTitle className="p-24-bold text-dark-600">

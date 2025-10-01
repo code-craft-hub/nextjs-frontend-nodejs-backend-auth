@@ -216,7 +216,8 @@ export async function getCurrentUser(user: any) {
       }
     }
     return null;
-  } catch (_) {
+  } catch (error) {
+    console.error(error)
     return null;
   }
 }

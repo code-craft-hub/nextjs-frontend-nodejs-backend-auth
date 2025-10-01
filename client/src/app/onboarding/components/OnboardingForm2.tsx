@@ -58,11 +58,13 @@ export const OnBoardingForm2 = ({ onNext, onPrev, initialUser }: OnboardingFormP
   async function onSubmit(values: z.infer<typeof formSchema>) {
     console.log("Form submitted:", values);
     const { resume, ...rest } = values;
+    if(resume) console.log(resume)
     try {
       await updateUser(rest);
       toast.success(` Your data has be saved!`);
       onNext();
     } catch (error) {
+      console.error(error)
       toast.error(` please try again.`);
       toast("Skip this process", {
         action: {

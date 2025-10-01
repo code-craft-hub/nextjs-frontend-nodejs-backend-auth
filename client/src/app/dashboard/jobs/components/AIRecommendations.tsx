@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 
-import { ArrowRight, SearchIcon } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import {
   ColumnFiltersState,
   flexRender,
@@ -15,8 +15,6 @@ import {
 } from "@tanstack/react-table";
 
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
-
-import { cn } from "@/lib/utils";
 
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown, Calendar, MapPin } from "lucide-react";
@@ -52,8 +50,8 @@ export const overviewColumns: ColumnDef<IJobType>[] = [
       );
     },
     cell: ({ row }) => (
-      <div className=" flex items-center justify-center">
-        <img src={row.original.companyText} alt={row.original.companyText} />
+      <div className="flex size-10 items-center justify-center shrink-0">
+        <img className="shrink-0" src={row.original.companyText} alt={row.original.companyText} />
       </div>
     ),
   },
@@ -243,40 +241,21 @@ export const AIRecommendations = () => {
   });
 
   return (
-    <div className="font-inter flex flex-col xl:flex-row  w-full overflow-hidden gap-4 xl:gap-8">
+    <div className="font-inter grid grid-cols-1 w-full overflow-hidden gap-4 xl:gap-8">
+
       <div className="space-y-4 w-full">
+      <h1 className="text-3xl text-center mb-8 font-medium font-inter">AI Recommendations</h1>
         <div className="flex flex-col gap-4">
-          <div className="flex justify-between">
-            <div className="">All Jobs</div>
+          <div className="ml-auto w-fit bg-white p-2">
             <p className="text-xs flex gap-1 text-gray-400">
-              <span className="">View all</span>
-              <ArrowRight className="size-4" />
+              <span className="">Filter options</span>
+              <ChevronDown className="size-4" />
             </p>
           </div>
         </div>
 
         <div className="w-full flex flex-col gap-6">
-          <div className="bg-white shadow-lg p-4 flex gap-4 justify-between  rounded-lg">
-            <div className="flex items-center gap-2 w-full">
-              <SearchIcon />
-              <input
-                type="text"
-                value={
-                  (table.getColumn("company")?.getFilterValue() as string) ?? ""
-                }
-                onChange={(event) =>
-                  table.getColumn("company")?.setFilterValue(event.target.value)
-                }
-                placeholder="Job title / Company name"
-                className={cn(
-                  "focus-visible:border-none focus-visible:outline-none w-full"
-                )}
-              />
-            </div>
-            <div className="">
-              <Button>Search</Button>
-            </div>
-          </div>
+       
           <div className="overflow-hidden border-none">
             <Table>
               <TableBody className="">

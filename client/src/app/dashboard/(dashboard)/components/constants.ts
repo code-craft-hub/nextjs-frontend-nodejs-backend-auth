@@ -1,9 +1,17 @@
+
+import SelectProfileIcon from "@/components/icons/SelectProfileIcon";
+import CameraIcon from "@/components/icons/cameraIcon";
+import TailorCoverLetterIcon from "@/components/icons/TailorCoverLetterIcon";
+import TailorInterviewQuestionIcon from "@/components/icons/TailorInterviewQuestionIcon";
+import TailorResumeIcon from "@/components/icons/TailorResumeIcon";
 import { IUser } from "@/types";
+import UploadCloudIcon from "@/components/icons/UploadCloudIcon";
 
 export interface ProfileOption {
   value: string;
   label: string;
-  icon: string;
+  image?: string;
+  icon?: React.ComponentType<{ className: string }>;
 }
 
 export type ActionValue =
@@ -14,39 +22,41 @@ export type ActionValue =
   | "tailor-cover-letter"
   | "generate-interview-questions";
 
-export const PROFILE_OPTIONS: readonly ProfileOption[] = [
-  {
-    value: "select-profile",
-    label: "Select Profile",
-    icon: "/select-profile.svg",
-  },
-  {
-    value: "upload-file",
-    label: "Upload file or link",
-    icon: "/upload-dashboard.svg",
-  },
-  {
-    value: "upload-photo",
-    label: "Upload photo",
-    icon: "/camera.svg",
-  },
-] as const;
+
+  
+  export const PROFILE_OPTIONS: readonly ProfileOption[] = [
+    {
+      value: "select-profile",
+      label: "Select Profile",
+      icon: SelectProfileIcon,
+    },
+    {
+      value: "upload",
+      label: "Upload file or link",
+      icon: UploadCloudIcon,
+    },
+    {
+      value: "upload-photo",
+      label: "Upload image",
+      icon: CameraIcon,
+    },
+  ] as const;
 
 export const ACTION_OPTIONS: readonly ProfileOption[] = [
   {
     value: "tailor-resume",
     label: "Tailor Resume",
-    icon: "/tailor-resume.svg",
+    icon: TailorResumeIcon,
   },
   {
     value: "tailor-cover-letter",
     label: "Tailor Cover Letter",
-    icon: "/tailor-letter.svg",
+    icon: TailorCoverLetterIcon,
   },
   {
     value: "generate-interview-questions",
     label: "Generate Interview Questions",
-    icon: "/tailor-question.svg",
+    icon: TailorInterviewQuestionIcon,
   },
 ] as const;
 

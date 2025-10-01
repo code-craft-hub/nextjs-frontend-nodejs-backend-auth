@@ -1,321 +1,251 @@
 "use client";
-import { InitialUser, IUser } from "@/types";
-import { cn } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { memo, useMemo } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { IUser } from "@/types";
+import { cn } from "@/lib/utils";
+import { JSX, memo, useCallback, useMemo } from "react";
 import { ApplicationHistory } from "../components/ApplicationHistory";
 import { SavedJobs } from "../components/SavedJobs";
 import { AIRecommendations } from "../components/AIRecommendations";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { MdLocationSearching } from "react-icons/md";
+import { Separator } from "@/components/ui/separator";
+import { FaChevronDown } from "react-icons/fa";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Card } from "@/components/ui/card";
+import { IoLocationOutline } from "react-icons/io5";
+import { SearchIcon } from "lucide-react";
 
-interface ProfileOption {
-  value: string;
+// Types
+type ComponentId =
+  | "overview"
+  | "ai-recommendations"
+  | "saved-jobs"
+  | "application-history";
+
+interface MenuItem {
+  id: ComponentId;
   label: string;
   icon: string;
+  url: string;
 }
 
-type ActionValue =
-  | "select-profile"
-  | "upload-file"
-  | "upload-photo"
-  | "tailor-resume"
-  | "tailor-cover-letter"
-  | "generate-interview-questions";
-
-const SelectOptions = memo(
-  ({
-    options,
-    value,
-    onValueChange,
-    placeholder,
-    className = "",
-    triggerClassName = "",
-  }: {
-    options: readonly ProfileOption[];
-    value: ActionValue;
-    onValueChange: (value: ActionValue) => void;
-    placeholder: string;
-    className?: string;
-    triggerClassName?: string;
-  }) => (
-    <div className={cn("w-full max-w-md mx-auto", className)}>
-      <Select value={value} onValueChange={onValueChange}>
-        <SelectTrigger className={cn("w-full", triggerClassName)}>
-          <SelectValue placeholder={placeholder} />
-        </SelectTrigger>
-        <SelectContent className="w-full bg-white border border-gray-200 rounded-lg shadow-lg mt-1">
-          {options.map(({ value, label, icon }) => (
-            <SelectItem
-              key={value}
-              value={value}
-              className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors duration-150"
-            >
-              <div className="flex items-center gap-3 w-full">
-                <img src={icon} alt={value} loading="lazy" />
-                {/* {icon} */}
-                {/* <Icon /> */}
-                <span className="text-gray-900 font-medium">{label}</span>
-              </div>
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </div>
-  )
-);
-
-SelectOptions.displayName = "SelectOptions";
-
-const RecentActivityCard = memo(() => {
-  const badgeData = useMemo(
-    () => [
-      { text: "Full-Time", variant: "teal" as const },
-      { text: "Lagos, Nigeria", variant: "blue" as const },
-      { text: "92% match", variant: "orange" as const },
-    ],
-    []
-  );
-
-  return (
-    <div className="flex bg-slate-50 p-4 sm:p-6 rounded-xl gap-4 sm:gap-6 border border-[#cbd5e1]">
-      <div className="shrink-0">
-        <img src="./company.svg" alt="" loading="lazy" />
-      </div>
-      <div className="flex flex-col gap-2">
-        <h1 className="font-inter">Social Media Assistant</h1>
-        <p className="font-poppins text-cverai-brown text-xs">
-          Nomad · <span className="font-inter">$2,000-5,000 / Monthly</span>
-        </p>
-        <div className="flex flex-wrap gap-2">
-          {badgeData.map((badge, badgeIndex) => (
-            <div key={badgeIndex} className="flex items-center gap-2">
-              <Badge
-                className={cn(
-                  "rounded-full font-epilogue font-semibold",
-                  badge.variant === "teal"
-                    ? "bg-cverai-teal/10 text-cverai-teal"
-                    : badge.variant === "blue"
-                    ? "text-cverai-blue border-cverai-blue bg-white"
-                    : "text-cverai-orange border-cverai-orange bg-white"
-                )}
-              >
-                {badge.text}
-              </Badge>
-              {badgeIndex === 0 && <div className="bg-slate-500 w-[1px] h-7" />}
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-});
-
-RecentActivityCard.displayName = "RecentActivityCard";
-export interface OnboardingFormProps {
-  onNext: () => void;
-  onPrev: () => void;
+interface CategoryProps {
   initialUser: Partial<IUser>;
-  children?: React.ReactNode;
+  tab: string;
 }
-const menuItems = [
+
+// Constants - moved outside component to prevent recreation
+const MENU_ITEMS: ReadonlyArray<MenuItem> = [
+  {
+    id: "overview",
+    label: "Overview",
+    icon: "/overview.svg",
+    url: "/dashboard/jobs",
+  },
   {
     id: "ai-recommendations",
     label: "AI Recommendations",
     icon: "/ai-recommendation.svg",
+    url: "/dashboard/jobs/category?tab=ai-recommendations",
   },
   {
     id: "saved-jobs",
     label: "Saved Jobs",
     icon: "/saved-job.svg",
+    url: "/dashboard/jobs/category?tab=saved-jobs",
   },
   {
     id: "application-history",
-    label: "Application history",
+    label: "Application History",
     icon: "/application-history.svg",
+    url: "/dashboard/jobs/category?tab=application-history",
   },
-];
+] as const;
 
-export const Category = memo(
-  ({ initialUser, tab }: { initialUser: Partial<IUser>; tab: string }) => {
-    console.log(initialUser);
-    const router = useRouter();
-    const params = useParams();
+// Component registry pattern for better scalability
+const COMPONENT_MAP: Record<ComponentId, () => JSX.Element> = {
+  overview: AIRecommendations,
+  "ai-recommendations": AIRecommendations,
+  "saved-jobs": SavedJobs,
+  "application-history": ApplicationHistory,
+};
 
-    return (
-      <div>
-        Category page
-        {JSON.stringify({ params, tab })}
-        <Tabs
-          defaultValue={tab ? tab : "ai-recommendations"}
-          className="flex flex-col font-poppins h-screen relative p-4 sm:p-8"
-        >
-          <TabsList>
-            <TabsTrigger
-              className={cn(
-                "group flex gap-2 data-[state=active]:bg-primary  data-[state=active]:text-white  p-2 hover:bg-primary hover:text-white hover-cursor-pointer items-center justify-start rounded-md w-44  hover:shadow-sm hover:cursor-pointer"
-              )}
-              value="ai-recommendations"
-            >
-              AI Recommendation
-            </TabsTrigger>
-            <TabsTrigger
-              className={cn(
-                "group flex gap-2 data-[state=active]:bg-primary  data-[state=active]:text-white  p-2 hover:bg-primary hover:text-white hover-cursor-pointer items-center justify-start rounded-md w-44  hover:shadow-sm hover:cursor-pointer"
-              )}
-              value="saved-jobs"
-            >
-              Saved Jobs
-            </TabsTrigger>
-            <TabsTrigger
-              className={cn(
-                "group flex gap-2 data-[state=active]:bg-primary  data-[state=active]:text-white  p-2 hover:bg-primary hover:text-white hover-cursor-pointer items-center justify-start rounded-md w-44  hover:shadow-sm hover:cursor-pointer"
-              )}
-              value="application-history"
-            >
-              Application History
-            </TabsTrigger>
-          </TabsList>
-          <TabsContent value="ai-recommendations" className="grid mt-8">
-            <AIRecommendations />
-          </TabsContent>
-          <TabsContent value="saved-jobs" className="grid mt-8">
-            <SavedJobs />
-          </TabsContent>
-          <TabsContent value="application-history" className="grid mt-8">
-            <ApplicationHistory />
-          </TabsContent>
-        </Tabs>
+// Extracted MenuItem component for better performance and separation of concerns
+const MenuItem = memo<{
+  item: MenuItem;
+  isActive: boolean;
+  onClick: (item: MenuItem) => void;
+}>(({ item, isActive, onClick }) => {
+  const handleClick = useCallback(() => {
+    onClick(item);
+  }, [item, onClick]);
+
+  return (
+    <button
+      type="button"
+      onClick={handleClick}
+      className={cn(
+        "group flex gap-2 data-[state=active]:bg-primary  data-[state=active]:text-white  p-2 hover:bg-primary hover:text-white hover-cursor-pointer items-center justify-start rounded-md  hover:shadow-sm hover:cursor-pointer",
+
+        isActive && "bg-primary text-white"
+      )}
+      aria-current={isActive ? "page" : undefined}
+    >
+      <div className="size-4 flex-shrink-0">
+        <Image
+          src={item.icon}
+          alt=""
+          width={16}
+          height={16}
+          className={cn(
+            "size-4 transition-all",
+            "group-hover:brightness-0 group-hover:invert",
+            isActive && "brightness-0 invert"
+          )}
+        />
       </div>
-    );
-  }
-);
+      <span className="text-xs font-medium hidden lg:flex">{item.label}</span>
+    </button>
+  );
+});
+
+MenuItem.displayName = "MenuItem";
+
+// Main component
+export const Category = memo<CategoryProps>(({ tab }) => {
+  const router = useRouter();
+
+  // Normalize tab to handle both query param and overview
+  const activeTab = useMemo(() => {
+    return tab || "overview";
+  }, [tab]);
+
+  // Memoized handler to prevent unnecessary recreations
+  const handleComponentChange = useCallback(
+    (item: MenuItem) => {
+      if (item.id === "overview") {
+        router.push("/dashboard/jobs");
+        return;
+      }
+
+      // Navigate to the new URL
+      router.push(item.url);
+
+      // Optional: Keep toast for debugging, remove in production
+      if (process.env.NODE_ENV === "development") {
+        toast.success(`Navigated to ${item.label}`);
+      }
+    },
+    [router]
+  );
+
+  // Get the active component based on current tab
+  const ActiveComponent = useMemo(() => {
+    return COMPONENT_MAP[activeTab as ComponentId] || AIRecommendations;
+  }, [activeTab]);
+
+  return (
+    <div className="flex  gap-4 lg:gap-6">
+      <nav className="bg-white p-3 h-fit rounded-md flex flex-col gap-1">
+        {MENU_ITEMS.map((item) => (
+          <MenuItem
+            key={item.id}
+            item={item}
+            isActive={activeTab === item.id}
+            onClick={handleComponentChange}
+          />
+        ))}
+      </nav>
+      <main className="flex-1">
+        <ActiveComponent />
+      </main>
+    </div>
+  );
+});
 
 Category.displayName = "Category";
 
-//       <h1 className="font-instrument text-3xl text-center tracking-tighter mb-8">
-//         AI Recommendations
-//       </h1>
-//       <div className="xl:flex xl:gap-8">
-//         <div className="grid grid-cols-1">
-//           <ScrollArea className="w-full whitespace-nowrap xl:hidden">
-//             <div className="flex flex-col py-1 gap-2 bg-white w-fit h-fit rounded-sm">
-//               <div
-//                 onClick={() => {
-//                   router.push("/dashboard/overview");
-//                 }}
-//                 className={cn(
-//                   "group flex gap-2 data-[state=active]:bg-primary  data-[state=active]:text-white  p-2 hover:bg-primary hover:text-white hover-cursor-pointer items-center justify-start rounded-md w-44  hover:shadow-sm hover:cursor-pointer"
-//                 )}
-//               >
-//                 <div className="size-fit rounded-sm">
-//                   <img
-//                     src={"/overview.svg"}
-//                     alt={"overview"}
-//                     className="size-4 group-hover:brightness-0 group-hover:invert group-data-[state=active]:brightness-0 group-data-[state=active]:invert"
-//                   />
-//                 </div>
-//                 <div className="">
-//                   <p className="text-xs">Overview</p>
-//                 </div>
-//               </div>
-//               {menuItems.map((item) => (
-//                 <TabsTrigger
-//                   key={item.id}
-//                   value={item.id}
-// className={cn(
-//   "group flex gap-2 data-[state=active]:bg-primary  data-[state=active]:text-white  p-2 hover:bg-primary hover:text-white hover-cursor-pointer items-center justify-start rounded-md w-44  hover:shadow-sm hover:cursor-pointer"
-// )}
-//                 >
-//                   <div className="size-fit rounded-sm">
-//                     <img
-//                       src={item.icon}
-//                       alt={item.label}
-//                       className="size-4 group-hover:brightness-0 group-hover:invert group-data-[state=active]:brightness-0 group-data-[state=active]:invert"
-//                     />
-//                   </div>
-//                   <div className="">
-//                     <p className="text-xs">{item.label}</p>
-//                   </div>
-//                 </TabsTrigger>
-//               ))}
-//             </div>
-//             <TabsList className="flex flex-row gap-2 py-4">
-//               {menuItems.map((item) => (
-//                 <TabsTrigger
-//                   key={item.id}
-//                   value={item.id}
-//                   className={cn(
-//                     "group flex data-[state=active]:bg-primary data-[state=active]:text-white  gap-2 items-center justify-start rounded-md w-48 p-4 hover:shadow-sm hover:cursor-pointer bg-white hover:text-white hover:bg-primary"
-//                   )}
-//                 >
-//                   <div className="size-fit rounded-sm">
-//                     <img
-//                       src={item.icon}
-//                       alt={item.label}
-//                       className="size-4 group-hover:brightness-0 group-hover:invert group-data-[state=active]:brightness-0 group-data-[state=active]:invert"
-//                     />
-//                   </div>
-//                   <div className="">
-//                     <p className="text-xs">{item.label}</p>
-//                   </div>
-//                 </TabsTrigger>
-//               ))}
-//             </TabsList>
-//             <ScrollBar orientation="horizontal" />
-//           </ScrollArea>
-//           <TabsList className="hidden xl:flex bg-transparent mt-13">
-//             {/* <div className="flex flex-col py-1 gap-2 bg-white w-fit h-fit rounded-sm">
-//               <div
-//                 onClick={() => {
-//                   router.push("/dashboard/overview");
-//                 }}
-//                 className={cn(
-//                   "group flex gap-2 data-[state=active]:bg-primary  data-[state=active]:text-white  p-2 hover:bg-primary hover:text-white hover-cursor-pointer items-center justify-start rounded-md w-44  hover:shadow-sm hover:cursor-pointer"
-//                 )}
-//               >
-//                 <div className="size-fit rounded-sm">
-//                   <img
-//                     src={"/overview.svg"}
-//                     alt={"overview"}
-//                     className="size-4 group-hover:brightness-0 group-hover:invert group-data-[state=active]:brightness-0 group-data-[state=active]:invert"
-//                   />
-//                 </div>
-//                 <div className="">
-//                   <p className="text-xs">Overview</p>
-//                 </div>
-//               </div>
-//               {menuItems.map((item) => (
-//                 <TabsTrigger
-//                   key={item.id}
-//                   value={item.id}
-//                   className={cn(
-//                     "group flex gap-2 data-[state=active]:bg-primary  data-[state=active]:text-white  p-2 hover:bg-primary hover:text-white hover-cursor-pointer items-center justify-start rounded-md w-44  hover:shadow-sm hover:cursor-pointer"
-//                   )}
-//                 >
-//                   <div className="size-fit rounded-sm">
-//                     <img
-//                       src={item.icon}
-//                       alt={item.label}
-//                       className="size-4 group-hover:brightness-0 group-hover:invert group-data-[state=active]:brightness-0 group-data-[state=active]:invert"
-//                     />
-//                   </div>
-//                   <div className="">
-//                     <p className="text-xs">{item.label}</p>
-//                   </div>
-//                 </TabsTrigger>
-//               ))}
-//             </div> */}
-//           </TabsList>
-//         </div>
+export const SearchBar = () => {
+  return (
+    <Card className="bg-white grid grid-cols-2 md:grid-cols-4 gap-4 py-4 max-w-screen-md mx-auto rounded-xl items-center px-2 ">
+      <div className="relative w-full">
+        <input
+          type="text"
+          placeholder="Job title / company name"
+          className="w-full bg-transparent focus:outline-none pl-8 "
+        />
+        <SearchIcon className="absolute top-1/2 -translate-y-1/2 left-2 size-4" />
+      </div>
+      <div className="flex gap-1 items-center">
+        <div className="">
+          <Separator
+            className="h-8 w-[1px]  bg-gray-400 mx-2"
+            orientation="vertical"
+          />
+        </div>
+        <IoLocationOutline className="shrink-0 text-black/50" />
+        <DropdownMenu>
+          <DropdownMenuTrigger className="w-full text-start text-black/50 border-none focus:border-none focus:outline-none">
+            Location
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuLabel>Job Locations</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuRadioGroup>
+              <DropdownMenuRadioItem value="united states">
+                United states
+              </DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="united kingdom">
+                United Kingdom
+              </DropdownMenuRadioItem>
+            </DropdownMenuRadioGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+      <div className="flex gap-1 items-center">
+        <div className="">
+          <Separator
+            className="h-8 max-md:hidden w-[0.5px] bg-gray-400 mx-2"
+            orientation="vertical"
+          />
+        </div>
 
-//
+        <DropdownMenu>
+          <DropdownMenuTrigger className="w-full focus:outline-none">
+            <div className="flex gap-2 items-center w-full text-black/50">
+              <MdLocationSearching />
+              <span className="text-black/50">Remote</span>
+              <FaChevronDown />
+            </div>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuLabel>Job Types</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuRadioGroup>
+              <DropdownMenuRadioItem value="remote">
+                Remote
+              </DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="sponsorships">
+                Sponsorship
+              </DropdownMenuRadioItem>
+            </DropdownMenuRadioGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+      <div className="flex mr-2 ml-auto">
+        <Button className="text-xs">Search</Button>
+      </div>
+    </Card>
+  );
+};

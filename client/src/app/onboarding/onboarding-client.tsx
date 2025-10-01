@@ -7,12 +7,13 @@ import { OnBoardingForm2 } from "./components/OnboardingForm2";
 import { OnBoardingForm3 } from "./components/OnboardingForm3";
 import { OnBoardingForm4 } from "./components/OnboardingForm4";
 import { OnBoardingForm5 } from "./components/OnboardingForm5";
-import { OnBoardingForm6 } from "./components/OnboardingForm6";
 import { IUser } from "@/types";
 import { authApi } from "@/hooks/use-auth";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
+import { OnBoardingForm6 } from "./components/OnboardingForm6";
+import { OnBoardingForm7 } from "./components/OnboardingForm7";
 
 export default function OnboardingClient({
   initialUser,
@@ -32,6 +33,7 @@ export default function OnboardingClient({
     OnBoardingForm4,
     OnBoardingForm5,
     OnBoardingForm6,
+    OnBoardingForm7,
   ];
   const totalSteps = steps.length;
 

@@ -1,13 +1,8 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { IUser } from "@/types";
+import { OnboardingFormProps } from "@/types";
 import { motion } from "framer-motion";
-export interface OnboardingFormProps {
-  onNext: () => void;
-  onPrev: () => void;
-  initialUser: Partial<IUser>;
-  children?: React.ReactNode;
-}
+
 export const OnBoardingForm0 = ({ onNext, children }: OnboardingFormProps) => {
   const handleStartOnboarding = () => {
     console.log("Starting onboarding...");
@@ -30,7 +25,7 @@ export const OnBoardingForm0 = ({ onNext, children }: OnboardingFormProps) => {
                 Welcome to Cver!
               </h1>
               <p className="text-gray-600">
-                We'd like to get to know you better so we can help you land your
+                We&apto;d like to get to know you better so we can help you land your
                 dream job. This will take less than 2 minutes.
               </p>
               <Button onClick={handleStartOnboarding}>Start Onboarding</Button>

@@ -1,5 +1,4 @@
 import React from "react";
-// import { JobListings } from "./components/JobListing";
 import { Jobs } from "./components/Jobs";
 import { requireOnboarding } from "@/lib/server-auth";
 

@@ -211,7 +211,7 @@ export const VerifyEmailClient = ({
                   )}
                 />
                 <p className="text-xs mb-4">
-                  Haven't received an OTP?
+                  Haven&apos;t received an OTP?
                   <Button
                     variant={"link"}
                     onClick={sendVerificationCode}

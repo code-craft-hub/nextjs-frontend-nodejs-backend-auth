@@ -190,6 +190,7 @@ export default function JobDashboard() {
         <div className="flex flex-row gap-4 py-4">
           {menuItems.map((item) => (
             <div
+            key={item.id}
               className={cn(
                 item.bgColor,
                 //   item.iconColor,

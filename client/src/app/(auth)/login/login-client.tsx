@@ -159,7 +159,7 @@ export const LoginClient = () => {
             <div>
               <h1 className="text-3xl font-bold text-gray-900 mb-2">Sign In</h1>
               <p className="text-gray-600">
-                Let's get you all set up so you can access your personal
+                Let&apos;s get you all set up so you can access your personal
                 account.
               </p>
             </div>
@@ -214,7 +214,7 @@ export const LoginClient = () => {
 
               {/* Login Link */}
               <div className="text-center">
-                <span className="text-gray-600">Don't have an account? </span>
+                <span className="text-gray-600">Don&apos;t have an account? </span>
                 <Link
                   href="/register"
                   className="text-blue-600 hover:underline font-medium"

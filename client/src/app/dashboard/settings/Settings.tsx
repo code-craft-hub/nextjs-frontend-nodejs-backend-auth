@@ -10,9 +10,8 @@ import { ProfileManagement } from "./ProfileManagement";
 const Settings = () => {
   return (
     <div>
-      <Tabs defaultValue="profile-management" className="p-4 sm:p-8">
+      <Tabs defaultValue="profile-management" >
         <TabsList className="bg-white w-full p-1 font-roboto gap-x-4">
-          {/* modified the data-[state=active]:bg-muted inside shadcn trigger component*/}
           <TabsTrigger
             value="profile-management"
             className="text-md font-medium"

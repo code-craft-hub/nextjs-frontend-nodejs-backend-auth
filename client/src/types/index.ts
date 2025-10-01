@@ -46,9 +46,9 @@ export interface OnboardingFormProps {
   children?: React.ReactNode;
 }
 
-export interface IResume {}
-export interface ICoverLetter {}
-export interface IInterviewQuestions {}
+// export interface IResume {}
+// export interface ICoverLetter {}
+// export interface IInterviewQuestions {}
 
 export interface IEducation {
   schoolName: string;

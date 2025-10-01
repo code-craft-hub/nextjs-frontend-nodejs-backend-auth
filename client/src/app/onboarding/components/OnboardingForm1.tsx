@@ -23,7 +23,7 @@ import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
-import { IUser } from "@/types";
+import { OnboardingFormProps } from "@/types";
 
 const formSchema = z.object({
   location: z.string({ message: "Please enter a valid country name." }),
@@ -42,13 +42,6 @@ interface FloatingLabelInputProps
   showPasswordToggle?: boolean;
 }
 
-export interface OnboardingFormProps {
-  onNext: () => void;
-  onPrev: () => void;
-  initialUser: Partial<IUser>;
-  children?: React.ReactNode;
-}
-
 export const OnBoardingForm1 = ({
   onNext,
   onPrev,
@@ -61,7 +54,6 @@ export const OnBoardingForm1 = ({
   function FloatingLabelInput({
     id,
     label,
-    type = "text",
     className = "",
     showPasswordToggle = false,
     ...props
@@ -114,7 +106,7 @@ export const OnBoardingForm1 = ({
   useEffect(() => {
     form.setValue("location", country);
     form.setValue("city", region);
-  }, [country, region]);
+  }, [country, region, form]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     console.log("Form submitted:", values);
@@ -125,6 +117,7 @@ export const OnBoardingForm1 = ({
       );
       onNext();
     } catch (error) {
+      console.error(error)
       toast.error(` please try again.`);
       toast("Skip this process", {
         action: {
@@ -182,7 +175,7 @@ export const OnBoardingForm1 = ({
         <div className="space-y-2">
           <div className="flex justify-between text-xs">
             <p className="">Progress</p>
-            <p className="">1/6</p>
+            <p className="">1/7</p>
           </div>
           <Progress value={10} className="w-full " />
         </div>
@@ -208,7 +201,7 @@ export const OnBoardingForm1 = ({
             <div className="space-y-6">
               <div>
                 <h1 className="text-2xl font-medium text-center text-gray-900 mb-2">
-                  Let's add your basic information
+                  Let&apto;s add your basic information
                 </h1>
               </div>
             </div>

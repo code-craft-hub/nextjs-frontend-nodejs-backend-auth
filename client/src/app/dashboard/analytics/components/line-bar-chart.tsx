@@ -248,14 +248,14 @@ export const UsageTrendDashboard = (): JSX.Element => {
                 type="monotone"
                 dataKey="desktop"
                 stroke={chartConfig.desktop.color}
-                strokeWidth={3}
+                stroke-width={3}
                 dot={false}
               />
               <Line
                 type="monotone"
                 dataKey="mobile"
                 stroke={chartConfig.mobile.color}
-                strokeWidth={3}
+                stroke-width={3}
                 dot={false}
               />{" "}
               <Bar

@@ -1,5 +1,5 @@
 "use client";
-import { Home, LayoutDashboard, LogOut, User, Mail } from "lucide-react";
+import {  LogOut, Mail } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 import {
@@ -15,6 +15,11 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/use-auth";
 import { useGetPageUrl } from "@/hooks/use-page-url";
 import { IUser } from "@/types";
+import HomeIcon from "./icons/homeIcon";
+import JobIcon from "./icons/jobIcon";
+import AnalyticIcon from "./icons/analyticIcon";
+import SettingIcon from "./icons/settingIcon";
+import UserIcon from "./icons/userIcon";
 
 export const UserMenu = ({ initialUser }: { initialUser: Partial<IUser> }) => {
   const { user, logout } = useAuth();
@@ -30,29 +35,29 @@ export const UserMenu = ({ initialUser }: { initialUser: Partial<IUser> }) => {
 
   const menuItems = [
     {
-      icon: <Home />,
       title: "Home",
-      isAdmin: true,
-      onClick: () => {
-        router.push("/");
-      },
+      icon: HomeIcon,
+      url: "/dashboard",
     },
     {
-      icon: <LayoutDashboard />,
-      title: "Dashboard",
-      isAdmin: true,
-      onClick: () => {
-        router.push("/dashboard");
-      },
+      title: "Jobs",
+      icon: JobIcon,
+      url: "/dashboard/jobs",
     },
-
     {
-      icon: <User />,
-      title: "Profile",
-      isAdmin: true,
-      onClick: () => {
-        router.push(`/dashboard/${dbUser?.uid}`);
-      },
+      title: "Analytics",
+      icon: AnalyticIcon,
+      url: "/dashboard/analytics",
+    },
+    {
+      title: "Settings",
+      icon: SettingIcon,
+      url: "/dashboard/settings",
+    },
+    {
+      title: "Account",
+      icon: UserIcon,
+      url: "/dashboard/account",
     },
   ];
 
@@ -105,17 +110,17 @@ export const UserMenu = ({ initialUser }: { initialUser: Partial<IUser> }) => {
             </div>
 
             <SheetClose className="w-full">
-              {menuItems?.map((item) => {
-                return item.isAdmin ? (
+              {menuItems?.map(({ title, url, icon: Icon }) => {
+                return (
                   <div
-                    key={item.title}
-                    onClick={() => item.onClick()}
-                    className="flex items-center gap-3 p-3 px-4 hover:bg-muted cursor-pointer border-t"
+                    key={title}
+                    onClick={() => router.push(url)}
+                    className="flex items-center gap-3 p-3 px-4 hover:bg-muted cursor-pointer border-t group hover:cursor-pointer"
                   >
-                    <span className=" font-medium">{item.icon}</span>
-                    <span className=" font-medium">{item.title}</span>
+                      <Icon className="group-hover:text-primary"/>
+                    <span className="group-hover:text-primary font-medium">{title}</span>
                   </div>
-                ) : null;
+                );
               })}
             </SheetClose>
 
@@ -123,7 +128,7 @@ export const UserMenu = ({ initialUser }: { initialUser: Partial<IUser> }) => {
               onClick={() => {
                 logout();
               }}
-              className="flex items-center gap-3 p-3 px-4  hover:bg-muted cursor-pointer border-t border-b"
+              className="flex hover:text-primary font-medium items-center gap-3 p-3 px-4  hover:bg-muted cursor-pointer border-t border-b"
             >
               <LogOut /> Logout
             </div>

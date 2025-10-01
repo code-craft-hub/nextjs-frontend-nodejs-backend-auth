@@ -1,31 +1,34 @@
 "use client";
 
 import * as React from "react";
-import { Briefcase } from "lucide-react";
-
-import { NavProjects } from "@/components/nav-projects";
 import { BsExclamationCircle } from "react-icons/bs";
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
   SidebarRail,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { IoDocumentTextOutline } from "react-icons/io5";
-import { CgFileDocument } from "react-icons/cg";
-import { LuFileQuestion } from "react-icons/lu";
 import { useAuth } from "@/hooks/use-auth";
 import Image from "next/image";
-import { MemoAiHandle } from "./icons/MemoAiHandle";
 import { cn } from "@/lib/utils";
+import { NavMain } from "./nav-main";
+import HomeIcon from "./icons/homeIcon";
+import UserIcon from "./icons/userIcon";
+import JobIcon from "./icons/jobIcon";
+import AnalyticIcon from "./icons/analyticIcon";
+import SettingIcon from "./icons/settingIcon";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user } = useAuth();
 
-  const {  open } = useSidebar();
+  const { open } = useSidebar();
 
-  const data = {
+  const leftSidebarData = {
     user: {
       name: user?.firstName ?? "",
       email: user?.email ?? "",
@@ -39,60 +42,82 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     menus: [
       {
         title: "Home",
-        icon: MemoAiHandle,
-        // menu-home.svg
-        link: "/dashboard",
+        icon: HomeIcon,
+        url: "/dashboard",
       },
       {
         title: "Jobs",
-        icon: CgFileDocument,
-        link: "/dashboard/jobs",
-        // puzzle.svg
-        // link: "/dashboard/resumes",
+        icon: JobIcon,
+        url: "/dashboard/jobs",
       },
       {
         title: "Analytics",
-        icon: IoDocumentTextOutline,
-        link: "/dashboard/analytics",
-        // link: "/dashboard/cover-letters",
+        icon: AnalyticIcon,
+        url: "/dashboard/analytics",
       },
       {
         title: "Settings",
-        icon: LuFileQuestion,
-        link: "/dashboard/settings",
-        // stats.svg
-        // link: "/dashboard/interview-questions",
+        icon: SettingIcon,
+        url: "/dashboard/settings",
       },
       {
         title: "Account",
-        icon: Briefcase,
-        link: "/dashboard/account",
-        // link: "/dashboard/job-listings",
+        icon: UserIcon,
+        url: "/dashboard/account",
       },
     ],
   };
+
   return (
-    <Sidebar collapsible="icon" {...props}>
-      <div className={cn("p-4", !open && "hidden")}>
-        <Image src={"/logo.svg"} width={100} height={100} alt={"Logo"} />
-      </div>
-
-
+    <Sidebar {...props}>
+      <SidebarHeader>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton size="lg" asChild>
+              <a href="#">
+                <Image src={"/logo.svg"} width={70} height={70} alt={"Logo"} />
+              </a>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarHeader>
       <SidebarContent>
-        <NavProjects projects={data.menus} />
+        <NavMain items={leftSidebarData.menus} />
       </SidebarContent>
-      <SidebarFooter className={cn("p-3", !open && "hidden")}>
-        <div className="bg-primary text-white p-4 rounded-2xl">
-          <div className="rounded-full bg-white p-2 w-fit">
-            <BsExclamationCircle className="rotate-180 size-6 text-primary " />
+      <SidebarFooter>
+        <div className={cn("p-3", !open && "hidden")}>
+          <div className="bg-primary text-white p-4 rounded-2xl">
+            <div className="rounded-full bg-white p-2 w-fit">
+              <BsExclamationCircle className="rotate-180 size-6 text-primary " />
+            </div>
+            <h1 className="font-medium my-2">Upgrade</h1>
+            <p className="text-sm">
+              Unlock more - upgrade your account for new and improved features
+            </p>
           </div>
-          <h1 className="font-medium my-2">Upgrade</h1>
-          <p className="text-sm">
-            Unlock more - upgrade your account for new and improved features
-          </p>
         </div>
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
   );
+  // return (
+  //   <div collapsible="icon" {...props}>
+  //     <div className={cn("p-4", !open && "hidden")}>
+  //       <Image src={"/logo.svg"} width={70} height={70} alt={"Logo"} />
+  //     </div>
+
+  //     <NavProjects projects={data.menus} />
+  //     <div className={cn("p-3", !open && "hidden")}>
+  //       <div className="bg-primary text-white p-4 rounded-2xl">
+  //         <div className="rounded-full bg-white p-2 w-fit">
+  //           <BsExclamationCircle className="rotate-180 size-6 text-primary " />
+  //         </div>
+  //         <h1 className="font-medium my-2">Upgrade</h1>
+  //         <p className="text-sm">
+  //           Unlock more - upgrade your account for new and improved features
+  //         </p>
+  //       </div>
+  //     </div>
+  //   </div>
+  // );
 }

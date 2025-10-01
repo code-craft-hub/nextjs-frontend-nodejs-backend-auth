@@ -6,7 +6,7 @@ const CategoryPage = async ({searchParams}: any) => {
   const session = await requireOnboarding();
   const tab = (await searchParams)?.tab
   return (
-    <div>
+    <div className="p-4 sm:p-8">
       <Category initialUser={session} tab={tab} />
     </div>
   );

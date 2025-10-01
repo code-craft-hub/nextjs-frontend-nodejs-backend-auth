@@ -5,10 +5,9 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { IconType } from "react-icons";
-import { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePathname, useRouter } from "next/navigation";
+import UserIcon from "./icons/userIcon";
 
 export function NavProjects({
   projects,
@@ -16,17 +15,12 @@ export function NavProjects({
   projects: {
     title: string;
     link: string;
-    icon: LucideIcon | IconType;
+    icon: string;
   }[];
 }) {
   const pathname = usePathname();
-
-  // const { isMobile } = useSidebar();
-
   const activeLink = (link: string) => {
-    // console.log(pathname, link)
     const active = link === pathname;
-    // const active = !!link?.startsWith(pathname);
     return active;
   };
 
@@ -34,15 +28,23 @@ export function NavProjects({
   const { isMobile, toggleSidebar } = useSidebar();
 
   return (
+    <div>
+      <div className="group flex gap-2 cursor-pointer">
+        <UserIcon className="text-[#B1B1B1] group-hover:text-[#4680EE] group-active:text-[#4680EE]" />
+        <h1 className="group-hover:text-[#4680EE] text-[#B1B1B1]">User</h1>
+      </div>
+    </div>
+  );
+
+  return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-      {/* <SidebarGroupLabel>Menus</SidebarGroupLabel> */}
       <SidebarMenu>
         {projects.map((item) => (
           <SidebarMenuItem className="" key={item.title}>
             <SidebarMenuButton
               className={cn(
-                activeLink(item.link) ? "text-primary": "text-black",
-                "hover:text-white hover:bg-primary/80 group"
+                activeLink(item.link) ? "text-primary" : "text-black",
+                "hover:text-primary hover:bg-transparent hover:cursor-pointer group"
               )}
               asChild
             >
@@ -57,8 +59,9 @@ export function NavProjects({
                 }}
                 className=""
               >
-                <item.icon className="text-black group-hover:text-white"/>
-                <span className="ml-1">{item.title}</span>
+                <span className="text-[#B1B1B1] font-medium hover:text-primary">
+                  {item.title}
+                </span>
               </div>
             </SidebarMenuButton>
           </SidebarMenuItem>

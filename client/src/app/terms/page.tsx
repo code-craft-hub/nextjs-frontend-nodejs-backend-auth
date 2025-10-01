@@ -40,11 +40,11 @@ const Terms = () => {
           https://cverai.com
         </p>
         <p className="text-start w-full">
-          <span className="font-bold text-xl">Registration and access</span>{" "}
+          <span className="font-bold text-xl">Registration and access</span>
           <br />
           Minimum age. You must be at least 13 years old or the minimum age
           required in your country to consent to use the Services. If you are
-          under 18 you must have your parent or legal guardian's permission to
+          under 18 you must have your parent or legal guardian&apos;s permission to
           use the Services.
         </p>
         <p className="text-start w-full">
@@ -74,7 +74,7 @@ const Terms = () => {
           activity. For example, you may not:
           <br />
           1. Use our Services in a way that infringes, misappropriates or
-          violates anyone's rights.
+          violates anyone&apos;s rights.
           <br />
           2. Modify, copy, lease, sell or distribute any of our Services.
           <br />
@@ -97,20 +97,20 @@ const Terms = () => {
         <p className="text-start w-full">
           <span className="font-bold text-xl">Software.</span> <br />
           Our Services may allow you to download software, such as mobile
-          applications, which may update automatically to ensure you're using
+          applications, which may update automatically to ensure you&apos;re using
           the latest version. Our software may include open source software that
-          is governed by its own licenses that we've made available to you.
+          is governed by its own licenses that we&apos;ve made available to you.
         </p>
         <p className="text-start w-full">
           <span className="font-bold text-xl">Corporate domains. </span>
           <br />
           If you create an account using an email address owned by an
           organization (for example, your employer), that account may be added
-          to the organization's business account with us, in which case we will
+          to the organization&apos;s business account with us, in which case we will
           provide notice to you so that you can help facilitate the transfer of
           your account (unless your organization has already provided notice to
           you that it may monitor and control your account). Once your account
-          is transferred, the organization's administrator will be able to
+          is transferred, the organization&apos;s administrator will be able to
           control your account, including being able to access Content (defined
           below) and restrict or remove your access to the account.
         </p>
@@ -147,7 +147,7 @@ const Terms = () => {
           interest, if any, in and to Output.
         </p>
         <p className="text-start w-full">
-          <span className="font-bold text-xl">Similarity of content.</span>{" "}
+          <span className="font-bold text-xl">Similarity of content.</span>
           <br />
           Due to the nature of our Services and artificial intelligence
           generally, output may not be unique and other users may receive
@@ -194,8 +194,8 @@ const Terms = () => {
           medical, or other important decisions about them.
           <br />
           4. Our Services may provide incomplete, incorrect, or offensive Output
-          that does not represent Cver Job Applications LTD's views. If Output references any
-          third party products or services, it doesn't mean the third party
+          that does not represent Cver Job Applications LTD&apos;s views. If Output references any
+          third party products or services, it doesn&apos;t mean the third party
           endorses or is affiliated with Cver Job Applications LTD.
         </p>
         <p className="text-start w-full">
@@ -212,8 +212,8 @@ const Terms = () => {
           If you purchase any Services, you will provide complete and accurate
           billing information, including a valid payment method. For paid
           subscriptions, we will automatically charge your payment method on
-          each agreed-upon periodic renewal until you cancel. You're responsible
-          for all applicable taxes, and we'll charge tax when required. If your
+          each agreed-upon periodic renewal until you cancel. You&apos;re responsible
+          for all applicable taxes, and we&apos;ll charge tax when required. If your
           payment cannot be completed, we may downgrade your account or suspend
           your access to our Services until payment is received.
         </p>
@@ -223,7 +223,7 @@ const Terms = () => {
           non-refundable, except where required by law. These Terms do not
           override any mandatory local laws regarding your cancellation rights.
           Changes. We may change our prices from time to time. If we increase
-          our subscription prices, we will give you at least 30 days' notice and
+          our subscription prices, we will give you at least 30 days&apos; notice and
           any price increase will take effect on your next renewal so that you
           can cancel if you do not agree to the price increase.
         </p>
@@ -273,14 +273,14 @@ const Terms = () => {
           you can file an appeal with us by contacting our Support team.
         </p>
         <p className="text-start w-full">
-          <span className="font-bold text-xl">Discontinuation of Services</span>{" "}
+          <span className="font-bold text-xl">Discontinuation of Services</span>
           <br />
           We may decide to discontinue our Services, but if we do, we will give
           you advance notice and a refund for any prepaid, unused Services.
         </p>
         <p className="text-start w-full">
-          <span className="font-bold text-xl">Disclaimer of warranties</span>{" "}
-          <br /> OUR SERVICES ARE PROVIDED 'AS IS.' EXCEPT TO THE EXTENT
+          <span className="font-bold text-xl">Disclaimer of warranties</span>
+          <br /> OUR SERVICES ARE PROVIDED &apos;AS IS.&apos; EXCEPT TO THE EXTENT
           PROHIBITED BY LAW, WE AND OUR AFFILIATES AND LICENSORS MAKE NO
           WARRANTIES (EXPRESS, IMPLIED, STATUTORY OR OTHERWISE) WITH RESPECT TO
           THE SERVICES, AND DISCLAIM ALL WARRANTIES INCLUDING, BUT NOT LIMITED
@@ -294,7 +294,7 @@ const Terms = () => {
           FACTUAL INFORMATION, OR AS A SUBSTITUTE FOR PROFESSIONAL ADVICE.
         </p>
         <p className="text-start w-full">
-          <span className="font-bold text-xl">Limitation of liability</span>{" "}
+          <span className="font-bold text-xl">Limitation of liability</span>
           <br />
           NEITHER WE NOR ANY OF OUR AFFILIATES OR LICENSORS WILL BE LIABLE FOR
           ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR EXEMPLARY
@@ -313,7 +313,7 @@ const Terms = () => {
           maximum extent permissible in your country of residence.
         </p>
         <p className="text-start w-full">
-          CVER JOB APPLICATIONS LTD'S AFFILIATES, SUPPLIERS, LICENSORS, AND DISTRIBUTORS ARE
+          CVER JOB APPLICATIONS LTD&apos;S AFFILIATES, SUPPLIERS, LICENSORS, AND DISTRIBUTORS ARE
           INTENDED THIRD PARTY BENEFICIARIES OF THIS SECTION.
         </p>
         <p className="text-start w-full">
@@ -334,7 +334,7 @@ const Terms = () => {
           <span className="font-bold text-xl">Indemnification</span> <br />
           You agree to indemnify and hold Cver Job Applications LTD and its affiliates,
           officers, agents, employees, and partners harmless from any claim or
-          demand, including reasonable attorneys' fees, made by any third party
+          demand, including reasonable attorneys&apos; fees, made by any third party
           due to or arising out of your use of the Service, your violation of
           these TOU, or your violation of any rights of another.
         </p>
@@ -346,9 +346,9 @@ const Terms = () => {
         <p className="text-start w-full">
           <span className="font-bold text-xl">
             Disclaimer of Warranties; Limitation of Liability
-          </span>{" "}
+          </span>
           <br />
-          The Service is provided on an "as is" and "as available" basis.
+          The Service is provided on an &quot;as is&quot; and &quot;as available&quot; basis.
           Cver Job Applications LTD makes no representations or warranties of any kind, express
           or implied, as to the operation of the Service or the information,
           content, materials, or products included on the Service. To the full
@@ -365,12 +365,12 @@ const Terms = () => {
         <p className="text-start w-full">
           <span className="font-bold text-xl">
             User Comments, Feedback and Other Submissions
-          </span>{" "}
+          </span>
           <br />
           If, at our request, you send certain specific submissions (for example
           contest entries) or without a request from us you send creative ideas,
           suggestions, proposals, plans, or other materials, whether online, by
-          email, by postal mail, or otherwise (collectively, "Comments"), you
+          email, by postal mail, or otherwise (collectively, &quot;Comments&quot;), you
           agree that Cver Job Applications LTD may, at any time, without restriction, edit,
           copy, publish, distribute, translate, and otherwise use in any medium
           any Comments that you forward to us. Cver Job Applications LTD is and shall be under
@@ -445,7 +445,7 @@ const Terms = () => {
           <br />
           6. A statement by you that the above information in your notice is
           accurate and, under penalty of perjury, that you are the copyright
-          owner or authorized to act on the copyright owner's behalf
+          owner or authorized to act on the copyright owner&apos;s behalf
         </p>
         <p className="text-start w-full">
           <span className="font-bold text-xl"> General Terms</span>
@@ -459,7 +459,7 @@ const Terms = () => {
         <p className="text-start w-full">
           <span className="font-bold text-xl">
             Changes to these Terms or our Services.
-          </span>{" "}
+          </span>
           <br />
           <br />
           We are continuously working to develop and improve our Services. We
@@ -485,9 +485,9 @@ const Terms = () => {
         </p>
         <p className="text-start w-full">
           <span className="font-bold text-xl">
-            {" "}
+            
             Delay in enforcing these Terms.
-          </span>{" "}
+          </span>
           <br />
           Our failure to enforce a provision is not a waiver of our right to do
           so later. Except as provided in the dispute resolution section above,

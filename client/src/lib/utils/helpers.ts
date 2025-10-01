@@ -1,8 +1,6 @@
 import { v4 as uuid } from "uuid";
 import OpenAI from "openai";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { type ClassValue, clsx } from "clsx";
-import { twMerge } from "tailwind-merge";
 import { TEducations, TWorkExperiences } from "@/types";
 import {
   formatDistanceToNow,
@@ -959,6 +957,7 @@ export function formatFirestoreRelative(
     }
     return distance;
   } catch (err) {
+    console.error(err)
     return formatDistanceToNowStrict(new Date());
   }
 }

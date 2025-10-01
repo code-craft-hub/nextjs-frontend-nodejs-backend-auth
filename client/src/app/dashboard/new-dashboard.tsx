@@ -9,9 +9,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { memo } from "react";
-import { AIApply } from "./(dashboard)/components/AIApply";
+import { AIApply } from "./(dashboard)/dashboard-tabs/AIApply";
 import { TailorResume } from "./(dashboard)/components/TailorResume";
-import { FindJob } from "./(dashboard)/components/FindJob";
+import { FindJob } from "./(dashboard)/dashboard-tabs/FindJob";
 import { InitialUser } from "@/types";
 
 interface ProfileOption {
