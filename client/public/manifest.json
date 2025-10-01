@@ -1,0 +1,21 @@
+{
+  "name": "Cverai - Career doc generator",
+  "short_name": "Cverai",
+  "description": "Generate professional resumes and cover letters with ease using AI technology.",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon.ico",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

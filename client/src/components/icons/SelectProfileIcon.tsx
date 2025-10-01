@@ -1,0 +1,25 @@
+export default function SelectProfileIcon({
+  className = "",
+}: {
+  className?: string;
+}) {
+  return (
+    <svg
+      width="16"
+      height="14"
+      viewBox="0 0 16 14"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+    >
+      <path
+        d="M1.33594 11.166L6.33594 6.16602L1.33594 1.16602M8.0026 12.8327H14.6693"
+        stroke="currentColor"
+        className="transition-colors duration-200"
+        strokeWidth="1.66667"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}

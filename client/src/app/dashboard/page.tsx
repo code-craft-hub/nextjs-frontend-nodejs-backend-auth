@@ -1,16 +1,17 @@
-import ProtectedRoute from "@/components/ProtectedRoute";
-import UserProfile from "@/components/UserProfile";
+import { requireOnboarding } from '@/lib/server-auth';
+import type { Metadata } from 'next';
+import { DashboardClient } from './new-dashboard';
 
+export const metadata: Metadata = {
+  title: 'Dashboard - Next.js Firebase Auth',
+  description: 'User dashboard',
+};
 
-
-export default function DashboardPage() {
-  return (
-    <ProtectedRoute>
-      <div>
-        <h1>Dashboard</h1>
-        <p>Welcome to your secure dashboard!</p>
-        <UserProfile />
-      </div>
-    </ProtectedRoute>
+export default async function DashboardPage() {
+  const session = await requireOnboarding();
+    return (
+    <DashboardClient 
+      initialUser={session}
+    />
   );
 }
