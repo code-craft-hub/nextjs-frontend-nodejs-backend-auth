@@ -232,15 +232,6 @@ import { LucideIcon } from "lucide-react";
 import { IconType } from "react-icons";
 import { User, Auth } from "firebase/auth";
 
-// import {
-//   userDetails,
-//   profileDetails,
-//   educationType,
-//   experienceType,
-//   SigninValidation,
-//   SignupValidation,
-// } from "@/lib/validation";
-// import { _ToObjectUnit } from "luxon";
 
 export type ISkills = {
   skills: {

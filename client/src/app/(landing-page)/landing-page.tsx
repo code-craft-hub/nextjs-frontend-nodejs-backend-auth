@@ -33,6 +33,7 @@ export const LandingPageClient = () => {
   return (
     <div className="min-h-screen bg-white font-poppins">
       <section
+      id="home"
         style={{
           background: "url('/landing-page-menu-gradient.svg')",
           backgroundRepeat: "no-repeat",
@@ -47,7 +48,7 @@ export const LandingPageClient = () => {
           </h1>
         </div>
       </section>
-      <section className="relative overflow-hidden">
+      <section  className="relative overflow-hidden">
         <div className="max-w-4xl mx-auto px-4 pb-20 lg:pb-32 space-y-8">
           <div className="flex flex-col xs5:flex-row items-center justify-center mx-auto gap-4">
             {actionButtons.map((option) => (
@@ -118,7 +119,7 @@ export const LandingPageClient = () => {
       </section>
 
       {/* Featured Jobs */}
-      <section className="pb-20">
+      <section id="feature-jobs" className="pb-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900">Featured Jobs</h2>
@@ -169,7 +170,7 @@ export const LandingPageClient = () => {
       </section>
 
       {/* Core Features */}
-      <section className="py-20">
+      <section id="features" className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 gap-16 items-center">
             <img
@@ -229,7 +230,7 @@ export const LandingPageClient = () => {
       </section>
 
       {/* FAQ Section */}
-      <section className="py-20">
+      <section id="faq" className="py-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-semibold text-gray-900 text-center mb-12">
             Frequently asked questions
@@ -264,7 +265,7 @@ export const LandingPageClient = () => {
       </section>
 
       {/* Pricing Section */}
-      <section className="py-20">
+      <section id="pricing" className="py-20">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-gray-900 text-center mb-4">
             Pricing
@@ -320,6 +321,7 @@ export const LandingPageClient = () => {
 
       {/* Testimonials Section */}
       <section
+        id="testimonials"
         className="py-50"
         style={{
           background: 'url("/testimonial-section.png") ',
@@ -366,7 +368,7 @@ export const LandingPageClient = () => {
         </div>
       </section>
 
-      <section className="py-20 bg-gray-50">
+      <section id={"blog"} className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
             <div className="mb-6 md:col-span-2">

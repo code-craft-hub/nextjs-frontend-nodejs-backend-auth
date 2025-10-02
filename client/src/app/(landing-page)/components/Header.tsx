@@ -15,6 +15,8 @@ import { navItems } from "../constants";
 import { Button } from "@/components/ui/button";
 import { Mail, Menu } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { smoothlyScrollToView } from "@/lib/utils/helpers";
 export const Header = () => {
   const { user } = useAuth();
   const { flag } = useUserLocation();
@@ -31,13 +33,14 @@ export const Header = () => {
 
             <nav className="hidden lg:flex items-center space-x-8">
               {navItems.map((nav) => (
-                <a
+                <Link
                   key={nav.name}
-                  href="#"
+                  href={nav.url}                        onClick={(e) => smoothlyScrollToView(e,nav.url)}
+                  
                   className="font-semibold font-poppins text-black hover:text-gray-900 transition-colors hover:bg-accent px-4 py-2 rounded-xl"
                 >
                   {nav.name}
-                </a>
+                </Link>
               ))}
             </nav>
             <div className="hidden lg:flex items-center space-x-4">

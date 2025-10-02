@@ -1,13 +1,10 @@
 import { capitalize } from "lodash";
-import { navigation } from "@/constants/data";
-import { Link as ScrollLink } from "react-scroll";
 import { social } from "@/constants/data";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { smoothlyScrollToView } from "@/lib/utils/helpers";
+import { navItems } from "@/app/(landing-page)/constants";
 
 export const Footer = () => {
-  const router = useRouter();
-
   return (
     <footer id="footer" className="bg-[#E4ECFE]">
       <div className="px-4 sm:px-8 w-full max-w-screen-xl mx-auto py-8 sm:py-16 overflow-hidden">
@@ -46,26 +43,18 @@ export const Footer = () => {
               </h2>
               <nav>
                 <ul className="space-y-2 capitalize text-[15px]">
-                  {navigation.map((item: any, index: number) => (
+                  {navItems.map((item: any, index: number) => (
                     <li
                       key={index}
                       className="text-black hover:scale-105 transition-transform duration-300 cursor-pointer"
                     >
-                      <ScrollLink
-                        to={item.href}
-                        spy
-                        smooth
-                        duration={500}
-                        offset={-70}
-                        className="transition-all duration-300 flex gap-4"
-                        onClick={() => {
-                          if (index === 4) router.push("/job-listings");
-                          if (index === 5) router.push("/blog");
-                          if (index <= 3) router.push("/");
-                        }}
+                      <Link
+                        href={item.url}
+                        onClick={(e) => smoothlyScrollToView(e,item.url)}
+                        className="transition-all duration-300 flex gap-4 capitalize"
                       >
-                        <p className="capitalize">{capitalize(item.name)}</p>
-                      </ScrollLink>
+                        {capitalize(item.name)}
+                      </Link>
                     </li>
                   ))}
                 </ul>

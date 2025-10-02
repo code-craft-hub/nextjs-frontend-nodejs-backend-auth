@@ -8,27 +8,27 @@ import {
 export const navItems = [
   {
     name: "Home",
-    url: "",
+    url: "#home",
     icon: <Home />,
   },
   {
     name: "Features",
-    url: "",
+    url: "#features",
     icon: <Store />,
   },
   {
     name: "Pricing",
-    url: "",
+    url: "#pricing",
     icon: <CreditCard />,
   },
   {
     name: "FAQ",
-    url: "",
+    url: "#faq",
     icon: <FileQuestionMark />,
   },
   {
     name: "Blog",
-    url: "",
+    url: "#blog",
     icon: <Newspaper />,
   },
 ];

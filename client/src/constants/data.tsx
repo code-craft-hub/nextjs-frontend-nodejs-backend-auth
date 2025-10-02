@@ -4,39 +4,6 @@ import { BiPlus } from "react-icons/bi";
 import { FaFacebook, FaTwitter, FaYoutube, FaInstagram } from "react-icons/fa";
 import { BiLogoLinkedin } from "react-icons/bi";
 
-// navigation
-export const navigation = [
-  {
-    name: "HOME",
-    href: "/",
-    position: "home",
-  },
-  {
-    name: "FEATURES",
-    href: "services",
-    position: "features",
-  },
-  {
-    name: "PRICING",
-    href: "pricing",
-    position: "pricing",
-  },
-  {
-    name: "FAQ",
-    href: "template",
-    position: "faq",
-  },
-  {
-    name: "JOB LISTINGS",
-    href: "/job-listings",
-    position: "job",
-  },
-  {
-    name: "BLOG",
-    href: "/blog",
-    position: "blog",
-  },
-];
 
 // social
 export const social = [

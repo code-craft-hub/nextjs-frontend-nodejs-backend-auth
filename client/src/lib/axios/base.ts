@@ -53,13 +53,13 @@ export const setupInterceptors = (client: AxiosInstance, apiName: string) => {
   client.interceptors.response.use(
     (response: AxiosResponse) => {
       // Calculate request duration
-      const endTime = new Date();
-      const duration = endTime.getTime() - response.config.metadata.startTime.getTime();
+      // const endTime = new Date();
+      // const duration = endTime.getTime() - response.config.metadata.startTime.getTime();
       
-      // Development logging
-      if (process.env.NODE_ENV === 'development') {
-        console.log(`✅ [${apiName}] ${response.status} ${response.config.url} (${duration}ms)`);
-      }
+      // // Development logging
+      // if (process.env.NODE_ENV === 'development') {
+      //   console.log(`✅ [${apiName}] ${response.status} ${response.config.url} (${duration}ms)`);
+      // }
 
       return response;
     },
