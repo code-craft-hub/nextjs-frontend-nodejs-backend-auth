@@ -1,1 +1,0 @@
-This project has many branch that has valuable authentication and authorization implementation.
