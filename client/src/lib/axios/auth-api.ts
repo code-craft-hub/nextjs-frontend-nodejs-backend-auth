@@ -5,7 +5,6 @@ import {
   ApiMethods,
 } from "./base";
 
-// Create auth API client
 const authClient = createApiClient({
   baseURL: process.env.NEXT_PUBLIC_AUTH_API_URL || "http://localhost:8080",
   timeout: 60000, // Longer timeout for authentication operations
