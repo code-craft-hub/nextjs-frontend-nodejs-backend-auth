@@ -230,7 +230,6 @@ export interface FloatingLabelInputProps
 
 import { LucideIcon } from "lucide-react";
 import { IconType } from "react-icons";
-import { User, Auth } from "firebase/auth";
 
 
 export type ISkills = {
@@ -345,18 +344,7 @@ export type UserDb = {
   resumeSample: string | null;
 };
 
-export type IContextType = {
-  sidebarExpand: boolean;
-  setSidebarExpand: React.Dispatch<React.SetStateAction<boolean>>;
-  contextUser: UserDb;
-  isLoading: boolean;
-  setContextUser: React.Dispatch<React.SetStateAction<UserDb>>;
-  isAuthenticated: boolean;
-  setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
-  checkAuthUser: () => Promise<boolean>;
-  auth: Auth;
-  authUser: User | null | undefined;
-};
+
 
 export type StoreUser = {
   Profile: string;
@@ -765,6 +753,4 @@ export interface UserProfile {
 export interface AuthProviderProps {
   children: React.ReactNode;
 }
-export interface AuthContextType {
-  user: User | null;
-}
+

@@ -1,4 +1,3 @@
-import { adminAuth } from "./firebase-admin";
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { jwtVerify, SignJWT } from "jose";
@@ -79,31 +78,7 @@ export async function getSessionFromCookies(): Promise<Partial<IUser> | null> {
   return verifySessionToken(sessionToken);
 }
 
-// Verify Firebase ID token and create user session
-export async function verifyFirebaseToken(
-  idToken: string
-): Promise<Partial<IUser>> {
-  const decodedToken = await adminAuth.verifyIdToken(idToken);
-  const user = await adminAuth.getUser(decodedToken.uid);
-  const [firstName, lastName] = user?.displayName?.split(" ") ?? [];
-  return {
-    uid: user.uid,
-    email: user.email!,
-    emailVerified: user.emailVerified,
-    onboardingComplete: user.customClaims?.onboardingComplete || false,
-    customClaims: user.customClaims,
-    firstName,
-    lastName,
-  };
-}
 
-// Update user custom claims
-export async function updateUserClaims(
-  uid: string,
-  claims: Record<string, any>
-) {
-  await adminAuth.setCustomUserClaims(uid, claims);
-}
 
 export async function signInWithPassword(email: string, password: string) {
   const response = await fetch(
@@ -125,11 +100,4 @@ export async function signInWithPassword(email: string, password: string) {
   }
 
   return response.json();
-}
-
-// Mark email as verified in Firebase
-export async function markEmailAsVerified(uid: string) {
-  await adminAuth.updateUser(uid, {
-    emailVerified: true,
-  });
 }
