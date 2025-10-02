@@ -8,6 +8,7 @@ import {
   isValid,
   Locale,
 } from "date-fns";
+import { MouseEvent } from "react";
 
 export function formatDateString(dateString: string) {
   const options: Intl.DateTimeFormatOptions = {
@@ -26,6 +27,24 @@ export function formatDateString(dateString: string) {
 
   return `${formattedDate} at ${time}`;
 }
+
+export const smoothlyScrollToView = (
+  e: MouseEvent<HTMLAnchorElement>,
+  href: string
+) => {
+  e.preventDefault();
+  const element = document.querySelector(href);
+  if (element) {
+    const offset = 70;
+    const elementPosition = element.getBoundingClientRect().top;
+    const offsetPosition = elementPosition + window.pageYOffset - offset;
+
+    window.scrollTo({
+      top: offsetPosition,
+      behavior: "smooth",
+    });
+  }
+};
 
 export const multiFormatDateString = (timestamp: string = ""): string => {
   const timestampNum = Math.round(new Date(timestamp).getTime() / 1000);
@@ -957,7 +976,7 @@ export function formatFirestoreRelative(
     }
     return distance;
   } catch (err) {
-    console.error(err)
+    console.error(err);
     return formatDistanceToNowStrict(new Date());
   }
 }
@@ -977,5 +996,3 @@ export const isValidEmail = (email?: string): boolean => {
   if (!email) return false;
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 };
-
-
