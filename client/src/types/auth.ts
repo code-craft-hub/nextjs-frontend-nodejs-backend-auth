@@ -1,5 +1,3 @@
-import { User as FirebaseUser } from 'firebase/auth';
-
 export interface UserRole {
   id: string;
   name: string;
@@ -37,35 +35,7 @@ export interface User {
   onboardingComplete: boolean;
 }
 
-export interface AuthUser extends Omit<FirebaseUser, 'metadata'> {
-  profile?: UserProfile;
-  customClaims?: Record<string, unknown>;
-}
 
-export interface AuthState {
-  user: AuthUser | null;
-  isLoading: boolean;
-  isAuthenticated: boolean;
-  hasRole: (roleId: string) => boolean;
-  hasPermission: (resource: string, action: Permission['action'], scope?: Permission['scope']) => boolean;
-  isAdmin: boolean;
-}
-
-export interface AuthContextValue extends AuthState {
-  signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string, displayName?: string) => Promise<void>;
-  signOut: () => Promise<void>;
-  resetPassword: (email: string) => Promise<void>;
-  updateProfile: (updates: Partial<UserProfile>) => Promise<void>;
-  refreshCustomClaims: () => Promise<void>;
-}
-
-export type AuthAction = 
-  | { type: 'AUTH_STATE_CHANGED'; payload: { user: AuthUser | null; isLoading: boolean } }
-  | { type: 'SET_LOADING'; payload: boolean }
-  | { type: 'SET_PROFILE'; payload: UserProfile | null }
-  | { type: 'SET_CUSTOM_CLAIMS'; payload: Record<string, unknown> | null }
-  | { type: 'SIGN_OUT' };
 
 export interface RouteProtection {
   requireAuth: boolean;

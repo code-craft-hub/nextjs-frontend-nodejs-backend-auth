@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { DashboardClient } from './new-dashboard';
 
 export const metadata: Metadata = {
-  title: 'Dashboard - Next.js Firebase Auth',
+  title: 'Cverai Dashboard',
   description: 'User dashboard',
 };
 

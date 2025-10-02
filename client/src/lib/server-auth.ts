@@ -1,6 +1,6 @@
-import { getSessionFromCookies } from './auth-utils';
 import { redirect } from 'next/navigation';
 import { cache } from 'react';
+import { getSessionFromCookies } from './auth.utils';
 
 // Cached server-side auth check
 export const getServerSession = cache(async () => {
