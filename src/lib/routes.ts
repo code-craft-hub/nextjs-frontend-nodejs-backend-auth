@@ -1,6 +1,6 @@
 export const ROUTES = {
   // Protected routes that require authentication
-  PROTECTED: ["/dashboard", "/admin"],
+  PROTECTED: ["/dashboard/home", "/admin"],
 
   // Public routes that don't require authentication
   PUBLIC: [
@@ -26,7 +26,7 @@ export const ROUTES = {
 
   // Dashboard routes
   DASHBOARD: {
-    HOME: "/dashboard",
+    HOME: "/dashboard/home",
     SETTINGS: "/dashboard/settings",
   },
 

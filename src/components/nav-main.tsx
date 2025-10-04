@@ -23,6 +23,7 @@ export function NavMain({
     }[];
   }[];
 }) {
+  
   const pathname = usePathname();
   const router = useRouter();
   return (
@@ -30,9 +31,10 @@ export function NavMain({
       <SidebarMenu>
         {items.map((item) => {
           const isItemActive =
-            pathname === item.url ||
-            item.items?.some((subItem) => pathname === subItem.url) ||
+            pathname === item.url || pathname.startsWith(item.url) ||
+            // item.items?.some((subItem) => pathname === subItem.url) ||
             false;
+            console.log(item.url, pathname, pathname.startsWith(item.url))
           return (
             <Collapsible
               key={item.title}

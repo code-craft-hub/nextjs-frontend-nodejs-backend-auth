@@ -6,7 +6,7 @@ export default async function OnboardingPage() {
   const session = await requireEmailVerification();
 
   if (session.onboardingComplete) {
-    redirect("/dashboard");
+    redirect("/dashboard/home");
   }
 
   return <OnboardingClient initialUser={session} />;

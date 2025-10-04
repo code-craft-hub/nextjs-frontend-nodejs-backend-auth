@@ -75,16 +75,6 @@
   --font-jakarta: var(--font-jakarta), sans-serif;
   --font-poppins: var(--font-poppins), sans-serif;
   --font-roboto: var(--font-roboto), sans-serif;
-
-  /* --font-inter: "Inter", sans-serif;
-  --font-poppins: "Poppins", sans-serif;
-  --font-outfit: "Outfit", sans-serif;
-  --font-roboto: "Roboto", sans-serif;
-  --font-garamond: "EB Garamond", serif;
-  --font-merriweather: "Merriweather", serif;
-  --font-instrument: "Instrument Sans", sans-serif;
-  --font-jakarta: "Plus Jakarta Sans", sans-serif;
-  --font-epilogue: "Epilogue", sans-serif; */
 }
 
 :root {

@@ -43,7 +43,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       {
         title: "Home",
         icon: HomeIcon,
-        url: "/dashboard",
+        url: "/dashboard/home",
       },
       {
         title: "Jobs",
@@ -69,7 +69,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   };
 
   return (
-    <Sidebar {...props}>
+    <Sidebar className="!bg-red-500" {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
@@ -100,24 +100,4 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarRail />
     </Sidebar>
   );
-  // return (
-  //   <div collapsible="icon" {...props}>
-  //     <div className={cn("p-4", !open && "hidden")}>
-  //       <Image src={"/logo.svg"} width={70} height={70} alt={"Logo"} />
-  //     </div>
-
-  //     <NavProjects projects={data.menus} />
-  //     <div className={cn("p-3", !open && "hidden")}>
-  //       <div className="bg-primary text-white p-4 rounded-2xl">
-  //         <div className="rounded-full bg-white p-2 w-fit">
-  //           <BsExclamationCircle className="rotate-180 size-6 text-primary " />
-  //         </div>
-  //         <h1 className="font-medium my-2">Upgrade</h1>
-  //         <p className="text-sm">
-  //           Unlock more - upgrade your account for new and improved features
-  //         </p>
-  //       </div>
-  //     </div>
-  //   </div>
-  // );
 }

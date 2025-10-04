@@ -13,7 +13,7 @@ export const AccountPage = ({ tab }: any) => {
     <div>
       <div className="flex items-center justify-center gap-4 border-b-2 max-w-96 mx-auto mb-4 sm:mb-8 font-inter">
         <button
-          onClick={() => router.push("/dashboard/account?tab=account")}
+          onClick={() => router.push("/dashboard/home/account?tab=account")}
           className={cn(
             "px-4 text-center w-full hover:cursor-pointer hover:border-primary/70",
             (tab === "account" || tab !== "security") &&
@@ -23,7 +23,7 @@ export const AccountPage = ({ tab }: any) => {
           Account Settings
         </button>
         <button
-          onClick={() => router.push("/dashboard/account?tab=security")}
+          onClick={() => router.push("/dashboard/home/account?tab=security")}
           className={cn(
             "px-4 text-center w-full hover:cursor-pointer hover:border-primary/70",
             tab === "security" && "border-b-2 border-primary"

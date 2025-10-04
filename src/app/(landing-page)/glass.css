@@ -1,6 +1,5 @@
 .glass-button {
   position: relative;
-  padding: 16px 24px;
   background: linear-gradient(
     40deg,
     rgba(5, 88, 226, 0) 0%,
@@ -16,9 +15,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
   font-weight: 500;
-  font-size: 16px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   overflow: hidden;

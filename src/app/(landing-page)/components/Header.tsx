@@ -46,7 +46,7 @@ export const Header = () => {
             <div className="hidden lg:flex items-center space-x-4">
               {!!user ? (
                 <Button
-                  onClick={() => router.push(`/dashboard`)}
+                  onClick={() => router.push(`/dashboard/home`)}
                   className="bg-blue-600 hover:bg-blue-700 text-white px-6 rounded-lg"
                 >
                   Dashboard
@@ -130,7 +130,7 @@ export const Header = () => {
                   <SheetClose asChild>
                     <Button
                       onClick={() => {
-                        router.push("/dashboard");
+                        router.push("/dashboard/home");
                       }}
                       className="bg-blue-600 hover:bg-blue-700 text-white px-6"
                     >

@@ -27,7 +27,7 @@ const Features = () => {
             </p>
             <button
               className="text-blue-500 mt-8"
-              onClick={() => router.push("/dashboard")}
+              onClick={() => router.push("/dashboard/home")}
             >
               Try it Now!
             </button>
@@ -53,7 +53,7 @@ const Features = () => {
           </p>
           <button
             className="text-blue-500 mt-8"
-            onClick={() => router.push("/dashboard")}
+            onClick={() => router.push("/dashboard/home")}
           >
             Try it Now!
           </button>
@@ -72,7 +72,7 @@ const Features = () => {
             </p>
             <button
               className="text-blue-500 mt-8 "
-              onClick={() => router.push("/dashboard")}
+              onClick={() => router.push("/dashboard/home")}
             >
               Try it Now!
             </button>
@@ -179,7 +179,7 @@ const Features = () => {
             </div>
             <button
               className="text-blue-500 mt-8 "
-              onClick={() => router.push("/dashboard")}
+              onClick={() => router.push("/dashboard/home")}
             >
               Get Started for Free!
             </button>

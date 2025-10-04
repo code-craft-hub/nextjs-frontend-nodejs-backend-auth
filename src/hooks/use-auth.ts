@@ -26,10 +26,9 @@ export const authApi = {
         password,
       });
 
-      console.log("response : ", data.data);
       return data.data;
     } catch (error: any) {
-      console.log("ERROR IN LOGIN FUNCTION : ", error);
+      console.error("ERROR IN LOGIN FUNCTION : ", error);
       toast.error(
         error?.response?.data?.error ||
           "Login failed. Please check your credentials."
@@ -41,13 +40,12 @@ export const authApi = {
 
   register: async (user: RegisterUserSchema): Promise<Partial<IUser>> => {
     try {
-      console.log("USER IN REGISTER FUNCTION : ", user);
       const { data } = await authClient.post("/register", user);
       toast.success("Registration successful! Please verify your email.");
 
       return data.data;
     } catch (error: any) {
-      console.log("ERROR IN REGISTER FUNCTION : ", error);
+      console.error("ERROR IN REGISTER FUNCTION : ", error);
       toast.error(error?.response?.data?.error || "Registration failed");
       throw new Error(error?.response.data.error || "Registration failed");
     }
@@ -64,7 +62,6 @@ export const authApi = {
   deleteUser: async (): Promise<{ success: boolean }> => {
     try {
       const { data } = await authClient.delete("/delete");
-      console.log("DELETED USER : ", data);
       toast.success("User account deleted successfully");
       window.location.href = "/register";
       return data.data;
@@ -76,7 +73,6 @@ export const authApi = {
   getUser: async (): Promise<IUser> => {
     try {
       const { data } = await authClient.get("/profile");
-      console.log("GET USER DATA : ", data.data);
       return data.data;
     } catch (error: any) {
       throw new Error(
@@ -140,12 +136,11 @@ export function useAuth(initialUser?: Partial<IUser>) {
     initialData: initialUser || undefined,
   });
 
-  console.log("USER IN USEAUTH", user)
   const updateUserMutation = useMutation({
     mutationFn: (data: any) => authApi.updateUser(data),
     onSuccess: (data) => {
       queryClient.setQueryData(["auth", "user"], data);
-      // router.push("/dashboard");
+      // router.push("/dashboard/home");
     },
   });
   // Login mutation
@@ -155,14 +150,13 @@ export function useAuth(initialUser?: Partial<IUser>) {
     onSuccess: (data) => {
       queryClient.setQueryData(["auth", "user"], data);
       // Check email verification first, then onboarding
-      console.log("Login successful in login mutation", data);
       toast.success("Login successful!");
       if (!data?.emailVerified) {
         router.push("/verify-email");
       } else if (!data?.onboardingComplete) {
         router.push("/onboarding");
       } else {
-        router.push("/dashboard");
+        router.push("/dashboard/home");
       }
     },
     onError: (error) => {
@@ -218,7 +212,7 @@ export function useAuth(initialUser?: Partial<IUser>) {
     mutationFn: authApi.completeOnboarding,
     onSuccess: (data) => {
       queryClient.setQueryData(["auth", "user"], data);
-      router.push("/dashboard");
+      router.push("/dashboard/home");
     },
   });
 

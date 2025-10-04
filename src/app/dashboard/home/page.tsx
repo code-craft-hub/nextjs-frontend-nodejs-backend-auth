@@ -1,7 +1,6 @@
 import { requireOnboarding } from '@/lib/server-auth';
 import type { Metadata } from 'next';
-import { DashboardClient } from './new-dashboard';
-
+import { DashboardClient } from '../new-dashboard';
 export const metadata: Metadata = {
   title: 'Cverai Dashboard',
   description: 'User dashboard',

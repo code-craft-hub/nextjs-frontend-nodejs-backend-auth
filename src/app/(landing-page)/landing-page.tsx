@@ -25,6 +25,7 @@ import {
   testimonials,
 } from "./constants";
 import { Header } from "./components/Header";
+import Link from "next/link";
 
 export const LandingPageClient = () => {
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
@@ -33,7 +34,7 @@ export const LandingPageClient = () => {
   return (
     <div className="min-h-screen bg-white font-poppins">
       <section
-      id="home"
+        id="home"
         style={{
           background: "url('/landing-page-menu-gradient.svg')",
           backgroundRepeat: "no-repeat",
@@ -48,15 +49,22 @@ export const LandingPageClient = () => {
           </h1>
         </div>
       </section>
-      <section  className="relative overflow-hidden">
+      <section className="relative overflow-hidden">
         <div className="max-w-4xl mx-auto px-4 pb-20 lg:pb-32 space-y-8">
-          <div className="flex flex-col xs5:flex-row items-center justify-center mx-auto gap-4">
+          <div className="flex flex-row items-center justify-center mx-auto max-sm:justify-evenly gap-2 sm:gap-4">
             {actionButtons.map((option) => (
               <div key={option.name}>
-                <a href="#" className="glass-button !text-black w-48">
-                  <img src={option.icon} alt={option.name} className="" />
-                  {option.name}
-                </a>
+                <Link
+                  href={option.url}
+                  className="glass-button !text-black sm:w-48 gap-2 p-3"
+                >
+                  <img
+                    src={option.icon}
+                    alt={option.name}
+                    className="max-xs4:size-3"
+                  />
+                  <span className="max-xs4:text-[0.6rem] text-nowrap">{option.name}</span>
+                </Link>
               </div>
             ))}
           </div>
@@ -66,7 +74,7 @@ export const LandingPageClient = () => {
               <div className="flex-1 relative">
                 <div
                   className="border-blue-500 border-[1px] w-fit rounded-full p-1 absolute bottom-4 left-3"
-                  onClick={() => router.push(`/dashboard`)}
+                  onClick={() => router.push(`/dashboard/home`)}
                 >
                   <Plus className=" text-blue-400 size-3" />
                 </div>
@@ -76,7 +84,7 @@ export const LandingPageClient = () => {
                 ></textarea>
                 <div
                   className="border-blue-500 border-[1px] w-fit rounded-full p-1 absolute bottom-4 right-3 "
-                  onClick={() => router.push(`/dashboard`)}
+                  onClick={() => router.push(`/dashboard/home`)}
                 >
                   <ArrowUp className=" text-blue-400 size-3 " />
                 </div>
@@ -219,7 +227,7 @@ export const LandingPageClient = () => {
                 LinkedIn, Telegram, WhatsApp, and more platforms.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button className=" text-white px-8 py-3">
+                <Button className="max-sm:text-2xs break-words text-white px-8 py-3">
                   Start now - Your job hunt just got easier!
                 </Button>
               </div>

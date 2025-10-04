@@ -30,7 +30,7 @@ export async function redirectIfAuthenticated() {
     if (!session.onboardingComplete) {
       redirect('/onboarding');
     } else {
-      redirect('/dashboard');
+      redirect('/dashboard/home');
     }
   }
 }

@@ -233,16 +233,16 @@ export const actionButtons = [
   {
     name: "AI Apply",
     icon: "/ai-apply.svg",
-    url: "/",
+    url: "/dashboard/home",
   },
   {
     name: "Tailor CV",
     icon: "/tailor-cv.svg",
-    url: "/",
+    url: "/dashboard/home",
   },
   {
     name: "Find Jobs",
     icon: "/search.svg",
-    url: "/",
+    url: "/dashboard/home",
   },
 ];

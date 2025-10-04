@@ -13,7 +13,6 @@ import {
 import { useUserLocation } from "@/hooks/get-user-location";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/use-auth";
-import { useGetPageUrl } from "@/hooks/use-page-url";
 import { IUser } from "@/types";
 import HomeIcon from "./icons/homeIcon";
 import JobIcon from "./icons/jobIcon";
@@ -24,20 +23,14 @@ import UserIcon from "./icons/userIcon";
 export const UserMenu = ({ initialUser }: { initialUser: Partial<IUser> }) => {
   const { user, logout } = useAuth();
   const dbUser = { ...initialUser, ...user };
-  console.log("dbUser in user menu", dbUser);
   const { flag } = useUserLocation();
   const router = useRouter();
-
-  const { pathname } = useGetPageUrl();
-  const Uid = pathname?.split("/")[2];
-  console.log(pathname, Uid, dbUser);
-  // const isAdmin = dbUser?.role === "superadmin";
 
   const menuItems = [
     {
       title: "Home",
       icon: HomeIcon,
-      url: "/dashboard",
+      url: "/dashboard/home",
     },
     {
       title: "Jobs",

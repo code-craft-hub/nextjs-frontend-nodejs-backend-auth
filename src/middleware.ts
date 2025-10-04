@@ -27,7 +27,7 @@ async function verifySessionToken(token: string): Promise<Partial<IUser> | null>
 
 console.log("MIDDLEWARE LOADED");
 const publicPaths = ["/login", "/register"];
-const protectedPaths = ["/dashboard"];
+const protectedPaths = ["/dashboard/home"];
 const verifyEmailPath = "/verify-email";
 const onboardingPath = "/onboarding";
 
@@ -69,7 +69,7 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL(onboardingPath, request.url));
       }
       // Finally redirect to dashboard
-      return NextResponse.redirect(new URL("/dashboard", request.url));
+      return NextResponse.redirect(new URL("/dashboard/home", request.url));
     }
     return NextResponse.next();
   }
@@ -83,7 +83,7 @@ export async function middleware(request: NextRequest) {
       if (!session.onboardingComplete) {
         return NextResponse.redirect(new URL(onboardingPath, request.url));
       } else {
-        return NextResponse.redirect(new URL("/dashboard", request.url));
+        return NextResponse.redirect(new URL("/dashboard/home", request.url));
       }
     }
     return NextResponse.next();
@@ -98,7 +98,7 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL(verifyEmailPath, request.url));
     }
     if (session.onboardingComplete) {
-      return NextResponse.redirect(new URL("/dashboard", request.url));
+      return NextResponse.redirect(new URL("/dashboard/home", request.url));
     }
     return NextResponse.next();
   }
