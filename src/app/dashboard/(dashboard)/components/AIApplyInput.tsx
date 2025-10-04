@@ -1,5 +1,4 @@
 "use client";
-import { InitialUser } from "@/types";
 
 import { ArrowUp, Plus } from "lucide-react";
 
@@ -32,7 +31,8 @@ const FORM_SCHEMA = z.object({
   }),
 });
 
-export const AIApplyInput = memo(({ initialUser }: InitialUser) => {
+export const AIApplyInput = memo(() => {
+
   const router = useRouter();
 
   const form = useForm<z.infer<typeof FORM_SCHEMA>>({
@@ -74,7 +74,7 @@ export const AIApplyInput = memo(({ initialUser }: InitialUser) => {
         </DropdownMenuContent>
       </DropdownMenu>
       {/* Main form area */}
-      <div className="relative shadow-blue-200 border-blue-500 rounded-2xl border-r shadow-xl h-34 bg-orange-500">
+      <div className="relative shadow-blue-200 border-blue-500 rounded-2xl border-r shadow-xl h-34 ">
         <Form {...form}>
           <form className="w-full">
             <FormField
@@ -85,7 +85,7 @@ export const AIApplyInput = memo(({ initialUser }: InitialUser) => {
                   <FormControl>
                     <textarea
                       placeholder="Let's get started"
-                      className="w-full outline-none focus:outline-none focus:border-none p-2 resize-none pl-4 pt-2 border-none placeholder:font-medium focus-visible:border-none h-26 bg-purple-500 z-50"
+                      className="w-full outline-none focus:outline-none focus:border-none p-2 resize-none pl-4 pt-2 border-none placeholder:font-medium focus-visible:border-none h-26  z-50"
                       {...field}
                     />
                   </FormControl>

@@ -8,6 +8,7 @@ import { RecentActivityCard } from "../components/RecentActivityCard";
 import { MOCK_DATA } from "../components/constants";
 
 export const AIApply = memo(({ initialUser }: InitialUser) => {
+  console.log(initialUser)
   const recentActivityItems = useMemo(
     () => Array.from({ length: 6 }, (_, index) => ({ id: index })),
     []
@@ -19,7 +20,7 @@ export const AIApply = memo(({ initialUser }: InitialUser) => {
         AI Assist to Apply
       </h1>
       <div className="grid gap-y-16">
-        <AIApplyInput initialUser={initialUser} />
+        <AIApplyInput  />
         <DataTable data={MOCK_DATA} />
         <Card className="p-4 sm:p-7 gap-4">
           <h1 className="font-bold text-xl">Recent Activity</h1>
