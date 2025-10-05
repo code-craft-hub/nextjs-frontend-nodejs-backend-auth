@@ -33,6 +33,8 @@ export const VerifyEmailClient = ({
   console.log("INITIAL USER : ", initialUser);
   const router = useRouter();
   const [isVerifying, setIsVerifying] = useState(false);
+
+  const [emailSent, setEmailSent] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [completedEmailVerification, setCompletedEmailVerification] =
     useState(false);
@@ -49,9 +51,12 @@ export const VerifyEmailClient = ({
   }, [timeLeft]);
 
   useEffect(() => {
-    sendVerificationCode();
-  }, []);
-
+    if (!emailSent) {
+      setEmailSent(true);
+      console.log("Sending initial verification code...");
+      sendVerificationCode();
+    }
+  }, [emailSent]);
   const sendVerificationCode = async () => {
     setIsVerifying(true);
     setIsSending(true);
@@ -211,7 +216,7 @@ export const VerifyEmailClient = ({
                   )}
                 />
                 <p className="text-xs mb-4">
-                  Haven&apos;t received an OTP?
+                  Haven&#39;t received an OTP?
                   <Button
                     variant={"link"}
                     onClick={sendVerificationCode}

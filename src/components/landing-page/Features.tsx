@@ -48,8 +48,8 @@ const Features = () => {
           <p className="max-w-[600px] mt-4 ">
             Craft a personalized, professional cover letter with our AI. Simply
             provide your details, and our AI generates a custom cover letter
-            that aligns perfectly with the job you&apos;re applying for, helping you
-            make a great first impression!
+            that aligns perfectly with the job you&#39;re applying for, helping
+            you make a great first impression!
           </p>
           <button
             className="text-blue-500 mt-8"

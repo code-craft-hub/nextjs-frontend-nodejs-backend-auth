@@ -123,6 +123,9 @@ export const Header = () => {
                     <Button
                       variant="outline"
                       className="text-gray-600 hover:text-gray-900"
+                      onClick={() => {
+                        router.push("/login");
+                      }}
                     >
                       Log in
                     </Button>

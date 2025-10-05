@@ -23,7 +23,7 @@ export const OnBoardingForm6 = ({ onNext, onPrev }: OnboardingFormProps) => {
           <div className="flex col-span-2 items-center space-x-2">
             <img src="/logo.svg" alt="" />
           </div>
-          <Progress min={6} max={7} progress={80} />
+          <Progress min={6} max={7} progress={90} />
         </div>
         <div className="w-full bg-white p-4 sm:p-16 shadow-[0px_5px_5px_rgba(0,0,0,0.2)] rounded-[10px]  box-border">
           <div className="flex flex-col gap-y-8 items-start w-full">

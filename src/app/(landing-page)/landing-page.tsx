@@ -63,7 +63,9 @@ export const LandingPageClient = () => {
                     alt={option.name}
                     className="max-xs4:size-3"
                   />
-                  <span className="max-xs4:text-[0.6rem] text-nowrap">{option.name}</span>
+                  <span className="max-xs4:text-[0.6rem] text-nowrap">
+                    {option.name}
+                  </span>
                 </Link>
               </div>
             ))}
@@ -387,8 +389,7 @@ export const LandingPageClient = () => {
             </div>
             <div className="">
               <p className="text-xs">
-                Don&apos;t miss out—get the latest job updates and blog
-                insights!
+                Don&#39;t miss out—get the latest job updates and blog insights!
               </p>
               <div className="flex gap-2 items-center mt-1">
                 <p className="text-blue-500 text-[12px]">See more posts</p>

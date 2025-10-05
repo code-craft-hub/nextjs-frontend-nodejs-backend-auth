@@ -36,6 +36,17 @@ export interface IUser {
   questions: any[];
 }
 
+export interface FloatingLabelInputProps
+  extends React.InputHTMLAttributes<HTMLInputElement> {
+  id?: string;
+  label: string;
+  type?: string;
+  className?: string;
+  showPasswordToggle?: boolean;
+  isUpdatingUserLoading?: boolean;
+}
+
+
 export interface InitialUser {
   initialUser: Partial<IUser>;
 }

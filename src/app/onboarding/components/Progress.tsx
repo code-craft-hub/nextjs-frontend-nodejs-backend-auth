@@ -1,17 +1,28 @@
+import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
 import React from "react";
 
 const Progress = ({
   min,
   max,
-  progress=55,
+  progress = 55,
+  className,
 }: {
   min: number;
   max: number;
   progress?: number;
+  className?: string;
 }) => {
+  const isMobile = useIsMobile();
   return (
     <div>
-      <div className="flex flex-col items-start gap-2 min-w-24 sm:max-w-96 sm:min-w-44 w-full">
+      <div
+        className={cn(
+          "flex flex-col items-start gap-2 w-full",
+          isMobile ? "min-w-32 max-w-44" : "min-w-64",
+          className
+        )}
+      >
         <div className="flex flex-row justify-between items-center w-full">
           <span className="text-xs leading-[15px] text-black font-normal font-poppins">
             Progress

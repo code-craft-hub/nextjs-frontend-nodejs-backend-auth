@@ -31,7 +31,7 @@ const FAQ = () => {
                   mentioned in the job description and cross-references them
                   with the information on your resume. The system then optimizes
                   your resume by emphasizing relevant experiences and skills
-                  that align with the job&apos;s requirements.
+                  that align with the job&#39;s requirements.
                 </AccordionContent>
               </AccordionItem>
               <AccordionItem value="item-2">

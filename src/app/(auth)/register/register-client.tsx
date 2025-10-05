@@ -48,7 +48,7 @@ export default function RegisterClient() {
 
     const handleFocus = () => setIsFocused(true);
 
-     useEffect(() => {
+    useEffect(() => {
       setHasValue(Boolean(value && String(value).length > 0));
     }, [value]);
 
@@ -151,7 +151,7 @@ export default function RegisterClient() {
     await register(values);
   };
 
- return (
+  return (
     <div className="min-h-screen flex font-poppins">
       {/* Left side - Form */}
       <div className="flex-1 flex items-center justify-center p-8 bg-white">
@@ -164,7 +164,7 @@ export default function RegisterClient() {
             <div>
               <h1 className="text-3xl font-bold text-gray-900 mb-2">Sign up</h1>
               <p className="text-gray-600">
-                Let&apos;s get you all set up so you can access your personal
+                Let&#39;s get you all set up so you can access your personal
                 account.
               </p>
             </div>
@@ -381,4 +381,4 @@ export default function RegisterClient() {
       </div>
     </div>
   );
-};
+}
