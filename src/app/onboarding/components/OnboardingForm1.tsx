@@ -36,9 +36,7 @@ export const OnBoardingForm1 = ({
   onPrev,
   initialUser,
 }: OnboardingFormProps) => {
-  const { updateUser, isUpdatingUserLoading, user } = useAuth();
-
-  console.log(user, initialUser);
+  const { updateUser, isUpdatingUserLoading } = useAuth();
 
   const { country, region, country_code } = useUserLocation();
   const form = useForm({
@@ -95,7 +93,7 @@ export const OnBoardingForm1 = ({
           )}
         >
           <img src="/logo.svg" alt="" className="" />
-          <Progress min={5} max={7} progress={70} />
+          <Progress min={1} max={7} progress={10} />
         </div>
         <div className="onboarding-card">
           <div className="space-y-6">
@@ -162,10 +160,10 @@ export const OnBoardingForm1 = ({
                           international
                           defaultCountry={(country_code as any) ?? "US"}
                           placeholder="Enter phone number"
-                          className="!border-0 !outline-none !ring-0"
+                          className="!border-0 !outline-none !ring-0 "
                           numberInputProps={{
                             className:
-                              "!border-0 !outline-none !ring-0 w-full max-sm:text-2xs",
+                              "!border-0 !outline-none !ring-0 w-full max-sm:text-2xs !w-full md:!w-96 lg:!w-[43rem] h-9",
                           }}
                         />
                       </div>

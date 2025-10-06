@@ -19,6 +19,7 @@ import {
   registerUserSchema,
   RegisterUserSchema,
 } from "@/lib/schema-validations";
+import { cn } from "@/lib/utils";
 
 export default function RegisterClient() {
   const { register, isRegisterLoading } = useAuth();
@@ -123,12 +124,12 @@ export default function RegisterClient() {
     className?: string;
     provider: string;
   }) {
-    console.log(provider);
     return (
       <Button
         type="button"
         variant="outline"
-        className={`h-12 flex items-center justify-center border-gray-300 hover:bg-gray-50 transition-colors ${className}`}
+        className={cn(`h-12 flex items-center justify-center border-gray-300 hover:bg-gray-50 transition-colors ${className}`)}
+        onClick={() => alert(`Sign in with ${provider}`)}
       >
         {icon}
       </Button>

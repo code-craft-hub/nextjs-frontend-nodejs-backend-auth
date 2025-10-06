@@ -15,14 +15,19 @@ import {
 } from "@/components/ui/form";
 
 import { cn } from "@/lib/utils";
-import { FileUpload } from "./file-upload";
+import { FileUpload } from "./FileUpload";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
 import { OnboardingFormProps } from "@/types";
 import { useIsMobile } from "@/hooks/use-mobile";
 import Progress from "./Progress";
-import OnboardingTabs from "./OnboardingTabs";
+import OnboardingTabs from "./OnBoardingTabs";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const formSchema = z.object({
   scratch: z.boolean().default(false).optional(),
@@ -64,9 +69,7 @@ export const OnBoardingForm2 = ({
     const { resume, ...rest } = values;
     try {
       await updateUser(rest);
-      toast.success(
-        `${initialUser?.displayName} Your data has be saved!`
-      );
+      toast.success(`${initialUser?.displayName} Your data has be saved!`);
       onNext();
     } catch (error) {
       console.error(error);
@@ -99,32 +102,45 @@ export const OnBoardingForm2 = ({
           <Progress min={2} max={7} progress={20} />
         </div>
         <div className="onboarding-card">
-          <OnboardingTabs activeTab={"cv-handling"}/>
+          <OnboardingTabs activeTab={"cv-handling"} />
           <div className="space-y-6">
             <div>
-              <h1 className="onboarding-h1">
-                Do you have CV?
-              </h1>
+              <h1 className="onboarding-h1">Do you have CV?</h1>
             </div>
           </div>
           <Form {...form}>
-            <form className="space-y-6 w-full" onSubmit={form.handleSubmit(onSubmit)}>
-              <FormField
-                control={form.control}
-                name="resume"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormControl>
-                      <FileUpload
-                        onChange={(file) => {
-                          field.onChange(file);
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <form
+              className="space-y-6 w-full"
+              onSubmit={form.handleSubmit(onSubmit)}
+            >
+              <Tooltip>
+                <TooltipTrigger className="w-full">
+                  <FormField
+                    control={form.control}
+                    name="resume"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <FileUpload
+                            onChange={(file) => {
+                              field.onChange(file);
+                            }}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </TooltipTrigger>
+                <TooltipContent className="bg-white text-black" side="top">
+                  <p>
+                    Upload your CV — it will serve as your master profile,
+                    forming the foundation for all personalized job applications
+                    you create with CverAI.
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+
               <FormField
                 control={form.control}
                 name="scratch"
@@ -135,7 +151,6 @@ export const OnBoardingForm2 = ({
                         checked={field.value}
                         onCheckedChange={async (checked: boolean) => {
                           field.onChange(checked);
-                         
                         }}
                       />
                     </FormControl>
@@ -156,7 +171,7 @@ export const OnBoardingForm2 = ({
                 <Button
                   type="submit"
                   disabled={isUpdatingUserLoading}
-                    className="onboarding-btn"
+                  className="onboarding-btn"
                 >
                   {isUpdatingUserLoading ? "Saving..." : "Save and Continue"}{" "}
                 </Button>

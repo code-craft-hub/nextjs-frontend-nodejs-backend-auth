@@ -1,19 +1,20 @@
 "use client";
 import { AnimatePresence } from "framer-motion";
 import { useState } from "react";
-import { OnBoardingForm0 } from "./components/OnboardingForm0";
-import { OnBoardingForm1 } from "./components/OnboardingForm1";
-import { OnBoardingForm2 } from "./components/OnboardingForm2";
-import { OnBoardingForm3 } from "./components/OnboardingForm3";
-import { OnBoardingForm4 } from "./components/OnboardingForm4";
-import { OnBoardingForm5 } from "./components/OnboardingForm5";
+import { OnBoardingForm0 } from "./components/OnBoardingForm0";
+import { OnBoardingForm1 } from "./components/OnBoardingForm1";
+import { OnBoardingForm2 } from "./components/OnBoardingForm2";
+import { OnBoardingForm3 } from "./components/OnBoardingForm3";
+import { OnBoardingForm4 } from "./components/OnBoardingForm4";
+import { OnBoardingForm5 } from "./components/OnBoardingForm5";
 import { IUser } from "@/types";
 import { authApi } from "@/hooks/use-auth";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
-import { OnBoardingForm6 } from "./components/OnboardingForm6";
-import { OnBoardingForm7 } from "./components/OnboardingForm7";
+import { OnBoardingForm6 } from "./components/OnBoardingForm6";
+import { OnBoardingForm7 } from "./components/OnBoardingForm7";
+import { DocumentTextExtractor } from "./components/AnyFormatToText";
 
 export default function OnboardingClient({
   initialUser,
@@ -26,6 +27,7 @@ export default function OnboardingClient({
   });
   const [currentStep, setCurrentStep] = useState(0);
   const steps = [
+    DocumentTextExtractor,
     OnBoardingForm0,
     OnBoardingForm1,
     OnBoardingForm2,

@@ -30,7 +30,6 @@ export const VerifyEmailClient = ({
 }: {
   initialUser: Partial<IUser>;
 }) => {
-  console.log("INITIAL USER : ", initialUser);
   const router = useRouter();
   const [isVerifying, setIsVerifying] = useState(false);
 
@@ -53,7 +52,6 @@ export const VerifyEmailClient = ({
   useEffect(() => {
     if (!emailSent) {
       setEmailSent(true);
-      console.log("Sending initial verification code...");
       sendVerificationCode();
     }
   }, [emailSent]);
@@ -62,15 +60,14 @@ export const VerifyEmailClient = ({
     setIsSending(true);
 
     try {
-      const { data } = await authClient.post("/send-verification");
+      await authClient.post("/send-verification");
 
-      console.log("sendVerificationCode response:", data);
 
-      toast.success("Verification code sent to your email!");
+      toast.success(`${initialUser.firstName}, verification code sent to your email!`);
       setCanResend(false);
       setTimeLeft(60); // 1 minute cooldown
     } catch (error: any) {
-      console.log(error.response.status);
+      console.error(error.response.status);
       if (error.response.status === 401) {
         router.replace("/login");
         return;
@@ -97,10 +94,9 @@ export const VerifyEmailClient = ({
     setIsVerifying(true);
 
     try {
-      const { data } = await authClient.post("/verify-email", { code });
+      await authClient.post("/verify-email", { code });
 
-      console.log("verifyCode response:", data);
-      toast.success("Email verified successfully!");
+      toast.success(`${initialUser.firstName}, your email has been verified successfully!`);
       setCompletedEmailVerification(true);
     } catch (error: any) {
       toast.error(

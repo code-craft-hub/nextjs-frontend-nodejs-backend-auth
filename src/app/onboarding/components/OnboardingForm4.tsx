@@ -11,13 +11,13 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
-import {  OnboardingFormProps } from "@/types";
+import { OnboardingFormProps } from "@/types";
 import { cn } from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox";
 import { motion } from "framer-motion";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
-import OnboardingTabs from "./OnboardingTabs";
+import OnboardingTabs from "./OnBoardingTabs";
 import Progress from "./Progress";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { FloatingLabelInput } from "./FloatingInput";
@@ -54,9 +54,7 @@ export const OnBoardingForm4 = ({
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       await updateUser(values);
-      toast.success(
-        `${initialUser?.displayName} Your data has be saved!`
-      );
+      toast.success(`${initialUser?.displayName} Your data has be saved!`);
       onNext();
     } catch (error) {
       console.error(error);

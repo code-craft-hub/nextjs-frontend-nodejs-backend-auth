@@ -25,7 +25,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { motion } from "framer-motion";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
-import OnboardingTabs from "./OnboardingTabs";
+import OnboardingTabs from "./OnBoardingTabs";
 import { useIsMobile } from "@/hooks/use-mobile";
 import Progress from "./Progress";
 import { FloatingLabelInput } from "./FloatingInput";
@@ -49,7 +49,6 @@ export const OnBoardingForm3 = ({
 }: OnboardingFormProps) => {
   const { updateUser, isUpdatingUserLoading } = useAuth();
 
-
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -65,13 +64,10 @@ export const OnBoardingForm3 = ({
     },
   });
 
-
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       await updateUser(values);
-      toast.success(
-        `${initialUser?.displayName} Your data has be saved!`
-      );
+      toast.success(`${initialUser?.displayName} Your data has be saved!`);
       onNext();
     } catch (error) {
       toast.error(` please try again.`);
@@ -107,7 +103,8 @@ export const OnBoardingForm3 = ({
         <div
           className={cn(
             "flex justify-between mb-9 w-full max-w-screen-lg ",
-            isMobile && "fixed top-0 left-0 width-full px-4 pt-5 backdrop-blur-2xl z-50 pb-4"
+            isMobile &&
+              "fixed top-0 left-0 width-full px-4 pt-5 backdrop-blur-2xl z-50 pb-4"
           )}
         >
           <img src="/logo.svg" alt="" className="" />
@@ -121,7 +118,10 @@ export const OnBoardingForm3 = ({
             </div>
           </div>
           <Form {...form}>
-            <form className="space-y-6 w-full" onSubmit={form.handleSubmit(onSubmit)}>
+            <form
+              className="space-y-6 w-full"
+              onSubmit={form.handleSubmit(onSubmit)}
+            >
               <div className="space-y-4">
                 <h1 className="h1">Job Type</h1>
                 <div className="grid grid-cols-2 gap-4">
@@ -340,7 +340,10 @@ export const OnBoardingForm3 = ({
                         </p>
                         <FormControl>
                           <SelectTrigger className="w-full sm:!h-12 rounded-sm">
-                            <SelectValue placeholder="Select location" className="text-2xs" />
+                            <SelectValue
+                              placeholder="Select location"
+                              className="text-2xs"
+                            />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
