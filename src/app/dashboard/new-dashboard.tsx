@@ -91,7 +91,6 @@ const SelectOptions = memo(
 SelectOptions.displayName = "SelectOptions";
 
 export const DashboardClient = memo(({ initialUser }: InitialUser) => {
-  console.log(initialUser);
 
   return (
     <>
@@ -127,7 +126,7 @@ export const DashboardClient = memo(({ initialUser }: InitialUser) => {
         </TabsList>
 
         <TabsContent value="ai-apply">
-          <AIApply initialUser={initialUser} />
+          <AIApply />
         </TabsContent>
         <TabsContent value="tailor-cv">
           <TailorResume initialUser={initialUser} />

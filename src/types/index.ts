@@ -28,7 +28,12 @@ export interface IUser {
   createdAt?: string | Date;
   updatedAt?: string | Date;
   softSkills?: ISkill[];
+  allSkills?: ISkill[];
   hardSkills?: ISkill[];
+  projects?: any[];
+  socials?: ISocials[];
+  certifications?: any[];
+
   workExperiences?: IWorkExperience[];
   educations?: IEducation[];
   CV?: any[];
@@ -57,14 +62,11 @@ export interface OnboardingFormProps {
   children?: React.ReactNode;
 }
 
-// export interface IResume {}
-// export interface ICoverLetter {}
-// export interface IInterviewQuestions {}
-
 export interface IEducation {
   schoolName: string;
   schoolLocation: string;
   degree: string;
+  academicAchievements?: string;
   fieldOfStudy: string;
   educationStart: string | Date;
   educationEnd: string | Date;

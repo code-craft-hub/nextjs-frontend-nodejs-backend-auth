@@ -1,5 +1,4 @@
 "use client";
-import { useState } from "react";
 import { motion } from "framer-motion";
 
 const ProgressIcon = ({ progress }: { progress: number }) => (
@@ -37,14 +36,13 @@ const ProgressIcon = ({ progress }: { progress: number }) => (
   </svg>
 );
 
-export const ProgressIndicator = () => {
+export const ProgressIndicator = ({ activeStep, setActiveStep }: { activeStep: number, setActiveStep: (step: number) => void}) => {
   const stages = [
     "Job Description Captured",
     "CV Tailored",
     "Email Drafted",
     "Application Sent",
   ];
-  const [activeStep, setActiveStep] = useState(0);
 
   return (
     <div className="">
@@ -78,6 +76,7 @@ export const ProgressIndicator = () => {
         {stages.map((label, i) => (
           <div
             key={i}
+            onClick={() => setActiveStep(i)}
             className="flex flex-row items-center justify-evenly z-10 w-full"
           >
             <span

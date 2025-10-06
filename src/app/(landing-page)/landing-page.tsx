@@ -76,7 +76,7 @@ export const LandingPageClient = () => {
               <div className="flex-1 relative">
                 <div
                   className="border-blue-500 border-[1px] w-fit rounded-full p-1 absolute bottom-4 left-3"
-                  onClick={() => router.push(`/dashboard/home`)}
+                  onClick={() => router.push(`/dashboard/ai-apply`)}
                 >
                   <Plus className=" text-blue-400 size-3" />
                 </div>
@@ -86,7 +86,7 @@ export const LandingPageClient = () => {
                 ></textarea>
                 <div
                   className="border-blue-500 border-[1px] w-fit rounded-full p-1 absolute bottom-4 right-3 "
-                  onClick={() => router.push(`/dashboard/home`)}
+                  onClick={() => router.push(`/dashboard/ai-apply`)}
                 >
                   <ArrowUp className=" text-blue-400 size-3 " />
                 </div>

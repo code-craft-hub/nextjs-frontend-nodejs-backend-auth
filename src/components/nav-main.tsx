@@ -34,7 +34,6 @@ export function NavMain({
             pathname === item.url || pathname.startsWith(item.url) ||
             // item.items?.some((subItem) => pathname === subItem.url) ||
             false;
-            console.log(item.url, pathname, pathname.startsWith(item.url))
           return (
             <Collapsible
               key={item.title}
