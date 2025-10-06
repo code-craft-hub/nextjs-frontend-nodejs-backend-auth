@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -68,7 +69,9 @@ const formSchema = z.object({
 
 type FormSchema = z.infer<typeof formSchema>;
 
+// ============================================================================
 // UTILITY FUNCTIONS - Text Extraction Services
+// ============================================================================
 
 class TextExtractionService {
   /**
@@ -176,8 +179,7 @@ class TextExtractionService {
         const textContent = await page.getTextContent();
 
         const pageText = textContent.items
-          .map((item: any) => ("str" in item ? item.str : ""))
-          .filter(Boolean)
+          .map((item: any) => item.str)
           .join(" ");
 
         if (pageText.trim()) {
@@ -423,7 +425,7 @@ const FileUploadZone: React.FC<FileUploadZoneProps> = ({
 // MAIN COMPONENT
 // ============================================================================
 
-export const DocumentTextExtractor = () => {
+export const AnyFormatToText = () => {
   const {
     processDocument,
     isProcessing,
