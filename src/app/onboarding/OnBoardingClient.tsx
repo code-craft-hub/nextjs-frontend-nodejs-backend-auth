@@ -15,7 +15,7 @@ import { X } from "lucide-react";
 import { OnBoardingForm6 } from "./components/OnBoardingForm6";
 import { OnBoardingForm7 } from "./components/OnBoardingForm7";
 // import { DocumentTextExtractor } from "./components/AnyFormatToText";
-import { AnyFormatToTextTalksToBackend } from "./components/AnyFormatToTextTalksToBackend";
+// import { AnyFormatToTextTalksToBackend } from "./components/AnyFormatToTextTalksToBackend";
 
 export default function OnboardingClient({
   initialUser,
@@ -28,7 +28,7 @@ export default function OnboardingClient({
   });
   const [currentStep, setCurrentStep] = useState(0);
   const steps = [
-    AnyFormatToTextTalksToBackend,
+    // AnyFormatToTextTalksToBackend,
     OnBoardingForm0,
     OnBoardingForm1,
     OnBoardingForm2,

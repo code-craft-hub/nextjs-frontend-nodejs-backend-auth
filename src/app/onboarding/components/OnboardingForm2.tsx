@@ -1,54 +1,18 @@
 "use client";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormLabel,
-  FormItem,
-  FormMessage,
-} from "@/components/ui/form";
-
 import { cn } from "@/lib/utils";
-import { FileUpload } from "./FileUpload";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useAuth } from "@/hooks/use-auth";
-import { toast } from "sonner";
 import { OnboardingFormProps } from "@/types";
 import { useIsMobile } from "@/hooks/use-mobile";
 import Progress from "./Progress";
 import OnboardingTabs from "./OnBoardingTabs";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 
-const formSchema = z.object({
-  scratch: z.boolean().default(false).optional(),
-  resume: z
-    .instanceof(File)
-    .refine((file) => file.size <= MAX_FILE_SIZE, {
-      message: "File must be 10MB or smaller",
-    })
-    .refine((file) => ACCEPTED_FILE_TYPES.includes(file.type), {
-      message: "Only PDF or Word documents are allowed",
-    })
-    .optional()
-    .nullable(),
-});
-
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
-const ACCEPTED_FILE_TYPES = [
-  "application/pdf",
-  "application/msword",
-  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-];
+import { FileUploadZone, useDocumentExtraction } from "./AnyFormatToText";
+import { useCallback } from "react";
+import { toast } from "sonner";
 
 export const OnBoardingForm2 = ({
   onNext,
@@ -56,32 +20,28 @@ export const OnBoardingForm2 = ({
   initialUser,
 }: OnboardingFormProps) => {
   const { updateUser, isUpdatingUserLoading } = useAuth();
+  const {
+    processDocument,
+    isProcessing,
+    error,
+    currentFile,
+    clearError,
+    clearFile,
+  } = useDocumentExtraction();
 
-  const form = useForm({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      scratch: false,
-      resume: null,
-    },
-  });
-
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    const { resume, ...rest } = values;
-    try {
-      await updateUser(rest);
-      toast.success(`${initialUser?.displayName} Your data has be saved!`);
-      onNext();
-    } catch (error) {
-      console.error(error);
-      toast.error(` please try again.`);
-      toast("Skip this process", {
-        action: {
-          label: "Skip",
-          onClick: () => () => onNext(),
-        },
+  const handleFileSelect = useCallback(
+    async (file: File) => {
+      clearError();
+      const result = await processDocument(file);
+      await updateUser({
+        baseResume: result?.text || "",
       });
-    }
-  }
+      toast.success(`${initialUser.firstName}, your base resume is saved!`);
+      onNext();
+    },
+    [processDocument, clearError]
+  );
+
   const isMobile = useIsMobile();
   return (
     <motion.div
@@ -108,76 +68,54 @@ export const OnBoardingForm2 = ({
               <h1 className="onboarding-h1">Do you have CV?</h1>
             </div>
           </div>
-          <Form {...form}>
-            <form
-              className="space-y-6 w-full"
-              onSubmit={form.handleSubmit(onSubmit)}
-            >
-              <Tooltip>
-                <TooltipTrigger className="w-full">
-                  <FormField
-                    control={form.control}
-                    name="resume"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormControl>
-                          <FileUpload
-                            onChange={(file) => {
-                              field.onChange(file);
-                            }}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </TooltipTrigger>
-                <TooltipContent className="bg-white text-black" side="top">
-                  <p>
-                    Upload your CV — it will serve as your master profile,
-                    forming the foundation for all personalized job applications
-                    you create with CverAI.
-                  </p>
-                </TooltipContent>
-              </Tooltip>
-
-              <FormField
-                control={form.control}
-                name="scratch"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center border p-4 rounded-sm ">
-                    <FormControl>
-                      <Checkbox
-                        checked={field.value}
-                        onCheckedChange={async (checked: boolean) => {
-                          field.onChange(checked);
-                        }}
-                      />
-                    </FormControl>
-                    <FormLabel>Create from scratch</FormLabel>
-                  </FormItem>
-                )}
+          <FileUploadZone
+            onFileSelect={handleFileSelect}
+            disabled={isProcessing}
+            currentFile={currentFile}
+            onClearFile={() => {
+              clearFile();
+            }}
+          />
+          <form className="space-y-6 w-full">
+            <div className="flex flex-row items-center border p-3 gap-2 rounded-sm ">
+              <Checkbox
+              id="create-from-scratch"
+                // checked={field.value}
+                onCheckedChange={async (checked: boolean) => {
+                  console.log("checked", checked);
+                  // await updateUser({
+                  //   baseResume: "",
+                  // });
+                  onNext();
+                }}
               />
-
-              <div className="flex gap-4">
-                <Button
-                  type="button"
-                  variant={"outline"}
-                  onClick={() => onPrev()}
-                  className="onboarding-btn"
-                >
-                  Previous
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={isUpdatingUserLoading}
-                  className="onboarding-btn"
-                >
-                  {isUpdatingUserLoading ? "Saving..." : "Save and Continue"}{" "}
-                </Button>
+              <label htmlFor="create-from-scratch" className="h1">Create from scratch</label>
+            </div>
+            {error && (
+              <div className="text-red-500 w-full p-3">
+                {typeof error === "string"
+                  ? error
+                  : "Failed to process document. Please try again."}
               </div>
-            </form>
-          </Form>
+            )}
+            <div className="flex gap-4">
+              <Button
+                type="button"
+                variant={"outline"}
+                onClick={() => onPrev()}
+                className="onboarding-btn"
+              >
+                Previous
+              </Button>
+              <Button
+                type="submit"
+                disabled={isUpdatingUserLoading}
+                className="onboarding-btn"
+              >
+                {isUpdatingUserLoading ? "Saving..." : "Save and Continue"}{" "}
+              </Button>
+            </div>
+          </form>
         </div>
       </div>
     </motion.div>
