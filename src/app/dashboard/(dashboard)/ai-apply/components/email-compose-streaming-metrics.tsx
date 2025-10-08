@@ -1,3 +1,4 @@
+import { Card } from '@/components/ui/card';
 import React from 'react';
 
 interface Metrics {
@@ -22,8 +23,8 @@ export const StreamingMetrics: React.FC<StreamingMetricsProps> = ({
   isComplete
 }) => {
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6">
-      <h3 className="text-sm font-semibold text-slate-700 mb-4">
+    <Card className="bg-white rounded-xl p-4 sm:p-6">
+      <h3 className="text-sm font-semibold text-slate-700">
         Content Metrics
       </h3>
       
@@ -126,6 +127,6 @@ export const StreamingMetrics: React.FC<StreamingMetricsProps> = ({
           <span>Generation complete</span>
         </div>
       )}
-    </div>
+    </Card>
   );
 };

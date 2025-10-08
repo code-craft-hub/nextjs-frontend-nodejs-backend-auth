@@ -1,97 +1,14 @@
 "use client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { memo } from "react";
 import { AIApply } from "./(dashboard)/dashboard-tabs/AIApply";
 import { TailorResume } from "./(dashboard)/components/TailorResume";
 import { FindJob } from "./(dashboard)/dashboard-tabs/FindJob";
 import { InitialUser } from "@/types";
-
-interface ProfileOption {
-  value: string;
-  label: string;
-  icon: string;
-}
-
-type ActionValue =
-  | "select-profile"
-  | "upload-file"
-  | "upload-photo"
-  | "tailor-resume"
-  | "tailor-cover-letter"
-  | "generate-interview-questions";
-
-const TAB_ITEMS = [
-  {
-    title: "AI Apply",
-    icon: "/white-ai-apply.svg",
-    value: "ai-apply",
-  },
-  {
-    title: "Tailor Cv",
-    icon: "/dashboard-tailor.svg",
-    value: "tailor-cv",
-  },
-  {
-    title: "Find Jobs",
-    icon: "/findJob.svg",
-    value: "find-jobs",
-  },
-] as const;
-
-const SelectOptions = memo(
-  ({
-    options,
-    value,
-    onValueChange,
-    placeholder,
-    className = "",
-    triggerClassName = "",
-  }: {
-    options: readonly ProfileOption[];
-    value: ActionValue;
-    onValueChange: (value: ActionValue) => void;
-    placeholder: string;
-    className?: string;
-    triggerClassName?: string;
-  }) => (
-    <div className={cn("w-full max-w-md mx-auto", className)}>
-      <Select value={value} onValueChange={onValueChange}>
-        <SelectTrigger className={cn("w-full", triggerClassName)}>
-          <SelectValue placeholder={placeholder} />
-        </SelectTrigger>
-        <SelectContent className="w-full bg-white border border-gray-200 rounded-lg shadow-lg mt-1">
-          {options.map(({ value, label, icon }) => (
-            <SelectItem
-              key={value}
-              value={value}
-              className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors duration-150"
-            >
-              <div className="flex items-center gap-3 w-full">
-                <img src={icon} alt={value} loading="lazy" />
-                {/* {icon} */}
-                {/* <Icon /> */}
-                <span className="text-gray-900 font-medium">{label}</span>
-              </div>
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </div>
-  )
-);
-
-SelectOptions.displayName = "SelectOptions";
+import { TAB_ITEMS } from "../(landing-page)/constants";
 
 export const DashboardClient = memo(({ initialUser }: InitialUser) => {
-
   return (
     <>
       <div

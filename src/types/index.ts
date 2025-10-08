@@ -1,3 +1,11 @@
+export interface StreamStatus {
+  isConnected: boolean;
+  isComplete: boolean;
+  error: string | null;
+  completedSections: Set<string>;
+  savedDocumentToDatabase: boolean;
+}
+
 export interface IUser {
   uid?: string;
   providerId?: string;

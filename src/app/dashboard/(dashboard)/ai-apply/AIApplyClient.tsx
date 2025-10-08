@@ -8,9 +8,10 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/use-auth";
 
 export const AIApplyClient = ({
-  jobDescription,
+  jobDescription,documentId
 }: {
   jobDescription: string;
+  documentId: string;
 }) => {
   const [activeStep, setActiveStep] = useState(0);
   const { user } = useAuth();
@@ -19,7 +20,7 @@ export const AIApplyClient = ({
     key: "resume" | "emailContent",
     value: any
   ) => {
-    setActiveStep(step);
+    // setActiveStep(step);
     setGeneratedData((prev) => ({ ...prev, [key]: value }));
   };
   const [generatedData, setGeneratedData] = useState({
@@ -32,7 +33,6 @@ export const AIApplyClient = ({
   if (activeStep === 3) {
     router.push("/dashboard/home");
   }
-  // console.log("User in AIApply:", user?.baseResume, jobDescription);
   return (
     <div>
       <ProgressIndicator
@@ -40,21 +40,23 @@ export const AIApplyClient = ({
         setActiveStep={setActiveStep}
       />
       <div className="">
-        {/* {activeStep === 0 && ( */}
+        {/* {activeStep === 0 && (
           <ResumeGenerator
             handleStepChange={handleStepChange}
             userProfile={user?.baseResume ?? ""}
             jobDescription={jobDescription}
+            documentId={documentId}
           />
-        {/* // )} */}
-        {/* {activeStep === 1 && (
-          <EmailComposer
+       )}
+         {activeStep === 1 && (
+          
+        )} */}
+        <EmailComposer
             handleStepChange={handleStepChange}
             userProfile={user?.baseResume ?? ""}
             jobDescription={jobDescription}
           />
-        )}
-        {activeStep === 2 && (
+        {/*{activeStep === 2 && (
           <DisplayResumeEmailContent generatedData={generatedData} />
         )} */}
       </div>

@@ -33,6 +33,26 @@ export const navItems = [
   },
 ];
 
+export const TAB_ITEMS = [
+  {
+    title: "AI Apply",
+    icon: "/white-ai-apply.svg",
+    value: "ai-apply",
+  },
+  {
+    title: "Tailor Cv",
+    icon: "/dashboard-tailor.svg",
+    value: "tailor-cv",
+  },
+  {
+    title: "Find Jobs",
+    icon: "/findJob.svg",
+    value: "find-jobs",
+  },
+] as const;
+
+
+
 export const featuredJobs = [
   {
     title: "Product Manager",

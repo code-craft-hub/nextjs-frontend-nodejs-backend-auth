@@ -3,18 +3,15 @@ import React, { useEffect } from "react";
 import { useResumeStream } from "@/hooks/stream-resume-hook";
 import { toast } from "sonner";
 import { PreviewResume } from "./preview-resume-template";
-import {
-  processCertifications,
-  processEducation,
-  processProjects,
-  processSkills,
-  processWorkExperience,
-} from "@/lib/utils/helpers";
+import GenerationStatus from "./GenerationStatus";
+import { useSearchParams, useRouter } from "next/navigation";
+import { useAuth } from "@/hooks/use-auth";
 
 export const ResumeGenerator = ({
   handleStepChange,
   userProfile,
   jobDescription,
+  documentId,
 }: {
   handleStepChange: (
     step: number,
@@ -23,80 +20,59 @@ export const ResumeGenerator = ({
   ) => void;
   userProfile: string;
   jobDescription: string;
+  documentId: string;
 }) => {
-  const endpoint =
-    process.env.NEXT_PUBLIC_AUTH_API_URL + "/new-resume-generation";
-  const { streamData, streamStatus, startStream } = useResumeStream(endpoint);
+  const router = useRouter();
+  const backendUrl = process.env.NEXT_PUBLIC_AUTH_API_URL;
+  const frontendUrl = process.env.NEXT_PUBLIC_APP_URL;
+
+  const { streamData, streamStatus, startStream } = useResumeStream(
+    backendUrl + "/new-resume-generation"
+  );
+  const { useCareerDoc } = useAuth();
+  const { data } = useCareerDoc(documentId);
+  console.log("Data from database : ", data);
+  const searchParams = useSearchParams();
+  const params = new URLSearchParams(searchParams.toString());
+  const oldDescription = params.get("jobDescription");
+  console.log(
+    "All values for 'jobDescription':",
+    params.getAll("jobDescription")
+  );
+  console.log("All entries:", [...params.entries()]);
 
   useEffect(() => {
-    if (userProfile && jobDescription) {
+    if (userProfile && jobDescription && !documentId) {
       startStream(userProfile, jobDescription);
     }
   }, [userProfile, jobDescription]);
 
   useEffect(() => {
-    if (streamStatus.completedSections.size === 6) {
+    console.log(streamStatus);
+    if (streamStatus.savedDocumentToDatabase) {
+      console.log("Status", streamStatus, streamData.documentId);
+      params.delete("jobDescription");
+      params.delete("documentId");
+      params.append("documentId", streamData.documentId);
+      params.append("jobDescription", oldDescription!.toString());
+      router.replace(`${frontendUrl}/dashboard/ai-apply?${params.toString()}`);
       toast.success(
         "Resume generation complete! Proceeding to next step in the next 5 seconds..."
       );
-      const streamedData = {
-        profile: streamData.profile,
-        education,
-        softSkill,
-        hardSkill,
-        certification,
-        project,
-        workExperience,
-      };
+
       setTimeout(() => {
-        handleStepChange(1, "resume", streamedData);
+        handleStepChange(1, "resume", streamData);
       }, 5000);
     }
-  }, [streamStatus.completedSections.size]);
+  }, [streamStatus.savedDocumentToDatabase]);
 
-  const workExperience = processWorkExperience(streamData.workExperience);
-  const education = processEducation(streamData.education);
-  const softSkill = processSkills(streamData.softSkill);
-  const hardSkill = processSkills(streamData.hardSkill);
-  const certification = processCertifications(streamData.certification);
-  const project = processProjects(streamData.project);
+  console.log("DATA : =============   :", streamData, data);
 
+  const shouldUseDbData = streamData.profile === "";
   return (
     <div className="max-w-4xl mx-auto p-6">
-      <div className="mb-4 p-3 rounded-lg border">
-        <div className="flex items-center gap-2 text-sm">
-          <span
-            className={`w-2 h-2 rounded-full ${
-              streamStatus.isConnected
-                ? "bg-green-500"
-                : streamStatus.isComplete
-                ? "bg-blue-500"
-                : "bg-gray-400"
-            }`}
-          ></span>
-          <span>
-            {streamStatus.isConnected
-              ? "Generating resume..."
-              : streamStatus.isComplete
-              ? "Resume generated!"
-              : "Ready to generate"}
-          </span>
-          {streamStatus.completedSections.size > 0 && (
-            <span className="">
-              ({streamStatus.completedSections.size}/6 sections complete)
-            </span>
-          )}
-        </div>
-        {streamStatus.error && (
-          <div className="mt-2 text-red-600 text-sm">
-            Error: {streamStatus.error}
-          </div>
-        )}
-      </div>
-      <PreviewResume data={streamData} />
-      <pre className="grid grid-cols-1 max-w-xl">
-        {JSON.stringify(streamData, null, 2)}
-      </pre>
+      <GenerationStatus streamStatus={streamStatus} />
+      <PreviewResume data={shouldUseDbData ? data! : streamData} />
     </div>
   );
 };

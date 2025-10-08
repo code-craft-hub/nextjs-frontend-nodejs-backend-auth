@@ -32,7 +32,6 @@ const FORM_SCHEMA = z.object({
 });
 
 export const AIApplyInput = memo(() => {
-
   const router = useRouter();
 
   const form = useForm<z.infer<typeof FORM_SCHEMA>>({
@@ -43,9 +42,9 @@ export const AIApplyInput = memo(() => {
   });
   const onSubmit = useCallback(
     ({ jobDescription }: z.infer<typeof FORM_SCHEMA>) => {
-      console.log(jobDescription);
       const params = new URLSearchParams();
       params.set("jobDescription", JSON.stringify(jobDescription));
+      localStorage?.removeItem("hasResumeAPICalled");
       router.push(`/dashboard/ai-apply?${params}`);
     },
     []

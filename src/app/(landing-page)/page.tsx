@@ -12,9 +12,8 @@ const LandingPage = async () => {
   
     console.log("User in layout:", user);
     const userPromise = queryClient.prefetchQuery({
-      queryKey: ["getCurrentUser"],
+      queryKey: ["auth", "user"],
       queryFn: () => getUser(),
-      // staleTime: 5 * 60 * 1000, // 5 minutes
     });
   
     userPromise.catch(console.error);
@@ -26,7 +25,7 @@ const LandingPage = async () => {
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <div className="dashboard-layout">
-        <Suspense fallback={<div>Loading ...</div>}>
+        <Suspense fallback={<div></div>}>
           <LandingPageClient />
         </Suspense>
       </div>

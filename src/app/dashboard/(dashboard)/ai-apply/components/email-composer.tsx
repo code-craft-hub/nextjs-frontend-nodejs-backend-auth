@@ -38,9 +38,7 @@ export const EmailComposer: React.FC<{
     if (!prompt.trim()) return;
 
     await startStreaming({
-      prompt,
-      systemMessage: systemMessage || undefined,
-      aiModel,
+     userProfile, jobDescription
     });
   };
 
@@ -57,9 +55,9 @@ export const EmailComposer: React.FC<{
       toast.success(
         "Resume generation complete! Proceeding to next step in the next 5 seconds..."
       );
-      setTimeout(() => {
-        handleStepChange(2, "emailContent", content);
-      }, 5000);
+      // setTimeout(() => {
+      //   handleStepChange(2, "emailContent", content);
+      // }, 5000);
     } else {
       // toast.success("There are some generations pending. Please wait...");
     }
@@ -72,21 +70,12 @@ export const EmailComposer: React.FC<{
   return (
     <div className="min-h-screen py-8">
       <div className="max-w-5xl mx-auto space-y-6">
-        {/* Controls */}
-        {/* <StreamingControls
-          prompt={prompt}
-          systemMessage={systemMessage}
-          aiModel={aiModel}
+        <StreamingDisplay
+          content={content}
           isStreaming={isStreaming}
-          onPromptChange={setPrompt}
-          onSystemMessageChange={setSystemMessage}
-          onAiModelChange={setAiModel}
-          onGenerate={handleGenerate}
-          onStop={stopStreaming}
-          onClear={handleClear}
-        /> */}
-
-        {/* Metrics */}
+          isComplete={isComplete}
+        />
+        
         {metrics && (
           <StreamingMetrics
             metrics={metrics}
@@ -95,7 +84,6 @@ export const EmailComposer: React.FC<{
           />
         )}
 
-        {/* Error Display */}
         {error && (
           <div className="bg-red-50 border border-red-200 rounded-lg p-4">
             <div className="flex items-start">
@@ -117,12 +105,6 @@ export const EmailComposer: React.FC<{
             </div>
           </div>
         )}
-
-        <StreamingDisplay
-          content={content}
-          isStreaming={isStreaming}
-          isComplete={isComplete}
-        />
       </div>
     </div>
   );

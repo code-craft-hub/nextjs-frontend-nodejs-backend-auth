@@ -7,18 +7,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
-// interface AuthResponse {
-//   success: boolean;
-//   data: Partial<IUser>;
-// }
-
-// interface AuthResponse {
-//   success: boolean;
-//   data: Partial<IUser>;
-// }
-
-// Auth API functions
-export const authApi = {
+export const apiService = {
   login: async (email: string, password: string): Promise<Partial<IUser>> => {
     try {
       const { data } = await authClient.post("/login", {
@@ -82,6 +71,19 @@ export const authApi = {
     }
   },
 
+  getCareerDoc: async (documentId: string): Promise<IUser> => {
+    try {
+      const { data } = await authClient.get(`/career-doc/${documentId}`);
+      console.log("Career Docs", data)
+      return data.data;
+    } catch (error: any) {
+      throw new Error(
+        "Failed to fetch user data:",
+        error.error || "Fetch failed"
+      );
+    }
+  },
+
   sendVerificationEmail: async (): Promise<{
     success: boolean;
     message: string;
@@ -126,18 +128,34 @@ export function useAuth(initialUser?: Partial<IUser>) {
   const router = useRouter();
   const queryClient = useQueryClient();
 
-  const { data: user, isLoading, error } = useQuery({
+  const {
+    data: user,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["auth", "user"],
-    queryFn: authApi.getUser,
+    queryFn: apiService.getUser,
     retry: false,
-    staleTime: 1000 * 60 * 60 * 5, // 5 minutes
-    gcTime: 1000 * 60 * 60 * 5, // 5 minutes
+    staleTime: 1000 * 60 * 60 * 10, // 10 minutes
+    gcTime: 1000 * 60 * 60 * 10, // 10 minutes
     refetchOnWindowFocus: false,
     initialData: initialUser || undefined,
   });
 
+
+
+  const useCareerDoc = (documentId?: string) => {
+    return useQuery({
+      queryKey: ["auth", "careerDoc", documentId],
+      queryFn: async () => {
+        if (!documentId) throw new Error("No documentId provided");
+        return apiService.getCareerDoc(documentId);
+      },
+      enabled: !!documentId, // Only runs when documentId is truthy
+    });
+  };
   const updateUserMutation = useMutation({
-    mutationFn: (data: any) => authApi.updateUser(data),
+    mutationFn: (data: any) => apiService.updateUser(data),
     onSuccess: (data) => {
       queryClient.setQueryData(["auth", "user"], data);
       // router.push("/dashboard/home");
@@ -146,7 +164,7 @@ export function useAuth(initialUser?: Partial<IUser>) {
   // Login mutation
   const loginMutation = useMutation({
     mutationFn: ({ email, password }: { email: string; password: string }) =>
-      authApi.login(email, password),
+      apiService.login(email, password),
     onSuccess: (data) => {
       queryClient.setQueryData(["auth", "user"], data);
       // Check email verification first, then onboarding
@@ -166,7 +184,7 @@ export function useAuth(initialUser?: Partial<IUser>) {
 
   // Register mutation
   const registerMutation = useMutation({
-    mutationFn: (user: RegisterUserSchema) => authApi.register(user),
+    mutationFn: (user: RegisterUserSchema) => apiService.register(user),
     onSuccess: (data) => {
       queryClient.setQueryData(["auth", "user"], data);
       router.push("/verify-email");
@@ -178,7 +196,7 @@ export function useAuth(initialUser?: Partial<IUser>) {
 
   // Send verification email mutation
   const sendVerificationMutation = useMutation({
-    mutationFn: authApi.sendVerificationEmail,
+    mutationFn: apiService.sendVerificationEmail,
     onError: (error) => {
       console.error("Send verification failed:", error.message);
     },
@@ -186,7 +204,7 @@ export function useAuth(initialUser?: Partial<IUser>) {
 
   // Verify email mutation
   const verifyEmailMutation = useMutation({
-    mutationFn: (code: string) => authApi.verifyEmail(code),
+    mutationFn: (code: string) => apiService.verifyEmail(code),
     onSuccess: (data) => {
       queryClient.setQueryData(["auth", "user"], data);
       // After email verification, go to onboarding
@@ -199,7 +217,7 @@ export function useAuth(initialUser?: Partial<IUser>) {
 
   // Logout mutation
   const logoutMutation = useMutation({
-    mutationFn: authApi.logout,
+    mutationFn: apiService.logout,
     onSuccess: () => {
       queryClient.setQueryData(["auth", "user"], null);
       queryClient.clear(); // Clear all cached data
@@ -209,7 +227,7 @@ export function useAuth(initialUser?: Partial<IUser>) {
 
   // Complete onboarding mutation
   const completeOnboardingMutation = useMutation({
-    mutationFn: authApi.completeOnboarding,
+    mutationFn: apiService.completeOnboarding,
     onSuccess: (data) => {
       queryClient.setQueryData(["auth", "user"], data);
       router.push("/dashboard/home");
@@ -220,6 +238,7 @@ export function useAuth(initialUser?: Partial<IUser>) {
     user,
     isLoading,
     isAuthenticated: !!user,
+    useCareerDoc,
     error,
     login: loginMutation.mutateAsync,
     register: registerMutation.mutateAsync,
