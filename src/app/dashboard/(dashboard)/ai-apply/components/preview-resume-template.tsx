@@ -3,16 +3,22 @@ import { useAuth } from "@/hooks/use-auth";
 import { monthYear, normalizeToString } from "@/lib/utils/helpers";
 import { IUser } from "@/types";
 
-export const PreviewResume = ({ data }: { data?: IUser }) => {
-    const {user} = useAuth()
+export const PreviewResume = ({ data }: { data: Partial<IUser> }) => {
+  const { user } = useAuth();
   return (
     <Card className="max-w-screen-lg  p-6 sm:px-10 text-gray-800 font-merriweather py-20">
       <header className="mb-8 text-center">
         <h1 className="text-4xl font-bold font-merriweather">
-          {data?.firstName || user?.firstName} {data?.lastName || user?.lastName}
+          {data?.firstName || user?.firstName}{" "}
+          {data?.lastName || user?.lastName}
         </h1>
         <p className="text-lg text-gray-600 font-merriweather">
-          {[data?.email || user?.email, data?.phoneNumber || user?.phoneNumber, data?.address, data?.portfolio]
+          {[
+            data?.email || user?.email,
+            data?.phoneNumber || user?.phoneNumber,
+            data?.address,
+            data?.portfolio,
+          ]
             ?.filter(Boolean)
             ?.join(" | ")}
         </p>
@@ -29,8 +35,8 @@ export const PreviewResume = ({ data }: { data?: IUser }) => {
         <h2 className="text-3xl font-bold border-b border-gray-300 pb-1 mb-2 font-merriweather">
           Work Experience
         </h2>
-        {Array.isArray(data?.workExperiences) &&
-          data?.workExperiences?.map((work, index) => {
+        {Array.isArray(data?.workExperience) &&
+          data?.workExperience?.map((work, index) => {
             const reg = /,/;
             let checkResp: string | string[] = work?.responsibilities!;
             if (typeof checkResp === "string" && reg.test(checkResp!)) {
@@ -70,11 +76,13 @@ export const PreviewResume = ({ data }: { data?: IUser }) => {
           Education
         </h2>
 
-        {Array.isArray(data?.educations) &&
-          data?.educations?.map((edu, index) => (
+        {Array.isArray(data?.education) &&
+          data?.education?.map((edu, index) => (
             <div key={index} className="mb-4">
               <div className="flex justify-between">
-                <p className="font-bold font-merriweather">{edu?.fieldOfStudy}</p>
+                <p className="font-bold font-merriweather">
+                  {edu?.fieldOfStudy}
+                </p>
                 <span className="text-sm text-gray-500 font-merriweather">
                   {monthYear(edu?.educationStart)} -{" "}
                   {monthYear(edu?.educationEnd)}
@@ -94,8 +102,8 @@ export const PreviewResume = ({ data }: { data?: IUser }) => {
           Certifications
         </h2>
         <div className="list-disc list-inside text-sm space-y-4">
-          {Array.isArray(data?.certifications) &&
-            data?.certifications?.map((cert, index) => (
+          {Array.isArray(data?.certification) &&
+            data?.certification?.map((cert, index) => (
               <div key={index} className="space-y-1">
                 <div className="flex justify-between">
                   <p className="font-bold">{cert?.title}</p>
@@ -112,15 +120,15 @@ export const PreviewResume = ({ data }: { data?: IUser }) => {
           Projects
         </h2>
         <div className="list-disc list-inside text-sm space-y-4">
-          {Array.isArray(data?.projects) &&
-            data?.projects?.map((cert, index) => (
+          {Array.isArray(data?.project) &&
+            data?.project?.map((project, index) => (
               <div key={index} className="space-y-1">
                 <div className="">
-                  <p className="font-bold">{cert?.name}</p>
-                  <p className="">{cert?.description}</p>
+                  <p className="font-bold">{project?.name}</p>
+                  <p className="">{project?.description}</p>
                 </div>
-                <div className="font-light">{cert?.issuer}</div>
-                <div className="">{cert?.description}</div>
+                <div className="font-light">{project?.issuer}</div>
+                <div className="">{project?.description}</div>
               </div>
             ))}
         </div>
@@ -130,8 +138,8 @@ export const PreviewResume = ({ data }: { data?: IUser }) => {
           Skills
         </h2>
         <div className="flex flex-wrap gap-2 text-sm mb-4">
-          {Array.isArray(data?.softSkills) &&
-            data?.softSkills?.map((skill, index) => (
+          {Array.isArray(data?.softSkill) &&
+            data?.softSkill?.map((skill, index) => (
               <span
                 key={index}
                 className="px-2 py-1 bg-gray-100 rounded font-merriweather"
@@ -141,19 +149,8 @@ export const PreviewResume = ({ data }: { data?: IUser }) => {
             ))}
         </div>
         <div className="flex flex-wrap gap-2 text-sm">
-          {Array.isArray(data?.hardSkills) &&
-            data?.hardSkills?.map((skill, index) => (
-              <span
-                key={index}
-                className="px-2 py-1 bg-gray-100 rounded font-merriweather"
-              >
-                {skill?.label}
-              </span>
-            ))}
-        </div>
-        <div className="flex flex-wrap gap-2 text-sm">
-          {Array.isArray(data?.allSkills) &&
-            data?.allSkills?.map((skill, index) => (
+          {Array.isArray(data?.hardSkill) &&
+            data?.hardSkill?.map((skill, index) => (
               <span
                 key={index}
                 className="px-2 py-1 bg-gray-100 rounded font-merriweather"

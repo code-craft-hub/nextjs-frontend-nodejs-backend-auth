@@ -1,5 +1,5 @@
 "use client";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -8,7 +8,6 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import Link from "next/link";
 
 // Define your route mapping
 const routeMap: Record<string, string> = {
@@ -23,6 +22,12 @@ const routeMap: Record<string, string> = {
 export const DynamicBreadcrumb = () => {
   const pathname = usePathname();
   const pathSegments = pathname.split("/").filter(Boolean);
+  const router = useRouter();
+
+  const handleNavigate = (href: string) => {
+    if (href === "/dashboard") return router.push("/dashboard/home");
+    router.push(href);
+  };
   return (
     <Breadcrumb>
       <BreadcrumbList>
@@ -33,17 +38,13 @@ export const DynamicBreadcrumb = () => {
             segment.charAt(0).toUpperCase() + segment.slice(1);
           const isLast = index === pathSegments.length - 1;
           return (
-            <div key={href} className="flex items-center">
+            <div key={href} className="flex items-center hover:cursor-pointer">
               <BreadcrumbItem className={index > 0 ? "hidden md:block" : ""}>
                 {isLast ? (
-                  <BreadcrumbPage>
-                    {title}
-                  </BreadcrumbPage>
+                  <BreadcrumbPage>{title}</BreadcrumbPage>
                 ) : (
-                  <BreadcrumbLink href={href} asChild>
-                    <Link href={href}>
-                      {title}
-                    </Link>
+                  <BreadcrumbLink onClick={() => handleNavigate(href)}>
+                    {title}
                   </BreadcrumbLink>
                 )}
               </BreadcrumbItem>

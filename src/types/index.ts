@@ -11,6 +11,7 @@ export interface IUser {
   cvTitle?: string;
   provider?: string;
   password?: string;
+  baseResume?: string;
   key?: string;
   address?: string;
   country?: string;
@@ -27,18 +28,18 @@ export interface IUser {
   photoURL?: string;
   createdAt?: string | Date;
   updatedAt?: string | Date;
-  softSkills?: ISkill[];
-  allSkills?: ISkill[];
-  hardSkills?: ISkill[];
-  projects?: any[];
+  skill?: ISkill[];
+  softSkill?: ISkill[];
+  hardSkill?: ISkill[];
+  project?: any[];
   socials?: ISocials[];
-  certifications?: any[];
+  certification?: any[];
 
-  workExperiences?: IWorkExperience[];
-  educations?: IEducation[];
+  workExperience?: IWorkExperience[];
+  education?: IEducation[];
   CV?: any[];
   coverLetterHistory: any[];
-  questions: any[];
+  question: any[];
 }
 
 export interface FloatingLabelInputProps
@@ -71,7 +72,7 @@ export interface IEducation {
   educationStart: string | Date;
   educationEnd: string | Date;
   acceptTerms: boolean;
-  EduID?: string | number;
+  educationId?: string | number;
 }
 
 export interface IWorkExperience {
@@ -82,7 +83,7 @@ export interface IWorkExperience {
   responsibilities?: string | string[];
   jobStart: string | Date;
   jobEnd: string | Date;
-  workID?: string | number;
+  workExperienceId?: string | number;
 }
 
 export interface ISkill {
@@ -101,9 +102,10 @@ export interface ResumeSection {
     | "profile"
     | "education"
     | "workExperience"
-    | "certifications"
-    | "projects"
-    | "skills";
+    | "certification"
+    | "project"
+    | "hardSkill"
+    | "softSkill";
   content: string;
   isComplete: boolean;
   isStreaming: boolean;
@@ -145,92 +147,33 @@ export const intialData = {
     isComplete: false,
     isStreaming: false,
   },
-  certifications: {
-    type: "certifications",
+  certification: {
+    type: "certification",
     content: "",
     isComplete: false,
     isStreaming: false,
   },
-  projects: {
-    type: "projects",
+  project: {
+    type: "project",
     content: "",
     isComplete: false,
     isStreaming: false,
   },
-  skills: {
-    type: "skills",
+  hardSkill: {
+    type: "hardSkill",
+    content: "",
+    isComplete: false,
+    isStreaming: false,
+  },
+  softSkill: {
+    type: "softSkill",
     content: "",
     isComplete: false,
     isStreaming: false,
   },
 };
 
-// Sample data - replace with your form inputs
-export const sampleUserProfile = {
-  name: "John Doe",
-  email: "john.doe@email.com",
-  phone: "+1-555-0123",
-  location: "San Francisco, CA",
-  linkedIn: "linkedin.com/in/johndoe",
-  github: "github.com/johndoe",
-  currentRole: "Full Stack Developer",
-  yearsOfExperience: 5,
-  skills: ["JavaScript", "React", "Node.js", "Python", "AWS", "Docker"],
-  education: [
-    {
-      degree: "Bachelor of Science in Computer Science",
-      institution: "University of California, Berkeley",
-      year: "2019",
-      gpa: "3.8",
-    },
-  ],
-  workExperience: [
-    {
-      title: "Senior Software Engineer",
-      company: "Tech Innovations Inc.",
-      duration: "2022 - Present",
-      description:
-        "Led development of microservices architecture, improved system performance by 40%",
-    },
-  ],
-  projects: [
-    {
-      name: "E-commerce Platform",
-      description:
-        "Built a full-stack e-commerce platform using React, Node.js, and MongoDB",
-      technologies: ["React", "Node.js", "MongoDB", "Stripe API"],
-    },
-  ],
-  certifications: [
-    {
-      name: "AWS Solutions Architect",
-      issuer: "Amazon Web Services",
-      date: "2023",
-    },
-  ],
-};
 
-export const sampleJobDescription = {
-  title: "Senior Full Stack Developer",
-  company: "Innovative Tech Solutions",
-  requirements: [
-    "5+ years of experience in full-stack development",
-    "Proficiency in React, Node.js, and modern JavaScript",
-    "Experience with cloud platforms (AWS preferred)",
-    "Strong understanding of RESTful APIs and microservices",
-    "Bachelor's degree in Computer Science or related field",
-  ],
-  responsibilities: [
-    "Lead development of scalable web applications",
-    "Collaborate with cross-functional teams",
-    "Mentor junior developers",
-    "Drive technical decision-making",
-  ],
-  preferredSkills: ["Docker", "Kubernetes", "GraphQL", "TypeScript"],
-  experience: "5+ years",
-  education: "Bachelor's degree preferred",
-  industry: "Technology",
-};
 
 export interface FloatingLabelInputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {

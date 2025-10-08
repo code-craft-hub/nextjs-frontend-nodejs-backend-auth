@@ -72,6 +72,3 @@ export default function RootLayout({
     </html>
   );
 }
-
-
-// push deployment

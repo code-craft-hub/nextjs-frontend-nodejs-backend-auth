@@ -150,7 +150,7 @@ export const OnBoardingForm1 = ({
                       >
                         <label
                           htmlFor={inputId}
-                          className={`absolute left-3 z-10 px-2 font-medium bg-background transition-all duration-200 ease-in-out pointer-events-none font-poppins max-sm:-top-1.5 -top-2.5 max-sm:text-2xs text-xs text-foreground`}
+                          className={`absolute left-3 z-10 px-2 font-medium bg-background transition-all duration-200 ease-in-out pointer-events-none font-poppins max-sm:-top-1.5 -top-2.5 max-sm:text-2xs text-xs text-foreground `}
                         >
                           Phone number
                         </label>
@@ -160,7 +160,7 @@ export const OnBoardingForm1 = ({
                           international
                           defaultCountry={(country_code as any) ?? "US"}
                           placeholder="Enter phone number"
-                          className="!border-0 !outline-none !ring-0 "
+                          className="!border-0 !outline-none !ring-0"
                           numberInputProps={{
                             className:
                               "!border-0 !outline-none !ring-0 w-full max-sm:text-2xs !w-full md:!w-96 lg:!w-[43rem] h-9",

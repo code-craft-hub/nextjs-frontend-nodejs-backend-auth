@@ -6,7 +6,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { UserMenu } from "@/components/user-menu";
-import { DynamicBreadcrumb } from "./components/Breadcrumb";
+import { DynamicBreadcrumb } from "./components/DynamicBreadcrumb";
 import { requireAuth } from "@/lib/server-auth";
 
 interface DashboardLayoutProps {

@@ -27,9 +27,6 @@ export const DisplayResumeEmailContent = ({ generatedData }: any) => {
     <div className="py-8 space-y-8">
       <DisplayGenerateEmailContent emailContent={data.emailContent} />      
       <PreviewResume data={data} />      
-      {/* <pre className="bg-gray-100 p-4 rounded-lg overflow-x-auto">
-        {JSON.stringify(generatedData, null, 2)}
-      </pre> */}
     </div>
   );
 };

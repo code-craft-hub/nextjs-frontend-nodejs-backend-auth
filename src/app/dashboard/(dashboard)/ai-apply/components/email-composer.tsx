@@ -14,10 +14,11 @@ export const EmailComposer: React.FC<{
     key: "resume" | "emailContent",
     value: any
   ) => void;
-}> = ({ handleStepChange }) => {
-  const {user} = useAuth();
-   const prompt =
-    `please compose an email for me to send to a job with email usecver@gmail.com, that's the recruiter, it is for a software engineering role. here is user information: ${user?.firstName} ${user?.lastName}, email: ${user?.email}, phone number: ${user?.phoneNumber}, address: ${user?.address}, portfolio: ${user?.portfolio}, ${user} make it professional and enthusiastic. keep it concise and to the point. use a professional tone. make sure to highlight my skills and experiences that are relevant to the job. make sure to proofread it for any grammatical errors or typos. make sure to include a call to action at the end of the email., I don't need markdown, and only provide the email content. I don't need any symbols or markdown. just the email content.`;
+  userProfile: string;
+  jobDescription: string;
+}> = ({ handleStepChange, userProfile, jobDescription }) => {
+  const { user } = useAuth();
+  const prompt = `please compose an email for me to send to a job with email usecver@gmail.com, that's the recruiter, it is for this job role in this description: ${jobDescription}. here is user information: ${user?.firstName} ${user?.lastName}, email: ${user?.email}, phone number: ${user?.phoneNumber}, address: ${user?.address}, portfolio: ${user?.portfolio}, ${user} make it professional and enthusiastic. keep it concise and to the point. use a professional tone. make sure to highlight my skills and experiences that are relevant to the job. make sure to proofread it for any grammatical errors or typos. make sure to include a call to action at the end of the email., Here is all the user information ${userProfile}, ensure to use the user information, and not placeholders, I hate placeholders like [] or {}, use real world information if you can't find the information that you need. I don't need markdown, and only provide the email content. I don't need any symbols or markdown. just the email content.`;
   const systemMessage =
     "You're a helpful assistant that helps people write professional job application emails.";
   const aiModel = "gemini";
@@ -66,14 +67,11 @@ export const EmailComposer: React.FC<{
 
   useEffect(() => {
     handleGenerate();
-    
   }, []);
 
   return (
     <div className="min-h-screen py-8">
       <div className="max-w-5xl mx-auto space-y-6">
-     
-
         {/* Controls */}
         {/* <StreamingControls
           prompt={prompt}
