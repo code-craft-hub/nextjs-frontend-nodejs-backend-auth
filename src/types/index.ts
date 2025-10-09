@@ -28,7 +28,7 @@ export interface IUser {
   website?: string;
   portfolio?: string;
   email?: string;
-  profile?: string;
+  profile: string;
   dataSource?: IDataSource[];
   credit?: number;
   onboardingComplete?: boolean;
@@ -42,6 +42,7 @@ export interface IUser {
   project?: any[];
   socials?: ISocials[];
   certification?: any[];
+  coverLetter?: string;
 
   workExperience?: IWorkExperience[];
   education?: IEducation[];
@@ -59,7 +60,6 @@ export interface FloatingLabelInputProps
   showPasswordToggle?: boolean;
   isUpdatingUserLoading?: boolean;
 }
-
 
 export interface InitialUser {
   initialUser: Partial<IUser>;
@@ -181,8 +181,6 @@ export const intialData = {
   },
 };
 
-
-
 export interface FloatingLabelInputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
   id?: string;
@@ -194,7 +192,6 @@ export interface FloatingLabelInputProps
 
 import { LucideIcon } from "lucide-react";
 import { IconType } from "react-icons";
-
 
 export type ISkills = {
   skills: {
@@ -307,8 +304,6 @@ export type UserDb = {
   photoURL: string | null;
   resumeSample: string | null;
 };
-
-
 
 export type StoreUser = {
   Profile: string;
@@ -717,4 +712,3 @@ export interface UserProfile {
 export interface AuthProviderProps {
   children: React.ReactNode;
 }
-

@@ -39,8 +39,8 @@ const ProgressIcon = ({ progress }: { progress: number }) => (
 export const ProgressIndicator = ({ activeStep, setActiveStep }: { activeStep: number, setActiveStep: (step: number) => void}) => {
   const stages = [
     "Job Description Captured",
-    "CV Tailored",
     "Email Drafted",
+    "CV Tailored",
     "Application Sent",
   ];
 

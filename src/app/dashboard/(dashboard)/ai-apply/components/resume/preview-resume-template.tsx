@@ -1,5 +1,7 @@
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useAuth } from "@/hooks/use-auth";
+import { cn } from "@/lib/utils";
 import { monthYear, normalizeToString } from "@/lib/utils/helpers";
 import { IUser } from "@/types";
 import { memo } from "react";
@@ -7,23 +9,21 @@ import { memo } from "react";
 interface PreviewResumeProps {
   data: Partial<IUser>;
   isStreaming?: boolean;
+  pause?: boolean;
+  cancelTimeout?: () => void;
 }
 
 /**
  * Memoized section wrapper for performance during streaming
  */
-const SectionWrapper = memo(({ 
-  children, 
-  show 
-}: { 
-  children: React.ReactNode; 
-  show: boolean;
-}) => {
-  if (!show) return null;
-  return <>{children}</>;
-});
+const SectionWrapper = memo(
+  ({ children, show }: { children: React.ReactNode; show: boolean }) => {
+    if (!show) return null;
+    return <div className="bg-white p-4">{children}</div>;
+  }
+);
 
-SectionWrapper.displayName = 'SectionWrapper';
+SectionWrapper.displayName = "SectionWrapper";
 
 /**
  * Streaming skeleton for loading states
@@ -44,17 +44,20 @@ const isValidArray = (arr: any): arr is any[] => {
  */
 const parseResponsibilities = (responsibilities: any): string[] => {
   if (!responsibilities) return [];
-  
+
   if (Array.isArray(responsibilities)) {
     return responsibilities;
   }
-  
-  if (typeof responsibilities === 'string') {
-    return responsibilities.includes(',') 
-      ? responsibilities.split(',').map(r => r.trim()).filter(Boolean)
+
+  if (typeof responsibilities === "string") {
+    return responsibilities.includes(",")
+      ? responsibilities
+          .split(",")
+          .map((r) => r.trim())
+          .filter(Boolean)
       : [responsibilities];
   }
-  
+
   return [];
 };
 
@@ -62,7 +65,12 @@ const parseResponsibilities = (responsibilities: any): string[] => {
  * Enterprise-grade resume preview with incremental streaming support
  * Renders content as it becomes available without waiting for complete data
  */
-export const PreviewResume = ({ data, isStreaming = false }: PreviewResumeProps) => {
+export const PreviewResume = ({
+  data,
+  isStreaming = false,
+  pause,
+  cancelTimeout,
+}: PreviewResumeProps) => {
   const { user } = useAuth();
 
   // Compute all derived values at the top level (no conditional hooks)
@@ -91,11 +99,23 @@ export const PreviewResume = ({ data, isStreaming = false }: PreviewResumeProps)
   const hasSkills = hasSoftSkills || hasHardSkills;
 
   return (
-    <Card className="max-w-screen-lg p-6 sm:px-10 text-gray-800 font-merriweather py-20">
+    <Card className={cn("max-w-screen-lg p-4 sm:px-5 text-gray-800 font-merriweather py-16 relative", pause && "bg-gray-300")}>
+      <Button
+        variant={"outline"}
+        onClick={() => {
+          if (cancelTimeout) cancelTimeout();
+        }}
+        className="absolute top-3 right-3 text-3xs"
+      >
+        Pause and Edit.
+      </Button>
       {/* Header - Always visible */}
       <header className="mb-8 text-center">
         <h1 className="text-4xl font-bold font-merriweather">
-          {fullName || (isStreaming && <StreamingSkeleton className="h-10 w-64 mx-auto" />)}
+          {fullName ||
+            (isStreaming && (
+              <StreamingSkeleton className="h-10 w-64 mx-auto" />
+            ))}
         </h1>
         {contactInfo && (
           <p className="text-lg text-gray-600 font-merriweather mt-2">
@@ -106,7 +126,7 @@ export const PreviewResume = ({ data, isStreaming = false }: PreviewResumeProps)
 
       {/* Summary Section - Streams character by character */}
       <SectionWrapper show={hasProfile || isStreaming}>
-        <section className="mb-8">
+        <section className="mb-4">
           <h2 className="text-3xl font-bold border-b border-gray-300 pb-1 mb-2 font-merriweather">
             Summary
           </h2>
@@ -126,23 +146,30 @@ export const PreviewResume = ({ data, isStreaming = false }: PreviewResumeProps)
 
       {/* Work Experience - Renders items incrementally */}
       <SectionWrapper show={hasWorkExperience || isStreaming}>
-        <section className="mb-8">
+        <section className="mb-4">
           <h2 className="text-3xl font-bold border-b border-gray-300 pb-1 mb-2 font-merriweather">
             Work Experience
           </h2>
           {hasWorkExperience ? (
             data.workExperience!.map((work, index) => {
-              const responsibilities = parseResponsibilities(work?.responsibilities);
+              const responsibilities = parseResponsibilities(
+                work?.responsibilities
+              );
 
               return (
-                <div key={`work-${index}-${work?.companyName || ''}`} className="mb-5">
+                <div
+                  key={`work-${index}-${work?.companyName || ""}`}
+                  className="mb-5"
+                >
                   <div className="flex justify-between items-center">
                     <h3 className="font-bold font-merriweather">
-                      {work?.jobTitle || 'Position'} - {work?.companyName || 'Company'}
+                      {work?.jobTitle || "Position"} -{" "}
+                      {work?.companyName || "Company"}
                     </h3>
                     {(work?.jobStart || work?.jobEnd) && (
                       <span className="text-sm text-gray-500 font-merriweather">
-                        {work?.jobStart ? monthYear(work.jobStart) : 'Present'} - {work?.jobEnd ? monthYear(work.jobEnd) : 'Present'}
+                        {work?.jobStart ? monthYear(work.jobStart) : "Present"}{" "}
+                        - {work?.jobEnd ? monthYear(work.jobEnd) : "Present"}
                       </span>
                     )}
                   </div>
@@ -154,8 +181,8 @@ export const PreviewResume = ({ data, isStreaming = false }: PreviewResumeProps)
                   {responsibilities.length > 0 && (
                     <ul className="list-inside text-sm mt-2 space-y-1">
                       {responsibilities.map((point: string, idx: number) => (
-                        <li 
-                          key={`resp-${index}-${idx}`} 
+                        <li
+                          key={`resp-${index}-${idx}`}
                           className="list-disc font-merriweather ml-4"
                         >
                           {point}
@@ -177,26 +204,33 @@ export const PreviewResume = ({ data, isStreaming = false }: PreviewResumeProps)
 
       {/* Education - Renders items incrementally */}
       <SectionWrapper show={hasEducation || isStreaming}>
-        <section className="mb-8">
+        <section className="mb-4">
           <h2 className="text-3xl font-bold border-b border-gray-300 pb-1 mb-2 font-merriweather">
             Education
           </h2>
           {hasEducation ? (
             data.education!.map((edu, index) => (
-              <div key={`edu-${index}-${edu?.schoolLocation || ''}`} className="mb-4">
+              <div
+                key={`edu-${index}-${edu?.schoolLocation || ""}`}
+                className="mb-4"
+              >
                 <div className="flex justify-between">
                   <p className="font-bold font-merriweather">
-                    {edu?.fieldOfStudy || 'Field of Study'}
+                    {edu?.fieldOfStudy || "Field of Study"}
                   </p>
                   {(edu?.educationStart || edu?.educationEnd) && (
                     <span className="text-sm text-gray-500 font-merriweather">
-                      {edu?.educationStart ? monthYear(edu.educationStart) : ''} -{' '}
-                      {edu?.educationEnd ? monthYear(edu.educationEnd) : 'Present'}
+                      {edu?.educationStart ? monthYear(edu.educationStart) : ""}{" "}
+                      -{" "}
+                      {edu?.educationEnd
+                        ? monthYear(edu.educationEnd)
+                        : "Present"}
                     </span>
                   )}
                 </div>
                 <p className="text-sm text-gray-600 font-merriweather">
-                  {edu?.degree || 'Degree'} - {edu?.schoolLocation || 'Location'}
+                  {edu?.degree || "Degree"} -{" "}
+                  {edu?.schoolLocation || "Location"}
                 </p>
                 {edu?.academicAchievements && (
                   <p className="text-sm text-gray-600 font-merriweather mt-1">
@@ -215,17 +249,20 @@ export const PreviewResume = ({ data, isStreaming = false }: PreviewResumeProps)
 
       {/* Certifications - Renders items incrementally */}
       <SectionWrapper show={hasCertifications || isStreaming}>
-        <section className="mb-8">
-           <h2 className="text-3xl font-bold border-b border-gray-300 pb-1 mb-2 font-merriweather">
+        <section className="mb-4">
+          <h2 className="text-3xl font-bold border-b border-gray-300 pb-1 mb-2 font-merriweather">
             Certifications
           </h2>
           <div className="space-y-4">
             {hasCertifications ? (
               data.certification!.map((cert, index) => (
-                <div key={`cert-${index}-${cert?.title || ''}`} className="space-y-1">
+                <div
+                  key={`cert-${index}-${cert?.title || ""}`}
+                  className="space-y-1"
+                >
                   <div className="flex justify-between">
                     <p className="font-bold font-merriweather">
-                      {cert?.title || 'Certification'}
+                      {cert?.title || "Certification"}
                     </p>
                     {cert?.issueDate && (
                       <p className="text-sm text-gray-500 font-merriweather">
@@ -254,14 +291,17 @@ export const PreviewResume = ({ data, isStreaming = false }: PreviewResumeProps)
 
       {/* Projects - Renders items incrementally */}
       <SectionWrapper show={hasProjects || isStreaming}>
-        <section className="mb-8">
+        <section className="mb-4">
           <h2 className="text-2xl font-semibold border-b border-gray-300 pb-1 mb-2 font-merriweather">
             Projects
           </h2>
           <div className="space-y-4">
             {hasProjects ? (
               data.project!.map((project, index) => (
-                <div key={`project-${index}-${project?.name || ''}`} className="space-y-1">
+                <div
+                  key={`project-${index}-${project?.name || ""}`}
+                  className="space-y-1"
+                >
                   {project?.name && (
                     <p className="font-bold font-merriweather">
                       {project.name}
@@ -274,12 +314,14 @@ export const PreviewResume = ({ data, isStreaming = false }: PreviewResumeProps)
                   )}
                   {project?.role && (
                     <div className="text-sm font-merriweather">
-                      <span className="font-semibold">Role:</span> {project.role}
+                      <span className="font-semibold">Role:</span>{" "}
+                      {project.role}
                     </div>
                   )}
                   {project?.techStack && isValidArray(project.techStack) && (
                     <div className="text-sm font-merriweather text-gray-600">
-                      <span className="font-semibold">Tech Stack:</span> {project.techStack.join(', ')}
+                      <span className="font-semibold">Tech Stack:</span>{" "}
+                      {project.techStack.join(", ")}
                     </div>
                   )}
                 </div>
@@ -297,7 +339,7 @@ export const PreviewResume = ({ data, isStreaming = false }: PreviewResumeProps)
           <h2 className="text-3xl font-bold border-b border-gray-300 pb-1 mb-2 font-merriweather">
             Skills
           </h2>
-          
+
           {/* Soft Skills */}
           {hasSoftSkills && (
             <div className="mb-4">
@@ -307,7 +349,7 @@ export const PreviewResume = ({ data, isStreaming = false }: PreviewResumeProps)
               <div className="flex flex-wrap gap-2 text-sm">
                 {data.softSkill!.map((skill, index) => (
                   <span
-                    key={`soft-${index}-${skill?.label || ''}`}
+                    key={`soft-${index}-${skill?.label || ""}`}
                     className="px-2 py-1 bg-gray-100 rounded font-merriweather"
                   >
                     {skill?.label}
@@ -326,7 +368,7 @@ export const PreviewResume = ({ data, isStreaming = false }: PreviewResumeProps)
               <div className="flex flex-wrap gap-2 text-sm">
                 {data.hardSkill!.map((skill, index) => (
                   <span
-                    key={`hard-${index}-${skill?.label || ''}`}
+                    key={`hard-${index}-${skill?.label || ""}`}
                     className="px-2 py-1 bg-gray-100 rounded font-merriweather"
                   >
                     {skill?.label}

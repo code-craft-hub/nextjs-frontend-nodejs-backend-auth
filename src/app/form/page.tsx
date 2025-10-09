@@ -1,10 +1,11 @@
 import React from "react";
-import { AIApplyClient } from "./AIApplyClient";
+import EditResumeTemplate from "../dashboard/(dashboard)/ai-apply/components/resume/EditResumeTemplate";
 import { getQueryClient } from "@/lib/query-client";
 import { apiService } from "@/hooks/use-auth";
 
-const AIApplyPage = async ({ searchParams }: any) => {
-  const { jobDescription, documentId,coverletterId } = await searchParams;
+
+const FormPage = async ({ searchParams }: any) => {
+  const { documentId, coverletterId } = await searchParams;
   const queryClient = getQueryClient();
 
   queryClient.prefetchQuery({
@@ -17,10 +18,10 @@ const AIApplyPage = async ({ searchParams }: any) => {
   });
 
   return (
-    <div className="p-4 sm:p-8 space-y-4">
-      <AIApplyClient jobDescription={jobDescription} documentId={documentId} coverletterId={coverletterId} />
+    <div>
+      <EditResumeTemplate documentId={documentId} />
     </div>
   );
 };
 
-export default AIApplyPage;
+export default FormPage;

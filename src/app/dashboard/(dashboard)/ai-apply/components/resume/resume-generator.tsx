@@ -1,9 +1,9 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useResumeStream } from "@/hooks/stream-resume-hook";
 import { toast } from "sonner";
 import { PreviewResume } from "./preview-resume-template";
-import GenerationStatus from "./GenerationStatus";
+// import GenerationStatus from "./GenerationStatus";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -22,6 +22,10 @@ export const ResumeGenerator = ({
   jobDescription: string;
   documentId: string;
 }) => {
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const [pause, setPause] = useState(true);
+
   const router = useRouter();
   const backendUrl = process.env.NEXT_PUBLIC_AUTH_API_URL;
   const frontendUrl = process.env.NEXT_PUBLIC_APP_URL;
@@ -31,15 +35,9 @@ export const ResumeGenerator = ({
   );
   const { useCareerDoc } = useAuth();
   const { data } = useCareerDoc(documentId);
-  console.log("Data from database : ", data);
   const searchParams = useSearchParams();
   const params = new URLSearchParams(searchParams.toString());
   const oldDescription = params.get("jobDescription");
-  console.log(
-    "All values for 'jobDescription':",
-    params.getAll("jobDescription")
-  );
-  console.log("All entries:", [...params.entries()]);
 
   useEffect(() => {
     if (userProfile && jobDescription && !documentId) {
@@ -60,19 +58,34 @@ export const ResumeGenerator = ({
         "Resume generation complete! Proceeding to next step in the next 5 seconds..."
       );
 
-      setTimeout(() => {
-        handleStepChange(1, "resume", streamData);
+      timeoutRef.current = setTimeout(() => {
+        handleStepChange(3, "resume", streamData);
       }, 5000);
     }
+
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
   }, [streamStatus.savedDocumentToDatabase]);
 
-  console.log("DATA : =============   :", streamData, data);
+  const cancelTimeout = () => {
+    if (timeoutRef.current) {
+      setPause(true);
+      clearTimeout(timeoutRef.current);
+    }
+  };
 
   const shouldUseDbData = streamData.profile === "";
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <GenerationStatus streamStatus={streamStatus} />
-      <PreviewResume data={shouldUseDbData ? data! : streamData} />
+    <div className="">
+      {/* <GenerationStatus streamStatus={streamStatus} /> */}
+      <PreviewResume
+        data={shouldUseDbData ? data! : streamData}
+        cancelTimeout={cancelTimeout}
+        pause={pause}
+      />
     </div>
   );
 };

@@ -50,22 +50,22 @@ export const EmailComposer: React.FC<{
 
   const metrics = content ? getReadingMetrics(content) : null;
 
-  useEffect(() => {
-    if (isComplete) {
-      toast.success(
-        "Resume generation complete! Proceeding to next step in the next 5 seconds..."
-      );
-      // setTimeout(() => {
-      //   handleStepChange(2, "emailContent", content);
-      // }, 5000);
-    } else {
-      // toast.success("There are some generations pending. Please wait...");
-    }
-  }, [isComplete, handleStepChange]);
+  // useEffect(() => {
+  //   if (isComplete) {
+  //     toast.success(
+  //       "Resume generation complete! Proceeding to next step in the next 5 seconds..."
+  //     );
+  //     // setTimeout(() => {
+  //     //   handleStepChange(2, "emailContent", content);
+  //     // }, 5000);
+  //   } else {
+  //     // toast.success("There are some generations pending. Please wait...");
+  //   }
+  // }, [isComplete, handleStepChange]);
 
-  useEffect(() => {
-    handleGenerate();
-  }, []);
+  // useEffect(() => {
+  //   handleGenerate();
+  // }, []);
 
   return (
     <div className="min-h-screen py-8">

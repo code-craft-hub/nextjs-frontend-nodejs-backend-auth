@@ -126,21 +126,21 @@ export const fileToBase64 = (file: File): Promise<string> =>
     reader.onerror = reject;
   });
 
-  /**
+/**
  * Format streaming content with proper markdown styling
  */
 export const formatStreamContent = (content: string): string => {
-  if (!content) return '';
+  if (!content) return "";
 
   // Add spacing for better readability
   let formatted = content
     // Headers
-    .replace(/^(#{1,6})\s+(.+)$/gm, '$1 $2\n')
+    .replace(/^(#{1,6})\s+(.+)$/gm, "$1 $2\n")
     // Code blocks
-    .replace(/```(\w+)?\n/g, '```$1\n')
+    .replace(/```(\w+)?\n/g, "```$1\n")
     // Lists
-    .replace(/^(\s*[-*+])\s+/gm, '$1 ')
-    .replace(/^(\s*\d+\.)\s+/gm, '$1 ');
+    .replace(/^(\s*[-*+])\s+/gm, "$1 ")
+    .replace(/^(\s*\d+\.)\s+/gm, "$1 ");
 
   return formatted;
 };
@@ -156,7 +156,7 @@ export const getReadingMetrics = (content: string) => {
   return {
     words,
     chars,
-    readingTime
+    readingTime,
   };
 };
 
@@ -174,94 +174,101 @@ export const extractTitle = (content: string): string | null => {
   const match = content.match(/^#\s+(.+)$/m);
   return match ? match[1] : null;
 };
-  export const processWorkExperience = (workExp: any) => {
-    if (!workExp) return [];
+export const processWorkExperience = (workExp: any) => {
+  if (!workExp) return [];
 
-    if (Array.isArray(workExp)) {
-      return workExp;
+  if (Array.isArray(workExp)) {
+    return workExp;
+  }
+
+  if (typeof workExp === "object" && workExp.experience) {
+    return workExp.experience;
+  }
+
+  if (typeof workExp === "object") {
+    return [workExp];
+  }
+
+  return [];
+};
+
+export const processEducation = (education: any) => {
+  if (!education) return [];
+
+  if (Array.isArray(education)) {
+    return education;
+  }
+
+  if (typeof education === "object" && education.degrees) {
+    return education.degrees;
+  }
+
+  if (typeof education === "object") {
+    return [education];
+  }
+
+  return [];
+};
+
+export const processSkills = (skills: any) => {
+  if (!skills) return [];
+
+  if (Array.isArray(skills)) {
+    return skills;
+  }
+
+  if (typeof skills === "object") {
+    // Handle different skill structures
+    if (skills.hardSkill || skills.softSkill) {
+      return [...(skills.hardSkill || []), ...(skills.softSkill || [])];
     }
-
-    if (typeof workExp === "object" && workExp.experience) {
-      return workExp.experience;
+    if (skills.technical || skills.soft) {
+      return [...(skills.technical || []), ...(skills.soft || [])];
     }
+  }
 
-    if (typeof workExp === "object") {
-      return [workExp];
-    }
+  return [];
+};
 
-    return [];
-  };
+export const processCertifications = (certification: any) => {
+  if (!certification) return [];
 
-  export const processEducation = (education: any) => {
-    if (!education) return [];
+  if (Array.isArray(certification)) {
+    return certification;
+  }
 
-    if (Array.isArray(education)) {
-      return education;
-    }
+  if (typeof certification === "object" && certification.certification) {
+    return certification.certification;
+  }
 
-    if (typeof education === "object" && education.degrees) {
-      return education.degrees;
-    }
+  if (typeof certification === "object") {
+    return [certification];
+  }
 
-    if (typeof education === "object") {
-      return [education];
-    }
+  return [];
+};
 
-    return [];
-  };
+export const processProjects = (project: any) => {
+  if (!project) return [];
 
-  export const processSkills = (skills: any) => {
-    if (!skills) return [];
+  if (Array.isArray(project)) {
+    return project;
+  }
 
-    if (Array.isArray(skills)) {
-      return skills;
-    }
+  if (typeof project === "object" && project.project) {
+    return project.project;
+  }
 
-    if (typeof skills === "object") {
-      // Handle different skill structures
-      if (skills.hardSkill || skills.softSkill) {
-        return [...(skills.hardSkill || []), ...(skills.softSkill || [])];
-      }
-      if (skills.technical || skills.soft) {
-        return [...(skills.technical || []), ...(skills.soft || [])];
-      }
-    }
+  if (typeof project === "object") {
+    return [project];
+  }
 
-    return [];
-  };
+  return [];
+};
 
-  export const processCertifications = (certification: any) => {
-    if (!certification) return [];
-
-    if (Array.isArray(certification)) {
-      return certification;
-    }
-
-    if (typeof certification === "object" && certification.certification) {
-      return certification.certification;
-    }
-
-    if (typeof certification === "object") {
-      return [certification];
-    }
-
-    return [];
-  };
-
-  export const processProjects = (project: any) => {
-    if (!project) return [];
-
-    if (Array.isArray(project)) {
-      return project;
-    }
-
-    if (typeof project === "object" && project.project) {
-      return project.project;
-    }
-
-    if (typeof project === "object") {
-      return [project];
-    }
-
-    return [];
-  };
+export const createOrderedParams = (docId: string, jobDesc: string) => {
+  const params = new URLSearchParams();
+  params.set("coverletterId", docId);
+  params.set("jobDescription", jobDesc);
+  return params;
+};
