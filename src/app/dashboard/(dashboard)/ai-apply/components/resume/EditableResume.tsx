@@ -436,8 +436,6 @@ export const PreviewResume = ({
                   </div>
                 </div>
               )}
-
-              {/* Streaming placeholder */}
               {isStreaming && !hasSkills && (
                 <div className="space-y-2">
                   <StreamingSkeleton className="h-8 w-full" />
