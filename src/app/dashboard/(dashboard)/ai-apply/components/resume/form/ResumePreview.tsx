@@ -60,9 +60,9 @@ export const ResumePreview: React.FC<ResumePreviewProps> = ({
           />
         )}
       </EditDialog>
-      <Separator />
+      {data.workExperience.length > 0 && <Separator />}
       <EditDialog
-      className="w-full"
+        className="w-full"
         trigger={
           <>
             {data.workExperience.length > 0 && (
@@ -113,7 +113,7 @@ export const ResumePreview: React.FC<ResumePreviewProps> = ({
           />
         )}
       </EditDialog>
-      <Separator />
+      {data.education.length > 0 && <Separator />}
       <EditDialog
         trigger={
           <>
@@ -162,7 +162,7 @@ export const ResumePreview: React.FC<ResumePreviewProps> = ({
           />
         )}
       </EditDialog>
-      <Separator />
+      {data.project.length > 0 && <Separator />}
       <EditDialog
         trigger={
           <>
@@ -215,7 +215,7 @@ export const ResumePreview: React.FC<ResumePreviewProps> = ({
           />
         )}
       </EditDialog>
-      <Separator />
+      {data.certification.length > 0 && <Separator />}
       <EditDialog
         trigger={
           <>
@@ -267,7 +267,9 @@ export const ResumePreview: React.FC<ResumePreviewProps> = ({
           />
         )}
       </EditDialog>
-      <Separator />
+      {(data.hardSkill.length > 0 || data.softSkill.length > 0) && (
+        <Separator />
+      )}
       {(data.hardSkill.length > 0 || data.softSkill.length > 0) && (
         <>
           <div className="space-y-4">

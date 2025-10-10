@@ -1,5 +1,3 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 import {
@@ -14,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { DynamicFieldArray } from "./DynamicFieldArray";
 import { DialogFooter } from "@/components/ui/dialog";
-import { ProjectFormData, projectSchema } from "@/lib/schema-validations/resume.schema";
+import { ProjectFormData } from "@/lib/schema-validations/resume.schema";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrayInputField } from "./ArrayInputField";
 
@@ -41,8 +39,8 @@ export const ProjectEditForm: React.FC<ProjectEditFormProps> = ({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-        <ScrollArea className="h-[500px] pr-4">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+        <ScrollArea>
           <DynamicFieldArray
             form={form}
             name="project"

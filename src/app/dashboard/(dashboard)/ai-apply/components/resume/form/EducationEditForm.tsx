@@ -1,5 +1,3 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 import {
@@ -11,12 +9,11 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { EducationFormData, educationSchema } from "@/lib/schema-validations/resume.schema";
+import { EducationFormData } from "@/lib/schema-validations/resume.schema";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { DynamicFieldArray } from "./DynamicFieldArray";
 import { DialogFooter } from "@/components/ui/dialog";
-
-
+import { toValidDate } from "@/lib/toValidDate";
 
 interface EducationEditFormProps {
   initialData?: EducationFormData[];
@@ -40,8 +37,8 @@ export const EducationEditForm: React.FC<EducationEditFormProps> = ({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-        <ScrollArea className="h-[500px] pr-4">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+        <ScrollArea>
           <DynamicFieldArray
             form={form}
             name="education"
@@ -119,7 +116,11 @@ export const EducationEditForm: React.FC<EducationEditFormProps> = ({
                       <FormItem>
                         <FormLabel>Start Date</FormLabel>
                         <FormControl>
-                          <Input {...field} type="month" />
+                          <Input
+                            type="month"
+                            value={toValidDate(field.value, "month")}
+                            onChange={(e) => field.onChange(e.target.value)}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -132,7 +133,11 @@ export const EducationEditForm: React.FC<EducationEditFormProps> = ({
                       <FormItem>
                         <FormLabel>End Date</FormLabel>
                         <FormControl>
-                          <Input {...field} type="month" />
+                          <Input
+                            type="month"
+                            value={toValidDate(field.value, "month")}
+                            onChange={(e) => field.onChange(e.target.value)}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

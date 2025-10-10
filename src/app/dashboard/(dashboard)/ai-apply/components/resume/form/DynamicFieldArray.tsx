@@ -35,7 +35,7 @@ export const DynamicFieldArray = <T,>({
           size="sm"
           onClick={() => append(defaultValue)}
         >
-          <Plus className="w-4 h-4 mr-2" />
+          <Plus className="w-4 h-4" />
           Add {label}
         </Button>
       </div>
@@ -45,12 +45,12 @@ export const DynamicFieldArray = <T,>({
             {fields.length > minItems && (
               <Button
                 type="button"
-                variant="destructive"
+                variant="ghost"
                 size="sm"
-                className="ml-auto absolute top-2 right-2"
+                className="ml-auto absolute top-1 right-1"
                 onClick={() => remove(index)}
               >
-                <Trash2 className="w-4 h-4" />
+                <Trash2 className="w-4 h-4 text-red-500" />
               </Button>
             )}
             {renderFields(index)}

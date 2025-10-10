@@ -12,9 +12,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import {
   ProfileFormData,
-  profileSchema,
 } from "@/lib/schema-validations/resume.schema";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
 interface ProfileEditFormProps {

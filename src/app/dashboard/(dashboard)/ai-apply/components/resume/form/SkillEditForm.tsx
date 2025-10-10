@@ -1,5 +1,3 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 import {
@@ -14,10 +12,7 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { DynamicFieldArray } from "./DynamicFieldArray";
 import { DialogFooter } from "@/components/ui/dialog";
-import {
-  SkillFormData,
-  skillSchema,
-} from "@/lib/schema-validations/resume.schema";
+import { SkillFormData } from "@/lib/schema-validations/resume.schema";
 
 interface SkillEditFormProps {
   initialData?: SkillFormData[];
@@ -45,36 +40,23 @@ export const SkillEditForm: React.FC<SkillEditFormProps> = ({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-        <ScrollArea className="h-[400px] pr-4">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+        <ScrollArea>
           <DynamicFieldArray
             form={form}
             name="skills"
             label="Skill"
             defaultValue={{ label: "", value: "" }}
             renderFields={(index) => (
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4">
                 <FormField
                   control={form.control}
                   name={`skills.${index}.label`}
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Skill {title}</FormLabel>
+                      <FormLabel>{title}</FormLabel>
                       <FormControl>
                         <Input {...field} placeholder={placeholder} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name={`skills.${index}.value`}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Skill Value (slug)</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder="lowercase-slug" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

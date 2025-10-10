@@ -46,9 +46,9 @@ export const WorkExperienceEditForm: React.FC<WorkExperienceEditFormProps> = ({
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(handleSubmit)}
-        className="p-1 rounded-xl"
+        className="space-y-4"
       >
-        <ScrollArea className="">
+        <ScrollArea>
           <DynamicFieldArray
             form={form}
             name="workExperience"

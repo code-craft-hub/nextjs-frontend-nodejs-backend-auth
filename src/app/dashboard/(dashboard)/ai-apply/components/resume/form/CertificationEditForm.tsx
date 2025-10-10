@@ -1,5 +1,3 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 import {
@@ -14,9 +12,9 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { DynamicFieldArray } from "./DynamicFieldArray";
 import { DialogFooter } from "@/components/ui/dialog";
-import { CertificationFormData, certificationSchema } from "@/lib/schema-validations/resume.schema";
+import { CertificationFormData } from "@/lib/schema-validations/resume.schema";
 import { Textarea } from "@/components/ui/textarea";
-
+import { toValidDate } from "@/lib/toValidDate";
 
 interface CertificationEditFormProps {
   initialData?: CertificationFormData[];
@@ -42,8 +40,8 @@ export const CertificationEditForm: React.FC<CertificationEditFormProps> = ({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-        <ScrollArea className="h-[500px] pr-4">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+        <ScrollArea>
           <DynamicFieldArray
             form={form}
             name="certification"
@@ -95,7 +93,11 @@ export const CertificationEditForm: React.FC<CertificationEditFormProps> = ({
                       <FormItem>
                         <FormLabel>Issue Date</FormLabel>
                         <FormControl>
-                          <Input {...field} type="month" />
+                          <Input
+                            type="month"
+                            value={toValidDate(field.value, "month")}
+                            onChange={(e) => field.onChange(e.target.value)}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -104,15 +106,20 @@ export const CertificationEditForm: React.FC<CertificationEditFormProps> = ({
                   <FormField
                     control={form.control}
                     name={`certification.${index}.expiryDate`}
-                    render={({ field }) => (
+                    render={({ field }) => {
+                      return(
                       <FormItem>
                         <FormLabel>Expiry Date (Optional)</FormLabel>
                         <FormControl>
-                          <Input {...field} type="month" />
+                          <Input
+                            type="month"
+                            value={toValidDate(field.value, "month")}
+                            onChange={(e) => field.onChange(e.target.value)}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
-                    )}
+                    )}}
                   />
                 </div>
                 <FormField
