@@ -1,5 +1,3 @@
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { EditDialog } from "./EditDialog";
 import { ProfileEditForm } from "./ProfileEditForm";
 import { WorkExperienceEditForm } from "./WorkExperienceEditForm";
@@ -7,25 +5,34 @@ import { EducationEditForm } from "./EducationEditForm";
 import { ProjectEditForm } from "./ProjectEditForm";
 import { CertificationEditForm } from "./CertificationEditForm";
 import { SkillEditForm } from "./SkillEditForm";
-import { ResumePreviewProps } from "@/types";
+import { useCallback } from "react";
+import { ResumeField } from "@/hooks/use-resume-data";
 
+interface ResumePreviewProps {
+  data: any;
+  onUpdate: <T>(field: ResumeField, value: T) => void;
+  isUpdating?: boolean;
+}
 
 export const ResumePreview: React.FC<ResumePreviewProps> = ({
   data,
-  handleProfileUpdate,
-  handleWorkExperienceUpdate,
-  handleEducationUpdate,
-  handleCertificationUpdate,
-  handleProjectUpdate,
-  handleHardSkillUpdate,
-  handleSoftSkillUpdate,
+  onUpdate,
 }) => {
-  console.count("PREVIEW RESUME RENDER");
+  // Create field-specific handlers dynamically
+  const createFieldHandler = useCallback(
+    <T,>(field: ResumeField) =>
+      (value: T) => {
+        onUpdate(field, value);
+      },
+    [onUpdate]
+  );
+
   return (
-    <div className="bg-white rounded-lg shadow-lg p-8 space-y-6">
+    <div className="bg-white rounded-lg shadow-lg p-8 space-y-6 relative">
+      {/* Profile Section */}
       <EditDialog
         trigger={
-          <div className="space-y-4 hover:cursor-pointer ">
+          <div className="space-y-4 hover:cursor-pointer hover:bg-gray-50 p-4 rounded-lg transition-colors">
             <h1 className="text-3xl font-bold text-gray-900">
               Professional Resume
             </h1>
@@ -37,29 +44,28 @@ export const ResumePreview: React.FC<ResumePreviewProps> = ({
       >
         {(onClose) => (
           <ProfileEditForm
-            initialData={data.profile!}
-            onSave={(data) => {
-              handleProfileUpdate(data);
+            initialData={data.profile}
+            onSave={(value) => {
+              createFieldHandler("profile")(value);
               onClose();
             }}
             onCancel={onClose}
           />
         )}
       </EditDialog>
-      {data.workExperience.length > 0 && <Separator />}
-      <EditDialog
-        className="w-full"
-        trigger={
-          <>
-            {data.workExperience.length > 0 && (
-              <div className="space-y-4 ">
-                <div className="flex items-center gap-2">
-                  <h2 className="text-xl font-semibold text-gray-900">
-                    Work Experience
-                  </h2>
-                </div>
-                {data.workExperience.map((exp) => (
-                  <div key={exp.workExperienceId} className="space-y-2 ">
+
+      {/* Work Experience Section */}
+      {data.workExperience?.length > 0 && (
+        <>
+          <div className="border-t pt-6" />
+          <EditDialog
+            trigger={
+              <div className="space-y-4 hover:cursor-pointer hover:bg-gray-50 p-4 rounded-lg transition-colors">
+                <h2 className="text-xl font-semibold text-gray-900">
+                  Work Experience
+                </h2>
+                {data.workExperience.map((exp: any) => (
+                  <div key={exp.workExperienceId} className="space-y-2">
                     <div className="flex justify-between items-start">
                       <div>
                         <h3 className="font-semibold text-gray-900">
@@ -75,265 +81,260 @@ export const ResumePreview: React.FC<ResumePreviewProps> = ({
                       </div>
                     </div>
                     <ul className="list-disc list-inside space-y-1 text-gray-700">
-                      {exp.responsibilities?.map((resp, idx) => (
-                        <li key={idx}>{resp}</li>
-                      ))}
+                      {exp.responsibilities?.map(
+                        (resp: string, idx: number) => (
+                          <li key={idx}>{resp}</li>
+                        )
+                      )}
                     </ul>
                   </div>
                 ))}
               </div>
+            }
+            title="Edit Work Experience"
+            description="Manage your professional work history"
+          >
+            {(onClose) => (
+              <WorkExperienceEditForm
+                initialData={data.workExperience}
+                onSave={(value) => {
+                  createFieldHandler("workExperience")(value);
+                  onClose();
+                }}
+                onCancel={onClose}
+              />
             )}
-          </>
-        }
-        title="Edit Work Experience"
-        description="Manage your professional work history"
-      >
-        {(onClose) => (
-          <WorkExperienceEditForm
-            initialData={data.workExperience}
-            onSave={(data) => {
-              handleWorkExperienceUpdate(data);
-              onClose();
-            }}
-            onCancel={onClose}
-          />
-        )}
-      </EditDialog>
-      {data.education.length > 0 && <Separator />}
-      <EditDialog
-        trigger={
-          <>
-            {data.education.length > 0 && (
-              <>
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <h2 className="text-xl font-semibold text-gray-900">
-                      Education
-                    </h2>
-                  </div>
-                  {data.education.map((edu) => (
-                    <div key={edu.educationId} className="space-y-1">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <h3 className="font-semibold text-gray-900">
-                            {edu.degree} in {edu.fieldOfStudy}
-                          </h3>
-                          <p className="text-gray-600">{edu.schoolName}</p>
-                        </div>
-                        <div className="text-right text-sm text-gray-500">
-                          <p>
-                            {edu.educationStart} - {edu.educationEnd}
-                          </p>
-                          <p>{edu.schoolLocation}</p>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </>
-            )}
-          </>
-        }
-        title="Edit Education"
-        description="Manage your educational background"
-      >
-        {(onClose) => (
-          <EducationEditForm
-            initialData={data.education}
-            onSave={(data) => {
-              handleEducationUpdate(data);
-              onClose();
-            }}
-            onCancel={onClose}
-          />
-        )}
-      </EditDialog>
-      {data.project.length > 0 && <Separator />}
-      <EditDialog
-        trigger={
-          <>
-            {data.project.length > 0 && (
-              <>
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <h2 className="text-xl font-semibold text-gray-900">
-                      Projects
-                    </h2>
-                  </div>
-                  {data.project.map((proj) => (
-                    <div key={proj.projectId} className="space-y-2">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <h3 className="font-semibold text-gray-900">
-                            {proj.name}
-                          </h3>
-                          <Badge variant="secondary" className="text-xs">
-                            {proj.role}
-                          </Badge>
-                        </div>
-                        <p className="text-gray-700 mt-1">{proj.description}</p>
-                        <div className="flex flex-wrap gap-2 mt-2">
-                          {proj?.techStack?.map((tech, idx) => (
-                            <Badge key={idx} variant="outline">
-                              {tech}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </>
-            )}
-          </>
-        }
-        title="Edit Projects"
-        description="Showcase your notable projects and contributions"
-      >
-        {(onClose) => (
-          <ProjectEditForm
-            initialData={data.project}
-            onSave={(data) => {
-              handleProjectUpdate(data);
-              onClose();
-            }}
-            onCancel={onClose}
-          />
-        )}
-      </EditDialog>
-      {data.certification.length > 0 && <Separator />}
-      <EditDialog
-        trigger={
-          <>
-            {data.certification.length > 0 && (
-              <>
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <h2 className="text-xl font-semibold text-gray-900">
-                      Certifications
-                    </h2>
-                  </div>
-                  {data.certification.map((cert) => (
-                    <div key={cert.certificationId} className="space-y-1">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <h3 className="font-semibold text-gray-900">
-                            {cert.title}
-                          </h3>
-                          <p className="text-gray-600">{cert.issuer}</p>
-                          {cert.description && (
-                            <p className="text-sm text-gray-500 mt-1">
-                              {cert.description}
-                            </p>
-                          )}
-                        </div>
-                        <div className="text-right text-sm text-gray-500">
-                          <p>Issued: {cert.issueDate}</p>
-                          {cert.expiryDate && <p>Expires: {cert.expiryDate}</p>}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </>
-            )}
-          </>
-        }
-        title="Edit Certifications"
-        description="Manage your professional certifications"
-      >
-        {(onClose) => (
-          <CertificationEditForm
-            initialData={data.certification}
-            onSave={(data) => {
-              handleCertificationUpdate(data);
-              onClose();
-            }}
-            onCancel={onClose}
-          />
-        )}
-      </EditDialog>
-      {(data.hardSkill.length > 0 || data.softSkill.length > 0) && (
-        <Separator />
+          </EditDialog>
+        </>
       )}
-      {(data.hardSkill.length > 0 || data.softSkill.length > 0) && (
-        <>
-          <div className="space-y-4">
-            <EditDialog
-              trigger={
-                <>
-                  {data.hardSkill.length > 0 && (
-                    <div>
-                      <div className="flex items-center gap-2 mb-3">
-                        <h2 className="text-xl font-semibold text-gray-900">
-                          Technical Skills
-                        </h2>
-                      </div>
-                      <div className="flex flex-wrap gap-2">
-                        {data.hardSkill.map((skill, idx) => (
-                          <Badge key={idx} variant="default">
-                            {skill.label}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </>
-              }
-              title="Edit Technical Skills"
-              description="Manage your technical and hard skills"
-            >
-              {(onClose) => (
-                <SkillEditForm
-                  initialData={data.hardSkill}
-                  title="Technical Skills"
-                  placeholder="React, Python, AWS..."
-                  onSave={(data) => {
-                    handleHardSkillUpdate(data);
-                    onClose();
-                  }}
-                  onCancel={onClose}
-                />
-              )}
-            </EditDialog>
 
-            <EditDialog
-              trigger={
-                <>
-                  {data.softSkill.length > 0 && (
-                    <div>
-                      <div className="flex items-center gap-2 mb-3">
-                        <h2 className="text-xl font-semibold text-gray-900">
-                          Soft Skills
-                        </h2>
+      {/* Education Section */}
+      {data.education?.length > 0 && (
+        <>
+          <div className="border-t pt-6" />
+          <EditDialog
+            trigger={
+              <div className="space-y-4 hover:cursor-pointer hover:bg-gray-50 p-4 rounded-lg transition-colors">
+                <h2 className="text-xl font-semibold text-gray-900">
+                  Education
+                </h2>
+                {data.education.map((edu: any) => (
+                  <div key={edu.educationId} className="space-y-1">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h3 className="font-semibold text-gray-900">
+                          {edu.degree} in {edu.fieldOfStudy}
+                        </h3>
+                        <p className="text-gray-600">{edu.schoolName}</p>
                       </div>
-                      <div className="flex flex-wrap gap-2">
-                        {data.softSkill.map((skill, idx) => (
-                          <Badge key={idx} variant="secondary">
-                            {skill.label}
-                          </Badge>
-                        ))}
+                      <div className="text-right text-sm text-gray-500">
+                        <p>
+                          {edu.educationStart} - {edu.educationEnd}
+                        </p>
+                        <p>{edu.schoolLocation}</p>
                       </div>
                     </div>
-                  )}
-                </>
-              }
-              title="Edit Soft Skills"
-              description="Manage your interpersonal and soft skills"
-            >
-              {(onClose) => (
-                <SkillEditForm
-                  initialData={data.softSkill}
-                  title="Soft Skills"
-                  placeholder="Leadership, Communication..."
-                  onSave={(data) => {
-                    handleSoftSkillUpdate(data);
-                    onClose();
-                  }}
-                  onCancel={onClose}
-                />
-              )}
-            </EditDialog>
+                  </div>
+                ))}
+              </div>
+            }
+            title="Edit Education"
+            description="Manage your educational background"
+          >
+            {(onClose) => (
+              <EducationEditForm
+                initialData={data.education}
+                onSave={(value) => {
+                  createFieldHandler("education")(value);
+                  onClose();
+                }}
+                onCancel={onClose}
+              />
+            )}
+          </EditDialog>
+        </>
+      )}
+
+      {/* Projects Section */}
+      {data.project?.length > 0 && (
+        <>
+          <div className="border-t pt-6" />
+          <EditDialog
+            trigger={
+              <div className="space-y-4 hover:cursor-pointer hover:bg-gray-50 p-4 rounded-lg transition-colors">
+                <h2 className="text-xl font-semibold text-gray-900">
+                  Projects
+                </h2>
+                {data.project.map((proj: any) => (
+                  <div key={proj.projectId} className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-semibold text-gray-900">
+                        {proj.name}
+                      </h3>
+                      <span className="text-xs bg-gray-100 px-2 py-1 rounded">
+                        {proj.role}
+                      </span>
+                    </div>
+                    <p className="text-gray-700">{proj.description}</p>
+                    <div className="flex flex-wrap gap-2">
+                      {proj.techStack?.map((tech: string, idx: number) => (
+                        <span
+                          key={idx}
+                          className="text-xs border px-2 py-1 rounded"
+                        >
+                          {tech}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            }
+            title="Edit Projects"
+            description="Showcase your notable projects"
+          >
+            {(onClose) => (
+              <ProjectEditForm
+                initialData={data.project}
+                onSave={(value) => {
+                  createFieldHandler("project")(value);
+                  onClose();
+                }}
+                onCancel={onClose}
+              />
+            )}
+          </EditDialog>
+        </>
+      )}
+
+      {/* Certifications Section */}
+      {data.certification?.length > 0 && (
+        <>
+          <div className="border-t pt-6" />
+          <EditDialog
+            trigger={
+              <div className="space-y-4 hover:cursor-pointer hover:bg-gray-50 p-4 rounded-lg transition-colors">
+                <h2 className="text-xl font-semibold text-gray-900">
+                  Certifications
+                </h2>
+                {data.certification.map((cert: any) => (
+                  <div key={cert.certificationId} className="space-y-1">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h3 className="font-semibold text-gray-900">
+                          {cert.title}
+                        </h3>
+                        <p className="text-gray-600">{cert.issuer}</p>
+                        {cert.description && (
+                          <p className="text-sm text-gray-500 mt-1">
+                            {cert.description}
+                          </p>
+                        )}
+                      </div>
+                      <div className="text-right text-sm text-gray-500">
+                        <p>Issued: {cert.issueDate}</p>
+                        {cert.expiryDate && <p>Expires: {cert.expiryDate}</p>}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            }
+            title="Edit Certifications"
+            description="Manage your professional certifications"
+          >
+            {(onClose) => (
+              <CertificationEditForm
+                initialData={data.certification}
+                onSave={(value) => {
+                  createFieldHandler("certification")(value);
+                  onClose();
+                }}
+                onCancel={onClose}
+              />
+            )}
+          </EditDialog>
+        </>
+      )}
+
+      {/* Skills Section */}
+      {(data.hardSkill?.length > 0 || data.softSkill?.length > 0) && (
+        <>
+          <div className="border-t pt-6" />
+          <div className="space-y-4">
+            {data.hardSkill?.length > 0 && (
+              <EditDialog
+                trigger={
+                  <div className="hover:cursor-pointer hover:bg-gray-50 p-4 rounded-lg transition-colors">
+                    <h2 className="text-xl font-semibold text-gray-900 mb-3">
+                      Technical Skills
+                    </h2>
+                    <div className="flex flex-wrap gap-2">
+                      {data.hardSkill.map((skill: any, idx: number) => (
+                        <span
+                          key={idx}
+                          className="bg-blue-100 text-blue-800 px-3 py-1 rounded text-sm"
+                        >
+                          {skill.label}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                }
+                title="Edit Technical Skills"
+                description="Manage your technical skills"
+              >
+                {(onClose) => (
+                  <SkillEditForm
+                    initialData={data.hardSkill}
+                    title="Technical Skills"
+                    placeholder="React, Python, AWS..."
+                    onSave={(value) => {
+                      createFieldHandler("hardSkill")(value);
+                      onClose();
+                    }}
+                    onCancel={onClose}
+                  />
+                )}
+              </EditDialog>
+            )}
+
+            {data.softSkill?.length > 0 && (
+              <EditDialog
+                trigger={
+                  <div className="hover:cursor-pointer hover:bg-gray-50 p-4 rounded-lg transition-colors">
+                    <h2 className="text-xl font-semibold text-gray-900 mb-3">
+                      Soft Skills
+                    </h2>
+                    <div className="flex flex-wrap gap-2">
+                      {data.softSkill.map((skill: any, idx: number) => (
+                        <span
+                          key={idx}
+                          className="bg-purple-100 text-purple-800 px-3 py-1 rounded text-sm"
+                        >
+                          {skill.label}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                }
+                title="Edit Soft Skills"
+                description="Manage your interpersonal skills"
+              >
+                {(onClose) => (
+                  <SkillEditForm
+                    initialData={data.softSkill}
+                    title="Soft Skills"
+                    placeholder="Leadership, Communication..."
+                    onSave={(value) => {
+                      createFieldHandler("softSkill")(value);
+                      onClose();
+                    }}
+                    onCancel={onClose}
+                  />
+                )}
+              </EditDialog>
+            )}
           </div>
         </>
       )}
