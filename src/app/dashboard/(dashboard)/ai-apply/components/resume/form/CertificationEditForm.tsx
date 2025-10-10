@@ -28,9 +28,6 @@ export const CertificationEditForm: React.FC<CertificationEditFormProps> = ({
   onCancel,
 }) => {
   const form = useForm<{ certification: CertificationFormData[] }>({
-    // resolver: zodResolver(
-    //   z.object({ certification: z.array(certificationSchema) })
-    // ),
     defaultValues: { certification: initialData },
   });
 

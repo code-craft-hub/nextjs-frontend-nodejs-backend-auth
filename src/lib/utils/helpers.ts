@@ -272,3 +272,29 @@ export const createOrderedParams = (docId: string, jobDesc: string) => {
   params.set("jobDescription", jobDesc);
   return params;
 };
+
+export const isValidArray = (arr: any): arr is any[] => {
+  return Array.isArray(arr) && arr.length > 0;
+};
+
+/**
+ * Parse responsibilities into array format
+ */
+export const parseResponsibilities = (responsibilities: any): string[] => {
+  if (!responsibilities) return [];
+
+  if (Array.isArray(responsibilities)) {
+    return responsibilities;
+  }
+
+  if (typeof responsibilities === "string") {
+    return responsibilities.includes(",")
+      ? responsibilities
+          .split(",")
+          .map((r) => r.trim())
+          .filter(Boolean)
+      : [responsibilities];
+  }
+
+  return [];
+};

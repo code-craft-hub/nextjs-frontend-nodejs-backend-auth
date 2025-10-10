@@ -1,5 +1,3 @@
-import { ResumeFormData } from "@/lib/schema-validations/resume.schema";
-
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { EditDialog } from "./EditDialog";
@@ -9,20 +7,8 @@ import { EducationEditForm } from "./EducationEditForm";
 import { ProjectEditForm } from "./ProjectEditForm";
 import { CertificationEditForm } from "./CertificationEditForm";
 import { SkillEditForm } from "./SkillEditForm";
-interface ResumePreviewProps {
-  data: ResumeFormData;
-  handleProfileUpdate: (profile: string) => void;
-  handleWorkExperienceUpdate: (
-    workExperience: ResumeFormData["workExperience"]
-  ) => void;
-  handleEducationUpdate: (education: ResumeFormData["education"]) => void;
-  handleCertificationUpdate: (
-    certification: ResumeFormData["certification"]
-  ) => void;
-  handleProjectUpdate: (project: ResumeFormData["project"]) => void;
-  handleHardSkillUpdate: (hardSkill: ResumeFormData["hardSkill"]) => void;
-  handleSoftSkillUpdate: (softSkill: ResumeFormData["softSkill"]) => void;
-}
+import { ResumePreviewProps } from "@/types";
+
 
 export const ResumePreview: React.FC<ResumePreviewProps> = ({
   data,

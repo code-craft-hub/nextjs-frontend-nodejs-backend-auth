@@ -51,6 +51,40 @@ export interface IUser {
   question: any[];
 }
 
+export interface PreviewResumeProps {
+  data: Partial<IUser>;
+  isStreaming?: boolean;
+  pause?: boolean;
+  cancelTimeout?: () => void;
+  handleProfileUpdate: (profile: string) => void;
+  handleWorkExperienceUpdate: (
+    workExperience: ResumeFormData["workExperience"]
+  ) => void;
+  handleEducationUpdate: (education: ResumeFormData["education"]) => void;
+  handleCertificationUpdate: (
+    certification: ResumeFormData["certification"]
+  ) => void;
+  handleProjectUpdate: (project: ResumeFormData["project"]) => void;
+  handleHardSkillUpdate: (hardSkill: ResumeFormData["hardSkill"]) => void;
+  handleSoftSkillUpdate: (softSkill: ResumeFormData["softSkill"]) => void;
+  
+}
+
+export interface ResumePreviewProps {
+  data: ResumeFormData;
+  handleProfileUpdate: (profile: string) => void;
+  handleWorkExperienceUpdate: (
+    workExperience: ResumeFormData["workExperience"]
+  ) => void;
+  handleEducationUpdate: (education: ResumeFormData["education"]) => void;
+  handleCertificationUpdate: (
+    certification: ResumeFormData["certification"]
+  ) => void;
+  handleProjectUpdate: (project: ResumeFormData["project"]) => void;
+  handleHardSkillUpdate: (hardSkill: ResumeFormData["hardSkill"]) => void;
+  handleSoftSkillUpdate: (softSkill: ResumeFormData["softSkill"]) => void;
+}
+
 export interface FloatingLabelInputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
   id?: string;
@@ -77,10 +111,10 @@ export interface IEducation {
   degree: string;
   academicAchievements?: string;
   fieldOfStudy: string;
-  educationStart: string | Date;
-  educationEnd: string | Date;
+  educationStart: string;
+  educationEnd: string;
   acceptTerms: boolean;
-  educationId?: string | number;
+  educationId?: string;
 }
 
 export interface IWorkExperience {
@@ -88,10 +122,10 @@ export interface IWorkExperience {
   companyName?: string;
   location?: string;
   workDescription?: string;
-  responsibilities?: string | string[];
-  jobStart: string | Date;
-  jobEnd: string | Date;
-  workExperienceId?: string | number;
+  responsibilities?: string[];
+  jobStart: string;
+  jobEnd: string;
+  workExperienceId?: string;
 }
 
 export interface ISkill {
@@ -190,6 +224,7 @@ export interface FloatingLabelInputProps
   showPasswordToggle?: boolean;
 }
 
+import { ResumeFormData } from "@/lib/schema-validations/resume.schema";
 import { LucideIcon } from "lucide-react";
 import { IconType } from "react-icons";
 
