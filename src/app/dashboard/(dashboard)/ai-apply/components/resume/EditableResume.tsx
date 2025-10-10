@@ -32,7 +32,7 @@ const StreamingSkeleton = ({ className = "" }: { className?: string }) => (
   <div className={`animate-pulse bg-gray-200 rounded ${className}`} />
 );
 
-export const PreviewResume = ({
+export const EditableResume = ({
   data,
   isStreaming = false,
   pause,

@@ -6,6 +6,7 @@ import { PreviewResume } from "./preview-resume-template";
 // import GenerationStatus from "./GenerationStatus";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/use-auth";
+import { EditableResume } from "./EditableResume";
 
 export const ResumeGenerator = ({
   handleStepChange,
@@ -80,8 +81,7 @@ export const ResumeGenerator = ({
   const shouldUseDbData = streamData.profile === "";
   return (
     <div className="">
-      {/* <GenerationStatus streamStatus={streamStatus} /> */}
-      <PreviewResume
+      <EditableResume
         data={shouldUseDbData ? data! : streamData}
         cancelTimeout={cancelTimeout}
         pause={pause}

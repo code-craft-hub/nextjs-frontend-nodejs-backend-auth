@@ -19,9 +19,6 @@ const EditResumeTemplate: React.FC<{ documentId: string }> = ({
   const { data } = useCareerDoc(documentId);
   const { resumeData, updateResumeData } = useResumeData(data!);
 
-  console.count("EDIT RESUME RENDER : PARENT");
-  console.log("Fetched Career Doc Data: ", data);
-  // Section update handlers with optimistic updates
   const handleProfileUpdate = useCallback(
     (profile: string) => {
       updateResumeData((prev) => ({ ...prev, profile }));
