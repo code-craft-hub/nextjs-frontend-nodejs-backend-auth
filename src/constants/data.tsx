@@ -4,7 +4,6 @@ import { BiPlus } from "react-icons/bi";
 import { FaFacebook, FaTwitter, FaYoutube, FaInstagram } from "react-icons/fa";
 import { BiLogoLinkedin } from "react-icons/bi";
 
-
 // social
 export const social = [
   {
@@ -106,4 +105,59 @@ export const creditCard = [
   },
 ];
 
-
+export const defaultResumeFormData = {
+  profile:
+    "Experienced software engineer with a passion for building scalable applications.",
+  education: [
+    {
+      educationId: crypto.randomUUID(),
+      degree: "Bachelor of Science",
+      fieldOfStudy: "Computer Science",
+      schoolName: "Stanford University",
+      educationStart: "2015-09",
+      educationEnd: "2019-06",
+      schoolLocation: "Stanford, CA",
+    },
+  ],
+  workExperience: [
+    {
+      workExperienceId: crypto.randomUUID(),
+      jobTitle: "Senior Software Engineer",
+      companyName: "Tech Corp",
+      location: "San Francisco, CA",
+      jobStart: "2019-07",
+      jobEnd: "2024-01",
+      responsibilities: [
+        "Developed responsive UI using React",
+        "Collaborated with backend team to integrate APIs",
+      ],
+    },
+  ],
+  certification: [
+    {
+      certificationId: crypto.randomUUID(),
+      title: "AWS Solutions Architect",
+      issuer: "Amazon Web Services",
+      issueDate: "2022-03",
+      expiryDate: "2025-03",
+      description: "Professional certification in cloud architecture",
+    },
+  ],
+  project: [
+    {
+      projectId: crypto.randomUUID(),
+      name: "E-Commerce Platform",
+      description: "Built a scalable e-commerce platform serving 1M+ users",
+      techStack: ["Next.js", "Node.js", "PostgreSQL"],
+      role: "Lead Developer",
+    },
+  ],
+  softSkill: [
+    { label: "Communication", value: "communication" },
+    { label: "Leadership", value: "leadership" },
+  ],
+  hardSkill: [
+    { label: "React", value: "react" },
+    { label: "TypeScript", value: "typescript" },
+  ],
+};

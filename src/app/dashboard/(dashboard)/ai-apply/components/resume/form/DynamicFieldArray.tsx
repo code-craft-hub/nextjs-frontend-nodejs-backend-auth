@@ -28,7 +28,7 @@ export const DynamicFieldArray = <T,>({
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-medium">{label}</h3>
+        {/* <h3 className="text-sm font-medium">{label}</h3> */}
         <Button
           type="button"
           variant="outline"
@@ -40,20 +40,20 @@ export const DynamicFieldArray = <T,>({
         </Button>
       </div>
       {fields.map((field, index) => (
-        <Card key={field.id} className="p-4">
+        <Card key={field.id} className="p-4 relative">
           <div className="space-y-4">
-            {renderFields(index)}
             {fields.length > minItems && (
               <Button
                 type="button"
                 variant="destructive"
                 size="sm"
+                className="ml-auto absolute top-2 right-2"
                 onClick={() => remove(index)}
               >
-                <Trash2 className="w-4 h-4 mr-2" />
-                Remove
+                <Trash2 className="w-4 h-4" />
               </Button>
             )}
+            {renderFields(index)}
           </div>
         </Card>
       ))}

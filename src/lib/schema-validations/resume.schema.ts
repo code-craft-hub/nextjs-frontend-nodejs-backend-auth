@@ -1,72 +1,68 @@
-// ============================================================================
-// VALIDATION SCHEMAS (Following Zod Best Practices)
-// ============================================================================
-
 import z from "zod";
 
 export const profileSchema = z.object({
   profile: z
     .string()
     .min(10, "Profile must be at least 10 characters")
-    .max(1000),
+    .optional(),
 });
+
 export const educationSchema = z.object({
-  educationId: z.string().uuid().optional(),
-  degree: z.string().min(1, "Degree is required").max(100),
-  fieldOfStudy: z.string().min(1, "Field of study is required").max(100),
-  schoolName: z.string().min(1, "School name is required").max(150),
-  educationStart: z.string().min(1, "Start date is required"),
-  educationEnd: z.string().min(1, "End date is required"),
-  schoolLocation: z.string().min(1, "Location is required").max(150),
+  educationId: z.uuid().optional(),
+  degree: z.string().min(1, "Degree is required").optional(),
+  fieldOfStudy: z.string().min(1, "Field of study is required").optional(),
+  schoolName: z.string().min(1, "School name is required").optional(),
+  educationStart: z.string().min(1, "Start date is required").optional(),
+  educationEnd: z.string().min(1, "End date is required").optional(),
+  schoolLocation: z.string().min(1, "Location is required").optional(),
 });
 
 export const workExperienceSchema = z.object({
-  workExperienceId: z.string().uuid().optional(),
-  jobTitle: z.string().min(1, "Job title is required").max(100),
-  companyName: z.string().min(1, "Company name is required").max(150),
-  location: z.string().min(1, "Location is required").max(150),
-  jobStart: z.string().min(1, "Start date is required"),
-  jobEnd: z.string().min(1, "End date is required"),
+  workExperienceId: z.uuid().optional(),
+  jobTitle: z.string("Job title is required").optional(),
+  companyName: z.string("Company name is required").optional(),
+  location: z.string("Location is required").optional(),
+  jobStart: z.string("Start date is required").optional(),
+  jobEnd: z.string("End date is required").optional(),
   responsibilities: z
     .array(z.string().min(1))
-    .min(1, "At least one responsibility required"),
+    .min(1, "At least one responsibility required")
+    .optional(),
 });
 
 export const certificationSchema = z.object({
-  certificationId: z.string().uuid().optional(),
-  title: z.string().min(1, "Title is required").max(150),
-  issuer: z.string().min(1, "Issuer is required").max(150),
-  issueDate: z.string().min(1, "Issue date is required"),
+  certificationId: z.uuid().optional(),
+  title: z.string().min(1, "Title is required").optional(),
+  issuer: z.string().min(1, "Issuer is required").optional(),
+  issueDate: z.string().min(1, "Issue date is required").optional(),
   expiryDate: z.string().optional(),
-  description: z.string().max(500).optional(),
+  description: z.string().optional(),
 });
 
 export const projectSchema = z.object({
-  projectId: z.string().uuid().optional(),
-  name: z.string().min(1, "Project name is required").max(150),
-  description: z.string().min(1, "Description is required").max(500),
+  projectId: z.uuid().optional(),
+  name: z.string().min(1, "Project name is required").optional(),
+  description: z.string().min(1, "Description is required").optional(),
   techStack: z
     .array(z.string().min(1))
-    .min(1, "At least one technology required"),
-  role: z.string().min(1, "Role is required").max(100),
+    .min(1, "At least one technology required")
+    .optional(),
+  role: z.string().min(1, "Role is required").optional(),
 });
 
 export const skillSchema = z.object({
-  label: z.string().min(1, "Label is required"),
-  value: z.string().min(1, "Value is required"),
+  label: z.string().min(1, "Label is required").optional(),
+  value: z.string().min(1, "Value is required").optional(),
 });
 
 export const resumeSchema = z.object({
-  profile: z
-    .string()
-    .min(10, "Profile must be at least 10 characters")
-    .max(1000),
-  education: z.array(educationSchema),
-  workExperience: z.array(workExperienceSchema),
-  certification: z.array(certificationSchema),
-  project: z.array(projectSchema),
-  softSkill: z.array(skillSchema),
-  hardSkill: z.array(skillSchema),
+  profile: profileSchema.shape.profile,
+  education: z.array(educationSchema).optional().default([]),
+  workExperience: z.array(workExperienceSchema).optional().default([]),
+  certification: z.array(certificationSchema).optional().default([]),
+  project: z.array(projectSchema).optional().default([]),
+  softSkill: z.array(skillSchema).optional().default([]),
+  hardSkill: z.array(skillSchema).optional().default([]),
 });
 
 export type ProfileFormData = z.infer<typeof profileSchema>;

@@ -1,11 +1,21 @@
 import { Button } from "@/components/ui/button";
 import { DialogFooter } from "@/components/ui/dialog";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
-import { ProfileFormData, profileSchema } from "@/lib/schema-validations/resume.schema";
+import {
+  ProfileFormData,
+  profileSchema,
+} from "@/lib/schema-validations/resume.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-
 
 interface ProfileEditFormProps {
   initialData: string;
@@ -19,12 +29,14 @@ export const ProfileEditForm: React.FC<ProfileEditFormProps> = ({
   onCancel,
 }) => {
   const form = useForm<ProfileFormData>({
-    resolver: zodResolver(profileSchema),
+    // resolver: zodResolver(profileSchema),
     defaultValues: { profile: initialData },
   });
 
   const handleSubmit = (data: ProfileFormData) => {
-    onSave(data.profile);
+    if (data?.profile) {
+      onSave(data.profile);
+    }
   };
 
   return (

@@ -35,7 +35,7 @@ export const SkillEditForm: React.FC<SkillEditFormProps> = ({
   placeholder,
 }) => {
   const form = useForm<{ skills: SkillFormData[] }>({
-    resolver: zodResolver(z.object({ skills: z.array(skillSchema) })),
+    // resolver: zodResolver(z.object({ skills: z.array(skillSchema) })),
     defaultValues: { skills: initialData },
   });
 

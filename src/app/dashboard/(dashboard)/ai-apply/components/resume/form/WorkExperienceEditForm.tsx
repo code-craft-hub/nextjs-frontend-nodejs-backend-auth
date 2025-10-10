@@ -1,6 +1,3 @@
-
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 import {
@@ -15,10 +12,11 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { DynamicFieldArray } from "./DynamicFieldArray";
 import { DialogFooter } from "@/components/ui/dialog";
-import { WorkExperienceFormData, workExperienceSchema } from "@/lib/schema-validations/resume.schema";
+import {
+  WorkExperienceFormData,
+} from "@/lib/schema-validations/resume.schema";
 import { ArrayInputField } from "./ArrayInputField";
-
-
+import { toValidDate } from "@/lib/toValidDate";
 
 interface WorkExperienceEditFormProps {
   initialData?: WorkExperienceFormData[];
@@ -32,10 +30,12 @@ export const WorkExperienceEditForm: React.FC<WorkExperienceEditFormProps> = ({
   onCancel,
 }) => {
   const form = useForm<{ workExperience: WorkExperienceFormData[] }>({
-    resolver: zodResolver(
-      z.object({ workExperience: z.array(workExperienceSchema) })
-    ),
-    defaultValues: { workExperience: initialData },
+    // resolver: zodResolver(
+    //   z.object({ workExperience: z.array(workExperienceSchema) })
+    // ),
+    defaultValues: {
+      workExperience: initialData,
+    },
   });
 
   const handleSubmit = (data: { workExperience: WorkExperienceFormData[] }) => {
@@ -44,8 +44,11 @@ export const WorkExperienceEditForm: React.FC<WorkExperienceEditFormProps> = ({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-        <ScrollArea className="h-[500px] pr-4">
+      <form
+        onSubmit={form.handleSubmit(handleSubmit)}
+        className="p-1 rounded-xl"
+      >
+        <ScrollArea className="">
           <DynamicFieldArray
             form={form}
             name="workExperience"
@@ -61,7 +64,7 @@ export const WorkExperienceEditForm: React.FC<WorkExperienceEditFormProps> = ({
             }}
             renderFields={(index) => (
               <>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-4 max-sm:mt-6 mt-4">
                   <FormField
                     control={form.control}
                     name={`workExperience.${index}.jobTitle`}
@@ -110,7 +113,11 @@ export const WorkExperienceEditForm: React.FC<WorkExperienceEditFormProps> = ({
                       <FormItem>
                         <FormLabel>Start Date</FormLabel>
                         <FormControl>
-                          <Input {...field} type="month" />
+                          <Input
+                            type="month"
+                            value={toValidDate(field.value, "month")}
+                            onChange={(e) => field.onChange(e.target.value)}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -119,15 +126,21 @@ export const WorkExperienceEditForm: React.FC<WorkExperienceEditFormProps> = ({
                   <FormField
                     control={form.control}
                     name={`workExperience.${index}.jobEnd`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>End Date</FormLabel>
-                        <FormControl>
-                          <Input {...field} type="month" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
+                    render={({ field }) => {
+                      return (
+                        <FormItem>
+                          <FormLabel>End Date</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="month"
+                              value={toValidDate(field.value, "month")}
+                              onChange={(e) => field.onChange(e.target.value)}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      );
+                    }}
                   />
                 </div>
                 <ArrayInputField
@@ -140,7 +153,7 @@ export const WorkExperienceEditForm: React.FC<WorkExperienceEditFormProps> = ({
             )}
           />
         </ScrollArea>
-        <DialogFooter>
+        <DialogFooter className="flex flex-row mt-3 gap-2">
           <Button type="button" variant="outline" onClick={onCancel}>
             Cancel
           </Button>

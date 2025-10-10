@@ -31,7 +31,7 @@ export const ProjectEditForm: React.FC<ProjectEditFormProps> = ({
   onCancel,
 }) => {
   const form = useForm<{ project: ProjectFormData[] }>({
-    resolver: zodResolver(z.object({ project: z.array(projectSchema) })),
+    // resolver: zodResolver(z.object({ project: z.array(projectSchema) })),
     defaultValues: { project: initialData },
   });
 

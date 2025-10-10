@@ -2,14 +2,6 @@ import { ResumeFormData } from "@/lib/schema-validations/resume.schema";
 
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import {
-  Briefcase,
-  GraduationCap,
-  Award,
-  FolderKanban,
-  Brain,
-  Code,
-} from "lucide-react";
 import { EditDialog } from "./EditDialog";
 import { ProfileEditForm } from "./ProfileEditForm";
 import { WorkExperienceEditForm } from "./WorkExperienceEditForm";
@@ -59,7 +51,7 @@ export const ResumePreview: React.FC<ResumePreviewProps> = ({
       >
         {(onClose) => (
           <ProfileEditForm
-            initialData={data.profile}
+            initialData={data.profile!}
             onSave={(data) => {
               handleProfileUpdate(data);
               onClose();
@@ -68,21 +60,20 @@ export const ResumePreview: React.FC<ResumePreviewProps> = ({
           />
         )}
       </EditDialog>
-
       <Separator />
       <EditDialog
+      className="w-full"
         trigger={
           <>
             {data.workExperience.length > 0 && (
-              <div className="space-y-4">
+              <div className="space-y-4 ">
                 <div className="flex items-center gap-2">
-                  <Briefcase className="w-5 h-5 text-blue-600" />
                   <h2 className="text-xl font-semibold text-gray-900">
                     Work Experience
                   </h2>
                 </div>
                 {data.workExperience.map((exp) => (
-                  <div key={exp.workExperienceId} className="space-y-2">
+                  <div key={exp.workExperienceId} className="space-y-2 ">
                     <div className="flex justify-between items-start">
                       <div>
                         <h3 className="font-semibold text-gray-900">
@@ -98,7 +89,7 @@ export const ResumePreview: React.FC<ResumePreviewProps> = ({
                       </div>
                     </div>
                     <ul className="list-disc list-inside space-y-1 text-gray-700">
-                      {exp.responsibilities.map((resp, idx) => (
+                      {exp.responsibilities?.map((resp, idx) => (
                         <li key={idx}>{resp}</li>
                       ))}
                     </ul>
@@ -130,7 +121,6 @@ export const ResumePreview: React.FC<ResumePreviewProps> = ({
               <>
                 <div className="space-y-4">
                   <div className="flex items-center gap-2">
-                    <GraduationCap className="w-5 h-5 text-green-600" />
                     <h2 className="text-xl font-semibold text-gray-900">
                       Education
                     </h2>
@@ -173,7 +163,6 @@ export const ResumePreview: React.FC<ResumePreviewProps> = ({
         )}
       </EditDialog>
       <Separator />
-
       <EditDialog
         trigger={
           <>
@@ -181,7 +170,6 @@ export const ResumePreview: React.FC<ResumePreviewProps> = ({
               <>
                 <div className="space-y-4">
                   <div className="flex items-center gap-2">
-                    <FolderKanban className="w-5 h-5 text-purple-600" />
                     <h2 className="text-xl font-semibold text-gray-900">
                       Projects
                     </h2>
@@ -199,7 +187,7 @@ export const ResumePreview: React.FC<ResumePreviewProps> = ({
                         </div>
                         <p className="text-gray-700 mt-1">{proj.description}</p>
                         <div className="flex flex-wrap gap-2 mt-2">
-                          {proj.techStack.map((tech, idx) => (
+                          {proj?.techStack?.map((tech, idx) => (
                             <Badge key={idx} variant="outline">
                               {tech}
                             </Badge>
@@ -228,7 +216,6 @@ export const ResumePreview: React.FC<ResumePreviewProps> = ({
         )}
       </EditDialog>
       <Separator />
-
       <EditDialog
         trigger={
           <>
@@ -236,7 +223,6 @@ export const ResumePreview: React.FC<ResumePreviewProps> = ({
               <>
                 <div className="space-y-4">
                   <div className="flex items-center gap-2">
-                    <Award className="w-5 h-5 text-orange-600" />
                     <h2 className="text-xl font-semibold text-gray-900">
                       Certifications
                     </h2>
@@ -291,7 +277,6 @@ export const ResumePreview: React.FC<ResumePreviewProps> = ({
                   {data.hardSkill.length > 0 && (
                     <div>
                       <div className="flex items-center gap-2 mb-3">
-                        <Code className="w-5 h-5 text-indigo-600" />
                         <h2 className="text-xl font-semibold text-gray-900">
                           Technical Skills
                         </h2>
@@ -330,7 +315,6 @@ export const ResumePreview: React.FC<ResumePreviewProps> = ({
                   {data.softSkill.length > 0 && (
                     <div>
                       <div className="flex items-center gap-2 mb-3">
-                        <Brain className="w-5 h-5 text-pink-600" />
                         <h2 className="text-xl font-semibold text-gray-900">
                           Soft Skills
                         </h2>

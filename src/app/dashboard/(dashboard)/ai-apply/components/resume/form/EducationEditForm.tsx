@@ -30,7 +30,7 @@ export const EducationEditForm: React.FC<EducationEditFormProps> = ({
   onCancel,
 }) => {
   const form = useForm<{ education: EducationFormData[] }>({
-    resolver: zodResolver(z.object({ education: z.array(educationSchema) })),
+    // resolver: zodResolver(z.object({ education: z.array(educationSchema) })),
     defaultValues: { education: initialData },
   });
 
