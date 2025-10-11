@@ -2,11 +2,12 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import { memo } from "react";
-import { AIApply } from "./(dashboard)/dashboard-tabs/AIApply";
-import { TailorResume } from "./(dashboard)/components/TailorResume";
-import { FindJob } from "./(dashboard)/dashboard-tabs/FindJob";
+import { AIApply } from "./(dashboard)/dashboard-tabs/ai-apply-tab/AIApply";
+// import { TailorResume } from "./(dashboard)/dashboard-tabs/ai-job-customization-tab/AIJobCustomization";
+import { FindJob } from "./(dashboard)/dashboard-tabs/find-job-tab/FindJob";
 import { InitialUser } from "@/types";
 import { TAB_ITEMS } from "../(landing-page)/constants";
+import { AIJobCustomization } from "./(dashboard)/dashboard-tabs/ai-job-customization-tab/AIJobCustomization";
 
 export const DashboardClient = memo(({ initialUser }: InitialUser) => {
   return (
@@ -46,7 +47,7 @@ export const DashboardClient = memo(({ initialUser }: InitialUser) => {
           <AIApply />
         </TabsContent>
         <TabsContent value="tailor-cv">
-          <TailorResume initialUser={initialUser} />
+          <AIJobCustomization initialUser={initialUser} />
         </TabsContent>
         <TabsContent value="find-jobs">
           <FindJob initialUser={initialUser} />

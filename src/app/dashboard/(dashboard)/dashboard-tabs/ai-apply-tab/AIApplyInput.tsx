@@ -22,7 +22,7 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
-import { PROFILE_OPTIONS } from "./constants";
+import { PROFILE_OPTIONS } from "../../components/constants";
 import { useRouter } from "next/navigation";
 
 const FORM_SCHEMA = z.object({

@@ -10,7 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { memo, useMemo } from "react";
-import JobDashboard from "../components/FindJobClient";
+import JobDashboard from "./FindJobClient";
 
 interface ProfileOption {
   value: string;

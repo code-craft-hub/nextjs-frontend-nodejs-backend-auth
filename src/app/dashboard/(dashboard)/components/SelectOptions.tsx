@@ -9,14 +9,13 @@ import { cn } from "@/lib/utils";
 import { memo } from "react";
 import { ProfileOption } from "./constants";
 
-
-type ActionValue =
-  | "select-profile"
-  | "upload-file"
-  | "upload-photo"
-  | "tailor-resume"
-  | "tailor-cover-letter"
-  | "generate-interview-questions";
+// type ActionValue =
+//   | "select-profile"
+//   | "upload-file"
+//   | "upload-photo"
+//   | "tailor-resume"
+//   | "tailor-cover-letter"
+//   | "generate-interview-questions";
 
 export const SelectOptions = memo(
   ({
@@ -29,8 +28,8 @@ export const SelectOptions = memo(
     triggerClassName = "",
   }: {
     options: readonly ProfileOption[];
-    value: ActionValue;
-    onValueChange: (value: ActionValue) => void;
+    value: any;
+    onValueChange: (value: any) => void;
     placeholder: string;
     className?: string;
     contentClassName?: string;
@@ -54,7 +53,9 @@ export const SelectOptions = memo(
             >
               <div className="flex items-center  gap-3 w-full">
                 {Icon && <Icon className="size-3 group-hover:text-primary" />}
-                <span className="font-medium group-hover:text-primary" >{label}</span>
+                <span className="font-medium group-hover:text-primary">
+                  {label}
+                </span>
               </div>
             </SelectItem>
           ))}

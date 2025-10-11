@@ -8,20 +8,10 @@ import {
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuPortal,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItemWithoutSVG,
   DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  memo,
-  useCallback,
-  useState,
-} from "react";
+import { memo, useCallback, useState } from "react";
 import { toast } from "sonner";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -34,8 +24,8 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
-import { ACTION_OPTIONS, ActionValue, PROFILE_OPTIONS } from "./constants";
-import { SelectOptions } from "./SelectOptions";
+import { ACTION_OPTIONS, ActionValue, PROFILE_OPTIONS } from "../../components/constants";
+import { SelectOptions } from "../../components/SelectOptions";
 import LockIcon from "@/components/icons/LockIcon";
 
 const FORM_SCHEMA = z.object({
@@ -46,8 +36,9 @@ const FORM_SCHEMA = z.object({
 
 export const TailorResumeInput = memo(({ initialUser }: InitialUser) => {
   console.log(initialUser);
-  const [profileInput, setProfileInput] = useState<string>("profile1");
+  // const [profileInput, setProfileInput] = useState<string>("profile1");
   const [docsInput, setDocsInput] = useState<ActionValue>("tailor-resume");
+  const [userProfile, setUserProfile] = useState<string>("profile1");
 
   const form = useForm<z.infer<typeof FORM_SCHEMA>>({
     resolver: zodResolver(FORM_SCHEMA),
@@ -60,7 +51,12 @@ export const TailorResumeInput = memo(({ initialUser }: InitialUser) => {
     console.log(data);
   }, []);
 
-  const profile = ["profile1", "profile2", "profile3"];
+  // const profile = ["profile1", "profile2", "profile3"];
+  const profiles = [
+    { value: "profile1", label: "Base profile", icon: LockIcon },
+    { value: "profile2", label: "Primary profile", icon: LockIcon },
+    { value: "profile3", label: "Job profile", icon: LockIcon },
+  ];
 
   return (
     <div className="!relative h-36">
@@ -68,41 +64,21 @@ export const TailorResumeInput = memo(({ initialUser }: InitialUser) => {
         <DropdownMenuTrigger className="absolute data-[state=open]:!shadow-2xl  rounded-full bottom-5 left-3 border-blue-500 p-1 hover:cursor-pointer z-20 border-2">
           <Plus className="text-blue-400 size-4 font-bold" />
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-44 p-3 " align="start">
+        <DropdownMenuContent className="w-44 p-1 " align="start">
           <DropdownMenuGroup>
-            <DropdownMenuSub>
-              <DropdownMenuSubTrigger className="gap-2 hover:cursor-pointer [&_svg]:!text-primary">
-                <div>
-                  {(() => {
-                    const { icon: Icon, label } = PROFILE_OPTIONS[0];
-                    return (
-                      <div className="flex gap-1 items-center justify-center text-primary hover:text-primary hover:cursor-pointer ">
-                        {Icon && <Icon className="size-4 text-primary" />}
-                        {label}
-                      </div>
-                    );
-                  })()}
-                </div>
-              </DropdownMenuSubTrigger>
-              <DropdownMenuPortal>
-                <DropdownMenuSubContent>
-                  <DropdownMenuRadioGroup
-                    value={profileInput}
-                    onValueChange={setProfileInput}
-                  >
-                    {profile.map((item) => (
-                      <DropdownMenuRadioItemWithoutSVG
-                        value={item}
-                        key={item}
-                        className="hover:text-primary hover:cursor-pointer data-[state=checked]:bg-primary data-[state=checked]:[&_svg]:text-white data-[state=checked]:text-white gap-2"
-                      >
-                        <LockIcon /> {item}
-                      </DropdownMenuRadioItemWithoutSVG>
-                    ))}
-                  </DropdownMenuRadioGroup>
-                </DropdownMenuSubContent>
-              </DropdownMenuPortal>
-            </DropdownMenuSub>
+            <DropdownMenuItem className="gap-2 hover:cursor-pointer [&_svg]:!text-primary">
+              <div>
+                {(() => {
+                  const { icon: Icon, label } = PROFILE_OPTIONS[0];
+                  return (
+                    <div className="flex gap-1 items-center justify-center text-primary hover:text-primary hover:cursor-pointer text-xs">
+                      {Icon && <Icon className="size-3 text-primary" />}
+                      {label}
+                    </div>
+                  );
+                })()}
+              </div>
+            </DropdownMenuItem>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
@@ -114,8 +90,8 @@ export const TailorResumeInput = memo(({ initialUser }: InitialUser) => {
                 key={value}
                 className="gap-2 group hover:text-primary hover:cursor-pointer"
               >
-                {Icon && <Icon className="size-4 group-hover:text-primary" />}
-                <p className="group-hover:text-primary">{label}</p>
+                {Icon && <Icon className="size-3 group-hover:text-primary" />}
+                <p className="group-hover:text-primary text-xs">{label}</p>
               </DropdownMenuItem>
             ))}
           </DropdownMenuGroup>
@@ -158,7 +134,22 @@ export const TailorResumeInput = memo(({ initialUser }: InitialUser) => {
           </form>
         </Form>
       </div>
-      <button className="absolute rounded-full bottom-5 right-3 border-blue-500 border p-1 hover:cursor-pointer z-20">
+      <div className="absolute bottom-5 right-12 hover:cursor-pointer z-20">
+        <SelectOptions
+          options={profiles}
+          value={userProfile}
+          onValueChange={(value) => {
+            setUserProfile(value);
+            toast.success(JSON.stringify(userProfile));
+          }}
+          placeholder="Tailor Resume"
+          triggerClassName={
+            "w-full !h-7 border-2 border-primary/70 rounded-xl text-primary hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 [&_svg]:!text-primary  text-2xs"
+          }
+          contentClassName="text-xs"
+        />
+      </div>
+      <button className="absolute rounded-full bottom-5 right-3 border-blue-500 border-2 p-1 hover:cursor-pointer z-20">
         <ArrowUp className="text-blue-400 size-4" />
       </button>
     </div>

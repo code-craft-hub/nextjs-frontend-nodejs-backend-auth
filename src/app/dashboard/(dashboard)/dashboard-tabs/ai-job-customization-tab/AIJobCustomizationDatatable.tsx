@@ -128,7 +128,7 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
   },
 ];
 
-export function TailorResumeDatatable({
+export function AIJobCustomizationDatatable({
   data,
 }: {
   data: z.infer<typeof schema>[];

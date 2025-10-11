@@ -1,10 +1,10 @@
 "use client";
 import { Card } from "@/components/ui/card";
 import { memo, useMemo } from "react";
-import { DataTable } from "../../components/dashboard-datatable";
-import { AIApplyInput } from "../components/AIApplyInput";
-import { RecentActivityCard } from "../components/RecentActivityCard";
-import { MOCK_DATA } from "../components/constants";
+import { DataTable } from "../../../components/dashboard-datatable";
+import { AIApplyInput } from "./AIApplyInput";
+import { RecentActivityCard } from "../../components/RecentActivityCard";
+import { MOCK_DATA } from "../../components/constants";
 
 export const AIApply = memo(() => {
   const recentActivityItems = useMemo(

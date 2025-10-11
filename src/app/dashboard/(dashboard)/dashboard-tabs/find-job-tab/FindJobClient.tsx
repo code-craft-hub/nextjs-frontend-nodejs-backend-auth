@@ -15,20 +15,12 @@ import {
   VisibilityState,
 } from "@tanstack/react-table";
 
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableRow,
-} from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 
-import { overviewColumns } from "./overview-columns";
+import { overviewColumns } from "../../components/overview-columns";
 import { cn } from "@/lib/utils";
 
 export default function JobDashboard() {
-
-  
-
   // Job listings data
   const jobsData = [
     {
@@ -123,8 +115,6 @@ export default function JobDashboard() {
     },
   ];
 
-
-
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -190,7 +180,7 @@ export default function JobDashboard() {
         <div className="flex flex-row gap-4 py-4">
           {menuItems.map((item) => (
             <div
-            key={item.id}
+              key={item.id}
               className={cn(
                 item.bgColor,
                 //   item.iconColor,
@@ -222,7 +212,6 @@ export default function JobDashboard() {
       </div>
 
       <div className="w-full flex flex-col gap-6">
-      
         <div className="bg-white shadow-lg p-4 flex gap-4 justify-between  rounded-lg">
           <div className="flex items-center gap-2 w-full">
             <SearchIcon />
@@ -273,7 +262,7 @@ export default function JobDashboard() {
                     className="hover:bg-white border-b !rounded-3xl hover:border-primary hover:border-[2px] hover:rounded-2xl hover:cursor-pointer"
                   >
                     {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id} >
+                      <TableCell key={cell.id}>
                         {flexRender(
                           cell.column.columnDef.cell,
                           cell.getContext()
@@ -295,10 +284,7 @@ export default function JobDashboard() {
             </TableBody>
           </Table>
         </div>
-     
       </div>
     </div>
   );
-
-
 }
