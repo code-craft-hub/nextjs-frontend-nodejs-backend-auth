@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
@@ -9,7 +8,7 @@ import {
   parseResponsibilities,
 } from "@/lib/utils/helpers";
 import { PreviewResumeProps, ResumeField } from "@/types";
-import { memo, useCallback } from "react";
+import { memo, useCallback, useEffect, useRef } from "react";
 import { ProfileEditForm } from "./form/ProfileEditForm";
 import { EditDialog } from "./form/EditDialog";
 import { WorkExperienceEditForm } from "./form/WorkExperienceEditForm";
@@ -17,11 +16,18 @@ import { EducationEditForm } from "./form/EducationEditForm";
 import { ProjectEditForm } from "./form/ProjectEditForm";
 import { SkillEditForm } from "./form/SkillEditForm";
 import { CertificationEditForm } from "./form/CertificationEditForm";
+import { Edit } from "lucide-react";
+import { ContactEditForm } from "./form/ContactEditForm";
 
 const SectionWrapper = memo(
-  ({ children, show }: { children: React.ReactNode; show: boolean }) => {
+  ({ children, show }: { children: React.ReactNode; show?: boolean }) => {
     if (!show) return null;
-    return <div className="bg-white p-4 hover:cursor-pointer hover:shadow-2xl shadow-blue-200 !rounded-2xl duration-700">{children}</div>;
+    return (
+      <div className="bg-white p-4 hover:cursor-pointer hover:shadow-2xl shadow-blue-200 !rounded-2xl duration-700 relative">
+        <Edit className="absolute top-3 right-3 size-3.5 text-gray-300" />
+        {children}
+      </div>
+    );
   }
 );
 
@@ -34,18 +40,18 @@ const StreamingSkeleton = ({ className = "" }: { className?: string }) => (
 export const EditableResume: React.FC<PreviewResumeProps> = ({
   data,
   isStreaming = false,
-  cancelTimeout,
   onUpdate,
 }) => {
   const { user } = useAuth();
+  const contentRef = useRef<HTMLDivElement>(null);
 
   const initialData = {
-    firstName: user?.firstName ?? data.contact?.firstName,
-    lastName: user?.lastName ?? data.contact?.lastName,
-    email: user?.email ?? data.contact?.email,
-    phoneNumber: user?.phoneNumber ?? data.contact?.phoneNumber,
-    address: user?.address ?? data.contact?.address,
-    portfolio: data.contact?.portfolio,
+    firstName: data.contact?.firstName ?? user?.firstName ?? "",
+    lastName: data.contact?.lastName ?? user?.lastName ??  "",
+    email: data.contact?.email ?? user?.email ??  "",
+    phoneNumber: data.contact?.phoneNumber ?? user?.phoneNumber ??  "",
+    address: data.contact?.address ?? user?.address ?? "",
+    portfolio: data.contact?.portfolio ?? "",
   };
   const fullName = `${initialData.firstName} ${initialData.lastName}`.trim();
 
@@ -77,34 +83,51 @@ export const EditableResume: React.FC<PreviewResumeProps> = ({
     [onUpdate]
   );
 
+  useEffect(() => {
+    if (contentRef.current) {
+      contentRef.current.scrollTop = contentRef.current.scrollHeight;
+    }
+  }, [isStreaming]);
+
   return (
     <Card
       className={cn(
         "max-w-screen-lg p-4 sm:px-5 text-gray-800 font-merriweather py-16 relative"
       )}
+      ref={contentRef}
     >
-      <Button
-        variant={"outline"}
-        onClick={() => {
-          if (cancelTimeout) cancelTimeout();
-        }}
-        className="absolute top-3 right-3 text-3xs"
+      <EditDialog
+        trigger={
+          <SectionWrapper show={true}>
+            <header className="text-center">
+              <h1 className="text-4xl font-bold font-merriweather">
+                {fullName ||
+                  (isStreaming && (
+                    <StreamingSkeleton className="h-10 w-64 mx-auto" />
+                  ))}
+              </h1>
+              {contactInfo && (
+                <p className="text-lg text-gray-600 font-merriweather mt-2">
+                  {contactInfo}
+                </p>
+              )}
+            </header>
+          </SectionWrapper>
+        }
+        title="Edit Contact Information"
+        description="Update your contact information"
       >
-        Pause and Edit.
-      </Button>
-      <header className="mb-8 text-center">
-        <h1 className="text-4xl font-bold font-merriweather">
-          {fullName ||
-            (isStreaming && (
-              <StreamingSkeleton className="h-10 w-64 mx-auto" />
-            ))}
-        </h1>
-        {contactInfo && (
-          <p className="text-lg text-gray-600 font-merriweather mt-2">
-            {contactInfo}
-          </p>
+        {(onClose) => (
+          <ContactEditForm
+            initialData={initialData}
+            onSave={(value) => {
+              createFieldHandler("contact")(value);
+              onClose();
+            }}
+            onCancel={onClose}
+          />
         )}
-      </header>
+      </EditDialog>
       <EditDialog
         trigger={
           <SectionWrapper show={hasProfile || isStreaming}>

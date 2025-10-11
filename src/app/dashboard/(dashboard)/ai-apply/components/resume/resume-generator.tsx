@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { EditableResume } from "./EditableResume";
 import { useResumeData } from "@/hooks/use-resume-data";
 import { Resume } from "@/types";
+import { createResumeOrderedParams } from "@/lib/utils/helpers";
 
 export const ResumeGenerator = ({
   handleStepChange,
@@ -52,26 +53,43 @@ export const ResumeGenerator = ({
 
   useEffect(() => {
     if (userProfile && jobDescription && !documentId) {
-      startStream(userProfile, jobDescription);
+      toast.promise(startStream(userProfile, jobDescription), {
+        loading: "Generating your tailored resume...",
+        success: (data) => {
+          return {
+            message: `${JSON.stringify(data)} Resume generation complete!`,
+            description: "Click the next button to edit your resume.",
+          };
+        },
+        error: "Error",
+      });
     }
   }, [userProfile, jobDescription]);
 
   useEffect(() => {
     console.log(streamStatus);
     if (streamStatus.savedDocumentToDatabase) {
-      console.log("Status", streamStatus, streamData.documentId);
-      params.delete("jobDescription");
-      params.delete("documentId");
-      params.append("documentId", streamData.documentId);
-      params.append("jobDescription", oldDescription!.toString());
-      router.replace(`${frontendUrl}/dashboard/ai-apply?${params.toString()}`);
+      const orderedParams = createResumeOrderedParams(streamData.documentId, oldDescription!);
+      router.replace(`${frontendUrl}/dashboard/ai-apply?${orderedParams.toString()}`);
       toast.success(
         "Resume generation complete! Proceeding to next step in the next 5 seconds..."
       );
 
       timeoutRef.current = setTimeout(() => {
         handleStepChange(3, "resume", streamData);
-      }, 5000);
+      }, 10000);
+
+      toast(`Pause and edit your resume`, {
+        cancel: {
+          label: "Edit Resume now.",
+          onClick: () => {
+            cancelTimeout();
+            toast(
+              "You paused the auto-proceed to next step. You can now edit your resume. click any section to edit."
+            );
+          },
+        },
+      });
     }
 
     return () => {

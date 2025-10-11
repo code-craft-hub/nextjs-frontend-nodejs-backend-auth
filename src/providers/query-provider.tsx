@@ -69,7 +69,7 @@ export function Providers({ children }: ProvidersProps) {
       {process.env.NODE_ENV === "development" && (
         <ReactQueryDevtools initialIsOpen={false} position="right" />
       )}
-      <Toaster richColors={true} />
+      <Toaster richColors={true} position="top-right" />
     </QueryClientProvider>
   );
 }

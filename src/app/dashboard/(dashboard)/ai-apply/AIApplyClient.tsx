@@ -69,11 +69,6 @@ export const AIApplyClient = ({
             documentId={documentId}
           />
         )}
-
-        
-        {/* {activeStep === 3 && (
-          <DisplayResumeEmailContent generatedData={generatedData} />
-        )} */}
       </div>
     </div>
   );

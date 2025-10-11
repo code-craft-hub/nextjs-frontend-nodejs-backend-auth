@@ -2,8 +2,8 @@ import React, { useRef, useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import { useCoverLetterGenerator } from "@/hooks/useCoverLetterGenerator";
 import { useAuth } from "@/hooks/use-auth";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { createOrderedParams } from "@/lib/utils/helpers";
+import { usePathname, useRouter } from "next/navigation";
+import { createCoverLetterOrderedParams } from "@/lib/utils/helpers";
 import { toast } from "sonner";
 import { isEmpty } from "lodash";
 
@@ -25,14 +25,14 @@ export const TemporaryEmailCompose: React.FC<{
     generateCoverLetter,
   } = useCoverLetterGenerator();
 
-
   const contentRef = useRef<HTMLDivElement>(null);
 
   console.log("Document ID:", coverletterId, documentId);
 
   const { useCareerDoc } = useAuth();
-  const { data } = useCareerDoc<{coverLetter: string}>(coverletterId ?? documentId);
-  const searchParams = useSearchParams();
+  const { data } = useCareerDoc<{ coverLetter: string }>(
+    coverletterId ?? documentId
+  );
   const router = useRouter();
   const pathname = usePathname();
   console.log("Current Pathname:", pathname);
@@ -41,20 +41,25 @@ export const TemporaryEmailCompose: React.FC<{
     console.log("Render phase", userProfile, jobDescription, coverletterId);
 
     if (userProfile && jobDescription && !coverletterId) {
-      generateCoverLetter({ userProfile, jobDescription });
+      toast.promise(generateCoverLetter({ userProfile, jobDescription }), {
+        loading: "Generating your tailored cover letter...",
+        success: (data) => {
+          return {
+            message: `${JSON.stringify(data)} Cover letter generation complete!`,
+            description: "Resume generation is starting now.",
+            closeButton: true,
+          };
+        },
+        error: "Error",
+      });
     }
   }, []);
 
   useEffect(() => {
     if (!documentId) return;
-    const orderedParams = createOrderedParams(documentId, jobDescription);
+    const orderedParams = createCoverLetterOrderedParams(documentId, jobDescription);
     router.replace(`${pathname}?${orderedParams.toString()}`);
-    console.log({ data, searchParams, pathname, documentId });
-    toast.success(
-      "Resume generation complete! Proceeding to next step in 5 seconds..." +
-        JSON.stringify({ data, searchParams, pathname, documentId })
-    );
-
+  
     setTimeout(() => {
       handleStepChange(2, "emailContent", generatedContent);
     }, 5000);

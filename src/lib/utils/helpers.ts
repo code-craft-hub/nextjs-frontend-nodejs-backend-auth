@@ -266,9 +266,15 @@ export const processProjects = (project: any) => {
   return [];
 };
 
-export const createOrderedParams = (docId: string, jobDesc: string) => {
+export const createCoverLetterOrderedParams = (docId: string, jobDesc: string) => {
   const params = new URLSearchParams();
   params.set("coverletterId", docId);
+  params.set("jobDescription", jobDesc);
+  return params;
+};
+export const createResumeOrderedParams = (docId: string, jobDesc: string) => {
+  const params = new URLSearchParams();
+  params.set("documentId", docId);
   params.set("jobDescription", jobDesc);
   return params;
 };
