@@ -1,19 +1,11 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { jsonrepair } from "jsonrepair";
 import { StreamStatus } from "@/types";
+import { ResumeFormData } from "@/lib/schema-validations/resume.schema";
 
-interface StreamData {
+type StreamData = {
   documentId: string;
-  profile?: string;
-  education: any[];
-  workExperience: any[];
-  certification: any[];
-  project: any[];
-  softSkill?: any[];
-  hardSkill?: any[];
-}
-
-
+} & ResumeFormData;
 
 interface StreamEvent {
   type:
@@ -310,10 +302,10 @@ export const useResumeStream = (endpoint: string): UseResumeStreamReturn => {
             ...prev,
             documentId: eventData.documentId,
           }));
-           setStreamStatus((prev) => ({
-              ...prev,
-              savedDocumentToDatabase: true,
-            }));
+          setStreamStatus((prev) => ({
+            ...prev,
+            savedDocumentToDatabase: true,
+          }));
           console.log("[Stream] Document saved with ID:", eventData.documentId);
           break;
 
@@ -371,7 +363,7 @@ export const useResumeStream = (endpoint: string): UseResumeStreamReturn => {
           isComplete: false,
           error: null,
           completedSections: new Set<string>(),
-          savedDocumentToDatabase: false
+          savedDocumentToDatabase: false,
         });
 
         sectionContentBufferRef.current.clear();

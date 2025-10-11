@@ -7,6 +7,7 @@ import { PreviewResume } from "./preview-resume-template";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/use-auth";
 import { EditableResume } from "./EditableResume";
+import { useResumeData } from "@/hooks/use-resume-data";
 
 export const ResumeGenerator = ({
   handleStepChange,
@@ -23,7 +24,19 @@ export const ResumeGenerator = ({
   jobDescription: string;
   documentId: string;
 }) => {
+  const { useCareerDoc } = useAuth();
+  const { data } = useCareerDoc(documentId);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const { resumeData, updateField } = useResumeData(data || {}, {
+    documentId,
+    onSuccess: (field) => {
+      console.log(`✓ Successfully updated ${field}`);
+    },
+    onError: (error, field) => {
+      console.error(`✗ Failed to update ${field}:`, error);
+    },
+  });
 
   const [pause, setPause] = useState(true);
 
@@ -34,8 +47,6 @@ export const ResumeGenerator = ({
   const { streamData, streamStatus, startStream } = useResumeStream(
     backendUrl + "/new-resume-generation"
   );
-  const { useCareerDoc } = useAuth();
-  const { data } = useCareerDoc(documentId);
   const searchParams = useSearchParams();
   const params = new URLSearchParams(searchParams.toString());
   const oldDescription = params.get("jobDescription");
@@ -82,9 +93,11 @@ export const ResumeGenerator = ({
   return (
     <div className="">
       <EditableResume
-        data={shouldUseDbData ? data! : streamData}
+        data={shouldUseDbData ? data! : streamData ?? resumeData}
         cancelTimeout={cancelTimeout}
         pause={pause}
+        resumeData={resumeData}
+        updateField={updateField}
       />
     </div>
   );

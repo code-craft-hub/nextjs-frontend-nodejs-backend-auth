@@ -35,7 +35,7 @@ export const EditDialog: React.FC<EditDialogProps> = ({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild={asChild} className={cn("text-start w-full", className)}>{trigger}</DialogTrigger>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto max-sm:!p-2">
+      <DialogContent className="!w-screen max-h-[90vh] overflow-y-auto max-sm:!p-2">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           {description && <DialogDescription>{description}</DialogDescription>}

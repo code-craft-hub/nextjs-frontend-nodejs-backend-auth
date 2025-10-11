@@ -7,7 +7,7 @@ const EditResumeTemplate: React.FC<{ documentId: string }> = ({
   documentId,
 }) => {
 
-  const {useCareerDoc} = useAuth();
+  const {user, useCareerDoc} = useAuth();
   const { data } = useCareerDoc(documentId);
 
   const { 
@@ -24,16 +24,7 @@ const EditResumeTemplate: React.FC<{ documentId: string }> = ({
     onError: (error, field) => {
       console.error(`✗ Failed to update ${field}:`, error);
     },
-  });
-
-  // if (isLoading) {
-  //   return (
-  //     <div className="flex items-center justify-center min-h-screen">
-  //       <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900" />
-  //     </div>
-  //   );
-  // }
-
+  })
   return (
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-7xl mx-auto space-y-8">
@@ -53,6 +44,7 @@ const EditResumeTemplate: React.FC<{ documentId: string }> = ({
         )}
         <ResumePreview
           data={resumeData}
+          user={user}
           onUpdate={updateField}
           isUpdating={isUpdating}
         />

@@ -1,3 +1,4 @@
+import { ResumeFormData } from "@/lib/schema-validations/resume.schema";
 export interface StreamStatus {
   isConnected: boolean;
   isComplete: boolean;
@@ -16,7 +17,6 @@ export interface IUser {
   lastName?: string;
   cvJobTitle?: string;
   customClaims?: Record<string, any> | undefined;
-  cvTitle?: string;
   provider?: string;
   password?: string;
   baseResume?: string;
@@ -29,60 +29,64 @@ export interface IUser {
   portfolio?: string;
   email?: string;
   profile: string;
-  dataSource?: IDataSource[];
   credit?: number;
   onboardingComplete?: boolean;
   maxCredit?: number;
   photoURL?: string;
   createdAt?: string | Date;
   updatedAt?: string | Date;
-  skill?: ISkill[];
-  softSkill?: ISkill[];
-  hardSkill?: ISkill[];
-  project?: any[];
-  socials?: ISocials[];
-  certification?: any[];
+  softSkill?: ResumeFormData["softSkill"];
+  hardSkill?: ResumeFormData["hardSkill"];
+  project?: ResumeFormData["project"];
+  socials?: any[];
+  certification?: ResumeFormData["certification"];
   coverLetter?: string;
-
-  workExperience?: IWorkExperience[];
-  education?: IEducation[];
-  CV?: any[];
-  coverLetterHistory: any[];
-  question: any[];
+  workExperience?: ResumeFormData["workExperience"];
+  education: ResumeFormData["education"];
 }
+
+export type Resume = ResumeFormData;
 
 export interface PreviewResumeProps {
-  data: Partial<IUser>;
+  data: ResumeFormData;
   isStreaming?: boolean;
   pause?: boolean;
+  onUpdate: <T,>(field: string, value: T) => void;
   cancelTimeout?: () => void;
-  handleProfileUpdate: (profile: string) => void;
-  handleWorkExperienceUpdate: (
-    workExperience: ResumeFormData["workExperience"]
-  ) => void;
-  handleEducationUpdate: (education: ResumeFormData["education"]) => void;
-  handleCertificationUpdate: (
-    certification: ResumeFormData["certification"]
-  ) => void;
-  handleProjectUpdate: (project: ResumeFormData["project"]) => void;
-  handleHardSkillUpdate: (hardSkill: ResumeFormData["hardSkill"]) => void;
-  handleSoftSkillUpdate: (softSkill: ResumeFormData["softSkill"]) => void;
-  
 }
 
+export type ResumeField =
+  | "profile"
+  | "contact"
+  | "workExperience"
+  | "education"
+  | "certification"
+  | "project"
+  | "softSkill"
+  | "hardSkill";
+
+export interface UpdatePayload<T = any> {
+  field: ResumeField;
+  value: T;
+  documentId: string;
+}
+
+export interface UseResumeDataOptions {
+  documentId: string;
+  apiUrl?: string;
+  onSuccess?: (field: ResumeField) => void;
+  onError?: (error: Error, field: ResumeField) => void;
+}
+
+export interface ApiError extends Error {
+  status?: number;
+  code?: string;
+}
 export interface ResumePreviewProps {
   data: ResumeFormData;
-  handleProfileUpdate: (profile: string) => void;
-  handleWorkExperienceUpdate: (
-    workExperience: ResumeFormData["workExperience"]
-  ) => void;
-  handleEducationUpdate: (education: ResumeFormData["education"]) => void;
-  handleCertificationUpdate: (
-    certification: ResumeFormData["certification"]
-  ) => void;
-  handleProjectUpdate: (project: ResumeFormData["project"]) => void;
-  handleHardSkillUpdate: (hardSkill: ResumeFormData["hardSkill"]) => void;
-  handleSoftSkillUpdate: (softSkill: ResumeFormData["softSkill"]) => void;
+  onUpdate: <T>(field: ResumeField, value: T) => void;
+  isUpdating?: boolean;
+  user: Partial<IUser> | null;
 }
 
 export interface FloatingLabelInputProps
@@ -103,40 +107,6 @@ export interface OnboardingFormProps {
   onPrev: () => void;
   initialUser: Partial<IUser>;
   children?: React.ReactNode;
-}
-
-export interface IEducation {
-  schoolName: string;
-  schoolLocation: string;
-  degree: string;
-  academicAchievements?: string;
-  fieldOfStudy: string;
-  educationStart: string;
-  educationEnd: string;
-  acceptTerms: boolean;
-  educationId?: string;
-}
-
-export interface IWorkExperience {
-  jobTitle?: string;
-  companyName?: string;
-  location?: string;
-  workDescription?: string;
-  responsibilities?: string[];
-  jobStart: string;
-  jobEnd: string;
-  workExperienceId?: string;
-}
-
-export interface ISkill {
-  value: string;
-  label: string;
-}
-
-export interface IDataSource {
-  data: string;
-  key: string;
-  genTableId: string;
 }
 
 export interface ResumeSection {
@@ -224,267 +194,6 @@ export interface FloatingLabelInputProps
   showPasswordToggle?: boolean;
 }
 
-import { ResumeFormData } from "@/lib/schema-validations/resume.schema";
-import { LucideIcon } from "lucide-react";
-import { IconType } from "react-icons";
-
-export type ISkills = {
-  skills: {
-    skills: string;
-  }[];
-};
-export type ISocials = {
-  socials: {
-    socials: string;
-  }[];
-};
-export type IVoluteering = {
-  volunteering: {
-    volunteering: string;
-  }[];
-};
-export type ICertificates = {
-  certifications: {
-    certifications: string;
-  }[];
-};
-
-export type FirstSectionTypes = {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phoneNumber: string;
-  address: string;
-  website: string;
-  Profile: string;
-  cvJobTitle: string;
-};
-
-export type IResumeSample = {
-  resumeSample: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phoneNumber: string;
-  address: string;
-  website: string;
-  Profile: string;
-  cvJobTitle: string;
-};
-
-export type INavLink = {
-  imgURL: string;
-  route: string;
-  label: string;
-};
-
-export type IUpdateUser = {
-  // [key: string]: string;
-  email?: string;
-  firstName?: string;
-  lastName?: string;
-  phoneNumber?: string;
-  provider?: string;
-  address?: string;
-  state?: any;
-  country?: {
-    capital: string;
-    currency: string;
-    currency_name: string;
-    currency_symbol: string;
-    latitude: string;
-    longitude: string;
-    name: string;
-    phone_code: string;
-    region: string;
-    subregion: string;
-  };
-};
-export type IpassWordChange = {
-  confirmPassword: string;
-  newPassword: string;
-  currentPassword: string;
-};
-
-export type IUpdateUserProfile = {
-  [key: string]: string | string[] | any[];
-  email: string;
-  firstName: string;
-  lastName: string;
-  phoneNumber: string;
-  address: string;
-  website: string;
-  Profile: string;
-  cvJobTitle: string;
-  educations: any[];
-  socials: any[];
-  certifications: any[];
-  projects: any[];
-  volunteering: any[];
-  skills: any[];
-  workExperiences: any[];
-};
-
-export type INewUser = {
-  email: string;
-  password: string;
-};
-
-export type UserDb = {
-  uid: string;
-  firstName: string | null;
-  lastName: string | null;
-  email: string | null;
-  phoneNumber: string | null;
-  photoURL: string | null;
-  resumeSample: string | null;
-};
-
-export type StoreUser = {
-  Profile: string;
-  address: string;
-  certifications: any[];
-  credit: number;
-  cvJobTitle: string;
-  educations: any[];
-  email: string;
-  firstName: string;
-  lastName: string;
-  maxCredit: number;
-  phoneNumber: string;
-  skills: any[];
-  website: string;
-  workExperiences: any[];
-};
-
-export type WorkExperiences = {
-  company: string;
-  jobDescription: string;
-  jobEndDate: string;
-  jobStartDate: string;
-  jobTitle: string;
-};
-
-export type TWorkExperiences = {
-  jobTitle?: string | undefined;
-  companyName?: string;
-  location?: string;
-  workDescription?: string;
-  responsibilities?: string | string[] | undefined;
-  jobStart: string;
-  jobEnd: string;
-  workID?: string | number | undefined;
-};
-
-export type TEducations = {
-  schoolName: string;
-  schoolLocation: string;
-  degree: string;
-  fieldOfStudy: string;
-  educationStart: string;
-  acceptTerms: boolean;
-  EduID?: string | number | undefined;
-  educationEnd: string;
-};
-export type SocialType = {
-  index: string;
-  value: string;
-};
-export type CertificateType = {
-  index: string;
-  certifications: string;
-};
-export type SkillType = {
-  index: number;
-  skill: string;
-};
-export type VoluntaryType = {
-  index: string;
-  volunteering: string;
-};
-
-export type ProjectType = {
-  description: string;
-  endDate: string;
-  startDate: string;
-  title: string;
-};
-
-export type NewResumeTemplate = {
-  [key: string]: any;
-  resumeSample: string;
-  uniqueUserObjects: any[];
-  firstName: string;
-  lastName: string;
-  email: string;
-  phoneNumber: string;
-  address: string;
-  website: string;
-  Profile: string;
-  cvJobTitle: string;
-  portfolio: string;
-  educations: any[];
-  coverLetterHistory: any[];
-  questions: any[];
-  resumeHistory: any[];
-  skills: any[];
-  workExperiences: any[];
-};
-
-export type createUser = {
-  resumeSample: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phoneNumber: string;
-  address: string;
-  website: string;
-  Profile: string;
-  cvJobTitle: string;
-  photoURL: string;
-  portfolio: string;
-  uniqueUserObjects: any[];
-  coverLetterHistory: any[];
-  resumeHistory: any[];
-  questions: any[];
-  educations: any[];
-  skills: string[];
-  workExperiences: any[];
-  password: string;
-  confirmPassword: string;
-};
-
-export type AccountUser = {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phoneNumber: string;
-  password: string;
-  address: string;
-};
-
-export type ActionProps = {
-  documentType: string;
-  documentName: string;
-  baseLink: string;
-  genTableId: string;
-  documentIndex: number;
-};
-
-export type SelectProps = {
-  value: string;
-  label: string;
-};
-
-export type childChartType = {
-  chartData?: {
-    name: string;
-    resume: number;
-    letter: number;
-    question: number;
-  }[];
-};
-
 export type ApprovedT = {
   duration: string;
   message: string;
@@ -504,140 +213,6 @@ export type cancelledT = {
   plan: string;
   price: number;
   status: string;
-};
-
-export type TableDataT = {
-  id?: string;
-  text?: string;
-  key?: string;
-  category?: string;
-  genTableId?: string;
-  letterID?: string;
-  createdDateTime: {
-    currentDate: string;
-    currentTime: string;
-  };
-};
-
-export type userDocProps = {
-  img: string;
-  title: string;
-  total: string;
-  link: string;
-};
-
-export type menuItemsT = {
-  title?: string;
-  icon: LucideIcon | IconType;
-  link?: string;
-  last?: boolean | undefined;
-};
-
-export type LetterType = {
-  key?: string | null | undefined;
-  data?: string;
-  firstName?: string;
-  lastName?: string;
-  email?: string;
-  country?: string;
-  state?: string;
-  phoneNumber?: string;
-  address?: string;
-  website?: string;
-  portfolio?: string;
-  category?: string;
-  letterID?: Date | string | number;
-  genTableId?: string;
-  imgIcon?: string;
-  salutation?: string;
-  closing?: string;
-  createdAt?: any;
-  createdDateTime?: any;
-  statue?: string;
-};
-
-export type LetterProps = {
-  children?: React.ReactNode;
-  nameOfDoc?: string;
-  documentType?: string;
-  allData?: LetterType | undefined;
-  setAllData?: React.Dispatch<React.SetStateAction<LetterType | undefined>>;
-  AILoading?: boolean;
-  onSubmit?: () => Promise<string | number>;
-  setValueQuill?: React.Dispatch<React.SetStateAction<string>>;
-  valueQuill?: string;
-  isPending?: boolean;
-  deletePro?: (id: number | string) => Promise<void> | undefined;
-  deleteDialog?: boolean;
-  handleAlertDialog?: () => void;
-  alertDialog?: boolean;
-  handleDeleteDialog?: () => void;
-};
-export type QuestionProps = {
-  children?: React.ReactNode;
-  nameOfDoc?: string;
-  documentType?: string;
-
-  allData?: QuestionType | undefined;
-  setAllData?: React.Dispatch<React.SetStateAction<QuestionType | undefined>>;
-  AILoading?: boolean;
-  onSubmit?: () => Promise<string | undefined>;
-  setValueQuill?: React.Dispatch<React.SetStateAction<string>>;
-  valueQuill?: string;
-  isPending?: boolean;
-  deletePro?: (id: number | string) => Promise<void> | undefined;
-  deleteDialog?: boolean;
-  handleAlertDialog?: () => void;
-  alertDialog?: boolean;
-  handleDeleteDialog?: () => void;
-};
-
-export type QuestionType = {
-  key?: string;
-  data?:
-    | {
-        [x: string]: string | number;
-        id: number;
-      }[]
-    | string
-    | string[];
-  category?: string;
-  questionID?: number | string;
-  genTableId?: string | number;
-  imgIcon?: string;
-  QA?: string[];
-  createdAt?: string;
-  createdDateTime?: {
-    currentDate?: string;
-    currentTime?: string;
-  };
-  statue?: string;
-};
-
-export type dbAddressT = {
-  apartment: string;
-  state: any;
-  country: {
-    capital: string;
-    currency: string;
-    currency_name: string;
-    currency_symbol: string;
-    latitude: string;
-    longitude: string;
-    name: string;
-    phone_code: string;
-    region: string;
-    continent: string;
-    subregion: string;
-  };
-};
-
-export type GoogleUser = {
-  email: string;
-  name: string;
-  given_name: string;
-  family_name: string;
-  picture: string;
 };
 
 export interface ApiResponse<T> {
@@ -663,20 +238,6 @@ export interface Media {
 export interface Author {
   name: string;
   avatar?: string | null;
-}
-
-export interface Category {
-  id: number;
-  name: string;
-  slug: string;
-  description?: string;
-}
-
-export interface Blocks {
-  id: number;
-  title?: string;
-  body: string;
-  __component: "shared.rich-text" | "shared.quote";
 }
 
 export interface Article {
@@ -742,8 +303,4 @@ export interface UserProfile {
   lastLoginAt: string;
   isEmailVerified: boolean;
   customClaims?: Record<string, any>;
-}
-
-export interface AuthProviderProps {
-  children: React.ReactNode;
 }

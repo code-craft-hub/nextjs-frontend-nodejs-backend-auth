@@ -7,6 +7,30 @@ export const profileSchema = z.object({
     .optional(),
 });
 
+export const contactSchema = z.object({
+  firstName: z
+    .string()
+    .min(10, "firstName must be at least 10 characters")
+    .optional(),
+  lastName: z
+    .string()
+    .min(10, "lastName must be at least 10 characters")
+    .optional(),
+  address: z
+    .string()
+    .min(10, "address must be at least 10 characters")
+    .optional(),
+  phoneNumber: z
+    .string()
+    .min(10, "phoneNumber must be at least 10 characters")
+    .optional(),
+  email: z.email("email must be at least 10 characters").optional(),
+  portfolio: z
+    .string()
+    .min(10, "portfolio must be at least 10 characters")
+    .optional(),
+});
+
 export const educationSchema = z.object({
   educationId: z.uuid().optional(),
   degree: z.string().min(1, "Degree is required").optional(),
@@ -15,6 +39,10 @@ export const educationSchema = z.object({
   educationStart: z.string().min(1, "Start date is required").optional(),
   educationEnd: z.string().min(1, "End date is required").optional(),
   schoolLocation: z.string().min(1, "Location is required").optional(),
+  academicAchievements: z
+    .string()
+    .min(1, "Academic achievements is required")
+    .optional(),
 });
 
 export const workExperienceSchema = z.object({
@@ -56,6 +84,7 @@ export const skillSchema = z.object({
 });
 
 export const resumeSchema = z.object({
+  contact: contactSchema.optional(),
   profile: profileSchema.shape.profile,
   education: z.array(educationSchema).optional().default([]),
   workExperience: z.array(workExperienceSchema).optional().default([]),
@@ -65,10 +94,11 @@ export const resumeSchema = z.object({
   hardSkill: z.array(skillSchema).optional().default([]),
 });
 
+export type ContactFormData = z.infer<typeof contactSchema>;
 export type ProfileFormData = z.infer<typeof profileSchema>;
-export type ResumeFormData = z.infer<typeof resumeSchema>;
 export type EducationFormData = z.infer<typeof educationSchema>;
 export type WorkExperienceFormData = z.infer<typeof workExperienceSchema>;
 export type CertificationFormData = z.infer<typeof certificationSchema>;
 export type ProjectFormData = z.infer<typeof projectSchema>;
 export type SkillFormData = z.infer<typeof skillSchema>;
+export type ResumeFormData = z.infer<typeof resumeSchema>;

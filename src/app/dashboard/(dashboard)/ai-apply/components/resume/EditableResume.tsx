@@ -8,8 +8,8 @@ import {
   normalizeToString,
   parseResponsibilities,
 } from "@/lib/utils/helpers";
-import { PreviewResumeProps } from "@/types";
-import { memo } from "react";
+import { PreviewResumeProps, ResumeField } from "@/types";
+import { memo, useCallback } from "react";
 import { ProfileEditForm } from "./form/ProfileEditForm";
 import { EditDialog } from "./form/EditDialog";
 import { WorkExperienceEditForm } from "./form/WorkExperienceEditForm";
@@ -32,30 +32,24 @@ const StreamingSkeleton = ({ className = "" }: { className?: string }) => (
   <div className={`animate-pulse bg-gray-200 rounded ${className}`} />
 );
 
-export const EditableResume = ({
+export const EditableResume: React.FC<PreviewResumeProps> = ({
   data,
   isStreaming = false,
   pause,
   cancelTimeout,
-  handleProfileUpdate,
-  handleWorkExperienceUpdate,
-  handleEducationUpdate,
-  handleCertificationUpdate,
-  handleProjectUpdate,
-  handleHardSkillUpdate,
-  handleSoftSkillUpdate,
-}: PreviewResumeProps) => {
+  onUpdate,
+}) => {
   const { user } = useAuth();
 
-  const firstName = data?.firstName || user?.firstName || "";
-  const lastName = data?.lastName || user?.lastName || "";
+  const firstName =  user?.firstName || "";//data?.firstName ||
+  const lastName =  user?.lastName || "";//data?.lastName ||
   const fullName = `${firstName} ${lastName}`.trim();
 
   const contactInfo = [
-    data?.email || user?.email,
-    data?.phoneNumber || user?.phoneNumber,
-    data?.address,
-    data?.portfolio,
+     user?.email,//data?.email ||
+     user?.phoneNumber,//data?.phoneNumber ||
+    // data?.address,
+    // data?.portfolio,
   ]
     .filter(Boolean)
     .join(" | ");
@@ -70,6 +64,14 @@ export const EditableResume = ({
   const hasSoftSkills = isValidArray(data?.softSkill);
   const hasHardSkills = isValidArray(data?.hardSkill);
   const hasSkills = hasSoftSkills || hasHardSkills;
+
+  const createFieldHandler = useCallback(
+    <T,>(field: ResumeField) =>
+      (value: T) => {
+        onUpdate(field, value);
+      },
+    [onUpdate]
+  );
 
   return (
     <Card
@@ -126,9 +128,9 @@ export const EditableResume = ({
       >
         {(onClose) => (
           <ProfileEditForm
-            initialData={data.profile!}
-            onSave={(data) => {
-              handleProfileUpdate(data);
+            initialData={data.profile ?? ""}
+            onSave={(value) => {
+              createFieldHandler("profile")(value);
               onClose();
             }}
             onCancel={onClose}
@@ -206,8 +208,8 @@ export const EditableResume = ({
         {(onClose) => (
           <WorkExperienceEditForm
             initialData={data.workExperience}
-            onSave={(data) => {
-              handleWorkExperienceUpdate(data);
+            onSave={(value) => {
+              createFieldHandler("workExperience")(value);
               onClose();
             }}
             onCancel={onClose}
@@ -268,8 +270,8 @@ export const EditableResume = ({
         {(onClose) => (
           <EducationEditForm
             initialData={data.education}
-            onSave={(data) => {
-              handleEducationUpdate(data);
+            onSave={(value) => {
+              createFieldHandler("education")(value);
               onClose();
             }}
             onCancel={onClose}
@@ -325,8 +327,8 @@ export const EditableResume = ({
         {(onClose) => (
           <CertificationEditForm
             initialData={data.certification}
-            onSave={(data) => {
-              handleCertificationUpdate(data);
+            onSave={(value) => {
+              createFieldHandler("certification")(value);
               onClose();
             }}
             onCancel={onClose}
@@ -385,8 +387,8 @@ export const EditableResume = ({
         {(onClose) => (
           <ProjectEditForm
             initialData={data.project}
-            onSave={(data) => {
-              handleProjectUpdate(data);
+            onSave={(value) => {
+              createFieldHandler("project")(value);
               onClose();
             }}
             onCancel={onClose}
@@ -453,8 +455,8 @@ export const EditableResume = ({
             initialData={data.hardSkill}
             title="Technical Skills"
             placeholder="React, Python, AWS..."
-            onSave={(data) => {
-              handleHardSkillUpdate(data);
+            onSave={(value) => {
+              createFieldHandler("hardSkill")(value);
               onClose();
             }}
             onCancel={onClose}
@@ -488,8 +490,8 @@ export const EditableResume = ({
             initialData={data.softSkill}
             title="Soft Skills"
             placeholder="Leadership, Communication..."
-            onSave={(data) => {
-              handleSoftSkillUpdate(data);
+            onSave={(value) => {
+              createFieldHandler("softSkill")(value);
               onClose();
             }}
             onCancel={onClose}

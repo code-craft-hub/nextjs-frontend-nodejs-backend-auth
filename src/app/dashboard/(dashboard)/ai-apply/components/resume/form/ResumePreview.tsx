@@ -6,17 +6,13 @@ import { ProjectEditForm } from "./ProjectEditForm";
 import { CertificationEditForm } from "./CertificationEditForm";
 import { SkillEditForm } from "./SkillEditForm";
 import { useCallback } from "react";
-import { ResumeField } from "@/hooks/use-resume-data";
-
-interface ResumePreviewProps {
-  data: any;
-  onUpdate: <T>(field: ResumeField, value: T) => void;
-  isUpdating?: boolean;
-}
+import { ResumeField, ResumePreviewProps } from "@/types";
+import { ContactEditForm } from "./ContactEditForm";
 
 export const ResumePreview: React.FC<ResumePreviewProps> = ({
   data,
   onUpdate,
+  user,
 }) => {
   // Create field-specific handlers dynamically
   const createFieldHandler = useCallback(
@@ -27,9 +23,53 @@ export const ResumePreview: React.FC<ResumePreviewProps> = ({
     [onUpdate]
   );
 
+  const contactInfo = [
+    data.contact?.email || user?.email,
+    data.contact?.phoneNumber || user?.phoneNumber,
+    data.contact?.address,
+    data.contact?.portfolio,
+  ]
+    .filter(Boolean)
+    .join(" | ");
+
+  const initialData = {
+    firstName: user?.firstName ?? data.contact?.firstName,
+    lastName: user?.lastName ?? data.contact?.lastName,
+    email: user?.email ?? data.contact?.email,
+    phoneNumber: user?.phoneNumber ?? data.contact?.phoneNumber,
+    address: user?.address ?? data.contact?.address,
+    portfolio: data.contact?.portfolio,
+  };
   return (
     <div className="bg-white rounded-lg shadow-lg p-8 space-y-6 relative">
-      {/* Profile Section */}
+      <EditDialog
+        trigger={
+          <div className="space-y-4 hover:cursor-pointer hover:bg-gray-50 p-4 rounded-lg transition-colors">
+            <h1 className="text-3xl font-bold text-gray-900">
+              {initialData.firstName}{" "}
+              {initialData.lastName}
+            </h1>
+            {contactInfo && (
+              <p className="text-lg text-gray-600 font-merriweather mt-2">
+                {contactInfo}
+              </p>
+            )}
+          </div>
+        }
+        title="Edit Contact Information"
+        description="Update your contact information"
+      >
+        {(onClose) => (
+          <ContactEditForm
+            initialData={initialData}
+            onSave={(value) => {
+              createFieldHandler("contact")(value);
+              onClose();
+            }}
+            onCancel={onClose}
+          />
+        )}
+      </EditDialog>
       <EditDialog
         trigger={
           <div className="space-y-4 hover:cursor-pointer hover:bg-gray-50 p-4 rounded-lg transition-colors">
@@ -44,7 +84,7 @@ export const ResumePreview: React.FC<ResumePreviewProps> = ({
       >
         {(onClose) => (
           <ProfileEditForm
-            initialData={data.profile}
+            initialData={data.profile ?? ""}
             onSave={(value) => {
               createFieldHandler("profile")(value);
               onClose();
