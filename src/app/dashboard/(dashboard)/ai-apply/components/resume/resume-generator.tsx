@@ -58,7 +58,8 @@ export const ResumeGenerator = ({
         success: (data) => {
           return {
             message: `${JSON.stringify(data)} Resume generation complete!`,
-            description: "Click the next button to edit your resume.",
+            description: "Cverai is thinking...",
+            // description: "Click the next button to edit your resume.",
           };
         },
         error: "Error",

@@ -37,7 +37,7 @@ export const SelectOptions = memo(
   }) => (
     <div className={cn("", className)}>
       <Select value={value} onValueChange={onValueChange}>
-        <SelectTrigger className={cn(triggerClassName)}>
+        <SelectTrigger className={cn(triggerClassName, "w-full max-sm:!w-22 !h-7")}>
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
         <SelectContent className="rounded-lg shadow-lg mt-1">
@@ -51,9 +51,9 @@ export const SelectOptions = memo(
                 contentClassName
               )}
             >
-              <div className="flex items-center  gap-3 w-full">
-                {Icon && <Icon className="size-3 group-hover:text-primary" />}
-                <span className="font-medium group-hover:text-primary">
+              <div className="flex items-center max-sm:gap-0.5 gap-3 w-full">
+                {Icon && <Icon className="max-sm:size-2 size-3 group-hover:text-primary" />}
+                <span className="font-medium group-hover:text-primary max-sm:text-3xs">
                   {label}
                 </span>
               </div>

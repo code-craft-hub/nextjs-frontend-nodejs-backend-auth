@@ -1,14 +1,13 @@
 "use client";
-import { InitialUser } from "@/types";
 import { Card } from "@/components/ui/card";
 
 import { memo, useMemo } from "react";
 import { RecentActivityCard } from "../../components/RecentActivityCard";
 import { MOCK_DATA_TAILOR_RESUME } from "../../components/constants";
 import { AIJobCustomizationDatatable } from "./AIJobCustomizationDatatable";
-import { TailorResumeInput } from "./AIJobCustomizationInput";
+import { AIJobCustomizationInput } from "./AIJobCustomizationInput";
 
-export const AIJobCustomization = memo(({ initialUser }: InitialUser) => {
+export const AIJobCustomization = memo(() => {
   const recentActivityItems = useMemo(
     () => Array.from({ length: 6 }, (_, index) => ({ id: index })),
     []
@@ -21,7 +20,7 @@ export const AIJobCustomization = memo(({ initialUser }: InitialUser) => {
       </h1>
 
       <div className="grid gap-y-16">
-        <TailorResumeInput initialUser={initialUser} />
+        <AIJobCustomizationInput/>
         <AIJobCustomizationDatatable data={MOCK_DATA_TAILOR_RESUME} />
         <Card className="p-4 sm:p-7 gap-4">
           <h1 className="font-bold text-xl">Recent Activity</h1>

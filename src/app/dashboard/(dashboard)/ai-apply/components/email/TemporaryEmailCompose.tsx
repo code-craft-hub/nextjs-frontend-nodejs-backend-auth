@@ -45,8 +45,11 @@ export const TemporaryEmailCompose: React.FC<{
         loading: "Generating your tailored cover letter...",
         success: (data) => {
           return {
-            message: `${JSON.stringify(data)} Cover letter generation complete!`,
-            description: "Resume generation is starting now.",
+            message: `${JSON.stringify(
+              data
+            )} Cover letter generation complete!`,
+            description: "Cverai is thinking...",
+            // description: "Resume generation is starting now.",
             closeButton: true,
           };
         },
@@ -57,9 +60,12 @@ export const TemporaryEmailCompose: React.FC<{
 
   useEffect(() => {
     if (!documentId) return;
-    const orderedParams = createCoverLetterOrderedParams(documentId, jobDescription);
+    const orderedParams = createCoverLetterOrderedParams(
+      documentId,
+      jobDescription
+    );
     router.replace(`${pathname}?${orderedParams.toString()}`);
-  
+
     setTimeout(() => {
       handleStepChange(2, "emailContent", generatedContent);
     }, 5000);

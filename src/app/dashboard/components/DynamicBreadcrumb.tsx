@@ -41,10 +41,10 @@ export const DynamicBreadcrumb = () => {
             <div key={href} className="flex items-center hover:cursor-pointer">
               <BreadcrumbItem className={index > 0 ? "hidden md:block" : ""}>
                 {isLast ? (
-                  <BreadcrumbPage>{title}</BreadcrumbPage>
+                  <BreadcrumbPage>{title?.replace(/-/ig, " ")}</BreadcrumbPage>
                 ) : (
                   <BreadcrumbLink onClick={() => handleNavigate(href)}>
-                    {title}
+                    {title?.replace(/-/ig, " ")}
                   </BreadcrumbLink>
                 )}
               </BreadcrumbItem>

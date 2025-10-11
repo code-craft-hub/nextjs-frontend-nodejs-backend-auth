@@ -1,6 +1,4 @@
 "use client";
-import { InitialUser } from "@/types";
-
 import { ArrowUp, Plus } from "lucide-react";
 
 import {
@@ -8,13 +6,11 @@ import {
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { memo, useCallback, useState } from "react";
+import { memo, useState } from "react";
 import { toast } from "sonner";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import {
@@ -24,9 +20,15 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
-import { ACTION_OPTIONS, ActionValue, PROFILE_OPTIONS } from "../../components/constants";
+import {
+  ACTION_OPTIONS,
+  ActionValue,
+  PROFILE_OPTIONS,
+} from "../../components/constants";
 import { SelectOptions } from "../../components/SelectOptions";
 import LockIcon from "@/components/icons/LockIcon";
+import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 const FORM_SCHEMA = z.object({
   jobDescription: z.string().min(2, {
@@ -34,24 +36,36 @@ const FORM_SCHEMA = z.object({
   }),
 });
 
-export const TailorResumeInput = memo(({ initialUser }: InitialUser) => {
-  console.log(initialUser);
-  // const [profileInput, setProfileInput] = useState<string>("profile1");
+export const AIJobCustomizationInput = memo(() => {
+  const [dataSource, setDataSource] = useState<string>("select-profile");
   const [docsInput, setDocsInput] = useState<ActionValue>("tailor-resume");
   const [userProfile, setUserProfile] = useState<string>("profile1");
+  const router = useRouter();
+
+  const changeDataSource = (value: string) => {
+    setDataSource(value);
+    toast.success(`Selected: ${value}`);
+  };
+
+  const onDocumentChange = (value: ActionValue) => {
+    toast.success(`Selected: ${value}`);
+
+    setDocsInput(value);
+  };
 
   const form = useForm<z.infer<typeof FORM_SCHEMA>>({
-    resolver: zodResolver(FORM_SCHEMA),
+    // resolver: zodResolver(FORM_SCHEMA),
     defaultValues: {
       jobDescription: "",
     },
   });
 
-  const onSubmit = useCallback((data: z.infer<typeof FORM_SCHEMA>) => {
-    console.log(data);
-  }, []);
+  const onSubmit = ({ jobDescription }: z.infer<typeof FORM_SCHEMA>) => {
+    toast.success(docsInput);
 
-  // const profile = ["profile1", "profile2", "profile3"];
+    router.push(`/dashboard/${docsInput}?dataSource=${dataSource}&profile=${userProfile}&jobDescription=${jobDescription}`);
+  };
+
   const profiles = [
     { value: "profile1", label: "Base profile", icon: LockIcon },
     { value: "profile2", label: "Primary profile", icon: LockIcon },
@@ -60,59 +74,7 @@ export const TailorResumeInput = memo(({ initialUser }: InitialUser) => {
 
   return (
     <div className="!relative h-36">
-      <DropdownMenu>
-        <DropdownMenuTrigger className="absolute data-[state=open]:!shadow-2xl  rounded-full bottom-5 left-3 border-blue-500 p-1 hover:cursor-pointer z-20 border-2">
-          <Plus className="text-blue-400 size-4 font-bold" />
-        </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-44 p-1 " align="start">
-          <DropdownMenuGroup>
-            <DropdownMenuItem className="gap-2 hover:cursor-pointer [&_svg]:!text-primary">
-              <div>
-                {(() => {
-                  const { icon: Icon, label } = PROFILE_OPTIONS[0];
-                  return (
-                    <div className="flex gap-1 items-center justify-center text-primary hover:text-primary hover:cursor-pointer text-xs">
-                      {Icon && <Icon className="size-3 text-primary" />}
-                      {label}
-                    </div>
-                  );
-                })()}
-              </div>
-            </DropdownMenuItem>
-          </DropdownMenuGroup>
-          <DropdownMenuSeparator />
-          <DropdownMenuGroup>
-            {PROFILE_OPTIONS.slice(1, 3).map(({ label, value, icon: Icon }) => (
-              <DropdownMenuItem
-                onSelect={() => {
-                  toast.success("selected");
-                }}
-                key={value}
-                className="gap-2 group hover:text-primary hover:cursor-pointer"
-              >
-                {Icon && <Icon className="size-3 group-hover:text-primary" />}
-                <p className="group-hover:text-primary text-xs">{label}</p>
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuGroup>
-        </DropdownMenuContent>
-      </DropdownMenu>
-      <div className="absolute bottom-5 left-12 hover:cursor-pointer z-20">
-        <SelectOptions
-          options={ACTION_OPTIONS}
-          value={docsInput}
-          onValueChange={(value) => {
-            setDocsInput(value);
-            toast.success(JSON.stringify(docsInput));
-          }}
-          placeholder="Tailor Resume"
-          triggerClassName={
-            "w-full !h-7 border-2 border-primary/70 rounded-xl text-primary hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 [&_svg]:!text-primary  text-2xs"
-          }
-          contentClassName="text-xs"
-        />
-      </div>
-      <div className="relative shadow-blue-200 border-blue-500 rounded-2xl border-r shadow-xl h-34 pointer-events-none">
+      <div className="relative shadow-blue-200 border-blue-500 rounded-2xl border-r shadow-xl h-38">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
             <FormField
@@ -123,7 +85,7 @@ export const TailorResumeInput = memo(({ initialUser }: InitialUser) => {
                   <FormControl>
                     <textarea
                       placeholder="Let's get started"
-                      className="w-full outline-none focus:outline-none focus:border-none p-2 resize-none pl-4 pt-2 border-none placeholder:font-medium focus-visible:border-none h-26"
+                      className="w-full outline-none focus:outline-none text-xs focus:border-none p-2 resize-none pl-4 pt-2 border-none placeholder:font-medium focus-visible:border-none h-26"
                       {...field}
                     />
                   </FormControl>
@@ -131,29 +93,77 @@ export const TailorResumeInput = memo(({ initialUser }: InitialUser) => {
                 </FormItem>
               )}
             />
+
+            <div className="flex  justify-between bg-yellow py-2">
+              <div className="flex gap-2 px-3">
+                <DropdownMenu>
+                  <DropdownMenuTrigger className=" data-[state=open]:!shadow-2xl  rounded-full  border-blue-500 p-1 hover:cursor-pointer z-20 border-2">
+                    <Plus className="text-blue-400 size-4 font-bold" />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="p-1 " align="start">
+                    <DropdownMenuGroup>
+                      {PROFILE_OPTIONS.map(({ label, value, icon: Icon }) => (
+                        <DropdownMenuItem
+                          onSelect={() => changeDataSource(value)}
+                          key={value}
+                          className={cn(
+                            "gap-2 group hover:text-primary hover:cursor-pointer mb-1",
+                            value === dataSource && "bg-gray-100 text-blue-500"
+                          )}
+                        >
+                          {Icon && (
+                            <Icon className="size-3 group-hover:text-primary" />
+                          )}
+                          <p className="group-hover:text-primary text-xs">
+                            {label}
+                          </p>
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuGroup>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <div className="hover:cursor-pointer z-20">
+                  <SelectOptions
+                    options={ACTION_OPTIONS}
+                    value={docsInput}
+                    onValueChange={(value) => onDocumentChange(value)}
+                    placeholder="Tailor Resume"
+                    triggerClassName={
+                      " border-2 border-primary/70 rounded-xl text-primary hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 [&_svg]:!text-primary  text-2xs"
+                    }
+                    contentClassName="text-xs"
+                  />
+                </div>
+              </div>
+              <div className="flex gap-2 px-3">
+                <div className="hover:cursor-pointer ">
+                  <SelectOptions
+                    options={profiles}
+                    value={userProfile}
+                    onValueChange={(value) => {
+                      setUserProfile(value);
+                      toast.success(JSON.stringify(userProfile));
+                    }}
+                    placeholder="Tailor Resume"
+                    triggerClassName={
+                      " border-2 border-primary/70 rounded-xl text-primary hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 [&_svg]:!text-primary  text-2xs"
+                    }
+                    contentClassName="text-xs"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="rounded-full border-blue-500 border-2 p-1 hover:cursor-pointer "
+                >
+                  <ArrowUp className="text-blue-400 size-4" />
+                </button>
+              </div>
+            </div>
           </form>
         </Form>
       </div>
-      <div className="absolute bottom-5 right-12 hover:cursor-pointer z-20">
-        <SelectOptions
-          options={profiles}
-          value={userProfile}
-          onValueChange={(value) => {
-            setUserProfile(value);
-            toast.success(JSON.stringify(userProfile));
-          }}
-          placeholder="Tailor Resume"
-          triggerClassName={
-            "w-full !h-7 border-2 border-primary/70 rounded-xl text-primary hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 [&_svg]:!text-primary  text-2xs"
-          }
-          contentClassName="text-xs"
-        />
-      </div>
-      <button className="absolute rounded-full bottom-5 right-3 border-blue-500 border-2 p-1 hover:cursor-pointer z-20">
-        <ArrowUp className="text-blue-400 size-4" />
-      </button>
     </div>
   );
 });
 
-TailorResumeInput.displayName = "TailorResumeInput";
+AIJobCustomizationInput.displayName = "AIJobCustomizationInput";

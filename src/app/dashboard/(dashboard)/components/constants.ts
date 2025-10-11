@@ -54,7 +54,7 @@ export const ACTION_OPTIONS: readonly ProfileOption[] = [
     icon: TailorCoverLetterIcon,
   },
   {
-    value: "generate-interview-questions",
+    value: "tailor-interview-question",
     label: "Generate Interview Questions",
     icon: TailorInterviewQuestionIcon,
   },
