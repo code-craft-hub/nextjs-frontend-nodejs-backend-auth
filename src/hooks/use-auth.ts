@@ -2,7 +2,7 @@
 
 import authClient from "@/lib/axios/auth-api";
 import { RegisterUserSchema } from "@/lib/schema-validations";
-import { IUser, Resume } from "@/types";
+import { IUser } from "@/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -142,12 +142,12 @@ export function useAuth(initialUser?: Partial<IUser>) {
     initialData: initialUser || undefined,
   });
 
-  const useCareerDoc = (documentId?: string) => {
+  const useCareerDoc = <T>(documentId?: string) => {
     return useQuery({
       queryKey: ["auth", "careerDoc", documentId],
       queryFn: async () => {
         if (!documentId) throw new Error("No documentId provided");
-        return apiService.getCareerDoc<Resume>(documentId);
+        return apiService.getCareerDoc<T>(documentId);
       },
       enabled: !!documentId, // Only runs when documentId is truthy
     });

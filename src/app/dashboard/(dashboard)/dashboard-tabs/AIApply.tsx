@@ -14,6 +14,7 @@ export const AIApply = memo(() => {
 
   return (
     <div className="flex flex-col font-poppins relative">
+      <button className="w-full bg-lime-300"></button>
       <h1 className="font-instrument text-3xl text-center tracking-tighter mb-12">
         AI Assist to Apply
       </h1>

@@ -51,7 +51,7 @@ export interface PreviewResumeProps {
   data: ResumeFormData;
   isStreaming?: boolean;
   pause?: boolean;
-  onUpdate: <T,>(field: string, value: T) => void;
+  onUpdate: <T,>(field: ResumeField, value: T) => void;
   cancelTimeout?: () => void;
 }
 

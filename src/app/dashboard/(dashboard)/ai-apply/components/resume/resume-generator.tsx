@@ -2,12 +2,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useResumeStream } from "@/hooks/stream-resume-hook";
 import { toast } from "sonner";
-import { PreviewResume } from "./preview-resume-template";
-// import GenerationStatus from "./GenerationStatus";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/use-auth";
 import { EditableResume } from "./EditableResume";
 import { useResumeData } from "@/hooks/use-resume-data";
+import { Resume } from "@/types";
 
 export const ResumeGenerator = ({
   handleStepChange,
@@ -25,7 +24,7 @@ export const ResumeGenerator = ({
   documentId: string;
 }) => {
   const { useCareerDoc } = useAuth();
-  const { data } = useCareerDoc(documentId);
+  const { data } = useCareerDoc<Resume>(documentId);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const { resumeData, updateField } = useResumeData(data || {}, {
@@ -93,11 +92,10 @@ export const ResumeGenerator = ({
   return (
     <div className="">
       <EditableResume
-        data={shouldUseDbData ? data! : streamData ?? resumeData}
+        data={shouldUseDbData ? resumeData : streamData}
         cancelTimeout={cancelTimeout}
         pause={pause}
-        resumeData={resumeData}
-        updateField={updateField}
+        onUpdate={updateField}
       />
     </div>
   );

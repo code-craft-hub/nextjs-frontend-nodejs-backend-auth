@@ -2,13 +2,14 @@
 import { useResumeData } from "@/hooks/use-resume-data";
 import { ResumePreview } from "./form/ResumePreview";
 import { useAuth } from "@/hooks/use-auth";
+import { Resume } from "@/types";
 
 const EditResumeTemplate: React.FC<{ documentId: string }> = ({
   documentId,
 }) => {
 
   const {user, useCareerDoc} = useAuth();
-  const { data } = useCareerDoc(documentId);
+  const { data } = useCareerDoc<Resume>(documentId);
 
   const { 
     resumeData, 
@@ -44,7 +45,7 @@ const EditResumeTemplate: React.FC<{ documentId: string }> = ({
         )}
         <ResumePreview
           data={resumeData}
-          user={user}
+          user={user ?? null}
           onUpdate={updateField}
           isUpdating={isUpdating}
         />

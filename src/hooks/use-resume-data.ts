@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect, useRef } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { authAPI } from "@/lib/axios/auth-api";
 import { ApiError, ResumeField, UpdatePayload, UseResumeDataOptions } from "@/types";
+import { ResumeFormData } from "@/lib/schema-validations/resume.schema";
 
 const createApiError = (message: string, status?: number): ApiError => {
   const error = new Error(message) as ApiError;
@@ -56,7 +57,24 @@ export const useResumeData = (
   const isOptimisticUpdate = useRef(false);
 
   // Local optimistic state
-  const [resumeData, setResumeData] = useState(() => ({
+  const [resumeData, setResumeData] = useState<ResumeFormData>(() => ({
+    education: [],
+    workExperience: [],
+    certification: [],
+    project: [],
+    skills: [],
+    softSkill: [],
+    hardSkill: [],
+    summary: "",
+    personalDetails: {
+      fullName: "",
+      email: "",
+      phone: "",
+      address: "",
+      linkedIn: "",
+      github: "",
+      website: "",
+    },
     ...initialData,
   }));
 
@@ -67,7 +85,8 @@ export const useResumeData = (
         // Only update if data actually changed to prevent unnecessary re-renders
         const hasChanged = Object.keys(initialData).some(
           (key) =>
-            JSON.stringify(prev[key]) !== JSON.stringify(initialData[key])
+            JSON.stringify((prev as Record<string, unknown>)[key]) !==
+            JSON.stringify((initialData as Record<string, unknown>)[key])
         );
         return hasChanged ? { ...prev, ...initialData } : prev;
       });

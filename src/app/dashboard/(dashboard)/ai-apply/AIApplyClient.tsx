@@ -2,8 +2,6 @@
 import React, { useState } from "react";
 import { ProgressIndicator } from "./progress-indicator";
 import { ResumeGenerator } from "./components/resume/resume-generator";
-// import { EmailComposer } from "./components/email-composer";
-import { DisplayResumeEmailContent } from "./components/email/display-resume-emailcontent";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/use-auth";
 import { TemporaryEmailCompose } from "./components/email/TemporaryEmailCompose";
@@ -72,11 +70,7 @@ export const AIApplyClient = ({
           />
         )}
 
-        {/* <EmailComposer
-            handleStepChange={handleStepChange}
-            userProfile={user?.baseResume ?? ""}
-            jobDescription={jobDescription}
-          /> */}
+        
         {/* {activeStep === 3 && (
           <DisplayResumeEmailContent generatedData={generatedData} />
         )} */}
