@@ -2,6 +2,7 @@ import React from "react";
 import EditResumeTemplate from "../dashboard/(dashboard)/ai-apply/components/resume/EditResumeTemplate";
 import { getQueryClient } from "@/lib/query-client";
 import { apiService } from "@/hooks/use-auth";
+import JobAnalyzer from "./InterviewQuestion";
 
 
 const FormPage = async ({ searchParams }: any) => {
@@ -19,7 +20,7 @@ const FormPage = async ({ searchParams }: any) => {
 
   return (
     <div>
-      <EditResumeTemplate documentId={documentId} />
+      <JobAnalyzer documentId={documentId} />
     </div>
   );
 };
