@@ -1,3 +1,4 @@
+import { jsonrepair } from "jsonrepair";
 import { MouseEvent } from "react";
 
 export const smoothlyScrollToView = (
@@ -266,7 +267,10 @@ export const processProjects = (project: any) => {
   return [];
 };
 
-export const createCoverLetterOrderedParams = (docId: string, jobDesc: string) => {
+export const createCoverLetterOrderedParams = (
+  docId: string,
+  jobDesc: string
+) => {
   const params = new URLSearchParams();
   params.set("coverletterId", docId);
   params.set("jobDescription", jobDesc);
@@ -303,4 +307,128 @@ export const parseResponsibilities = (responsibilities: any): string[] => {
   }
 
   return [];
+};
+
+/**
+ * Sanitize content by removing markdown code blocks and other artifacts
+ */
+export const sanitizeJSONContent = (content: string): string => {
+  let sanitized = content.trim();
+
+  // Remove markdown code blocks (```json ... ``` or ``` ... ```)
+  sanitized = sanitized.replace(/^```(?:json)?\s*\n?/gm, "");
+  sanitized = sanitized.replace(/\n?```\s*$/gm, "");
+
+  // Remove leading/trailing backticks
+  sanitized = sanitized.replace(/^`+|`+$/g, "");
+
+  // Remove any BOM characters
+  sanitized = sanitized.replace(/^\uFEFF/, "");
+
+  return sanitized.trim();
+};
+
+/**
+ * Check if content looks like it might be incomplete JSON
+ */
+export const isLikelyIncompleteJSON = (content: string): boolean => {
+  const trimmed = content.trim();
+
+  if (!trimmed) return true;
+  if (!trimmed.startsWith("[") && !trimmed.startsWith("{")) return true;
+
+  // Count brackets/braces
+  const openBrackets = (trimmed.match(/\[/g) || []).length;
+  const closeBrackets = (trimmed.match(/\]/g) || []).length;
+  const openBraces = (trimmed.match(/\{/g) || []).length;
+  const closeBraces = (trimmed.match(/\}/g) || []).length;
+
+  return openBrackets !== closeBrackets || openBraces !== closeBraces;
+};
+
+/**
+ * Attempt to complete incomplete JSON arrays
+ */
+export const attemptJSONCompletion = (content: string): string => {
+  let completed = content.trim();
+
+  // If it starts with [ but doesn't end with ], try to close it
+  if (completed.startsWith("[") && !completed.endsWith("]")) {
+    // Remove trailing commas
+    completed = completed.replace(/,\s*$/, "");
+
+    // Count open braces in incomplete objects
+    const openBraces = (completed.match(/\{/g) || []).length;
+    const closeBraces = (completed.match(/\}/g) || []).length;
+
+    // Close any open objects
+    for (let i = 0; i < openBraces - closeBraces; i++) {
+      completed += "}";
+    }
+
+    // Close the array
+    completed += "]";
+  }
+
+  return completed;
+};
+
+export const parseJSONSafely = (
+  rawContent: string,
+  section: string,
+  isComplete: boolean = false
+): { success: boolean; data: any[]; shouldUpdate: boolean } => {
+  // Sanitize first
+  const content = sanitizeJSONContent(rawContent);
+
+  if (!content || content === "[]") {
+    return { success: true, data: [], shouldUpdate: false };
+  }
+
+  // Strategy 1: Native parse for valid JSON
+  try {
+    const parsed = JSON.parse(content);
+    const data = Array.isArray(parsed) ? parsed : [];
+    return { success: true, data, shouldUpdate: true };
+  } catch (nativeError) {
+    // Only log for completed sections
+    if (isComplete) {
+      console.debug(`[${section}] Native parse failed, attempting repair`);
+    }
+  }
+
+  // Strategy 2: For incomplete JSON during streaming, try to complete it
+  if (!isComplete && isLikelyIncompleteJSON(content)) {
+    try {
+      const completed = attemptJSONCompletion(content);
+      const parsed = JSON.parse(completed);
+      const data = Array.isArray(parsed) ? parsed : [];
+      return { success: true, data, shouldUpdate: data.length > 0 };
+    } catch (completionError) {
+      // Expected for very incomplete data, skip silently
+      return { success: false, data: [], shouldUpdate: false };
+    }
+  }
+
+  // Strategy 3: Use jsonrepair for malformed but mostly complete JSON
+  if (isComplete) {
+    try {
+      const repaired = jsonrepair(content);
+      const parsed = JSON.parse(repaired);
+      const data = Array.isArray(parsed) ? parsed : [];
+      console.log(`[${section}] Successfully repaired JSON`);
+      return { success: true, data, shouldUpdate: true };
+    } catch (repairError) {
+      console.error(
+        `[${section}] JSON repair failed:`,
+        repairError,
+        "\nContent:",
+        content.substring(0, 200)
+      );
+      return { success: false, data: [], shouldUpdate: false };
+    }
+  }
+
+  // For streaming content that can't be parsed yet
+  return { success: false, data: [], shouldUpdate: false };
 };

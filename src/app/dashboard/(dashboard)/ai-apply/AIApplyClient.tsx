@@ -4,7 +4,7 @@ import { ProgressIndicator } from "./progress-indicator";
 import { useRouter } from "next/navigation";
 import { TemporaryEmailCompose } from "./components/email/TemporaryEmailCompose";
 import { toast } from "sonner";
-import { ResumeGenerator } from "./components/resume/resume-generator";
+import { ResumeGenerator } from "./components/resume/ResumeGenerator";
 
 export const AIApplyClient = ({
   jobDescription,
@@ -25,7 +25,6 @@ export const AIApplyClient = ({
 
   console.count("AI APPLY CLIENT RENDERED");
 
-  // ✅ Memoize handleStepChange to prevent child re-renders
   const handleStepChange = useCallback(
     (step: number, key: "resume" | "emailContent", value: any) => {
       setActiveStep(step);
@@ -34,17 +33,10 @@ export const AIApplyClient = ({
     []
   );
 
-  // ✅ Move activeStep === 3 logic to useEffect
   useEffect(() => {
     if (activeStep === 3) {
       console.log("GENERATED DATA : ", generatedData);
       toast.success("Hurry! We've sent your application. Good luck!");
-      
-      // const timer = setTimeout(() => {
-      //   router.push("/dashboard/home");
-      // }, 5000);
-
-      // return () => clearTimeout(timer); // Cleanup
     }
   }, [activeStep, generatedData, router]);
 

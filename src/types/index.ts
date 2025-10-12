@@ -124,21 +124,6 @@ export interface ResumeSection {
   error?: string;
 }
 
-export interface StreamEvent {
-  type:
-    | "sectionStarted"
-    | "sectionContent"
-    | "sectionCompleted"
-    | "sectionError"
-    | "generationComplete"
-    | "error";
-  section?: string;
-  content?: string;
-  fullContent?: string;
-  error?: string;
-  sections?: Record<string, string>;
-  timestamp: string;
-}
 
 export const intialData = {
   profile: {
@@ -303,4 +288,38 @@ export interface UserProfile {
   lastLoginAt: string;
   isEmailVerified: boolean;
   customClaims?: Record<string, any>;
+}
+
+
+export type StreamData = {
+  documentId: string;
+} & ResumeFormData;
+
+export interface StreamEvent {
+  type:
+    | "sectionStarted"
+    | "sectionContent"
+    | "sectionCompleted"
+    | "generationComplete"
+    | "documentSaved"
+    | "documentSaveError"
+    | "sectionError"
+    | "error";
+  documentId: string;
+  section?: string;
+  content?: string;
+  fullContent?: string;
+  error?: string;
+}
+
+export interface RequestPayload {
+  user: Partial<IUser>;
+  jobDescription: string;
+}
+
+export interface UseResumeStreamReturn {
+  streamData: StreamData;
+  streamStatus: StreamStatus;
+  startStream: (user: Partial<IUser>, jobDescription: string) => Promise<void>;
+  stopStream: () => void;
 }

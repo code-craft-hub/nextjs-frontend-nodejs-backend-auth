@@ -54,11 +54,9 @@ export const ResumeGenerator = ({
     if (user && jobDescription && !documentId) {
       toast.promise(startStream(user, jobDescription), {
         loading: "Generating your tailored resume...",
-        success: (data) => {
+        success: ()=> {
           return {
-            message: `${JSON.stringify(data)} Resume generation complete!`,
-            description: "Cverai is thinking...",
-            // description: "Click the next button to edit your resume.",
+            message: `Resume generation complete!`,
           };
         },
         error: "Error",
