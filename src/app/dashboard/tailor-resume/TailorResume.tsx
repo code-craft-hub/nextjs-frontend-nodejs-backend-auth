@@ -65,29 +65,13 @@ export const TailorResume = ({
         streamData.documentId,
         oldDescription!
       );
-      router.replace(
-        `${frontendUrl}/dashboard/ai-apply?${orderedParams.toString()}`
+      router.push(
+        `${frontendUrl}/dashboard/tailor-resume?${orderedParams.toString()}`
       );
-      toast.success(
-        "Resume generation complete! Proceeding to next step in the next 5 seconds..."
-      );
-
-     
-
-      toast(`Pause and edit your resume`, {
-        cancel: {
-          label: "Edit Resume now.",
-          onClick: () => {
-            cancelTimeout();
-            toast(
-              "You paused the auto-proceed to next step. You can now edit your resume. click any section to edit."
-            );
-          },
-        },
+      toast.success("Resume generation complete! Click any section to edit.", {
+        duration: 8000,
       });
     }
-
-   
   }, [streamStatus.savedDocumentToDatabase]);
 
   const cancelTimeout = () => {

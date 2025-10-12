@@ -4,13 +4,9 @@ import { getQueryClient } from "@/lib/query-client";
 import { apiService } from "@/hooks/use-auth";
 import { COLLECTIONS } from "@/lib/utils/constants";
 const TailorCoverLetterPage = async ({ searchParams }: any) => {
-  const { jobDescription, documentId, coverletterId } = await searchParams;
+  const { jobDescription, coverletterId } = await searchParams;
   const queryClient = getQueryClient();
 
-  queryClient.prefetchQuery({
-    queryKey: ["auth", "careerDoc"],
-    queryFn: () => apiService.getCareerDoc(documentId, COLLECTIONS.RESUME),
-  });
   queryClient.prefetchQuery({
     queryKey: ["auth", "careerDoc"],
     queryFn: () =>
@@ -18,10 +14,13 @@ const TailorCoverLetterPage = async ({ searchParams }: any) => {
   });
   return (
     <div>
-      <TailorCoverLetter
-        jobDescription={jobDescription}
-        coverletterId={coverletterId}
-      />
+     
+      <div className="p-4 sm:p-8">
+        <TailorCoverLetter
+          jobDescription={jobDescription}
+          coverletterId={coverletterId}
+        />{" "}
+      </div>
     </div>
   );
 };

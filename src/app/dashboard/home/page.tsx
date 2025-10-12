@@ -1,16 +1,12 @@
-import { requireOnboarding } from '@/lib/server-auth';
-import type { Metadata } from 'next';
-import { DashboardClient } from '../new-dashboard';
+import { requireOnboarding } from "@/lib/server-auth";
+import type { Metadata } from "next";
+import { HomeClient } from "./Home.tsx";
 export const metadata: Metadata = {
-  title: 'Cverai Dashboard',
-  description: 'User dashboard',
+  title: "Cverai Dashboard",
+  description: "User dashboard",
 };
 
-export default async function DashboardPage() {
+export default async function HomePage() {
   const session = await requireOnboarding();
-    return (
-    <DashboardClient 
-      initialUser={session}
-    />
-  );
+  return <HomeClient initialUser={session} />;
 }

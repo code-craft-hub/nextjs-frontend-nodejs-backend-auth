@@ -8,6 +8,8 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { capitalize } from "lodash";
+import { cn } from "@/lib/utils";
 
 // Define your route mapping
 const routeMap: Record<string, string> = {
@@ -39,16 +41,16 @@ export const DynamicBreadcrumb = () => {
           const isLast = index === pathSegments.length - 1;
           return (
             <div key={href} className="flex items-center hover:cursor-pointer">
-              <BreadcrumbItem className={index > 0 ? "hidden md:block" : ""}>
+              <BreadcrumbItem className={cn(index > 0 ? "hidden md:block" : "", "")}>
                 {isLast ? (
-                  <BreadcrumbPage>{title?.replace(/-/ig, " ")}</BreadcrumbPage>
+                  <BreadcrumbLink>{capitalize(title?.replace(/-/ig, " "))}</BreadcrumbLink>
                 ) : (
-                  <BreadcrumbLink onClick={() => handleNavigate(href)}>
-                    {title?.replace(/-/ig, " ")}
-                  </BreadcrumbLink>
+                  <BreadcrumbPage onClick={() => handleNavigate(href)}>
+                    {capitalize(title?.replace(/-/ig, " "))}
+                  </BreadcrumbPage>
                 )}
               </BreadcrumbItem>
-              {!isLast && <BreadcrumbSeparator className="hidden md:block" />}
+              {!isLast && <BreadcrumbSeparator className="hidden md:block mt-0.5" />}
             </div>
           );
         })}

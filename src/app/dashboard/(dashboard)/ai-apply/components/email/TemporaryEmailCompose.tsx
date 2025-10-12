@@ -49,8 +49,6 @@ export const TemporaryEmailCompose = memo<{
         success: () => {
           return {
             message: "Cover letter generation complete!",
-            description: "Cverai is thinking...",
-            closeButton: true,
           };
         },
         error: "Failed to generate cover letter",

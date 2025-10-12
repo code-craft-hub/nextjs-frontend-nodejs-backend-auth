@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useRef, useEffect, memo } from "react";
 import { Loader2 } from "lucide-react";
 import { useCoverLetterGenerator } from "@/hooks/useCoverLetterGenerator";
@@ -7,6 +9,7 @@ import { createCoverLetterOrderedParams } from "@/lib/utils/helpers";
 import { toast } from "sonner";
 import { isEmpty } from "lodash";
 import { COLLECTIONS } from "@/lib/utils/constants";
+import { Card } from "@/components/ui/card";
 
 export const TailorCoverLetter = memo<{
   jobDescription: string;
@@ -44,8 +47,6 @@ export const TailorCoverLetter = memo<{
         success: () => {
           return {
             message: "Cover letter generation complete!",
-            description: "Cverai is thinking...",
-            closeButton: true,
           };
         },
         error: "Failed to generate cover letter",
@@ -87,16 +88,16 @@ export const TailorCoverLetter = memo<{
     : generatedContent;
 
   return (
-    <div className="grid grid-cols-1">
-      <div className="bg-slate-50 border-b border-slate-200 shadow-md rounded-xl flex flex-col items-center justify-between">
+    <Card className="grid grid-cols-1 p-0">
+      <div className="bg-slate-50 border-b  border-slate-200 shadow-md rounded-xl flex flex-col items-center justify-between">
         <div className="flex w-full gap-3 items-center p-4">
           <div className="flex gap-1.5">
             <div className="w-3 h-3 rounded-full bg-red-400"></div>
             <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
             <div className="w-3 h-3 rounded-full bg-green-400"></div>
           </div>
-          <span className="text-sm font-medium text-slate-500">
-            Email content
+          <span className="text-xl font-medium text-slate-500">
+            Tailor Cover Letter
           </span>
         </div>
 
@@ -119,22 +120,14 @@ export const TailorCoverLetter = memo<{
           )}
         </div>
 
-        {generatedContent && (
-          <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-100">
-            <p className="text-sm text-blue-800">
-              <strong>Tip:</strong> Review and customize the generated content
-              before sending. Add personal touches to make it uniquely yours!
-            </p>
-          </div>
-        )}
-
+       
         {error && (
           <div className="text-red-500 p-4 shadow-xl w-full">
             Error: {JSON.stringify(error)}
           </div>
         )}
       </div>
-    </div>
+    </Card>
   );
 });
 

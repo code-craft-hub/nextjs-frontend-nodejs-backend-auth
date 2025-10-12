@@ -58,6 +58,7 @@ export function normalizeToString(input: any): string {
     return "";
   }
 
+
   // If input is already a string, try to parse it as JSON
   if (typeof input === "string") {
     // Return as-is if it's already plain text (not JSON)

@@ -23,7 +23,7 @@ const SectionWrapper = memo(
   ({ children, show }: { children: React.ReactNode; show?: boolean }) => {
     if (!show) return null;
     return (
-      <div className="bg-white p-4 hover:cursor-pointer hover:shadow-2xl shadow-blue-200 !rounded-2xl duration-700 relative">
+      <div className="bg-white p-4 hover:cursor-pointer hover:shadow-sm shadow-blue-200 !rounded-2xl duration-700 relative">
         <Edit className="absolute top-3 right-3 size-3.5 text-gray-300" />
         {children}
       </div>
@@ -97,7 +97,7 @@ export const EditableResume: React.FC<PreviewResumeProps> = ({
     >
       <EditDialog
         trigger={
-          <SectionWrapper show={true}>
+          <SectionWrapper show={!!fullName || isStreaming}>
             <header className="text-center">
               <h1 className="text-4xl font-bold font-merriweather">
                 {fullName ||
@@ -136,7 +136,7 @@ export const EditableResume: React.FC<PreviewResumeProps> = ({
               </h2>
               {hasProfile ? (
                 <p className="leading-relaxed font-merriweather whitespace-pre-wrap">
-                  {profile}
+                  {normalizeToString(profile)}
                 </p>
               ) : isStreaming ? (
                 <div className="space-y-2">
