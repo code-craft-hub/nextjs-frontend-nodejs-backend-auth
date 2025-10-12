@@ -71,9 +71,9 @@ export const apiService = {
     }
   },
 
-  getCareerDoc: async <T>(documentId: string): Promise<T> => {
+  getCareerDoc: async <T>(documentId: string, collection: string): Promise<T> => {
     try {
-      const { data } = await authClient.get(`/career-doc/${documentId}`);
+      const { data } = await authClient.get(`/career-doc/${documentId}?collection=${collection}`);
       console.log("Career Docs", data);
       return data.data;
     } catch (error: any) {
@@ -142,12 +142,12 @@ export function useAuth(initialUser?: Partial<IUser>) {
     initialData: initialUser || undefined,
   });
 
-  const useCareerDoc = <T>(documentId?: string) => {
+  const useCareerDoc = <T>(documentId: string, collection: string) => {
     return useQuery({
       queryKey: ["auth", "careerDoc", documentId],
       queryFn: async () => {
         if (!documentId) throw new Error("No documentId provided");
-        return apiService.getCareerDoc<T>(documentId);
+        return apiService.getCareerDoc<T>(documentId, collection);
       },
       enabled: !!documentId, // Only runs when documentId is truthy
     });

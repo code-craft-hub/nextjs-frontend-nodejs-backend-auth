@@ -3,13 +3,14 @@ import { useResumeData } from "@/hooks/use-resume-data";
 import { ResumePreview } from "./form/ResumePreview";
 import { useAuth } from "@/hooks/use-auth";
 import { Resume } from "@/types";
+import { COLLECTIONS } from "@/lib/utils/constants";
 
 const EditResumeTemplate: React.FC<{ documentId: string }> = ({
   documentId,
 }) => {
 
   const {user, useCareerDoc} = useAuth();
-  const { data } = useCareerDoc<Resume>(documentId);
+  const { data } = useCareerDoc<Resume>(documentId,COLLECTIONS.RESUME);
 
   const { 
     resumeData, 

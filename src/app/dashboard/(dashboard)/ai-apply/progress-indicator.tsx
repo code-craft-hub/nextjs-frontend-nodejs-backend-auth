@@ -36,13 +36,26 @@ const ProgressIcon = ({ progress }: { progress: number }) => (
   </svg>
 );
 
-export const ProgressIndicator = ({ activeStep, setActiveStep }: { activeStep: number, setActiveStep: (step: number) => void}) => {
+export const ProgressIndicator = ({
+  activeStep,
+  setActiveStep,
+}: {
+  activeStep: number;
+  setActiveStep: (step: number) => void;
+}) => {
   const stages = [
     "Job Description Captured",
     "Email Drafted",
     "CV Tailored",
     "Application Sent",
   ];
+
+  const handleSetActiveStep = (step: number) => {
+    if (step <= activeStep) {
+      if (step === 0) return;
+      setActiveStep(step);
+    }
+  };
 
   return (
     <div className="">
@@ -62,7 +75,7 @@ export const ProgressIndicator = ({ activeStep, setActiveStep }: { activeStep: n
             className="flex flex-row items-center justify-evenly z-10 w-full"
           >
             <motion.button
-              onClick={() => setActiveStep(i)}
+              onClick={() => handleSetActiveStep(i)}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -76,7 +89,7 @@ export const ProgressIndicator = ({ activeStep, setActiveStep }: { activeStep: n
         {stages.map((label, i) => (
           <div
             key={i}
-            onClick={() => setActiveStep(i)}
+            onClick={() => handleSetActiveStep(i)}
             className="flex flex-row items-center justify-evenly z-10 w-full"
           >
             <span

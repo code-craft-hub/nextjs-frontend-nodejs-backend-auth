@@ -47,9 +47,9 @@ export const EditableResume: React.FC<PreviewResumeProps> = ({
 
   const initialData = {
     firstName: data.contact?.firstName ?? user?.firstName ?? "",
-    lastName: data.contact?.lastName ?? user?.lastName ??  "",
-    email: data.contact?.email ?? user?.email ??  "",
-    phoneNumber: data.contact?.phoneNumber ?? user?.phoneNumber ??  "",
+    lastName: data.contact?.lastName ?? user?.lastName ?? "",
+    email: data.contact?.email ?? user?.email ?? "",
+    phoneNumber: data.contact?.phoneNumber ?? user?.phoneNumber ?? "",
     address: data.contact?.address ?? user?.address ?? "",
     portfolio: data.contact?.portfolio ?? "",
   };
@@ -94,7 +94,6 @@ export const EditableResume: React.FC<PreviewResumeProps> = ({
       className={cn(
         "max-w-screen-lg p-4 sm:px-5 text-gray-800 font-merriweather py-16 relative"
       )}
-      ref={contentRef}
     >
       <EditDialog
         trigger={
@@ -509,6 +508,7 @@ export const EditableResume: React.FC<PreviewResumeProps> = ({
           )}
         </section>
       </SectionWrapper>
+      <div ref={contentRef} />
     </Card>
   );
 };

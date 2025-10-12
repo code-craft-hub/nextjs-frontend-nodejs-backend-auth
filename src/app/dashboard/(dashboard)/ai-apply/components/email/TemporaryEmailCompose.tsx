@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, memo } from "react";
 import { Loader2 } from "lucide-react";
 import { useCoverLetterGenerator } from "@/hooks/useCoverLetterGenerator";
 import { useAuth } from "@/hooks/use-auth";
@@ -6,17 +6,19 @@ import { usePathname, useRouter } from "next/navigation";
 import { createCoverLetterOrderedParams } from "@/lib/utils/helpers";
 import { toast } from "sonner";
 import { isEmpty } from "lodash";
+import { COLLECTIONS } from "@/lib/utils/constants";
 
-export const TemporaryEmailCompose: React.FC<{
+export const TemporaryEmailCompose = memo<{
   handleStepChange: (
     step: number,
     key: "resume" | "emailContent",
     value: any
   ) => void;
-  userProfile: string;
   jobDescription: string;
   coverletterId: string;
-}> = ({ handleStepChange, userProfile, jobDescription, coverletterId }) => {
+}>(({ handleStepChange, jobDescription, coverletterId }) => {
+  console.count("TEMP EMAIL COMPOSE RENDERED");
+
   const {
     generatedContent,
     isGenerating,
@@ -26,60 +28,73 @@ export const TemporaryEmailCompose: React.FC<{
   } = useCoverLetterGenerator();
 
   const contentRef = useRef<HTMLDivElement>(null);
+  const hasGeneratedRef = useRef(false); // Track if we've already generated
+  const hasUpdatedRouteRef = useRef(false); // Track if we've updated the route
 
-  console.log("Document ID:", coverletterId, documentId);
-
-  const { useCareerDoc } = useAuth();
+  const { user, useCareerDoc } = useAuth();
   const { data } = useCareerDoc<{ coverLetter: string }>(
-    coverletterId ?? documentId
+    coverletterId ?? documentId,
+    COLLECTIONS.COVER_LETTER
   );
   const router = useRouter();
   const pathname = usePathname();
-  console.log("Current Pathname:", pathname);
 
+  // ✅ Generate cover letter only once when component mounts
   useEffect(() => {
-    console.log("Render phase", userProfile, jobDescription, coverletterId);
+    if (user && jobDescription && !coverletterId && !hasGeneratedRef.current) {
+      hasGeneratedRef.current = true;
 
-    if (userProfile && jobDescription && !coverletterId) {
-      toast.promise(generateCoverLetter({ userProfile, jobDescription }), {
+      toast.promise(generateCoverLetter({ user, jobDescription }), {
         loading: "Generating your tailored cover letter...",
-        success: (data) => {
+        success: () => {
           return {
-            message: `${JSON.stringify(
-              data
-            )} Cover letter generation complete!`,
+            message: "Cover letter generation complete!",
             description: "Cverai is thinking...",
-            // description: "Resume generation is starting now.",
             closeButton: true,
           };
         },
-        error: "Error",
+        error: "Failed to generate cover letter",
       });
     }
-  }, []);
+  }, [user, jobDescription, coverletterId, generateCoverLetter]);
 
+  // ✅ Update route and trigger step change only once when documentId is available
   useEffect(() => {
-    if (!documentId) return;
+    if (!documentId || hasUpdatedRouteRef.current) return;
+
+    hasUpdatedRouteRef.current = true;
+
     const orderedParams = createCoverLetterOrderedParams(
       documentId,
       jobDescription
     );
     router.replace(`${pathname}?${orderedParams.toString()}`);
 
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       handleStepChange(2, "emailContent", generatedContent);
     }, 5000);
-  }, [documentId]);
 
+    return () => clearTimeout(timer);
+  }, [
+    documentId,
+    jobDescription,
+    pathname,
+    router,
+    handleStepChange,
+    generatedContent,
+  ]);
+
+  // ✅ Auto-scroll to bottom when content changes
   useEffect(() => {
-    if (contentRef.current) {
+    if (contentRef.current && generatedContent) {
       contentRef.current.scrollTop = contentRef.current.scrollHeight;
     }
   }, [generatedContent]);
 
   const isGeneratedEmpty = isEmpty(generatedContent);
-
-  console.log("Generating : ", generatedContent, isGenerating, error);
+  const displayContent = isGeneratedEmpty
+    ? data?.coverLetter
+    : generatedContent;
 
   return (
     <div className="grid grid-cols-1">
@@ -94,24 +109,26 @@ export const TemporaryEmailCompose: React.FC<{
             Email content
           </span>
         </div>
+
         <div
           ref={contentRef}
           className="bg-white p-4 h-[500px] overflow-y-auto w-full"
         >
-          {isGenerating && !generatedContent && (
+          {isGenerating && !generatedContent ? (
             <div className="flex flex-col items-center justify-center h-full text-gray-400">
               <Loader2 className="w-12 h-12 animate-spin mb-4" />
               <p className="text-sm">Generating your cover letter...</p>
             </div>
+          ) : (
+            <div className="whitespace-pre-wrap text-gray-800 leading-relaxed font-mono text-sm">
+              {displayContent}
+              {isGenerating && (
+                <span className="inline-block w-2 h-5 bg-blue-600 ml-1 animate-pulse"></span>
+              )}
+            </div>
           )}
-
-          <div className="whitespace-pre-wrap text-gray-800 leading-relaxed font-mono text-sm">
-            {isGeneratedEmpty ? data?.coverLetter : generatedContent}
-            {isGenerating && (
-              <span className="inline-block w-2 h-5 bg-blue-600 ml-1 animate-pulse"></span>
-            )}
-          </div>
         </div>
+
         {generatedContent && (
           <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-100">
             <p className="text-sm text-blue-800">
@@ -123,10 +140,12 @@ export const TemporaryEmailCompose: React.FC<{
 
         {error && (
           <div className="text-red-500 p-4 shadow-xl w-full">
-            {JSON.stringify(error)}
+            Error: {JSON.stringify(error)}
           </div>
         )}
       </div>
     </div>
   );
-};
+});
+
+TemporaryEmailCompose.displayName = "TemporaryEmailCompose";

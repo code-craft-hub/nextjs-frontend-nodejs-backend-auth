@@ -33,3 +33,11 @@ export const onBoardingTabs = [
 ];
 
 export type TOnboardingTab = (typeof onBoardingTabs)[number];
+
+export const COLLECTIONS = {
+  USERS: "users",
+  RESUME: "resume",
+  COVER_LETTER: "cover_letter",
+  JOB_APPLICATION: "job_application",
+  INTERVIEW_QUESTION: "interview_question",
+};

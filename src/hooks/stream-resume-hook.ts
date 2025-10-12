@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { jsonrepair } from "jsonrepair";
-import { StreamStatus } from "@/types";
+import { IUser, StreamStatus } from "@/types";
 import { ResumeFormData } from "@/lib/schema-validations/resume.schema";
 
 type StreamData = {
@@ -25,14 +25,14 @@ interface StreamEvent {
 }
 
 interface RequestPayload {
-  userProfile: string;
+  user: Partial<IUser>;
   jobDescription: string;
 }
 
 interface UseResumeStreamReturn {
   streamData: StreamData;
   streamStatus: StreamStatus;
-  startStream: (userProfile: string, jobDescription: string) => Promise<void>;
+  startStream: (user: Partial<IUser>, jobDescription: string) => Promise<void>;
   stopStream: () => void;
 }
 
@@ -337,7 +337,7 @@ export const useResumeStream = (endpoint: string): UseResumeStreamReturn => {
    * Start streaming with proper lifecycle management
    */
   const startStream = useCallback(
-    async (userProfile: string, jobDescription: string): Promise<void> => {
+    async (user: Partial<IUser>, jobDescription: string): Promise<void> => {
       try {
         // Cleanup existing connections
         if (abortControllerRef.current) {
@@ -377,7 +377,7 @@ export const useResumeStream = (endpoint: string): UseResumeStreamReturn => {
             "Cache-Control": "no-cache",
           },
           body: JSON.stringify({
-            userProfile,
+            user,
             jobDescription,
           } as RequestPayload),
           signal: abortControllerRef.current.signal,

@@ -84,7 +84,7 @@ export const AIApplyInput = memo(() => {
                   <FormControl>
                     <textarea
                       placeholder="Let's get started"
-                      className="w-full outline-none focus:outline-none focus:border-none p-2 resize-none pl-4 pt-2 border-none placeholder:font-medium focus-visible:border-none h-26  z-50"
+                      className="w-full outline-none focus:outline-none focus:border-none p-2 resize-none pl-4 pt-2 border-none placeholder:font-medium focus-visible:border-none h-26 text-xs z-50"
                       {...field}
                     />
                   </FormControl>

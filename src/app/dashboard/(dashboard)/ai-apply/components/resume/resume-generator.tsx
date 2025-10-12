@@ -8,10 +8,10 @@ import { EditableResume } from "./EditableResume";
 import { useResumeData } from "@/hooks/use-resume-data";
 import { Resume } from "@/types";
 import { createResumeOrderedParams } from "@/lib/utils/helpers";
+import { COLLECTIONS } from "@/lib/utils/constants";
 
 export const ResumeGenerator = ({
   handleStepChange,
-  userProfile,
   jobDescription,
   documentId,
 }: {
@@ -20,12 +20,11 @@ export const ResumeGenerator = ({
     key: "resume" | "emailContent",
     value: any
   ) => void;
-  userProfile: string;
   jobDescription: string;
   documentId: string;
 }) => {
-  const { useCareerDoc } = useAuth();
-  const { data } = useCareerDoc<Resume>(documentId);
+  const { user, useCareerDoc } = useAuth();
+  const { data } = useCareerDoc<Resume>(documentId, COLLECTIONS.RESUME);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const { resumeData, updateField } = useResumeData(data || {}, {
@@ -52,8 +51,8 @@ export const ResumeGenerator = ({
   const oldDescription = params.get("jobDescription");
 
   useEffect(() => {
-    if (userProfile && jobDescription && !documentId) {
-      toast.promise(startStream(userProfile, jobDescription), {
+    if (user && jobDescription && !documentId) {
+      toast.promise(startStream(user, jobDescription), {
         loading: "Generating your tailored resume...",
         success: (data) => {
           return {
@@ -65,13 +64,18 @@ export const ResumeGenerator = ({
         error: "Error",
       });
     }
-  }, [userProfile, jobDescription]);
+  }, [user, jobDescription]);
 
   useEffect(() => {
     console.log(streamStatus);
     if (streamStatus.savedDocumentToDatabase) {
-      const orderedParams = createResumeOrderedParams(streamData.documentId, oldDescription!);
-      router.replace(`${frontendUrl}/dashboard/ai-apply?${orderedParams.toString()}`);
+      const orderedParams = createResumeOrderedParams(
+        streamData.documentId,
+        oldDescription!
+      );
+      router.replace(
+        `${frontendUrl}/dashboard/ai-apply?${orderedParams.toString()}`
+      );
       toast.success(
         "Resume generation complete! Proceeding to next step in the next 5 seconds..."
       );
