@@ -1,12 +1,111 @@
 "use client";
-import React from 'react'
+import React, { useEffect, useRef, useState } from "react";
+import { useResumeStream } from "@/hooks/stream-resume-hook";
+import { toast } from "sonner";
+import { useSearchParams, useRouter } from "next/navigation";
+import { useAuth } from "@/hooks/use-auth";
+import { useResumeData } from "@/hooks/use-resume-data";
+import { Resume } from "@/types";
+import { createResumeOrderedParams } from "@/lib/utils/helpers";
+import { COLLECTIONS } from "@/lib/utils/constants";
+import { EditableResume } from "../(dashboard)/ai-apply/components/resume/EditableResume";
 
-const TailorResume = () => {
+export const TailorResume = ({
+  jobDescription,
+  documentId,
+}: {
+  jobDescription: string;
+  documentId: string;
+}) => {
+  const { user, useCareerDoc } = useAuth();
+  const { data } = useCareerDoc<Resume>(documentId, COLLECTIONS.RESUME);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const { resumeData, updateField } = useResumeData(data || {}, {
+    documentId,
+    onSuccess: (field) => {
+      console.log(`✓ Successfully updated ${field}`);
+    },
+    onError: (error, field) => {
+      console.error(`✗ Failed to update ${field}:`, error);
+    },
+  });
+
+  const [pause, setPause] = useState(true);
+
+  const router = useRouter();
+  const backendUrl = process.env.NEXT_PUBLIC_AUTH_API_URL;
+  const frontendUrl = process.env.NEXT_PUBLIC_APP_URL;
+
+  const { streamData, streamStatus, startStream } = useResumeStream(
+    backendUrl + "/new-resume-generation"
+  );
+  const searchParams = useSearchParams();
+  const params = new URLSearchParams(searchParams.toString());
+  const oldDescription = params.get("jobDescription");
+
+  useEffect(() => {
+    if (user && jobDescription && !documentId) {
+      toast.promise(startStream(user, jobDescription), {
+        loading: "Generating your tailored resume...",
+        success: () => {
+          return {
+            message: `Resume generation complete!`,
+          };
+        },
+        error: "Error",
+      });
+    }
+  }, [user, jobDescription]);
+
+  useEffect(() => {
+    console.log(streamStatus);
+    if (streamStatus.savedDocumentToDatabase) {
+      const orderedParams = createResumeOrderedParams(
+        streamData.documentId,
+        oldDescription!
+      );
+      router.replace(
+        `${frontendUrl}/dashboard/ai-apply?${orderedParams.toString()}`
+      );
+      toast.success(
+        "Resume generation complete! Proceeding to next step in the next 5 seconds..."
+      );
+
+     
+
+      toast(`Pause and edit your resume`, {
+        cancel: {
+          label: "Edit Resume now.",
+          onClick: () => {
+            cancelTimeout();
+            toast(
+              "You paused the auto-proceed to next step. You can now edit your resume. click any section to edit."
+            );
+          },
+        },
+      });
+    }
+
+   
+  }, [streamStatus.savedDocumentToDatabase]);
+
+  const cancelTimeout = () => {
+    if (timeoutRef.current) {
+      setPause(true);
+      clearTimeout(timeoutRef.current);
+    }
+  };
+
+  const shouldUseDbData = streamData.profile === "";
   return (
-    <div>
-      TailorResume
+    <div className="">
+      <EditableResume
+        data={shouldUseDbData ? resumeData : streamData}
+        cancelTimeout={cancelTimeout}
+        pause={pause}
+        onUpdate={updateField}
+      />
     </div>
-  )
-}
-
-export default TailorResume
+  );
+};

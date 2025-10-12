@@ -1,27 +1,28 @@
 import React from "react";
 import { TailorInterviewQuestion } from "./TailorInterviewQuestion";
 
+import { getQueryClient } from "@/lib/query-client";
+import { apiService } from "@/hooks/use-auth";
+import { COLLECTIONS } from "@/lib/utils/constants";
 const TailorInterviewQuestionPage = async ({ searchParams }: any) => {
-  const { jobDescription, documentId, coverletterId } = await searchParams;
+  const { jobDescription, interviewQuestionId } = await searchParams;
 
-  console.log("TailorInterviewQuestionPage server :", jobDescription, documentId, coverletterId);
-  // const queryClient = getQueryClient();
+  const queryClient = getQueryClient();
 
-  // queryClient.prefetchQuery({
-  //   queryKey: ["auth", "careerDoc"],
-  //   queryFn: () => apiService.getCareerDoc(documentId),
-  // });
-  // queryClient.prefetchQuery({
-  //   queryKey: ["auth", "careerDoc"],
-  //   queryFn: () => apiService.getCareerDoc(coverletterId),
-  // });
+  queryClient.prefetchQuery({
+    queryKey: ["auth", "careerDoc"],
+    queryFn: () =>
+      apiService.getCareerDoc(
+        interviewQuestionId,
+        COLLECTIONS.INTERVIEW_QUESTION
+      ),
+  });
 
   return (
     <div>
       <TailorInterviewQuestion
         jobDescription={jobDescription}
-        documentId={documentId}
-        coverletterId={coverletterId}
+        interviewQuestionId={interviewQuestionId}
       />
     </div>
   );

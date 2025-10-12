@@ -1,9 +1,11 @@
 "use client";
-import { HelpCircle, CheckCircle, Loader2 } from "lucide-react";
+import { HelpCircle, CheckCircle } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { jsonrepair } from "jsonrepair";
 import { toast } from "sonner";
 import { useConfettiStore } from "@/hooks/useConfetti-store";
+import { useAuth } from "@/hooks/use-auth";
+import { COLLECTIONS } from "@/lib/utils/constants";
 
 interface QAItem {
   question: string;
@@ -12,18 +14,19 @@ interface QAItem {
 
 export const TailorInterviewQuestion = ({
   jobDescription,
-  documentId,
-  coverletterId,
+  interviewQuestionId
 }: {
   jobDescription: string;
-  documentId: string;
-  coverletterId: string;
+  interviewQuestionId: string;
 }) => {
   // const [jobDescription, setJobDescription] = useState<string>("");
   const [qaData, setQaData] = useState<QAItem[]>([]);
-  const [interviewQuestion, setInterviewQuestion] = useState("");
+  const { user, useCareerDoc } = useAuth();
+  const { data } = useCareerDoc<{ coverLetter: string }>(
+    interviewQuestionId,
+    COLLECTIONS.INTERVIEW_QUESTION
+  );
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
-  const [error, setError] = useState<string>("");
   const resultsEndRef = useRef<HTMLDivElement>(null);
   const confetti = useConfettiStore();
 
@@ -150,12 +153,11 @@ Example output format:
 
   const handleSubmit = async () => {
     if (!jobDescription.trim()) {
-      setError("Please enter a job description");
+      toast.error("Please enter a job description");
       return;
     }
 
     setIsGenerating(true);
-    setError("");
     setQaData([]);
 
     try {
@@ -170,6 +172,7 @@ Example output format:
             jobDescription,
             prompt: prompt.replace("{jobDescription}", jobDescription),
             systemMessage,
+            user
           }),
         }
       );
@@ -241,7 +244,7 @@ Example output format:
                   buffer = remainder;
                 }
               } else if (parsed.error) {
-                setError(parsed.error);
+                toast.error(parsed.error);
               }
             } catch (e) {
               // Skip invalid JSON in SSE data
@@ -251,7 +254,7 @@ Example output format:
       }
     } catch (error) {
       console.error("Error fetching interview questions:", error);
-      setError(
+      toast.error(
         error instanceof Error
           ? error.message
           : "Failed to generate questions. Please try again."
@@ -261,6 +264,8 @@ Example output format:
     }
   };
 
+
+
   return (
     <div className="min-h-screen h-full p-8">
       <div className="max-w-5xl mx-auto">
@@ -269,15 +274,15 @@ Example output format:
             Job Interview Questions & Answers
           </h1>
         </div>
-        {qaData.length > 0 ? (
+        {(qaData ?? data).length > 0 ? (
           <div className="space-y-6">
             <div className="flex items-center justify-between mb-4">
               <span className="bg-blue-100 text-blue-800 px-4 py-2 rounded-full font-semibold">
-                {qaData.length} {qaData.length === 1 ? "Question" : "Questions"}
+                {(qaData ?? data).length} {(qaData ?? data).length === 1 ? "Question" : "Questions"}
               </span>
             </div>
 
-            {qaData.map((item, index) => (
+            {(qaData ?? data).map((item, index) => (
               <div
                 key={index}
                 className="bg-white rounded-2xl shadow-lg overflow-hidden border border-slate-200 hover:shadow-xl transition-shadow duration-300"
@@ -337,6 +342,7 @@ Example output format:
             </div>
           </div>
         )}
+
       </div>
     </div>
   );
