@@ -135,7 +135,7 @@ export const formatStreamContent = (content: string): string => {
   if (!content) return "";
 
   // Add spacing for better readability
-  let formatted = content
+  const formatted = content
     // Headers
     .replace(/^(#{1,6})\s+(.+)$/gm, "$1 $2\n")
     // Code blocks
