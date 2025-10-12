@@ -1,19 +1,19 @@
 "use client";
 import { AnimatePresence } from "framer-motion";
 import { useState } from "react";
-import { OnBoardingForm0 } from "./components/OnBoardingForm0";
-import { OnBoardingForm1 } from "./components/OnBoardingForm1";
-import { OnBoardingForm2 } from "./components/OnBoardingForm2";
-import { OnBoardingForm3 } from "./components/OnBoardingForm3";
-import { OnBoardingForm4 } from "./components/OnBoardingForm4";
-import { OnBoardingForm5 } from "./components/OnBoardingForm5";
 import { IUser } from "@/types";
 import { apiService } from "@/hooks/use-auth";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
-import { OnBoardingForm6 } from "./components/OnBoardingForm6";
-import { OnBoardingForm7 } from "./components/OnBoardingForm7";
+import { OnBoardingForm0 } from "./onboarding-pages/OnBoardingForm0";
+import { OnBoardingForm1 } from "./onboarding-pages/OnBoardingForm1";
+import { OnBoardingForm2 } from "./onboarding-pages/OnBoardingForm2";
+import { OnBoardingForm3 } from "./onboarding-pages/OnBoardingForm3";
+import { OnBoardingForm4 } from "./onboarding-pages/OnBoardingForm4";
+import { OnBoardingForm5 } from "./onboarding-pages/OnBoardingForm5";
+import { OnBoardingForm6 } from "./onboarding-pages/OnBoardingForm6";
+import { OnBoardingForm7 } from "./onboarding-pages/OnBoardingForm7";
 // import { DocumentTextExtractor } from "./components/AnyFormatToText";
 // import { AnyFormatToTextTalksToBackend } from "./components/AnyFormatToTextTalksToBackend";
 
