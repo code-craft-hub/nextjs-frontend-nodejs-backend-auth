@@ -29,6 +29,7 @@ import { SelectOptions } from "../../components/SelectOptions";
 import LockIcon from "@/components/icons/LockIcon";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
+import { emailRegex } from "@/validation";
 
 const FORM_SCHEMA = z.object({
   jobDescription: z.string().min(2, {
@@ -58,9 +59,17 @@ export const AIJobCustomizationInput = memo(() => {
   });
 
   const onSubmit = ({ jobDescription }: z.infer<typeof FORM_SCHEMA>) => {
-    toast.success(docsInput);
+    const foundEmails = jobDescription.match(emailRegex) || [];
 
-    router.push(`/dashboard/${docsInput}?dataSource=${dataSource}&profile=${userProfile}&jobDescription=${jobDescription}`);
+    if (foundEmails.length === 0) {
+      toast.error(
+        "No destination email found in job description. Please include the destination email in the job description."
+      );
+      return;
+    }
+    router.push(
+      `/dashboard/${docsInput}?dataSource=${dataSource}&profile=${userProfile}&jobDescription=${jobDescription}&destinationEmail=${foundEmails[0]}`
+    );
   };
 
   const profiles = [

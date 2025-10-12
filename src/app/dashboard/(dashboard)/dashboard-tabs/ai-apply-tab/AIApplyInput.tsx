@@ -12,7 +12,7 @@ import {
 import { memo, useCallback } from "react";
 import { toast } from "sonner";
 
-import { zodResolver } from "@hookform/resolvers/zod";
+// import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import {
@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/form";
 import { PROFILE_OPTIONS } from "../../components/constants";
 import { useRouter } from "next/navigation";
+import { emailRegex } from "@/validation";
 
 const FORM_SCHEMA = z.object({
   jobDescription: z.string().min(2, {
@@ -31,26 +32,36 @@ const FORM_SCHEMA = z.object({
   }),
 });
 
+
 export const AIApplyInput = memo(() => {
   const router = useRouter();
 
   const form = useForm<z.infer<typeof FORM_SCHEMA>>({
-    resolver: zodResolver(FORM_SCHEMA),
+    // resolver: zodResolver(FORM_SCHEMA),
     defaultValues: {
       jobDescription: "",
     },
   });
   const onSubmit = useCallback(
     ({ jobDescription }: z.infer<typeof FORM_SCHEMA>) => {
+      const foundEmails = jobDescription.match(emailRegex) || [];
+
+      if (foundEmails.length === 0) {
+        toast.error(
+          "No destination email found in job description. Please include the destination email in the job description."
+        );
+        return;
+      }
       const params = new URLSearchParams();
       params.set("jobDescription", JSON.stringify(jobDescription));
+      params.set("destinationEmail", JSON.stringify(foundEmails[0]));
       localStorage?.removeItem("hasResumeAPICalled");
       router.push(`/dashboard/ai-apply?${params}`);
     },
     []
   );
 
-  // 
+  //
   return (
     <div className="!relative h-36">
       <DropdownMenu>

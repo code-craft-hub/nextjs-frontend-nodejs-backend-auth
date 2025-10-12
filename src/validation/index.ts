@@ -71,4 +71,5 @@ export const profileDetails = z.object({
     .min(3, { message: "profile field requires a minimum of 3 characters" }),
 });
 
+export const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
 
