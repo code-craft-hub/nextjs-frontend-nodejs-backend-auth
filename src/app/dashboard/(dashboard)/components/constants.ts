@@ -20,7 +20,7 @@ export type ActionValue =
   | "upload-photo"
   | "tailor-resume"
   | "tailor-cover-letter"
-  | "generate-interview-questions";
+  | "tailor-interview-question";
 
 
   

@@ -29,18 +29,21 @@ import {
 } from "@/components/ui/table";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 export const schema = z.object({
   id: z.number(),
-  jobTitle: z.string(),
-  applicationDate: z.string(),
+  title: z.string(),
+  generatedAt: z.string(),
   applicationMethod: z.array(
     z.object({ value: z.string(), title: z.string() })
   ),
-  action: z.string(),
+  type: z.string(),
 });
 
-const columns: ColumnDef<z.infer<typeof schema>>[] = [
+const getColumns = (
+  router: ReturnType<typeof useRouter>
+): ColumnDef<z.infer<typeof schema>>[] => [
   {
     id: "select",
     header: ({ table }) => (
@@ -68,47 +71,46 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "jobTitle",
+    accessorKey: "title",
     header: "Job Title",
     cell: ({ row }) => {
-      return <div className="font-inter">{row.original.jobTitle}</div>;
+      return <div className="font-inter">{row.original.title}</div>;
     },
     enableHiding: false,
   },
   {
-    accessorKey: "applicationDate",
+    accessorKey: "generatedAt",
     header: "Application Date",
     cell: ({ row }) => (
       <div className="">
         <Badge variant="outline" className={cn("border-0 px-1.5 font-inter")}>
-          {row.original.applicationDate}
+          {row.original?.generatedAt?.split(".")[0]}
         </Badge>
       </div>
     ),
   },
   {
-    accessorKey: "applicationMethod",
+    accessorKey: "type",
     header: "Application Method",
     cell: ({ row }) => (
       <div className="flex gap-2">
-        {row.original.applicationMethod.map((method) => (
-          <div key={method.title}>
-            <Badge
-              variant="outline"
-              key={method.title}
-              className={cn(
-                "text-muted-foreground px-1.5 rounded-2xl font-jakarta",
-                method.value === "resume"
-                  ? "bg-primary/10 border-primary/40 text-primary "
-                  : method.value === "cover-letter"
-                  ? "bg-cverai-green/10 border-cverai-green/40 text-cverai-green"
-                  : "bg-orange-500/10 border-orange-500/40 text-orange-500"
-              )}
-            >
-              {method.title}
-            </Badge>
-          </div>
-        ))}
+        {/* {row.original.applicationMethod.map((method) => ( */}
+        <div>
+          <Badge
+            variant="outline"
+            className={cn(
+              "text-muted-foreground px-1.5 rounded-2xl font-jakarta",
+              row.getValue("type") === "resume"
+                ? "bg-primary/10 border-primary/40 text-primary "
+                : row.getValue("type") === "cover-letter"
+                ? "bg-cverai-green/10 border-cverai-green/40 text-cverai-green"
+                : "bg-orange-500/10 border-orange-500/40 text-orange-500"
+            )}
+          >
+            {row.getValue("type")}
+          </Badge>
+        </div>
+        {/* ))} */}
       </div>
     ),
   },
@@ -119,7 +121,22 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
         variant={"ghost"}
         className="text-blue-500 font-jakarta"
         onClick={() => {
-          toast.success(JSON.stringify(row.original, null, 2));
+          if (row.original.type === "resume") {
+            router.push(
+              `/dashboard/tailor-resume?documentId=${row.original.id}`
+            );
+            toast.success("Resume Generated. Check your email!");
+          } else if (row.original.type === "cover-letter") {
+            router.push(
+              `/dashboard/tailor-cover-letter?coverletterId=${row.original.id}`
+            );
+            toast.success("Cover Letter Generated. Check your email!");
+          } else if (row.original.type === "interview-question") {
+            router.push(
+              `/dashboard/tailor-interview-question?interviewQuestionId=${row.original.id}`
+            );
+            toast.success("Interview Questions Generated. Check your email!");
+          }
         }}
       >
         Show Details
@@ -133,6 +150,8 @@ export function AIJobCustomizationDatatable({
 }: {
   data: z.infer<typeof schema>[];
 }) {
+  const router = useRouter(); // Add this line
+
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
@@ -144,6 +163,8 @@ export function AIJobCustomizationDatatable({
     pageIndex: 0,
     pageSize: 10,
   });
+
+  const columns = React.useMemo(() => getColumns(router), [router]); // Generate columns with router
 
   const table = useReactTable({
     data,

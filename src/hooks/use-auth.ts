@@ -84,6 +84,20 @@ export const apiService = {
     }
   },
 
+
+  getAllDoc: async <T>(collection: string): Promise<T> => {
+    try {
+      const { data } = await authClient.get(`/career-doc/?collection=${collection}`);
+      console.log("Career Docs", data);
+      return data.data;
+    } catch (error: any) {
+      throw new Error(
+        "Failed to fetch user data:",
+        error.error || "Fetch failed"
+      );
+    }
+  },
+
   sendVerificationEmail: async (): Promise<{
     success: boolean;
     message: string;
@@ -150,6 +164,15 @@ export function useAuth(initialUser?: Partial<IUser>) {
         return apiService.getCareerDoc<T>(documentId, collection);
       },
       enabled: !!documentId, // Only runs when documentId is truthy
+    });
+  };
+
+  const useGetAllDoc = <T>(collection: string) => {
+    return useQuery({
+      queryKey: ["auth", "getAllDoc", collection],
+      queryFn: async () => {
+        return apiService.getAllDoc<T>(collection);
+      },
     });
   };
   const updateUserMutation = useMutation({
@@ -237,6 +260,7 @@ export function useAuth(initialUser?: Partial<IUser>) {
     isLoading,
     isAuthenticated: !!user,
     useCareerDoc,
+    useGetAllDoc,
     error,
     login: loginMutation.mutateAsync,
     register: registerMutation.mutateAsync,

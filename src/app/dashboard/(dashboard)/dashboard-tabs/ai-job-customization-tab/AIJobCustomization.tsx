@@ -3,11 +3,38 @@ import { Card } from "@/components/ui/card";
 
 import { memo, useMemo } from "react";
 import { RecentActivityCard } from "../../components/RecentActivityCard";
-import { MOCK_DATA_TAILOR_RESUME } from "../../components/constants";
 import { AIJobCustomizationDatatable } from "./AIJobCustomizationDatatable";
 import { AIJobCustomizationInput } from "./AIJobCustomizationInput";
+import { useAuth } from "@/hooks/use-auth";
+import { COLLECTIONS } from "@/lib/utils/constants";
+import { CoverLetter, InterviewQuestion, Resume } from "@/types";
 
 export const AIJobCustomization = memo(() => {
+  const { useGetAllDoc } = useAuth();
+  const { data: INTERVIEW_QUESTION } = useGetAllDoc<InterviewQuestion[]>(
+    COLLECTIONS.INTERVIEW_QUESTION
+  );
+  const { data: COVER_LETTER } = useGetAllDoc<CoverLetter[]>(
+    COLLECTIONS.COVER_LETTER
+  );
+  const { data: RESUME } = useGetAllDoc<Resume[]>(COLLECTIONS.RESUME);
+
+  const data = useMemo(() => {
+    return [
+      ...(INTERVIEW_QUESTION ?? []),
+      ...(COVER_LETTER ?? []),
+      ...(RESUME ?? []),
+    ]?.map((item: any) => ({ ...item.data, id: item?.id })) || [];
+  }, [INTERVIEW_QUESTION, COVER_LETTER, RESUME]);
+
+  console.log("DATA IN AI JOB CUSTOMIZATION TAB: ", data);
+
+  // console.log("SINGLE : ", INTERVIEW_QUESTION, COVER_LETTER, RESUME, [
+  //   ...(INTERVIEW_QUESTION ?? []),
+  //   ...(COVER_LETTER ?? []),
+  //   ...(RESUME ?? []),
+  // ]);
+
   const recentActivityItems = useMemo(
     () => Array.from({ length: 6 }, (_, index) => ({ id: index })),
     []
@@ -20,8 +47,8 @@ export const AIJobCustomization = memo(() => {
       </h1>
 
       <div className="grid gap-y-16">
-        <AIJobCustomizationInput/>
-        <AIJobCustomizationDatatable data={MOCK_DATA_TAILOR_RESUME} />
+        <AIJobCustomizationInput />
+        <AIJobCustomizationDatatable data={data} />
         <Card className="p-4 sm:p-7 gap-4">
           <h1 className="font-bold text-xl">Recent Activity</h1>
           <div className="grid sm:grid-cols-2 gap-y-4 sm:gap-y-8 gap-x-13">

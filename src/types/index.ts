@@ -51,7 +51,7 @@ export interface PreviewResumeProps {
   data: ResumeFormData;
   isStreaming?: boolean;
   pause?: boolean;
-  onUpdate: <T,>(field: ResumeField, value: T) => void;
+  onUpdate: <T>(field: ResumeField, value: T) => void;
   cancelTimeout?: () => void;
 }
 
@@ -123,7 +123,6 @@ export interface ResumeSection {
   isStreaming: boolean;
   error?: string;
 }
-
 
 export const intialData = {
   profile: {
@@ -290,7 +289,6 @@ export interface UserProfile {
   customClaims?: Record<string, any>;
 }
 
-
 export type StreamData = {
   documentId: string;
 } & ResumeFormData;
@@ -322,4 +320,30 @@ export interface UseResumeStreamReturn {
   streamStatus: StreamStatus;
   startStream: (user: Partial<IUser>, jobDescription: string) => Promise<void>;
   stopStream: () => void;
+}
+
+export interface InterviewQuestion {
+  fullContent?: { answer: string; question: string; type: string }[];
+  firstName: string;
+  lastName: string;
+  email: string;
+  address: string;
+  phoneNumber: string;
+  portfolio: string;
+  type: string;
+  generatedAt: string;
+  title: string;
+}
+
+export interface CoverLetter {
+  firstName: string;
+  lastName: string;
+  email: string;
+  address: string;
+  phoneNumber: string;
+  portfolio: string;
+  title: string;
+  coverLetter: string;
+  type: string;
+  generatedAt: string;
 }

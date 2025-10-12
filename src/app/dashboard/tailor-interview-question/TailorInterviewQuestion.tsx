@@ -6,6 +6,8 @@ import { toast } from "sonner";
 import { useConfettiStore } from "@/hooks/useConfetti-store";
 import { useAuth } from "@/hooks/use-auth";
 import { COLLECTIONS } from "@/lib/utils/constants";
+import { isEmpty } from "lodash";
+import { InterviewQuestion } from "@/types";
 
 interface QAItem {
   question: string;
@@ -14,7 +16,7 @@ interface QAItem {
 
 export const TailorInterviewQuestion = ({
   jobDescription,
-  interviewQuestionId
+  interviewQuestionId,
 }: {
   jobDescription: string;
   interviewQuestionId: string;
@@ -22,7 +24,7 @@ export const TailorInterviewQuestion = ({
   // const [jobDescription, setJobDescription] = useState<string>("");
   const [qaData, setQaData] = useState<QAItem[]>([]);
   const { user, useCareerDoc } = useAuth();
-  const { data } = useCareerDoc<{ coverLetter: string }>(
+  const { data } = useCareerDoc<InterviewQuestion>(
     interviewQuestionId,
     COLLECTIONS.INTERVIEW_QUESTION
   );
@@ -172,7 +174,7 @@ Example output format:
             jobDescription,
             prompt: prompt.replace("{jobDescription}", jobDescription),
             systemMessage,
-            user
+            user,
           }),
         }
       );
@@ -264,7 +266,9 @@ Example output format:
     }
   };
 
-
+  const generatedEmpty = isEmpty(qaData);
+  const dataEmpty = isEmpty(data);
+  const allEmpty = generatedEmpty && dataEmpty;
 
   return (
     <div className="min-h-screen h-full p-8">
@@ -274,15 +278,18 @@ Example output format:
             Job Interview Questions & Answers
           </h1>
         </div>
-        {(qaData ?? data).length > 0 ? (
+        {!allEmpty ? (
           <div className="space-y-6">
-            <div className="flex items-center justify-between mb-4">
+           {!generatedEmpty && <div className="flex items-center justify-between mb-4">
               <span className="bg-blue-100 text-blue-800 px-4 py-2 rounded-full font-semibold">
-                {(qaData ?? data).length} {(qaData ?? data).length === 1 ? "Question" : "Questions"}
+                {(qaData)?.length}{" "}
+                {(qaData)?.length === 1
+                  ? "Question"
+                  : "Questions"}
               </span>
-            </div>
+            </div>}
 
-            {(qaData ?? data).map((item, index) => (
+            {generatedEmpty && data?.fullContent?.map((item, index) => (
               <div
                 key={index}
                 className="bg-white rounded-2xl shadow-lg overflow-hidden border border-slate-200 hover:shadow-xl transition-shadow duration-300"
@@ -300,7 +307,7 @@ Example output format:
                         Question {index + 1}
                       </div>
                       <h3 className="text-xl font-semibold text-slate-800 leading-relaxed">
-                        {item.question}
+                        {item?.question}
                       </h3>
                     </div>
                   </div>
@@ -320,7 +327,52 @@ Example output format:
                         Answer {index + 1}
                       </div>
                       <p className="text-slate-700 leading-relaxed text-lg">
-                        {item.answer}
+                        {item?.answer}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+            {!generatedEmpty && qaData?.map((item, index) => (
+              <div
+                key={index}
+                className="bg-white rounded-2xl shadow-lg overflow-hidden border border-slate-200 hover:shadow-xl transition-shadow duration-300"
+              >
+                <div className="p-8">
+                  {/* Question Section */}
+                  <div className="flex gap-4 mb-6">
+                    <div className="flex-shrink-0">
+                      <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                        <HelpCircle className="w-6 h-6 text-blue-600" />
+                      </div>
+                    </div>
+                    <div className="flex-1">
+                      <div className="text-sm font-semibold text-blue-600 mb-2 uppercase tracking-wide">
+                        Question {index + 1}
+                      </div>
+                      <h3 className="text-xl font-semibold text-slate-800 leading-relaxed">
+                        {item?.question}
+                      </h3>
+                    </div>
+                  </div>
+
+                  {/* Divider */}
+                  <div className="border-t border-slate-200 my-6"></div>
+
+                  {/* Answer Section */}
+                  <div className="flex gap-4">
+                    <div className="flex-shrink-0">
+                      <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center">
+                        <CheckCircle className="w-6 h-6 text-emerald-600" />
+                      </div>
+                    </div>
+                    <div className="flex-1">
+                      <div className="text-sm font-semibold text-emerald-600 mb-2 uppercase tracking-wide">
+                        Answer {index + 1}
+                      </div>
+                      <p className="text-slate-700 leading-relaxed text-lg">
+                        {item?.answer}
                       </p>
                     </div>
                   </div>
@@ -336,13 +388,12 @@ Example output format:
               <div className="size-44">
                 <img src="/assets/undraw/empty.svg" alt="" />
               </div>
-            <h1 className="my-4 text-gray-300 text-center text-[11px] leading-3 max-w-64 mx-auto">
-              Your tailored interview questions & answers will appear here.
-            </h1>
+              <h1 className="my-4 text-gray-300 text-center text-[11px] leading-3 max-w-64 mx-auto">
+                Your tailored interview questions & answers will appear here.
+              </h1>
             </div>
           </div>
         )}
-
       </div>
     </div>
   );

@@ -9,6 +9,8 @@ import { TAB_ITEMS } from "../../(landing-page)/constants";
 import { AIJobCustomization } from "../(dashboard)/dashboard-tabs/ai-job-customization-tab/AIJobCustomization";
 
 export const HomeClient = memo(({ initialUser }: InitialUser) => {
+
+  
   return (
     <>
       <div

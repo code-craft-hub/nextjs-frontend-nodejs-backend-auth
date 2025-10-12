@@ -61,9 +61,10 @@ export const AIJobCustomizationInput = memo(() => {
   const onSubmit = ({ jobDescription }: z.infer<typeof FORM_SCHEMA>) => {
     const foundEmails = jobDescription.match(emailRegex) || [];
 
-    if (foundEmails.length === 0) {
+    if (foundEmails.length === 0 && docsInput !== "tailor-interview-question") {
       toast.error(
-        "No destination email found in job description. Please include the destination email in the job description."
+        "No destination email found in job description. Please include the destination email in the job description." +
+          docsInput
       );
       return;
     }
