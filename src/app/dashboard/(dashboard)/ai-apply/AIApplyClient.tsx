@@ -38,45 +38,46 @@ export const AIApplyClient = ({
     []
   );
 
-  useEffect(() => {
-    if (activeStep === 3) {
-      console.log("GENERATED DATA : ", generatedData);
-      toast.success("Hurry! We've sent your application. Good luck!");
-      try {
-        authAPI.post("/send-email-with-resume", {
-          emailContent: generatedData.emailContent,
-          resume: generatedData.resume,
-          destinationEmail: destinationEmail ?? email,
-          user,
-        });
-      } catch (error) {
-        toast.error("Failed to send application email.");
-        console.error("Error sending application email:", error);
-      }
-    }
-  }, [activeStep, generatedData, router]);
+  // useEffect(() => {
+  //   if (activeStep === 3) {
+  //     console.log("GENERATED DATA : ", generatedData);
+  //     toast.success("Hurry! We've sent your application. Good luck!");
+  //     try {
+  //       authAPI.post("/send-email-with-resume", {
+  //         emailContent: generatedData.emailContent,
+  //         resume: generatedData.resume,
+  //         destinationEmail: destinationEmail ?? email,
+  //         user,
+  //       });
+  //     } catch (error) {
+  //       toast.error("Failed to send application email.");
+  //       console.error("Error sending application email:", error);
+  //     }
+  //   }
+  // }, [activeStep, generatedData, router]);
   //
   return (
     <div className="">
-      <ProgressIndicator
+      {/* <ProgressIndicator
         activeStep={activeStep}
         setActiveStep={setActiveStep}
-      />
+      /> */}
+      Preview  here
       <div className="py-4">
-        {activeStep === 1 && (
+        {/* {activeStep === 1 && (
           <TemporaryEmailCompose
             handleStepChange={handleStepChange}
             jobDescription={jobDescription}
             coverletterId={coverletterId}
           />
         )}
-        {activeStep >= 2 && (
-          <ResumeGenerator
+        {activeStep >= 2 && ( */}
+          {/* <ResumeGenerator
             handleStepChange={handleStepChange}
             jobDescription={jobDescription}
             documentId={documentId}
-          />
-        )}
+          /> */}
+        {/* )} */}
       </div>
     </div>
   );

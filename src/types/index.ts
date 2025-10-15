@@ -4,7 +4,6 @@ export interface StreamStatus {
   isComplete: boolean;
   error: string | null;
   completedSections: Set<string>;
-  savedDocumentToDatabase: boolean;
 }
 
 export interface IUser {
@@ -49,9 +48,9 @@ export type Resume = ResumeFormData;
 
 export interface PreviewResumeProps {
   data: ResumeFormData;
+  documentId: string;
   isStreaming?: boolean;
-  pause?: boolean;
-  onUpdate: <T>(field: ResumeField, value: T) => void;
+  onUpdate?: <T>(field: ResumeField, value: T) => void;
   cancelTimeout?: () => void;
 }
 
@@ -289,9 +288,7 @@ export interface UserProfile {
   customClaims?: Record<string, any>;
 }
 
-export type StreamData = {
-  documentId: string;
-} & ResumeFormData;
+export type StreamData =  ResumeFormData;
 
 export interface StreamEvent {
   type:

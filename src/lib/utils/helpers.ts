@@ -1,3 +1,4 @@
+import { ApiError } from "@/types";
 import { jsonrepair } from "jsonrepair";
 import { MouseEvent } from "react";
 
@@ -18,6 +19,13 @@ export const smoothlyScrollToView = (
     });
   }
 };
+
+export const createApiError = (message: string, status?: number): ApiError => {
+  const error = new Error(message) as ApiError;
+  error.status = status;
+  return error;
+};
+
 
 export function validateOrCreateDate(inputDate: string | Date): Date {
   const date = new Date(inputDate);

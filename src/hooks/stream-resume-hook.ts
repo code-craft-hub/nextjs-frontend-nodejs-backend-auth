@@ -3,12 +3,11 @@ import { IUser, RequestPayload, StreamData, StreamEvent, StreamStatus, UseResume
 import { parseJSONSafely } from "@/lib/utils/helpers";
 
 
-export const useResumeStream = (endpoint: string): UseResumeStreamReturn => {
+export const useResumeStream = (endpoint: string, resumeId: string): UseResumeStreamReturn => {
   const [streamData, setStreamData] = useState<StreamData>(() => ({
-    documentId: "",
     profile: "",
-    education: [],
     workExperience: [],
+    education: [],
     certification: [],
     project: [],
     softSkill: [],
@@ -20,7 +19,6 @@ export const useResumeStream = (endpoint: string): UseResumeStreamReturn => {
     isComplete: false,
     error: null,
     completedSections: new Set<string>(),
-    savedDocumentToDatabase: false,
   }));
 
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -183,10 +181,9 @@ export const useResumeStream = (endpoint: string): UseResumeStreamReturn => {
         // Reset state
         setStreamData({
           profile: "",
-          education: [],
           workExperience: [],
+          education: [],
           certification: [],
-          documentId: "",
           project: [],
           softSkill: [],
           hardSkill: [],
@@ -197,7 +194,6 @@ export const useResumeStream = (endpoint: string): UseResumeStreamReturn => {
           isComplete: false,
           error: null,
           completedSections: new Set<string>(),
-          savedDocumentToDatabase: false,
         });
 
         sectionContentBufferRef.current.clear();
@@ -211,6 +207,7 @@ export const useResumeStream = (endpoint: string): UseResumeStreamReturn => {
             "Cache-Control": "no-cache",
           },
           body: JSON.stringify({
+            resumeId,
             user,
             jobDescription,
           } as RequestPayload),

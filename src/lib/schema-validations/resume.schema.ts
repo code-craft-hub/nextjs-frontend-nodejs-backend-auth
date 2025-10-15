@@ -1,34 +1,16 @@
 import z from "zod";
 
 export const profileSchema = z.object({
-  profile: z
-    .string()
-    .min(10, "Profile must be at least 10 characters")
-    .optional(),
+  profile: z.string().optional(),
 });
 
 export const contactSchema = z.object({
-  firstName: z
-    .string()
-    .min(10, "firstName must be at least 10 characters")
-    .optional(),
-  lastName: z
-    .string()
-    .min(10, "lastName must be at least 10 characters")
-    .optional(),
-  address: z
-    .string()
-    .min(10, "address must be at least 10 characters")
-    .optional(),
-  phoneNumber: z
-    .string()
-    .min(10, "phoneNumber must be at least 10 characters")
-    .optional(),
+  firstName: z.string().optional(),
+  lastName: z.string().optional(),
+  address: z.string().optional(),
+  phoneNumber: z.string().optional(),
   email: z.email("email must be at least 10 characters").optional(),
-  portfolio: z
-    .string()
-    .min(10, "portfolio must be at least 10 characters")
-    .optional(),
+  portfolio: z.string().optional(),
 });
 
 export const educationSchema = z.object({

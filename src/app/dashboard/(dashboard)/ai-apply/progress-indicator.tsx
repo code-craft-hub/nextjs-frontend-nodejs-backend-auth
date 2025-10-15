@@ -41,7 +41,7 @@ export const ProgressIndicator = ({
   setActiveStep,
 }: {
   activeStep: number;
-  setActiveStep: (step: number) => void;
+  setActiveStep?: (step: number) => void;
 }) => {
   const stages = [
     "Job Description Captured",
@@ -53,7 +53,7 @@ export const ProgressIndicator = ({
   const handleSetActiveStep = (step: number) => {
     if (step <= activeStep) {
       if (step === 0) return;
-      setActiveStep(step);
+     setActiveStep &&  setActiveStep(step);
     }
   };
 

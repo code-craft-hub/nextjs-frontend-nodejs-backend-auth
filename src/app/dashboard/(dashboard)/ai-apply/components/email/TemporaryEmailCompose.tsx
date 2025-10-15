@@ -1,3 +1,4 @@
+"use client";
 import React, { useRef, useEffect, memo } from "react";
 import { Loader2 } from "lucide-react";
 import { useCoverLetterGenerator } from "@/hooks/useCoverLetterGenerator";
@@ -7,16 +8,12 @@ import { createCoverLetterOrderedParams } from "@/lib/utils/helpers";
 import { toast } from "sonner";
 import { isEmpty } from "lodash";
 import { COLLECTIONS } from "@/lib/utils/constants";
+import { v4 as uuidv4 } from "uuid";
 
 export const TemporaryEmailCompose = memo<{
-  handleStepChange: (
-    step: number,
-    key: "resume" | "emailContent",
-    value: any
-  ) => void;
   jobDescription: string;
   coverletterId: string;
-}>(({ handleStepChange, jobDescription, coverletterId }) => {
+}>(({ jobDescription, coverletterId }) => {
   console.count("TEMP EMAIL COMPOSE RENDERED");
 
   const {
@@ -41,7 +38,14 @@ export const TemporaryEmailCompose = memo<{
 
   // ✅ Generate cover letter only once when component mounts
   useEffect(() => {
-    if (user && jobDescription && !coverletterId && !hasGeneratedRef.current) {
+    console.log(
+      "user, jobDescription, hasGeneratedRef.current",
+      user,
+      jobDescription,
+      hasGeneratedRef.current
+    );
+    //
+    if (user && jobDescription && !hasGeneratedRef.current) {
       hasGeneratedRef.current = true;
 
       toast.promise(generateCoverLetter({ user, jobDescription }), {
@@ -54,7 +58,9 @@ export const TemporaryEmailCompose = memo<{
         error: "Failed to generate cover letter",
       });
     }
-  }, [user, jobDescription, coverletterId, generateCoverLetter]);
+  }, []);
+
+  // user, jobDescription, coverletterId, generateCoverLetter
 
   // ✅ Update route and trigger step change only once when documentId is available
   useEffect(() => {
@@ -66,21 +72,17 @@ export const TemporaryEmailCompose = memo<{
       documentId,
       jobDescription
     );
-    router.replace(`${pathname}?${orderedParams.toString()}`);
 
-    const timer = setTimeout(() => {
-      handleStepChange(2, "emailContent", generatedContent);
-    }, 5000);
+    router.push(`/dashboard/resume/${uuidv4()}?${orderedParams.toString()}`);
+    toast.success(JSON.stringify(pathname));
+    // router.replace(`${pathname}?${orderedParams.toString()}`);
 
-    return () => clearTimeout(timer);
-  }, [
-    documentId,
-    jobDescription,
-    pathname,
-    router,
-    handleStepChange,
-    generatedContent,
-  ]);
+    // const timer = setTimeout(() => {
+    //   router.push("/dashboard/ai-apply");
+    // }, 5000);
+
+    // return () => clearTimeout(timer);
+  }, [documentId, jobDescription, pathname, router, generatedContent]);
 
   // ✅ Auto-scroll to bottom when content changes
   useEffect(() => {

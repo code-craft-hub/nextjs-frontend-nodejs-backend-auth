@@ -1,14 +1,10 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { authAPI } from "@/lib/axios/auth-api";
-import { ApiError, ResumeField, UpdatePayload, UseResumeDataOptions } from "@/types";
+import { ResumeField, UpdatePayload, UseResumeDataOptions } from "@/types";
 import { ResumeFormData } from "@/lib/schema-validations/resume.schema";
-
-const createApiError = (message: string, status?: number): ApiError => {
-  const error = new Error(message) as ApiError;
-  error.status = status;
-  return error;
-};
+import { createApiError } from "@/lib/utils/helpers";
+import { COLLECTIONS } from "@/lib/utils/constants";
 
 const updateResumeField = async <T>(
   payload: UpdatePayload<T>,
@@ -16,7 +12,7 @@ const updateResumeField = async <T>(
 ): Promise<any> => {
   try {
     const { data } = await authAPI.patch(
-      `${baseUrl}/career-doc/${payload.documentId}`,
+      `${baseUrl}/career-doc/${payload.documentId}?collection=${COLLECTIONS.RESUME}`,
       {
         documentId: payload.documentId,
         updates: {
@@ -53,18 +49,11 @@ export const useResumeData = (
   const { documentId, apiUrl, onSuccess, onError } = options;
   const queryClient = useQueryClient();
 
-  // Use ref to track if we're in the middle of an optimistic update
-  const isOptimisticUpdate = useRef(false);
+  // Track pending updates to prevent premature syncing
+  const pendingUpdatesRef = useRef<Set<ResumeField>>(new Set());
 
   // Local optimistic state
   const [resumeData, setResumeData] = useState<ResumeFormData>(() => ({
-    education: [],
-    workExperience: [],
-    certification: [],
-    project: [],
-    skills: [],
-    softSkill: [],
-    hardSkill: [],
     summary: "",
     personalDetails: {
       fullName: "",
@@ -75,22 +64,37 @@ export const useResumeData = (
       github: "",
       website: "",
     },
+    workExperience: [],
+    education: [],
+    certification: [],
+    project: [],
+    skills: [],
+    softSkill: [],
+    hardSkill: [],
     ...initialData,
   }));
 
-  // Sync with external data changes - but only when NOT doing optimistic updates
+  // Sync with external data changes - but only for fields not being updated
   useEffect(() => {
-    if (!isOptimisticUpdate.current) {
-      setResumeData((prev) => {
-        // Only update if data actually changed to prevent unnecessary re-renders
-        const hasChanged = Object.keys(initialData).some(
-          (key) =>
-            JSON.stringify((prev as Record<string, unknown>)[key]) !==
-            JSON.stringify((initialData as Record<string, unknown>)[key])
-        );
-        return hasChanged ? { ...prev, ...initialData } : prev;
+    setResumeData((prev) => {
+      const updates: Record<string, any> = {};
+      let hasChanges = false;
+
+      Object.keys(initialData).forEach((key) => {
+        // Skip fields that are currently being updated
+        if (!pendingUpdatesRef.current.has(key as ResumeField)) {
+          const prevValue = (prev as Record<string, unknown>)[key];
+          const newValue = (initialData as Record<string, unknown>)[key];
+          
+          if (JSON.stringify(prevValue) !== JSON.stringify(newValue)) {
+            updates[key] = newValue;
+            hasChanges = true;
+          }
+        }
       });
-    }
+
+      return hasChanges ? { ...prev, ...updates } : prev;
+    });
   }, [initialData]);
 
   // TanStack Query mutation with optimistic updates
@@ -98,14 +102,15 @@ export const useResumeData = (
     any,
     Error,
     UpdatePayload<any>,
-    { previousData: any }
+    { previousData: any; field: ResumeField }
   >({
     mutationFn: async <T>(payload: UpdatePayload<T>) => {
       return updateResumeField(payload, apiUrl);
     },
 
     onMutate: async (payload) => {
-      isOptimisticUpdate.current = true;
+      // Mark this field as being updated
+      pendingUpdatesRef.current.add(payload.field);
 
       // Cancel outgoing refetches to prevent race conditions
       await queryClient.cancelQueries({
@@ -124,11 +129,14 @@ export const useResumeData = (
       }));
 
       // Return context for rollback
-      return { previousData };
+      return { previousData, field: payload.field };
     },
 
     onError: (error: Error, payload, context) => {
-      isOptimisticUpdate.current = false;
+      // Remove from pending updates
+      if (context?.field) {
+        pendingUpdatesRef.current.delete(context.field);
+      }
 
       // Rollback optimistic update on error
       if (context?.previousData) {
@@ -143,20 +151,31 @@ export const useResumeData = (
       onError?.(error, payload.field);
     },
 
-    onSuccess: (data, payload) => {
+    onSuccess: (data, payload, context) => {
       console.log("Server confirmed update:", data);
+      
+      // Remove from pending updates after successful update
+      if (context?.field) {
+        pendingUpdatesRef.current.delete(context.field);
+      }
+
+      // Update local state with confirmed data if available
+      if (data?.data) {
+        setResumeData((prev) => ({ ...prev, ...data.data }));
+      }
+
       // Call success callback
       onSuccess?.(payload.field);
     },
 
-    onSettled: () => {
-      isOptimisticUpdate.current = false;
+    onSettled: (_data, _error, payload) => {
+      // Ensure field is removed from pending updates
+      pendingUpdatesRef.current.delete(payload.field);
 
       // Invalidate queries without refetching immediately
-      // This marks the data as stale but doesn't trigger a refetch
       queryClient.invalidateQueries({
         queryKey: resumeQueryKeys.doc(documentId),
-        refetchType: "none", // Don't refetch immediately
+        refetchType: "none",
       });
     },
   });
@@ -174,7 +193,7 @@ export const useResumeData = (
         documentId,
       });
     },
-    [documentId, mutation.mutate]
+    [documentId, mutation]
   );
 
   // Batch update for multiple fields
@@ -191,7 +210,7 @@ export const useResumeData = (
         });
       });
     },
-    [documentId, mutation.mutate]
+    [documentId, mutation]
   );
 
   return {

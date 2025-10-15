@@ -29,7 +29,6 @@ import { SelectOptions } from "../../components/SelectOptions";
 import LockIcon from "@/components/icons/LockIcon";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
-import { emailRegex } from "@/validation";
 
 const FORM_SCHEMA = z.object({
   jobDescription: z.string().min(2, {
@@ -59,17 +58,10 @@ export const AIJobCustomizationInput = memo(() => {
   });
 
   const onSubmit = ({ jobDescription }: z.infer<typeof FORM_SCHEMA>) => {
-    const foundEmails = jobDescription.match(emailRegex) || [];
 
-    if (foundEmails.length === 0 && docsInput !== "tailor-interview-question") {
-      toast.error(
-        "No destination email found in job description. Please include the destination email in the job description." +
-          docsInput
-      );
-      return;
-    }
+
     router.push(
-      `/dashboard/${docsInput}?dataSource=${dataSource}&profile=${userProfile}&jobDescription=${jobDescription}&destinationEmail=${foundEmails[0]}`
+      `/dashboard/${docsInput}?dataSource=${dataSource}&profile=${userProfile}&jobDescription=${jobDescription}`
     );
   };
 
