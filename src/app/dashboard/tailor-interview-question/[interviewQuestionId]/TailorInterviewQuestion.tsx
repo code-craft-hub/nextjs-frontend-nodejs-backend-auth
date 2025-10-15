@@ -9,6 +9,7 @@ import { COLLECTIONS } from "@/lib/utils/constants";
 import { isEmpty } from "lodash";
 import { InterviewQuestion, QAItem } from "@/types";
 import { extractCompleteJsonObjects } from "@/lib/utils/helpers";
+import TailorInterviewQuestionEmptyState from "./TailorInterviewQuestionEmptyState";
 
 export const TailorInterviewQuestion = ({
   jobDescription,
@@ -21,7 +22,7 @@ export const TailorInterviewQuestion = ({
 
   const [qaData, setQaData] = useState<QAItem[]>([]);
   const { user, useCareerDoc } = useAuth();
-  const { data } = useCareerDoc<InterviewQuestion>(
+  const { data, isFetched, status } = useCareerDoc<InterviewQuestion>(
     interviewQuestionId,
     COLLECTIONS.INTERVIEW_QUESTION
   );
@@ -41,22 +42,24 @@ export const TailorInterviewQuestion = ({
 
   console.count("Render TailorInterviewQuestion");
   useEffect(() => {
-    if (jobDescription?.trim() && !hasGeneratedRef.current) {
-      hasGeneratedRef.current = true;
+    if (isFetched && status === "success") {
+      if (jobDescription?.trim() && !hasGeneratedRef.current && !data) {
+        hasGeneratedRef.current = true;
 
-      console.count("API CALLED TailorInterviewQuestion");
-      toast.promise(handleSubmit(), {
-        loading: "I'm generating your tailored interview questions...",
-        success: () => {
-          return {
-            message: `Hurray! Interview question generation complete!`,
-            description: "Hopefully you nailed it!",
-          };
-        },
-        error: "Error",
-      });
+        console.count("API CALLED TailorInterviewQuestion");
+        toast.promise(handleSubmit(), {
+          loading: "I'm generating your tailored interview questions...",
+          success: () => {
+            return {
+              message: `Hurray! Interview question generation complete!`,
+              description: "Hopefully you nailed it!",
+            };
+          },
+          error: "Error",
+        });
+      }
+      confetti.onOpen();
     }
-    confetti.onOpen();
   }, []);
 
   const handleSubmit = async () => {
@@ -289,15 +292,10 @@ export const TailorInterviewQuestion = ({
             <div ref={resultsEndRef} />
           </div>
         ) : (
-          <div className="h-full flex items-center justify-center">
-            <div className=" mt-4">
-              <div className="size-44">
-                <img src="/assets/undraw/empty.svg" alt="" />
-              </div>
-              <h1 className="my-4 text-gray-300 text-center text-[11px] leading-3 max-w-64 mx-auto">
-                Your tailored interview questions & answers will appear here.
-              </h1>
-            </div>
+          <div className="gap-4 sm:gap-8 grid grid-cols-1">
+            {Array.from({ length: 3 }).map((_, index) => (
+              <TailorInterviewQuestionEmptyState key={index} index={index} />
+            ))}
           </div>
         )}
       </div>

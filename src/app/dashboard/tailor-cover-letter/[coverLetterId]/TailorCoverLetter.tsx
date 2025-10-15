@@ -4,68 +4,85 @@ import React, { useRef, useEffect, memo } from "react";
 import { Loader2 } from "lucide-react";
 import { useCoverLetterGenerator } from "@/hooks/useCoverLetterGenerator";
 import { useAuth } from "@/hooks/use-auth";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { createCoverLetterOrderedParams } from "@/lib/utils/helpers";
 import { toast } from "sonner";
 import { isEmpty } from "lodash";
 import { COLLECTIONS } from "@/lib/utils/constants";
 import { Card } from "@/components/ui/card";
+import { v4 as uuidv4 } from "uuid";
 
 export const TailorCoverLetter = memo<{
   jobDescription: string;
   coverLetterId: string;
-}>(({ jobDescription, coverLetterId }) => {
-  console.count("TEMP EMAIL COMPOSE RENDERED");
+  aiApply: boolean;
+}>(({ jobDescription, coverLetterId, aiApply }) => {
 
-  const {
-    generatedContent,
-    isGenerating,
-    error,
-    documentId,
-    generateCoverLetter,
-  } = useCoverLetterGenerator();
+  console.log("COVER LETTER ID : ", coverLetterId); 
+  console.count("TAILOR COVER LETTER RENDERED");
+
+  const { generatedContent, isGenerating, error, generateCoverLetter } =
+    useCoverLetterGenerator();
 
   const contentRef = useRef<HTMLDivElement>(null);
   const hasGeneratedRef = useRef(false); // Track if we've already generated
-  const hasUpdatedRouteRef = useRef(false); // Track if we've updated the route
 
   const { user, useCareerDoc } = useAuth();
-  const { data } = useCareerDoc<{ coverLetter: string }>(
-    coverLetterId ?? documentId,
+  const { data, isFetched, status } = useCareerDoc<{ coverLetter: string }>(
+    coverLetterId,
     COLLECTIONS.COVER_LETTER
   );
   const router = useRouter();
-  const pathname = usePathname();
 
-  // ✅ Generate cover letter only once when component mounts
   useEffect(() => {
-    if (user && jobDescription && !hasGeneratedRef.current) {
-      hasGeneratedRef.current = true;
-
-      toast.promise(generateCoverLetter({ user, jobDescription }), {
-        loading: "Generating your tailored cover letter...",
-        success: () => {
-          return {
-            message: "Cover letter generation complete!",
-          };
-        },
-        error: "Failed to generate cover letter",
-      });
-    }
-  }, [user, jobDescription, coverLetterId, generateCoverLetter]);
-
-  // ✅ Update route and trigger step change only once when documentId is available
-  useEffect(() => {
-    if (!documentId || hasUpdatedRouteRef.current) return;
-
-    hasUpdatedRouteRef.current = true;
-
-    const orderedParams = createCoverLetterOrderedParams(
-      documentId,
-      jobDescription
+    console.log(
+      user,
+      jobDescription,
+      hasGeneratedRef.current,
+      data
     );
-    router.replace(`${pathname}?${orderedParams.toString()}`);
-  }, [documentId, jobDescription, pathname, router, generatedContent]);
+    
+    if (isFetched && status === "success") {
+      console.log("INSIDE IFF", status, isFetched);
+      if (user && jobDescription && !hasGeneratedRef.current && !data) {
+        hasGeneratedRef.current = true;
+        
+        console.count("API CALLED")
+        toast.promise(
+          generateCoverLetter({ user, jobDescription, coverLetterId }),
+          {
+            loading: "Generating your tailored cover letter...",
+            success: () => {
+              return {
+                message: "Cover letter generation complete!",
+              };
+            },
+            error: "Failed to generate cover letter",
+          }
+        );
+
+        if (aiApply) {
+          const orderedParams = createCoverLetterOrderedParams(
+            coverLetterId,
+            jobDescription
+          );
+          router.push(
+            `/dashboard/resume/${uuidv4()}?${orderedParams.toString()}`
+          );
+        }
+      }
+    }
+  }, [
+    user,
+    jobDescription,
+    data,
+    aiApply,
+    coverLetterId,
+    generateCoverLetter,
+    router,
+    status,
+    isFetched,
+  ]);
 
   // ✅ Auto-scroll to bottom when content changes
   useEffect(() => {

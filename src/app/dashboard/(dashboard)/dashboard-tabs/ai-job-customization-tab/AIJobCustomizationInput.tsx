@@ -68,8 +68,6 @@ export const AIJobCustomizationInput = memo(() => {
 
   const profiles = [
     { value: "profile1", label: "Base profile", icon: LockIcon },
-    // { value: "profile2", label: "Primary profile", icon: LockIcon },
-    // { value: "profile3", label: "Job profile", icon: LockIcon },
   ];
 
   return (

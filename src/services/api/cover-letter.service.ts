@@ -3,6 +3,7 @@
 import { IUser } from "@/types";
 
 export interface CoverLetterRequest {
+  coverLetterId: string;
   user?: Partial<IUser>;
   jobDescription: string;
   aiModel?: 'gemini' | 'gpt';

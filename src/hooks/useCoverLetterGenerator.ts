@@ -6,7 +6,6 @@ interface UseCoverLetterGeneratorReturn {
   generatedContent: string;
   isGenerating: boolean;
   error: string;
-  documentId: string;
   generateCoverLetter: (request: CoverLetterRequest) => Promise<void>;
   cancelGeneration: () => void;
   resetContent: () => void;
@@ -18,7 +17,6 @@ interface UseCoverLetterGeneratorReturn {
 export const useCoverLetterGenerator = (): UseCoverLetterGeneratorReturn => {
   const [generatedContent, setGeneratedContent] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
-  const [documentId, setDocumentId] = useState('');
   const [error, setError] = useState('');
   const abortControllerRef = useRef<AbortController | null>(null);
 
@@ -42,9 +40,8 @@ export const useCoverLetterGenerator = (): UseCoverLetterGeneratorReturn => {
         setIsGenerating(false);
       },
       // onComplete
-      (documentId) => {
+      () => {
         setIsGenerating(false);
-        setDocumentId(documentId);
       },
       // signal
       abortControllerRef.current.signal
@@ -67,7 +64,6 @@ export const useCoverLetterGenerator = (): UseCoverLetterGeneratorReturn => {
     generatedContent,
     isGenerating,
     error,
-    documentId,
     generateCoverLetter,
     cancelGeneration,
     resetContent

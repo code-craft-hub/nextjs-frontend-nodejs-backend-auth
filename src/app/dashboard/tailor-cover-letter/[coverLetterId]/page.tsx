@@ -4,7 +4,7 @@ import { apiService } from "@/hooks/use-auth";
 import { COLLECTIONS } from "@/lib/utils/constants";
 import { TailorCoverLetter } from "./TailorCoverLetter";
 const TailorCoverLetterPage = async ({ searchParams, params }: any) => {
-  const { jobDescription } = await searchParams;
+  const { jobDescription ,aiApply } = await searchParams;
   const { coverLetterId } = await params;
   const queryClient = getQueryClient();
 
@@ -13,12 +13,16 @@ const TailorCoverLetterPage = async ({ searchParams, params }: any) => {
     queryFn: () =>
       apiService.getCareerDoc(coverLetterId, COLLECTIONS.COVER_LETTER),
   });
+
+    console.log(aiApply, "aiApply");
+
   return (
     <div>
       <div className="p-4 sm:p-8">
         <TailorCoverLetter
           jobDescription={jobDescription}
           coverLetterId={coverLetterId}
+          aiApply={aiApply === "true"}
         />{" "}
       </div>
     </div>

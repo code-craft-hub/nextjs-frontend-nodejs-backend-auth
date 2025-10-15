@@ -13,78 +13,76 @@ import { v4 as uuidv4 } from "uuid";
 export const TemporaryEmailCompose = memo<{
   jobDescription: string;
   coverLetterId: string;
-}>(({ jobDescription, coverLetterId }) => {
+  aiApply?: boolean;
+}>(({ jobDescription, coverLetterId, aiApply }) => {
   console.count("TEMP EMAIL COMPOSE RENDERED");
 
-  const {
-    generatedContent,
-    isGenerating,
-    error,
-    documentId,
-    generateCoverLetter,
-  } = useCoverLetterGenerator();
+  const { generatedContent, isGenerating, error, generateCoverLetter } =
+    useCoverLetterGenerator();
 
   const contentRef = useRef<HTMLDivElement>(null);
-  const hasGeneratedRef = useRef(false); // Track if we've already generated
-  const hasUpdatedRouteRef = useRef(false); // Track if we've updated the route
+  const hasGeneratedRef = useRef(false);
 
   const { user, useCareerDoc } = useAuth();
-  const { data } = useCareerDoc<{ coverLetter: string }>(
-    coverLetterId ?? documentId,
+  const { data, isFetched, status } = useCareerDoc<{ coverLetter: string }>(
+    coverLetterId,
     COLLECTIONS.COVER_LETTER
   );
   const router = useRouter();
   const pathname = usePathname();
 
-  // ✅ Generate cover letter only once when component mounts
+  console.log("PATH NAME : ", pathname);
+
   useEffect(() => {
     console.log(
-      "user, jobDescription, hasGeneratedRef.current",
+      "user, jobDescription, hasGeneratedRef.current, data",
       user,
       jobDescription,
-      hasGeneratedRef.current
+      hasGeneratedRef.current,
+      data
     );
-    //
-    if (user && jobDescription && !hasGeneratedRef.current) {
-      hasGeneratedRef.current = true;
 
-      toast.promise(generateCoverLetter({ user, jobDescription }), {
-        loading: "Generating your tailored cover letter...",
-        success: () => {
-          return {
-            message: "Cover letter generation complete!",
-          };
-        },
-        error: "Failed to generate cover letter",
-      });
+    if (isFetched && status === "success") {
+      console.log("INSIDE IFF", status, isFetched);
+      if (user && jobDescription && !hasGeneratedRef.current && !data) {
+        hasGeneratedRef.current = true;
+
+        toast.promise(
+          generateCoverLetter({ user, jobDescription, coverLetterId }),
+          {
+            loading: "Generating your tailored cover letter...",
+            success: () => {
+              return {
+                message: "Cover letter generation complete!",
+              };
+            },
+            error: "Failed to generate cover letter",
+          }
+        );
+
+        if (aiApply) {
+          const orderedParams = createCoverLetterOrderedParams(
+            coverLetterId,
+            jobDescription
+          );
+          router.push(
+            `/dashboard/resume/${uuidv4()}?${orderedParams.toString()}`
+          );
+        }
+      }
     }
-  }, []);
+  }, [
+    user,
+    jobDescription,
+    data,
+    aiApply,
+    coverLetterId,
+    generateCoverLetter,
+    router,status,isFetched
+  ]);
+  // Removed hasGeneratedRef.current from dependencies
+  // Added data and all other used variables
 
-  // user, jobDescription, coverLetterId, generateCoverLetter
-
-  // ✅ Update route and trigger step change only once when documentId is available
-  useEffect(() => {
-    if (!documentId || hasUpdatedRouteRef.current) return;
-
-    hasUpdatedRouteRef.current = true;
-
-    const orderedParams = createCoverLetterOrderedParams(
-      documentId,
-      jobDescription
-    );
-
-    router.push(`/dashboard/resume/${uuidv4()}?${orderedParams.toString()}`);
-    toast.success(JSON.stringify(pathname));
-    // router.replace(`${pathname}?${orderedParams.toString()}`);
-
-    // const timer = setTimeout(() => {
-    //   router.push("/dashboard/ai-apply");
-    // }, 5000);
-
-    // return () => clearTimeout(timer);
-  }, [documentId, jobDescription, pathname, router, generatedContent]);
-
-  // ✅ Auto-scroll to bottom when content changes
   useEffect(() => {
     if (contentRef.current && generatedContent) {
       contentRef.current.scrollTop = contentRef.current.scrollHeight;
@@ -128,15 +126,6 @@ export const TemporaryEmailCompose = memo<{
             </div>
           )}
         </div>
-
-        {generatedContent && (
-          <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-100">
-            <p className="text-sm text-blue-800">
-              <strong>Tip:</strong> Review and customize the generated content
-              before sending. Add personal touches to make it uniquely yours!
-            </p>
-          </div>
-        )}
 
         {error && (
           <div className="text-red-500 p-4 shadow-xl w-full">

@@ -10,17 +10,19 @@ const coverLetterId = async ({
     jobDescription: string;
     documentId: string;
     destinationEmail: string;
+    aiApply: string;
   }>;
 }) => {
-  const { jobDescription } = await searchParams;
+  const { jobDescription, aiApply } = await searchParams;
   const { coverLetterId } = await params;
+  console.log(aiApply, "aiApply");
   return (
     <div className="p-4 sm:p-8">
-      Cover Letter ID: {coverLetterId}
       <ProgressIndicator activeStep={1} />
       <TemporaryEmailCompose
         jobDescription={jobDescription}
         coverLetterId={coverLetterId}
+        aiApply={aiApply === "true"}
       />
     </div>
   );
