@@ -1,24 +1,24 @@
 import React from "react";
-import { TailorCoverLetter } from "./TailorCoverLetter";
 import { getQueryClient } from "@/lib/query-client";
 import { apiService } from "@/hooks/use-auth";
 import { COLLECTIONS } from "@/lib/utils/constants";
-const TailorCoverLetterPage = async ({ searchParams }: any) => {
-  const { jobDescription, coverletterId } = await searchParams;
+import { TailorCoverLetter } from "./TailorCoverLetter";
+const TailorCoverLetterPage = async ({ searchParams, params }: any) => {
+  const { jobDescription } = await searchParams;
+  const { coverLetterId } = await params;
   const queryClient = getQueryClient();
 
   queryClient.prefetchQuery({
     queryKey: ["auth", "careerDoc"],
     queryFn: () =>
-      apiService.getCareerDoc(coverletterId, COLLECTIONS.COVER_LETTER),
+      apiService.getCareerDoc(coverLetterId, COLLECTIONS.COVER_LETTER),
   });
   return (
     <div>
-     
       <div className="p-4 sm:p-8">
         <TailorCoverLetter
           jobDescription={jobDescription}
-          coverletterId={coverletterId}
+          coverLetterId={coverLetterId}
         />{" "}
       </div>
     </div>

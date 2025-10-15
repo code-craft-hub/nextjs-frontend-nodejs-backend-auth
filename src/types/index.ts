@@ -48,7 +48,7 @@ export type Resume = ResumeFormData;
 
 export interface PreviewResumeProps {
   data: ResumeFormData;
-  documentId: string;
+  resumeId: string;
   isStreaming?: boolean;
   onUpdate?: <T>(field: ResumeField, value: T) => void;
   cancelTimeout?: () => void;
@@ -67,11 +67,11 @@ export type ResumeField =
 export interface UpdatePayload<T = any> {
   field: ResumeField;
   value: T;
-  documentId: string;
+  resumeId: string;
 }
 
 export interface UseResumeDataOptions {
-  documentId: string;
+  resumeId: string;
   apiUrl?: string;
   onSuccess?: (field: ResumeField) => void;
   onError?: (error: Error, field: ResumeField) => void;
@@ -343,4 +343,10 @@ export interface CoverLetter {
   coverLetter: string;
   type: string;
   generatedAt: string;
+}
+
+
+export interface QAItem {
+  question: string;
+  answer: string;
 }

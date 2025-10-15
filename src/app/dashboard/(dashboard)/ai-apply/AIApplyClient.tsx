@@ -11,12 +11,12 @@ import { useAuth } from "@/hooks/use-auth";
 export const AIApplyClient = ({
   jobDescription,
   documentId,
-  coverletterId,
+  coverLetterId,
   destinationEmail,
 }: {
   jobDescription: string;
   documentId: string;
-  coverletterId: string;
+  coverLetterId: string;
   destinationEmail: string;
 }) => {
   const { user } = useAuth();
@@ -62,17 +62,17 @@ export const AIApplyClient = ({
         activeStep={activeStep}
         setActiveStep={setActiveStep}
       /> */}
-      Preview  here
+      Preview here
       <div className="py-4">
         {/* {activeStep === 1 && (
           <TemporaryEmailCompose
             handleStepChange={handleStepChange}
             jobDescription={jobDescription}
-            coverletterId={coverletterId}
+            coverLetterId={coverLetterId}
           />
         )}
         {activeStep >= 2 && ( */}
-          {/* <ResumeGenerator
+        {/* <ResumeGenerator
             handleStepChange={handleStepChange}
             jobDescription={jobDescription}
             documentId={documentId}

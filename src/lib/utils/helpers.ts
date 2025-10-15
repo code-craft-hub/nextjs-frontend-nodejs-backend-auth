@@ -1,4 +1,4 @@
-import { ApiError } from "@/types";
+import { ApiError, QAItem } from "@/types";
 import { jsonrepair } from "jsonrepair";
 import { MouseEvent } from "react";
 
@@ -20,12 +20,77 @@ export const smoothlyScrollToView = (
   }
 };
 
+export const extractCompleteJsonObjects = (
+  text: string
+): {
+  complete: QAItem[];
+  remainder: string;
+} => {
+  const complete: QAItem[] = [];
+  let remainder = text;
+
+  // Try to find complete JSON objects by looking for newlines or complete braces
+  const lines = text.split("\n");
+  const incompleteLine: string[] = [];
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+
+    if (!trimmed || trimmed === "[DONE]") continue;
+
+    // Remove markdown code blocks if present
+    const cleaned = trimmed
+      .replace(/^```json\s*/i, "")
+      .replace(/^```\s*/i, "")
+      .replace(/```\s*$/i, "");
+
+    if (!cleaned) continue;
+
+    // Check if line looks like it could be complete JSON (has opening and closing braces)
+    const openBraces = (cleaned.match(/{/g) || []).length;
+    const closeBraces = (cleaned.match(/}/g) || []).length;
+
+    if (openBraces > 0 && openBraces === closeBraces) {
+      // Looks complete, try to parse
+      try {
+        const parsed = JSON.parse(cleaned);
+        if (parsed.type === "qa" && parsed.question && parsed.answer) {
+          complete.push({
+            question: parsed.question,
+            answer: parsed.answer,
+          });
+        }
+      } catch (e) {
+        // Try to repair the JSON
+        try {
+          const repaired = jsonrepair(cleaned);
+          const parsed = JSON.parse(repaired);
+          if (parsed.type === "qa" && parsed.question && parsed.answer) {
+            complete.push({
+              question: parsed.question,
+              answer: parsed.answer,
+            });
+          }
+        } catch (repairError) {
+          // Still incomplete, save for next iteration
+          incompleteLine.push(line);
+        }
+      }
+    } else {
+      // Definitely incomplete
+      incompleteLine.push(line);
+    }
+  }
+
+  remainder = incompleteLine.join("\n");
+  return { complete, remainder };
+};
+
 export const createApiError = (message: string, status?: number): ApiError => {
   const error = new Error(message) as ApiError;
   error.status = status;
   return error;
 };
-
 
 export function validateOrCreateDate(inputDate: string | Date): Date {
   const date = new Date(inputDate);
@@ -65,7 +130,6 @@ export function normalizeToString(input: any): string {
   if (input == null) {
     return "";
   }
-
 
   // If input is already a string, try to parse it as JSON
   if (typeof input === "string") {
@@ -281,7 +345,7 @@ export const createCoverLetterOrderedParams = (
   jobDesc: string
 ) => {
   const params = new URLSearchParams();
-  params.set("coverletterId", docId);
+  params.set("coverLetterId", docId);
   params.set("jobDescription", jobDesc);
   return params;
 };

@@ -1,7 +1,7 @@
 import { TemporaryEmailCompose } from "../../(dashboard)/ai-apply/components/email/TemporaryEmailCompose";
 import { ProgressIndicator } from "../../(dashboard)/ai-apply/progress-indicator";
 
-const CoverLetterId = async ({
+const coverLetterId = async ({
   params,
   searchParams,
 }: {
@@ -20,10 +20,10 @@ const CoverLetterId = async ({
       <ProgressIndicator activeStep={1} />
       <TemporaryEmailCompose
         jobDescription={jobDescription}
-        coverletterId={coverLetterId}
+        coverLetterId={coverLetterId}
       />
     </div>
   );
 };
 
-export default CoverLetterId;
+export default coverLetterId;

@@ -4,14 +4,14 @@ import { getQueryClient } from "@/lib/query-client";
 import { apiService } from "@/hooks/use-auth";
 import { COLLECTIONS } from "@/lib/utils/constants";
 
-const TailorResumePage = async ({ searchParams }: any) => {
-  const { jobDescription, documentId } = await searchParams;
-
+const TailorResumePage = async ({ searchParams, params }: any) => {
+  const { jobDescription } = await searchParams;
+const {resumeId} = await params;
   const queryClient = getQueryClient();
 
   queryClient.prefetchQuery({
     queryKey: ["auth", "careerDoc"],
-    queryFn: () => apiService.getCareerDoc(documentId, COLLECTIONS.RESUME),
+    queryFn: () => apiService.getCareerDoc(resumeId, COLLECTIONS.RESUME),
   });
 
   return (
@@ -27,7 +27,7 @@ const TailorResumePage = async ({ searchParams }: any) => {
       />
       <div className="p-4 sm:p-8">
     
-        <TailorResume jobDescription={jobDescription} documentId={documentId} />
+        <TailorResume jobDescription={jobDescription} resumeId={resumeId} />
       </div>
     </div>
   );

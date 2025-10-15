@@ -40,14 +40,14 @@ const StreamingSkeleton = ({ className = "" }: { className?: string }) => (
 
 export const EditableResume: React.FC<PreviewResumeProps> = ({
   data,
-  documentId,
+  resumeId,
   isStreaming,
 }) => {
   const { user } = useAuth();
   const contentRef = useRef<HTMLDivElement>(null);
 
   const { resumeData, updateField } = useResumeData(data || {}, {
-    documentId,
+    resumeId,
     onSuccess: (field) => {
       console.log(`✓ Successfully updated ${field}`);
     },

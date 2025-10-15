@@ -4,8 +4,9 @@ import { TailorInterviewQuestion } from "./TailorInterviewQuestion";
 import { getQueryClient } from "@/lib/query-client";
 import { apiService } from "@/hooks/use-auth";
 import { COLLECTIONS } from "@/lib/utils/constants";
-const TailorInterviewQuestionPage = async ({ searchParams }: any) => {
-  const { jobDescription, interviewQuestionId } = await searchParams;
+const TailorInterviewQuestionPage = async ({ searchParams, params }: any) => {
+  const { jobDescription } = await searchParams;
+  const { interviewQuestionId } = await params;
 
   const queryClient = getQueryClient();
 

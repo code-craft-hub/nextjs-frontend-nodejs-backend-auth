@@ -128,7 +128,7 @@ const getColumns = (
             toast.success("Resume Generated. Check your email!");
           } else if (row.original.type === "cover-letter") {
             router.push(
-              `/dashboard/tailor-cover-letter?coverletterId=${row.original.id}`
+              `/dashboard/tailor-cover-letter?coverLetterId=${row.original.id}`
             );
             toast.success("Cover Letter Generated. Check your email!");
           } else if (row.original.type === "interview-question") {

@@ -1,5 +1,6 @@
 "use client";
 import { ArrowUp, Plus } from "lucide-react";
+import {v4 as uuidv4} from "uuid";
 
 import {
   DropdownMenu,
@@ -61,7 +62,7 @@ export const AIJobCustomizationInput = memo(() => {
 
 
     router.push(
-      `/dashboard/${docsInput}?dataSource=${dataSource}&profile=${userProfile}&jobDescription=${jobDescription}`
+      `/dashboard/${docsInput}/${uuidv4()}?dataSource=${dataSource}&profile=${userProfile}&aiApppy=true&jobDescription=${jobDescription}`
     );
   };
 

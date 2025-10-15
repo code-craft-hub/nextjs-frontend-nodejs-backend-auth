@@ -13,8 +13,8 @@ import { Card } from "@/components/ui/card";
 
 export const TailorCoverLetter = memo<{
   jobDescription: string;
-  coverletterId: string;
-}>(({ jobDescription, coverletterId }) => {
+  coverLetterId: string;
+}>(({ jobDescription, coverLetterId }) => {
   console.count("TEMP EMAIL COMPOSE RENDERED");
 
   const {
@@ -31,7 +31,7 @@ export const TailorCoverLetter = memo<{
 
   const { user, useCareerDoc } = useAuth();
   const { data } = useCareerDoc<{ coverLetter: string }>(
-    coverletterId ?? documentId,
+    coverLetterId ?? documentId,
     COLLECTIONS.COVER_LETTER
   );
   const router = useRouter();
@@ -39,7 +39,7 @@ export const TailorCoverLetter = memo<{
 
   // ✅ Generate cover letter only once when component mounts
   useEffect(() => {
-    if (user && jobDescription && !coverletterId && !hasGeneratedRef.current) {
+    if (user && jobDescription && !hasGeneratedRef.current) {
       hasGeneratedRef.current = true;
 
       toast.promise(generateCoverLetter({ user, jobDescription }), {
@@ -52,7 +52,7 @@ export const TailorCoverLetter = memo<{
         error: "Failed to generate cover letter",
       });
     }
-  }, [user, jobDescription, coverletterId, generateCoverLetter]);
+  }, [user, jobDescription, coverLetterId, generateCoverLetter]);
 
   // ✅ Update route and trigger step change only once when documentId is available
   useEffect(() => {
@@ -65,15 +65,7 @@ export const TailorCoverLetter = memo<{
       jobDescription
     );
     router.replace(`${pathname}?${orderedParams.toString()}`);
-
- 
-  }, [
-    documentId,
-    jobDescription,
-    pathname,
-    router,
-    generatedContent,
-  ]);
+  }, [documentId, jobDescription, pathname, router, generatedContent]);
 
   // ✅ Auto-scroll to bottom when content changes
   useEffect(() => {
@@ -120,7 +112,6 @@ export const TailorCoverLetter = memo<{
           )}
         </div>
 
-       
         {error && (
           <div className="text-red-500 p-4 shadow-xl w-full">
             Error: {JSON.stringify(error)}

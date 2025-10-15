@@ -76,7 +76,7 @@ export const ResumeGenerator = ({
       <EditableResume
         data={resumeData}
         cancelTimeout={cancelTimeout}
-        documentId={resumeId}
+        resumeId={resumeId}
         isStreaming={streamStatus.isComplete}
       />
       <div ref={resultsEndRef} className="" />

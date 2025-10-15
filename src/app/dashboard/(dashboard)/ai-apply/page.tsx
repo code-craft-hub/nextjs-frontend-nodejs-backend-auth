@@ -5,7 +5,7 @@ import { apiService } from "@/hooks/use-auth";
 import { COLLECTIONS } from "@/lib/utils/constants";
 
 const AIApplyPage = async ({ searchParams }: any) => {
-  const { jobDescription, documentId, coverletterId, destinationEmail } =
+  const { jobDescription, documentId, coverLetterId, destinationEmail } =
     await searchParams;
   const queryClient = getQueryClient();
 
@@ -16,7 +16,7 @@ const AIApplyPage = async ({ searchParams }: any) => {
   queryClient.prefetchQuery({
     queryKey: ["auth", "careerDoc"],
     queryFn: () =>
-      apiService.getCareerDoc(coverletterId, COLLECTIONS.COVER_LETTER),
+      apiService.getCareerDoc(coverLetterId, COLLECTIONS.COVER_LETTER),
   });
 
   return (
@@ -24,7 +24,7 @@ const AIApplyPage = async ({ searchParams }: any) => {
       <AIApplyClient
         jobDescription={jobDescription}
         documentId={documentId}
-        coverletterId={coverletterId}
+        coverLetterId={coverLetterId}
         destinationEmail={destinationEmail}
       />
     </div>

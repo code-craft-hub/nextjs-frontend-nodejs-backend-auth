@@ -12,8 +12,8 @@ import { v4 as uuidv4 } from "uuid";
 
 export const TemporaryEmailCompose = memo<{
   jobDescription: string;
-  coverletterId: string;
-}>(({ jobDescription, coverletterId }) => {
+  coverLetterId: string;
+}>(({ jobDescription, coverLetterId }) => {
   console.count("TEMP EMAIL COMPOSE RENDERED");
 
   const {
@@ -30,7 +30,7 @@ export const TemporaryEmailCompose = memo<{
 
   const { user, useCareerDoc } = useAuth();
   const { data } = useCareerDoc<{ coverLetter: string }>(
-    coverletterId ?? documentId,
+    coverLetterId ?? documentId,
     COLLECTIONS.COVER_LETTER
   );
   const router = useRouter();
@@ -60,7 +60,7 @@ export const TemporaryEmailCompose = memo<{
     }
   }, []);
 
-  // user, jobDescription, coverletterId, generateCoverLetter
+  // user, jobDescription, coverLetterId, generateCoverLetter
 
   // ✅ Update route and trigger step change only once when documentId is available
   useEffect(() => {

@@ -12,9 +12,9 @@ const updateResumeField = async <T>(
 ): Promise<any> => {
   try {
     const { data } = await authAPI.patch(
-      `${baseUrl}/career-doc/${payload.documentId}?collection=${COLLECTIONS.RESUME}`,
+      `${baseUrl}/career-doc/${payload.resumeId}?collection=${COLLECTIONS.RESUME}`,
       {
-        documentId: payload.documentId,
+        resumeId: payload.resumeId,
         updates: {
           [payload.field]: payload.value,
         },
@@ -46,7 +46,7 @@ export const useResumeData = (
   initialData: Partial<any>,
   options: UseResumeDataOptions
 ) => {
-  const { documentId, apiUrl, onSuccess, onError } = options;
+  const { resumeId, apiUrl, onSuccess, onError } = options;
   const queryClient = useQueryClient();
 
   // Track pending updates to prevent premature syncing
@@ -114,16 +114,16 @@ export const useResumeData = (
 
       // Cancel outgoing refetches to prevent race conditions
       await queryClient.cancelQueries({
-        queryKey: resumeQueryKeys.doc(documentId),
+        queryKey: resumeQueryKeys.doc(resumeId),
       });
 
       // Snapshot previous value for rollback
       const previousData = queryClient.getQueryData(
-        resumeQueryKeys.doc(documentId)
+        resumeQueryKeys.doc(resumeId)
       );
 
       // Optimistically update cache
-      queryClient.setQueryData(resumeQueryKeys.doc(documentId), (old: any) => ({
+      queryClient.setQueryData(resumeQueryKeys.doc(resumeId), (old: any) => ({
         ...old,
         [payload.field]: payload.value,
       }));
@@ -141,7 +141,7 @@ export const useResumeData = (
       // Rollback optimistic update on error
       if (context?.previousData) {
         queryClient.setQueryData(
-          resumeQueryKeys.doc(documentId),
+          resumeQueryKeys.doc(resumeId),
           context.previousData
         );
         setResumeData(context.previousData as any);
@@ -174,7 +174,7 @@ export const useResumeData = (
 
       // Invalidate queries without refetching immediately
       queryClient.invalidateQueries({
-        queryKey: resumeQueryKeys.doc(documentId),
+        queryKey: resumeQueryKeys.doc(resumeId),
         refetchType: "none",
       });
     },
@@ -190,10 +190,10 @@ export const useResumeData = (
       mutation.mutate({
         field,
         value,
-        documentId,
+        resumeId,
       });
     },
-    [documentId, mutation]
+    [resumeId, mutation]
   );
 
   // Batch update for multiple fields
@@ -206,11 +206,11 @@ export const useResumeData = (
         mutation.mutate({
           field: field as ResumeField,
           value,
-          documentId,
+          resumeId,
         });
       });
     },
-    [documentId, mutation]
+    [resumeId, mutation]
   );
 
   return {
