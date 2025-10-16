@@ -33,7 +33,7 @@ export const apiService = {
     destinationEmail: string
   ): Promise<Partial<IUser>> => {
     try {
-      const { data } = await authClient.post("/v1/send-email", {
+      const { data } = await authClient.post("/send-email-with-resume-and-coverletter", {
         user,
         coverLetterData,
         resumeData,
@@ -42,13 +42,13 @@ export const apiService = {
 
       return data.data;
     } catch (error: any) {
-      console.error("ERROR IN LOGIN FUNCTION : ", error);
+      console.error("ERROR IN auto-apply: ", error);
       toast.error(
         error?.response?.data?.error ||
-          "Login failed. Please check your credentials."
+          "Auto apply failed. Please try again."
       );
 
-      throw new Error(error.error || "Login failed");
+      throw new Error(error.error || "Auto apply failed. Please try again.");
     }
   },
 
