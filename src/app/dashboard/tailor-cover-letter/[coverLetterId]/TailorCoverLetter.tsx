@@ -17,8 +17,9 @@ import { ProgressIndicator } from "../../(dashboard)/ai-apply/progress-indicator
 export const TailorCoverLetter = memo<{
   jobDescription: string;
   coverLetterId: string;
+  destinationEmail: string;
   aiApply: boolean;
-}>(({ jobDescription, coverLetterId, aiApply }) => {
+}>(({ jobDescription, coverLetterId, aiApply, destinationEmail }) => {
   // console.log("COVER LETTER ID : ", coverLetterId);
   // console.count("TAILOR COVER LETTER RENDERED");
 
@@ -64,7 +65,7 @@ export const TailorCoverLetter = memo<{
 
               console.log("INSIDE THE TIMEOUT IN COVER LETTER");
               router.push(
-                `/dashboard/tailor-resume/${uuidv4()}?aiApply=true&${orderedParams.toString()}`
+                `/dashboard/tailor-resume/${uuidv4()}?aiApply=true&destinationEmail=${destinationEmail}&${orderedParams.toString()}`
               );
             }
           } catch (err) {

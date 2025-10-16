@@ -14,11 +14,13 @@ export const TailorResume = ({
   resumeId,
   coverLetterId,
   aiApply,
+  destinationEmail,
 }: {
   jobDescription: string;
   resumeId: string;
   coverLetterId: string;
   aiApply: boolean;
+  destinationEmail: string;
 }) => {
   const { user, useCareerDoc } = useAuth();
   const { data, status, isFetched } = useCareerDoc<Resume>(
@@ -59,12 +61,11 @@ export const TailorResume = ({
           },
           error: "Error",
         });
-
       }
     }
     if (aiApply && streamStatus.isComplete) {
       router.push(
-        `/dashboard/preview?resumeId=${resumeId}&coverLetterId=${coverLetterId}`
+        `/dashboard/preview?resumeId=${resumeId}&coverLetterId=${coverLetterId}&destinationEmail=${destinationEmail}`
       );
     }
   }, [
@@ -81,8 +82,16 @@ export const TailorResume = ({
   return (
     <div className="space-y-4 sm:space-y-8">
       {JSON.stringify(streamStatus)}
-      {streamStatus.isComplete ? <div> streaming isComplete is True</div> : <div>streaming isComplete is False</div>}
-      {streamStatus.isConnected ? <div> streaming isConnected is True</div> : <div>streaming isConnected is False</div>}
+      {streamStatus.isComplete ? (
+        <div> streaming isComplete is True</div>
+      ) : (
+        <div>streaming isComplete is False</div>
+      )}
+      {streamStatus.isConnected ? (
+        <div> streaming isConnected is True</div>
+      ) : (
+        <div>streaming isConnected is False</div>
+      )}
       {aiApply && <ProgressIndicator activeStep={2} />}
       <EditableResume
         data={shouldUseDbData ? data! : streamData}

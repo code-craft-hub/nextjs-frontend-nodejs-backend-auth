@@ -2,7 +2,7 @@
 
 import authClient from "@/lib/axios/auth-api";
 import { RegisterUserSchema } from "@/lib/schema-validations";
-import { IUser } from "@/types";
+import { CoverLetter, IUser, Resume } from "@/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -13,6 +13,31 @@ export const apiService = {
       const { data } = await authClient.post("/login", {
         email,
         password,
+      });
+
+      return data.data;
+    } catch (error: any) {
+      console.error("ERROR IN LOGIN FUNCTION : ", error);
+      toast.error(
+        error?.response?.data?.error ||
+          "Login failed. Please check your credentials."
+      );
+
+      throw new Error(error.error || "Login failed");
+    }
+  },
+  sendApplication: async (
+    user: Partial<IUser>,
+    coverLetterData: CoverLetter | undefined,
+    resumeData: Resume | undefined,
+    destinationEmail: string
+  ): Promise<Partial<IUser>> => {
+    try {
+      const { data } = await authClient.post("/v1/send-email", {
+        user,
+        coverLetterData,
+        resumeData,
+        destinationEmail,
       });
 
       return data.data;
@@ -71,9 +96,14 @@ export const apiService = {
     }
   },
 
-  getCareerDoc: async <T>(documentId: string, collection: string): Promise<T> => {
+  getCareerDoc: async <T>(
+    documentId: string,
+    collection: string
+  ): Promise<T> => {
     try {
-      const { data } = await authClient.get(`/career-doc/${documentId}?collection=${collection}`);
+      const { data } = await authClient.get(
+        `/career-doc/${documentId}?collection=${collection}`
+      );
       console.log("Career Docs", data);
       return data.data;
     } catch (error: any) {
@@ -84,10 +114,11 @@ export const apiService = {
     }
   },
 
-
   getAllDoc: async <T>(collection: string): Promise<T> => {
     try {
-      const { data } = await authClient.get(`/career-doc/?collection=${collection}`);
+      const { data } = await authClient.get(
+        `/career-doc/?collection=${collection}`
+      );
       console.log("Career Docs", data);
       return data.data;
     } catch (error: any) {

@@ -5,7 +5,7 @@ import { apiService } from "@/hooks/use-auth";
 import { COLLECTIONS } from "@/lib/utils/constants";
 
 const TailorResumePage = async ({ searchParams, params }: any) => {
-  const { jobDescription, aiApply, coverLetterId } = await searchParams;
+  const { jobDescription, aiApply, coverLetterId,destinationEmail } = await searchParams;
   const { resumeId } = await params;
   const queryClient = getQueryClient();
 
@@ -31,6 +31,7 @@ const TailorResumePage = async ({ searchParams, params }: any) => {
           jobDescription={jobDescription}
           resumeId={resumeId}
           coverLetterId={coverLetterId}
+          destinationEmail={destinationEmail}
         />
       </div>
     </div>
