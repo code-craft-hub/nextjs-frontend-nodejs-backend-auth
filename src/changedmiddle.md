@@ -46,6 +46,8 @@ export async function middleware(request: NextRequest) {
   }
 
   const sessionToken = request.cookies.get("session")?.value;
+  console.log("Session Token raw:", request.cookies.get("session"));
+  console.log("Session Token Retrieved:", sessionToken);
   const session = sessionToken ? await verifySessionToken(sessionToken) : null;
 
   console.log("Session Token in MIDDLEWARE:", sessionToken);
