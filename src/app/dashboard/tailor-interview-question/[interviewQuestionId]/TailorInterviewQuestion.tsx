@@ -3,7 +3,6 @@ import { HelpCircle, CheckCircle } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { jsonrepair } from "jsonrepair";
 import { toast } from "sonner";
-import { useConfettiStore } from "@/hooks/useConfetti-store";
 import { useAuth } from "@/hooks/use-auth";
 import { COLLECTIONS } from "@/lib/utils/constants";
 import { isEmpty } from "lodash";
@@ -28,7 +27,6 @@ export const TailorInterviewQuestion = ({
   );
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const resultsEndRef = useRef<HTMLDivElement>(null);
-  const confetti = useConfettiStore();
 
   // Auto-scroll effect when new Q&A pairs are added
   useEffect(() => {
@@ -58,9 +56,8 @@ export const TailorInterviewQuestion = ({
           error: "Error",
         });
       }
-      confetti.onOpen();
     }
-  }, []);
+  }, [user, jobDescription, data, status, isFetched]);
 
   const handleSubmit = async () => {
     if (!jobDescription.trim()) {

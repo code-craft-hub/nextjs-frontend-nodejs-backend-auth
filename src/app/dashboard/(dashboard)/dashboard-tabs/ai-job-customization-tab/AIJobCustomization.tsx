@@ -27,13 +27,6 @@ export const AIJobCustomization = memo(() => {
     ]?.map((item: any) => ({ ...item.data, id: item?.id })) || [];
   }, [INTERVIEW_QUESTION, COVER_LETTER, RESUME]);
 
-  console.log("DATA IN AI JOB CUSTOMIZATION TAB: ", data);
-
-  // console.log("SINGLE : ", INTERVIEW_QUESTION, COVER_LETTER, RESUME, [
-  //   ...(INTERVIEW_QUESTION ?? []),
-  //   ...(COVER_LETTER ?? []),
-  //   ...(RESUME ?? []),
-  // ]);
 
   const recentActivityItems = useMemo(
     () => Array.from({ length: 6 }, (_, index) => ({ id: index })),
