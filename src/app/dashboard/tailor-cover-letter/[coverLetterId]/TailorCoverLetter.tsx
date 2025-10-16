@@ -12,14 +12,15 @@ import { COLLECTIONS } from "@/lib/utils/constants";
 import { v4 as uuidv4 } from "uuid";
 import { Button } from "@/components/ui/button";
 import { CoverLetterRequest } from "@/types";
+import { ProgressIndicator } from "../../(dashboard)/ai-apply/progress-indicator";
 
 export const TailorCoverLetter = memo<{
   jobDescription: string;
   coverLetterId: string;
   aiApply: boolean;
 }>(({ jobDescription, coverLetterId, aiApply }) => {
-  console.log("COVER LETTER ID : ", coverLetterId);
-  console.count("TAILOR COVER LETTER RENDERED");
+  // console.log("COVER LETTER ID : ", coverLetterId);
+  // console.count("TAILOR COVER LETTER RENDERED");
 
   const { generatedContent, isGenerating, error, generateCoverLetter } =
     useCoverLetterGenerator();
@@ -33,50 +34,57 @@ export const TailorCoverLetter = memo<{
     COLLECTIONS.COVER_LETTER
   );
   const router = useRouter();
-
   useEffect(() => {
-    console.log(user, jobDescription, hasGeneratedRef.current, data);
+    const runGeneration = async () => {
+      if (isFetched && status === "success") {
+        if (user && jobDescription && !hasGeneratedRef.current && !data) {
+          hasGeneratedRef.current = true;
 
-    if (isFetched && status === "success") {
-      console.log("INSIDE IFF", status, isFetched);
-      if (user && jobDescription && !hasGeneratedRef.current && !data) {
-        hasGeneratedRef.current = true;
+          console.count("API CALLED");
 
-        console.count("API CALLED");
-        toast.promise(
-          generateCoverLetter({ user, jobDescription, coverLetterId }),
-          {
-            loading: "Generating your tailored cover letter...",
-            success: () => {
-              return {
-                message: "Cover letter generation complete!",
-              };
-            },
-            error: "Failed to generate cover letter",
+          try {
+            toast.promise(
+              generateCoverLetter({ user, jobDescription, coverLetterId }),
+              {
+                loading: "Generating your tailored cover letter...",
+                success: "Cover letter generation complete!",
+                error: "Failed to generate cover letter",
+              }
+            );
+
+            // ✅ Wait before navigating only after generation completes
+            if (aiApply) {
+              const orderedParams = createCoverLetterOrderedParams(
+                coverLetterId,
+                jobDescription
+              );
+
+              console.log("Waiting 5 seconds before navigating...");
+              await new Promise((resolve) => setTimeout(resolve, 5000));
+
+              console.log("INSIDE THE TIMEOUT IN COVER LETTER");
+              router.push(
+                `/dashboard/tailor-resume/${uuidv4()}?aiApply=true&${orderedParams.toString()}`
+              );
+            }
+          } catch (err) {
+            console.error("Error generating cover letter:", err);
           }
-        );
-
-        if (aiApply) {
-          const orderedParams = createCoverLetterOrderedParams(
-            coverLetterId,
-            jobDescription
-          );
-          router.push(
-            `/dashboard/resume/${uuidv4()}?${orderedParams.toString()}`
-          );
         }
       }
-    }
+    };
+
+    runGeneration();
   }, [
     user,
     jobDescription,
     data,
+    status,
+    isFetched,
     aiApply,
     coverLetterId,
     generateCoverLetter,
     router,
-    status,
-    isFetched,
   ]);
 
   // ✅ Auto-scroll to bottom when content changes
@@ -93,6 +101,8 @@ export const TailorCoverLetter = memo<{
 
   return (
     <div className="grid grid-cols-1 gap-4 sm:gap-6">
+      {/* <div className="p"></div> */}
+      {aiApply && <ProgressIndicator activeStep={1} />}
       <div className="flex w-full gap-3 items-center  p-4 sm:px-8 bg-white justify-between">
         <p className="text-xl font-medium font-inter">Tailor Cover Letter</p>
         <Button>Delete</Button>
@@ -111,7 +121,8 @@ export const TailorCoverLetter = memo<{
             <div className="whitespace-pre-wrap text-gray-800 leading-relaxed font-outfit text-md flex flex-col gap-2">
               <div className="mb-4">
                 <p className="text-xl font-medium font-inter">
-                  {data?.firstName} {data?.lastName}{" "}
+                  {data?.firstName ?? user?.firstName}{" "}
+                  {data?.lastName ?? user?.lastName}{" "}
                 </p>
                 <p className="text-sm font-inter">{data?.title}</p>
               </div>
@@ -123,9 +134,10 @@ export const TailorCoverLetter = memo<{
                 <div className="mt-8">
                   <p className="">Sincerely</p>
                   <p className="">
-                    {data?.firstName} {data?.lastName}
+                    {data?.firstName ?? user?.firstName}{" "}
+                    {data?.lastName ?? user?.lastName}
                   </p>
-                  <p className="">{data?.phoneNumber}</p>
+                  <p className="">{data?.phoneNumber ?? user?.phoneNumber}</p>
                 </div>
               )}
             </div>

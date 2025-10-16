@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowUp, Plus } from "lucide-react";
-import {v4 as uuidv4} from "uuid";
+import { v4 as uuidv4 } from "uuid";
 
 import {
   DropdownMenu,
@@ -55,7 +55,9 @@ export const AIApplyInput = memo(() => {
       params.set("jobDescription", JSON.stringify(jobDescription));
       params.set("destinationEmail", JSON.stringify(foundEmails[0]));
       localStorage?.removeItem("hasResumeAPICalled");
-      router.push(`/dashboard/cover-letter/${uuidv4()}?${params}`);
+      router.push(
+        `/dashboard/tailor-cover-letter/${uuidv4()}?${params}&aiApply=true`
+      );
       // router.push(`/dashboard/resume/${uuidv4()}?${params}`);
     },
     []

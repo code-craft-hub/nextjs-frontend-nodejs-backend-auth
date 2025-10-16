@@ -31,7 +31,7 @@ export const useResumeStream = (endpoint: string, resumeId: string): UseResumeSt
   const handleStreamEvent = useCallback(
     (eventData: StreamEvent): void => {
       const { type, section, content, fullContent, error } = eventData;
-      console.log({ type, section, content, fullContent, error });
+      // console.log({ type, section, content, fullContent, error });
       switch (type) {
         case "sectionStarted":
           if (section) {

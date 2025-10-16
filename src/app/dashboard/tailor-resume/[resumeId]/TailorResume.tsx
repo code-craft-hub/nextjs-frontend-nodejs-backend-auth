@@ -7,20 +7,26 @@ import { useResumeData } from "@/hooks/use-resume-data";
 import { Resume } from "@/types";
 import { COLLECTIONS } from "@/lib/utils/constants";
 import { EditableResume } from "../../(dashboard)/ai-apply/components/resume/EditableResume";
+import { ProgressIndicator } from "../../(dashboard)/ai-apply/progress-indicator";
 
 export const TailorResume = ({
   jobDescription,
   resumeId,
+  aiApply,
 }: {
   jobDescription: string;
   resumeId: string;
+  aiApply: boolean;
 }) => {
   const { user, useCareerDoc } = useAuth();
-  const { data } = useCareerDoc<Resume>(resumeId, COLLECTIONS.RESUME);
+  const { data, status, isFetched } = useCareerDoc<Resume>(
+    resumeId,
+    COLLECTIONS.RESUME
+  );
   const resultsEndRef = useRef<HTMLDivElement>(null);
   const hasGeneratedRef = useRef(false);
 
-  console.count("TAILOR RESUME RENDERED");
+  // console.count("TAILOR RESUME RENDERED");
 
   const { resumeData, updateField } = useResumeData(data || {}, {
     resumeId,
@@ -49,24 +55,27 @@ export const TailorResume = ({
   }, [streamData]);
 
   useEffect(() => {
-    if (user && jobDescription) {
-      hasGeneratedRef.current = true;
-      console.count("API CALLED")
-      toast.promise(startStream(user, jobDescription), {
-        loading: "Generating your tailored resume...",
-        success: () => {
-          return {
-            message: `Resume generation complete!`,
-          };
-        },
-        error: "Error",
-      });
+    if (isFetched && status === "success") {
+      if (user && jobDescription && !data && !hasGeneratedRef.current) {
+        hasGeneratedRef.current = true;
+        console.count("API CALLED");
+        toast.promise(startStream(user, jobDescription), {
+          loading: "Generating your tailored resume...",
+          success: () => {
+            return {
+              message: `Resume generation complete!`,
+            };
+          },
+          error: "Error",
+        });
+      }
     }
-  }, [user, jobDescription]);
+  }, [user, jobDescription, data, status, isFetched, aiApply]);
 
   const shouldUseDbData = streamData.profile === "";
   return (
-    <div className="">
+    <div className="space-y-4 sm:space-y-8">
+      {aiApply && <ProgressIndicator activeStep={2} />}
       <EditableResume
         data={shouldUseDbData ? resumeData : streamData}
         onUpdate={updateField}

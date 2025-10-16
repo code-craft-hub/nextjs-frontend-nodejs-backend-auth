@@ -62,7 +62,7 @@ export const AIJobCustomizationInput = memo(() => {
 
 
     router.push(
-      `/dashboard/${docsInput}/${uuidv4()}?dataSource=${dataSource}&profile=${userProfile}&aiApppy=true&jobDescription=${jobDescription}`
+      `/dashboard/${docsInput}/${uuidv4()}?dataSource=${dataSource}&profile=${userProfile}&jobDescription=${jobDescription}`
     );
   };
 

@@ -5,8 +5,8 @@ import { apiService } from "@/hooks/use-auth";
 import { COLLECTIONS } from "@/lib/utils/constants";
 
 const TailorResumePage = async ({ searchParams, params }: any) => {
-  const { jobDescription } = await searchParams;
-const {resumeId} = await params;
+  const { jobDescription, aiApply } = await searchParams;
+  const { resumeId } = await params;
   const queryClient = getQueryClient();
 
   queryClient.prefetchQuery({
@@ -26,8 +26,11 @@ const {resumeId} = await params;
         }}
       />
       <div className="p-4 sm:p-8">
-    
-        <TailorResume jobDescription={jobDescription} resumeId={resumeId} />
+        <TailorResume
+          aiApply={aiApply === "true"}
+          jobDescription={jobDescription}
+          resumeId={resumeId}
+        />
       </div>
     </div>
   );
