@@ -50,8 +50,8 @@ export interface PreviewResumeProps {
   data: ResumeFormData;
   resumeId: string;
   isStreaming?: boolean;
-  onUpdate?: <T>(field: ResumeField, value: T) => void;
-  cancelTimeout?: () => void;
+  // onUpdate?: <T>(field: ResumeField, value: T) => void;
+  // cancelTimeout?: () => void;
 }
 
 export interface CoverLetterRequest {

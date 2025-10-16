@@ -47,7 +47,8 @@ export const ProgressIndicator = ({
     "Job Description Captured",
     "Email Drafted",
     "CV Tailored",
-    "Application Sent",
+    "Review",
+    "Application Sent"
   ];
 
   const handleSetActiveStep = (step: number) => {
@@ -60,7 +61,7 @@ export const ProgressIndicator = ({
   return (
     <div className="">
       <div className="relative flex flex-row justify-between w-full items-center">
-        <div className="bg-gray-50 absolute top-1/2 left-[12%] w-[75%] h-[2px] -translate-y-1/2">
+        <div className="bg-gray-50 absolute top-1/2 left-[12%] w-[78%] h-[2px] -translate-y-1/2">
           <motion.div
             className="h-full bg-[#4680EE] origin-left"
             initial={{ scaleX: 0 }}

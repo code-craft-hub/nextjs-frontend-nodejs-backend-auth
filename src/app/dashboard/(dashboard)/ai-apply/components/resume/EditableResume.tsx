@@ -104,7 +104,7 @@ export const EditableResume: React.FC<PreviewResumeProps> = ({
   return (
     <Card
       className={cn(
-        "max-w-screen-lg p-4 sm:px-5 text-gray-800 font-merriweather py-16 relative"
+        " p-4 sm:px-5 text-gray-800 font-merriweather py-16 relative rounded-sm"
       )}
     >
       {fullName && (

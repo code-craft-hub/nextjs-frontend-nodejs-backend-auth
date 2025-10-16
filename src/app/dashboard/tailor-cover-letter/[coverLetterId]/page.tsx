@@ -14,8 +14,6 @@ const TailorCoverLetterPage = async ({ searchParams, params }: any) => {
       apiService.getCareerDoc(coverLetterId, COLLECTIONS.COVER_LETTER),
   });
 
-    console.log(aiApply, "aiApply");
-
   return (
     <div className="">
       <div className="p-4 sm:p-8">
