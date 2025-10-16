@@ -81,7 +81,7 @@ export const TailorResume = ({
   const shouldUseDbData = streamData.profile === "";
   return (
     <div className="space-y-4 sm:space-y-8">
-      {JSON.stringify(streamStatus)}
+      {/* {JSON.stringify(streamStatus)}
       {streamStatus.isComplete ? (
         <div> streaming isComplete is True</div>
       ) : (
@@ -91,7 +91,7 @@ export const TailorResume = ({
         <div> streaming isConnected is True</div>
       ) : (
         <div>streaming isConnected is False</div>
-      )}
+      )} */}
       {aiApply && <ProgressIndicator activeStep={2} />}
       <EditableResume
         data={shouldUseDbData ? data! : streamData}

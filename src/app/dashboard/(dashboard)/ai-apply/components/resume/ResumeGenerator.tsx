@@ -25,7 +25,7 @@ export const ResumeGenerator = ({
     isFetched,
     status,
   } = useCareerDoc<any>(resumeId, COLLECTIONS.RESUME);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  // const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const resultsEndRef = useRef<HTMLDivElement>(null);
 
@@ -38,11 +38,11 @@ export const ResumeGenerator = ({
     }
   }, [streamData]);
 
-  const cancelTimeout = () => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-  };
+  // const cancelTimeout = () => {
+  //   if (timeoutRef.current) {
+  //     clearTimeout(timeoutRef.current);
+  //   }
+  // };
 
 
   useEffect(() => {
@@ -75,7 +75,7 @@ export const ResumeGenerator = ({
       isStreaming: {streamStatus.isComplete ? "Complete" : "In Progress"} */}
       <EditableResume
         data={resumeData}
-        cancelTimeout={cancelTimeout}
+        // cancelTimeout={cancelTimeout}
         resumeId={resumeId}
         isStreaming={streamStatus.isComplete}
       />
