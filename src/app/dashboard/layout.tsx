@@ -5,7 +5,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { UserMenu } from "@/components/user-menu";
+import { UserMenu } from "@/components/UserMenu";
 import { DynamicBreadcrumb } from "./components/DynamicBreadcrumb";
 import { requireAuth } from "@/lib/server-auth";
 
@@ -32,10 +32,14 @@ const DashboardLayout = async ({ children }: DashboardLayoutProps) => {
             <DynamicBreadcrumb />
           </div>
           <div className="ml-auto">
-            <UserMenu initialUser={session}/>
+            <UserMenu initialUser={session} />
           </div>
         </header>
-        <div className="flex flex-1 flex-col gap-4 max-w-screen-xl">{children}</div>
+        <div className="w-full min-h-screen bg-[#F5F7FA]">
+          <div className="flex flex-1 flex-col gap-4 max-w-screen-xl ">
+            {children}
+          </div>
+        </div>
       </SidebarInset>
     </SidebarProvider>
   );

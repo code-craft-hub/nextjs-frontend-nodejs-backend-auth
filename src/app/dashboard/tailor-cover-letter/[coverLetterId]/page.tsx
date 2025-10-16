@@ -17,7 +17,7 @@ const TailorCoverLetterPage = async ({ searchParams, params }: any) => {
     console.log(aiApply, "aiApply");
 
   return (
-    <div>
+    <div className="">
       <div className="p-4 sm:p-8">
         <TailorCoverLetter
           jobDescription={jobDescription}

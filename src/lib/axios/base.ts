@@ -37,9 +37,9 @@ export const setupInterceptors = (client: AxiosInstance, apiName: string) => {
       }
       
       // Development logging
-      if (process.env.NODE_ENV === 'development') {
-        console.log(`🚀 [${apiName}] ${config.method?.toUpperCase()} ${config.url}`, config);
-      }
+      // if (process.env.NODE_ENV === 'development') {
+      //   console.log(`🚀 [${apiName}] ${config.method?.toUpperCase()} ${config.url}`, config);
+      // }
 
       return config;
     },

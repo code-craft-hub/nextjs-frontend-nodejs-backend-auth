@@ -158,24 +158,24 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border outline-ring/50 ;
   }
   body {
-    @apply bg-background;
+    @apply !bg-[#F5F7FA] w-full;
   }
   .onboarding-h1 {
-    @apply max-sm:text-sm text-2xl font-medium text-center text-gray-900 mb-2
+    @apply max-sm:text-sm text-2xl font-medium text-center text-gray-900 mb-2;
   }
   .h1 {
-    @apply max-md:!text-xs
+    @apply max-md:!text-xs;
   }
   .onboarding-btn {
-    @apply max-sm:!text-2xs
+    @apply max-sm:!text-2xs;
   }
   .onboarding-container {
-    @apply flex flex-col w-full items-center justify-center min-h-screen h-full mt-16 md:mt-8 p-4 sm:p-16
+    @apply flex flex-col w-full items-center justify-center min-h-screen h-full mt-16 md:mt-8 p-4 sm:p-16;
   }
   .onboarding-card {
-    @apply flex flex-col items-center justify-center max-w-screen-lg w-full shadow-2xl rounded-[4px] p-4 max-md:py-8 sm:p-8 md:p-16 bg-white space-y-7
+    @apply flex flex-col items-center justify-center max-w-screen-lg w-full shadow-2xl rounded-[4px] p-4 max-md:py-8 sm:p-8 md:p-16 bg-white space-y-7;
   }
 }

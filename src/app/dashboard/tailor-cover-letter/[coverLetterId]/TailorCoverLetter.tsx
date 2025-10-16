@@ -9,16 +9,16 @@ import { createCoverLetterOrderedParams } from "@/lib/utils/helpers";
 import { toast } from "sonner";
 import { isEmpty } from "lodash";
 import { COLLECTIONS } from "@/lib/utils/constants";
-import { Card } from "@/components/ui/card";
 import { v4 as uuidv4 } from "uuid";
+import { Button } from "@/components/ui/button";
+import { CoverLetterRequest } from "@/types";
 
 export const TailorCoverLetter = memo<{
   jobDescription: string;
   coverLetterId: string;
   aiApply: boolean;
 }>(({ jobDescription, coverLetterId, aiApply }) => {
-
-  console.log("COVER LETTER ID : ", coverLetterId); 
+  console.log("COVER LETTER ID : ", coverLetterId);
   console.count("TAILOR COVER LETTER RENDERED");
 
   const { generatedContent, isGenerating, error, generateCoverLetter } =
@@ -28,26 +28,21 @@ export const TailorCoverLetter = memo<{
   const hasGeneratedRef = useRef(false); // Track if we've already generated
 
   const { user, useCareerDoc } = useAuth();
-  const { data, isFetched, status } = useCareerDoc<{ coverLetter: string }>(
+  const { data, isFetched, status } = useCareerDoc<CoverLetterRequest>(
     coverLetterId,
     COLLECTIONS.COVER_LETTER
   );
   const router = useRouter();
 
   useEffect(() => {
-    console.log(
-      user,
-      jobDescription,
-      hasGeneratedRef.current,
-      data
-    );
-    
+    console.log(user, jobDescription, hasGeneratedRef.current, data);
+
     if (isFetched && status === "success") {
       console.log("INSIDE IFF", status, isFetched);
       if (user && jobDescription && !hasGeneratedRef.current && !data) {
         hasGeneratedRef.current = true;
-        
-        console.count("API CALLED")
+
+        console.count("API CALLED");
         toast.promise(
           generateCoverLetter({ user, jobDescription, coverLetterId }),
           {
@@ -97,22 +92,15 @@ export const TailorCoverLetter = memo<{
     : generatedContent;
 
   return (
-    <Card className="grid grid-cols-1 p-0">
+    <div className="grid grid-cols-1 gap-4 sm:gap-6">
+      <div className="flex w-full gap-3 items-center  p-4 sm:px-8 bg-white justify-between">
+        <p className="text-xl font-medium font-inter">Tailor Cover Letter</p>
+        <Button>Delete</Button>
+      </div>
       <div className="bg-slate-50 border-b  border-slate-200 shadow-md rounded-xl flex flex-col items-center justify-between">
-        <div className="flex w-full gap-3 items-center p-4">
-          <div className="flex gap-1.5">
-            <div className="w-3 h-3 rounded-full bg-red-400"></div>
-            <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
-            <div className="w-3 h-3 rounded-full bg-green-400"></div>
-          </div>
-          <span className="text-xl font-medium text-slate-500">
-            Tailor Cover Letter
-          </span>
-        </div>
-
         <div
           ref={contentRef}
-          className="bg-white p-4 h-[500px] overflow-y-auto w-full"
+          className="bg-white p-4 sm:p-8 h-[500px] overflow-y-auto w-full"
         >
           {isGenerating && !generatedContent ? (
             <div className="flex flex-col items-center justify-center h-full text-gray-400">
@@ -120,10 +108,25 @@ export const TailorCoverLetter = memo<{
               <p className="text-sm">Generating your cover letter...</p>
             </div>
           ) : (
-            <div className="whitespace-pre-wrap text-gray-800 leading-relaxed font-mono text-sm">
-              {displayContent}
-              {isGenerating && (
-                <span className="inline-block w-2 h-5 bg-blue-600 ml-1 animate-pulse"></span>
+            <div className="whitespace-pre-wrap text-gray-800 leading-relaxed font-outfit text-md flex flex-col gap-2">
+              <div className="mb-4">
+                <p className="text-xl font-medium font-inter">
+                  {data?.firstName} {data?.lastName}{" "}
+                </p>
+                <p className="text-sm font-inter">{data?.title}</p>
+              </div>
+              <p className="text-sm font-bold font-inter">
+                Dear Hiring Manager,
+              </p>
+              <p className="text-sm">{displayContent}</p>
+              {displayContent && (
+                <div className="mt-8">
+                  <p className="">Sincerely</p>
+                  <p className="">
+                    {data?.firstName} {data?.lastName}
+                  </p>
+                  <p className="">{data?.phoneNumber}</p>
+                </div>
               )}
             </div>
           )}
@@ -135,7 +138,7 @@ export const TailorCoverLetter = memo<{
           </div>
         )}
       </div>
-    </Card>
+    </div>
   );
 });
 

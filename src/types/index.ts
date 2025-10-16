@@ -54,6 +54,20 @@ export interface PreviewResumeProps {
   cancelTimeout?: () => void;
 }
 
+export interface CoverLetterRequest {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  address: string;
+  phoneNumber: string;
+  portfolio: string;
+  title: string;
+  coverLetter: string;
+  type: string;
+  generatedAt: string;
+}
+
 export type ResumeField =
   | "profile"
   | "contact"
@@ -288,7 +302,7 @@ export interface UserProfile {
   customClaims?: Record<string, any>;
 }
 
-export type StreamData =  ResumeFormData;
+export type StreamData = ResumeFormData;
 
 export interface StreamEvent {
   type:
@@ -344,7 +358,6 @@ export interface CoverLetter {
   type: string;
   generatedAt: string;
 }
-
 
 export interface QAItem {
   question: string;

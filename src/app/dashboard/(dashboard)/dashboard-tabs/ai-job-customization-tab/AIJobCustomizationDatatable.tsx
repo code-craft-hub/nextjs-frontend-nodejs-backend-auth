@@ -13,7 +13,6 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
-import { toast } from "sonner";
 import { z } from "zod";
 
 import { Badge } from "@/components/ui/badge";
@@ -123,19 +122,16 @@ const getColumns = (
         onClick={() => {
           if (row.original.type === "resume") {
             router.push(
-              `/dashboard/tailor-resume?documentId=${row.original.id}`
+              `/dashboard/tailor-resume/${row.original.id}`
             );
-            toast.success("Resume Generated. Check your email!");
           } else if (row.original.type === "cover-letter") {
             router.push(
-              `/dashboard/tailor-cover-letter?coverLetterId=${row.original.id}`
+              `/dashboard/tailor-cover-letter/${row.original.id}`
             );
-            toast.success("Cover Letter Generated. Check your email!");
           } else if (row.original.type === "interview-question") {
             router.push(
-              `/dashboard/tailor-interview-question?interviewQuestionId=${row.original.id}`
+              `/dashboard/tailor-interview-question/${row.original.id}`
             );
-            toast.success("Interview Questions Generated. Check your email!");
           }
         }}
       >
