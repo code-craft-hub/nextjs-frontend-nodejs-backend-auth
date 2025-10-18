@@ -5,7 +5,11 @@ import { IUser } from "./types";
 
 async function verifySessionToken(token: string): Promise<Partial<IUser> | null> {
   try {
+
+    console.log('THIS IS THE TOKEN WE ARE VERIFYING IN MIDDLEWARE:', token);
+
     const secret = new TextEncoder().encode(process.env.JWT_SECRET);
+    console.log("THIS IS THE SECRET : ", secret);
     const { payload } = await jwtVerify(token, secret, {
       issuer: "nextjs-app",
     });
@@ -48,6 +52,8 @@ export async function middleware(request: NextRequest) {
   const sessionToken = request.cookies.get("session")?.value;
   console.log("Session Token raw:", request.cookies.get("session"));
   console.log("Session Token Retrieved:", sessionToken);
+
+  console.log("Verifying session token in MIDDLEWARE...");
   const session = sessionToken ? await verifySessionToken(sessionToken) : null;
 
   console.log("Session Token in MIDDLEWARE:", sessionToken);
