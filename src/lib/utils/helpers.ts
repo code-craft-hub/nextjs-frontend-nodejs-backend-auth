@@ -2,6 +2,29 @@ import { ApiError, QAItem } from "@/types";
 import { jsonrepair } from "jsonrepair";
 import { MouseEvent } from "react";
 
+export const getJwtSecret = () => {
+  const secret = process.env.JWT_SECRET?.trim();
+  console.log("THIS IS THE JWT SECRET:", secret);
+  console.log("THIS IS THE JWT SECRET LENGTH:", secret?.length);
+
+  if (!secret) {
+    throw new Error("JWT_SECRET environment variable is not defined");
+  }
+
+  if (secret.length === 0) {
+    throw new Error("JWT_SECRET environment variable is empty");
+  }
+
+  if (secret.length < 32) {
+    console.warn(
+      `[WARNING] JWT_SECRET is only ${secret.length} characters. ` +
+        "Recommended minimum is 32 characters for security."
+    );
+  }
+
+  return secret;
+};
+
 export const smoothlyScrollToView = (
   e: MouseEvent<HTMLAnchorElement>,
   href: string
