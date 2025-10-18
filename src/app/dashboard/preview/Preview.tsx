@@ -56,7 +56,11 @@ const Preview = ({
       <ProgressIndicator activeStep={activeStep} />
       <TailorCoverLetterDisplay user={user} data={fetched.coverLetterData!} />
       <EditableResume data={fetched.resumeData!} resumeId={resumeId} />
-      <Button onClick={() => handleSubmit()}>Submit</Button>
+      <div className="flex items-center justify-center">
+        <Button onClick={() => handleSubmit()} className="w-64 ">
+          Submit
+        </Button>
+      </div>
     </div>
   );
 };

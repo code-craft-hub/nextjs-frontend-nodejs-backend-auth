@@ -73,6 +73,7 @@ export async function getSessionFromRequest(
 // Get session from cookies (for server components)
 export async function getSessionFromCookies(): Promise<Partial<IUser> | null> {
   const cookieStore = await cookies();
+  console.log("Cookies available:", cookieStore.getAll()); // Debugging line
   const sessionToken = cookieStore.get("session")?.value;
   if (!sessionToken) return null;
   return verifySessionToken(sessionToken);

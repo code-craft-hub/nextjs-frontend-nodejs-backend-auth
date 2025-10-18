@@ -17,7 +17,7 @@ export const RecentActivityCard = memo(() => {
   return (
     <div className="flex bg-slate-50 p-4 sm:p-6 rounded-xl gap-4 sm:gap-6 border border-[#cbd5e1]">
       <div className="shrink-0">
-        <img src="./company.svg" alt="" loading="lazy" />
+        <img src="/company.svg" alt="" loading="lazy" />
       </div>
       <div className="flex flex-col gap-2">
         <h1 className="font-inter">Social Media Assistant</h1>
