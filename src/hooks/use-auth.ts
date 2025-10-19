@@ -33,19 +33,21 @@ export const apiService = {
     destinationEmail: string
   ): Promise<Partial<IUser>> => {
     try {
-      const { data } = await authClient.post("/send-email-with-resume-and-coverletter", {
-        user,
-        coverLetterData,
-        resumeData,
-        destinationEmail,
-      });
+      const { data } = await authClient.post(
+        "/send-email-with-resume-and-coverletter",
+        {
+          user,
+          coverLetterData,
+          resumeData,
+          destinationEmail,
+        }
+      );
 
       return data.data;
     } catch (error: any) {
       console.error("ERROR IN auto-apply: ", error);
       toast.error(
-        error?.response?.data?.error ||
-          "Auto apply failed. Please try again."
+        error?.response?.data?.error || "Auto apply failed. Please try again."
       );
 
       throw new Error(error.error || "Auto apply failed. Please try again.");
@@ -189,12 +191,15 @@ export function useAuth(initialUser?: Partial<IUser>) {
 
   const useCareerDoc = <T>(documentId: string, collection: string) => {
     return useQuery({
-      queryKey: ["auth", "careerDoc", documentId],
+      // FIXED: Include collection in the query key!
+      queryKey: ["auth", "careerDoc", collection, documentId],
       queryFn: async () => {
         if (!documentId) throw new Error("No documentId provided");
         return apiService.getCareerDoc<T>(documentId, collection);
       },
-      enabled: !!documentId, // Only runs when documentId is truthy
+      enabled: !!documentId && !!collection,
+      staleTime: 0, // Always fetch fresh data
+      refetchOnMount: true, // Always refetch when component mounts
     });
   };
 

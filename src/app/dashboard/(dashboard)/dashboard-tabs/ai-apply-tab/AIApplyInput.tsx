@@ -28,6 +28,7 @@ import { FileUploadForm } from "@/components/FileUploadForm";
 import { UploadedFile } from "@/types";
 import { cn } from "@/lib/utils";
 import { useDocumentExtraction } from "@/app/onboarding/onboarding-pages/AnyFormatToText";
+import { isEmpty } from "lodash";
 
 const FORM_SCHEMA = z.object({
   jobDescription: z.string().min(2, {
@@ -36,73 +37,63 @@ const FORM_SCHEMA = z.object({
 });
 
 export const AIApplyInput = memo(() => {
-  const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
-  const {
-    processDocument,
-    isProcessing,
-    // error,
-    // currentFile,
-    // clearError,
-    // clearFile,
-  } = useDocumentExtraction();
+  const [uploadedFiles, setUploadedFiles] = useState<UploadedFile | null>(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [extractedText, setExtractedText] = useState<string>("");
 
-  const handleTextExtraction = async () => {
-    if (uploadedFiles.length === 0) {
-      console.log("No files uploaded");
-      return;
-    }
+  const router = useRouter();
+  const isSelectedFile = !isEmpty(uploadedFiles);
 
-    try {
-      let extractedText = "";
-      console.log(uploadedFiles.length);
-      for (const uploadedFile of uploadedFiles) {
-        console.log("Processing file:", uploadedFile.file.name);
-        const data = await processDocument(uploadedFile.file);
-        extractedText = data?.text || "";
-      }
-      return extractedText;
-    } catch (error) {
-      console.error("Error extracting text:", error);
-    } finally {
-    }
-  };
+  const form = useForm<z.infer<typeof FORM_SCHEMA>>({
+    defaultValues: {
+      jobDescription: "",
+    },
+  });
+
+  const { processDocument, isProcessing } = useDocumentExtraction();
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (!files || files.length === 0) return;
 
-    Array.from(files).forEach((file) => {
-      const fileType = file.type.startsWith("image/") ? "image" : "pdf";
-      const reader = new FileReader();
+    const file = files[0];
 
-      reader.onload = (e) => {
-        const preview = e.target?.result as string;
-        setUploadedFiles((prev) => [
-          ...prev,
-          { file, preview, type: fileType },
-        ]);
-      };
+    const fileType = file.type.startsWith("image/") ? "image" : "pdf";
+    const reader = new FileReader();
 
-      reader.readAsDataURL(file);
-    });
+    reader.onload = async (e) => {
+      const preview = e.target?.result as string;
+      setUploadedFiles({ file, preview, type: fileType });
+      try {
+        console.log("Processing file:", file.name);
+        toast.promise(processDocument(file), {
+          loading: `Cverai is converting this ${fileType} into text.`,
+          success: (data) => {
+            console.log("data extracted : ", data?.text);
+            setExtractedText(data?.text ?? "");
+            return `Done processing the ${fileType}`;
+          },
+          error: "Error",
+        });
+        console.log("Extracted Text on Upload:", extractedText);
+      } catch (error) {
+        console.error("Error extracting text:", error);
+      }
+    };
+
+    reader.readAsDataURL(file);
 
     event.target.value = "";
+
+    setIsDropdownOpen(false);
   };
 
-  const router = useRouter();
-
-  const form = useForm<z.infer<typeof FORM_SCHEMA>>({
-    // resolver: zodResolver(FORM_SCHEMA),
-    defaultValues: {
-      jobDescription: "",
-    },
-  });
   const onSubmit = useCallback(
     async ({ jobDescription }: z.infer<typeof FORM_SCHEMA>) => {
-      const extractText = await handleTextExtraction();
-      console.log("Extracted Text:", extractText);
-
-      const foundEmails = jobDescription.match(emailRegex) || [];
+      const foundEmails =
+        jobDescription.match(emailRegex) ||
+        extractedText.match(emailRegex) ||
+        [];
 
       if (foundEmails.length === 0) {
         toast.error(
@@ -111,23 +102,24 @@ export const AIApplyInput = memo(() => {
         return;
       }
       const params = new URLSearchParams();
-      params.set("jobDescription", JSON.stringify(jobDescription));
+      params.set(
+        "jobDescription",
+        JSON.stringify(jobDescription + extractedText)
+      );
       params.set("destinationEmail", JSON.stringify(foundEmails[0]));
       localStorage?.removeItem("hasResumeAPICalled");
       router.push(
         `/dashboard/tailor-cover-letter/${uuidv4()}?${params}&aiApply=true`
       );
-      // router.push(`/dashboard/resume/${uuidv4()}?${params}`);
     },
-    []
+    [router, extractedText]
   );
 
-  //
   return (
     <div
       className={cn(
         "relative shadow-blue-200 border-blue-500 rounded-2xl border-r shadow-xl  flex flex-col justify-between",
-        uploadedFiles.length > 0 ? "" : "h-38"
+        isSelectedFile ? "" : "h-38"
       )}
     >
       <FileUploadForm
@@ -148,7 +140,7 @@ export const AIApplyInput = memo(() => {
                     placeholder="Let's get started"
                     className={cn(
                       "w-full outline-none focus:outline-none focus:border-none p-2 resize-none pl-4 pt-2 border-none placeholder:font-medium focus-visible:border-none  text-xs z-50",
-                      uploadedFiles.length > 0 ? "" : "h-26"
+                      isSelectedFile ? "" : "h-26"
                     )}
                     {...field}
                   />
@@ -160,27 +152,7 @@ export const AIApplyInput = memo(() => {
         </form>
       </Form>
       <div className="flex justify-between  p-2">
-        {/* <label htmlFor="file-upload" className="bg-amber-900 w-full h-full">
-          <input
-            id="file-upload"
-            type="file"
-            accept="image/*,.pdf"
-            multiple
-            onChange={handleFileUpload}
-            className="hidden"
-          />
-          {PROFILE_OPTIONS.slice(1).map(({ label, value, icon: Icon }) => (
-            <div
-              onSelect={() => {}}
-              key={value}
-              className="gap-2 group hover:text-primary hover:cursor-pointer"
-            >
-              {Icon && <Icon className="size-4 group-hover:text-primary" />}
-              <p className="group-hover:text-primary">{label}</p>
-            </div>
-          ))}
-        </label> */}
-        <DropdownMenu>
+        <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
           <DropdownMenuTrigger className="data-[state=open]:!shadow-2xl rounded-full border-blue-500 p-1 hover:cursor-pointer z-20 border-2">
             <Plus className="text-blue-400 size-4 font-bold" />
           </DropdownMenuTrigger>
@@ -188,12 +160,10 @@ export const AIApplyInput = memo(() => {
             className="p-2 flex flex-col gap-2"
             align="start"
           >
-            {/* Single file input outside the loop */}
             <input
               id="file-upload"
               type="file"
               accept="image/*,.pdf"
-              multiple
               onChange={handleFileUpload}
               className="hidden "
             />
@@ -215,7 +185,7 @@ export const AIApplyInput = memo(() => {
         </DropdownMenu>
         <button
           onClick={form.handleSubmit(onSubmit)}
-          className="rounded-full border-blue-500 border-2 p-1 hover:cursor-pointer z-50"
+          className="rounded-full border-blue-500 border-2 p-1 hover:cursor-pointer z-50,"
         >
           <ArrowUp className="text-blue-400 size-4" />
         </button>

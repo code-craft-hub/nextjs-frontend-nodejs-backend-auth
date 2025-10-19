@@ -39,8 +39,10 @@ const ProgressIcon = ({ progress }: { progress: number }) => (
 export const ProgressIndicator = ({
   activeStep,
   setActiveStep,
+  handleSubmit,
 }: {
   activeStep: number;
+  handleSubmit?: () => void;
   setActiveStep?: (step: number) => void;
 }) => {
   const stages = [
@@ -48,13 +50,15 @@ export const ProgressIndicator = ({
     "Email Drafted",
     "CV Tailored",
     "Review",
-    "Application Sent"
+    "Application Sent",
   ];
 
   const handleSetActiveStep = (step: number) => {
+    console.log(step, activeStep);
     if (step <= activeStep) {
       if (step === 0) return;
-     setActiveStep &&  setActiveStep(step);
+      setActiveStep && setActiveStep(step);
+      if (step === 4) handleSubmit && handleSubmit();
     }
   };
 

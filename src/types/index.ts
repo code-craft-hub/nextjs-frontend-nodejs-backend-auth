@@ -7,7 +7,7 @@ export interface StreamStatus {
 }
 
 export type UploadedFile = {
-  file: File;
+  file: File | null;
   preview: string;
   type: "image" | "pdf";
 };

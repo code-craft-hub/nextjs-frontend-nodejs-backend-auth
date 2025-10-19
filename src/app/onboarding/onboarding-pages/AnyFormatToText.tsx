@@ -126,6 +126,7 @@ class TextExtractionService {
    */
   private static async extractFromImage(file: File): Promise<string> {
     try {
+      console.log("HIT THE IMAGE PROCESSING FUNCTION")
       const { data } = await Tesseract.recognize(
         file,
         "eng", // Language code - can be extended to support multiple languages
