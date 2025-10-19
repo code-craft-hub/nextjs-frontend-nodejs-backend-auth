@@ -30,7 +30,8 @@ export const apiService = {
     user: Partial<IUser>,
     coverLetterData: CoverLetter | undefined,
     resumeData: Resume | undefined,
-    destinationEmail: string
+    destinationEmail: string,
+    jobDescription: string
   ): Promise<Partial<IUser>> => {
     try {
       const { data } = await authClient.post(
@@ -40,6 +41,7 @@ export const apiService = {
           coverLetterData,
           resumeData,
           destinationEmail,
+          jobDescription,
         }
       );
 
@@ -169,9 +171,14 @@ export const apiService = {
       throw new Error(error.error || "Updating user failed");
     }
   },
-  deleteCareerDoc: async (id: string, collection: string): Promise<Partial<IUser>> => {
+  deleteCareerDoc: async (
+    id: string,
+    collection: string
+  ): Promise<Partial<IUser>> => {
     try {
-      const { data } = await authClient.delete(`/career-doc/${id}/${collection}`);
+      const { data } = await authClient.delete(
+        `/career-doc/${id}/${collection}`
+      );
       return data.data;
     } catch (error: any) {
       throw new Error(error.error || "Deleting document failed");

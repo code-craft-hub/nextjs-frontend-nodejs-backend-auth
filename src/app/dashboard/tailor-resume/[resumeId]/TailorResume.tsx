@@ -66,7 +66,7 @@ export const TailorResume = ({
     }
     if (aiApply && streamStatus.isComplete) {
       router.push(
-        `/dashboard/preview?resumeId=${resumeId}&coverLetterId=${coverLetterId}&destinationEmail=${destinationEmail}`
+        `/dashboard/preview?resumeId=${resumeId}&coverLetterId=${coverLetterId}&destinationEmail=${destinationEmail}&jobDescription=${jobDescription}`
       );
     }
   }, [

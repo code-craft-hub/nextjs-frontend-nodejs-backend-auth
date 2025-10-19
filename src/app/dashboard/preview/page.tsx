@@ -2,7 +2,7 @@ import React from "react";
 import Preview from "./Preview";
 
 const PreviewPage = async ({ searchParams }: any) => {
-  const { coverLetterId, resumeId, destinationEmail } = await searchParams;
+  const { coverLetterId, resumeId, destinationEmail, jobDescription } = await searchParams;
 
   let email = "";
 
@@ -20,6 +20,7 @@ const PreviewPage = async ({ searchParams }: any) => {
         coverLetterId={coverLetterId}
         resumeId={resumeId}
         destinationEmail={destinationEmail}
+        jobDescription={jobDescription}
       />
     </div>
   );

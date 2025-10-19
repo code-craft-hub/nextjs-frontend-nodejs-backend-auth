@@ -16,9 +16,11 @@ const Preview = ({
   coverLetterId,
   resumeId,
   destinationEmail,
+  jobDescription
 }: {
   coverLetterId: string;
   resumeId: string;
+  jobDescription: string;
   destinationEmail: string;
 }) => {
   const [activeStep, setActiveStep] = useState(3);
@@ -53,7 +55,8 @@ const Preview = ({
       user,
       coverLetterData,
       resumeData,
-      destinationEmail
+      destinationEmail,
+      jobDescription
     );
   };
 
@@ -76,27 +79,6 @@ const Preview = ({
     );
   }
 
-  // Show error state
-  // if (hasError || !coverLetterData || !resumeData) {
-  //   return (
-  //     <div className="space-y-4 sm:space-y-8">
-  //       <ProgressIndicator activeStep={activeStep} />
-  //       <div className="flex items-center justify-center min-h-[400px]">
-  //         <div className="text-center space-y-4">
-  //           <p className="text-red-600">Failed to load application data</p>
-  //           {(resumeError || coverLetterError) && (
-  //             <p className="text-sm text-gray-600">
-  //               {resumeError?.message || coverLetterError?.message}
-  //             </p>
-  //           )}
-  //           <Button onClick={() => window.location.reload()}>Retry</Button>
-  //         </div>
-  //       </div>
-  //     </div>
-  //   );
-  // }
-
-  // Render the actual content
   return (
     <div className="space-y-4 sm:space-y-8">
       <ProgressIndicator activeStep={activeStep} />
