@@ -13,7 +13,6 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
-import { toast } from "sonner";
 import { z } from "zod";
 
 import { Badge } from "@/components/ui/badge";
@@ -29,16 +28,27 @@ import {
 } from "@/components/ui/table";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 export const schema = z.object({
   id: z.number(),
-  jobTitle: z.string(),
-  applicationDate: z.string(),
-  applicationMethod: z.string().array(),
+  title: z.string(),
+  generatedAt: z.string(),
+  type: z.string(),
   action: z.string(),
+  recruiterEmail: z.string(),
+  jobDescription: z.string(),
+  resumeData: z.object({
+    id: z.number(),
+  }),
+  coverLetterData: z.object({
+    id: z.number(),
+  }),
 });
 
-const columns: ColumnDef<z.infer<typeof schema>>[] = [
+const getColumns = (
+  router: ReturnType<typeof useRouter>
+): ColumnDef<z.infer<typeof schema>>[] => [
   {
     id: "select",
     header: ({ table }) => (
@@ -66,45 +76,42 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "jobTitle",
+    accessorKey: "title",
     header: "Job Title",
     cell: ({ row }) => {
-      return <div className="font-inter">{row.original.jobTitle}</div>;
+      return <div className="font-inter">{row.original.title}</div>;
     },
     enableHiding: false,
   },
   {
-    accessorKey: "applicationDate",
+    accessorKey: "generatedAt",
     header: "Application Date",
     cell: ({ row }) => (
       <div className="">
         <Badge variant="outline" className={cn("border-0 px-1.5 font-inter")}>
-          {row.original.applicationDate}
+          {row.original.generatedAt}
         </Badge>
       </div>
     ),
   },
   {
-    accessorKey: "applicationMethod",
+    accessorKey: "type",
     header: "Application Method",
     cell: ({ row }) => (
       <div className="flex gap-2">
-        {row.original.applicationMethod.map((method, index) => (
-          <div key={method}>
-            <Badge
-              variant="outline"
-              key={method}
-              className={cn(
-                "text-muted-foreground px-1.5 rounded-2xl font-jakarta",
-                index % 2 === 0
-                  ? "bg-primary/10 border-primary/40 text-primary"
-                  : "bg-cverai-green/10 border-cverai-green/40 text-cverai-green"
-              )}
-            >
-              {method}
-            </Badge>
-          </div>
-        ))}
+        <div>
+          <Badge
+            variant="outline"
+            className={cn(
+              "text-muted-foreground px-1.5 rounded-2xl font-jakarta capitalize",
+              row.original.type !== "email"
+                ? "bg-primary/10 border-primary/40 text-primary"
+                : "bg-cverai-green/10 border-cverai-green/40 text-cverai-green"
+            )}
+          >
+            {row.original.type}
+          </Badge>
+        </div>
       </div>
     ),
   },
@@ -115,7 +122,10 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
         variant={"ghost"}
         className="text-blue-500 font-jakarta"
         onClick={() => {
-          toast.success(JSON.stringify(row.original, null, 2));
+          console.log(row.original);
+          router.push(
+            `/dashboard/preview?resumeId=${row.original.resumeData.id}&coverLetterId=${row.original.coverLetterData.id}&destinationEmail=${row.original.recruiterEmail}&jobDescription=${row.original.jobDescription}`
+          );
         }}
       >
         Show Details
@@ -125,6 +135,7 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
 ];
 
 export function AIApplyDatatable({ data }: { data: z.infer<typeof schema>[] }) {
+  const router = useRouter();
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
@@ -136,6 +147,8 @@ export function AIApplyDatatable({ data }: { data: z.infer<typeof schema>[] }) {
     pageIndex: 0,
     pageSize: 10,
   });
+
+  const columns = React.useMemo(() => getColumns(router), [router]); // Generate columns with router
 
   const table = useReactTable({
     data,

@@ -40,4 +40,5 @@ export const COLLECTIONS = {
   COVER_LETTER: "cover_letter",
   JOB_APPLICATION: "job_application",
   INTERVIEW_QUESTION: "interview_question",
+  AI_APPLY: "ai_apply",
 };

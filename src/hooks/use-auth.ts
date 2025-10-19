@@ -48,11 +48,9 @@ export const apiService = {
       return data.data;
     } catch (error: any) {
       console.error("ERROR IN auto-apply: ", error);
-      toast.error(
-        error?.response?.data?.error || "Auto apply failed. Please try again."
-      );
-
-      throw new Error(error.error || "Auto apply failed. Please try again.");
+     
+      throw error;
+      // throw new Error(error.error || "Auto apply failed. Please try again.");
     }
   },
 

@@ -16,7 +16,7 @@ const Preview = ({
   coverLetterId,
   resumeId,
   destinationEmail,
-  jobDescription
+  jobDescription,
 }: {
   coverLetterId: string;
   resumeId: string;
@@ -24,6 +24,7 @@ const Preview = ({
   destinationEmail: string;
 }) => {
   const [activeStep, setActiveStep] = useState(3);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { user, useCareerDoc } = useAuth();
   const router = useRouter();
 
@@ -42,22 +43,36 @@ const Preview = ({
   const isLoading = isResumeLoading || isCoverLetterLoading;
   // const hasError = resumeError || coverLetterError;
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!user || !coverLetterData || !resumeData) {
       toast.error("Missing required data");
       return;
     }
 
-    setActiveStep(4);
-    toast.success("Application Submitted Successfully!");
-
-    apiService.sendApplication(
-      user,
-      coverLetterData,
-      resumeData,
-      destinationEmail,
-      jobDescription
-    );
+    try {
+      setIsSubmitting(true);
+      await apiService.sendApplication(
+        user,
+        coverLetterData,
+        resumeData,
+        destinationEmail,
+        jobDescription
+      );
+      setActiveStep(4);
+      toast.success("Application Submitted Successfully!");
+    } catch (error: any) {
+      toast.error(
+        error?.response?.data || "Auto apply failed. Please try again.",
+        {
+          action: {
+            label: "Authenticate",
+            onClick: () => router.push("/dashboard/settings"),
+          },
+        }
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleCoverLetterDelete = async () => {
@@ -83,9 +98,12 @@ const Preview = ({
     <div className="space-y-4 sm:space-y-8">
       <ProgressIndicator activeStep={activeStep} />
       <div className="flex w-full gap-3 items-center  p-4 bg-white justify-between">
-        <p className="text-md font-medium font-inter">Preview Resume and Cover Letter</p>
+        <p className="text-md font-medium font-inter">
+          Preview Resume and Cover Letter
+        </p>
         <Button
-        className="text-2xs"
+          disabled={isSubmitting}
+          className="text-2xs"
           onClick={() => {
             handleCoverLetterDelete();
           }}
@@ -96,7 +114,7 @@ const Preview = ({
       <TailorCoverLetterDisplay user={user} data={coverLetterData} />
       <EditableResume data={resumeData!} resumeId={resumeId} />
       <div className="flex items-center justify-center">
-        <Button onClick={handleSubmit} className="w-64">
+        <Button disabled={isSubmitting} onClick={handleSubmit} className="w-64">
           Submit
         </Button>
       </div>

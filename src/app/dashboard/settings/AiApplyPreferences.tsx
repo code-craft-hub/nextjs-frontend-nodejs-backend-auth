@@ -3,7 +3,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
 import React, { JSX, useState } from "react";
 import { toast } from "sonner";
-import AuthorizeGoogle from "./(google-gmail-authorization)/AuthorizeGoogle";
+// import AuthorizeGoogle from "./(google-gmail-authorization)/AuthorizeGoogle";
 interface SettingOption {
   label: string;
   description: string;
@@ -259,7 +259,7 @@ export const AiApplyPreferences: React.FC = () => {
         <button
           key={index}
           className={cn(
-            "p-2 border border-blue-300 rounded-lg text-3xs hover:bg-gray-50 transition-colors",
+            "p-2 border border-blue-300 rounded-lg text-3xs transition-colors",
             index % 2 != 0 ? "bg-blue-500 text-white" : "text-blue-500"
           )}
           onClick={() => handleButtonClick(action)}
@@ -339,7 +339,7 @@ export const AiApplyPreferences: React.FC = () => {
           </div>
         ))}
 
-        <AuthorizeGoogle />
+        
       </div>
       <div className="mt-6 flex gap-4 ml-auto w-fit">
         <Button
