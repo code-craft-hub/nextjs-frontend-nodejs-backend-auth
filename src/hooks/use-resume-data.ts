@@ -1,17 +1,18 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { authAPI } from "@/lib/axios/auth-api";
+// import { authAPI } from "@/lib/axios/auth-api";
 import { ResumeField, UpdatePayload, UseResumeDataOptions } from "@/types";
 import { ResumeFormData } from "@/lib/schema-validations/resume.schema";
 import { createApiError } from "@/lib/utils/helpers";
 import { COLLECTIONS } from "@/lib/utils/constants";
+import authClient from "@/lib/axios/auth-api";
 
 const updateResumeField = async <T>(
   payload: UpdatePayload<T>,
   baseUrl: string = process.env.NEXT_PUBLIC_AUTH_API_URL || ""
 ): Promise<any> => {
   try {
-    const { data } = await authAPI.patch(
+    const { data } = await authClient.patch(
       `${baseUrl}/career-doc/${payload.resumeId}?collection=${COLLECTIONS.RESUME}`,
       {
         resumeId: payload.resumeId,

@@ -1,8 +1,8 @@
 import {
   createApiClient,
   setupInterceptors,
-  createApiMethods,
-  ApiMethods,
+  // createApiMethods,
+  // ApiMethods,
 } from "./base";
 
 const authClient = createApiClient({
@@ -37,39 +37,39 @@ authClient.interceptors.response.use(
 );
 
 // Create API methods
-const authMethods = createApiMethods(authClient);
+// const authMethods = createApiMethods(authClient);
 
-// Auth-specific extended API
-interface AuthAPI extends ApiMethods {
-  login: (credentials: { email: string; password: string }) => Promise<any>;
-  logout: () => Promise<any>;
-  register: (userData: {
-    email: string;
-    password: string;
-    name: string;
-  }) => Promise<any>;
-  refreshToken: () => Promise<any>;
-  forgotPassword: (email: string) => Promise<any>;
-  resetPassword: (token: string, password: string) => Promise<any>;
-  verifyEmail: (token: string) => Promise<any>;
-  getProfile: () => Promise<any>;
-}
+// // Auth-specific extended API
+// interface AuthAPI extends ApiMethods {
+//   login: (credentials: { email: string; password: string }) => Promise<any>;
+//   logout: () => Promise<any>;
+//   register: (userData: {
+//     email: string;
+//     password: string;
+//     name: string;
+//   }) => Promise<any>;
+//   refreshToken: () => Promise<any>;
+//   forgotPassword: (email: string) => Promise<any>;
+//   resetPassword: (token: string, password: string) => Promise<any>;
+//   verifyEmail: (token: string) => Promise<any>;
+//   getProfile: () => Promise<any>;
+// }
 
-export const authAPI: AuthAPI = {
-  ...authMethods,
-  login: (credentials) => authMethods.post("/login", credentials),
-  logout: () => authMethods.post("/logout"),
-  register: (userData) => authMethods.post("/register", userData),
-  refreshToken: () => authMethods.post("/refresh"),
-  forgotPassword: (email) => authMethods.post("/forgot-password", { email }),
-  resetPassword: (token, password) =>
-    authMethods.post("/reset-password", { token, password }),
+// export const authAPI: AuthAPI = {
+//   ...authMethods,
+//   login: (credentials) => authMethods.post("/login", credentials),
+//   logout: () => authMethods.post("/logout"),
+//   register: (userData) => authMethods.post("/register", userData),
+//   refreshToken: () => authMethods.post("/refresh"),
+//   forgotPassword: (email) => authMethods.post("/forgot-password", { email }),
+//   resetPassword: (token, password) =>
+//     authMethods.post("/reset-password", { token, password }),
 
-  // Email verification
-  verifyEmail: (token) => authMethods.post("/verify-email", { token }),
+//   // Email verification
+//   verifyEmail: (token) => authMethods.post("/verify-email", { token }),
 
-  // Profile management
-  getProfile: () => authMethods.get("/profile"),
-};
+//   // Profile management
+//   getProfile: () => authMethods.get("/profile"),
+// };
 
 export default authClient;

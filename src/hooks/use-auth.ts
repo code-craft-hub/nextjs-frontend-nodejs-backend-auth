@@ -169,6 +169,14 @@ export const apiService = {
       throw new Error(error.error || "Updating user failed");
     }
   },
+  deleteCareerDoc: async (id: string, collection: string): Promise<Partial<IUser>> => {
+    try {
+      const { data } = await authClient.delete(`/career-doc/${id}/${collection}`);
+      return data.data;
+    } catch (error: any) {
+      throw new Error(error.error || "Deleting document failed");
+    }
+  },
 };
 
 export function useAuth(initialUser?: Partial<IUser>) {

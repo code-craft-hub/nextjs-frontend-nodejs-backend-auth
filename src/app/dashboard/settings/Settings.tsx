@@ -10,23 +10,26 @@ import { ProfileManagement } from "./ProfileManagement";
 const Settings = () => {
   return (
     <div>
-      <Tabs defaultValue="profile-management" >
+      <Tabs defaultValue="profile-management">
         <TabsList className="bg-white w-full p-1 font-roboto gap-x-4">
           <TabsTrigger
             value="profile-management"
-            className="text-md font-medium"
+            className="text-xs font-medium"
           >
             <User className="w-4 h-4" />
             <span className="max-sm:hidden">Profile Management</span>
           </TabsTrigger>
           <TabsTrigger
             value="ai-applypreference"
-            className="text-md font-medium"
+            className="text-xs font-medium"
           >
-            <img src="/ai-apply.svg" alt="AI apply" className="size-4" /> 
+            <img src="/ai-apply.svg" alt="AI apply" className="size-4" />
             <span className="max-sm:hidden">AI Apply Preferences</span>
           </TabsTrigger>
-          <TabsTrigger value="advanced-settings">
+          <TabsTrigger
+            className="text-xs font-medium"
+            value="advanced-settings"
+          >
             <img src="/select-profile.svg" alt="AI apply" className="size-4" />
             <span className="max-sm:hidden">Advanced Settings</span>
           </TabsTrigger>

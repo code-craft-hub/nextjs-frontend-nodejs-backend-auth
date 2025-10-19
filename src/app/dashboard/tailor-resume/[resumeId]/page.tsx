@@ -16,7 +16,7 @@ const TailorResumePage = async ({ searchParams, params }: any) => {
 
   return (
     <div>
-      <div
+      {/* <div
         className="absolute w-full h-80 top-0 pointer-events-none"
         style={{
           background: "url('/dashboard-gradient.svg')",
@@ -24,7 +24,7 @@ const TailorResumePage = async ({ searchParams, params }: any) => {
           backgroundSize: "cover",
           backgroundPosition: "center center",
         }}
-      />
+      /> */}
       <div className="p-4 sm:p-8">
         <TailorResume
           aiApply={aiApply === "true"}

@@ -1,6 +1,9 @@
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/use-auth";
+import { cn } from "@/lib/utils";
 import React, { JSX, useState } from "react";
 import { toast } from "sonner";
+import AuthorizeGoogle from "./(google-gmail-authorization)/AuthorizeGoogle";
 interface SettingOption {
   label: string;
   description: string;
@@ -66,6 +69,7 @@ const Label: React.FC<LabelProps> = ({ htmlFor, className = "", children }) => (
 );
 
 export const AiApplyPreferences: React.FC = () => {
+  const { user } = useAuth();
   const settings: Setting[] = [
     {
       section: "Auto Apply Configuration",
@@ -142,7 +146,7 @@ export const AiApplyPreferences: React.FC = () => {
       options: [
         {
           label: "Gmail Connected",
-          description: "Connected: Cver@gmail.com",
+          description: `Connected: ${user?.email}`,
           type: "buttons",
           actions: ["Disconnect", "Edit"],
         },
@@ -173,7 +177,7 @@ export const AiApplyPreferences: React.FC = () => {
       options: [
         {
           label: "WhatsApp Connection",
-          description: "Connected: +234 812 345 6789",
+          description: `Connected: ${user?.phoneNumber || "Not Connected"}`,
           type: "buttons",
           actions: ["Disconnect", "Edit"],
         },
@@ -224,19 +228,19 @@ export const AiApplyPreferences: React.FC = () => {
   };
 
   // Reset all switches
-  const resetAllSwitches = (): void => {
-    const resetState: SwitchStates = {};
-    Object.keys(switchStates).forEach((key) => {
-      resetState[key] = false;
-    });
-    setSwitchStates(resetState);
-  };
+  // const resetAllSwitches = (): void => {
+  //   const resetState: SwitchStates = {};
+  //   Object.keys(switchStates).forEach((key) => {
+  //     resetState[key] = false;
+  //   });
+  //   setSwitchStates(resetState);
+  // };
 
   // Save settings (example API call)
   const saveSettings = async (): Promise<void> => {
     try {
       console.log("Save settings:", switchStates);
-      toast.success("Data saved success!")
+      toast.success("Data saved success!");
       // Example API call
       // await fetch('/api/settings', {
       //   method: 'POST',
@@ -254,7 +258,10 @@ export const AiApplyPreferences: React.FC = () => {
       {actions.map((action: string, index: number) => (
         <button
           key={index}
-          className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+          className={cn(
+            "p-2 border border-blue-300 rounded-lg text-3xs hover:bg-gray-50 transition-colors",
+            index % 2 != 0 ? "bg-blue-500 text-white" : "text-blue-500"
+          )}
           onClick={() => handleButtonClick(action)}
           style={{
             boxShadow: `
@@ -331,21 +338,23 @@ export const AiApplyPreferences: React.FC = () => {
             </div>
           </div>
         ))}
+
+        <AuthorizeGoogle />
       </div>
-      <div className="mt-6 flex gap-4">
+      <div className="mt-6 flex gap-4 ml-auto w-fit">
         <Button
           className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
           onClick={saveSettings}
-          >
+        >
           Save Settings
         </Button>
-        <Button
+        {/* <Button
           className="px-4 py-2 rounded  transition-colors"
           variant={"outline"}
           onClick={resetAllSwitches}
         >
           Reset All
-        </Button>
+        </Button> */}
       </div>
     </div>
   );

@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 const Preview = ({
   coverLetterId,
@@ -22,37 +23,47 @@ const Preview = ({
 }) => {
   const [activeStep, setActiveStep] = useState(3);
   const { user, useCareerDoc } = useAuth();
-  
+  const router = useRouter();
+
   const {
     data: resumeData,
     isLoading: isResumeLoading,
-    error: resumeError,
+    // error: resumeError,
   } = useCareerDoc<Resume>(resumeId, COLLECTIONS.RESUME);
-  
+
   const {
     data: coverLetterData,
     isLoading: isCoverLetterLoading,
-    error: coverLetterError,
+    // error: coverLetterError,
   } = useCareerDoc<CoverLetter>(coverLetterId, COLLECTIONS.COVER_LETTER);
 
   const isLoading = isResumeLoading || isCoverLetterLoading;
-  const hasError = resumeError || coverLetterError;
+  // const hasError = resumeError || coverLetterError;
 
   const handleSubmit = () => {
     if (!user || !coverLetterData || !resumeData) {
       toast.error("Missing required data");
       return;
     }
-    
+
     setActiveStep(4);
     toast.success("Application Submitted Successfully!");
-    
+
     apiService.sendApplication(
       user,
       coverLetterData,
       resumeData,
       destinationEmail
     );
+  };
+
+  const handleCoverLetterDelete = async () => {
+    Promise.all([
+      apiService.deleteCareerDoc(coverLetterId, COLLECTIONS.COVER_LETTER),
+      apiService.deleteCareerDoc(resumeId, COLLECTIONS.RESUME),
+    ]);
+    toast.success("Resume and Cover Letter deleted successfully");
+    router.push("/dashboard/home");
   };
 
   // Show loading state
@@ -66,31 +77,42 @@ const Preview = ({
   }
 
   // Show error state
-  if (hasError || !coverLetterData || !resumeData) {
-    return (
-      <div className="space-y-4 sm:space-y-8">
-        <ProgressIndicator activeStep={activeStep} />
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="text-center space-y-4">
-            <p className="text-red-600">Failed to load application data</p>
-            {(resumeError || coverLetterError) && (
-              <p className="text-sm text-gray-600">
-                {resumeError?.message || coverLetterError?.message}
-              </p>
-            )}
-            <Button onClick={() => window.location.reload()}>Retry</Button>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // if (hasError || !coverLetterData || !resumeData) {
+  //   return (
+  //     <div className="space-y-4 sm:space-y-8">
+  //       <ProgressIndicator activeStep={activeStep} />
+  //       <div className="flex items-center justify-center min-h-[400px]">
+  //         <div className="text-center space-y-4">
+  //           <p className="text-red-600">Failed to load application data</p>
+  //           {(resumeError || coverLetterError) && (
+  //             <p className="text-sm text-gray-600">
+  //               {resumeError?.message || coverLetterError?.message}
+  //             </p>
+  //           )}
+  //           <Button onClick={() => window.location.reload()}>Retry</Button>
+  //         </div>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   // Render the actual content
   return (
     <div className="space-y-4 sm:space-y-8">
       <ProgressIndicator activeStep={activeStep} />
+      <div className="flex w-full gap-3 items-center  p-4 bg-white justify-between">
+        <p className="text-md font-medium font-inter">Preview Resume and Cover Letter</p>
+        <Button
+        className="text-2xs"
+          onClick={() => {
+            handleCoverLetterDelete();
+          }}
+        >
+          Delete
+        </Button>
+      </div>
       <TailorCoverLetterDisplay user={user} data={coverLetterData} />
-      <EditableResume data={resumeData} resumeId={resumeId} />
+      <EditableResume data={resumeData!} resumeId={resumeId} />
       <div className="flex items-center justify-center">
         <Button onClick={handleSubmit} className="w-64">
           Submit

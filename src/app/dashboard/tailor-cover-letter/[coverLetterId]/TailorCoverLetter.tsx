@@ -3,7 +3,7 @@
 import React, { useRef, useEffect, memo } from "react";
 import { Loader2 } from "lucide-react";
 import { useCoverLetterGenerator } from "@/hooks/useCoverLetterGenerator";
-import { useAuth } from "@/hooks/use-auth";
+import { apiService, useAuth } from "@/hooks/use-auth";
 import { useRouter } from "next/navigation";
 import { createCoverLetterOrderedParams } from "@/lib/utils/helpers";
 import { toast } from "sonner";
@@ -100,13 +100,26 @@ export const TailorCoverLetter = memo<{
     ? data?.coverLetter
     : generatedContent;
 
+  const handleCoverLetterDelete = async () => {
+    await apiService.deleteCareerDoc(coverLetterId, COLLECTIONS.COVER_LETTER);
+    toast.success("Cover letter deleted successfully");
+    router.push("/dashboard/home");
+  };
+
   return (
     <div className="grid grid-cols-1 gap-4 sm:gap-6">
       {/* <div className="p"></div> */}
       {aiApply && <ProgressIndicator activeStep={1} />}
-      <div className="flex w-full gap-3 items-center  p-4 sm:px-8 bg-white justify-between">
-        <p className="text-xl font-medium font-inter">Tailor Cover Letter</p>
-        <Button>Delete</Button>
+      <div className="flex w-full gap-3 items-center  p-4  bg-white justify-between">
+        <p className="text-xl font-medium font-inter">Tailored Cover Letter</p>
+        <Button
+        className="text-2xs"
+          onClick={() => {
+            handleCoverLetterDelete();
+          }}
+        >
+          Delete
+        </Button>
       </div>
       <div className="bg-slate-50 border-b  border-slate-200 shadow-md rounded-xl flex flex-col items-center justify-between">
         <div

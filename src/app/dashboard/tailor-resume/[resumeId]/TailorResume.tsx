@@ -2,12 +2,13 @@
 import React, { useEffect, useRef } from "react";
 import { useResumeStream } from "@/hooks/stream-resume-hook";
 import { toast } from "sonner";
-import { useAuth } from "@/hooks/use-auth";
+import { apiService, useAuth } from "@/hooks/use-auth";
 import { Resume } from "@/types";
 import { COLLECTIONS } from "@/lib/utils/constants";
 import { EditableResume } from "../../(dashboard)/ai-apply/components/resume/EditableResume";
 import { ProgressIndicator } from "../../(dashboard)/ai-apply/progress-indicator";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 
 export const TailorResume = ({
   jobDescription,
@@ -79,6 +80,12 @@ export const TailorResume = ({
   ]);
 
   const shouldUseDbData = streamData.profile === "";
+
+  const handleCoverLetterDelete = async () => {
+    await apiService.deleteCareerDoc(resumeId, COLLECTIONS.RESUME);
+    toast.success("Resume deleted successfully");
+    router.push("/dashboard/home");
+  };
   return (
     <div className="space-y-4 sm:space-y-8">
       {/* {JSON.stringify(streamStatus)}
@@ -93,6 +100,17 @@ export const TailorResume = ({
         <div>streaming isConnected is False</div>
       )} */}
       {aiApply && <ProgressIndicator activeStep={2} />}
+      <div className="flex w-full gap-3 items-center  p-4  bg-white justify-between">
+        <p className="text-xl font-medium font-inter">Tailored Resume</p>
+        <Button
+          className="text-2xs"
+          onClick={() => {
+            handleCoverLetterDelete();
+          }}
+        >
+          Delete
+        </Button>
+      </div>
       <EditableResume
         data={shouldUseDbData ? data! : streamData}
         resumeId={resumeId}
