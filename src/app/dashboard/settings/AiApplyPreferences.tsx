@@ -3,11 +3,11 @@ import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
 import React, { JSX, useState } from "react";
 import { toast } from "sonner";
-// import AuthorizeGoogle from "./(google-gmail-authorization)/AuthorizeGoogle";
+import AuthorizeGoogle from "./(google-gmail-authorization)/AuthorizeGoogle";
 interface SettingOption {
   label: string;
   description: string;
-  type: "toggle" | "buttons";
+  type: "toggle" | "buttons" | "custom";
   key?: string;
   actions?: string[];
 }
@@ -147,7 +147,7 @@ export const AiApplyPreferences: React.FC = () => {
         {
           label: "Gmail Connected",
           description: `Connected: ${user?.email}`,
-          type: "buttons",
+          type: "custom",
           actions: ["Disconnect", "Edit"],
         },
       ],
@@ -330,6 +330,31 @@ export const AiApplyPreferences: React.FC = () => {
                         />
                       ) : option.type === "buttons" && option.actions ? (
                         renderButtons(option.actions)
+                      ) : option.type === "custom" && option.actions ? (
+                        <div>
+                          <div className="flex gap-2">
+                            <AuthorizeGoogle />
+                            {/* <button
+                                key={index}
+                                className={cn(
+                                  "p-2 border border-blue-300 rounded-lg text-3xs transition-colors",
+                                  index % 2 != 0
+                                    ? "bg-blue-500 text-white"
+                                    : "text-blue-500"
+                                )}
+                                onClick={() => handleButtonClick(action)}
+                                style={{
+                                  boxShadow: `
+      0 0 0 1px rgba(158, 203, 251, 0.3),
+      0 2px 4px rgba(158, 203, 251, 0.1),
+      0 4px 8px rgba(158, 203, 251, 0.1)
+    `,
+                                }}
+                              >
+                                {action}
+                              </button> */}
+                          </div>
+                        </div>
                       ) : null}
                     </div>
                   </div>
@@ -338,8 +363,6 @@ export const AiApplyPreferences: React.FC = () => {
             </div>
           </div>
         ))}
-
-        
       </div>
       <div className="mt-6 flex gap-4 ml-auto w-fit">
         <Button

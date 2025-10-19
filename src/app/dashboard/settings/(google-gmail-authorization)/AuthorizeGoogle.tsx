@@ -7,10 +7,10 @@ import { toast } from "sonner";
 import {
   Form,
   FormControl,
-  FormDescription,
+  // FormDescription,
   FormField,
   FormItem,
-  FormLabel,
+  // FormLabel,
 } from "@/components/ui/form";
 import { Switch } from "@/components/ui/switch";
 import { useRouter } from "next/navigation";
@@ -127,14 +127,14 @@ const AuthorizeGoogle: React.FC = () => {
           name="authorized"
           render={({ field }) => (
             <FormItem className="flex flex-row items-center ">
-              <div className="space-y-0.5">
+              {/* <div className="space-y-0.5">
                 <FormLabel>Email Authorization</FormLabel>
                 <FormDescription>
                   Turn on to grant cverai access to your email box, to send
                   emails and save generate emails and cover letters to your
                   inbox.
                 </FormDescription>
-              </div>
+              </div> */}
               <FormControl>
                 <Switch
                   checked={field.value}
