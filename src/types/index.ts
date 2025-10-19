@@ -6,6 +6,12 @@ export interface StreamStatus {
   completedSections: Set<string>;
 }
 
+export type UploadedFile = {
+  file: File;
+  preview: string;
+  type: "image" | "pdf";
+};
+
 export interface IUser {
   uid?: string;
   providerId?: string;
