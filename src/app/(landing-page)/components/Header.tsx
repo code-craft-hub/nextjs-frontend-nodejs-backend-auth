@@ -24,14 +24,14 @@ export const Header = () => {
 
   return (
     <div>
-      <header className="fixed w-full top-0 z-50  backdrop-blur-sm">
+      <header className="fixed w-full top-0 z-50  backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+          <div className="flex items-center justify-between h-16 z-50">
             <div className="flex items-center space-x-2">
               <img src="/logo.svg" alt="" />
             </div>
 
-            <nav className="hidden lg:flex items-center space-x-8">
+            <nav className="hidden lg:flex items-center space-x-8 z-50">
               {navItems.map((nav) => (
                 <Link
                   key={nav.name}

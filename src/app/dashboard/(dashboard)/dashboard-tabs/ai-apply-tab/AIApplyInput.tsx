@@ -142,7 +142,7 @@ export const AIApplyInput = memo(
                     <textarea
                       placeholder="Let's get started"
                       className={cn(
-                        "w-full outline-none focus:outline-none focus:border-none p-2 resize-none pl-4 pt-2 border-none placeholder:font-medium focus-visible:border-none  text-xs z-50",
+                        "w-full outline-none focus:outline-none focus:border-none p-2 resize-none pl-4 pt-2 border-none placeholder:font-medium focus-visible:border-none  text-xs",
                         isSelectedFile ? "" : "h-26"
                       )}
                       {...field}
