@@ -36,9 +36,7 @@ const DashboardLayout = async ({ children }: DashboardLayoutProps) => {
           </div>
         </header>
         <div className="w-full min-h-screen bg-[#F5F7FA]">
-          <div className="flex flex-1 flex-col gap-4 max-w-screen-xl ">
-            {children}
-          </div>
+          {children}
         </div>
       </SidebarInset>
     </SidebarProvider>

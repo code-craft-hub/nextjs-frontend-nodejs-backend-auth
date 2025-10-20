@@ -22,6 +22,7 @@ import UserIcon from "./icons/userIcon";
 import JobIcon from "./icons/jobIcon";
 import AnalyticIcon from "./icons/analyticIcon";
 import SettingIcon from "./icons/settingIcon";
+import Link from "next/link";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user } = useAuth();
@@ -69,14 +70,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   };
 
   return (
-    <Sidebar className="!bg-red-500" {...props}>
+    <Sidebar className="" {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <a href="#">
-                <Image src={"/logo.svg"} width={70} height={70} alt={"Logo"} />
-              </a>
+              <Link href="/">
+                <Image src={"/cverai-logo.png"} width={70} height={70} alt={"Logo"} />
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

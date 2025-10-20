@@ -56,14 +56,14 @@ export const LandingPageClient = () => {
               <div key={option.name}>
                 <Link
                   href={option.url}
-                  className="glass-button !text-black sm:w-48 gap-2 p-3"
+                  className="glass-button !text-black sm:w-32 gap-2 p-3"
                 >
                   <img
                     src={option.icon}
                     alt={option.name}
-                    className="max-xs4:size-3"
+                    className="max-xs4:size-3 size-4"
                   />
-                  <span className="max-xs4:text-[0.6rem] text-nowrap">
+                  <span className="max-xs4:text-[0.6rem] text-xs text-nowrap">
                     {option.name}
                   </span>
                 </Link>
