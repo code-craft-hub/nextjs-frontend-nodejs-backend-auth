@@ -1,9 +1,6 @@
 import { requireOnboarding } from "@/lib/server-auth";
 import type { Metadata } from "next";
 import { HomeClient } from "./Home.tsx";
-// import { getQueryClient } from "@/lib/query-client.js";
-// import { apiService } from "@/hooks/use-auth.js";
-// import { COLLECTIONS } from "@/lib/utils/constants.js";
 export const metadata: Metadata = {
   title: "Cverai Dashboard",
   description: "User dashboard",
