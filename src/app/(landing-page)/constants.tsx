@@ -38,20 +38,21 @@ export const TAB_ITEMS = [
     title: "AI Apply",
     icon: "/white-ai-apply.svg",
     value: "ai-apply",
+    url: "/dashboard/home?tab=ai-apply",
   },
   {
     title: "Tailor Cv",
     icon: "/dashboard-tailor.svg",
     value: "tailor-cv",
+    url: "/dashboard/home?tab=tailor-cv",
   },
   {
     title: "Find Jobs",
     icon: "/findJob.svg",
     value: "find-jobs",
+    url: "/dashboard/home?tab=find-jobs",
   },
 ] as const;
-
-
 
 export const featuredJobs = [
   {
@@ -253,16 +254,16 @@ export const actionButtons = [
   {
     name: "AI Apply",
     icon: "/ai-apply.svg",
-    url: "/dashboard/home",
+    url: "/dashboard/home?tab=ai-apply",
   },
   {
     name: "Tailor CV",
     icon: "/tailor-cv.svg",
-    url: "/dashboard/home",
+    url: "/dashboard/home?tab=tailor-cv",
   },
   {
     name: "Find Jobs",
     icon: "/search.svg",
-    url: "/dashboard/home",
+    url: "/dashboard/home?tab=find-jobs",
   },
 ];

@@ -11,6 +11,7 @@ export type UploadedFile = {
   preview: string;
   type: "image" | "pdf";
 };
+export type DashboardTab = "ai-apply" | "find-jobs" | "tailor-cv";
 
 export interface IUser {
   uid?: string;

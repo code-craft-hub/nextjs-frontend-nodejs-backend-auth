@@ -1,21 +1,19 @@
 import { requireOnboarding } from "@/lib/server-auth";
 import type { Metadata } from "next";
 import { HomeClient } from "./Home.tsx";
+import { DashboardTab } from "@/types/index.js";
+
 export const metadata: Metadata = {
   title: "Cverai Dashboard",
   description: "User dashboard",
 };
 
-export default async function HomePage() {
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ tab: DashboardTab }>;
+}) {
+  const { tab } = await searchParams;
   const session = await requireOnboarding();
-  // const queryClient = getQueryClient();
-  // queryClient.prefetchQuery({
-  //   queryKey: ["auth", "careerDoc"],
-  //   queryFn: () => {
-  //     apiService.getAllDoc(COLLECTIONS.COVER_LETTER);
-  //     apiService.getAllDoc(COLLECTIONS.RESUME);
-  //     apiService.getAllDoc(COLLECTIONS.INTERVIEW_QUESTION);
-  //   },
-  // });
-  return <HomeClient initialUser={session} />;
+  return <HomeClient initialUser={session} tab={tab} />;
 }

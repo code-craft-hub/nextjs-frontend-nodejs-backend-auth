@@ -29,7 +29,10 @@ import Link from "next/link";
 
 export const LandingPageClient = () => {
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
+  const [jobDescription, setJobDescription] = useState("");
   const router = useRouter();
+
+  console.count("LandingPageClient Rendered");
 
   return (
     <div className="min-h-screen bg-white font-poppins">
@@ -44,13 +47,13 @@ export const LandingPageClient = () => {
       >
         <Header />
         <div className="pt-32 mx-auto">
-          <h1 className="text-4xl text-center font-medium s:text-red-900 mb-16 !font-instrument">
+          <h1 className="text-4xl text-center font-medium s:text-red-900 mb-12 !font-instrument">
             AI Assist To Apply
           </h1>
         </div>
       </section>
       <section className="relative overflow-hidden">
-        <div className="max-w-4xl mx-auto px-4 pb-20 lg:pb-32 space-y-8">
+        <div className="max-w-7xl mx-auto px-4 pb-20 sm:px-6 lg:px-8 lg:pb-32 space-y-8">
           <div className="flex flex-row items-center justify-center mx-auto max-sm:justify-evenly gap-2 sm:gap-4">
             {actionButtons.map((option) => (
               <div key={option.name}>
@@ -70,7 +73,7 @@ export const LandingPageClient = () => {
               </div>
             ))}
           </div>
-          <div className="text-center  mx-auto">
+          <div className="text-center mx-auto">
             {/* Search Bar */}
             <div className=" mb-16">
               <div className="flex-1 relative">
@@ -82,11 +85,13 @@ export const LandingPageClient = () => {
                 </div>
                 <textarea
                   placeholder="Let's get started"
+                  value={jobDescription}
+                  onChange={(e) => setJobDescription(e.target.value)}
                   className="w-full h-36 border p-2 resize-none rounded-2xl pl-4 pt-2  placeholder:font-medium shadow-xl shadow-blue-100 transition-all duration-500"
                 ></textarea>
                 <div
                   className="border-blue-500 border-[1px] w-fit rounded-full p-1 absolute bottom-4 right-3 "
-                  onClick={() => router.push(`/dashboard/ai-apply`)}
+                  onClick={() => router.push(`/dashboard/home?tab=ai-apply&jobDescription=${encodeURIComponent(jobDescription)}`)}
                 >
                   <ArrowUp className=" text-blue-400 size-3 " />
                 </div>
