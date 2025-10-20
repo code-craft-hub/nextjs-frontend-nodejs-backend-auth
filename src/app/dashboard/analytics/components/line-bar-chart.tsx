@@ -100,8 +100,7 @@ export const UsageTrendDashboard = (): JSX.Element => {
     });
   }, [activeIndex]);
 
-  const handleMouseEnter = useCallback((data: any, index: number): void => {
-    console.log(data, index);
+  const handleMouseEnter = useCallback((_data: any, index: number): void => {
     setActiveIndex(index);
   }, []);
 

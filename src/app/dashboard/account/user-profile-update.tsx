@@ -71,8 +71,7 @@ export const UserProfileForm: React.FC = () => {
     },
   });
 
-  const onSubmit = (data: ProfileFormData) => {
-    console.log("Form submitted:", data);
+  const onSubmit = () => {
   };
 
   return (

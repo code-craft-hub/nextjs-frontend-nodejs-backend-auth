@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { memo } from "react";
 import { AIApply } from "../(dashboard)/dashboard-tabs/ai-apply-tab/AIApply";
 import { FindJob } from "../(dashboard)/dashboard-tabs/find-job-tab/FindJob";
-import { DashboardTab, IUser } from "@/types";
+import { DashboardTab } from "@/types";
 import { TAB_ITEMS } from "../../(landing-page)/constants";
 import { AIJobCustomization } from "../(dashboard)/dashboard-tabs/ai-job-customization-tab/AIJobCustomization";
 import { TopGradient } from "@/components/shared/TopGradient";
@@ -12,11 +12,9 @@ import { useRouter } from "next/navigation";
 
 export const HomeClient = memo(
   ({
-    initialUser,
     tab,
     jobDescription
   }: {
-    initialUser: Partial<IUser>;
     tab: DashboardTab;
     jobDescription: string;
   }) => {
@@ -59,7 +57,7 @@ export const HomeClient = memo(
               <AIJobCustomization />
             </TabsContent>
             <TabsContent value="find-jobs">
-              <FindJob initialUser={initialUser} />
+              <FindJob/>
             </TabsContent>
           </Tabs>
         </div>

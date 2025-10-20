@@ -1,6 +1,5 @@
 import React, { Suspense } from "react";
 import { getQueryClient } from "@/lib/query-client";
-import { getServerSession } from "@/lib/server-auth";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { getUser } from "@/lib/server-fetch.utils";
 import { LandingPageClient } from "./landing-page";
@@ -8,9 +7,7 @@ import { LandingPageClient } from "./landing-page";
 const LandingPage = async () => {
   async function prefetchUserData() {
     const queryClient = getQueryClient();
-    const user = await getServerSession();
   
-    console.log("User in layout:", user);
     const userPromise = queryClient.prefetchQuery({
       queryKey: ["auth", "user"],
       queryFn: () => getUser(),

@@ -3,7 +3,7 @@ import React, { useRef, useEffect, memo } from "react";
 import { Loader2 } from "lucide-react";
 import { useCoverLetterGenerator } from "@/hooks/useCoverLetterGenerator";
 import { useAuth } from "@/hooks/use-auth";
-import { usePathname, useRouter } from "next/navigation";
+import {  useRouter } from "next/navigation";
 import { createCoverLetterOrderedParams } from "@/lib/utils/helpers";
 import { toast } from "sonner";
 import { isEmpty } from "lodash";
@@ -29,21 +29,12 @@ export const TemporaryEmailCompose = memo<{
     COLLECTIONS.COVER_LETTER
   );
   const router = useRouter();
-  const pathname = usePathname();
 
-  console.log("PATH NAME : ", pathname);
 
   useEffect(() => {
-    console.log(
-      "user, jobDescription, hasGeneratedRef.current, data",
-      user,
-      jobDescription,
-      hasGeneratedRef.current,
-      data
-    );
+   
 
     if (isFetched && status === "success") {
-      console.log("INSIDE IFF", status, isFetched);
       if (user && jobDescription && !hasGeneratedRef.current && !data) {
         hasGeneratedRef.current = true;
 

@@ -43,7 +43,6 @@ export const useStreamingContent = () => {
     // Create abort controller for cancellation
     abortControllerRef.current = new AbortController();
 
-    console.log("ENDPOINT : ", endpoint);
 
     try {
       const response = await fetch(endpoint, {

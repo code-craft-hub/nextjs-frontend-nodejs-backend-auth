@@ -42,14 +42,12 @@ let queryClient: QueryClient | undefined = undefined;
 function getQueryClient() {
   if (typeof window === "undefined") {
     // Server: always create a new query client
-    console.log("QUERYCLIENT IN QUERYCLIENT IN SERVER CONTEXT");
 
     return createQueryClient();
   }
 
   // Client: create query client if not already created
   if (!queryClient) {
-    console.log("QUERYCLIENT IN QUERYCLIENT IN CLIENT CONTEXT");
     queryClient = createQueryClient();
   }
 

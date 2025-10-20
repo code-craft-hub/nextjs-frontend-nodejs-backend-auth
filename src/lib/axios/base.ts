@@ -36,10 +36,7 @@ export const setupInterceptors = (client: AxiosInstance, apiName: string) => {
         }
       }
       
-      // Development logging
-      // if (process.env.NODE_ENV === 'development') {
-      //   console.log(`🚀 [${apiName}] ${config.method?.toUpperCase()} ${config.url}`, config);
-      // }
+      
 
       return config;
     },
@@ -56,10 +53,7 @@ export const setupInterceptors = (client: AxiosInstance, apiName: string) => {
       // const endTime = new Date();
       // const duration = endTime.getTime() - response.config.metadata.startTime.getTime();
       
-      // // Development logging
-      // if (process.env.NODE_ENV === 'development') {
-      //   console.log(`✅ [${apiName}] ${response.status} ${response.config.url} (${duration}ms)`);
-      // }
+   
 
       return response;
     },

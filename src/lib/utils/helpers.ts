@@ -4,8 +4,6 @@ import { MouseEvent } from "react";
 
 export const getJwtSecret = () => {
   const secret = process.env.JWT_SECRET?.trim();
-  console.log("THIS IS THE JWT SECRET:", secret);
-  console.log("THIS IS THE JWT SECRET LENGTH:", secret?.length);
 
   if (!secret) {
     throw new Error("JWT_SECRET environment variable is not defined");
@@ -512,7 +510,6 @@ export const parseJSONSafely = (
       const repaired = jsonrepair(content);
       const parsed = JSON.parse(repaired);
       const data = Array.isArray(parsed) ? parsed : [];
-      console.log(`[${section}] Successfully repaired JSON`);
       return { success: true, data, shouldUpdate: true };
     } catch (repairError) {
       console.error(

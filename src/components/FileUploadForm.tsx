@@ -15,7 +15,6 @@ export const FileUploadForm = ({
     setUploadedFiles(null);
   };
 
-  console.log("Uploaded Files:", uploadedFiles);
 
   const isSelectedFile = !isEmpty(uploadedFiles);
 

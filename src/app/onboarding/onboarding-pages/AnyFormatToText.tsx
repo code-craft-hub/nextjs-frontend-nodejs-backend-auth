@@ -126,7 +126,6 @@ class TextExtractionService {
    */
   private static async extractFromImage(file: File): Promise<string> {
     try {
-      console.log("HIT THE IMAGE PROCESSING FUNCTION")
       const { data } = await Tesseract.recognize(
         file,
         "eng", // Language code - can be extended to support multiple languages
@@ -328,7 +327,6 @@ export const FileUploadZone: React.FC<FileUploadZoneProps> = ({
       if (disabled) return;
 
       const files = Array.from(e.dataTransfer.files);
-      console.log("FileS", e.dataTransfer.files, "ARRAY : ", files);
       if (files.length > 0) {
         onFileSelect(files[0]);
       }
@@ -446,7 +444,6 @@ export const DocumentTextExtractor = () => {
     async (file: File) => {
       clearError();
       const result = await processDocument(file);
-      console.log("Extraction result", file, result);
       if (result) {
         form.setValue("extractedText", result.text, { shouldValidate: true });
         form.setValue("metadata", {
@@ -465,8 +462,7 @@ export const DocumentTextExtractor = () => {
     form.reset();
   }, [clearFile, form]);
 
-  const onSubmit = useCallback((values: FormSchema) => {
-    console.log("Form submitted with values:", values);
+  const onSubmit = useCallback(() => {
     // Handle submission - send to API, process further, etc.
   }, []);
 

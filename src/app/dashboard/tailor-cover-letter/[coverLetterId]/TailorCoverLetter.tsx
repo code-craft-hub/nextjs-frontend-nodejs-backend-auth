@@ -20,8 +20,6 @@ export const TailorCoverLetter = memo<{
   destinationEmail: string;
   aiApply: boolean;
 }>(({ jobDescription, coverLetterId, aiApply, destinationEmail }) => {
-  // console.log("COVER LETTER ID : ", coverLetterId);
-  // console.count("TAILOR COVER LETTER RENDERED");
 
   const { generatedContent, isGenerating, error, generateCoverLetter } =
     useCoverLetterGenerator();
@@ -60,10 +58,8 @@ export const TailorCoverLetter = memo<{
                 jobDescription
               );
 
-              console.log("Waiting 5 seconds before navigating...");
               await new Promise((resolve) => setTimeout(resolve, 5000));
 
-              console.log("INSIDE THE TIMEOUT IN COVER LETTER");
               router.push(
                 `/dashboard/tailor-resume/${uuidv4()}?aiApply=true&destinationEmail=${destinationEmail}&${orderedParams.toString()}`
               );

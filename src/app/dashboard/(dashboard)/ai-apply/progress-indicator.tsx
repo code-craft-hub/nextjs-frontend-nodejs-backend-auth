@@ -54,7 +54,6 @@ export const ProgressIndicator = ({
   ];
 
   const handleSetActiveStep = (step: number) => {
-    console.log(step, activeStep);
     if (step <= activeStep) {
       if (step === 0) return;
       setActiveStep && setActiveStep(step);

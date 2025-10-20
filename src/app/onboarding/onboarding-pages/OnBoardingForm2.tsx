@@ -81,8 +81,7 @@ export const OnBoardingForm2 = ({
               <Checkbox
               id="create-from-scratch"
                 // checked={field.value}
-                onCheckedChange={async (checked: boolean) => {
-                  console.log("checked", checked);
+                onCheckedChange={async () => {
                   // await updateUser({
                   //   baseResume: "",
                   // });

@@ -1,5 +1,5 @@
 "use client";
-import { InitialUser, IUser } from "@/types";
+import { IUser } from "@/types";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -122,8 +122,7 @@ export interface OnboardingFormProps {
   children?: React.ReactNode;
 }
 
-export const FindJob = memo(({ initialUser }: InitialUser) => {
-  console.log(initialUser);
+export const FindJob = memo(() => {
 
   return (
     <div className="flex flex-col font-poppins h-screen relative">

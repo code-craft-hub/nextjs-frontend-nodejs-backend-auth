@@ -22,7 +22,6 @@ const updateResumeField = async <T>(
       }
     );
 
-    console.log("Update response:", data);
     return data;
   } catch (error) {
     if (error instanceof Error) {
@@ -153,9 +152,7 @@ export const useResumeData = (
     },
 
     onSuccess: (data, payload, context) => {
-      console.log("Server confirmed update:", data);
       
-      // Remove from pending updates after successful update
       if (context?.field) {
         pendingUpdatesRef.current.delete(context.field);
       }

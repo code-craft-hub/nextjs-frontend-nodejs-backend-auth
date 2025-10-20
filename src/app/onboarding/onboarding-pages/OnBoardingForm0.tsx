@@ -5,7 +5,6 @@ import { motion } from "framer-motion";
 
 export const OnBoardingForm0 = ({ onNext, children }: OnboardingFormProps) => {
   const handleStartOnboarding = () => {
-    console.log("Starting onboarding...");
     onNext();
   };
 

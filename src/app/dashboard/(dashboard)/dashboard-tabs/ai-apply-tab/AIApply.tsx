@@ -20,7 +20,6 @@ export const AIApply = memo(({jobDescription}: {jobDescription: string}) => {
   
   const MOCK_DATA = data?.map((item: any) => ({ ...item.data, id: item?.id })) || [];
   
-  console.log("AI Apply Data:", MOCK_DATA);
   return (
     <div className="flex flex-col font-poppins relative">
       <h1 className="font-instrument text-3xl text-center tracking-tighter mb-12">

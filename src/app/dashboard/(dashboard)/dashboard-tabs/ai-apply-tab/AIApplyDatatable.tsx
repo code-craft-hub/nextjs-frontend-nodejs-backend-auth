@@ -122,7 +122,6 @@ const getColumns = (
         variant={"ghost"}
         className="text-blue-500 font-jakarta"
         onClick={() => {
-          console.log(row.original);
           router.push(
             `/dashboard/preview?resumeId=${row.original.resumeData.id}&coverLetterId=${row.original.coverLetterData.id}&destinationEmail=${row.original.recruiterEmail}&jobDescription=${row.original.jobDescription}`
           );

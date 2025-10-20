@@ -68,17 +68,14 @@ export const AIApplyInput = memo(
         const preview = e.target?.result as string;
         setUploadedFiles({ file, preview, type: fileType });
         try {
-          console.log("Processing file:", file.name);
           toast.promise(processDocument(file), {
             loading: `Cverai is converting this ${fileType} into text.`,
             success: (data) => {
-              console.log("data extracted : ", data?.text);
               setExtractedText(data?.text ?? "");
               return `Done processing the ${fileType}`;
             },
             error: "Error",
           });
-          console.log("Extracted Text on Upload:", extractedText);
         } catch (error) {
           console.error("Error extracting text:", error);
         }

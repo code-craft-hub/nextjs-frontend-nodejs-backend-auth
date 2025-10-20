@@ -48,8 +48,7 @@ export const EditableResume: React.FC<PreviewResumeProps> = ({
 
   const { resumeData, updateField } = useResumeData(data || {}, {
     resumeId,
-    onSuccess: (field) => {
-      console.log(`✓ Successfully updated ${field}`);
+    onSuccess: () => {
     },
     onError: (error, field) => {
       console.error(`✗ Failed to update ${field}:`, error);

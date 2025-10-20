@@ -11,7 +11,6 @@ export const getServerSession = cache(async () => {
 export async function requireAuth() {
   const session = await getServerSession();
 
-  console.log("Session in requireAuth:", session); // Debugging line
   if (!session) {
     redirect('/login');
   }

@@ -65,8 +65,7 @@ export const PasswordUpdateForm: React.FC = () => {
   const watchedPassword = form.watch("password");
   const passwordValidation = usePasswordValidation(watchedPassword || "");
 
-  const onSubmit = (data: PasswordFormData) => {
-    console.log("Password update submitted:", data);
+  const onSubmit = () => {
     toast.success("Account info updated!");
   };
 

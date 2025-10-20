@@ -14,6 +14,6 @@ export default async function HomePage({
   searchParams: Promise<{ tab: DashboardTab, jobDescription: string }>;
 }) {
   const { tab, jobDescription } = await searchParams;
-  const session = await requireOnboarding();
-  return <HomeClient initialUser={session} tab={tab} jobDescription={jobDescription} />;
+  await requireOnboarding();
+  return <HomeClient tab={tab} jobDescription={jobDescription} />;
 }

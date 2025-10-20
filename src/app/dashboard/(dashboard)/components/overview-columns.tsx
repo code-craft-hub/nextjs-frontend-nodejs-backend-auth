@@ -187,10 +187,10 @@ export const overviewColumns: ColumnDef<IJobType>[] = [
   {
     id: "actions",
     enableHiding: false,
-    cell: ({ row }) => {
+    cell: () => {
       return (
         <div className="flex justify-end">
-          <Button variant={'button'} onClick={() => console.log(row)}>Apply Now</Button>
+          <Button variant={'button'} >Apply Now</Button>
         </div>
       );
     },

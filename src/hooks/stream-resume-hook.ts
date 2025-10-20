@@ -31,11 +31,9 @@ export const useResumeStream = (endpoint: string, resumeId: string): UseResumeSt
   const handleStreamEvent = useCallback(
     (eventData: StreamEvent): void => {
       const { type, section, content, fullContent, error } = eventData;
-      // console.log({ type, section, content, fullContent, error });
       switch (type) {
         case "sectionStarted":
           if (section) {
-            console.log(`[Stream] Section started: ${section}`);
             sectionContentBufferRef.current.set(section, "");
           }
           break;
@@ -138,7 +136,6 @@ export const useResumeStream = (endpoint: string, resumeId: string): UseResumeSt
             ...prev,
             savedDocumentToDatabase: true,
           }));
-          console.log("[Stream] Document saved with ID:", eventData.documentId);
           break;
 
         case "documentSaveError":

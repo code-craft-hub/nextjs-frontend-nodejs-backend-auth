@@ -32,8 +32,6 @@ whatsappApiClient.interceptors.request.use(
 // Response Interceptor
 whatsappApiClient.interceptors.response.use(
   (response) => {
-    // console.info(`[API Response] ${response.status} ${response.config.url} `);
-    // console.log("RESPONSE INSIZE AXIOS : ", response)
     return response;
   },
   (error: AxiosError<ApiError>) => {

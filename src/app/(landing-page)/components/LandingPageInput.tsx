@@ -28,7 +28,6 @@ export const LandingPageInput = () => {
 
   // 2. Define a submit handler.
   function onSubmit({ jobDescription }: z.infer<typeof formSchema>) {
-    console.log(jobDescription);
     // if (!jobDescription) return;
     router.push(
       `/dashboard/home?tab=ai-apply&jobDescription=${encodeURIComponent(

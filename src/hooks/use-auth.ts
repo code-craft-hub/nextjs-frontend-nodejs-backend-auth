@@ -106,7 +106,6 @@ export const apiService = {
       const { data } = await authClient.get(
         `/career-doc/${documentId}?collection=${collection}`
       );
-      console.log("Career Docs", data);
       return data.data;
     } catch (error: any) {
       throw new Error(
@@ -121,7 +120,6 @@ export const apiService = {
       const { data } = await authClient.get(
         `/career-doc/?collection=${collection}`
       );
-      console.log("Career Docs", data);
       return data.data;
     } catch (error: any) {
       throw new Error(
