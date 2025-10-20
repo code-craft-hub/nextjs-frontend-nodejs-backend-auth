@@ -6,13 +6,10 @@ import {
   MapPin,
   ChevronDown,
   ArrowRight,
-  Plus,
-  ArrowUp,
   Bookmark,
   ChevronRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useRouter } from "next/navigation";
 import { Footer } from "@/components/landing-page/Footer";
 import {
   actionButtons,
@@ -26,11 +23,10 @@ import {
 } from "./constants";
 import { Header } from "./components/Header";
 import Link from "next/link";
+import { LandingPageInput } from "./components/LandingPageInput";
 
 export const LandingPageClient = () => {
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
-  const [jobDescription, setJobDescription] = useState("");
-  const router = useRouter();
 
   console.count("LandingPageClient Rendered");
 
@@ -76,25 +72,9 @@ export const LandingPageClient = () => {
           <div className="text-center mx-auto">
             {/* Search Bar */}
             <div className=" mb-16">
-              <div className="flex-1 relative">
-                <div
-                  className="border-blue-500 border-[1px] w-fit rounded-full p-1 absolute bottom-4 left-3"
-                  onClick={() => router.push(`/dashboard/ai-apply`)}
-                >
-                  <Plus className=" text-blue-400 size-3" />
-                </div>
-                <textarea
-                  placeholder="Let's get started"
-                  value={jobDescription}
-                  onChange={(e) => setJobDescription(e.target.value)}
-                  className="w-full h-36 border p-2 resize-none rounded-2xl pl-4 pt-2  placeholder:font-medium shadow-xl shadow-blue-100 transition-all duration-500"
-                ></textarea>
-                <div
-                  className="border-blue-500 border-[1px] w-fit rounded-full p-1 absolute bottom-4 right-3 "
-                  onClick={() => router.push(`/dashboard/home?tab=ai-apply&jobDescription=${encodeURIComponent(jobDescription)}`)}
-                >
-                  <ArrowUp className=" text-blue-400 size-3 " />
-                </div>
+              <div className="flex-1 relative ">
+                <LandingPageInput  />
+               
               </div>
             </div>
 

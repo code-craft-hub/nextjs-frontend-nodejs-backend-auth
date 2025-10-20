@@ -11,9 +11,9 @@ export const metadata: Metadata = {
 export default async function HomePage({
   searchParams,
 }: {
-  searchParams: Promise<{ tab: DashboardTab }>;
+  searchParams: Promise<{ tab: DashboardTab, jobDescription: string }>;
 }) {
-  const { tab } = await searchParams;
+  const { tab, jobDescription } = await searchParams;
   const session = await requireOnboarding();
-  return <HomeClient initialUser={session} tab={tab} />;
+  return <HomeClient initialUser={session} tab={tab} jobDescription={jobDescription} />;
 }

@@ -7,7 +7,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { COLLECTIONS } from "@/lib/utils/constants";
 import { AIApplyDatatable } from "./AIApplyDatatable";
 
-export const AIApply = memo(() => {
+export const AIApply = memo(({jobDescription}: {jobDescription: string}) => {
   const recentActivityItems = useMemo(
     () => Array.from({ length: 6 }, (_, index) => ({ id: index })),
     []
@@ -27,7 +27,7 @@ export const AIApply = memo(() => {
         AI Assist to Apply
       </h1>
       <div className="grid gap-y-16">
-        <AIApplyInput />
+        <AIApplyInput jobDescription={jobDescription}/>
         <AIApplyDatatable data={MOCK_DATA} />
         <Card className="p-4 sm:p-7 gap-4">
           <h1 className="font-bold text-xl">Recent Activity</h1>

@@ -14,9 +14,11 @@ export const HomeClient = memo(
   ({
     initialUser,
     tab,
+    jobDescription
   }: {
     initialUser: Partial<IUser>;
     tab: DashboardTab;
+    jobDescription: string;
   }) => {
     // w-[calc(100vw-500px)]
 
@@ -51,7 +53,7 @@ export const HomeClient = memo(
             </TabsList>
 
             <TabsContent value="ai-apply">
-              <AIApply />
+              <AIApply jobDescription={jobDescription}/>
             </TabsContent>
             <TabsContent value="tailor-cv">
               <AIJobCustomization />
