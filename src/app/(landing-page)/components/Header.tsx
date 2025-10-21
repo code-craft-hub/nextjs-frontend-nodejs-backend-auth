@@ -16,9 +16,11 @@ import { Menu } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { smoothlyScrollToView } from "@/lib/utils/helpers";
-export const Header = () => {
+import { useState } from "react";
+export const Header = ({ url }: { url?: string }) => {
   const { user } = useAuth();
   const router = useRouter();
+  const [modal, setModal] = useState(false);
 
   return (
     <div>
@@ -34,8 +36,16 @@ export const Header = () => {
                 <Link
                   key={nav.name}
                   href={nav.url}
-                  onClick={(e) => smoothlyScrollToView(e, nav.url)}
-                  className="font-medium font-poppins text-black hover:text-gray-900 transition-colors hover:bg-accent px-4 py-2 rounded-xl"
+                  onClick={(e) => {
+                    if (url) {
+                      e.preventDefault();
+                      router.push(url);
+                      smoothlyScrollToView(e, nav.url);
+                    } else {
+                      smoothlyScrollToView(e, nav.url);
+                    }
+                  }}
+                  className="font-medium font-poppins text-black transition-colors hover:text-primary px-4 py-2 rounded-xl"
                 >
                   {nav.name}
                 </Link>
@@ -59,7 +69,7 @@ export const Header = () => {
               )}
             </div>
 
-            <Sheet>
+            <Sheet open={modal} onOpenChange={setModal}>
               <SheetTrigger asChild className="lg:hidden p-2 rounded-lg">
                 <Button variant="ghost">
                   <Menu size={24} />
@@ -86,7 +96,17 @@ export const Header = () => {
                       <Link
                         key={nav.name}
                         href={nav.url}
-                        onClick={(e) => smoothlyScrollToView(e, nav.url)}
+                        onClick={(e) => {
+                          if (url) {
+                            e.preventDefault();
+                            router.push(url);
+                            smoothlyScrollToView(e, nav.url);
+                          } else {
+                            smoothlyScrollToView(e, nav.url);
+                          }
+
+                          setModal(false);
+                        }}
                         className="font-poppins text-black hover:text-gray-900 transition-colors hover:bg-accent px-4 py-2 border-t w-full text-start flex gap-2"
                       >
                         <p className="">{nav.icon}</p>

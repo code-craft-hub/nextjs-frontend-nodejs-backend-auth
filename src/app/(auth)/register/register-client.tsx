@@ -274,13 +274,13 @@ export default function RegisterClient() {
                     <div className="space-y-1 leading-none">
                       <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                         I agree to all the{" "}
-                        <a href="#" className="text-blue-600 hover:underline">
+                        <Link href="/terms" className="text-blue-600 hover:underline">
                           Terms
-                        </a>{" "}
+                        </Link>{" "}
                         and{" "}
-                        <a href="#" className="text-blue-600 hover:underline">
+                        <Link href="/policy" className="text-blue-600 hover:underline">
                           Privacy Policies
-                        </a>
+                        </Link>
                       </label>
                       <FormMessage />
                     </div>

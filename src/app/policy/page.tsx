@@ -6,8 +6,8 @@ import { Header } from "../(landing-page)/components/Header";
 const Policy = () => {
   return (
     <div>
-      <Header />
-      <div className="flex flex-col p-4 md:p-8 gap-4 md:gap-8 items-center justify-center max-w-screen-md mx-auto text-start">
+      <Header url="/" />
+      <div className="flex flex-col p-4 md:p-8 gap-4 md:gap-8 items-center justify-center max-w-screen-md mx-auto text-start mt-16">
         <h1 className="font-bold text-2xl ">PRIVACY POLICY FOR CVER JOB APPLICATIONS LTD</h1>
         <p className="">
           Cver Job Applications LTD understands that your privacy is important to you and that

@@ -6,8 +6,8 @@ import { Header } from "../(landing-page)/components/Header";
 const Terms = () => {
   return (
     <div>
-      <Header />
-      <div className="flex flex-col p-4 md:p-8 gap-4 md:gap-8 items-center justify-center max-w-screen-md mx-auto text-start">
+      <Header url="/" />
+      <div className="flex flex-col p-4 md:p-8 gap-4 md:gap-8 items-center justify-center max-w-screen-md mx-auto text-start mt-16">
         <h1 className="font-bold text-2xl ">
           TERMS OF USE FOR CVER JOB APPLICATIONS LTD
         </h1>

@@ -2,7 +2,7 @@ import React, { Suspense } from "react";
 import { getQueryClient } from "@/lib/query-client";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { getUser } from "@/lib/server-fetch.utils";
-import { LandingPageClient } from "./landing-page";
+import { LandingPageClient } from "./LandingPageClient";
 
 const LandingPage = async () => {
   async function prefetchUserData() {
