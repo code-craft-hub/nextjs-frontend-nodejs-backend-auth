@@ -1,35 +1,34 @@
-import {
-  Home,
-  Store,
-  CreditCard,
-  FileQuestionMark,
-  Newspaper,
-} from "lucide-react";
+import AnalyticIcon from "@/components/icons/analyticIcon";
+import HomeIcon from "@/components/icons/homeIcon";
+import JobIcon from "@/components/icons/jobIcon";
+import SettingIcon from "@/components/icons/settingIcon";
+import UserIcon from "@/components/icons/userIcon";
+
 export const navItems = [
   {
     name: "Home",
     url: "#home",
-    icon: <Home />,
+    icon: <HomeIcon />,
   },
   {
     name: "Features",
     url: "#features",
-    icon: <Store />,
+    icon: <JobIcon />,
   },
   {
     name: "Pricing",
     url: "#pricing",
-    icon: <CreditCard />,
+    icon: <AnalyticIcon />,
   },
   {
     name: "FAQ",
     url: "#faq",
-    icon: <FileQuestionMark />,
+    icon: <SettingIcon />,
   },
   {
     name: "Blog",
     url: "#blog",
-    icon: <Newspaper />,
+    icon: <UserIcon />,
   },
 ];
 
@@ -267,3 +266,5 @@ export const actionButtons = [
     url: "/dashboard/home?tab=find-jobs",
   },
 ];
+
+export type ActionOption = typeof actionButtons[number];

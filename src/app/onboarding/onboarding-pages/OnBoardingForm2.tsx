@@ -58,7 +58,7 @@ export const OnBoardingForm2 = ({
             isMobile && "fixed top-0 left-0 width-full px-4 pt-5"
           )}
         >
-          <img src="/logo.svg" alt="" className="" />
+          <img src="/cverai-logo.png" className="w-28 h-8" alt="" />
           <Progress min={2} max={7} progress={20} />
         </div>
         <div className="onboarding-card">
@@ -79,7 +79,7 @@ export const OnBoardingForm2 = ({
           <form className="space-y-6 w-full">
             <div className="flex flex-row items-center border p-3 gap-2 rounded-sm ">
               <Checkbox
-              id="create-from-scratch"
+                id="create-from-scratch"
                 // checked={field.value}
                 onCheckedChange={async () => {
                   // await updateUser({
@@ -88,7 +88,9 @@ export const OnBoardingForm2 = ({
                   onNext();
                 }}
               />
-              <label htmlFor="create-from-scratch" className="h1">Create from scratch</label>
+              <label htmlFor="create-from-scratch" className="h1">
+                Create from scratch
+              </label>
             </div>
             {error && (
               <div className="text-red-500 w-full p-3">

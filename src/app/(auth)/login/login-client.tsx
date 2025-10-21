@@ -147,14 +147,12 @@ export const LoginClient = () => {
   };
 
   return (
-    <div className="min-h-screen flex font-poppins">
-      {/* Left side - Form */}
+    <div className=" flex font-poppins">
       <div className="flex-1 flex items-center justify-center p-8 bg-white">
         <div className="w-full max-w-md space-y-8">
-          {/* Logo and Header */}
           <div className="space-y-6">
             <div className="flex items-center space-x-2">
-              <img src="/logo.svg" alt="" />
+              <img src="/cverai-logo.png" className="w-28 h-8" alt="" />
             </div>
             <div>
               <h1 className="text-3xl font-bold text-gray-900 mb-2">Sign In</h1>
@@ -291,7 +289,7 @@ export const LoginClient = () => {
         </div>
       </div>
 
-      <div className="hidden lg:flex flex-1 relative overflow-hidden bg-blue-500 min-h-screen">
+      <div className="hidden lg:flex flex-1 relative overflow-hidden h-full bg-blue-500 ">
         <img
           src="/auth-page.png"
           alt="Auth Image"

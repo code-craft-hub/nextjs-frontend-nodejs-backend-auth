@@ -23,6 +23,7 @@ const buttonVariants = cva(
           "text-white bg-primary rounded-[3px] hover:shadow-lg hover:cursor-pointer hover:bg-primary/80",
         button:
           "text-button bg-button-accent rounded-[3px] hover:text-white hover:cursor-pointer hover:bg-button",
+        cveraiOutline: "border-2 border-[#E7F0FA] text-primary bg-white rounded-none"
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",

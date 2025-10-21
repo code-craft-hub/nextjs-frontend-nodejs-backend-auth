@@ -47,9 +47,7 @@ export const OnBoardingForm5 = ({
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       await updateUser(values);
-     toast.success(
-        `${initialUser?.displayName} Your data has be saved!`
-      );
+      toast.success(`${initialUser?.displayName} Your data has be saved!`);
       onNext();
     } catch (error) {
       console.error(error);
@@ -80,7 +78,7 @@ export const OnBoardingForm5 = ({
               "fixed top-0 left-0 width-full px-4 pt-5 backdrop-blur-2xl z-50 pb-4"
           )}
         >
-          <img src="/logo.svg" alt="" className="" />
+          <img src="/cverai-logo.png" alt="" className="" />
           <Progress min={5} max={7} progress={70} />
         </div>
         <div className="onboarding-card">

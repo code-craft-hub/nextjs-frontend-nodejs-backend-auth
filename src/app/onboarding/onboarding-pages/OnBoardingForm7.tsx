@@ -34,7 +34,7 @@ export const OnBoardingForm7 = ({ onNext, onPrev }: OnboardingFormProps) => {
       <div className="flex flex-col items-start gap-9 w-full max-w-screen-2xl">
         <div className="flex flex-row justify-between items-center w-full">
           <div className="flex col-span-2 items-center space-x-2">
-            <img src="/logo.svg" alt="" />
+            <img src="/cverai-logo.png" className="w-28 h-8" alt="" />
           </div>
           <Progress min={7} max={7} progress={100} />
         </div>

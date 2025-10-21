@@ -37,7 +37,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     },
     teams: {
       name: "Cver AI",
-      logo: "/logo.svg",
+      logo: "/cverai-logo.png",
       plan: "Enterprise",
     },
     menus: [
@@ -76,7 +76,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <Link href="/">
-                <Image src={"/cverai-logo.png"} width={70} height={70} alt={"Logo"} />
+                <Image
+                  src={"/cverai-logo.png"}
+                  width={70}
+                  height={70}
+                  alt={"Logo"}
+                />
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

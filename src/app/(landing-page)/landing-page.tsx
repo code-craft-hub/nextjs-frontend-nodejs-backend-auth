@@ -2,13 +2,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import "./glass.css";
-import {
-  MapPin,
-  ChevronDown,
-  ArrowRight,
-  Bookmark,
-  ChevronRight,
-} from "lucide-react";
+import { MapPin, ChevronDown, ArrowRight, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Footer } from "@/components/landing-page/Footer";
 import {
@@ -22,8 +16,9 @@ import {
   testimonials,
 } from "./constants";
 import { Header } from "./components/Header";
-import Link from "next/link";
 import { LandingPageInput } from "./components/LandingPageInput";
+import { ActionButton } from "./components/ActionButton";
+import { MeetCverai } from "./components/MeetCverai";
 
 export const LandingPageClient = () => {
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
@@ -52,29 +47,14 @@ export const LandingPageClient = () => {
         <div className="max-w-7xl mx-auto px-4 pb-20 sm:px-6 lg:px-8 lg:pb-32 space-y-8">
           <div className="flex flex-row items-center justify-center mx-auto max-sm:justify-evenly gap-2 sm:gap-4">
             {actionButtons.map((option) => (
-              <div key={option.name}>
-                <Link
-                  href={option.url}
-                  className="glass-button !text-black sm:w-32 gap-2 p-3"
-                >
-                  <img
-                    src={option.icon}
-                    alt={option.name}
-                    className="max-xs4:size-3 size-4"
-                  />
-                  <span className="max-xs4:text-[0.6rem] text-xs text-nowrap">
-                    {option.name}
-                  </span>
-                </Link>
-              </div>
+              <ActionButton key={option.name} option={option} />
             ))}
           </div>
           <div className="text-center mx-auto">
             {/* Search Bar */}
             <div className=" mb-16">
               <div className="flex-1 relative ">
-                <LandingPageInput  />
-               
+                <LandingPageInput />
               </div>
             </div>
 
@@ -85,10 +65,10 @@ export const LandingPageClient = () => {
               </h2>
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 w-full">
                 {howItWorks.map((item) => (
-                  <div className="text-center " key={item.title}>
+                  <div className="text-center" key={item.title}>
                     <div
                       className={cn(
-                        "w-16 h-16 mx-auto mb-4 shadow-2xl rounded-2xl flex items-center justify-center",
+                        "w-16 h-16 mx-auto mb-10 shadow-2xl rounded-2xl flex items-center justify-center",
                         item.color
                       )}
                     >
@@ -118,10 +98,7 @@ export const LandingPageClient = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900">Featured Jobs</h2>
-            <Button
-              variant="outline"
-              className="text-blue-600 border-blue-600 hover:bg-blue-50"
-            >
+            <Button variant="cveraiOutline">
               View All <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           </div>
@@ -133,10 +110,10 @@ export const LandingPageClient = () => {
                 className="bg-white rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow p-4 space-y-4"
               >
                 <div className="">
-                  <h3 className="font-semibold  mb-1">{job.title}</h3>
+                  <h3 className="font-medium mb-1">{job.title}</h3>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs px-2 py-1 bg-green-100 text-green-800 uppercase text-nowrap h-fit">
+                  <span className="text-xs px-2 py-1 bg-[#E7F6EA] text-[#0BA02C] uppercase text-nowrap h-fit">
                     {job.type}
                   </span>
                   <span className=" text-gray-400 text-xs">
@@ -144,7 +121,7 @@ export const LandingPageClient = () => {
                   </span>
                 </div>
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-gray-200 flex items-center justify-center text-2xl">
+                  <div className="w-12 h-12 rounded-sm bg-gray-200 flex items-center justify-center text-2xl">
                     {job.logo}
                   </div>
                   <div className="">
@@ -155,7 +132,7 @@ export const LandingPageClient = () => {
                     </div>
                   </div>
                   <div className="ml-auto">
-                    <Bookmark className="size-4 text-gray-300" />
+                    <Button>Auto Apply</Button>{" "}
                   </div>
                 </div>
               </div>
@@ -199,31 +176,7 @@ export const LandingPageClient = () => {
           </div>
         </div>
       </section>
-
-      {/* Mobile App Section */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-6">
-                Meet AI Apply - <br />
-                Apply for Jobs in Seconds.
-              </h2>
-              <p className="text-gray-600 mb-8 text-lg">
-                Streamline your job search with AI-powered applications across
-                LinkedIn, Telegram, WhatsApp, and more platforms.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Button className="max-sm:text-2xs break-words text-white px-8 py-3">
-                  Start now - Your job hunt just got easier!
-                </Button>
-              </div>
-            </div>
-            <img src="/job-interview.png" alt="Job Interview" />
-          </div>
-        </div>
-      </section>
-
+      <MeetCverai />
       {/* FAQ Section */}
       <section id="faq" className="py-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">

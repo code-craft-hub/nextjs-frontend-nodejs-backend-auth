@@ -128,7 +128,9 @@ export default function RegisterClient() {
       <Button
         type="button"
         variant="outline"
-        className={cn(`h-12 flex items-center justify-center border-gray-300 hover:bg-gray-50 transition-colors ${className}`)}
+        className={cn(
+          `h-12 flex items-center justify-center border-gray-300 hover:bg-gray-50 transition-colors ${className}`
+        )}
         onClick={() => alert(`Sign in with ${provider}`)}
       >
         {icon}
@@ -160,7 +162,7 @@ export default function RegisterClient() {
           {/* Logo and Header */}
           <div className="space-y-6">
             <div className="flex items-center space-x-2">
-              <img src="/logo.svg" alt="" />
+              <img src="/cverai-logo.png" className="w-28 h-8" alt="" />
             </div>
             <div>
               <h1 className="text-3xl font-bold text-gray-900 mb-2">Sign up</h1>

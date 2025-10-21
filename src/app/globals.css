@@ -75,6 +75,7 @@
   --font-jakarta: var(--font-jakarta), sans-serif;
   --font-poppins: var(--font-poppins), sans-serif;
   --font-roboto: var(--font-roboto), sans-serif;
+  --font-geist: var(--font-geist), sans-serif;
 }
 
 :root {

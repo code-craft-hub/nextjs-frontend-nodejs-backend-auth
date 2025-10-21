@@ -10,11 +10,16 @@ import {
   Plus_Jakarta_Sans,
   Poppins,
   Roboto,
+  Geist,
 } from "next/font/google";
 
 const ebGaramond = EB_Garamond({
   subsets: ["latin"],
   variable: "--font-garamond",
+});
+const geist = Geist({
+  subsets: ["latin"],
+  variable: "--font-geist",
 });
 const epilogue = Epilogue({ subsets: ["latin"], variable: "--font-epilogue" });
 const instrumentSans = Instrument_Sans({
@@ -56,6 +61,7 @@ export default function RootLayout({
       ${plusJakartaSans.variable}
       ${poppins.variable}
       ${roboto.variable}
+      ${geist.variable}
     `}
       suppressHydrationWarning={true}
     >

@@ -62,8 +62,9 @@ export const VerifyEmailClient = ({
     try {
       await authClient.post("/send-verification");
 
-
-      toast.success(`${initialUser.firstName}, verification code sent to your email!`);
+      toast.success(
+        `${initialUser.firstName}, verification code sent to your email!`
+      );
       setCanResend(false);
       setTimeLeft(60); // 1 minute cooldown
     } catch (error: any) {
@@ -96,7 +97,9 @@ export const VerifyEmailClient = ({
     try {
       await authClient.post("/verify-email", { code });
 
-      toast.success(`${initialUser.firstName}, your email has been verified successfully!`);
+      toast.success(
+        `${initialUser.firstName}, your email has been verified successfully!`
+      );
       setCompletedEmailVerification(true);
     } catch (error: any) {
       toast.error(
@@ -127,7 +130,7 @@ export const VerifyEmailClient = ({
               {/* Logo and Header */}
               <div className="space-y-6">
                 <div className="flex flex-col space-y-8 items-center justify-center">
-                  <img src="/logo.svg" alt="Logo" />
+                  <img src="/cverai-logo.png" className="w-28 h-8" alt="Logo" />
                   <img src="success-icon.svg" alt="success" />
                 </div>
               </div>
@@ -171,7 +174,7 @@ export const VerifyEmailClient = ({
             {/* Logo and Header */}
             <div className="space-y-6">
               <div className="flex items-center space-x-2">
-                <img src="/logo.svg" alt="" />
+                <img src="/cverai-logo.png" className="w-28 h-8" alt="" />
               </div>
               <div>
                 <h1 className="text-3xl font-bold text-gray-900 mb-2">
