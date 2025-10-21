@@ -354,6 +354,7 @@ export interface InterviewQuestion {
 }
 
 export interface CoverLetter {
+  id: string;
   firstName: string;
   lastName: string;
   email: string;

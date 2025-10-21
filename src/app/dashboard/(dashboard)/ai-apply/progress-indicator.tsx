@@ -46,7 +46,7 @@ export const ProgressIndicator = ({
   setActiveStep?: (step: number) => void;
 }) => {
   const stages = [
-    "Job Description Captured",
+    "Job Captured",
     "Email Drafted",
     "CV Tailored",
     "Review",

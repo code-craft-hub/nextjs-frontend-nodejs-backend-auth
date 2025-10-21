@@ -125,7 +125,7 @@ export const LandingPageClient = () => {
                     {job.logo}
                   </div>
                   <div className="">
-                    <p className="text-gray-600 text-sm">{job.company}</p>
+                    <p className="text-gray-600 text-sm font-medium">{job.company}</p>
                     <div className="flex items-center text-gray-500 text-xs">
                       <MapPin className="w-3 h-3 mr-1" />
                       {job.location}
@@ -192,7 +192,9 @@ export const LandingPageClient = () => {
                   }
                   className="w-full px-6 py-6 text-left flex items-center justify-between hover:bg-gray-50 rounded-2xl transition-colors"
                 >
-                  <span className="font-semibold text-gray-900">
+
+                  
+                  <span className="font-poppins text-[#030712]">
                     {item.question}
                   </span>
                   <ChevronDown
@@ -226,7 +228,7 @@ export const LandingPageClient = () => {
             {creditCard.map((plan) => (
               <div
                 key={plan.tier}
-                className="bg-white rounded-3xl shadow-2xl p-8 flex flex-col justify-between"
+                className="bg-white rounded-3xl shadow-2xl shadow-blue-100 p-8 flex flex-col justify-between max-w-md max-md:mx-auto"
               >
                 <div className="">
                   <div className=" mb-8">
@@ -288,13 +290,13 @@ export const LandingPageClient = () => {
             </p>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-8 mx-auto items-center justify-center">
+          <div className="flex flex-col max-sm:flex-wrap md:flex-row gap-8 mx-auto items-center justify-center">
             {testimonials.map((testimonial, index) => (
               <div
                 key={testimonial.company}
                 className={`${
                   index % 2 === 0 && "sm:mt-16"
-                } bg-white rounded-2xl p-6 shadow-2xl h-fit space-y-4 w-[300px]`}
+                } bg-white rounded-2xl p-6 shadow-2xl shadow-blue-100 h-fit space-y-4 w-[300px]`}
               >
                 <div className="flex items-center mb-4">
                   <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-2xl mr-4">

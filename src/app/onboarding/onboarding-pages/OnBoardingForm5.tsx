@@ -78,7 +78,7 @@ export const OnBoardingForm5 = ({
               "fixed top-0 left-0 width-full px-4 pt-5 backdrop-blur-2xl z-50 pb-4"
           )}
         >
-          <img src="/cverai-logo.png" alt="" className="" />
+          <img src="/cverai-logo.png" alt="" className="w-28 h-8" />
           <Progress min={5} max={7} progress={70} />
         </div>
         <div className="onboarding-card">

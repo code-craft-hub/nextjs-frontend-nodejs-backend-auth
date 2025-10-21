@@ -127,6 +127,13 @@ export const testimonials = [
     avatar: "/marketer.png",
     content: "“More Call backs in 2 weeks than 2 months”",
   },
+  {
+    name: "Mark",
+    role: "Recuriter",
+    company: "vercel",
+    avatar: "/tobi.png",
+    content: "“Now, I just prep for interviews”",
+  },
 ];
 export const blogs = [
   {

@@ -111,7 +111,7 @@ const Preview = ({
           Delete
         </Button>
       </div>
-      <TailorCoverLetterDisplay user={user} data={coverLetterData} />
+      <TailorCoverLetterDisplay user={user} data={coverLetterData} destinationEmail={destinationEmail}/>
       <EditableResume data={resumeData!} resumeId={resumeId} />
       <div className="flex items-center justify-center">
         <Button disabled={isSubmitting} onClick={handleSubmit} className="w-64">
