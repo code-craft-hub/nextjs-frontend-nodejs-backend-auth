@@ -33,3 +33,5 @@ export const ActionButton = React.memo(
     );
   }
 );
+
+ActionButton.displayName = "ActionButton";

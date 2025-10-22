@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/form";
 import { useRouter } from "next/navigation";
 import { ArrowUp, Plus } from "lucide-react";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 const formSchema = z.object({
   jobDescription: z.string().optional(),
@@ -20,7 +21,7 @@ const formSchema = z.object({
 export const LandingPageInput = () => {
   const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
-    // resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema),
     defaultValues: {
       jobDescription: "",
     },
