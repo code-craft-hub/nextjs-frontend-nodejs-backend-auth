@@ -9,5 +9,5 @@ export default async function OnboardingPage() {
     redirect("/dashboard/home");
   }
 
-  return <OnboardingClient initialUser={session} />;
+  return <OnboardingClient  />;
 }

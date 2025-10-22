@@ -70,7 +70,6 @@ export const setupInterceptors = (client: AxiosInstance, apiName: string) => {
             // Handle based on API type
             if (apiName !== 'AUTH' && typeof window !== 'undefined') {
               // Only redirect for non-auth APIs to avoid infinite loops
-              localStorage?.removeItem('authToken');
               window.location.href = '/login';
             }
             break;

@@ -1,7 +1,7 @@
 export const TopGradient = () => {
   return (
     <div
-      className="absolute w-full h-96 top-0 pointer-events-none"
+      className="absolute w-full h-64 top-0 pointer-events-none"
       style={{
         background: "url('/dashboard-gradient.svg')",
         backgroundRepeat: "no-repeat",

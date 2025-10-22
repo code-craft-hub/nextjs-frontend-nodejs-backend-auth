@@ -15,13 +15,13 @@ export const TailorResume = ({
   resumeId,
   coverLetterId,
   aiApply,
-  destinationEmail,
+  recruiterEmail,
 }: {
   jobDescription: string;
   resumeId: string;
   coverLetterId: string;
   aiApply: boolean;
-  destinationEmail: string;
+  recruiterEmail: string;
 }) => {
   const { user, useCareerDoc } = useAuth();
   const { data, status, isFetched } = useCareerDoc<Resume>(
@@ -66,7 +66,7 @@ export const TailorResume = ({
     }
     if (aiApply && streamStatus.isComplete) {
       router.push(
-        `/dashboard/preview?resumeId=${resumeId}&coverLetterId=${coverLetterId}&destinationEmail=${destinationEmail}&jobDescription=${jobDescription}`
+        `/dashboard/preview?resumeId=${resumeId}&coverLetterId=${coverLetterId}&recruiterEmail=${recruiterEmail}&jobDescription=${jobDescription}`
       );
     }
   }, [

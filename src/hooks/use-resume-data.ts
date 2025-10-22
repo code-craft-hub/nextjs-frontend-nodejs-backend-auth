@@ -13,7 +13,7 @@ const updateResumeField = async <T>(
 ): Promise<any> => {
   try {
     const { data } = await authClient.patch(
-      `${baseUrl}/career-doc/${payload.resumeId}?collection=${COLLECTIONS.RESUME}`,
+      `${baseUrl}/career-doc/${COLLECTIONS.RESUME}/${payload.resumeId}`,
       {
         resumeId: payload.resumeId,
         updates: {

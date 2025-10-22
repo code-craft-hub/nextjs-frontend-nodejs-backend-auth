@@ -84,6 +84,19 @@ export const AiApplyPreferences: React.FC = () => {
       ],
     },
     {
+      section: "Email Integration",
+      subTitle: "Connect your Gmail account for email-based job applications",
+      img: "/email.svg",
+      options: [
+        {
+          label: "Gmail Connected",
+          description: `Connected: ${user?.email}`,
+          type: "custom",
+          actions: ["Disconnect", "Edit"],
+        },
+      ],
+    },
+    {
       section: "CV Strategy",
       heading: true,
       options: [
@@ -139,19 +152,7 @@ export const AiApplyPreferences: React.FC = () => {
         },
       ],
     },
-    {
-      section: "Email Integration",
-      subTitle: "Connect your Gmail account for email-based job applications",
-      img: "/email.svg",
-      options: [
-        {
-          label: "Gmail Connected",
-          description: `Connected: ${user?.email}`,
-          type: "custom",
-          actions: ["Disconnect", "Edit"],
-        },
-      ],
-    },
+
     {
       child: true,
       options: [

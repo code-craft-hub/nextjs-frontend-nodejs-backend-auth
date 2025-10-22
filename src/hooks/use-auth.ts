@@ -26,33 +26,6 @@ export const apiService = {
       throw new Error(error.error || "Login failed");
     }
   },
-  sendApplication: async (
-    user: Partial<IUser>,
-    coverLetterData: CoverLetter | undefined,
-    resumeData: Resume | undefined,
-    destinationEmail: string,
-    jobDescription: string
-  ): Promise<Partial<IUser>> => {
-    try {
-      const { data } = await authClient.post(
-        "/send-email-with-resume-and-coverletter",
-        {
-          user,
-          coverLetterData,
-          resumeData,
-          destinationEmail,
-          jobDescription,
-        }
-      );
-
-      return data.data;
-    } catch (error: any) {
-      console.error("ERROR IN auto-apply: ", error);
-     
-      throw error;
-      // throw new Error(error.error || "Auto apply failed. Please try again.");
-    }
-  },
 
   register: async (user: RegisterUserSchema): Promise<Partial<IUser>> => {
     try {
@@ -75,6 +48,7 @@ export const apiService = {
       throw new Error(error.error || "Logout failed");
     }
   },
+
   deleteUser: async (): Promise<{ success: boolean }> => {
     try {
       const { data } = await authClient.delete("/delete");
@@ -97,29 +71,10 @@ export const apiService = {
       );
     }
   },
-
-  getCareerDoc: async <T>(
-    documentId: string,
-    collection: string
-  ): Promise<T> => {
+  gmailOauthStatus: async (email:string): Promise<{isAuthorized: boolean}> => {
     try {
-      const { data } = await authClient.get(
-        `/career-doc/${documentId}?collection=${collection}`
-      );
-      return data.data;
-    } catch (error: any) {
-      throw new Error(
-        "Failed to fetch user data:",
-        error.error || "Fetch failed"
-      );
-    }
-  },
-
-  getAllDoc: async <T>(collection: string): Promise<T> => {
-    try {
-      const { data } = await authClient.get(
-        `/career-doc/?collection=${collection}`
-      );
+      const { data } = await authClient.get(`/google-gmail-oauth/auth-status/${encodeURIComponent(email)}`);
+      console.log("GMAIL OAUTH STATUS DATA: ", data);
       return data.data;
     } catch (error: any) {
       throw new Error(
@@ -167,6 +122,59 @@ export const apiService = {
       throw new Error(error.error || "Updating user failed");
     }
   },
+
+  getCareerDoc: async <T>(
+    documentId: string,
+    collection: string
+  ): Promise<T> => {
+    try {
+      const { data } = await authClient.get(
+        `/career-doc/${documentId}?collection=${collection}`
+      );
+      return data.data;
+    } catch (error: any) {
+      throw new Error(
+        "Failed to fetch user data:",
+        error.error || "Fetch failed"
+      );
+    }
+  },
+
+  updateCareerDoc: async <T>(
+    documentId: string,
+    collection: string,
+    input: Partial<T>
+  ) => {
+    try {
+      const { data } = await authClient.patch(
+        `/career-doc/${collection}/${documentId}`,
+        {
+          updates: input,
+        }
+      );
+      return data.data;
+    } catch (error: any) {
+      throw new Error(
+        "Failed to update document:",
+        error.error || "Update failed"
+      );
+    }
+  },
+
+  getAllDoc: async <T>(collection: string): Promise<T> => {
+    try {
+      const { data } = await authClient.get(
+        `/career-doc/?collection=${collection}`
+      );
+      return data.data;
+    } catch (error: any) {
+      throw new Error(
+        "Failed to fetch all documents:",
+        error.error || "Fetch failed"
+      );
+    }
+  },
+
   deleteCareerDoc: async (
     id: string,
     collection: string
@@ -178,6 +186,33 @@ export const apiService = {
       return data.data;
     } catch (error: any) {
       throw new Error(error.error || "Deleting document failed");
+    }
+  },
+  sendApplication: async (
+    user: Partial<IUser>,
+    coverLetterData: CoverLetter | undefined,
+    resumeData: Resume | undefined,
+    recruiterEmail: string,
+    jobDescription: string
+  ): Promise<Partial<IUser>> => {
+    try {
+      const { data } = await authClient.post(
+        "/send-email-with-resume-and-coverletter",
+        {
+          user,
+          coverLetterData,
+          resumeData,
+          recruiterEmail,
+          jobDescription,
+        }
+      );
+
+      return data.data;
+    } catch (error: any) {
+      console.error("ERROR IN auto-apply: ", error);
+
+      throw error;
+      // throw new Error(error.error || "Auto apply failed. Please try again.");
     }
   },
 };

@@ -27,7 +27,6 @@ authClient.interceptors.response.use(
     if (error.response?.status === 401) {
       // For auth API, don't redirect - just clear any stored tokens
       if (typeof window !== "undefined") {
-        // localStorage?.removeItem("authToken");
         // Dispatch logout event or call logout function
         // window.dispatchEvent(new CustomEvent("auth:logout"));
       }

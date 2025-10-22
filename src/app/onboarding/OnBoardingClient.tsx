@@ -1,7 +1,6 @@
 "use client";
 import { AnimatePresence } from "framer-motion";
 import { useState } from "react";
-import { IUser } from "@/types";
 import { apiService } from "@/hooks/use-auth";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -14,21 +13,14 @@ import { OnBoardingForm4 } from "./onboarding-pages/OnBoardingForm4";
 import { OnBoardingForm5 } from "./onboarding-pages/OnBoardingForm5";
 import { OnBoardingForm6 } from "./onboarding-pages/OnBoardingForm6";
 import { OnBoardingForm7 } from "./onboarding-pages/OnBoardingForm7";
-// import { DocumentTextExtractor } from "./components/AnyFormatToText";
-// import { AnyFormatToTextTalksToBackend } from "./components/AnyFormatToTextTalksToBackend";
 
-export default function OnboardingClient({
-  initialUser,
-}: {
-  initialUser: Partial<IUser>;
-}) {
+export default function OnboardingClient() {
   useQuery({
     queryKey: ["auth", "user"],
     queryFn: apiService.getUser,
   });
   const [currentStep, setCurrentStep] = useState(0);
   const steps = [
-    // AnyFormatToTextTalksToBackend,
     OnBoardingForm0,
     OnBoardingForm1,
     OnBoardingForm2,
@@ -59,7 +51,6 @@ export default function OnboardingClient({
       <AnimatePresence mode="wait">
         <CurrentStepComponent
           key={currentStep}
-          initialUser={initialUser}
           onNext={nextStep}
           onPrev={prevStep}
         >
@@ -67,7 +58,7 @@ export default function OnboardingClient({
             className="text-blue-500 lg:text-white"
             variant={"ghost"}
             onClick={async () => {
-              await apiService.deleteUser();
+              await apiService.logout();
             }}
           >
             <X />

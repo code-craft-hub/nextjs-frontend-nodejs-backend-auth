@@ -123,7 +123,7 @@ const getColumns = (
         className="text-blue-500 font-jakarta"
         onClick={() => {
           router.push(
-            `/dashboard/preview?resumeId=${row.original.resumeData.id}&coverLetterId=${row.original.coverLetterData.id}&destinationEmail=${row.original.recruiterEmail}&jobDescription=${row.original.jobDescription}`
+            `/dashboard/preview?resumeId=${row.original.resumeData.id}&coverLetterId=${row.original.coverLetterData.id}&recruiterEmail=${row.original.recruiterEmail}&jobDescription=${row.original.jobDescription}`
           );
         }}
       >

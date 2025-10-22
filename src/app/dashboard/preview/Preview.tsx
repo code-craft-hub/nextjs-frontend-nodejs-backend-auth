@@ -15,13 +15,13 @@ import { useRouter } from "next/navigation";
 const Preview = ({
   coverLetterId,
   resumeId,
-  destinationEmail,
+  recruiterEmail,
   jobDescription,
 }: {
   coverLetterId: string;
   resumeId: string;
   jobDescription: string;
-  destinationEmail: string;
+  recruiterEmail: string;
 }) => {
   const [activeStep, setActiveStep] = useState(3);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -55,7 +55,7 @@ const Preview = ({
         user,
         coverLetterData,
         resumeData,
-        destinationEmail,
+        recruiterEmail,
         jobDescription
       );
       setActiveStep(4);
@@ -111,7 +111,11 @@ const Preview = ({
           Delete
         </Button>
       </div>
-      <TailorCoverLetterDisplay user={user} data={coverLetterData} destinationEmail={destinationEmail}/>
+      <TailorCoverLetterDisplay
+        user={user}
+        data={coverLetterData}
+        recruiterEmail={recruiterEmail}
+      />
       <EditableResume data={resumeData!} resumeId={resumeId} />
       <div className="flex items-center justify-center">
         <Button disabled={isSubmitting} onClick={handleSubmit} className="w-64">

@@ -127,16 +127,11 @@ const AuthorizeGoogle: React.FC = () => {
           name="authorized"
           render={({ field }) => (
             <FormItem className="flex flex-row items-center ">
-              {/* <div className="space-y-0.5">
-                <FormLabel>Email Authorization</FormLabel>
-                <FormDescription>
-                  Turn on to grant cverai access to your email box, to send
-                  emails and save generate emails and cover letters to your
-                  inbox.
-                </FormDescription>
-              </div> */}
+             
               <FormControl>
                 <Switch
+                className="!bg-gray-300 data-[state=checked]:!bg-blue-500 h-6.5 w-12 pl-0.5"
+                thumbClassName="size-5 !bg-white data-[state=checked]:!translate-x-[calc(100%)]"
                   checked={field.value}
                   onCheckedChange={(checked: boolean) => {
                     field.onChange(checked);

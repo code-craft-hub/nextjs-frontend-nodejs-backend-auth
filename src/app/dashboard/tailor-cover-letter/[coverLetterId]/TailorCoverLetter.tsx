@@ -17,10 +17,9 @@ import { ProgressIndicator } from "../../(dashboard)/ai-apply/progress-indicator
 export const TailorCoverLetter = memo<{
   jobDescription: string;
   coverLetterId: string;
-  destinationEmail: string;
+  recruiterEmail: string;
   aiApply: boolean;
-}>(({ jobDescription, coverLetterId, aiApply, destinationEmail }) => {
-
+}>(({ jobDescription, coverLetterId, aiApply, recruiterEmail }) => {
   const { generatedContent, isGenerating, error, generateCoverLetter } =
     useCoverLetterGenerator();
 
@@ -61,7 +60,7 @@ export const TailorCoverLetter = memo<{
               await new Promise((resolve) => setTimeout(resolve, 5000));
 
               router.push(
-                `/dashboard/tailor-resume/${uuidv4()}?aiApply=true&destinationEmail=${destinationEmail}&${orderedParams.toString()}`
+                `/dashboard/tailor-resume/${uuidv4()}?aiApply=true&recruiterEmail=${recruiterEmail}&${orderedParams.toString()}`
               );
             }
           } catch (err) {
@@ -109,7 +108,7 @@ export const TailorCoverLetter = memo<{
       <div className="flex w-full gap-3 items-center  p-4  bg-white justify-between">
         <p className="text-xl font-medium font-inter">Tailored Cover Letter</p>
         <Button
-        className="text-2xs"
+          className="text-2xs"
           onClick={() => {
             handleCoverLetterDelete();
           }}

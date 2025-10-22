@@ -17,9 +17,8 @@ import { toast } from "sonner";
 export const OnBoardingForm2 = ({
   onNext,
   onPrev,
-  initialUser,
 }: OnboardingFormProps) => {
-  const { updateUser, isUpdatingUserLoading } = useAuth();
+  const { updateUser, isUpdatingUserLoading, user } = useAuth();
   const {
     processDocument,
     isProcessing,
@@ -36,7 +35,7 @@ export const OnBoardingForm2 = ({
       await updateUser({
         baseResume: result?.text || "",
       });
-      toast.success(`${initialUser.firstName}, your base resume is saved!`);
+      toast.success(`${user?.firstName}, your base resume is saved!`);
       onNext();
     },
     [processDocument, clearError]

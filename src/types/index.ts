@@ -125,7 +125,6 @@ export interface InitialUser {
 export interface OnboardingFormProps {
   onNext: () => void;
   onPrev: () => void;
-  initialUser: Partial<IUser>;
   children?: React.ReactNode;
 }
 
@@ -362,9 +361,11 @@ export interface CoverLetter {
   phoneNumber: string;
   portfolio: string;
   title: string;
+  salutation?: string;
   coverLetter: string;
   type: string;
   generatedAt: string;
+  recruiterEmail: string;
 }
 
 export interface QAItem {
