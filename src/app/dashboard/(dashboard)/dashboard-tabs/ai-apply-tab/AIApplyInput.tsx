@@ -29,7 +29,7 @@ import { UploadedFile } from "@/types";
 import { cn } from "@/lib/utils";
 import { useDocumentExtraction } from "@/app/onboarding/onboarding-pages/AnyFormatToText";
 import { isEmpty } from "lodash";
-import { apiService, useAuth } from "@/hooks/use-auth";
+// import { apiService, useAuth } from "@/hooks/use-auth";
 
 const FORM_SCHEMA = z.object({
   jobDescription: z.string().min(2, {
@@ -39,7 +39,7 @@ const FORM_SCHEMA = z.object({
 
 export const AIApplyInput = memo(
   ({ jobDescription }: { jobDescription: string }) => {
-    const { user } = useAuth();
+    // const { user } = useAuth();
     const [uploadedFiles, setUploadedFiles] = useState<UploadedFile | null>(
       null
     );
@@ -97,32 +97,32 @@ export const AIApplyInput = memo(
           extractedText.match(emailRegex) ||
           [];
 
-        if (user?.email) {
-          const { isAuthorized } = await apiService.gmailOauthStatus(
-            user.email
-          );
-          console.log("GMAIL OAUTH STATUS: ", isAuthorized);
+        // if (user?.email) {
+        //   const { isAuthorized } = await apiService.gmailOauthStatus(
+        //     user.email
+        //   );
+        //   console.log("GMAIL OAUTH STATUS: ", isAuthorized);
 
-          if (!isAuthorized) {
-            toast(
-              "Please authorize Cverai to send emails on your behalf from the settings page.  ",
-              {
-                action: {
-                  label: "Authorize now",
-                  onClick: () =>
-                    router.push(`/dashboard/settings?tab=ai-applypreference`),
-                },
-                classNames: {
-                  // toast: "!bg-yellow-50 !border-yellow-200",
-                  actionButton:
-                    "!bg-blue-600 hover:!bg-blue-700 !text-white !h-8",
-                },
-              }
-            );
+        //   if (!isAuthorized) {
+        //     toast(
+        //       "Please authorize Cverai to send emails on your behalf from the settings page.  ",
+        //       {
+        //         action: {
+        //           label: "Authorize now",
+        //           onClick: () =>
+        //             router.push(`/dashboard/settings?tab=ai-applypreference`),
+        //         },
+        //         classNames: {
+        //           // toast: "!bg-yellow-50 !border-yellow-200",
+        //           actionButton:
+        //             "!bg-blue-600 hover:!bg-blue-700 !text-white !h-8",
+        //         },
+        //       }
+        //     );
 
-            return;
-          }
-        }
+        //     return;
+        //   }
+        // }
 
         if (foundEmails.length === 0) {
           toast.error(
