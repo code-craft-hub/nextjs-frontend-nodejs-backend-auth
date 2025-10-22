@@ -74,7 +74,6 @@ export const apiService = {
   gmailOauthStatus: async (email:string): Promise<{isAuthorized: boolean}> => {
     try {
       const { data } = await authClient.get(`/google-gmail-oauth/auth-status/${encodeURIComponent(email)}`);
-      console.log("GMAIL OAUTH STATUS DATA: ", data);
       return data.data;
     } catch (error: any) {
       throw new Error(
