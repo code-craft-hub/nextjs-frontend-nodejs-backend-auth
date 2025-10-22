@@ -96,28 +96,32 @@ export const AIApplyInput = memo(
           jobDescription.match(emailRegex) ||
           extractedText.match(emailRegex) ||
           [];
-        const { isAuthorized } = await apiService.gmailOauthStatus(
-          user?.email!
-        );
-        console.log("GMAIL OAUTH STATUS: ", isAuthorized);
 
-        if (!isAuthorized) {
-          toast(
-            "Please authorize Cverai to send emails on your behalf from the settings page.  ",
-            {
-              action: {
-                label: "Authorize now",
-                onClick: () =>
-                  router.push(`/dashboard/settings?tab=ai-applypreference`),
-              },
-              classNames: {
-                // toast: "!bg-yellow-50 !border-yellow-200",
-                actionButton: "!bg-blue-600 hover:!bg-blue-700 !text-white !h-8",
-              },
-            }
+        if (user?.email) {
+          const { isAuthorized } = await apiService.gmailOauthStatus(
+            user.email
           );
+          console.log("GMAIL OAUTH STATUS: ", isAuthorized);
 
-          return;
+          if (!isAuthorized) {
+            toast(
+              "Please authorize Cverai to send emails on your behalf from the settings page.  ",
+              {
+                action: {
+                  label: "Authorize now",
+                  onClick: () =>
+                    router.push(`/dashboard/settings?tab=ai-applypreference`),
+                },
+                classNames: {
+                  // toast: "!bg-yellow-50 !border-yellow-200",
+                  actionButton:
+                    "!bg-blue-600 hover:!bg-blue-700 !text-white !h-8",
+                },
+              }
+            );
+
+            return;
+          }
         }
 
         if (foundEmails.length === 0) {
