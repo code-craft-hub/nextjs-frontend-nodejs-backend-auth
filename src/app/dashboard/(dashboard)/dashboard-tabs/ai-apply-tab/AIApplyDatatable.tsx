@@ -175,64 +175,66 @@ export function AIApplyDatatable({ data }: { data: z.infer<typeof schema>[] }) {
   });
 
   return (
-    <Card>
-      <div className="">
-        <h1 className="font-bold text-xl px-6">Recent Activity</h1>
-      </div>
-      <div className="overflow-hidden grid">
-        <Table>
-          <TableHeader className="bg-muted sticky top-0 z-10">
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead
-                      className="px-6"
-                      key={header.id}
-                      colSpan={header.colSpan}
-                    >
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
+    table.getRowModel().rows?.length !== 0 && (
+      <Card>
+        <div className="">
+          <h1 className="font-bold text-xl px-6">Recent Activity</h1>
+          <div className="overflow-hidden grid">
+            <Table>
+              <TableHeader className="bg-muted sticky top-0 z-10">
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => {
+                      return (
+                        <TableHead
+                          className="px-6"
+                          key={header.id}
+                          colSpan={header.colSpan}
+                        >
+                          {header.isPlaceholder
+                            ? null
+                            : flexRender(
+                                header.column.columnDef.header,
+                                header.getContext()
+                              )}
+                        </TableHead>
+                      );
+                    })}
+                  </TableRow>
+                ))}
+              </TableHeader>
+              <TableBody className="**:data-[slot=table-cell]:first:w-8">
+                {table.getRowModel().rows?.length ? (
+                  table.getRowModel().rows.map((row) => (
+                    <TableRow key={row.id}>
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id} className="px-6">
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
                           )}
-                    </TableHead>
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody className="**:data-[slot=table-cell]:first:w-8">
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id}>
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="px-6">
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell
+                      colSpan={columns.length}
+                      className="h-24 text-center"
+                    >
+                      No results.
                     </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
-      <div className="text-blue-500 text-center border-t -mt-4 pt-4">
-        View more
-      </div>
-    </Card>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+          <div className="text-blue-500 text-center border-t -mt-4 pt-4">
+            View more
+          </div>
+        </div>
+      </Card>
+    )
   );
 }

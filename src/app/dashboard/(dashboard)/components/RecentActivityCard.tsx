@@ -4,7 +4,9 @@ import { memo, useMemo } from "react";
 
 
 
-export const RecentActivityCard = memo(() => {
+export const RecentActivityCard = memo((
+  // {jobData}: {jobData: any}
+) => {
   const badgeData = useMemo(
     () => [
       { text: "Full-Time", variant: "teal" as const },
@@ -13,6 +15,8 @@ export const RecentActivityCard = memo(() => {
     ],
     []
   );
+
+  // console.log(jobData)
 
   return (
     <div className="flex bg-slate-50 p-4 sm:p-6 rounded-xl gap-4 sm:gap-6 border border-[#cbd5e1]">

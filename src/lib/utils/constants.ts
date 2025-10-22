@@ -38,7 +38,7 @@ export const COLLECTIONS = {
   USERS: "users",
   RESUME: "resume",
   COVER_LETTER: "cover_letter",
-  JOB_APPLICATION: "job_application",
+  JOBS: "jobs",
   INTERVIEW_QUESTION: "interview_question",
   AI_APPLY: "ai_apply",
 };

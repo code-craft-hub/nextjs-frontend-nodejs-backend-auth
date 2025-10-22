@@ -174,6 +174,20 @@ export const apiService = {
     }
   },
 
+  getPaginatedDoc: async <T>(collection: string): Promise<T> => {
+    try {
+      const { data } = await authClient.get(
+        `/career-doc/paginated/?collection=${collection}`
+      );
+      return data.data;
+    } catch (error: any) {
+      throw new Error(
+        "Failed to fetch all documents:",
+        error.error || "Fetch failed"
+      );
+    }
+  },
+
   deleteCareerDoc: async (
     id: string,
     collection: string
