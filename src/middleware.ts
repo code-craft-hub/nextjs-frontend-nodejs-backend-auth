@@ -6,11 +6,7 @@ import { getJwtSecret } from "./lib/utils/helpers";
 
 async function verifySessionToken(token: string): Promise<Partial<IUser> | null> {
   try {
-
-    console.log('THIS IS THE TOKEN WE ARE VERIFYING IN MIDDLEWARE:', token);
-
     const secret = new TextEncoder().encode(getJwtSecret());
-    console.log("THIS IS THE SECRET : ", secret);
     const { payload } = await jwtVerify(token, secret, {
       issuer: "nextjs-app",
     });

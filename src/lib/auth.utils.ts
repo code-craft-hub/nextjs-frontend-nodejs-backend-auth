@@ -80,24 +80,3 @@ export async function getSessionFromCookies(): Promise<Partial<IUser> | null> {
 
 
 
-export async function signInWithPassword(email: string, password: string) {
-  const response = await fetch(
-    `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${process.env.NEXT_PUBLIC_FIREBASE_API_KEY}`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email,
-        password,
-        returnSecureToken: true,
-      }),
-    }
-  );
-
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.error?.message || "Sign in failed");
-  }
-
-  return response.json();
-}

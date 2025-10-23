@@ -12,6 +12,7 @@ import {
   Roboto,
   Geist,
 } from "next/font/google";
+import { Metadata } from "next";
 
 const ebGaramond = EB_Garamond({
   subsets: ["latin"],
@@ -43,6 +44,10 @@ const poppins = Poppins({
 });
 const roboto = Roboto({ subsets: ["latin"], variable: "--font-roboto" });
 
+export const metadata: Metadata = {
+  title: "Career Platform",
+  description: "Manage your career documents and interview prep",
+};
 export default function RootLayout({
   children,
 }: {
