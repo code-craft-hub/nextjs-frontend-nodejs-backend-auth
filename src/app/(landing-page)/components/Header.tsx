@@ -9,7 +9,6 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 
-import { useAuth } from "@/hooks/use-auth";
 import { navItems } from "../constants";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
@@ -17,10 +16,14 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { smoothlyScrollToView } from "@/lib/utils/helpers";
 import { useState } from "react";
-export const Header = ({ url }: { url?: string }) => {
-  const { user } = useAuth();
+import { useQuery } from "@tanstack/react-query";
+import { userQueries } from "@/lib/queries/user.queries";
+
+export const Header = ({ url, userId }: { url?: string; userId?: string }) => {
   const router = useRouter();
   const [modal, setModal] = useState(false);
+
+  const { data: user } = useQuery(userQueries.detail(userId ?? ""));
 
   return (
     <div>
@@ -109,7 +112,7 @@ export const Header = ({ url }: { url?: string }) => {
                         }}
                         className="font-poppins text-black hover:text-gray-900 transition-colors hover:bg-accent px-4 py-2 border-t w-full text-start flex gap-2"
                       >
-                        <p className="">{nav.icon}</p>
+                        {/* <p className="">{nav.icon}</p> */}
                         <p className="">{nav.name}</p>
                       </Link>
                     ))}
@@ -117,27 +120,41 @@ export const Header = ({ url }: { url?: string }) => {
                 </SheetClose>
 
                 <SheetFooter>
-                  <SheetClose asChild>
-                    <Button
-                      variant="outline"
-                      className="text-gray-600 hover:text-gray-900"
-                      onClick={() => {
-                        router.push("/login");
-                      }}
-                    >
-                      Log in
-                    </Button>
-                  </SheetClose>
-                  <SheetClose asChild>
-                    <Button
-                      onClick={() => {
-                        router.push("/dashboard/home");
-                      }}
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-6"
-                    >
-                      Get started
-                    </Button>
-                  </SheetClose>
+                  {!!user ? (
+                    <SheetClose asChild>
+                      <Button
+                        onClick={() => {
+                          router.push("/dashboard/home");
+                        }}
+                      >
+                        Dashboard
+                      </Button>
+                    </SheetClose>
+                  ) : (
+                    <div className="">
+                      <SheetClose asChild>
+                        <Button
+                          variant="outline"
+                          className="text-gray-600 hover:text-gray-900"
+                          onClick={() => {
+                            router.push("/login");
+                          }}
+                        >
+                          Log in
+                        </Button>
+                      </SheetClose>
+                      <SheetClose asChild>
+                        <Button
+                          onClick={() => {
+                            router.push("/dashboard/home");
+                          }}
+                          className="bg-blue-600 hover:bg-blue-700 text-white px-6"
+                        >
+                          Get started
+                        </Button>
+                      </SheetClose>
+                    </div>
+                  )}
                 </SheetFooter>
               </SheetContent>
             </Sheet>

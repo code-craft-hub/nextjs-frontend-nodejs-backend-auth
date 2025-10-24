@@ -1,3 +1,4 @@
+import { PaginationParams } from "../types";
 import { JobFilters } from "../types/jobs";
 
 export const queryKeys = {
@@ -9,6 +10,8 @@ export const queryKeys = {
       [...queryKeys.users.lists(), filters] as const,
     details: () => [...queryKeys.users.all, "detail"] as const,
     detail: (id: string) => [...queryKeys.users.details(), id] as const,
+    infinite: (params: Omit<PaginationParams, "page">) =>
+      [...queryKeys.users.all, "infinite", params] as const,
   },
 
   // Auth keys

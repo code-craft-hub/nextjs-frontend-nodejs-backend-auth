@@ -1,13 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, MapPin } from "lucide-react";
-import { featuredJobs } from "../constants";
 import { JobFilters } from "@/lib/types/jobs";
 import { jobsQueries } from "@/lib/queries/jobs.queries";
 import { useQuery } from "@tanstack/react-query";
 
 export const FeatureJobs = ({ filters }: { filters: JobFilters }) => {
-  const { data: jobs, isLoading } = useQuery(jobsQueries.all(filters));
-console.log("🚀 FeaturedJobs filters:", filters, jobs);
+  const { data: jobs } = useQuery(jobsQueries.all(filters));
   return (
     <section id="feature-jobs" className="pb-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -19,33 +17,33 @@ console.log("🚀 FeaturedJobs filters:", filters, jobs);
         </div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {featuredJobs.map((job, index) => (
+          {jobs?.data?.map((job, index) => (
             <div
               key={index}
               className="bg-white rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow p-4 space-y-4"
             >
               <div className="">
-                <h3 className="font-medium mb-1">{job.title}</h3>
+                <h3 className="font-medium mb-1 line-clamp-1">{job?.title}</h3>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-xs px-2 py-1 bg-[#E7F6EA] text-[#0BA02C] uppercase text-nowrap h-fit">
-                  {job.type}
+                  {job?.jobType}
                 </span>
                 <span className=" text-gray-400 text-xs">
-                  Salary: {job.salary}
+                  Salary: {job?.salary ?? "Not Disclosed"}
                 </span>
               </div>
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-sm bg-gray-200 flex items-center justify-center text-2xl">
-                  {job.logo}
+                <div className="w-12 h-12 rounded-sm bg-gray-200 flex items-center justify-center text-2xl shrink-0">
+                  <img src={job?.logo ?? "/placeholder.jpg"} alt="company logo" className="size-10" />
                 </div>
                 <div className="">
                   <p className="text-gray-600 text-sm font-medium">
-                    {job.company}
+                    {job?.companyName}
                   </p>
                   <div className="flex items-center text-gray-500 text-xs">
                     <MapPin className="w-3 h-3 mr-1" />
-                    {job.location}
+                    <p className="line-clamp-1">{job?.location}</p>
                   </div>
                 </div>
                 <div className="ml-auto">

@@ -21,8 +21,16 @@ import { MeetCverai } from "./components/MeetCverai";
 import { FeatureJobs } from "./components/FeatureJobs";
 import { JobFilters } from "@/lib/types/jobs";
 
-export const LandingPageClient = ({filters}: {filters: JobFilters}) => {
+export const LandingPageClient = ({
+  filters,
+  userId,
+}: {
+  filters: JobFilters;
+  userId: string;
+}) => {
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
+
+
   return (
     <div className="min-h-screen bg-white font-poppins">
       <section
@@ -34,7 +42,7 @@ export const LandingPageClient = ({filters}: {filters: JobFilters}) => {
           backgroundPosition: "center center",
         }}
       >
-        <Header />
+        <Header userId={userId} />
         <div className="pt-32 mx-auto">
           <h1 className="text-4xl text-center font-medium s:text-red-900 mb-12 !font-instrument">
             AI Assist To Apply
@@ -145,8 +153,6 @@ export const LandingPageClient = ({filters}: {filters: JobFilters}) => {
                   }
                   className="w-full px-6 py-6 text-left flex items-center justify-between hover:bg-gray-50 rounded-2xl transition-colors"
                 >
-
-                  
                   <span className="font-poppins text-[#030712]">
                     {item.question}
                   </span>

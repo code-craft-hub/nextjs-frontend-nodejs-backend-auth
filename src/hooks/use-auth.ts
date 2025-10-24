@@ -62,7 +62,7 @@ export const apiService = {
 
   getUser: async (): Promise<IUser> => {
     try {
-      const { data } = await authClient.get("/profile");
+      const { data } = await authClient.get("/users");
       return data.data;
     } catch (error: any) {
       throw new Error(

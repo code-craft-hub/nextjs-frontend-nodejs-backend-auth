@@ -11,7 +11,7 @@ export const authApi = {
   getSession: () => api.get<AuthSession>("/auth/session"),
 
   // Get current user profile
-  getProfile: () => api.get<User>("/auth/profile"),
+  getProfile: () => api.get<User>("/auth/users"),
 
   // Login
   login: (credentials: LoginCredentials) =>

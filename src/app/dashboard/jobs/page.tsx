@@ -7,7 +7,7 @@ const JobListingsPage = async () => {
 
   return (
     <div>
-      <Jobs  />
+      <Jobs />
     </div>
   );
 };

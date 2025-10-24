@@ -1,7 +1,4 @@
 import React from "react";
-// import { getQueryClient } from "@/lib/query-client";
-// import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
-import { getUser } from "@/lib/server-fetch.utils";
 import { LandingPageClient } from "./LandingPageClient";
 import { createServerQueryClient } from "@/lib/query/prefetch";
 import { JobFilters } from "@/lib/types/jobs";
@@ -9,11 +6,25 @@ import { jobsQueries } from "@/lib/queries/jobs.queries";
 import { prefetchWithPriority } from "@/lib/query/parallel-prefetch";
 import { HydrationBoundary } from "@/components/hydration-boundary";
 import { dehydrate } from "@tanstack/react-query";
+import { getSessionFromCookies } from "@/lib/auth.utils";
+// import { userQueries } from "@/lib/queries/user.queries";
+import { userServerQueries } from "@/lib/queries/user.server.queries";
 
 const LandingPage = async () => {
   const queryClient = createServerQueryClient();
+  const email = (await getSessionFromCookies())?.email;
 
-  // Build filters - only include defined values
+  // if(email) await queryClient.prefetchQuery(userQueries.detail(email));
+
+  if (email) {
+    await queryClient.prefetchQuery(userServerQueries.detail(email));
+  }
+
+  const cached = queryClient.getQueryData(
+    userServerQueries.detail(email!).queryKey
+  );
+
+  console.log("👤 User cached in server fetch:", cached);
   const filters: JobFilters = {
     page: 1,
     limit: 10,
@@ -31,8 +42,6 @@ const LandingPage = async () => {
       priority: "high",
     },
   ]);
-  console.log("✅ Prefetch complete");
-
   // Check cache
   const cachedData = queryClient.getQueryData(
     jobsQueries.all(filters).queryKey
@@ -42,24 +51,9 @@ const LandingPage = async () => {
   // Dehydrate
   const dehydratedState = dehydrate(queryClient);
   console.log("💧 Dehydrated queries:", dehydratedState.queries.length);
-
-  // async function prefetchUserData() {
-  //   const queryClient = getQueryClient();
-
-  //   const userPromise = queryClient.prefetchQuery({
-  //     queryKey: ["auth", "user"],
-  //     queryFn: () => getUser(),
-  //   });
-
-  //   userPromise.catch(console.error);
-
-  //   return queryClient;
-  // }
-
-  // const queryClient = await prefetchUserData();
   return (
     <HydrationBoundary state={dehydratedState}>
-      <LandingPageClient filters={filters} />
+      <LandingPageClient filters={filters} userId={email!} />
     </HydrationBoundary>
   );
 };
