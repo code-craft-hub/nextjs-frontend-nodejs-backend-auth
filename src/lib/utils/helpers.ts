@@ -1,3 +1,4 @@
+import { formatDistanceToNow } from "date-fns";
 import { ApiError, QAItem } from "@/types";
 import { jsonrepair } from "jsonrepair";
 import { MouseEvent } from "react";
@@ -113,6 +114,10 @@ export const createApiError = (message: string, status?: number): ApiError => {
   return error;
 };
 
+export const randomPercentage = () => {
+  return Math.floor(Math.random() * (100 - 50 + 1) + 50) + '%'
+}
+
 export function validateOrCreateDate(inputDate: string | Date): Date {
   const date = new Date(inputDate);
   if (isNaN(date.getTime())) {
@@ -120,6 +125,14 @@ export function validateOrCreateDate(inputDate: string | Date): Date {
   }
   return date;
 }
+
+export const humanDate = (input: any) => {
+  const validDate = formatDistanceToNow(
+    input instanceof Date ? input : new Date(input),
+    { addSuffix: true }
+  );
+  return validDate;
+};
 
 export function monthYear(input: Date | string) {
   const validDate = validateOrCreateDate(input);

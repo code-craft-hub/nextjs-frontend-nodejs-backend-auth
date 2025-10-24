@@ -23,7 +23,7 @@ interface JobsPageProps {
 
 // app/jobs/page.tsx
 export default async function JobsPage({ searchParams }: JobsPageProps) {
-  console.log('🚀 SERVER COMPONENT START');
+  // console.log('🚀 SERVER COMPONENT START');
   
   const queryClient = createServerQueryClient();
   const params = await searchParams;
@@ -39,11 +39,11 @@ export default async function JobsPage({ searchParams }: JobsPageProps) {
   if (params.status) filters.status = params.status as any;
   if (params.locationType) filters.locationType = params.locationType as any;
 
-  console.log('📋 Filters:', filters);
-  console.log('🔑 Query key:', jobsQueries.all(filters).queryKey);
+  // console.log('📋 Filters:', filters);
+  // console.log('🔑 Query key:', jobsQueries.all(filters).queryKey);
 
-  // Prefetch
-  console.log('⏳ Starting prefetch...');
+  // // Prefetch
+  // console.log('⏳ Starting prefetch...');
   await prefetchWithPriority(queryClient, [
     {
       queryKey: jobsQueries.all(filters).queryKey,
@@ -51,15 +51,15 @@ export default async function JobsPage({ searchParams }: JobsPageProps) {
       priority: "high",
     },
   ]);
-  console.log('✅ Prefetch complete');
+  // console.log('✅ Prefetch complete');
 
   // Check cache
-  const cachedData = queryClient.getQueryData(jobsQueries.all(filters).queryKey);
-  console.log('🎯 Query cached:', !!cachedData);
+  // const cachedData = queryClient.getQueryData(jobsQueries.all(filters).queryKey);
+  // console.log('🎯 Query cached:', !!cachedData);
 
   // Dehydrate
   const dehydratedState = dehydrate(queryClient);
-  console.log('💧 Dehydrated queries:', dehydratedState.queries.length);
+  // console.log('💧 Dehydrated queries:', dehydratedState.queries.length);
 
   return (
     <HydrationBoundary state={dehydratedState}>

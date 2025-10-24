@@ -1,136 +1,130 @@
 "use client";
-import { IUser } from "@/types";
-import { cn } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { memo, useMemo } from "react";
+import { memo } from "react";
 import JobDashboard from "./FindJobClient";
+import { jobsQueries } from "@/lib/queries/jobs.queries";
+import { useQuery } from "@tanstack/react-query";
 
-interface ProfileOption {
-  value: string;
-  label: string;
-  icon: string;
-}
+import { ColumnDef } from "@tanstack/react-table";
+import { ArrowUpDown, Calendar, DollarSign, MapPin } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { FaRegBookmark, FaBookmark } from "react-icons/fa";
+import { humanDate, randomPercentage } from "@/lib/utils/helpers";
+import { JobType } from "@/types";
 
-type ActionValue =
-  | "select-profile"
-  | "upload-file"
-  | "upload-photo"
-  | "tailor-resume"
-  | "tailor-cover-letter"
-  | "generate-interview-questions";
-
-const SelectOptions = memo(
-  ({
-    options,
-    value,
-    onValueChange,
-    placeholder,
-    className = "",
-    triggerClassName = "",
-  }: {
-    options: readonly ProfileOption[];
-    value: ActionValue;
-    onValueChange: (value: ActionValue) => void;
-    placeholder: string;
-    className?: string;
-    triggerClassName?: string;
-  }) => (
-    <div className={cn("w-full max-w-md mx-auto", className)}>
-      <Select value={value} onValueChange={onValueChange}>
-        <SelectTrigger className={cn("w-full", triggerClassName)}>
-          <SelectValue placeholder={placeholder} />
-        </SelectTrigger>
-        <SelectContent className="w-full bg-white border border-gray-200 rounded-lg shadow-lg mt-1">
-          {options.map(({ value, label, icon }) => (
-            <SelectItem
-              key={value}
-              value={value}
-              className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors duration-150"
-            >
-              <div className="flex items-center gap-3 w-full">
-                <img src={icon} alt={value} loading="lazy" />
-                {/* {icon} */}
-                {/* <Icon /> */}
-                <span className="text-gray-900 font-medium">{label}</span>
-              </div>
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </div>
-  )
-);
-
-SelectOptions.displayName = "SelectOptions";
-
-const RecentActivityCard = memo(() => {
-  const badgeData = useMemo(
-    () => [
-      { text: "Full-Time", variant: "teal" as const },
-      { text: "Lagos, Nigeria", variant: "blue" as const },
-      { text: "92% match", variant: "orange" as const },
-    ],
-    []
-  );
-
-  return (
-    <div className="flex bg-slate-50 p-4 sm:p-6 rounded-xl gap-4 sm:gap-6 border border-[#cbd5e1]">
-      <div className="shrink-0">
-        <img src="/company.svg" alt="" loading="lazy" />
+const fingJobsColumns: ColumnDef<JobType>[] = [
+  {
+    accessorKey: "company",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          company
+          <ArrowUpDown />
+        </Button>
+      );
+    },
+    cell: ({ row }) => (
+      <div className=" flex items-center justify-center ">
+        <img
+          src={row.original.companyLogo ?? "/company.svg"}
+          alt={row.original.companyText}
+          className="size-12"
+        />
       </div>
-      <div className="flex flex-col gap-2">
-        <h1 className="font-inter">Social Media Assistant</h1>
-        <p className="font-poppins text-cverai-brown text-xs">
-          Nomad · <span className="font-inter">$2,000-5,000 / Monthly</span>
-        </p>
-        <div className="flex flex-wrap gap-2">
-          {badgeData.map((badge, badgeIndex) => (
-            <div key={badgeIndex} className="flex items-center gap-2">
-              <Badge
-                className={cn(
-                  "rounded-full font-epilogue font-semibold",
-                  badge.variant === "teal"
-                    ? "bg-cverai-teal/10 text-cverai-teal"
-                    : badge.variant === "blue"
-                    ? "text-cverai-blue border-cverai-blue bg-white"
-                    : "text-cverai-orange border-cverai-orange bg-white"
-                )}
-              >
-                {badge.text}
-              </Badge>
-              {badgeIndex === 0 && <div className="bg-slate-500 w-[1px] h-7" />}
-            </div>
-          ))}
+    ),
+  },
+
+  {
+    accessorKey: "title",
+    header: "Title",
+    cell: ({ row }) => (
+      <div className="capitalize">
+        <div className="flex gap-4 items-center">
+          <div className="font-medium text-xs max-w-sm overflow-hidden">
+            {row.getValue("title")}
+          </div>
+          <div className="bg-blue-50 rounde text-blue-600">
+            <span className="text-2xs">{row.original.jobType}</span>
+          </div>
+        </div>
+        <div className="flex gap-x-4 mt-1">
+          <p className="flex gap-1 text-gray-400">
+            <MapPin className="size-3" />
+            <span className="text-2xs"> {row.original.location}</span>
+          </p>
+          <p className="flex gap-1 text-gray-400">
+            <DollarSign className="size-3" />
+            <span className="text-2xs">
+              {" "}
+              {row.original?.salary ?? "Not disclosed"}
+            </span>
+          </p>
+          <p className="flex gap-1 text-gray-400">
+            <Calendar className="size-3" />
+            <span className="text-2xs">
+              {humanDate(row.original?.scrapedDate)}
+            </span>
+          </p>
+          <p className="text-2xs text-green-400">{randomPercentage()}</p>
         </div>
       </div>
-    </div>
-  );
-});
+    ),
+  },
 
-RecentActivityCard.displayName = "RecentActivityCard";
-export interface OnboardingFormProps {
-  onNext: () => void;
-  onPrev: () => void;
-  initialUser: Partial<IUser>;
-  children?: React.ReactNode;
-}
+  {
+    accessorKey: "isBookmarked",
+    header: () => <div className=""></div>,
+    cell: ({ row }) => {
+      return (
+        <div className="flex justify-end">
+          {row.original.isBookmarked ? (
+            <div>
+              <FaBookmark className="size-4" />
+            </div>
+          ) : (
+            <FaRegBookmark className="size-4 text-gray-400" />
+          )}
+        </div>
+      );
+    },
+  },
+  {
+    id: "actions",
+    enableHiding: false,
+    cell: ({ row }) => {
+      return (
+        <div className="flex justify-end">
+          <Button
+            onClick={() => {
+              window.open(row.original.link, "_blank");
+            }}
+            variant={"button"}
+          >
+            Apply Now
+          </Button>
+        </div>
+      );
+    },
+  },
+];
 
 export const FindJob = memo(() => {
+  const filters = {
+    page: 1,
+    limit: 20,
+  };
+
+  const { data: jobs } = useQuery(jobsQueries.all(filters));
 
   return (
     <div className="flex flex-col font-poppins h-screen relative">
       <h1 className="font-instrument text-3xl text-center tracking-tighter mb-8">
         AI Job Document Recommendation
       </h1>
-      <div className="grid">
-        <JobDashboard />
+      <div className="grid pb-16 bg">
+        <JobDashboard jobs={jobs?.data!} fingJobsColumns={fingJobsColumns} />
       </div>
     </div>
   );

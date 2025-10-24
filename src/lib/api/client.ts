@@ -1,5 +1,4 @@
 // lib/api/client.ts
-import { cookies } from "next/headers";
 
 const baseURL =
   process.env.NEXT_PUBLIC_AUTH_API_URL || "http://localhost:8080/api";
@@ -31,13 +30,15 @@ async function getServerCookies(): Promise<string | null> {
   }
 
   try {
+    const { cookies } = await import("next/headers");
+
     const cookieStore = await cookies();
     const cookieString = cookieStore
       .getAll()
       .map((cookie) => `${cookie.name}=${cookie.value}`)
       .join("; ");
 
-    console.log("📦 Server cookies:", cookieString ? "present" : "missing");
+    // console.log("📦 Server cookies:", cookieString ? "present" : "missing");
     return cookieString || null;
   } catch (error) {
     // cookies() might throw in some contexts (like route handlers in some cases)
@@ -53,8 +54,8 @@ export async function apiClient<T>(
   const { params, ...fetchOptions } = options;
 
   const isServerSide = isServer();
-  console.log("🔍 Environment:", isServerSide ? "SERVER" : "CLIENT");
-  console.log("API Request:", endpoint, params, fetchOptions);
+  // console.log("🔍 Environment:", isServerSide ? "SERVER" : "CLIENT");
+  // console.log("API Request:", endpoint, params, fetchOptions);
 
   // Build URL with query params - FILTER OUT UNDEFINED
   let url = `${baseURL}${endpoint}`;
@@ -72,7 +73,7 @@ export async function apiClient<T>(
     }
   }
 
-  console.log("🌐 Final URL:", url);
+  // console.log("🌐 Final URL:", url);
 
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
@@ -91,7 +92,7 @@ export async function apiClient<T>(
     const serverCookies = await getServerCookies();
     if (serverCookies) {
       headers["Cookie"] = serverCookies;
-      console.log("🍪 [SERVER] Forwarding cookies to API");
+      // console.log("🍪 [SERVER] Forwarding cookies to API");
     } else {
       console.log("⚠️ [SERVER] No cookies found to forward");
     }
@@ -117,11 +118,11 @@ export async function apiClient<T>(
   }
 
   const data = await response.json();
-  console.log("✅ API Response:", {
-    endpoint,
-    hasData: !!data,
-    dataKeys: Object.keys(data || {}),
-  });
+  // console.log("✅ API Response:", {
+  //   endpoint,
+  //   hasData: !!data,
+  //   dataKeys: Object.keys(data || {}),
+  // });
 
   return data;
 }

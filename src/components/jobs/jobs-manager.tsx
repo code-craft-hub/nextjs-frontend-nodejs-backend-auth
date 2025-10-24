@@ -11,12 +11,11 @@ import {
   useBulkChangeStatusMutation,
   useDuplicateJobMutation,
 } from '@/lib/mutations/jobs.mutations';
-import { useState, useMemo, useCallback } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useState, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import type { Job, JobFilters } from '@/lib/types/jobs';
 import { JobCard } from './job-card';
 import { JobForm } from './job-form';
-import { JobFiltersPanel } from './job-filters-panel';
 import { JobStats } from './job-stats';
 
 interface JobsManagerProps {
@@ -37,7 +36,7 @@ export function JobsManager({ initialFilters }: JobsManagerProps) {
   // Queries - all instantly load from SSR cache
   const { data: jobs, isLoading } = useQuery(jobsQueries.all(filters));
   const { data: stats } = useQuery(jobsQueries.stats());
-  const { data: filterOptions } = useQuery(jobsQueries.filters());
+  // const { data: filterOptions } = useQuery(jobsQueries.filters());
 
   // Mutations
   const createMutation = useCreateJobMutation();
@@ -58,11 +57,11 @@ export function JobsManager({ initialFilters }: JobsManagerProps) {
     router.push(`/jobs?${params.toString()}`, { scroll: false });
   }, [router]);
 
-  const handleFilterChange = useCallback((newFilters: Partial<JobFilters>) => {
-    const updated = { ...filters, ...newFilters, page: 1 };
-    setFilters(updated);
-    updateFiltersInUrl(updated);
-  }, [filters, updateFiltersInUrl]);
+  // const handleFilterChange = useCallback((newFilters: Partial<JobFilters>) => {
+  //   const updated = { ...filters, ...newFilters, page: 1 };
+  //   setFilters(updated);
+  //   updateFiltersInUrl(updated);
+  // }, [filters, updateFiltersInUrl]);
 
   const handlePageChange = useCallback((page: number) => {
     const updated = { ...filters, page };
@@ -83,7 +82,7 @@ export function JobsManager({ initialFilters }: JobsManagerProps) {
 
   const selectAll = () => {
     if (jobs?.data) {
-      setSelectedJobs(new Set(jobs.data.map(j => j.id)));
+      // setSelectedJobs(new Set(jobs.data.map(j => j.id)));
     }
   };
 
@@ -142,8 +141,6 @@ export function JobsManager({ initialFilters }: JobsManagerProps) {
   const allSelected = jobs?.data && selectedJobs.size === jobs.data.length;
   const someSelected = selectedJobs.size > 0 && !allSelected;
 
-  console.log('🏢 JobsManager Render', jobs);
-  // console.log('🏢 JobsManager Render', { filters, selectedJobs, isLoading, jobs });
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -292,8 +289,8 @@ export function JobsManager({ initialFilters }: JobsManagerProps) {
                   {jobs?.data.map((job) => (
                     <JobCard
                       key={job.id}
-                      job={job}
-                      isSelected={selectedJobs.has(job.id)}
+                      job={job as any}
+                      isSelected={selectedJobs.has(job.id as any)}
                       onSelect={toggleSelection}
                       onEdit={startEdit}
                       onDelete={handleDelete}

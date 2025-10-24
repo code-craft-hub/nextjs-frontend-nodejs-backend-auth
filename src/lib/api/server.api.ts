@@ -6,13 +6,13 @@ import { cookies } from 'next/headers';
 async function getCookieString() {
   const cookieStore = await cookies();
   
-  console.log('🔍 Retrieving cookies from Next.js cookie store');
+  // console.log('🔍 Retrieving cookies from Next.js cookie store');
   const cookieString = cookieStore
     .getAll()
     .map(cookie => `${cookie.name}=${cookie.value}`)
     .join('; ');
     
-  console.log('📦 Server cookies:', cookieString ? 'present' : 'missing');
+  // console.log('📦 Server cookies:', cookieString ? 'present' : 'missing');
   return cookieString;
 }
 

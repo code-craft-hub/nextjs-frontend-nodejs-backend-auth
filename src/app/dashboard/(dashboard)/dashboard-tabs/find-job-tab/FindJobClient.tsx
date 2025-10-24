@@ -17,104 +17,53 @@ import {
 
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 
-import { overviewColumns } from "../../components/overview-columns";
 import { cn } from "@/lib/utils";
+import { JobType } from "@/types";
+import { useRouter } from "next/navigation";
+const menuItems = [
+  {
+    id: "ai-recommendations",
+    count: "574",
+    label: "AI Recommendations",
+    icon: "/bell.svg",
+    bgColor: "bg-green-100",
+    iconColor: "text-green-600",
+    countColor: "text-green-800",
+    labelColor: "text-green-700",
+    url: "/dashboard/jobs/category?tab=ai-recommendations",
+  },
+  {
+    id: "saved-jobs",
+    count: "238",
+    label: "Saved Jobs",
+    icon: "/save.svg",
+    bgColor: "bg-yellow-100",
+    iconColor: "text-yellow-600",
+    countColor: "text-yellow-800",
+    labelColor: "text-yellow-700",
+    url: "/dashboard/jobs/category?tab=saved-jobs",
+  },
+  {
+    id: "application-history",
+    count: "589",
+    label: "Application history",
+    icon: "/briefcase-dasboard.svg",
+    bgColor: "bg-blue-100",
+    iconColor: "text-blue-600",
+    countColor: "text-blue-800",
+    labelColor: "text-blue-700",
+    url: "/dashboard/jobs/category?tab=application-history",
+  },
+];
 
-export default function JobDashboard() {
-  // Job listings data
-  const jobsData = [
-    {
-      id: 1,
-      title: "Technical Support Specialist",
-      company: "Google",
-      companyLogo: "bg-white border-2 border-gray-200",
-      companyIcon: "text-blue-500 font-bold text-lg",
-      companyText: "/yt-company.svg",
-      location: "Lagos",
-      salary: "$15K-$20K",
-      postedTime: "2 days ago",
-      matchPercentage: "100 match",
-      jobType: "Full Time",
-      isBookmarked: false,
-      isFilled: false,
-    },
-    {
-      id: 2,
-      title: "Technical Support Specialist",
-      company: "YouTube",
-      companyLogo: "bg-red-600",
-      companyIcon: "text-white",
-      companyText: "/g-company.svg",
-      location: "Lagos",
-      salary: "$15K-$20K",
-      postedTime: "2 days ago",
-      matchPercentage: "100 match",
-      jobType: "Full Time",
-      isBookmarked: false,
-      isFilled: false,
-    },
-    {
-      id: 3,
-      title: "Technical Support Specialist",
-      company: "Reddit",
-      companyLogo: "bg-orange-500",
-      companyIcon: "text-white",
-      companyText: "/r-company.svg",
-      location: "Lagos",
-      salary: "$15K-$20K",
-      postedTime: "2 days ago",
-      matchPercentage: "100 match",
-      jobType: "Full Time",
-      isBookmarked: true,
-      isFilled: false,
-    },
-    {
-      id: 4,
-      title: "Technical Support Specialist",
-      company: "Discord",
-      companyLogo: "bg-blue-600",
-      companyIcon: "text-white",
-      companyText: "/n-company.svg",
-      location: "Lagos",
-      salary: "$15K-$20K",
-      postedTime: "2 days ago",
-      matchPercentage: "100 match",
-      jobType: "Full Time",
-      isBookmarked: false,
-      isFilled: false,
-    },
-    {
-      id: 5,
-      title: "Technical Support Specialist",
-      company: "Instagram",
-      companyLogo: "bg-gradient-to-br from-purple-600 to-pink-500",
-      companyIcon: "text-white",
-      companyText: "/ig-company.svg",
-      location: "Lagos",
-      salary: "$15K-$20K",
-      postedTime: "2 days ago",
-      matchPercentage: "100 match",
-      jobType: "Full Time",
-      isBookmarked: true,
-      isFilled: false,
-    },
-    {
-      id: 6,
-      title: "Technical Support Specialist",
-      company: "Slack",
-      companyLogo: "bg-white border-2 border-gray-200",
-      companyIcon: "text-red-500",
-      companyText: "/sl-company.svg",
-      location: "Lagos",
-      salary: "$15K-$20K",
-      postedTime: "2 days ago",
-      matchPercentage: "100 match",
-      jobType: "Full Time",
-      isBookmarked: false,
-      isFilled: true,
-    },
-  ];
-
+export default function JobDashboard({
+  jobs,
+  fingJobsColumns,
+}: {
+  jobs: JobType[];
+  fingJobsColumns: any;
+}) {
+  const router = useRouter();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -123,8 +72,8 @@ export default function JobDashboard() {
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
   const table = useReactTable({
-    data: jobsData,
-    columns: overviewColumns,
+    data: jobs,
+    columns: fingJobsColumns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
@@ -141,39 +90,6 @@ export default function JobDashboard() {
     },
   });
 
-  const menuItems = [
-    {
-      id: "ai-recommendations",
-      count: "574",
-      label: "AI Recommendations",
-      icon: "/bell.svg",
-      bgColor: "bg-green-100",
-      iconColor: "text-green-600",
-      countColor: "text-green-800",
-      labelColor: "text-green-700",
-    },
-    {
-      id: "saved-jobs",
-      count: "238",
-      label: "Saved Jobs",
-      icon: "/save.svg",
-      bgColor: "bg-yellow-100",
-      iconColor: "text-yellow-600",
-      countColor: "text-yellow-800",
-      labelColor: "text-yellow-700",
-    },
-    {
-      id: "application-history",
-      count: "589",
-      label: "Application history",
-      icon: "/briefcase-dasboard.svg",
-      bgColor: "bg-blue-100",
-      iconColor: "text-blue-600",
-      countColor: "text-blue-800",
-      labelColor: "text-blue-700",
-    },
-  ];
-
   return (
     <div className="font-inter flex flex-col w-full overflow-hidden gap-y-4">
       <ScrollArea className="w-full whitespace-nowrap">
@@ -183,10 +99,11 @@ export default function JobDashboard() {
               key={item.id}
               className={cn(
                 item.bgColor,
-                //   item.iconColor,
-                //   item.labelColor,
                 "flex justify-between p-4 items-center rounded-md w-64 hover:shadow-sm hover:cursor-pointer"
               )}
+              onClick={() => {
+                router.push(item.url);
+              }}
             >
               <div className="">
                 <h1 className="font-bold mb-1">{item.count}</h1>
@@ -235,24 +152,6 @@ export default function JobDashboard() {
         </div>
         <div className="overflow-hidden border-none">
           <Table>
-            {/* <TableHeader>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => {
-                    return (
-                      <TableHead key={header.id}>
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext()
-                            )}
-                      </TableHead>
-                    );
-                  })}
-                </TableRow>
-              ))}
-            </TableHeader> */}
             <TableBody className="">
               {table.getRowModel().rows?.length ? (
                 table.getRowModel().rows.map((row) => (
@@ -274,7 +173,7 @@ export default function JobDashboard() {
               ) : (
                 <TableRow>
                   <TableCell
-                    colSpan={overviewColumns.length}
+                    colSpan={fingJobsColumns.length}
                     className="h-24 text-center"
                   >
                     No results.

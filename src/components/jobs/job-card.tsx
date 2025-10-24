@@ -2,9 +2,10 @@
 'use client';
 
 import type { Job } from '@/lib/types/jobs';
+import { JobType } from '@/types';
 
 interface JobCardProps {
-  job: Job;
+  job: JobType extends Job ? JobType : Job;
   isSelected: boolean;
   onSelect: (id: string) => void;
   onEdit: (job: Job) => void;
@@ -22,14 +23,14 @@ export function JobCard({
   onDelete,
   onDuplicate,
   onHover,
-  viewMode,
+  // viewMode,
 }: JobCardProps) {
-  const statusColors = {
-    draft: 'bg-gray-100 text-gray-800',
-    active: 'bg-green-100 text-green-800',
-    closed: 'bg-red-100 text-red-800',
-    archived: 'bg-yellow-100 text-yellow-800',
-  };
+  // const statusColors = {
+  //   draft: 'bg-gray-100 text-gray-800',
+  //   active: 'bg-green-100 text-green-800',
+  //   closed: 'bg-red-100 text-red-800',
+  //   archived: 'bg-yellow-100 text-yellow-800',
+  // };
 
   return (
     <div
@@ -60,7 +61,7 @@ export function JobCard({
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <span className={`px-3 py-1 rounded-full text-xs font-semibold ${statusColors?.[job?.status]}`}>
+          <span className={`px-3 py-1 rounded-full text-xs font-semibold }`}>
             {job.status}
           </span>
         </div>
@@ -104,7 +105,7 @@ export function JobCard({
 
       {job?.tags?.length > 0 && (
         <div className="mt-4 flex flex-wrap gap-2">
-          {job?.tags.slice(0, 5).map((tag) => (
+          {job?.tags.slice(0, 5).map((tag: any) => (
             <span key={tag} className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">
               {tag}
             </span>

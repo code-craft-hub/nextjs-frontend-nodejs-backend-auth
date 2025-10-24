@@ -13,7 +13,7 @@ import { useRouter } from "next/navigation";
 export const HomeClient = memo(
   ({
     tab,
-    jobDescription
+    jobDescription,
   }: {
     tab: DashboardTab;
     jobDescription: string;

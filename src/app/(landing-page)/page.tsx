@@ -20,21 +20,21 @@ const LandingPage = async () => {
     await queryClient.prefetchQuery(userServerQueries.detail(email));
   }
 
-  const cached = queryClient.getQueryData(
-    userServerQueries.detail(email!).queryKey
-  );
+  // const cached = queryClient.getQueryData(
+  //   userServerQueries.detail(email!).queryKey
+  // );
 
-  console.log("👤 User cached in server fetch:", cached);
+  // console.log("👤 User cached in server fetch:", cached);
   const filters: JobFilters = {
     page: 1,
     limit: 10,
   };
 
-  console.log("📋 Filters:", filters);
-  console.log("🔑 Query key:", jobsQueries.all(filters).queryKey);
+  // console.log("📋 Filters:", filters);
+  // console.log("🔑 Query key:", jobsQueries.all(filters).queryKey);
 
   // Prefetch
-  console.log("⏳ Starting prefetch...");
+  // console.log("⏳ Starting prefetch...");
   await prefetchWithPriority(queryClient, [
     {
       queryKey: jobsQueries.all(filters).queryKey,
@@ -43,14 +43,14 @@ const LandingPage = async () => {
     },
   ]);
   // Check cache
-  const cachedData = queryClient.getQueryData(
-    jobsQueries.all(filters).queryKey
-  );
-  console.log("🎯 Query cached:", !!cachedData);
+  // const cachedData = queryClient.getQueryData(
+  //   jobsQueries.all(filters).queryKey
+  // );
+  // console.log("🎯 Query cached:", !!cachedData);
 
   // Dehydrate
   const dehydratedState = dehydrate(queryClient);
-  console.log("💧 Dehydrated queries:", dehydratedState.queries.length);
+  // console.log("💧 Dehydrated queries:", dehydratedState.queries.length);
   return (
     <HydrationBoundary state={dehydratedState}>
       <LandingPageClient filters={filters} userId={email!} />

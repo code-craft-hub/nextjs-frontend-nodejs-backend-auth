@@ -4,7 +4,6 @@ import axios, {
   AxiosResponse,
   InternalAxiosRequestConfig,
 } from "axios";
-import { cookies } from "next/headers";
 
 export interface ApiClientConfig {
   baseURL: string;
@@ -25,16 +24,18 @@ async function getServerCookies(): Promise<string | null> {
   }
 
   try {
+    const { cookies } = await import("next/headers");
+
     const cookieStore = await cookies();
     const cookieString = cookieStore
       .getAll()
       .map((cookie) => `${cookie.name}=${cookie.value}`)
       .join("; ");
 
-    console.log(
-      "📦 [Axios] Server cookies:",
-      cookieString ? "present" : "missing"
-    );
+    // console.log(
+    //   "📦 [Axios] Server cookies:",
+    //   cookieString ? "present" : "missing"
+    // );
     return cookieString || null;
   } catch (error) {
     console.warn("⚠️ [Axios] Could not access cookies:", error);
@@ -66,29 +67,29 @@ export const setupInterceptors = (client: AxiosInstance, apiName: string) => {
       (config as any).metadata = { startTime: new Date() };
 
       const isServerSide = isServer();
-      console.log(
-        `🔍 [${apiName}] Environment:`,
-        isServerSide ? "SERVER" : "CLIENT"
-      );
+      // console.log(
+      //   `🔍 [${apiName}] Environment:`,
+      //   isServerSide ? "SERVER" : "CLIENT"
+      // );
 
       // 🔑 AUTOMATIC: Get and forward cookies if on server
       if (isServerSide) {
         const serverCookies = await getServerCookies();
         if (serverCookies) {
           config.headers.Cookie = serverCookies;
-          console.log(
-            `🍪 [${apiName}] [SERVER] Forwarding cookies to API`,
-            config,
-            "HARDERS : ",
-            config.headers
-          );
+          // console.log(
+          //   `🍪 [${apiName}] [SERVER] Forwarding cookies to API`,
+          //   config,
+          //   "HARDERS : ",
+          //   config.headers
+          // );
         } else {
-          console.log(`⚠️ [${apiName}] [SERVER] No cookies found to forward`);
+          // console.log(`⚠️ [${apiName}] [SERVER] No cookies found to forward`);
         }
       } else {
-        console.log(
-          `🌐 [${apiName}] [CLIENT] Using browser's automatic cookie handling`
-        );
+        // console.log(
+        //   `🌐 [${apiName}] [CLIENT] Using browser's automatic cookie handling`
+        // );
       }
 
       return config;
@@ -102,14 +103,14 @@ export const setupInterceptors = (client: AxiosInstance, apiName: string) => {
   // Response interceptor
   client.interceptors.response.use(
     (response: AxiosResponse) => {
-      const duration =
-        new Date().getTime() -
-        (response.config as any).metadata?.startTime?.getTime();
-      console.log(`✅ [${apiName}] Response:`, {
-        url: response.config.url,
-        status: response.status,
-        duration: `${duration}ms`,
-      });
+      // const duration =
+      //   new Date().getTime() -
+      //   (response.config as any).metadata?.startTime?.getTime();
+      // console.log(`✅ [${apiName}] Response:`, {
+      //   url: response.config.url,
+      //   status: response.status,
+      //   duration: `${duration}ms`,
+      // });
 
       return response;
     },

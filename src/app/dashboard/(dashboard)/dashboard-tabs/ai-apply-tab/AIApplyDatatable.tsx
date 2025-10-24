@@ -133,7 +133,12 @@ const getColumns = (
   },
 ];
 
-export function AIApplyDatatable({ data }: { data: z.infer<typeof schema>[] }) {
+export function AIApplyDatatable({
+  data,
+}: {
+  data: z.infer<typeof schema>[];
+  jobs: any;
+}) {
   const router = useRouter();
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
