@@ -19,11 +19,11 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { userQueries } from "@/lib/queries/user.queries";
 
-export const Header = ({ url, userId }: { url?: string; userId?: string }) => {
+export const Header = ({ url }: { url?: string }) => {
   const router = useRouter();
   const [modal, setModal] = useState(false);
 
-  const { data: user } = useQuery(userQueries.detail(userId ?? ""));
+  const { data: user } = useQuery(userQueries.detail());
 
   return (
     <div>

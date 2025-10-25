@@ -14,7 +14,7 @@ const LandingPage = async () => {
   const queryClient = createServerQueryClient();
   const email = (await getSessionFromCookies())?.email;
 
-  // if(email) await queryClient.prefetchQuery(userQueries.detail(email));
+  // if(email) await queryClient.prefetchQuery(userQueries.detail());
 
   if (email) {
     await queryClient.prefetchQuery(userServerQueries.detail(email));

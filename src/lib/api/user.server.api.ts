@@ -3,9 +3,9 @@ import { serverApi } from './server.api';
 import { User, PaginationParams, PaginatedResponse } from '@/lib/types';
 
 export const userServerApi = {
-  getUsers: (params?: PaginationParams) =>
-    serverApi.get<PaginatedResponse<User>>('/users', { params }),
+  getUsers: (_params?: PaginationParams) =>
+    serverApi.get<PaginatedResponse<User>>('/users', ),
 
-  getUser: (id: string) => 
-    serverApi.get<User>(`/users/${id}`),
+  getUser: () => 
+    serverApi.get<User>(`/users`),
 };

@@ -9,7 +9,7 @@ export const queryKeys = {
     list: (filters: Record<string, any>) =>
       [...queryKeys.users.lists(), filters] as const,
     details: () => [...queryKeys.users.all, "detail"] as const,
-    detail: (id: string) => [...queryKeys.users.details(), id] as const,
+    detail: () => [...queryKeys.users.details(), "user"] as const,
     infinite: (params: Omit<PaginationParams, "page">) =>
       [...queryKeys.users.all, "infinite", params] as const,
   },

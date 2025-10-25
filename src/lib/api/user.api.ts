@@ -21,7 +21,7 @@ export const userApi = {
     api.get<PaginatedResponse<User>>("/users"),
 
   // Get user by ID
-  getUser: (id: string) => api.get<{ data: Partial<IUser> }>(`/users/${id}`),
+  getUser: () => api.get<{ data: Partial<IUser> }>(`/users`),
 
   // Create user
   createUser: (data: CreateUserData) => api.post<User>("/users", data),

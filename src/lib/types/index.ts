@@ -7,6 +7,25 @@ export interface User {
   updatedAt: string;
 }
 
+export interface ProfileData {
+  jobLevelPreference: string;
+  jobTypePreference: string;
+  roleOfInterest: string;
+  remoteWorkPreference: string;
+  relocationWillingness: string;
+  location: string;
+  salaryExpectation: string;
+  availabilityToStart: string;
+}
+
+export interface ProfileResponse {
+  id: string;
+  userId: string;
+  dataSource: ProfileData;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface AuthSession {
   user: User;
   expiresAt: string;
@@ -40,7 +59,7 @@ export interface InterviewQuestion {
   question: string;
   answer?: string;
   category: string;
-  difficulty: 'easy' | 'medium' | 'hard';
+  difficulty: "easy" | "medium" | "hard";
   createdAt: string;
   updatedAt: string;
 }
@@ -72,7 +91,7 @@ export interface PaginationParams {
   page?: number;
   limit?: number;
   sort?: string;
-  order?: 'asc' | 'desc';
+  order?: "asc" | "desc";
 }
 
 export interface PaginatedResponse<T> {

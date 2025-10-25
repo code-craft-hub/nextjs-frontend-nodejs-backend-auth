@@ -14,8 +14,8 @@ export const userServerQueries = {
 
   detail: (id: string) =>
     queryOptions({
-      queryKey: queryKeys.users.detail(id),
-      queryFn: () => userServerApi.getUser(id),
+      queryKey: queryKeys.users.detail(),
+      queryFn: () => userServerApi.getUser(),
       staleTime: 5 * 60 * 1000,
       enabled: !!id,
     }),

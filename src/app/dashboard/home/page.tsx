@@ -19,12 +19,10 @@ export default async function HomePage({
 }: {
   searchParams: Promise<{ tab: DashboardTab; jobDescription: string }>;
 }) {
-  const session = await requireOnboarding();
+  await requireOnboarding();
   const queryClient = createServerQueryClient();
 
-  const { data } = await queryClient.fetchQuery(
-    userQueries.detail(session.email ?? "")
-  );
+  const { data } = await queryClient.fetchQuery(userQueries.detail());
 
   const { tab, jobDescription } = await searchParams;
 
@@ -60,7 +58,8 @@ export default async function HomePage({
 
   return (
     <HydrationBoundary state={dehydratedState}>
-      <HomeClient tab={tab} jobDescription={jobDescription} filters={filters} />;
+      <HomeClient tab={tab} jobDescription={jobDescription} filters={filters} />
+      ;
     </HydrationBoundary>
   );
 }

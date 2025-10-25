@@ -1,13 +1,16 @@
 import React from "react";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, PlusIcon } from "lucide-react";
 import ProfileManagementModal from "./modal";
 import { Button } from "@/components/ui/button";
+import { IUser } from "@/types";
 
-interface ProfileData {
+export interface ProfileData {
   id: string;
   title: string;
   description: string;
   date: string;
+  key?: string;
+  data?: string;
 }
 
 const profilesData: ProfileData[] = [
@@ -35,17 +38,20 @@ const profilesData: ProfileData[] = [
 ];
 
 const ProfileCard: React.FC<{ profile: ProfileData }> = ({ profile }) => {
+  console.log("PROFILE CARD RENDERED: ", profile);
   return (
     <div className="bg-white rounded-lg font-inter border border-gray-200  mb-4">
       <div className="p-6">
-        <h3 className="text-md font-medium mb-3">{profile.title}</h3>
-        <p className="text-gray-600 text-sm leading-relaxed mb-2">
-          {profile.description}
+        <h3 className="text-md font-medium mb-3 capitalize">
+          {profile?.title ?? profile?.key}
+        </h3>
+        <p className="text-gray-600 text-sm leading-relaxed mb-2 line-clamp-3">
+          {profile?.description ?? profile?.data}
         </p>
-        <p className="text-gray-400 text-sm ">{profile.date}</p>
+        <p className="text-gray-400 text-sm">{profile.date}</p>
       </div>
       <div className="border-t p-4">
-        <ProfileManagementModal>
+        <ProfileManagementModal profile={profile}>
           <button className="flex items-center justify-between w-full text-blue-600 text-sm font-medium hover:text-blue-700 transition-colors">
             <span>Edit Profile</span>
             <ChevronRight className="w-4 h-4" />
@@ -56,7 +62,9 @@ const ProfileCard: React.FC<{ profile: ProfileData }> = ({ profile }) => {
   );
 };
 
-export const ProfileManagement: React.FC = () => {
+export const ProfileManagement: React.FC<{ user: Partial<IUser> }> = ({
+  user,
+}) => {
   return (
     <div className="font-inter">
       {/* Header */}
@@ -74,10 +82,18 @@ export const ProfileManagement: React.FC = () => {
         </div>
       </div>
       <div className="space-y-4 mb-8">
-        {profilesData.map((profile) => (
-          <ProfileCard key={profile.id} profile={profile} />
+        {user?.dataSource?.map((profile) => (
+          <ProfileCard key={profile.profileID} profile={profile} />
         ))}
       </div>
+      <ProfileManagementModal >
+        <div className="border-2 border-dashed p-4 items-center justify-center flex border-blue-500 rounded-lg mb-8">
+          <div className="gap-2 flex">
+            <PlusIcon className="w-5 h-5 text-gray-500" />
+            <span className="text-gray-500 font-medium">Add new profile</span>
+          </div>
+        </div>
+      </ProfileManagementModal>
 
       {/* Save Settings Button */}
       <div className="flex justify-end">
