@@ -38,6 +38,7 @@ export interface IUser {
   uid?: string;
   providerId?: string;
   emailVerified?: boolean;
+  role?: string;
   isAnonymous?: boolean;
   displayName?: string;
   firstName?: string;

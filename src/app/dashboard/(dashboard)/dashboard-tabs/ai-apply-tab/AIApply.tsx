@@ -10,15 +10,19 @@ import { COLLECTIONS } from "@/lib/utils/constants";
 import { AIApplyDatatable } from "./AIApplyDatatable";
 import { jobsQueries } from "@/lib/queries/jobs.queries";
 import { useQuery } from "@tanstack/react-query";
+import { JobFilters } from "@/lib/types/jobs";
 
 export const AIApply = memo(
-  ({ jobDescription }: { jobDescription: string }) => {
+  ({
+    jobDescription,
+    filters,
+  }: {
+    jobDescription: string;
+    filters: JobFilters;
+  }) => {
     const { useGetAllDoc } = useAuth();
 
-    const filters = {
-      page: 1,
-      limit: 20,
-    };
+  
     const { data } = useGetAllDoc<any[]>(COLLECTIONS.AI_APPLY);
 
     const MOCK_DATA =
@@ -33,7 +37,7 @@ export const AIApply = memo(
         <div className="grid gap-y-16">
           <AIApplyInput jobDescription={jobDescription} />
           <AIApplyDatatable data={MOCK_DATA} jobs={jobs} />
-          <RecentActivityCard />
+          <RecentActivityCard filters={filters} />
         </div>
       </div>
     );

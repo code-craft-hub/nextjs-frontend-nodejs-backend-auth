@@ -1,3 +1,4 @@
+import { IUser } from "@/types";
 import { api } from "./client";
 import type { User, PaginatedResponse, PaginationParams } from "@/lib/types";
 
@@ -16,11 +17,11 @@ export interface UpdateUserData {
 
 export const userApi = {
   // Get all users (with pagination)
-  getUsers: (params?: PaginationParams) =>
-    api.get<PaginatedResponse<User>>("/users", { params }),
+  getUsers: (_params?: PaginationParams) =>
+    api.get<PaginatedResponse<User>>("/users"),
 
   // Get user by ID
-  getUser: (id: string) => api.get<User>(`/users/${id}`),
+  getUser: (id: string) => api.get<{ data: Partial<IUser> }>(`/users/${id}`),
 
   // Create user
   createUser: (data: CreateUserData) => api.post<User>("/users", data),

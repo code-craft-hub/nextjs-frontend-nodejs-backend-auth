@@ -73,7 +73,7 @@ export async function apiClient<T>(
     }
   }
 
-  // console.log("🌐 Final URL:", url);
+  console.log("🌐 Final URL:", url);
 
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
@@ -103,7 +103,7 @@ export async function apiClient<T>(
   const response = await fetch(url, {
     ...fetchOptions,
     headers,
-    credentials: "include", // Always include (works in browser, harmless on server)
+    credentials: "include", 
     cache: "no-store",
     next: {
       revalidate: 0,
@@ -118,11 +118,10 @@ export async function apiClient<T>(
   }
 
   const data = await response.json();
-  // console.log("✅ API Response:", {
-  //   endpoint,
-  //   hasData: !!data,
-  //   dataKeys: Object.keys(data || {}),
-  // });
+  console.log("✅ API Response:", {
+    endpoint,
+    data,
+  });
 
   return data;
 }

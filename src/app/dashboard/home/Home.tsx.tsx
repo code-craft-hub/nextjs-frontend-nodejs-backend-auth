@@ -8,19 +8,20 @@ import { DashboardTab } from "@/types";
 import { TAB_ITEMS } from "../../(landing-page)/constants";
 import { AIJobCustomization } from "../(dashboard)/dashboard-tabs/ai-job-customization-tab/AIJobCustomization";
 import { TopGradient } from "@/components/shared/TopGradient";
-import { useRouter } from "next/navigation";
+import { JobFilters } from "@/lib/types/jobs";
 
 export const HomeClient = memo(
   ({
     tab,
     jobDescription,
+    filters,
   }: {
     tab: DashboardTab;
     jobDescription: string;
+    filters: JobFilters;
   }) => {
     // w-[calc(100vw-500px)]
 
-    const router = useRouter();
     return (
       <>
         <TopGradient />
@@ -37,7 +38,7 @@ export const HomeClient = memo(
                     "data-[state=active]:bg-primary data-[state=active]:hover:shadow-sm data-[state=active]:shadow-md data-[state=active]:hover:bg-blue-400 data-[state=active]:text-white h-[3.4rem] xs5:max-w-[7.833rem] shadow-md hover:shadow-sm hover:cursor-pointer shadow-blue-200 flex-1 items-center justify-center xs5:gap-3 rounded-2xl border border-white px-3 py-1 text-sm font-medium whitespace-nowrap transition-[color,box-shadow] [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 [&[data-state=active]_img]:invert [&[data-state=active]_img]:brightness-200"
                   )}
                   value={item.value}
-                  onClick={() => router.push(item.url)}
+                  // onClick={() => router.push(item.url)}
                 >
                   <img
                     src={item.icon}
@@ -51,13 +52,13 @@ export const HomeClient = memo(
             </TabsList>
 
             <TabsContent value="ai-apply">
-              <AIApply jobDescription={jobDescription}/>
+              <AIApply jobDescription={jobDescription} filters={filters} />
             </TabsContent>
             <TabsContent value="tailor-cv">
-              <AIJobCustomization />
+              <AIJobCustomization filters={filters} />
             </TabsContent>
             <TabsContent value="find-jobs">
-              <FindJob/>
+              <FindJob filters={filters} />
             </TabsContent>
           </Tabs>
         </div>

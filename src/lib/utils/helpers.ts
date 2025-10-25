@@ -115,7 +115,7 @@ export const createApiError = (message: string, status?: number): ApiError => {
 };
 
 export const randomPercentage = () => {
-  return Math.floor(Math.random() * (100 - 50 + 1) + 50) + '%'
+  return Math.floor(Math.random() * (100 - 50 + 1) + 50) + ' %'
 }
 
 export function validateOrCreateDate(inputDate: string | Date): Date {

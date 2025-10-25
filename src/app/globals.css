@@ -180,6 +180,6 @@
     @apply flex flex-col items-center justify-center max-w-screen-lg w-full shadow-2xl rounded-[4px] p-4 max-md:py-8 sm:p-8 md:p-16 bg-white space-y-7;
   }
   .container {
-    @apply max-w-screen-xl mx-auto px-4;
+    @apply max-w-screen-xl mx-auto sm:px-4;
   }
 }

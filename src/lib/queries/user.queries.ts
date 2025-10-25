@@ -1,4 +1,3 @@
-// lib/queries/user.queries.ts
 import { queryOptions } from "@tanstack/react-query";
 import { userApi } from "@/lib/api/user.api";
 import { queryKeys } from "@/lib/query/keys";

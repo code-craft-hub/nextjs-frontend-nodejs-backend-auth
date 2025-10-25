@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { FaRegBookmark, FaBookmark } from "react-icons/fa";
 import { humanDate, randomPercentage } from "@/lib/utils/helpers";
 import { JobType } from "@/types";
+import { JobFilters } from "@/lib/types/jobs";
 
 const fingJobsColumns: ColumnDef<JobType>[] = [
   {
@@ -110,12 +111,7 @@ const fingJobsColumns: ColumnDef<JobType>[] = [
   },
 ];
 
-export const FindJob = memo(() => {
-  const filters = {
-    page: 1,
-    limit: 20,
-  };
-
+export const FindJob = memo(({ filters }: { filters: JobFilters }) => {
   const { data: jobs } = useQuery(jobsQueries.all(filters));
 
   return (
