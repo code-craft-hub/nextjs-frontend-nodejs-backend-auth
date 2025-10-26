@@ -58,11 +58,10 @@ export default async function JobsPage({ searchParams }: JobsPageProps) {
   // console.log('🎯 Query cached:', !!cachedData);
 
   // Dehydrate
-  const dehydratedState = dehydrate(queryClient);
   // console.log('💧 Dehydrated queries:', dehydratedState.queries.length);
 
   return (
-    <HydrationBoundary state={dehydratedState}>
+    <HydrationBoundary state={dehydrate(queryClient)}>
       <JobsManager initialFilters={filters} />
     </HydrationBoundary>
   );

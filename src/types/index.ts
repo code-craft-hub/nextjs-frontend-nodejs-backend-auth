@@ -39,9 +39,10 @@ export interface IUser {
   providerId?: string;
   emailVerified?: boolean;
   dataSource?: any[];
-  role?: string;
+  role?: any[];
   isAnonymous?: boolean;
   displayName?: string;
+  countryCode?: string;
   firstName?: string;
   lastName?: string;
   cvJobTitle?: string;
@@ -149,6 +150,7 @@ export interface OnboardingFormProps {
   onNext: () => void;
   onPrev: () => void;
   children?: React.ReactNode;
+  fromDataSourceStep?: () => void;
 }
 
 export interface ResumeSection {

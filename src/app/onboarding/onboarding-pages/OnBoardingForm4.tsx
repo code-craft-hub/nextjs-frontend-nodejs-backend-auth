@@ -32,10 +32,7 @@ const formSchema = z.object({
   others: z.string(),
 });
 
-export const OnBoardingForm4 = ({
-  onNext,
-  onPrev,
-}: OnboardingFormProps) => {
+export const OnBoardingForm4 = ({ onNext, onPrev }: OnboardingFormProps) => {
   const { updateUser, isUpdatingUserLoading, user } = useAuth();
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -52,7 +49,7 @@ export const OnBoardingForm4 = ({
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      await updateUser(values);
+      await updateUser({ userNeed: values });
       toast.success(`${user?.firstName} Your data has be saved!`);
       onNext();
     } catch (error) {
@@ -85,11 +82,7 @@ export const OnBoardingForm4 = ({
               "fixed top-0 left-0 width-full px-4 pt-5 backdrop-blur-2xl z-50 pb-4"
           )}
         >
-          <img
-            src="/cverai-logo.png"
-            className="w-28 h-8"
-            alt=""
-          />
+          <img src="/cverai-logo.png" className="w-28 h-8" alt="" />
           <Progress min={4} max={7} progress={50} />
         </div>
         <div className="onboarding-card">

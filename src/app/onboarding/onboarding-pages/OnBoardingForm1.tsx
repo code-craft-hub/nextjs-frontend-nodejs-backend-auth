@@ -24,8 +24,8 @@ import { FloatingLabelInput } from "./FloatingInput";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 const formSchema = z.object({
-  location: z.string({ message: "Please enter a valid country name." }),
-  city: z.string({ message: "Please enter a valid city name." }),
+  country: z.string({ message: "Please enter a valid country name." }),
+  state: z.string({ message: "Please enter a valid state name." }),
   phoneNumber: z.string().refine((val) => isValidPhoneNumber(val || ""), {
     message: "Invalid phone number",
   }),
@@ -41,15 +41,15 @@ export const OnBoardingForm1 = ({
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      location: "",
-      city: "",
+      country: "",
+      state: "",
       phoneNumber: "",
     },
   });
 
   useEffect(() => {
-    form.setValue("location", country);
-    form.setValue("city", region);
+    form.setValue("country", country);
+    form.setValue("state", region);
   }, [country, region, form]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
@@ -111,7 +111,7 @@ export const OnBoardingForm1 = ({
             >
               <FormField
                 control={form.control}
-                name="location"
+                name="country"
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
@@ -123,7 +123,7 @@ export const OnBoardingForm1 = ({
               />
               <FormField
                 control={form.control}
-                name="city"
+                name="state"
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>

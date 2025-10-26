@@ -38,6 +38,10 @@ export default function OnboardingClient() {
     }
   };
 
+  const fromDataSourceStep = () => {
+    setCurrentStep(3);
+  }
+
   const prevStep = () => {
     if (currentStep > 0) {
       setCurrentStep((prev) => prev - 1);
@@ -53,6 +57,7 @@ export default function OnboardingClient() {
           key={currentStep}
           onNext={nextStep}
           onPrev={prevStep}
+          fromDataSourceStep={fromDataSourceStep}
         >
           <Button
             className="text-blue-500 lg:text-white"

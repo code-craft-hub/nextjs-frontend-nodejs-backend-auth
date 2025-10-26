@@ -14,8 +14,8 @@ export interface Option {
 }
 
 const createOption = (label: string) => ({
-  label,
-  value: label,
+  label: label?.toLocaleLowerCase(),
+  value: label?.toLocaleLowerCase(),
 });
 
 interface SelectCreatableProps {

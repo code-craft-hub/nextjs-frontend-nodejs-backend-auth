@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -22,7 +22,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { useAuth } from "@/hooks/use-auth";
+import { userQueries } from "@/lib/queries/user.queries";
+import { useQuery } from "@tanstack/react-query";
+import { useUserLocation } from "@/hooks/get-user-location";
 
 // Zod validation schema
 const profileSchema = z.object({
@@ -56,8 +58,9 @@ const countryCodes = [
 ];
 
 export const UserProfileForm: React.FC = () => {
-  const { user } = useAuth();
-
+  const { data: user } = useQuery(userQueries.detail());
+  const { continent_code } = useUserLocation();
+  
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
@@ -65,14 +68,23 @@ export const UserProfileForm: React.FC = () => {
       lastName: "",
       country: "",
       state: "",
-      countryCode: "NG",
-      phoneNumber: "+234 812 345 6789",
+      countryCode: "",
+      phoneNumber: "",
       emailAddress: "",
     },
   });
 
-  const onSubmit = () => {
-  };
+  useEffect(() => {
+    form.setValue("firstName", user?.firstName || "");
+    form.setValue("lastName", user?.lastName || "");
+    form.setValue("emailAddress", user?.email || "");
+    form.setValue("country", user?.country || "");
+    form.setValue("state", user?.state || "");
+    form.setValue("countryCode", user?.countryCode || continent_code || "");
+    form.setValue("phoneNumber", user?.phoneNumber || "");
+  }, [form, user]);
+
+  const onSubmit = () => {};
 
   return (
     <div className="flex flex-col items-start p-10 gap-2.5 bg-white rounded-lg">

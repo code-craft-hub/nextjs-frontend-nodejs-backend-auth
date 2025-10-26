@@ -22,7 +22,7 @@ export interface ProfileData {
   location?: string;
   salaryExpectation?: string;
   availabilityToStart?: string;
-  defaultDataSource?: boolean;
+  defaultDataSource?: string;
   profileID?: string;
   activeDataSource?: string;
 }
@@ -101,16 +101,16 @@ export const ProfileManagement: React.FC = () => {
         </p>
         <div className="mt-2">
           <h2 className="font-medium text-gray-900">
-            Active Profiles ({data?.data?.dataSource?.length})
+            Active Profiles ({data?.dataSource?.length})
           </h2>
         </div>
       </div>
       <div className="space-y-4 mb-8">
-        {data?.data?.dataSource?.map((profile) => (
+        {data?.dataSource?.map((profile) => (
           <ProfileCard
             key={profile.profileID}
             profile={profile}
-            dataSource={data?.data}
+            dataSource={data}
           />
         ))}
       </div>

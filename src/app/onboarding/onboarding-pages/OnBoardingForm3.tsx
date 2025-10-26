@@ -1,7 +1,7 @@
 "use client";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -28,7 +28,7 @@ import { toast } from "sonner";
 import OnboardingTabs from "./OnBoardingTabs";
 import { useIsMobile } from "@/hooks/use-mobile";
 import Progress from "./Progress";
-import { FloatingLabelInput } from "./FloatingInput";
+import { SelectCreatable } from "@/components/shared/SelectCreatable";
 
 const formSchema = z.object({
   partTime: z.boolean().default(false).optional(),
@@ -39,14 +39,14 @@ const formSchema = z.object({
   remote: z.boolean().default(false).optional(),
   onsite: z.boolean().default(false).optional(),
   location: z.string(),
-  role: z.string(),
+  roleOfInterest: z
+    .array(z.object({ label: z.string(), value: z.string() }))
+    .optional(),
 });
 
-export const OnBoardingForm3 = ({
-  onNext,
-  onPrev,
-}: OnboardingFormProps) => {
+export const OnBoardingForm3 = ({ onNext, onPrev }: OnboardingFormProps) => {
   const { updateUser, isUpdatingUserLoading, user } = useAuth();
+  console.log(user?.dataSource?.[0]);
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -59,13 +59,20 @@ export const OnBoardingForm3 = ({
       remote: false,
       onsite: false,
       location: "",
-      role: "",
+      roleOfInterest: [],
     },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      await updateUser(values);
+      const dataSource = [
+        {
+          ...user?.dataSource?.[0],
+          ...values,
+        },
+      ];
+
+      await updateUser({ dataSource: dataSource });
       toast.success(`${user?.firstName} Your data has be saved!`);
       onNext();
     } catch (error) {
@@ -357,7 +364,17 @@ export const OnBoardingForm3 = ({
                     </FormItem>
                   )}
                 />
-                <FormField
+                <Controller
+                  name="roleOfInterest"
+                  control={form.control}
+                  render={({ field }) => (
+                    <SelectCreatable
+                      placeholder="Marketing, Software Development"
+                      {...field}
+                    />
+                  )}
+                />
+                {/* <FormField
                   control={form.control}
                   name="role"
                   render={({ field }) => (
@@ -371,7 +388,7 @@ export const OnBoardingForm3 = ({
                       <FormMessage />
                     </FormItem>
                   )}
-                />
+                /> */}
               </div>
 
               <div className="flex gap-4">

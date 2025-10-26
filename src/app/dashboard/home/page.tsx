@@ -22,14 +22,17 @@ export default async function HomePage({
   await requireOnboarding();
   const queryClient = createServerQueryClient();
 
-  const { data } = await queryClient.fetchQuery(userQueries.detail());
+  const user  = await queryClient.fetchQuery(userQueries.detail());
 
+  console.log("🧑‍💼 User Data in HomePage:", user);
   const { tab, jobDescription } = await searchParams;
 
   const filters: JobFilters = {
     page: 1,
     limit: 20,
-    jobRole: data?.role!,
+    jobRole: encodeURIComponent(
+      user?.role?.map((role) => role.value).join(",") || ""
+    ),
   };
 
   // console.log("📋 Filters:", filters);
@@ -59,7 +62,6 @@ export default async function HomePage({
   return (
     <HydrationBoundary state={dehydratedState}>
       <HomeClient tab={tab} jobDescription={jobDescription} filters={filters} />
-      ;
     </HydrationBoundary>
   );
 }

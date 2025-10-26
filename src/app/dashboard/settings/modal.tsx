@@ -73,7 +73,7 @@ export default function ProfileManagementModal({
         salaryExpectation: profile.salaryExpectation || "",
         availabilityToStart: profile.availabilityToStart || "",
         description: profile.description || profile.data || "",
-        defaultDataSource: profile.activeDataSource || false,
+        defaultDataSource: profile.activeDataSource === "" && true,
       });
     }
   }, [profile, reset]);
@@ -132,7 +132,7 @@ export default function ProfileManagementModal({
         location: profile.location || "",
         salaryExpectation: profile.salaryExpectation || "",
         availabilityToStart: profile.availabilityToStart || "",
-        defaultDataSource: profile.activeDataSource || false,
+        defaultDataSource: profile.activeDataSource === "" && true,
       });
     }
   };

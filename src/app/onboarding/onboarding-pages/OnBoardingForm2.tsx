@@ -11,14 +11,28 @@ import Progress from "./Progress";
 import OnboardingTabs from "./OnBoardingTabs";
 
 import { FileUploadZone, useDocumentExtraction } from "./AnyFormatToText";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { toast } from "sonner";
+
+const dataSource: {
+  description: string;
+  ProfileID: string;
+  title: string;
+}[] = [];
 
 export const OnBoardingForm2 = ({
   onNext,
   onPrev,
+  fromDataSourceStep,
 }: OnboardingFormProps) => {
   const { updateUser, isUpdatingUserLoading, user } = useAuth();
+
+  useEffect(() => {
+    if (user?.dataSource && Array.isArray(user.dataSource)) {
+      fromDataSourceStep && fromDataSourceStep();
+    }
+  }, [user]);
+
   const {
     processDocument,
     isProcessing,
@@ -32,9 +46,12 @@ export const OnBoardingForm2 = ({
     async (file: File) => {
       clearError();
       const result = await processDocument(file);
-      await updateUser({
-        baseResume: result?.text || "",
+      dataSource.push({
+        description: result?.text || "",
+        ProfileID: crypto.randomUUID(),
+        title: file.name,
       });
+      await updateUser({ dataSource: dataSource });
       toast.success(`${user?.firstName}, your base resume is saved!`);
       onNext();
     },

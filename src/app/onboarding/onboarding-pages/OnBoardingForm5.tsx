@@ -31,11 +31,8 @@ const formSchema = z.object({
   others: z.string().optional(),
 });
 
-export const OnBoardingForm5 = ({
-  onNext,
-  onPrev,
-}: OnboardingFormProps) => {
-  const { updateUser, isUpdatingUserLoading,user } = useAuth();
+export const OnBoardingForm5 = ({ onNext, onPrev }: OnboardingFormProps) => {
+  const { updateUser, isUpdatingUserLoading, user } = useAuth();
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -45,7 +42,7 @@ export const OnBoardingForm5 = ({
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      await updateUser(values);
+      await updateUser({ discovery: values });
       toast.success(`${user?.firstName} Your data has be saved!`);
       onNext();
     } catch (error) {
