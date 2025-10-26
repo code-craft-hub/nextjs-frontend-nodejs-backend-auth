@@ -7,9 +7,8 @@ import { User } from "lucide-react";
 import { AdvancedProfileManagement } from "./AdvancedProfileManagement";
 import { ProfileManagement } from "./ProfileManagement";
 import { useRouter } from "next/navigation";
-import { IUser } from "@/types";
 
-const Settings = ({ tab, user }: { tab: string; user: Partial<IUser> }) => {
+const Settings = ({ tab }: { tab: string; }) => {
   const router = useRouter();
   return (
     <div>
@@ -47,7 +46,7 @@ const Settings = ({ tab, user }: { tab: string; user: Partial<IUser> }) => {
           </TabsTrigger>
         </TabsList>
         <TabsContent value="profile-management" className="text-md font-medium">
-          <ProfileManagement  user={user}/>
+          <ProfileManagement/>
         </TabsContent>
         <TabsContent value="ai-applypreference">
           <AiApplyPreferences />

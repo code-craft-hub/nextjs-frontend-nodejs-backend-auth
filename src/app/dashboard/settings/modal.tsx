@@ -17,24 +17,18 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Loader2 } from "lucide-react";
+import { BookmarkIcon, Loader2 } from "lucide-react";
 import {
-  useCreateProfile,
-  useProfile,
-  useUpdateProfile,
+  useCreateDataSource,
+  useUpdateDataSource,
 } from "@/lib/mutations/profile.mutations";
 import { ProfileData } from "./ProfileManagement";
+import { Option, SelectCreatable } from "@/components/shared/SelectCreatable";
+import { Textarea } from "@/components/ui/textarea";
+import { Toggle } from "@/components/ui/toggle";
 
 const jobLevel = ["Entry Level", "Mid Level", "Senior Level"];
 const jobTypes = ["Full Time", "Part Time", "Contract"];
-const departments = [
-  "Information Security",
-  "Marketing",
-  "Software Development",
-  "Customer Support",
-  "Human Resource",
-  "Accounting/Audit",
-];
 const availability = ["Yes", "No"];
 
 interface ProfileManagementModalProps {
@@ -48,22 +42,21 @@ export default function ProfileManagementModal({
 }: ProfileManagementModalProps) {
   const [open, setOpen] = useState(false);
 
-  // Fetch existing profile
-
-  // Mutations
-  const updateProfile = useUpdateProfile();
-  const createProfile = useCreateProfile();
+  const updateDataSource = useUpdateDataSource();
+  const createDataSource = useCreateDataSource();
 
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
       jobLevelPreference: jobLevel[0],
       jobTypePreference: jobTypes[0],
-      roleOfInterest: departments[0],
+      roleOfInterest: [] as Option[],
       remoteWorkPreference: availability[0],
       relocationWillingness: "",
       location: "",
       salaryExpectation: "",
       availabilityToStart: "",
+      description: "",
+      defaultDataSource: false,
     },
   });
 
@@ -73,12 +66,14 @@ export default function ProfileManagementModal({
       reset({
         jobLevelPreference: profile.jobLevelPreference || jobLevel[0],
         jobTypePreference: profile.jobTypePreference || jobTypes[0],
-        roleOfInterest: profile.roleOfInterest || departments[0],
+        roleOfInterest: profile.roleOfInterest || [],
         remoteWorkPreference: profile.remoteWorkPreference || availability[0],
         relocationWillingness: profile.relocationWillingness || "",
         location: profile.location || "",
         salaryExpectation: profile.salaryExpectation || "",
         availabilityToStart: profile.availabilityToStart || "",
+        description: profile.description || profile.data || "",
+        defaultDataSource: profile.activeDataSource || false,
       });
     }
   }, [profile, reset]);
@@ -89,7 +84,7 @@ export default function ProfileManagementModal({
 
     // Determine if we should create or update
     if (profile) {
-      updateProfile.mutate(
+      updateDataSource.mutate(
         {
           profileData: userProfile,
         },
@@ -104,9 +99,9 @@ export default function ProfileManagementModal({
         }
       );
     } else {
-      createProfile.mutate(
+      createDataSource.mutate(
         {
-          profileData: userProfile,
+          profileData: { ...userProfile, ProfileID: crypto.randomUUID() },
         },
         {
           onSuccess: () => {
@@ -131,23 +126,24 @@ export default function ProfileManagementModal({
       reset({
         jobLevelPreference: profile.jobLevelPreference || jobLevel[0],
         jobTypePreference: profile.jobTypePreference || jobTypes[0],
-        roleOfInterest: profile.roleOfInterest || departments[0],
+        roleOfInterest: profile.roleOfInterest || [],
         remoteWorkPreference: profile.remoteWorkPreference || availability[0],
         relocationWillingness: profile.relocationWillingness || "",
         location: profile.location || "",
         salaryExpectation: profile.salaryExpectation || "",
         availabilityToStart: profile.availabilityToStart || "",
+        defaultDataSource: profile.activeDataSource || false,
       });
     }
   };
 
-  const isSubmitting = updateProfile.isPending || createProfile.isPending;
+  const isSubmitting = updateDataSource.isPending || createDataSource.isPending;
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogTitle className="sr-only">Edit Profile</DialogTitle>
-      <DialogContent className="max-sm:h-[90svh] overflow-y-auto md:!min-w-[45rem]">
+      <DialogContent className="h-[90svh] overflow-y-auto md:!min-w-[45rem]">
         <div className="font-inter flex items-center justify-center">
           <div className="w-full">
             <div className="relative flex flex-col mb-11 gap-y-4">
@@ -220,24 +216,10 @@ export default function ProfileManagementModal({
                     name="roleOfInterest"
                     control={control}
                     render={({ field }) => (
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value}
-                      >
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Information Security" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectGroup>
-                            <SelectLabel>Role of Interest</SelectLabel>
-                            {departments.map((job) => (
-                              <SelectItem value={job} key={job}>
-                                {job}
-                              </SelectItem>
-                            ))}
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
+                      <SelectCreatable
+                        placeholder="Marketing, Software Development"
+                        {...field}
+                      />
                     )}
                   />
                 </div>
@@ -332,6 +314,42 @@ export default function ProfileManagementModal({
                     )}
                   />
                 </div>
+                <div className="space-y-1.5">
+                  <h1 className="">Description</h1>
+                  <Controller
+                    name="description"
+                    control={control}
+                    render={({ field }) => (
+                      <Textarea
+                      className="max-h-32"
+                        placeholder="Tell Cverai a bit about this profile — it'll help personalize your career documents when needed."
+                        {...field}
+                      ></Textarea>
+                    )}
+                  />
+                </div>
+                <div className="absolute top-20 right-6">
+                  <Controller
+                    name="defaultDataSource"
+                    control={control}
+                    render={({ field }) => (
+                      <Toggle
+                        aria-label="Toggle bookmark"
+                        size="sm"
+                        variant="outline"
+                        pressed={field.value}
+                        onPressedChange={field.onChange}
+                        className="data-[state=on]:bg-transparent data-[state=on]:*:[svg]:fill-primary data-[state=on]:*:[svg]:stroke-primary"
+                      >
+                        <BookmarkIcon />
+                        <span className="mt-0.5">
+
+                        Make default profile
+                        </span>
+                      </Toggle>
+                    )}
+                  />
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3 mt-14 w-full">
@@ -348,8 +366,10 @@ export default function ProfileManagementModal({
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       Updating...
                     </>
+                  ) : profile ? (
+                    "Update Profile"
                   ) : (
-                    "Update"
+                    "Create Profile"
                   )}
                 </Button>
               </div>

@@ -31,7 +31,7 @@ export function useCreateUserMutation() {
 
       return { previousUsers };
     },
-    onError: (err, variables, context) => {
+    onError: (_err, _variables, context) => {
       // Rollback on error
       if (context?.previousUsers) {
         queryClient.setQueriesData(
@@ -54,12 +54,12 @@ export function useUpdateUserMutation() {
     mutationFn: ({ id, data }: { id: string; data: UpdateUserData }) =>
       userApi.updateUser(id, data),
     onMutate: async ({ id, data }) => {
-      await queryClient.cancelQueries({ queryKey: queryKeys.users.detail(id) });
+      await queryClient.cancelQueries({ queryKey: queryKeys.users.detail() });
 
-      const previousUser = queryClient.getQueryData(queryKeys.users.detail(id));
+      const previousUser = queryClient.getQueryData(queryKeys.users.detail());
 
       // Optimistically update detail
-      queryClient.setQueryData<User>(queryKeys.users.detail(id), (old) => {
+      queryClient.setQueryData<User>(queryKeys.users.detail(), (old) => {
         if (!old) return old;
         return { ...old, ...data, updatedAt: new Date().toISOString() };
       });
@@ -80,13 +80,13 @@ export function useUpdateUserMutation() {
 
       return { previousUser };
     },
-    onError: (err, { id }, context) => {
+    onError: (_err, _data, context) => {
       if (context?.previousUser) {
-        queryClient.setQueryData(queryKeys.users.detail(id), context.previousUser);
+        queryClient.setQueryData(queryKeys.users.detail(), context.previousUser);
       }
     },
-    onSettled: (data, error, { id }) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.users.detail(id) });
+    onSettled: (_data, _error) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.users.detail() });
       queryClient.invalidateQueries({ queryKey: queryKeys.users.lists() });
     },
   });
@@ -117,7 +117,7 @@ export function useDeleteUserMutation() {
 
       return { previousUsers };
     },
-    onError: (err, id, context) => {
+    onError: (_err, _id, context) => {
       if (context?.previousUsers) {
         queryClient.setQueriesData(
           { queryKey: queryKeys.users.lists() },

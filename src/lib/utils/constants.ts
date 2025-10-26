@@ -42,3 +42,73 @@ export const COLLECTIONS = {
   INTERVIEW_QUESTION: "interview_question",
   AI_APPLY: "ai_apply",
 };
+
+export const customStyles = {
+  control: (base: any) => ({
+    ...base,
+    minHeight: "20px",
+    borderRadius: "10px",
+    border: "2px solid #4680EE",
+    backgroundColor: "#F5F7FA",
+    // boxShadow:
+    //   "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+    padding: "2px 0px",
+    fontSize: "16px",
+    // transition: "all 0.3s ease",
+    // "&:hover": {
+    //   border: "2px solid #3b82f6",
+    //   boxShadow:
+    //     "0 10px 15px -3px rgba(59, 130, 246, 0.2), 0 4px 6px -2px rgba(59, 130, 246, 0.1)",
+    // },
+    // "&:focus-within": {
+    //   border: "2px solid #3b82f6",
+    //   boxShadow: "0 0 0 4px rgba(59, 130, 246, 0.1)",
+    // },
+  }),
+  multiValue: (base: any) => ({
+    ...base,
+    backgroundColor: "#4680EE",
+    borderRadius: "12px",
+    padding: "2px 8px",
+    margin: "4px",
+  }),
+  multiValueLabel: (base: any) => ({
+    ...base,
+    color: "#ffffff",
+    fontSize: "14px",
+    fontWeight: "500",
+    padding: "2px 6px",
+  }),
+  multiValueRemove: (base: any) => ({
+    ...base,
+    color: "#ffffff",
+    borderRadius: "0 10px 10px 0",
+    transition: "all 0.2s ease",
+    "&:hover": {
+      backgroundColor: "#4680EE",
+      color: "#ffffff",
+    },
+  }),
+  input: (base: any) => ({
+    ...base,
+    color: "#1f2937",
+    fontSize: "16px",
+  }),
+  placeholder: (base: any) => ({
+    ...base,
+    color: "#9ca3af",
+    fontSize: "16px",
+  }),
+  clearIndicator: (base: any) => ({
+    ...base,
+    color: "#6b7280",
+    padding: "8px",
+    cursor: "pointer",
+    borderRadius: "8px",
+    transition: "all 0.2s ease",
+    "&:hover": {
+      color: "#ef4444",
+      backgroundColor: "#fee2e2",
+    },
+  }),
+};

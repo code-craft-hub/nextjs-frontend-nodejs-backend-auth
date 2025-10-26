@@ -1,38 +1,54 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { profileApi } from "../api/profile.api";
+import { userQueries } from "../queries/user.queries";
 
 // Query keys
 export const profileKeys = {
   all: ["profile"] as const,
-  detail: (userId: string) => [...profileKeys.all, userId] as const,
+  detail: () => [...profileKeys.all, "user"] as const,
 };
 
 // Custom hooks
 export const useProfile = (userId: string) => {
   return useQuery({
-    queryKey: profileKeys.detail(userId),
-    queryFn: () => profileApi.getProfile(userId),
+    queryKey: profileKeys.detail(),
+    queryFn: () => profileApi.getProfile(),
     enabled: !!userId,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };
 
-export const useUpdateProfile = () => {
+export const useUpdateDataSource = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: profileApi.updateProfile,
-    onSuccess: (data, variables) => {
-      // Invalidate and refetch profile query
+    mutationFn: profileApi.updateDataSource,
+    onSuccess: (data, _variables) => {
       queryClient.invalidateQueries({
-        queryKey: profileKeys.detail(variables.userId),
+        queryKey: profileKeys.detail(),
       });
-      
-      // Optionally update cache directly
-      queryClient.setQueryData(
-        profileKeys.detail(variables.userId),
-        data
-      );
+      queryClient.invalidateQueries({
+        queryKey: userQueries.detail().queryKey,
+      });
+      queryClient.setQueryData(profileKeys.detail(), data);
+    },
+    onError: (error: any) => {
+      console.error("Failed to update profile:", error);
+    },
+  });
+};
+export const useDeleteDataSource = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: profileApi.deleteDataSource,
+    onSuccess: (_data, _variables) => {
+      queryClient.invalidateQueries({
+        queryKey: profileKeys.detail(),
+      });
+      queryClient.invalidateQueries({
+        queryKey: userQueries.detail().queryKey,
+      });
     },
     onError: (error: any) => {
       console.error("Failed to update profile:", error);
@@ -40,15 +56,19 @@ export const useUpdateProfile = () => {
   });
 };
 
-export const useCreateProfile = () => {
+export const useCreateDataSource = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: profileApi.createProfile,
-    onSuccess: (data, variables) => {
+    mutationFn: profileApi.createDataSource,
+    onSuccess: (_data, _variables) => {
       // Invalidate and refetch profile query
       queryClient.invalidateQueries({
-        queryKey: profileKeys.detail(variables.userId),
+        queryKey: profileKeys.detail(),
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: userQueries.detail().queryKey,
       });
     },
     onError: (error: any) => {

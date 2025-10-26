@@ -3,29 +3,42 @@ import { api } from "./client";
 
 // API functions
 export const profileApi = {
-  getProfile: async (userId: string): Promise<ProfileResponse> => {
-    const data = api.get<ProfileResponse>(`/api/users/${userId}`);
+  getProfile: async (): Promise<ProfileResponse> => {
+    const data = api.get<ProfileResponse>(`/users/`);
     return data;
   },
 
-  updateProfile: async (payload: {
+  updateDataSource: async (payload: {
     profileData: ProfileData;
   }): Promise<ProfileResponse> => {
-    const data = api.put<ProfileResponse>(
-      `/users/update`,
+    const data = await api.put<ProfileResponse>(
+      `/users/create-update-data-source`,
       payload.profileData
     );
     return data;
   },
 
-  createProfile: async (payload: {
-    userId: string;
+  createDataSource: async (payload: {
     profileData: ProfileData;
   }): Promise<ProfileResponse> => {
-    const data = api.post<ProfileResponse>("/api/users", {
-      userId: payload.userId,
-      ...payload.profileData,
-    });
+    const data = await api.put<ProfileResponse>(
+      "/users/create-update-data-source",
+      {
+        ...payload.profileData,
+      }
+    );
     return data;
+  },
+  deleteDataSource: async (): Promise<ProfileResponse> => {
+    try {
+      const data = await api.delete<ProfileResponse>(
+        "/users/delete-data-source"
+      );
+      console.log("Deleted data source:", data);
+      return data;
+    } catch (error) {
+      console.error("Error deleting data source:", error);
+      throw error;
+    }
   },
 };

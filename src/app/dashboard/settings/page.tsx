@@ -15,7 +15,7 @@ const page = async ({
   await requireOnboarding();
   const queryClient = createServerQueryClient();
 
-  const { data } = await queryClient.fetchQuery(
+   await queryClient.prefetchQuery(
     userQueries.detail()
   );
 
@@ -24,7 +24,7 @@ const page = async ({
   return (
     <div className="p-4 sm:p-8">
       <HydrationBoundary state={dehydratedState}>
-        <Settings tab={tab} user={data}/>
+        <Settings tab={tab} />
       </HydrationBoundary>
     </div>
   );
