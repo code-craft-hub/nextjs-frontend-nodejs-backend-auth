@@ -21,8 +21,8 @@ export interface ResumeFilters extends PaginationParams {
 
 export const resumeApi = {
   // Get all resumes
-  getResumes: (params?: ResumeFilters) =>
-    api.get<PaginatedResponse<Resume>>('/resumes', { params }),
+  getResumes: (_params?: ResumeFilters) =>
+    api.get<PaginatedResponse<Resume>>('/resumes',),
 
   // Get resume by ID
   getResume: (id: string) =>

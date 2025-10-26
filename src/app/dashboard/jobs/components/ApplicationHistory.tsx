@@ -14,6 +14,10 @@ import {
 
 import { jobsData, overviewColumns } from "./AIRecommendations";
 import { SearchBar } from "../category/category";
+import { useQuery } from "@tanstack/react-query";
+import { jobsQueries } from "@/lib/queries/jobs.queries";
+import JobDashboard from "../../(dashboard)/dashboard-tabs/find-job-tab/FindJobClient";
+import { getFindJobsColumns } from "../../(dashboard)/dashboard-tabs/find-job-tab/FindJob";
 
 export type IJobType = {
   id: number;
@@ -59,6 +63,26 @@ export const ApplicationHistory = () => {
       rowSelection,
     },
   });
+
+    const filters: any = {
+    page: 1,
+    limit: 20,
+  };
+
+  const { data: initialData } = useQuery({
+    ...jobsQueries.all(filters),
+    initialData: undefined, // Let it pull from cache
+  });
+
+  return (
+    <div className="grid pb-16 bg">
+      <JobDashboard
+        initialJobs={initialData?.data ?? []}
+        fingJobsColumns={getFindJobsColumns()}
+        filters={filters}
+      />
+    </div>
+  );
 
 
   return (

@@ -1,3 +1,5 @@
+import { randomNumber } from "./helpers";
+
 export const contextUser = {
   uid: "",
   firstName: "",
@@ -112,3 +114,39 @@ export const customStyles = {
     },
   }),
 };
+
+export const menuItems = [
+  {
+    id: "ai-recommendations",
+    count: randomNumber(10),
+    label: "AI Recommendations",
+    icon: "/bell.svg",
+    bgColor: "bg-green-100",
+    iconColor: "text-green-600",
+    countColor: "text-green-800",
+    labelColor: "text-green-700",
+    url: "/dashboard/jobs/category?tab=ai-recommendations",
+  },
+  {
+    id: "saved-jobs",
+    count: "0",
+    label: "Saved Jobs",
+    icon: "/save.svg",
+    bgColor: "bg-yellow-100",
+    iconColor: "text-yellow-600",
+    countColor: "text-yellow-800",
+    labelColor: "text-yellow-700",
+    url: "/dashboard/jobs/category?tab=saved-jobs",
+  },
+  {
+    id: "application-history",
+    count: "0",
+    label: "Application history",
+    icon: "/briefcase-dasboard.svg",
+    bgColor: "bg-blue-100",
+    iconColor: "text-blue-600",
+    countColor: "text-blue-800",
+    labelColor: "text-blue-700",
+    url: "/dashboard/jobs/category?tab=application-history",
+  },
+];

@@ -53,7 +53,7 @@ const LandingPage = async () => {
   // console.log("💧 Dehydrated queries:", dehydratedState.queries.length);
   return (
     <HydrationBoundary state={dehydratedState}>
-      <LandingPageClient filters={filters} userId={email!} />
+      <LandingPageClient filters={filters} />
     </HydrationBoundary>
   );
 };

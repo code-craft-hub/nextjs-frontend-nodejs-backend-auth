@@ -43,6 +43,7 @@ export interface IUser {
   isAnonymous?: boolean;
   displayName?: string;
   countryCode?: string;
+  defaultactiveDataSource?: string;
   firstName?: string;
   lastName?: string;
   cvJobTitle?: string;

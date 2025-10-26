@@ -37,7 +37,7 @@ export function useCreateCoverLetterMutation() {
 
       return { previousCoverLetters };
     },
-    onError: (err, variables, context) => {
+    onError: (_err, _id, context) => {
       if (context?.previousCoverLetters) {
         queryClient.setQueriesData(
           { queryKey: queryKeys.coverLetters.lists() },
@@ -82,12 +82,12 @@ export function useUpdateCoverLetterMutation() {
 
       return { previousCoverLetter };
     },
-    onError: (err, { id }, context) => {
+    onError: (_err, { id }, context) => {
       if (context?.previousCoverLetter) {
         queryClient.setQueryData(queryKeys.coverLetters.detail(id), context.previousCoverLetter);
       }
     },
-    onSettled: (data, error, { id }) => {
+    onSettled: (_err, _id, { id }) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.coverLetters.detail(id) });
       queryClient.invalidateQueries({ queryKey: queryKeys.coverLetters.lists() });
     },
@@ -118,7 +118,7 @@ export function useDeleteCoverLetterMutation() {
 
       return { previousCoverLetters };
     },
-    onError: (err, id, context) => {
+    onError: (_err, _id, context) => {
       if (context?.previousCoverLetters) {
         queryClient.setQueriesData(
           { queryKey: queryKeys.coverLetters.lists() },

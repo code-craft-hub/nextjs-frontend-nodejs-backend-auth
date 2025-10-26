@@ -29,12 +29,12 @@ export interface BlogFilters extends PaginationParams {
 
 export const blogApi = {
   // Get all blogs
-  getBlogs: (params?: BlogFilters) =>
-    api.get<PaginatedResponse<Blog>>('/blogs', { params }),
+  getBlogs: (_params?: BlogFilters) =>
+    api.get<PaginatedResponse<Blog>>('/blogs'),
 
   // Get published blogs
-  getPublishedBlogs: (params?: PaginationParams) =>
-    api.get<PaginatedResponse<Blog>>('/blogs/published', { params }),
+  getPublishedBlogs: (_params?: PaginationParams) =>
+    api.get<PaginatedResponse<Blog>>('/blogs/published'),
 
   // Get blog by ID
   getBlog: (id: string) =>

@@ -37,7 +37,7 @@ export function useCreateInterviewQuestionMutation() {
 
       return { previousQuestions };
     },
-    onError: (err, variables, context) => {
+    onError: (_err, _id, context) => {
       if (context?.previousQuestions) {
         queryClient.setQueriesData(
           { queryKey: queryKeys.interviewQuestions.lists() },
@@ -82,12 +82,12 @@ export function useUpdateInterviewQuestionMutation() {
 
       return { previousQuestion };
     },
-    onError: (err, { id }, context) => {
+    onError: (_err,  { id }, context) => {
       if (context?.previousQuestion) {
         queryClient.setQueryData(queryKeys.interviewQuestions.detail(id), context.previousQuestion);
       }
     },
-    onSettled: (data, error, { id }) => {
+    onSettled: (_err, _id, { id }) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.interviewQuestions.detail(id) });
       queryClient.invalidateQueries({ queryKey: queryKeys.interviewQuestions.lists() });
     },
@@ -118,7 +118,7 @@ export function useDeleteInterviewQuestionMutation() {
 
       return { previousQuestions };
     },
-    onError: (err, id, context) => {
+    onError: (_err, _id, context) => {
       if (context?.previousQuestions) {
         queryClient.setQueriesData(
           { queryKey: queryKeys.interviewQuestions.lists() },

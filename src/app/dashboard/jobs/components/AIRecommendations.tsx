@@ -19,6 +19,10 @@ import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown, Calendar, MapPin } from "lucide-react";
 import { FaRegBookmark, FaBookmark } from "react-icons/fa";
+import JobDashboard from "../../(dashboard)/dashboard-tabs/find-job-tab/FindJobClient";
+import { useQuery } from "@tanstack/react-query";
+import { jobsQueries } from "@/lib/queries/jobs.queries";
+import { getFindJobsColumns } from "../../(dashboard)/dashboard-tabs/find-job-tab/FindJob";
 
 export type IJobType = {
   id: number;
@@ -51,7 +55,11 @@ export const overviewColumns: ColumnDef<IJobType>[] = [
     },
     cell: ({ row }) => (
       <div className="flex size-10 items-center justify-center shrink-0">
-        <img className="shrink-0" src={row.original.companyText} alt={row.original.companyText} />
+        <img
+          className="shrink-0"
+          src={row.original.companyText}
+          alt={row.original.companyText}
+        />
       </div>
     ),
   },
@@ -213,7 +221,6 @@ export const jobsData = [
 ];
 
 export const AIRecommendations = () => {
-
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -240,11 +247,31 @@ export const AIRecommendations = () => {
     },
   });
 
+  const filters: any = {
+    page: 1,
+    limit: 20,
+  };
+
+  const { data: initialData } = useQuery({
+    ...jobsQueries.all(filters),
+    initialData: undefined, // Let it pull from cache
+  });
+
+  return (
+    <div className="grid pb-16 bg">
+      <JobDashboard
+        initialJobs={initialData?.data ?? []}
+        fingJobsColumns={getFindJobsColumns()}
+        filters={filters}
+      />
+    </div>
+  );
   return (
     <div className="font-inter grid grid-cols-1 w-full overflow-hidden gap-4 xl:gap-8">
-
       <div className="space-y-4 w-full">
-      <h1 className="text-3xl text-center mb-8 font-medium font-inter">AI Recommendations</h1>
+        <h1 className="text-3xl text-center mb-8 font-medium font-inter">
+          AI Recommendations
+        </h1>
         <div className="flex flex-col gap-4">
           <div className="ml-auto w-fit bg-white p-2">
             <p className="text-xs flex gap-1 text-gray-400">
@@ -255,7 +282,6 @@ export const AIRecommendations = () => {
         </div>
 
         <div className="w-full flex flex-col gap-6">
-       
           <div className="overflow-hidden border-none">
             <Table>
               <TableBody className="">

@@ -38,7 +38,7 @@ export function useCreateBlogMutation() {
 
       return { previousBlogs };
     },
-    onError: (err, variables, context) => {
+    onError: (_err, _id, context) => {
       if (context?.previousBlogs) {
         queryClient.setQueriesData(
           { queryKey: queryKeys.blogs.lists() },
@@ -84,12 +84,12 @@ export function useUpdateBlogMutation() {
 
       return { previousBlog };
     },
-    onError: (err, { id }, context) => {
+    onError: (_err, { id }, context) => {
       if (context?.previousBlog) {
         queryClient.setQueryData(queryKeys.blogs.detail(id), context.previousBlog);
       }
     },
-    onSettled: (data, error, { id }) => {
+    onSettled: (_err, _id, { id }) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.blogs.detail(id) });
       queryClient.invalidateQueries({ queryKey: queryKeys.blogs.lists() });
       queryClient.invalidateQueries({ queryKey: queryKeys.blogs.published() });
@@ -121,7 +121,7 @@ export function useDeleteBlogMutation() {
 
       return { previousBlogs };
     },
-    onError: (err, id, context) => {
+    onError: (_err, _id, context) => {
       if (context?.previousBlogs) {
         queryClient.setQueriesData(
           { queryKey: queryKeys.blogs.lists() },
@@ -166,12 +166,12 @@ export function useTogglePublishBlogMutation() {
 
       return { previousBlog };
     },
-    onError: (err, id, context) => {
+    onError: (_err, id, context) => {
       if (context?.previousBlog) {
         queryClient.setQueryData(queryKeys.blogs.detail(id), context.previousBlog);
       }
     },
-    onSettled: (data, error, id) => {
+    onSettled: (_err, _id, id) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.blogs.detail(id) });
       queryClient.invalidateQueries({ queryKey: queryKeys.blogs.lists() });
       queryClient.invalidateQueries({ queryKey: queryKeys.blogs.published() });

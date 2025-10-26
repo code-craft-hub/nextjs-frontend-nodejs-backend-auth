@@ -7,7 +7,6 @@ import { ApplicationHistory } from "../components/ApplicationHistory";
 import { SavedJobs } from "../components/SavedJobs";
 import { AIRecommendations } from "../components/AIRecommendations";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { MdLocationSearching } from "react-icons/md";
@@ -141,11 +140,6 @@ export const Category = memo<CategoryProps>(({ tab }) => {
 
       // Navigate to the new URL
       router.push(item.url);
-
-      // Optional: Keep toast for debugging, remove in production
-      if (process.env.NODE_ENV === "development") {
-        toast.success(`Navigated to ${item.label}`);
-      }
     },
     [router]
   );

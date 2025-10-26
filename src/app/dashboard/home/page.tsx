@@ -21,25 +21,22 @@ export default async function HomePage({
 }) {
   await requireOnboarding();
   const queryClient = createServerQueryClient();
+   await queryClient.fetchQuery(userQueries.detail());
+  // const defaultJobRole = user?.dataSource?.find(
+  //   (ds) => ds.ProfileID === user?.defaultactiveDataSource
+  // );
+  // const roles =
+  //   defaultJobRole?.roleOfInterest?.map((role: any) => role.value).join(", ") ||
+  //   "None";
 
-  const user  = await queryClient.fetchQuery(userQueries.detail());
-
-  console.log("🧑‍💼 User Data in HomePage:", user);
   const { tab, jobDescription } = await searchParams;
 
   const filters: JobFilters = {
     page: 1,
     limit: 20,
-    jobRole: encodeURIComponent(
-      user?.role?.map((role) => role.value).join(",") || ""
-    ),
+    // jobRole: encodeURIComponent(roles),
   };
 
-  // console.log("📋 Filters:", filters);
-  // console.log("🔑 Query key:", jobsQueries.all(filters).queryKey);
-
-  // // Prefetch
-  // console.log("⏳ Starting prefetch...");
   await prefetchWithPriority(queryClient, [
     {
       queryKey: jobsQueries.all(filters).queryKey,
@@ -47,20 +44,11 @@ export default async function HomePage({
       priority: "high",
     },
   ]);
-  // console.log("✅ Prefetch complete");
 
-  // Check cache
-  // const cachedData = queryClient.getQueryData(
-  //   jobsQueries.all(filters).queryKey
-  // );
-  // console.log("🎯 Query cached:", !!cachedData);
-
-  // Dehydrate
-  const dehydratedState = dehydrate(queryClient);
-  // console.log("💧 Dehydrated queries:", dehydratedState.queries.length);
+  await queryClient.prefetchInfiniteQuery(jobsQueries.infinite(filters));
 
   return (
-    <HydrationBoundary state={dehydratedState}>
+    <HydrationBoundary state={dehydrate(queryClient)}>
       <HomeClient tab={tab} jobDescription={jobDescription} filters={filters} />
     </HydrationBoundary>
   );

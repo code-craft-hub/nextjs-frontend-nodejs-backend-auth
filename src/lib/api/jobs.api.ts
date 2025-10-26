@@ -3,8 +3,6 @@ import { JobType } from "@/types";
 import { api } from "./client";
 import type { PaginatedResponse } from "@/lib/types";
 
-// FIX THE ANY TYPES BELOW LATER
-
 export const jobsApi = {
   // Get all jobs with advanced filtering
   getJobs: (params?: any) =>

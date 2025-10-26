@@ -28,9 +28,9 @@ export const RecentActivityCard = memo(
                 />
               </div>
               <div className="flex flex-col gap-2">
-                <h1 className="font-inter line-clamp-1">{job.title}</h1>
+                <h1 className="font-inter line-clamp-1 capitalize">{job.title}</h1>
                 <p className="font-poppins text-cverai-brown text-xs">
-                  <span className="max-w-sm overflow-hidden">
+                  <span className="max-w-sm overflow-hidden capitalize">
                     {job.companyName}
                   </span>{" "}
                   ·{" "}
@@ -64,7 +64,7 @@ export const RecentActivityCard = memo(
                       )}
                     >
                       {/* {job.scrapedDate} */}
-                      {randomPercentage()} match
+                      {randomPercentage(10)} match
                     </Badge>
                   </div>
                 </div>

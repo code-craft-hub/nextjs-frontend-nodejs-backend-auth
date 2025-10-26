@@ -46,7 +46,6 @@ const formSchema = z.object({
 
 export const OnBoardingForm3 = ({ onNext, onPrev }: OnboardingFormProps) => {
   const { updateUser, isUpdatingUserLoading, user } = useAuth();
-  console.log(user?.dataSource?.[0]);
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -72,7 +71,10 @@ export const OnBoardingForm3 = ({ onNext, onPrev }: OnboardingFormProps) => {
         },
       ];
 
-      await updateUser({ dataSource: dataSource });
+      await updateUser({
+        dataSource: dataSource,
+        defaultactiveDataSource: user?.dataSource?.[0]?.ProfileID,
+      });
       toast.success(`${user?.firstName} Your data has be saved!`);
       onNext();
     } catch (error) {

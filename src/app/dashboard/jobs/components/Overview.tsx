@@ -3,10 +3,9 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
-import { ArrowRight, SearchIcon } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import {
   ColumnFiltersState,
-  flexRender,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
@@ -16,12 +15,15 @@ import {
   VisibilityState,
 } from "@tanstack/react-table";
 
-import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 
 import { cn } from "@/lib/utils";
 
 import { useRouter } from "next/navigation";
 import { jobsData, overviewColumns } from "./AIRecommendations";
+import { jobsQueries } from "@/lib/queries/jobs.queries";
+import { useQuery } from "@tanstack/react-query";
+import JobDashboard from "../../(dashboard)/dashboard-tabs/find-job-tab/FindJobClient";
+import { getFindJobsColumns } from "../../(dashboard)/dashboard-tabs/find-job-tab/FindJob";
 
 export type IJobType = {
   id: number;
@@ -47,7 +49,7 @@ export default function Overview() {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
-  const table = useReactTable({
+  useReactTable({
     data: jobsData,
     columns: overviewColumns,
     onSortingChange: setSorting,
@@ -130,6 +132,15 @@ export default function Overview() {
     },
   ];
   const router = useRouter();
+  const filters: any = {
+    page: 1,
+    limit: 20,
+  };
+
+  const { data: initialData } = useQuery({
+    ...jobsQueries.all(filters),
+    initialData: undefined, // Let it pull from cache
+  });
   return (
     <div className="lg:gap-6 lg:flex ">
       <div className="bg-white p-3 h-fit rounded-md hidden lg:flex lg:flex-col gap-1">
@@ -138,14 +149,18 @@ export default function Overview() {
             onClick={() => router.push(item.url)}
             key={item.id}
             className={cn(
-              "group flex gap-2 data-[state=active]:bg-primary  data-[state=active]:text-white  p-2 hover:bg-primary hover:text-white hover-cursor-pointer items-center justify-start rounded-md w-44  hover:shadow-sm hover:cursor-pointer", item.isActive && "bg-blue-500 text-white"
+              "group flex gap-2 data-[state=active]:bg-primary  data-[state=active]:text-white  p-2 hover:bg-primary hover:text-white hover-cursor-pointer items-center justify-start rounded-md w-44  hover:shadow-sm hover:cursor-pointer",
+              item.isActive && "bg-blue-500 text-white"
             )}
           >
             <div className="size-fit rounded-sm">
               <img
                 src={item.icon}
                 alt={item.label}
-                className={cn("size-4 group-hover:brightness-0 group-hover:invert group-data-[state=active]:brightness-0 group-data-[state=active]:invert", item.isActive && "brightness-0 invert")}
+                className={cn(
+                  "size-4 group-hover:brightness-0 group-hover:invert group-data-[state=active]:brightness-0 group-data-[state=active]:invert",
+                  item.isActive && "brightness-0 invert"
+                )}
               />
             </div>
             <div className="">
@@ -159,7 +174,7 @@ export default function Overview() {
           <div className="flex flex-row gap-4 pb-4">
             {menuItems.map((item) => (
               <div
-              key={item.id}
+                key={item.id}
                 className={cn(
                   item.bgColor,
                   "flex justify-between p-4 items-center rounded-md min-w-64 w-full hover:shadow-sm hover:cursor-pointer"
@@ -204,7 +219,15 @@ export default function Overview() {
           </div>
         </div>
 
-        <div className="space-y-4 w-full">
+        <div className="grid pb-16 bg">
+          <JobDashboard
+            initialJobs={initialData?.data ?? []}
+            fingJobsColumns={getFindJobsColumns()}
+            filters={filters}
+          />
+        </div>
+
+        {/* <div className="space-y-4 w-full">
           <div className="flex flex-col gap-4">
             <div className="flex justify-between">
               <div className="">All Jobs</div>
@@ -274,7 +297,7 @@ export default function Overview() {
               </Table>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

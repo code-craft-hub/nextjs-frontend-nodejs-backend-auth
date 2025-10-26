@@ -23,10 +23,8 @@ import { JobFilters } from "@/lib/types/jobs";
 
 export const LandingPageClient = ({
   filters,
-  userId,
 }: {
   filters: JobFilters;
-  userId: string;
 }) => {
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
 
@@ -42,7 +40,7 @@ export const LandingPageClient = ({
           backgroundPosition: "center center",
         }}
       >
-        <Header userId={userId} />
+        <Header />
         <div className="pt-32 mx-auto">
           <h1 className="text-4xl text-center font-medium s:text-red-900 mb-12 !font-instrument">
             AI Assist To Apply

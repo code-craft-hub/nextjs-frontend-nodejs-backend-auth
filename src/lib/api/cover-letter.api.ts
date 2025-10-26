@@ -28,8 +28,8 @@ export interface CoverLetterFilters extends PaginationParams {
 
 export const coverLetterApi = {
   // Get all cover letters
-  getCoverLetters: (params?: CoverLetterFilters) =>
-    api.get<PaginatedResponse<CoverLetter>>("/cover-letters", { params }),
+  getCoverLetters: (_params?: CoverLetterFilters) =>
+    api.get<PaginatedResponse<CoverLetter>>("/cover-letters"),
 
   // Get cover letter by ID
   getCoverLetter: (id: string) => api.get<CoverLetter>(`/cover-letters/${id}`),

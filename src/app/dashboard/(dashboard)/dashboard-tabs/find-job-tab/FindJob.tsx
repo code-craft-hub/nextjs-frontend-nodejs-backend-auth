@@ -5,29 +5,23 @@ import { jobsQueries } from "@/lib/queries/jobs.queries";
 import { useQuery } from "@tanstack/react-query";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown, Calendar, DollarSign, MapPin } from "lucide-react";
+import { BookmarkIcon, Calendar, DollarSign, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { FaRegBookmark, FaBookmark } from "react-icons/fa";
 import { humanDate, randomPercentage } from "@/lib/utils/helpers";
 import { JobType } from "@/types";
 import { JobFilters } from "@/lib/types/jobs";
+import { Toggle } from "@/components/ui/toggle";
+// import { useUpdateJobMutation } from "@/lib/mutations/jobs.mutations";
 
-const fingJobsColumns: ColumnDef<JobType>[] = [
+// Move column definition outside component and make it a function
+export const getFindJobsColumns = (
+  // updateJobs: ReturnType<typeof useUpdateJobMutation>
+): ColumnDef<JobType>[] => [
   {
-    accessorKey: "company",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          company
-          <ArrowUpDown />
-        </Button>
-      );
-    },
+    accessorKey: "companyText",
+    header: "Company",
     cell: ({ row }) => (
-      <div className=" flex items-center justify-center ">
+      <div className="shrink-0 flex items-center justify-center size-16">
         <img
           src={row.original.companyLogo ?? "/company.svg"}
           alt={row.original.companyText}
@@ -46,23 +40,22 @@ const fingJobsColumns: ColumnDef<JobType>[] = [
           <div className="font-medium text-xs max-w-sm overflow-hidden">
             {row.getValue("title")}
           </div>
-          <div className="bg-blue-50 rounde text-blue-600">
+          <div className="bg-blue-50 rounded text-blue-600 px-2 py-1">
             <span className="text-2xs">{row.original.jobType}</span>
           </div>
         </div>
         <div className="flex gap-x-4 mt-1">
-          <p className="flex gap-1 text-gray-400">
+          <p className="flex gap-1 text-gray-400 items-center">
             <MapPin className="size-3" />
-            <span className="text-2xs"> {row.original.location}</span>
+            <span className="text-2xs">{row.original.location}</span>
           </p>
-          <p className="flex gap-1 text-gray-400">
+          <p className="flex gap-1 text-gray-400 items-center">
             <DollarSign className="size-3" />
             <span className="text-2xs">
-              {" "}
               {row.original?.salary ?? "Not disclosed"}
             </span>
           </p>
-          <p className="flex gap-1 text-gray-400">
+          <p className="flex gap-1 text-gray-400 items-center">
             <Calendar className="size-3" />
             <span className="text-2xs">
               {humanDate(row.original?.scrapedDate)}
@@ -79,14 +72,27 @@ const fingJobsColumns: ColumnDef<JobType>[] = [
     header: () => <div className=""></div>,
     cell: ({ row }) => {
       return (
-        <div className="flex justify-end">
-          {row.original.isBookmarked ? (
-            <div>
-              <FaBookmark className="size-4" />
-            </div>
-          ) : (
-            <FaRegBookmark className="size-4 text-gray-400" />
-          )}
+        <div
+          onClick={() => {
+            console.log(row.original.id);
+            // updateJobs.mutate({
+            //   id: String(row.original.id),
+            //   data: {
+            //     isBookmarked: !row.original.isBookmarked,
+            //   },
+            // });
+          }}
+          className="flex justify-end"
+        >
+          <Toggle
+            pressed={row.original.isBookmarked}
+            aria-label="Toggle bookmark"
+            size="sm"
+            variant="outline"
+            className="data-[state=on]:bg-transparent data-[state=on]:*:[svg]:fill-blue-500 data-[state=on]:*:[svg]:stroke-blue-500"
+          >
+            <BookmarkIcon />
+          </Toggle>
         </div>
       );
     },
@@ -112,7 +118,17 @@ const fingJobsColumns: ColumnDef<JobType>[] = [
 ];
 
 export const FindJob = memo(({ filters }: { filters: JobFilters }) => {
-  const { data: jobs } = useQuery(jobsQueries.all(filters));
+  const { data: initialData } = useQuery({
+    ...jobsQueries.all(filters),
+    initialData: undefined, // Let it pull from cache
+  });
+
+  // const updateJobs = useUpdateJobMutation();
+
+  // Generate columns with the mutation
+  const columns = getFindJobsColumns(
+    // updateJobs
+  );
 
   return (
     <div className="flex flex-col font-poppins h-screen relative">
@@ -120,7 +136,11 @@ export const FindJob = memo(({ filters }: { filters: JobFilters }) => {
         AI Job Document Recommendation
       </h1>
       <div className="grid pb-16 bg">
-        <JobDashboard jobs={jobs?.data!} fingJobsColumns={fingJobsColumns} />
+        <JobDashboard
+          initialJobs={initialData?.data ?? []}
+          fingJobsColumns={columns}
+          filters={filters}
+        />
       </div>
     </div>
   );

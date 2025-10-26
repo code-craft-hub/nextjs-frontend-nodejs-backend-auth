@@ -37,7 +37,7 @@ export function useCreateResumeMutation() {
 
       return { previousResumes };
     },
-    onError: (err, variables, context) => {
+    onError: (_err, _variables, context) => {
       if (context?.previousResumes) {
         queryClient.setQueriesData(
           { queryKey: queryKeys.resumes.lists() },
@@ -82,12 +82,12 @@ export function useUpdateResumeMutation() {
 
       return { previousResume };
     },
-    onError: (err, { id }, context) => {
+    onError: (_err, { id }, context) => {
       if (context?.previousResume) {
         queryClient.setQueryData(queryKeys.resumes.detail(id), context.previousResume);
       }
     },
-    onSettled: (data, error, { id }) => {
+    onSettled: (_data, _error, { id }) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.resumes.detail(id) });
       queryClient.invalidateQueries({ queryKey: queryKeys.resumes.lists() });
     },
@@ -118,7 +118,7 @@ export function useDeleteResumeMutation() {
 
       return { previousResumes };
     },
-    onError: (err, id, context) => {
+    onError: (_err, _id, context) => {
       if (context?.previousResumes) {
         queryClient.setQueriesData(
           { queryKey: queryKeys.resumes.lists() },

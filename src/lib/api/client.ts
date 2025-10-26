@@ -51,79 +51,84 @@ export async function apiClient<T>(
   endpoint: string,
   options: FetchOptions = {}
 ): Promise<T> {
-  const { params, ...fetchOptions } = options;
+  try {
+    const { params, ...fetchOptions } = options;
 
-  const isServerSide = isServer();
-  // console.log("🔍 Environment:", isServerSide ? "SERVER" : "CLIENT");
-  // console.log("API Request:", endpoint, params, fetchOptions);
+    const isServerSide = isServer();
+    // console.log("🔍 Environment:", isServerSide ? "SERVER" : "CLIENT");
+    // console.log("API Request:", endpoint, params, fetchOptions);
 
-  // Build URL with query params - FILTER OUT UNDEFINED
-  let url = `${baseURL}${endpoint}`;
-  if (params) {
-    const searchParams = new URLSearchParams();
-    Object.entries(params).forEach(([key, value]) => {
-      if (value !== undefined && value !== null && value !== "") {
-        searchParams.append(key, String(value));
+    // Build URL with query params - FILTER OUT UNDEFINED
+    let url = `${baseURL}${endpoint}`;
+    if (params) {
+      const searchParams = new URLSearchParams();
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== "") {
+          searchParams.append(key, String(value));
+        }
+      });
+
+      const queryString = searchParams.toString();
+      if (queryString) {
+        url += `?${queryString}`;
       }
-    });
-
-    const queryString = searchParams.toString();
-    if (queryString) {
-      url += `?${queryString}`;
     }
-  }
 
-  console.log("🌐 Final URL:", url);
+    console.log("🌐 Final URL:", url);
 
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-  };
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+    };
 
-  // Add any additional headers from options
-  if (fetchOptions.headers) {
-    const existingHeaders = new Headers(fetchOptions.headers);
-    existingHeaders.forEach((value, key) => {
-      headers[key] = value;
-    });
-  }
+    // Add any additional headers from options
+    if (fetchOptions.headers) {
+      const existingHeaders = new Headers(fetchOptions.headers);
+      existingHeaders.forEach((value, key) => {
+        headers[key] = value;
+      });
+    }
 
-  // 🔑 AUTOMATIC: Get and forward cookies if on server
-  if (isServerSide) {
-    const serverCookies = await getServerCookies();
-    if (serverCookies) {
-      headers["Cookie"] = serverCookies;
-      // console.log("🍪 [SERVER] Forwarding cookies to API");
+    // 🔑 AUTOMATIC: Get and forward cookies if on server
+    if (isServerSide) {
+      const serverCookies = await getServerCookies();
+      if (serverCookies) {
+        headers["Cookie"] = serverCookies;
+        // console.log("🍪 [SERVER] Forwarding cookies to API");
+      } else {
+        console.log("⚠️ [SERVER] No cookies found to forward");
+      }
     } else {
-      console.log("⚠️ [SERVER] No cookies found to forward");
+      console.log("🌐 [CLIENT] Using browser's automatic cookie handling");
     }
-  } else {
-    console.log("🌐 [CLIENT] Using browser's automatic cookie handling");
+
+    const response = await fetch(url, {
+      ...fetchOptions,
+      headers,
+      credentials: "include",
+      cache: "no-store",
+      next: {
+        revalidate: 0,
+        ...fetchOptions.next,
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      console.error("❌ API Error:", response.status, errorData);
+      throw new APIError(response.status, response.statusText, errorData);
+    }
+
+    const data = await response.json();
+    console.log("✅ API Response:", {
+      endpoint,
+      data,
+    });
+
+    return data;
+  } catch (error) {
+    console.error("🔥 API Client Error:", error);
+    throw error;
   }
-
-  const response = await fetch(url, {
-    ...fetchOptions,
-    headers,
-    credentials: "include", 
-    cache: "no-store",
-    next: {
-      revalidate: 0,
-      ...fetchOptions.next,
-    },
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    console.error("❌ API Error:", response.status, errorData);
-    throw new APIError(response.status, response.statusText, errorData);
-  }
-
-  const data = await response.json();
-  console.log("✅ API Response:", {
-    endpoint,
-    data,
-  });
-
-  return data;
 }
 
 // Helper methods - now fully automatic!

@@ -80,9 +80,7 @@ export default function ProfileManagementModal({
 
   const onSubmit = (data: any) => {
     const userProfile = { ...profile, ...data };
-    console.log("Form Data:", userProfile);
 
-    // Determine if we should create or update
     if (profile) {
       updateDataSource.mutate(
         {
@@ -90,7 +88,6 @@ export default function ProfileManagementModal({
         },
         {
           onSuccess: () => {
-            console.log("Profile updated successfully");
             setOpen(false);
           },
           onError: (error) => {
@@ -105,7 +102,6 @@ export default function ProfileManagementModal({
         },
         {
           onSuccess: () => {
-            console.log("Profile created successfully");
             setOpen(false);
           },
           onError: (error) => {

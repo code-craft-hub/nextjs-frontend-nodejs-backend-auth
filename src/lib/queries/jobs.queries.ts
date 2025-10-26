@@ -1,12 +1,12 @@
 // lib/queries/jobs.queries.ts
-import { queryOptions, infiniteQueryOptions } from '@tanstack/react-query';
-import { jobsApi } from '@/lib/api/jobs.api';
-import { queryKeys } from '@/lib/query/keys';
-import type { JobFilters } from '@/lib/types/jobs';
-import { normalizeJobFilters } from '../query/normalize-filters';
+import { queryOptions, infiniteQueryOptions } from "@tanstack/react-query";
+import { jobsApi } from "@/lib/api/jobs.api";
+import { queryKeys } from "@/lib/query/keys";
+import type { JobFilters } from "@/lib/types/jobs";
+import { normalizeJobFilters } from "../query/normalize-filters";
 
 export const jobsQueries = {
- all: (filters: JobFilters = {}) => {
+  all: (filters: JobFilters = {}) => {
     const normalized = normalizeJobFilters(filters);
     return queryOptions({
       queryKey: queryKeys.jobs.list(normalized), // Use normalized
@@ -14,13 +14,16 @@ export const jobsQueries = {
       staleTime: 10 * 60 * 1000,
     });
   },
-
-  // Infinite scroll query (FAANG standard for large datasets)
-  infinite: (filters: JobFilters = {}) =>
-    infiniteQueryOptions({
-      queryKey: [...queryKeys.jobs.lists(), 'infinite', filters],
-      queryFn: ({ pageParam = 1 }) =>
-        jobsApi.getJobs({ ...filters, page: pageParam, limit: 20 }),
+  infinite: (filters: Omit<JobFilters, "page">) => {
+    const baseFilters = normalizeJobFilters(filters as JobFilters);
+    return infiniteQueryOptions({
+      queryKey: [...queryKeys.jobs.lists(), "infinite", baseFilters],
+      queryFn: ({ pageParam }) =>
+        jobsApi.getJobs({
+          ...baseFilters,
+          page: pageParam,
+          limit: baseFilters.limit || 20,
+        }),
       getNextPageParam: (lastPage) => {
         if (lastPage.page < lastPage.totalPages) {
           return lastPage.page + 1;
@@ -34,8 +37,30 @@ export const jobsQueries = {
         return undefined;
       },
       initialPageParam: 1,
-      staleTime: 2 * 60 * 1000,
-    }),
+      staleTime: 10 * 60 * 1000, // Match your regular query staleTime
+    });
+  },
+
+  // infinite: (filters: JobFilters = {}) =>
+  //   infiniteQueryOptions({
+  //     queryKey: [...queryKeys.jobs.lists(), 'infinite', filters],
+  //     queryFn: ({ pageParam = 1 }) =>
+  //       jobsApi.getJobs({ ...filters, page: pageParam, limit: 20 }),
+  //     getNextPageParam: (lastPage) => {
+  //       if (lastPage.page < lastPage.totalPages) {
+  //         return lastPage.page + 1;
+  //       }
+  //       return undefined;
+  //     },
+  //     getPreviousPageParam: (firstPage) => {
+  //       if (firstPage.page > 1) {
+  //         return firstPage.page - 1;
+  //       }
+  //       return undefined;
+  //     },
+  //     initialPageParam: 1,
+  //     staleTime: 2 * 60 * 1000,
+  //   }),
 
   // Job detail
   detail: (id: string) =>

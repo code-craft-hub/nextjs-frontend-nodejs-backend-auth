@@ -35,7 +35,7 @@ export const FeatureJobs = ({ filters }: { filters: JobFilters }) => {
               </div>
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-sm bg-gray-200 flex items-center justify-center text-2xl shrink-0">
-                  <img src={job?.logo ?? "/placeholder.jpg"} alt="company logo" className="size-10" />
+                  <img src={job?.companyLogo ?? "/placeholder.jpg"} alt="company logo" className="size-10" />
                 </div>
                 <div className="">
                   <p className="text-gray-600 text-sm font-medium">

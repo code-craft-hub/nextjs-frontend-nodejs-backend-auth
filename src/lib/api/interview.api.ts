@@ -24,8 +24,8 @@ export interface InterviewQuestionFilters extends PaginationParams {
 
 export const interviewQuestionApi = {
   // Get all interview questions
-  getInterviewQuestions: (params?: InterviewQuestionFilters) =>
-    api.get<PaginatedResponse<InterviewQuestion>>('/interview-questions', { params }),
+  getInterviewQuestions: (_params?: InterviewQuestionFilters) =>
+    api.get<PaginatedResponse<InterviewQuestion>>('/interview-questions'),
 
   // Get interview question by ID
   getInterviewQuestion: (id: string) =>
@@ -46,6 +46,6 @@ export const interviewQuestionApi = {
   // Get random questions
   getRandomQuestions: (count: number, category?: string) =>
     api.get<InterviewQuestion[]>('/interview-questions/random', { 
-      params: { count, category } 
+      params: { count, ...(category && { category })} 
     }),
 };

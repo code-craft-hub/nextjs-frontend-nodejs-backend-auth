@@ -3,7 +3,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { blogQueries } from '@/lib/queries/blog.queries';
-import { BlogCard } from './blog-card';
+// import { BlogCard } from './blog-card';
 
 export function BlogList() {
   // Data is already prefetched, so this loads instantly without spinner
@@ -20,9 +20,9 @@ export function BlogList() {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {data.data.map((blog) => (
+      {/* {data.data.map((blog) => (
         <BlogCard key={blog.id} blog={blog} />
-      ))}
+      ))} */}
     </div>
   );
 }
