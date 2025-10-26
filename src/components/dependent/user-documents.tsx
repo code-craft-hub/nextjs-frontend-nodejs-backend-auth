@@ -32,7 +32,7 @@ export function UserDocuments() {
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold">
-        {profile.name}'s Documents
+        {profile.name} Documents
       </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
