@@ -6,6 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { userQueries } from "@/lib/queries/user.queries";
 import { useDeleteDataSource } from "@/lib/mutations/profile.mutations";
 import { cn } from "@/lib/utils";
+import AuthorizeGoogle from "./(google-gmail-authorization)/AuthorizeGoogle";
 
 export interface ProfileData {
   id: string;
@@ -64,11 +65,6 @@ const ProfileCard: React.FC<{ profile: ProfileData; dataSource: any }> = ({
                 : "text-gray-300"
             )}
           />
-          {JSON.stringify({
-            active: profile.activeDataSource,
-            profileID: profile.profileID,
-            dataSource: dataSource?.activeDataSource,
-          })}
         </div>
         <p className="text-gray-600 text-sm leading-relaxed mb-2 line-clamp-3">
           {profile?.description || profile?.data || "No description available."}
@@ -123,6 +119,9 @@ export const ProfileManagement: React.FC = () => {
         </div>
       </ProfileManagementModal>
 
+      <div className="hidden">
+        <AuthorizeGoogle />
+      </div>
       <div className="flex justify-end">
         <Button className="">Save Settings</Button>
       </div>

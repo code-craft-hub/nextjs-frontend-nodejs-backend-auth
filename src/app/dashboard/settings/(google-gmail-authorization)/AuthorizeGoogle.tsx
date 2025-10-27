@@ -78,8 +78,9 @@ const AuthorizeGoogle: React.FC = () => {
     if (!userEmail || !isValidEmail(userEmail)) return;
 
     try {
-      const { data } = await checkAuthStatus(userEmail);
+      const { data } = await checkAuthStatus();
       form.setValue("authorized", data.isAuthorized);
+      return data;
     } catch (error) {
       console.error("Error checking auth status:", error);
     }
@@ -100,7 +101,7 @@ const AuthorizeGoogle: React.FC = () => {
 
     try {
       setIsLoading(true);
-      const { success, data, message } = await requestAuthUrl(userEmail);
+      const { success, data, message } = await requestAuthUrl();
       if (!success) return toast.error(`Error: ${message}`);
 
       // ✅ Start Google OAuth
@@ -127,11 +128,10 @@ const AuthorizeGoogle: React.FC = () => {
           name="authorized"
           render={({ field }) => (
             <FormItem className="flex flex-row items-center ">
-             
               <FormControl>
                 <Switch
-                className="!bg-gray-300 data-[state=checked]:!bg-blue-500 h-6.5 w-12 pl-0.5"
-                thumbClassName="size-5 !bg-white data-[state=checked]:!translate-x-[calc(100%)]"
+                  className="!bg-gray-300 data-[state=checked]:!bg-blue-500 h-6.5 w-12 pl-0.5"
+                  thumbClassName="size-5 !bg-white data-[state=checked]:!translate-x-[calc(100%)]"
                   checked={field.value}
                   onCheckedChange={(checked: boolean) => {
                     field.onChange(checked);

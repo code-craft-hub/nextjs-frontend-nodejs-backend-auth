@@ -11,16 +11,16 @@ export interface EmailFormData {
   attachment?: File;
 }
 
-export const checkAuthStatus = async (email: string) => {
+export const checkAuthStatus = async () => {
   const { data } = await authClient.get(
-    `/google-gmail-oauth/auth-status/${encodeURIComponent(email)}`
+    `/google-gmail-oauth/auth-status/`
   );
   return data;
 };
 
-export const requestAuthUrl = async (email: string) => {
+export const requestAuthUrl = async () => {
   const { data } = await authClient.get(
-    `/google-gmail-oauth/auth-url/${encodeURIComponent(email)}`
+    `/google-gmail-oauth/auth-url/`
   );
   return data;
 };
