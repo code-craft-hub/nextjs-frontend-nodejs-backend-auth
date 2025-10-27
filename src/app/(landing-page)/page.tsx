@@ -8,7 +8,7 @@ import { HydrationBoundary } from "@/components/hydration-boundary";
 import { dehydrate } from "@tanstack/react-query";
 import { getSessionFromCookies } from "@/lib/auth.utils";
 // import { userQueries } from "@/lib/queries/user.queries";
-import { userServerQueries } from "@/lib/queries/user.server.queries";
+import { userQueries } from "@/lib/queries/user.queries";
 
 const LandingPage = async () => {
   const queryClient = createServerQueryClient();
@@ -17,7 +17,7 @@ const LandingPage = async () => {
   // if(email) await queryClient.prefetchQuery(userQueries.detail());
 
   if (email) {
-    await queryClient.prefetchQuery(userServerQueries.detail(email));
+    await queryClient.prefetchQuery(userQueries.detail());
   }
 
   // const cached = queryClient.getQueryData(

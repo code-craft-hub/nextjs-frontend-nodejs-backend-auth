@@ -1,11 +1,30 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
-import { ArrowRight, MapPin } from "lucide-react";
+import { ArrowRight, MapPin, Sparkles } from "lucide-react";
 import { JobFilters } from "@/lib/types/jobs";
 import { jobsQueries } from "@/lib/queries/jobs.queries";
 import { useQuery } from "@tanstack/react-query";
+import { apiService } from "@/hooks/use-auth";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { v4 as uuidv4 } from "uuid";
+import { cn } from "@/lib/utils";
 
 export const FeatureJobs = ({ filters }: { filters: JobFilters }) => {
   const { data: jobs } = useQuery(jobsQueries.all(filters));
+
+  jobs?.data.forEach((job) => {
+    const j = {
+      ...job,
+      descriptionHtml: undefined,
+      descriptionText: undefined,
+    };
+
+    console.log(j);
+  });
+
+  const router = useRouter();
   return (
     <section id="feature-jobs" className="pb-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -20,14 +39,23 @@ export const FeatureJobs = ({ filters }: { filters: JobFilters }) => {
           {jobs?.data?.map((job, index) => (
             <div
               key={index}
-              className="bg-white rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow p-4 space-y-4"
+              className={cn("bg-white rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow p-4 space-y-4", !!job?.emailApply && "shadow-blue-100 shadow-2xl ")}
             >
-              <div className="">
+              <div className="flex justify-between">
                 <h3 className="font-medium mb-1 line-clamp-1">{job?.title}</h3>
+                <p className="">
+                  {!!job?.emailApply && (
+                    <Sparkles className="w-4 h-4 text-yellow-500 animate-bounce" />
+                  )}
+                </p>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-xs px-2 py-1 bg-[#E7F6EA] text-[#0BA02C] uppercase text-nowrap h-fit">
-                  {job?.jobType}
+                  {!!job?.jobType
+                    ? job?.jobType
+                    : job?.employmentType
+                    ? job.employmentType
+                    : "On-site"}
                 </span>
                 <span className=" text-gray-400 text-xs">
                   Salary: {job?.salary ?? "Not Disclosed"}
@@ -35,7 +63,13 @@ export const FeatureJobs = ({ filters }: { filters: JobFilters }) => {
               </div>
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-sm bg-gray-200 flex items-center justify-center text-2xl shrink-0">
-                  <img src={job?.companyLogo ?? "/placeholder.jpg"} alt="company logo" className="size-10" />
+                  <img
+                    src={
+                      !!job?.companyLogo ? job?.companyLogo : "/placeholder.jpg"
+                    }
+                    alt="company logo"
+                    className="size-10"
+                  />
                 </div>
                 <div className="">
                   <p className="text-gray-600 text-sm font-medium">
@@ -47,7 +81,53 @@ export const FeatureJobs = ({ filters }: { filters: JobFilters }) => {
                   </div>
                 </div>
                 <div className="ml-auto">
-                  <Button>Auto Apply</Button>{" "}
+                  <Button
+                    onClick={async () => {
+                      if (!job?.emailApply) {
+                        window.open(job.link, "__blank");
+                        return;
+                      }
+
+                      const { isAuthorized } =
+                        await apiService.gmailOauthStatus();
+
+                      if (!isAuthorized) {
+                        toast.error(
+                          "✨ Go to the Settings page and enable authorization for Cverai to send emails on your behalf. This option is located in the second card.",
+                          {
+                            action: {
+                              label: "Authorize now",
+                              onClick: () =>
+                                router.push(
+                                  `/dashboard/settings?tab=ai-applypreference`
+                                ),
+                            },
+                            classNames: {
+                              actionButton:
+                                "!bg-blue-600 hover:!bg-blue-700 !text-white !h-8",
+                            },
+                          }
+                        );
+
+                        return;
+                      }
+
+                      const params = new URLSearchParams();
+                      params.set(
+                        "jobDescription",
+                        JSON.stringify(job?.descriptionText || "")
+                      );
+                      params.set(
+                        "recruiterEmail",
+                        encodeURIComponent(job?.emailApply)
+                      );
+                      router.push(
+                        `/dashboard/tailor-cover-letter/${uuidv4()}?${params}&aiApply=true`
+                      );
+                    }}
+                  >
+                    Auto Apply
+                  </Button>
                 </div>
               </div>
             </div>

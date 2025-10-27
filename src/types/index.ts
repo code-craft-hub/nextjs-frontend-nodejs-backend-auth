@@ -30,9 +30,11 @@ export type JobType = {
   companyName: string;
   descriptionText: string;
   link: string;
+  emailApply: string;
   postedAt: string;
   scrapedDate: string;
   sponsorCategory: string;
+  employmentType?: string;
 };
 export interface IUser {
   uid?: string;

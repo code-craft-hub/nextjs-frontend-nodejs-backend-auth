@@ -115,7 +115,7 @@ export async function apiClient<T>(
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       console.error("❌ API Error:", response.status, errorData);
-      throw new APIError(response.status, response.statusText, errorData);
+      console.error(response.status, response.statusText, errorData);
     }
 
     const data = await response.json();

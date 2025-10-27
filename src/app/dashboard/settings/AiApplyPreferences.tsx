@@ -1,9 +1,10 @@
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
 import React, { JSX, useState } from "react";
 import { toast } from "sonner";
 import AuthorizeGoogle from "./(google-gmail-authorization)/AuthorizeGoogle";
+import { userQueries } from "@/lib/queries/user.queries";
+import { useQuery } from "@tanstack/react-query";
 interface SettingOption {
   label: string;
   description: string;
@@ -69,7 +70,7 @@ const Label: React.FC<LabelProps> = ({ htmlFor, className = "", children }) => (
 );
 
 export const AiApplyPreferences: React.FC = () => {
-  const { user } = useAuth();
+  const { data: user } = useQuery(userQueries.detail());
   const settings: Setting[] = [
     {
       section: "Auto Apply Configuration",

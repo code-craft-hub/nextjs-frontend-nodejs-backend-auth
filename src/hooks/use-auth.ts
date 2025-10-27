@@ -71,9 +71,13 @@ export const apiService = {
       );
     }
   },
-  gmailOauthStatus: async (email:string): Promise<{isAuthorized: boolean}> => {
+  gmailOauthStatus: async (
+    email?: string
+  ): Promise<{ isAuthorized: boolean }> => {
     try {
-      const { data } = await authClient.get(`/google-gmail-oauth/auth-status/${encodeURIComponent(email)}`);
+      const { data } = await authClient.get(
+        `/google-gmail-oauth/auth-status/${email && encodeURIComponent(email)}`
+      );
       return data.data;
     } catch (error: any) {
       throw new Error(
