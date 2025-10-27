@@ -1,10 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import React, { JSX, useState } from "react";
-import { toast } from "sonner";
 import AuthorizeGoogle from "./(google-gmail-authorization)/AuthorizeGoogle";
 import { userQueries } from "@/lib/queries/user.queries";
 import { useQuery } from "@tanstack/react-query";
+import { useUpdateUserMutation } from "@/lib/mutations/user.mutations";
 interface SettingOption {
   label: string;
   description: string;
@@ -44,7 +44,6 @@ const Switch: React.FC<SwitchProps> = ({ id, checked, onCheckedChange }) => (
       type="checkbox"
       checked={checked}
       onChange={(e) => onCheckedChange(e.target.checked)}
-      //   : React.ChangeEvent<HTMLInputElement>
       className="sr-only"
       id={id}
     />
@@ -70,7 +69,9 @@ const Label: React.FC<LabelProps> = ({ htmlFor, className = "", children }) => (
 );
 
 export const AiApplyPreferences: React.FC = () => {
+  const updateUser = useUpdateUserMutation();
   const { data: user } = useQuery(userQueries.detail());
+
   const settings: Setting[] = [
     {
       section: "Auto Apply Configuration",
@@ -201,58 +202,72 @@ export const AiApplyPreferences: React.FC = () => {
   // Initialize state for all toggle switches
   const [switchStates, setSwitchStates] = useState<SwitchStates>(() => {
     const initialState: SwitchStates = {};
-
-    settings.forEach((setting: Setting) => {
-      setting.options?.forEach((option: SettingOption) => {
-        if (option.type === "toggle" && option.key) {
-          initialState[option.key] = false; // Default to false, you can set custom defaults
-        }
-      });
+    Object.entries(user?.aiApplyPreferences ?? {}).forEach(([key, value]) => {
+      if (key && typeof value === "boolean") {
+        initialState[key] = value;
+      }
     });
+    // settings.forEach((setting: Setting) => {
+    //   setting.options?.forEach((option: SettingOption) => {
+    //     if (option.type === "toggle" && option.key) {
+    //       initialState[option.key] = false; // Default to false, you can set custom defaults
+    //     }
+    //   });
+    // });
 
     return initialState;
   });
 
   // Handle switch state changes
-  const handleSwitchChange = (key: string, checked: boolean): void => {
-    setSwitchStates((prev: SwitchStates) => ({
-      ...prev,
-      [key]: checked,
-    }));
+  const handleSwitchChange = async (key: string, checked: boolean) => {
+    setSwitchStates((prev: SwitchStates) => {
+      const newState = {
+        ...prev,
+        [key]: checked,
+      };
+
+      // Ensure autoSendApplications and saveAsDrafts are always opposite
+      if (key === "autoSendApplications") {
+        newState.saveAsDrafts = !checked;
+      } else if (key === "saveAsDrafts") {
+        newState.autoSendApplications = !checked;
+      }
+
+      if (key === "pauseForInput") {
+        newState.intelligentAnswers = !checked;
+      } else if (key === "intelligentAnswers") {
+        newState.pauseForInput = !checked;
+      }
+
+      if (key === "autoSubmit") {
+        newState.reviewBeforeSubmit = !checked;
+      } else if (key === "reviewBeforeSubmit") {
+        newState.autoSubmit = !checked;
+      }
+      if (key === "generateTailoredCV") {
+        newState.useMasterCV = !checked;
+      } else if (key === "useMasterCV") {
+        newState.generateTailoredCV = !checked;
+      }
+
+      return newState;
+    });
 
     // Optional: Add your custom logic here
-    console.log(`${key} changed to:`, checked);
-  };
-
-  // Handle button clicks
-  const handleButtonClick = (action: string): void => {
-    console.log(`${action} clicked`);
-  };
-
-  // Reset all switches
-  // const resetAllSwitches = (): void => {
-  //   const resetState: SwitchStates = {};
-  //   Object.keys(switchStates).forEach((key) => {
-  //     resetState[key] = false;
-  //   });
-  //   setSwitchStates(resetState);
-  // };
-
-  // Save settings (example API call)
-  const saveSettings = async (): Promise<void> => {
     try {
-      console.log("Save settings:", switchStates);
-      toast.success("Data saved success!");
-      // Example API call
-      // await fetch('/api/settings', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(switchStates)
-      // });
+      const userAIApplyPreferences = {
+        aiApplyPreferences: switchStates,
+      };
+      await updateUser.mutateAsync({ data: userAIApplyPreferences });
     } catch (error) {
       console.error("Error saving settings:", error);
     }
   };
+
+  // Handle button clicks
+  const handleButtonClick = (_action: string): void => {};
+
+  // const saveSettings = async (): Promise<void> => {};
 
   // Render button actions
   const renderButtons = (actions: string[]): JSX.Element => (
@@ -336,25 +351,6 @@ export const AiApplyPreferences: React.FC = () => {
                         <div>
                           <div className="flex gap-2">
                             <AuthorizeGoogle />
-                            {/* <button
-                                key={index}
-                                className={cn(
-                                  "p-2 border border-blue-300 rounded-lg text-3xs transition-colors",
-                                  index % 2 != 0
-                                    ? "bg-blue-500 text-white"
-                                    : "text-blue-500"
-                                )}
-                                onClick={() => handleButtonClick(action)}
-                                style={{
-                                  boxShadow: `
-      0 0 0 1px rgba(158, 203, 251, 0.3),
-      0 2px 4px rgba(158, 203, 251, 0.1),
-      0 4px 8px rgba(158, 203, 251, 0.1)
-    `,
-                                }}
-                              >
-                                {action}
-                              </button> */}
                           </div>
                         </div>
                       ) : null}
@@ -366,21 +362,14 @@ export const AiApplyPreferences: React.FC = () => {
           </div>
         ))}
       </div>
-      <div className="mt-6 flex gap-4 ml-auto w-fit">
+      {/* <div className="mt-6 flex gap-4 ml-auto w-fit">
         <Button
           className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
           onClick={saveSettings}
         >
           Save Settings
         </Button>
-        {/* <Button
-          className="px-4 py-2 rounded  transition-colors"
-          variant={"outline"}
-          onClick={resetAllSwitches}
-        >
-          Reset All
-        </Button> */}
-      </div>
+      </div> */}
     </div>
   );
 };

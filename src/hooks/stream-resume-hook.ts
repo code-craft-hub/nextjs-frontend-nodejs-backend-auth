@@ -76,9 +76,6 @@ export const useResumeStream = (endpoint: string, resumeId: string): UseResumeSt
 
         case "sectionCompleted":
           if (!section) break;
-
-          console.log(`[Stream] Section completed: ${section}`);
-
           setStreamStatus((prev) => ({
             ...prev,
             completedSections: new Set([...prev.completedSections, section]),
@@ -115,7 +112,6 @@ export const useResumeStream = (endpoint: string, resumeId: string): UseResumeSt
             isComplete: true,
             isConnected: false,
           }));
-          console.log("[Stream] Generation complete");
           sectionContentBufferRef.current.clear();
           break;
 
@@ -233,7 +229,6 @@ export const useResumeStream = (endpoint: string, resumeId: string): UseResumeSt
           const { value, done } = await reader.read();
 
           if (done) {
-            console.log("[Stream] Stream ended");
             setStreamStatus((prev) => ({
               ...prev,
               isComplete: true,

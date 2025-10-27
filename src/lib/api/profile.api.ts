@@ -34,7 +34,6 @@ export const profileApi = {
       const data = await api.delete<ProfileResponse>(
         "/users/delete-data-source"
       );
-      console.log("Deleted data source:", data);
       return data;
     } catch (error) {
       console.error("Error deleting data source:", error);

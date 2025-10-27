@@ -1,8 +1,11 @@
 // lib/mutations/user.mutations.ts
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { userApi, type CreateUserData, type UpdateUserData } from '@/lib/api/user.api';
-import { queryKeys } from '@/lib/query/keys';
-import type { User, PaginatedResponse } from '@/lib/types';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  userApi,
+  type CreateUserData,
+} from "@/lib/api/user.api";
+import { queryKeys } from "@/lib/query/keys";
+import type { User, PaginatedResponse } from "@/lib/types";
 
 export function useCreateUserMutation() {
   const queryClient = useQueryClient();
@@ -23,7 +26,15 @@ export function useCreateUserMutation() {
           if (!old) return old;
           return {
             ...old,
-            data: [{ id: 'temp-' + Date.now(), ...newUser, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() } as User, ...old.data],
+            data: [
+              {
+                id: "temp-" + Date.now(),
+                ...newUser,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+              } as User,
+              ...old.data,
+            ],
             total: old.total + 1,
           };
         }
@@ -51,40 +62,45 @@ export function useUpdateUserMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: UpdateUserData }) =>
-      userApi.updateUser(id, data),
-    onMutate: async ({ id, data }) => {
-      await queryClient.cancelQueries({ queryKey: queryKeys.users.detail() });
+    mutationFn: ({ data }: {data: any }) =>
+      userApi.updateUser(data),
+    // onMutate: async ({ id, data }) => {
+    //   await queryClient.cancelQueries({ queryKey: queryKeys.users.detail() });
 
-      const previousUser = queryClient.getQueryData(queryKeys.users.detail());
+    //   const previousUser = queryClient.getQueryData(queryKeys.users.detail());
 
-      // Optimistically update detail
-      queryClient.setQueryData<User>(queryKeys.users.detail(), (old) => {
-        if (!old) return old;
-        return { ...old, ...data, updatedAt: new Date().toISOString() };
-      });
+    //   // Optimistically update detail
+    //   queryClient.setQueryData<User>(queryKeys.users.detail(), (old) => {
+    //     if (!old) return old;
+    //     return { ...old, ...data, updatedAt: new Date().toISOString() };
+    //   });
 
-      // Update in lists
-      queryClient.setQueriesData<PaginatedResponse<User>>(
-        { queryKey: queryKeys.users.lists() },
-        (old) => {
-          if (!old) return old;
-          return {
-            ...old,
-            data: old.data.map((user) =>
-              user.id === id ? { ...user, ...data, updatedAt: new Date().toISOString() } : user
-            ),
-          };
-        }
-      );
+    //   // Update in lists
+    //   queryClient.setQueriesData<PaginatedResponse<User>>(
+    //     { queryKey: queryKeys.users.lists() },
+    //     (old) => {
+    //       if (!old) return old;
+    //       return {
+    //         ...old,
+    //         data: old.data.map((user) =>
+    //           user.id === id
+    //             ? { ...user, ...data, updatedAt: new Date().toISOString() }
+    //             : user
+    //         ),
+    //       };
+    //     }
+    //   );
 
-      return { previousUser };
-    },
-    onError: (_err, _data, context) => {
-      if (context?.previousUser) {
-        queryClient.setQueryData(queryKeys.users.detail(), context.previousUser);
-      }
-    },
+    //   return { previousUser };
+    // },
+    // onError: (_err, _data, context) => {
+    //   if (context?.previousUser) {
+    //     queryClient.setQueryData(
+    //       queryKeys.users.detail(),
+    //       context.previousUser
+    //     );
+    //   }
+    // },
     onSettled: (_data, _error) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.users.detail() });
       queryClient.invalidateQueries({ queryKey: queryKeys.users.lists() });

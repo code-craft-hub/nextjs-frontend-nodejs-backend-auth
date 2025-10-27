@@ -38,7 +38,6 @@ async function getServerCookies(): Promise<string | null> {
       .map((cookie) => `${cookie.name}=${cookie.value}`)
       .join("; ");
 
-    // console.log("📦 Server cookies:", cookieString ? "present" : "missing");
     return cookieString || null;
   } catch (error) {
     // cookies() might throw in some contexts (like route handlers in some cases)
@@ -55,10 +54,6 @@ export async function apiClient<T>(
     const { params, ...fetchOptions } = options;
 
     const isServerSide = isServer();
-    // console.log("🔍 Environment:", isServerSide ? "SERVER" : "CLIENT");
-    // console.log("API Request:", endpoint, params, fetchOptions);
-
-    // Build URL with query params - FILTER OUT UNDEFINED
     let url = `${baseURL}${endpoint}`;
     if (params) {
       const searchParams = new URLSearchParams();
@@ -93,12 +88,7 @@ export async function apiClient<T>(
       const serverCookies = await getServerCookies();
       if (serverCookies) {
         headers["Cookie"] = serverCookies;
-        // console.log("🍪 [SERVER] Forwarding cookies to API");
-      } else {
-        console.log("⚠️ [SERVER] No cookies found to forward");
       }
-    } else {
-      console.log("🌐 [CLIENT] Using browser's automatic cookie handling");
     }
 
     const response = await fetch(url, {
@@ -119,10 +109,6 @@ export async function apiClient<T>(
     }
 
     const data = await response.json();
-    console.log("✅ API Response:", {
-      endpoint,
-      data,
-    });
 
     return data;
   } catch (error) {

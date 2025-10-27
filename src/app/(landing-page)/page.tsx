@@ -13,28 +13,13 @@ import { userQueries } from "@/lib/queries/user.queries";
 const LandingPage = async () => {
   const queryClient = createServerQueryClient();
   const email = (await getSessionFromCookies())?.email;
-
-  // if(email) await queryClient.prefetchQuery(userQueries.detail());
-
   if (email) {
     await queryClient.prefetchQuery(userQueries.detail());
   }
-
-  // const cached = queryClient.getQueryData(
-  //   userServerQueries.detail(email!).queryKey
-  // );
-
-  // console.log("👤 User cached in server fetch:", cached);
   const filters: JobFilters = {
     page: 1,
     limit: 10,
   };
-
-  // console.log("📋 Filters:", filters);
-  // console.log("🔑 Query key:", jobsQueries.all(filters).queryKey);
-
-  // Prefetch
-  // console.log("⏳ Starting prefetch...");
   await prefetchWithPriority(queryClient, [
     {
       queryKey: jobsQueries.all(filters).queryKey,
@@ -42,15 +27,7 @@ const LandingPage = async () => {
       priority: "high",
     },
   ]);
-  // Check cache
-  // const cachedData = queryClient.getQueryData(
-  //   jobsQueries.all(filters).queryKey
-  // );
-  // console.log("🎯 Query cached:", !!cachedData);
-
-  // Dehydrate
   const dehydratedState = dehydrate(queryClient);
-  // console.log("💧 Dehydrated queries:", dehydratedState.queries.length);
   return (
     <HydrationBoundary state={dehydratedState}>
       <LandingPageClient filters={filters} />

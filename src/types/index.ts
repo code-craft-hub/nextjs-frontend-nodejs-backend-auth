@@ -52,6 +52,7 @@ export interface IUser {
   customClaims?: Record<string, any> | undefined;
   provider?: string;
   password?: string;
+  aiApplyPreferences?: any;
   baseResume?: string;
   key?: string;
   address?: string;

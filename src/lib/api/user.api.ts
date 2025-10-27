@@ -9,10 +9,8 @@ export interface CreateUserData {
   role?: string;
 }
 
-export interface UpdateUserData {
-  email?: string;
-  name?: string;
-  role?: string;
+export interface UpdateUserData<T = never> {
+  data?: Partial<T>;
 }
 
 export const userApi = {
@@ -30,8 +28,7 @@ export const userApi = {
   createUser: (data: CreateUserData) => api.post<User>("/users", data),
 
   // Update user
-  updateUser: (id: string, data: UpdateUserData) =>
-    api.patch<User>(`/users/${id}`, data),
+  updateUser: (data: UpdateUserData) => api.put<User>(`/update-user`, data),
 
   // Delete user
   deleteUser: (id: string) => api.delete<void>(`/users/${id}`),

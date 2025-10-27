@@ -1,4 +1,4 @@
-import { formatDistanceToNow } from "date-fns";
+import { formatDistanceToNow, isValid } from "date-fns";
 import { ApiError, QAItem } from "@/types";
 import { jsonrepair } from "jsonrepair";
 import { MouseEvent } from "react";
@@ -129,14 +129,25 @@ export function validateOrCreateDate(inputDate: string | Date): Date {
   return date;
 }
 
-export const humanDate = (input: any) => {
-  const validDate = formatDistanceToNow(
-    input instanceof Date ? input : new Date(input),
-    { addSuffix: true }
-  );
-  return validDate;
-};
 
+
+
+export const humanDate = (input: any): string => {
+  try {
+    if (!input) return formatDistanceToNow(new Date(), { addSuffix: true });
+
+    const date = input instanceof Date ? input : new Date(input);
+
+    if (!isValid(date)) return formatDistanceToNow(new Date(), { addSuffix: true });
+
+    // if(isNaN(date.getTime())) 
+
+    return formatDistanceToNow(date, { addSuffix: true });
+  } catch (err) {
+    console.error("humanDate() failed with input:", input, err);
+    return "Invalid date";
+  }
+};
 export function monthYear(input: Date | string) {
   const validDate = validateOrCreateDate(input);
   return String(
