@@ -30,6 +30,7 @@ export type JobType = {
   companyName: string;
   descriptionText: string;
   link: string;
+  salaryInfo: any;
   emailApply: string;
   postedAt: string;
   scrapedDate: string;
