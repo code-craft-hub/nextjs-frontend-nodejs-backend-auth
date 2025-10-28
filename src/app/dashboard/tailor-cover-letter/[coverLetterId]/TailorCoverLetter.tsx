@@ -3,7 +3,7 @@
 import React, { useRef, useEffect, memo } from "react";
 import { Loader2 } from "lucide-react";
 import { useCoverLetterGenerator } from "@/hooks/useCoverLetterGenerator";
-import { apiService, useAuth } from "@/hooks/use-auth";
+import { apiService } from "@/hooks/use-auth";
 import { useRouter } from "next/navigation";
 import { createCoverLetterOrderedParams } from "@/lib/utils/helpers";
 import { toast } from "sonner";
@@ -11,8 +11,10 @@ import { isEmpty } from "lodash";
 import { COLLECTIONS } from "@/lib/utils/constants";
 import { v4 as uuidv4 } from "uuid";
 import { Button } from "@/components/ui/button";
-import { CoverLetterRequest } from "@/types";
 import { ProgressIndicator } from "../../(dashboard)/ai-apply/progress-indicator";
+import { useQuery } from "@tanstack/react-query";
+import { userQueries } from "@/lib/queries/user.queries";
+import { coverLetterQueries } from "@/lib/queries/cover-letter.queries";
 
 export const TailorCoverLetter = memo<{
   jobDescription: string;
@@ -26,11 +28,11 @@ export const TailorCoverLetter = memo<{
   const contentRef = useRef<HTMLDivElement>(null);
   const hasGeneratedRef = useRef(false); // Track if we've already generated
 
-  const { user, useCareerDoc } = useAuth();
-  const { data, isFetched, status } = useCareerDoc<CoverLetterRequest>(
-    coverLetterId,
-    COLLECTIONS.COVER_LETTER
+  const { data: user } = useQuery(userQueries.detail());
+  const { data, status, isFetched } = useQuery(
+    coverLetterQueries.detail(coverLetterId)
   );
+
   const router = useRouter();
   useEffect(() => {
     const runGeneration = async () => {

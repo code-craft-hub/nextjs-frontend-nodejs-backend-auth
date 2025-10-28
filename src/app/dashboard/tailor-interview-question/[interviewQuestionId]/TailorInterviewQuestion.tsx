@@ -3,12 +3,13 @@ import { HelpCircle, CheckCircle } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { jsonrepair } from "jsonrepair";
 import { toast } from "sonner";
-import { useAuth } from "@/hooks/use-auth";
-import { COLLECTIONS } from "@/lib/utils/constants";
 import { isEmpty } from "lodash";
-import { InterviewQuestion, QAItem } from "@/types";
+import {  QAItem } from "@/types";
 import { extractCompleteJsonObjects } from "@/lib/utils/helpers";
 import TailorInterviewQuestionEmptyState from "./TailorInterviewQuestionEmptyState";
+import { useQuery } from "@tanstack/react-query";
+import { interviewQuestionQueries } from "@/lib/queries/interview.queries";
+import { userQueries } from "@/lib/queries/user.queries";
 
 export const TailorInterviewQuestion = ({
   jobDescription,
@@ -20,11 +21,12 @@ export const TailorInterviewQuestion = ({
   const hasGeneratedRef = useRef(false);
 
   const [qaData, setQaData] = useState<QAItem[]>([]);
-  const { user, useCareerDoc } = useAuth();
-  const { data, isFetched, status } = useCareerDoc<InterviewQuestion>(
-    interviewQuestionId,
-    COLLECTIONS.INTERVIEW_QUESTION
+
+  const {data: user } = useQuery(userQueries.detail());
+  const { data, status, isFetched } = useQuery(
+    interviewQuestionQueries.detail(interviewQuestionId)
   );
+
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const resultsEndRef = useRef<HTMLDivElement>(null);
 

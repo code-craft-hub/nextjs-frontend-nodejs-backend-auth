@@ -20,21 +20,19 @@ export const AIJobCustomization = memo(
       interviewQuestionQueries.all(filters)
     );
 
+    const data = useMemo(() => {
+      const merged = [
+        ...(interviewQuestion?.data ?? []),
+        ...(coverLetter?.data ?? []),
+        ...(resumes?.data ?? []),
+      ].map((item: any) => ({
+        ...item.data,
+        id: item?.id,
+        _type: item?.type ?? "unknown",
+      }));
 
-
-  const data = useMemo(() => {
-    const merged = [
-      ...(interviewQuestion?.data ?? []),
-      ...(coverLetter?.data ?? []),
-      ...(resumes?.data ?? []),
-    ].map((item: any) => ({
-      ...item.data,
-      id: item?.id,
-      _type: item?.type ?? "unknown",
-    }));
-
-    return shuffleArray(merged);
-  }, [interviewQuestion?.data, coverLetter?.data, resumes?.data]);
+      return shuffleArray(merged);
+    }, [interviewQuestion?.data, coverLetter?.data, resumes?.data]);
 
     return (
       <div className="flex flex-col font-poppins h-screen relative">

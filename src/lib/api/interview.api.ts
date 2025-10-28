@@ -1,7 +1,7 @@
 // lib/api/interview.api.ts
+import { InterviewQuestion } from "@/types";
 import { api } from "./client";
 import type {
-  InterviewQuestion,
   PaginatedResponse,
   PaginationParams,
 } from "@/lib/types";

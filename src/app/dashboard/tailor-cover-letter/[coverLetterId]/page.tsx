@@ -1,18 +1,18 @@
 import React from "react";
-import { getQueryClient } from "@/lib/query-client";
-import { apiService } from "@/hooks/use-auth";
-import { COLLECTIONS } from "@/lib/utils/constants";
 import { TailorCoverLetter } from "./TailorCoverLetter";
+import { createServerQueryClient } from "@/lib/query/prefetch";
+import { coverLetterQueries } from "@/lib/queries/cover-letter.queries";
+import { userQueries } from "@/lib/queries/user.queries";
 const TailorCoverLetterPage = async ({ searchParams, params }: any) => {
   const { jobDescription, aiApply, recruiterEmail } = await searchParams;
   const { coverLetterId } = await params;
-  const queryClient = getQueryClient();
-
-  queryClient.prefetchQuery({
-    queryKey: ["auth", "careerDoc"],
-    queryFn: () =>
-      apiService.getCareerDoc(coverLetterId, COLLECTIONS.COVER_LETTER),
-  });
+  const queryClient = createServerQueryClient();
+  await queryClient.prefetchQuery(
+    coverLetterQueries.detail(coverLetterId)
+  );
+  await queryClient.prefetchQuery(
+    userQueries.detail()
+  );
 
   return (
     <div className="">

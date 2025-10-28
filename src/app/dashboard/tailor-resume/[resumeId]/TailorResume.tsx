@@ -3,12 +3,13 @@ import React, { useEffect, useRef } from "react";
 import { useResumeStream } from "@/hooks/stream-resume-hook";
 import { toast } from "sonner";
 import { apiService, useAuth } from "@/hooks/use-auth";
-import { Resume } from "@/types";
 import { COLLECTIONS } from "@/lib/utils/constants";
 import { EditableResume } from "../../(dashboard)/ai-apply/components/resume/EditableResume";
 import { ProgressIndicator } from "../../(dashboard)/ai-apply/progress-indicator";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { useQuery } from "@tanstack/react-query";
+import { resumeQueries } from "@/lib/queries/resume.queries";
 
 export const TailorResume = ({
   jobDescription,
@@ -23,11 +24,13 @@ export const TailorResume = ({
   aiApply: boolean;
   recruiterEmail: string;
 }) => {
-  const { user, useCareerDoc } = useAuth();
-  const { data, status, isFetched } = useCareerDoc<Resume>(
-    resumeId,
-    COLLECTIONS.RESUME
-  );
+  const { user } = useAuth();
+  // const { data,  } = useCareerDoc<Resume>(
+  //   resumeId,
+  //   COLLECTIONS.RESUME
+  // );
+
+  const { data, status, isFetched } = useQuery(resumeQueries.detail(resumeId));
   const resultsEndRef = useRef<HTMLDivElement>(null);
   const hasGeneratedRef = useRef(false);
   const router = useRouter();

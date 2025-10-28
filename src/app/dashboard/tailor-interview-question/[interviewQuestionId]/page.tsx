@@ -1,31 +1,28 @@
 import React from "react";
 import { TailorInterviewQuestion } from "./TailorInterviewQuestion";
-
-import { getQueryClient } from "@/lib/query-client";
-import { apiService } from "@/hooks/use-auth";
-import { COLLECTIONS } from "@/lib/utils/constants";
+import { createServerQueryClient } from "@/lib/query/prefetch";
+import { interviewQuestionQueries } from "@/lib/queries/interview.queries";
+import { HydrationBoundary } from "@/components/hydration-boundary";
+import { dehydrate } from "@tanstack/react-query";
+import { userQueries } from "@/lib/queries/user.queries";
 const TailorInterviewQuestionPage = async ({ searchParams, params }: any) => {
   const { jobDescription } = await searchParams;
   const { interviewQuestionId } = await params;
 
-  const queryClient = getQueryClient();
-
-  queryClient.prefetchQuery({
-    queryKey: ["auth", "careerDoc"],
-    queryFn: () =>
-      apiService.getCareerDoc(
-        interviewQuestionId,
-        COLLECTIONS.INTERVIEW_QUESTION
-      ),
-  });
-
+  const queryClient = createServerQueryClient();
+  await queryClient.prefetchQuery(
+    interviewQuestionQueries.detail(interviewQuestionId)
+  );
+  await queryClient.prefetchQuery(
+    userQueries.detail()
+  );
   return (
-    <div>
+    <HydrationBoundary state={dehydrate(queryClient)}>
       <TailorInterviewQuestion
         jobDescription={jobDescription}
         interviewQuestionId={interviewQuestionId}
       />
-    </div>
+     </HydrationBoundary> 
   );
 };
 

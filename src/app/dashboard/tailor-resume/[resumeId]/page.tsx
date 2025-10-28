@@ -1,22 +1,20 @@
 import React from "react";
 import { TailorResume } from "./TailorResume";
-import { getQueryClient } from "@/lib/query-client";
-import { apiService } from "@/hooks/use-auth";
-import { COLLECTIONS } from "@/lib/utils/constants";
+import { createServerQueryClient } from "@/lib/query/prefetch";
+import { resumeQueries } from "@/lib/queries/resume.queries";
+import { HydrationBoundary } from "@/components/hydration-boundary";
+import { dehydrate } from "@tanstack/react-query";
 
 const TailorResumePage = async ({ searchParams, params }: any) => {
   const { jobDescription, aiApply, coverLetterId, recruiterEmail } =
     await searchParams;
   const { resumeId } = await params;
-  const queryClient = getQueryClient();
 
-  queryClient.prefetchQuery({
-    queryKey: ["auth", "careerDoc"],
-    queryFn: () => apiService.getCareerDoc(resumeId, COLLECTIONS.RESUME),
-  });
+  const queryClient = createServerQueryClient();
+  await queryClient.prefetchQuery(resumeQueries.detail(resumeId));
 
   return (
-    <div>
+    <HydrationBoundary state={dehydrate(queryClient)}>
       <div className="p-4 sm:p-8">
         <TailorResume
           aiApply={aiApply === "true"}
@@ -26,7 +24,7 @@ const TailorResumePage = async ({ searchParams, params }: any) => {
           recruiterEmail={recruiterEmail}
         />
       </div>
-    </div>
+    </HydrationBoundary>
   );
 };
 
