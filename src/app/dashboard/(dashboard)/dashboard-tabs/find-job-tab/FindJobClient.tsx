@@ -22,6 +22,7 @@ import { JobFilters } from "@/lib/types/jobs";
 import { menuItems } from "@/lib/utils/constants";
 
 export default function JobDashboard({
+  hideToMenus,
   initialJobs,
   fingJobsColumns,
   filters,
@@ -29,6 +30,8 @@ export default function JobDashboard({
   initialJobs: JobType[];
   fingJobsColumns: any;
   filters: Omit<JobFilters, "page">;
+  hideToMenus?: boolean;
+
 }) {
   const router = useRouter();
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -117,7 +120,7 @@ export default function JobDashboard({
 
   return (
     <div className="w-full flex flex-col gap-6">
-      <ScrollArea className="grid grid-cols-1">
+      {!hideToMenus && <ScrollArea className="grid grid-cols-1">
         <div className="flex flex-row gap-4 py-4 mx-auto w-fit">
           {menuItems.map((item) => (
             <div
@@ -141,7 +144,7 @@ export default function JobDashboard({
           ))}
         </div>
         <ScrollBar orientation="horizontal" />
-      </ScrollArea>
+      </ScrollArea>}
       <div className="bg-white shadow-lg p-4 flex gap-4 justify-between rounded-lg">
         <div className="flex items-center gap-2 w-full">
           <SearchIcon />

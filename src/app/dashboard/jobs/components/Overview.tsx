@@ -24,6 +24,7 @@ import { jobsQueries } from "@/lib/queries/jobs.queries";
 import { useQuery } from "@tanstack/react-query";
 import JobDashboard from "../../(dashboard)/dashboard-tabs/find-job-tab/FindJobClient";
 import { getFindJobsColumns } from "../../(dashboard)/dashboard-tabs/find-job-tab/FindJob";
+import { menuItems } from "@/lib/utils/constants";
 
 export type IJobType = {
   id: number;
@@ -68,41 +69,7 @@ export default function Overview() {
     },
   });
 
-  const menuItems = [
-    {
-      id: "ai-recommendations",
-      count: "574",
-      label: "AI Recommendations",
-      icon: "/bell.svg",
-      bgColor: "bg-[#E7F6EA]",
-      iconColor: "text-green-600",
-      countColor: "text-green-800",
-      labelColor: "text-green-700",
-      url: `/dashboard/jobs/category?tab=ai-recommendations`,
-    },
-    {
-      id: "saved-jobs",
-      count: "238",
-      label: "Saved Jobs",
-      icon: "/save.svg",
-      bgColor: "bg-[#FFF6E6]",
-      iconColor: "text-yellow-600",
-      countColor: "text-yellow-800",
-      labelColor: "text-yellow-700",
-      url: `/dashboard/jobs/category?tab=saved-jobs`,
-    },
-    {
-      id: "application-history",
-      count: "589",
-      label: "Application history",
-      icon: "/briefcase-dasboard.svg",
-      bgColor: "bg-[#E7F0FA]",
-      iconColor: "text-blue-600",
-      countColor: "text-blue-800",
-      labelColor: "text-blue-700",
-      url: `/dashboard/jobs/category?tab=application-history`,
-    },
-  ];
+
 
   const leftMenuItems = [
     {
@@ -136,6 +103,7 @@ export default function Overview() {
     page: 1,
     limit: 20,
   };
+  
 
   const { data: initialData } = useQuery({
     ...jobsQueries.all(filters),
@@ -222,8 +190,9 @@ export default function Overview() {
         <div className="grid pb-16 bg">
           <JobDashboard
             initialJobs={initialData?.data ?? []}
-            fingJobsColumns={getFindJobsColumns()}
+            fingJobsColumns={getFindJobsColumns(router)}
             filters={filters}
+            hideToMenus={true}
           />
         </div>
 

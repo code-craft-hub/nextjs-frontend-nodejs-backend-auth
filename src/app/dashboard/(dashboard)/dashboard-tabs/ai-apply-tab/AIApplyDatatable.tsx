@@ -235,7 +235,7 @@ export function AIApplyDatatable({
               </TableBody>
             </Table>
           </div>
-          <div className="text-blue-500 text-center border-t -mt-4 pt-4">
+          <div className="text-blue-500 text-center border-t pt-4">
             View more
           </div>
         </div>

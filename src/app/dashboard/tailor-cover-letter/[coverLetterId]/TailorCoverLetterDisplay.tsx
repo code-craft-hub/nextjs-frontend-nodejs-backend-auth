@@ -170,13 +170,13 @@ const TailorCoverLetterDisplay = ({
             </div>
             <div className="whitespace-pre-wrap text-gray-800 leading-relaxed font-outfit text-md flex flex-col gap-2">
               <div className="mb-4">
-                <p className="text-xl font-medium font-inter">
+                <p className="text-sm text-gray-500 font-medium font-inter">
                   To:{" "}
                   {recruiterEmail ||
                     currentData?.recruiterEmail ||
                     "Not specified"}
                 </p>
-                <p className="text-sm font-inter">
+                <p className="text-md font-inter">
                   Subject: {currentData?.title || "Untitled"}
                 </p>
               </div>

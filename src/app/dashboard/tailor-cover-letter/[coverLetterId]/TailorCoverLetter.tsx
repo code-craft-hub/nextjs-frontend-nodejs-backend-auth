@@ -103,7 +103,6 @@ export const TailorCoverLetter = memo<{
 
   return (
     <div className="grid grid-cols-1 gap-4 sm:gap-6">
-      {/* <div className="p"></div> */}
       {aiApply && <ProgressIndicator activeStep={1} />}
       <div className="flex w-full gap-3 items-center  p-4  bg-white justify-between">
         <p className="text-xl font-medium font-inter">Tailored Cover Letter</p>

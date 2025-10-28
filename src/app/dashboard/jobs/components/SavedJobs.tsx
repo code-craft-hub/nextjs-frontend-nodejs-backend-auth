@@ -19,6 +19,7 @@ import { useQuery } from "@tanstack/react-query";
 import { jobsQueries } from "@/lib/queries/jobs.queries";
 import JobDashboard from "../../(dashboard)/dashboard-tabs/find-job-tab/FindJobClient";
 import { getFindJobsColumns } from "../../(dashboard)/dashboard-tabs/find-job-tab/FindJob";
+import { useRouter } from "next/navigation";
 
 export type IJobType = {
   id: number;
@@ -63,7 +64,7 @@ export const SavedJobs = () => {
     },
   });
 
-    const filters: any = {
+  const filters: any = {
     page: 1,
     limit: 20,
   };
@@ -73,11 +74,13 @@ export const SavedJobs = () => {
     initialData: undefined, // Let it pull from cache
   });
 
+  const router = useRouter();
+
   return (
     <div className="grid pb-16 bg">
       <JobDashboard
         initialJobs={initialData?.data ?? []}
-        fingJobsColumns={getFindJobsColumns()}
+        fingJobsColumns={getFindJobsColumns(router)}
         filters={filters}
       />
     </div>
