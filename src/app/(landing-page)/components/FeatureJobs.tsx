@@ -20,16 +20,19 @@ export const FeatureJobs = ({ filters }: { filters: JobFilters }) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center mb-12">
           <h2 className="text-3xl font-bold text-gray-900">Featured Jobs</h2>
-          <Button variant="cveraiOutline">
+          <Button variant="cveraiOutline" onClick={() => router.push("/dashboard/home?tab=find-jobs")}>
             View All <ArrowRight className="w-4 h-4 ml-2" />
           </Button>
         </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {jobs?.data?.map((job, index) => (
             <div
               key={index}
-              className={cn("bg-white rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow p-4 space-y-4", !!job?.emailApply && "shadow-blue-100 shadow-2xl ")}
+              className={cn(
+                "bg-white rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow p-4 space-y-4",
+                !!job?.emailApply && "shadow-blue-100 shadow-2xl "
+              )}
             >
               <div className="flex justify-between">
                 <h3 className="font-medium mb-1 line-clamp-1">{job?.title}</h3>
@@ -116,7 +119,7 @@ export const FeatureJobs = ({ filters }: { filters: JobFilters }) => {
                       );
                     }}
                   >
-                    Auto Apply
+                    {!!job?.emailApply ? "Auto Apply" : "Apply"}
                   </Button>
                 </div>
               </div>

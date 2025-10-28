@@ -26,7 +26,7 @@ export const getFindJobsColumns =
             src={
               !!row.original.companyLogo
                 ? row.original.companyLogo
-                : "/company.svg"
+                : "/placeholder.jpg"
             }
             alt={row.original.companyText}
             className="size-12"
@@ -78,7 +78,6 @@ export const getFindJobsColumns =
         return (
           <div
             onClick={() => {
-              console.log(row.original.id);
               // updateJobs.mutate({
               //   id: String(row.original.id),
               //   data: {

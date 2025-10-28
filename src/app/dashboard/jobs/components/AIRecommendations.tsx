@@ -57,7 +57,11 @@ export const overviewColumns: ColumnDef<IJobType>[] = [
       <div className="flex size-10 items-center justify-center shrink-0">
         <img
           className="shrink-0"
-          src={row.original.companyText}
+          src={
+            !!row.original.companyLogo
+              ? row.original.companyLogo
+              : "/placeholder.jpg"
+          }
           alt={row.original.companyText}
         />
       </div>
@@ -116,10 +120,10 @@ export const overviewColumns: ColumnDef<IJobType>[] = [
   {
     id: "actions",
     enableHiding: false,
-    cell: ({ row }) => {
+    cell: () => {
       return (
         <div className="flex justify-end">
-          <Button variant={"button"} onClick={() => console.log(row)}>
+          <Button variant={"button"} >
             Apply Now
           </Button>
         </div>

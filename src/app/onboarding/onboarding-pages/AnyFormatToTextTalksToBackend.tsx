@@ -63,9 +63,9 @@ const extractDocumentText = async (
   formData.append('language', language);
   formData.append('sanitize', 'true');
 
-  for(const [key, value]  of formData.entries()){
-    console.log('FormData entry:', key , " : ", value);
-  }
+  // for(const [key, value]  of formData.entries()){
+  //   console.log('FormData entry:', key , " : ", value);
+  // }
 
   const response = await fetch(API_BASE_URL, {
     method: 'POST',
@@ -127,7 +127,6 @@ const FileUploadZone: React.FC<FileUploadZoneProps> = ({
 
   const handleFileInput = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      console.log("File input changed:", e.target.files);
       const files = e.target.files;
       if (files && files.length > 0) {
         onFileSelect(files[0]);

@@ -133,7 +133,7 @@ class TextExtractionService {
           logger: (m) => {
             // Optional: Log progress for better UX
             if (m.status === "recognizing text") {
-              console.log(`OCR Progress: ${Math.round(m.progress * 100)}%`);
+              console.info(`OCR Progress: ${Math.round(m.progress * 100)}%`);
             }
           },
         }

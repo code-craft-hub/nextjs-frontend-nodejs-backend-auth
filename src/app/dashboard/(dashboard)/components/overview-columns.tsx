@@ -1,10 +1,5 @@
 import { ColumnDef } from "@tanstack/react-table";
-import {
-  ArrowUpDown,
-  Calendar,
-  DollarSign,
-  MapPin,
-} from "lucide-react";
+import { ArrowUpDown, Calendar, DollarSign, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FaRegBookmark, FaBookmark } from "react-icons/fa";
 export const jobsData = [
@@ -130,7 +125,14 @@ export const overviewColumns: ColumnDef<IJobType>[] = [
     },
     cell: ({ row }) => (
       <div className=" flex items-center justify-center">
-        <img src={row.original.companyText} alt={row.original.companyText} />
+        <img
+          src={
+            !!row.original.companyLogo
+              ? row.original.companyLogo
+              : "/placeholder.jpg"
+          }
+          alt={row.original.companyText}
+        />
       </div>
     ),
   },
@@ -190,7 +192,7 @@ export const overviewColumns: ColumnDef<IJobType>[] = [
     cell: () => {
       return (
         <div className="flex justify-end">
-          <Button variant={'button'} >Apply Now</Button>
+          <Button variant={"button"}>Apply Now</Button>
         </div>
       );
     },
