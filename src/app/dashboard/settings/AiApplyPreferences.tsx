@@ -219,45 +219,45 @@ export const AiApplyPreferences: React.FC = () => {
 
   // Handle switch state changes
   const handleSwitchChange = async (key: string, checked: boolean) => {
-    setSwitchStates((prev: SwitchStates) => {
-      const newState = {
+    const newState = (prev: SwitchStates) => {
+      const updated = {
         ...prev,
         [key]: checked,
       };
 
       // Ensure autoSendApplications and saveAsDrafts are always opposite
       if (key === "autoSendApplications") {
-        newState.saveAsDrafts = !checked;
+        updated.saveAsDrafts = !checked;
       } else if (key === "saveAsDrafts") {
-        newState.autoSendApplications = !checked;
+        updated.autoSendApplications = !checked;
       }
 
       if (key === "pauseForInput") {
-        newState.intelligentAnswers = !checked;
+        updated.intelligentAnswers = !checked;
       } else if (key === "intelligentAnswers") {
-        newState.pauseForInput = !checked;
+        updated.pauseForInput = !checked;
       }
 
       if (key === "autoSubmit") {
-        newState.reviewBeforeSubmit = !checked;
+        updated.reviewBeforeSubmit = !checked;
       } else if (key === "reviewBeforeSubmit") {
-        newState.autoSubmit = !checked;
+        updated.autoSubmit = !checked;
       }
       if (key === "generateTailoredCV") {
-        newState.useMasterCV = !checked;
+        updated.useMasterCV = !checked;
       } else if (key === "useMasterCV") {
-        newState.generateTailoredCV = !checked;
+        updated.generateTailoredCV = !checked;
       }
 
-      return newState;
-    });
+      return updated;
+    };
 
-    // Optional: Add your custom logic here
+    setSwitchStates(newState);
+
     try {
-      const userAIApplyPreferences = {
-        aiApplyPreferences: switchStates,
-      };
-      await updateUser.mutateAsync({ data: userAIApplyPreferences });
+      await updateUser.mutateAsync({
+        data: { aiApplyPreferences: newState(switchStates) },
+      });
     } catch (error) {
       console.error("Error saving settings:", error);
     }

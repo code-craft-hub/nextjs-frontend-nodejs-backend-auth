@@ -127,63 +127,58 @@ ColumnDef<JobType>[] => [
         <div className="flex justify-end">
           {/* <HoverCard>
             <HoverCardTrigger> */}
-              <Button
-                // onClick={() => {
-                //   window.open(row.original.link, "_blank");
-                // }}
+          <Button
+            className="w-full"
+            onClick={async () => {
+              if (!row.original?.emailApply) {
+                window.open(row.original.link, "__blank");
+                return;
+              }
 
-                className="w-full"
+              const { isAuthorized } = await apiService.gmailOauthStatus();
 
-                onClick={async () => {
-                  if (!row.original?.emailApply) {
-                    window.open(row.original.link, "__blank");
-                    return;
+              if (!isAuthorized) {
+                toast.error(
+                  "✨ Go to the Settings page and enable authorization for Cverai to send emails on your behalf. This option is located in the second card.",
+                  {
+                    action: {
+                      label: "Authorize now",
+                      onClick: () =>
+                        router.push(
+                          `/dashboard/settings?tab=ai-applypreference`
+                        ),
+                    },
+                    classNames: {
+                      actionButton:
+                        "!bg-blue-600 hover:!bg-blue-700 !text-white !h-8",
+                    },
                   }
+                );
 
-                  const { isAuthorized } = await apiService.gmailOauthStatus();
+                return;
+              }
 
-                  if (!isAuthorized) {
-                    toast.error(
-                      "✨ Go to the Settings page and enable authorization for Cverai to send emails on your behalf. This option is located in the second card.",
-                      {
-                        action: {
-                          label: "Authorize now",
-                          onClick: () =>
-                            router.push(
-                              `/dashboard/settings?tab=ai-applypreference`
-                            ),
-                        },
-                        classNames: {
-                          actionButton:
-                            "!bg-blue-600 hover:!bg-blue-700 !text-white !h-8",
-                        },
-                      }
-                    );
-
-                    return;
-                  }
-
-                  const params = new URLSearchParams();
-                  params.set(
-                    "jobDescription",
-                    JSON.stringify(row.original?.descriptionText || "")
-                  );
-                  params.set(
-                    "recruiterEmail",
-                    encodeURIComponent(row.original?.emailApply)
-                  );
-                  router.push(
-                    `/dashboard/tailor-cover-letter/${uuidv4()}?${params}&aiApply=true`
-                  );
-                }}
-                variant={"button"}
-              >
-                {row.original?.emailApply ? "Auto Apply" : "Apply Now"}
-                {row.original?.emailApply && (
-                  <Sparkles className="text-3 text-yellow" />
-                )}
-              </Button>
-            {/* </HoverCardTrigger>
+              const params = new URLSearchParams();
+              params.set(
+                "jobDescription",
+                JSON.stringify(row.original?.descriptionText || "")
+              );
+              params.set(
+                "recruiterEmail",
+                encodeURIComponent(row.original?.emailApply)
+              );
+              router.push(
+                `/dashboard/tailor-cover-letter/${uuidv4()}?${params}&aiApply=true`
+              );
+            }}
+            variant={"button"}
+          >
+            {row.original?.emailApply ? "Auto Apply" : "Apply Now"}
+            {row.original?.emailApply && (
+              <Sparkles className="text-3 text-yellow" />
+            )}
+          </Button>
+          {/* </HoverCardTrigger>
             <HoverCardContent className="w-fit font-garamond">
               <p className="w-full p-1 bg-slate-100 mb-1">Recruiter email:</p>
               <p className="w-full p-1 text-xs bg-slate-100">

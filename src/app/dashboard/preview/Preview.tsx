@@ -40,6 +40,8 @@ const Preview = ({
     // error: coverLetterError,
   } = useCareerDoc<CoverLetter>(coverLetterId, COLLECTIONS.COVER_LETTER);
 
+  console.log(user)
+
   const isLoading = isResumeLoading || isCoverLetterLoading;
   // const hasError = resumeError || coverLetterError;
 

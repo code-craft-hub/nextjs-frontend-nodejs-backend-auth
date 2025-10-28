@@ -42,10 +42,10 @@ export const RecentActivityCard = memo(
                 <Button
                   variant={"ghost"}
                   onClick={async () => {
-                    // if (!job?.emailApply) {
-                    //   window.open(job.link, "__blank");
-                    //   return;
-                    // }
+                    if (!job?.emailApply) {
+                      window.open(job.link, "__blank");
+                      return;
+                    }
 
                     const { isAuthorized } =
                       await apiService.gmailOauthStatus();
