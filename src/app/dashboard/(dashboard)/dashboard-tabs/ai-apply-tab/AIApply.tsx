@@ -2,15 +2,11 @@
 import { memo } from "react";
 import { AIApplyInput } from "./AIApplyInput";
 import { RecentActivityCard } from "../../components/RecentActivityCard";
-import {
-  //  apiService,
-  useAuth,
-} from "@/hooks/use-auth";
-import { COLLECTIONS } from "@/lib/utils/constants";
 import { AIApplyDatatable } from "./AIApplyDatatable";
 import { jobsQueries } from "@/lib/queries/jobs.queries";
 import { useQuery } from "@tanstack/react-query";
 import { JobFilters } from "@/lib/types/jobs";
+import { aiApplyQueries } from "@/lib/queries/ai-apply.queries";
 
 export const AIApply = memo(
   ({
@@ -20,13 +16,10 @@ export const AIApply = memo(
     jobDescription: string;
     filters: JobFilters;
   }) => {
-    const { useGetAllDoc } = useAuth();
+    const { data: aiApply } = useQuery(aiApplyQueries.all(filters));
+    const aiApplyData =
+      aiApply?.data?.map((item: any) => ({ ...item.data, id: item?.id })) || [];
 
-  
-    const { data } = useGetAllDoc<any[]>(COLLECTIONS.AI_APPLY);
-
-    const MOCK_DATA =
-      data?.map((item: any) => ({ ...item.data, id: item?.id })) || [];
     const { data: jobs } = useQuery(jobsQueries.all(filters));
 
     return (
@@ -36,7 +29,7 @@ export const AIApply = memo(
         </h1>
         <div className="grid gap-y-16">
           <AIApplyInput jobDescription={jobDescription} />
-          <AIApplyDatatable data={MOCK_DATA} jobs={jobs} />
+          <AIApplyDatatable data={aiApplyData} jobs={jobs} />
           <RecentActivityCard filters={filters} />
         </div>
       </div>

@@ -4,7 +4,6 @@ import { prefetchWithPriority } from '@/lib/query/parallel-prefetch';
 import { HydrationBoundary } from '@/components/hydration-boundary';
 import { resumeQueries } from '@/lib/queries/resume.queries';
 import { authQueries } from '@/lib/queries/auth.queries';
-import { ResumeEditor } from '@/components/resume/resume-editor';
 import { dehydrate } from '@tanstack/react-query';
 import { notFound } from 'next/navigation';
 
@@ -37,7 +36,7 @@ export default async function ResumeEditPage({ params }: ResumeEditPageProps) {
 
     return (
       <HydrationBoundary state={dehydrate(queryClient)}>
-        <ResumeEditor id={params.id} />
+        <div/>
       </HydrationBoundary>
     );
   } catch (error) {

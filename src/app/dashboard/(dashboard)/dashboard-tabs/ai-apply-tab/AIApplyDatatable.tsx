@@ -29,6 +29,7 @@ import {
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react";
 
 export const schema = z.object({
   id: z.number(),
@@ -38,12 +39,8 @@ export const schema = z.object({
   action: z.string(),
   recruiterEmail: z.string(),
   jobDescription: z.string(),
-  resumeData: z.object({
-    id: z.number(),
-  }),
-  coverLetterData: z.object({
-    id: z.number(),
-  }),
+  coverLetterId: z.string(),
+  resumeId: z.string(),
 });
 
 const getColumns = (
@@ -89,7 +86,7 @@ const getColumns = (
     cell: ({ row }) => (
       <div className="">
         <Badge variant="outline" className={cn("border-0 px-1.5 font-inter")}>
-          {row.original.generatedAt}
+          {(row.original?.generatedAt)?.split(".")[0]}
         </Badge>
       </div>
     ),
@@ -98,7 +95,7 @@ const getColumns = (
     accessorKey: "type",
     header: "Application Method",
     cell: ({ row }) => (
-      <div className="flex gap-2">
+      <div className="flex gap-2 items-center justify-center">
         <div>
           <Badge
             variant="outline"
@@ -123,7 +120,7 @@ const getColumns = (
         className="text-blue-500 font-jakarta"
         onClick={() => {
           router.push(
-            `/dashboard/preview?resumeId=${row.original.resumeData.id}&coverLetterId=${row.original.coverLetterData.id}&recruiterEmail=${row.original.recruiterEmail}&jobDescription=${row.original.jobDescription}`
+            `/dashboard/preview?resumeId=${row.original.resumeId}&coverLetterId=${row.original.coverLetterId}&recruiterEmail=${row.original.recruiterEmail}&jobDescription=${row.original.jobDescription}`
           );
         }}
       >
@@ -178,6 +175,20 @@ export function AIApplyDatatable({
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
   });
+
+  const [isLoadingMore, setIsLoadingMore] = React.useState(false);
+
+  const totalRows = data.length;
+  const currentRows = (pagination.pageIndex + 1) * pagination.pageSize;
+  const canLoadMore = currentRows < totalRows;
+
+  const handleLoadMore = async () => {
+    if (!canLoadMore) return;
+    setIsLoadingMore(true);
+
+    table.setPageSize(pagination.pageSize + 10);
+    setIsLoadingMore(false);
+  };
 
   return (
     table.getRowModel().rows?.length !== 0 && (
@@ -235,9 +246,26 @@ export function AIApplyDatatable({
               </TableBody>
             </Table>
           </div>
-          <div className="text-blue-500 text-center border-t pt-4">
-            View more
-          </div>
+          {canLoadMore ? (
+            <div className="flex justify-center border-t py-4">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleLoadMore}
+                disabled={isLoadingMore}
+                className="text-blue-600 hover:text-blue-700"
+              >
+                {isLoadingMore ? (
+                  <Button>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Loading...
+                  </Button>
+                ) : (
+                  "Load more"
+                )}
+              </Button>
+            </div>
+          ) : null}
         </div>
       </Card>
     )

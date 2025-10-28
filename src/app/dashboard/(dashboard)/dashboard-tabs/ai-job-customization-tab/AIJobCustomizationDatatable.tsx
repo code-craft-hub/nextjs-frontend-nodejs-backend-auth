@@ -1,4 +1,7 @@
 import * as React from "react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -15,9 +18,6 @@ import {
 } from "@tanstack/react-table";
 import { z } from "zod";
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Table,
   TableBody,
@@ -29,6 +29,7 @@ import {
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react";
 
 export const schema = z.object({
   id: z.number(),
@@ -83,7 +84,7 @@ const getColumns = (
     cell: ({ row }) => (
       <div className="">
         <Badge variant="outline" className={cn("border-0 px-1.5 font-inter")}>
-          {row.original?.generatedAt?.split(".")[0]}
+          {(row.original?.generatedAt)?.split(".")[0]}
         </Badge>
       </div>
     ),
@@ -92,8 +93,7 @@ const getColumns = (
     accessorKey: "type",
     header: "Application Method",
     cell: ({ row }) => (
-      <div className="flex gap-2">
-        {/* {row.original.applicationMethod.map((method) => ( */}
+      <div className="flex gap-2 items-center justify-center">
         <div>
           <Badge
             variant="outline"
@@ -109,7 +109,6 @@ const getColumns = (
             {row.getValue("type")}
           </Badge>
         </div>
-        {/* ))} */}
       </div>
     ),
   },
@@ -121,13 +120,9 @@ const getColumns = (
         className="text-blue-500 font-jakarta"
         onClick={() => {
           if (row.original.type === "resume") {
-            router.push(
-              `/dashboard/tailor-resume/${row.original.id}`
-            );
+            router.push(`/dashboard/tailor-resume/${row.original.id}`);
           } else if (row.original.type === "cover-letter") {
-            router.push(
-              `/dashboard/tailor-cover-letter/${row.original.id}`
-            );
+            router.push(`/dashboard/tailor-cover-letter/${row.original.id}`);
           } else if (row.original.type === "interview-question") {
             router.push(
               `/dashboard/tailor-interview-question/${row.original.id}`
@@ -146,7 +141,7 @@ export function AIJobCustomizationDatatable({
 }: {
   data: z.infer<typeof schema>[];
 }) {
-  const router = useRouter(); // Add this line
+  const router = useRouter();
 
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
@@ -160,7 +155,9 @@ export function AIJobCustomizationDatatable({
     pageSize: 10,
   });
 
-  const columns = React.useMemo(() => getColumns(router), [router]); // Generate columns with router
+  const [isLoadingMore, setIsLoadingMore] = React.useState(false);
+
+  const columns = React.useMemo(() => getColumns(router), [router]);
 
   const table = useReactTable({
     data,
@@ -172,7 +169,6 @@ export function AIJobCustomizationDatatable({
       columnFilters,
       pagination,
     },
-    // getRowId: (row) => row.id.toString(),
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
@@ -186,6 +182,18 @@ export function AIJobCustomizationDatatable({
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
   });
+
+  const totalRows = data.length;
+  const currentRows = (pagination.pageIndex + 1) * pagination.pageSize;
+  const canLoadMore = currentRows < totalRows;
+
+  const handleLoadMore = async () => {
+    if (!canLoadMore) return;
+    setIsLoadingMore(true);
+
+    table.setPageSize(pagination.pageSize + 10);
+    setIsLoadingMore(false);
+  };
 
   return (
     <Card>
@@ -243,9 +251,26 @@ export function AIJobCustomizationDatatable({
           </TableBody>
         </Table>
       </div>
-      <div className="text-blue-500 text-center border-t -mt-4 pt-4">
-        View more
-      </div>
+      {canLoadMore ? (
+        <div className="flex justify-center border-t py-4">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleLoadMore}
+            disabled={isLoadingMore}
+            className="text-blue-600 hover:text-blue-700"
+          >
+            {isLoadingMore ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Loading...
+              </>
+            ) : (
+              "Load more"
+            )}
+          </Button>
+        </div>
+      ) : null}
     </Card>
   );
 }

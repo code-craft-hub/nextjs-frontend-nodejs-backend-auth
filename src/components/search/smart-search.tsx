@@ -50,7 +50,7 @@ export function SmartSearch() {
             <div className="p-4 text-gray-500 text-center">No results found</div>
           ) : (
             <ul>
-              {data?.data.map((coverLetter) => (
+              {data?.data.map((coverLetter: any) => (
                 <li
                   key={coverLetter.id}
                   className="p-4 border-b last:border-b-0 hover:bg-gray-50 cursor-pointer transition"

@@ -4,32 +4,37 @@ import { memo, useMemo } from "react";
 import { RecentActivityCard } from "../../components/RecentActivityCard";
 import { AIJobCustomizationDatatable } from "./AIJobCustomizationDatatable";
 import { AIJobCustomizationInput } from "./AIJobCustomizationInput";
-import { useAuth } from "@/hooks/use-auth";
-import { COLLECTIONS } from "@/lib/utils/constants";
-import { CoverLetter, InterviewQuestion, Resume } from "@/types";
 import { isEmpty } from "lodash";
 import { JobFilters } from "@/lib/types/jobs";
+import { useQuery } from "@tanstack/react-query";
+import { resumeQueries } from "@/lib/queries/resume.queries";
+import { coverLetterQueries } from "@/lib/queries/cover-letter.queries";
+import { interviewQuestionQueries } from "@/lib/queries/interview.queries";
+import { shuffleArray } from "@/lib/utils/helpers";
 
 export const AIJobCustomization = memo(
   ({ filters }: { filters: JobFilters }) => {
-    const { useGetAllDoc } = useAuth();
-    const { data: INTERVIEW_QUESTION } = useGetAllDoc<InterviewQuestion[]>(
-      COLLECTIONS.INTERVIEW_QUESTION
+    const { data: resumes } = useQuery(resumeQueries.all(filters));
+    const { data: coverLetter } = useQuery(coverLetterQueries.all(filters));
+    const { data: interviewQuestion } = useQuery(
+      interviewQuestionQueries.all(filters)
     );
-    const { data: COVER_LETTER } = useGetAllDoc<CoverLetter[]>(
-      COLLECTIONS.COVER_LETTER
-    );
-    const { data: RESUME } = useGetAllDoc<Resume[]>(COLLECTIONS.RESUME);
 
-    const data = useMemo(() => {
-      return (
-        [
-          ...(INTERVIEW_QUESTION ?? []),
-          ...(COVER_LETTER ?? []),
-          ...(RESUME ?? []),
-        ]?.map((item: any) => ({ ...item.data, id: item?.id })) || []
-      );
-    }, [INTERVIEW_QUESTION, COVER_LETTER, RESUME]);
+
+
+  const data = useMemo(() => {
+    const merged = [
+      ...(interviewQuestion?.data ?? []),
+      ...(coverLetter?.data ?? []),
+      ...(resumes?.data ?? []),
+    ].map((item: any) => ({
+      ...item.data,
+      id: item?.id,
+      _type: item?.type ?? "unknown",
+    }));
+
+    return shuffleArray(merged);
+  }, [interviewQuestion?.data, coverLetter?.data, resumes?.data]);
 
     return (
       <div className="flex flex-col font-poppins h-screen relative">

@@ -1,11 +1,4 @@
-export interface User {
-  id: string;
-  email: string;
-  name: string;
-  role: string;
-  createdAt: string;
-  updatedAt: string;
-}
+import { IUser } from "@/types";
 
 export interface ProfileData {
   jobLevelPreference: string;
@@ -27,7 +20,7 @@ export interface ProfileResponse {
 }
 
 export interface AuthSession {
-  user: User;
+  user: Partial<IUser>;
   expiresAt: string;
 }
 
@@ -42,16 +35,6 @@ export interface RegisterData {
   name: string;
 }
 
-export interface CoverLetter {
-  id: string;
-  userId: string;
-  title: string;
-  content: string;
-  jobTitle?: string;
-  company?: string;
-  createdAt: string;
-  updatedAt: string;
-}
 
 export interface InterviewQuestion {
   id: string;
@@ -64,15 +47,6 @@ export interface InterviewQuestion {
   updatedAt: string;
 }
 
-export interface Resume {
-  id: string;
-  userId: string;
-  title: string;
-  content: any; // JSON structure
-  template?: string;
-  createdAt: string;
-  updatedAt: string;
-}
 
 export interface Blog {
   id: string;

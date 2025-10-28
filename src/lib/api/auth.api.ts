@@ -3,7 +3,6 @@ import type {
   AuthSession,
   LoginCredentials,
   RegisterData,
-  User,
 } from "@/lib/types";
 
 export const authApi = {
@@ -11,7 +10,7 @@ export const authApi = {
   getSession: () => api.get<AuthSession>("/auth/session"),
 
   // Get current user profile
-  getProfile: () => api.get<User>("/auth/users"),
+  getProfile: () => api.get<any>("/auth/users"),
 
   // Login
   login: (credentials: LoginCredentials) =>

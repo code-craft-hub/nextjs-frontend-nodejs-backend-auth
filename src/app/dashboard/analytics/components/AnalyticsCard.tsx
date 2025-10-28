@@ -2,7 +2,6 @@
 import { cn } from "@/lib/utils";
 import React from "react";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { randomNumber } from "@/lib/utils/helpers";
 
 interface StatItem {
   id: string;
@@ -19,7 +18,7 @@ interface StatItem {
 const statsData: StatItem[] = [
   {
     id: "1",
-    count: randomNumber(1),
+    count: 0,
     title: "Auto Applications",
     subtitle: "18 minutes saved per application",
     iconBg: "bg-white",
@@ -30,7 +29,7 @@ const statsData: StatItem[] = [
   },
   {
     id: "2",
-    count: randomNumber(1),
+    count: 0,
     title: "Tailored Resume",
     subtitle: "12 tailored resumes this week",
     iconBg: "bg-blue-50",
@@ -41,7 +40,7 @@ const statsData: StatItem[] = [
   },
   {
     id: "3",
-    count: randomNumber(0),
+    count: 0,
     title: "Tailored Cover Letters",
     subtitle: "4 tailored cover letters this week",
     iconBg: "bg-green-50",
@@ -52,7 +51,7 @@ const statsData: StatItem[] = [
   },
   {
     id: "4",
-    count: randomNumber(1),
+    count: 0,
     title: "Tailored Interview Questions",
     subtitle: "4 tailored interview questions this week",
     iconBg: "bg-orange-50",
@@ -191,6 +190,7 @@ const StatCard: React.FC<{ stat: StatItem }> = ({ stat }) => {
 };
 
 export const AnalyticsCard: React.FC = () => {
+  // const {data: user} = useQuery(userQueries.detail())
   return (
     <div className="grid grid-cols-1">
       <ScrollArea>

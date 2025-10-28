@@ -2,7 +2,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { resumeApi, type CreateResumeData, type UpdateResumeData } from '@/lib/api/resume.api';
 import { queryKeys } from '@/lib/query/keys';
-import type { Resume, PaginatedResponse } from '@/lib/types';
+import type {  PaginatedResponse } from '@/lib/types';
 
 export function useCreateResumeMutation() {
   const queryClient = useQueryClient();
@@ -14,7 +14,7 @@ export function useCreateResumeMutation() {
 
       const previousResumes = queryClient.getQueryData(queryKeys.resumes.lists());
 
-      queryClient.setQueriesData<PaginatedResponse<Resume>>(
+      queryClient.setQueriesData<PaginatedResponse<any>>(
         { queryKey: queryKeys.resumes.lists() },
         (old) => {
           if (!old) return old;
@@ -27,7 +27,7 @@ export function useCreateResumeMutation() {
                 ...newResume,
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString(),
-              } as Resume,
+              } as any,
               ...old.data,
             ],
             total: old.total + 1,
@@ -62,12 +62,12 @@ export function useUpdateResumeMutation() {
 
       const previousResume = queryClient.getQueryData(queryKeys.resumes.detail(id));
 
-      queryClient.setQueryData<Resume>(queryKeys.resumes.detail(id), (old) => {
+      queryClient.setQueryData<any>(queryKeys.resumes.detail(id), (old: any) => {
         if (!old) return old;
         return { ...old, ...data, updatedAt: new Date().toISOString() };
       });
 
-      queryClient.setQueriesData<PaginatedResponse<Resume>>(
+      queryClient.setQueriesData<PaginatedResponse<any>>(
         { queryKey: queryKeys.resumes.lists() },
         (old) => {
           if (!old) return old;
@@ -104,7 +104,7 @@ export function useDeleteResumeMutation() {
 
       const previousResumes = queryClient.getQueryData(queryKeys.resumes.lists());
 
-      queryClient.setQueriesData<PaginatedResponse<Resume>>(
+      queryClient.setQueriesData<PaginatedResponse<any>>(
         { queryKey: queryKeys.resumes.lists() },
         (old) => {
           if (!old) return old;

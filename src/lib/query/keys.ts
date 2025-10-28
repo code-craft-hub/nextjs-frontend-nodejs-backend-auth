@@ -52,6 +52,17 @@ export const queryKeys = {
     detail: (id: string) => [...queryKeys.resumes.details(), id] as const,
   },
 
+
+  // AI Apply keys
+  aiApply: {
+    all: ["ai-apply"] as const,
+    lists: () => [...queryKeys.aiApply.all, "list"] as const,
+    list: (filters: Record<string, any>) =>
+      [...queryKeys.aiApply.lists(), filters] as const,
+    details: () => [...queryKeys.aiApply.all, "detail"] as const,
+    detail: (id: string) => [...queryKeys.aiApply.details(), id] as const,
+  },
+
   // Blog keys
   blogs: {
     all: ["blogs"] as const,

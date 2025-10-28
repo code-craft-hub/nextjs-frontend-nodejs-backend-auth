@@ -69,7 +69,7 @@ export async function apiClient<T>(
       }
     }
 
-    console.log("🌐 Final URL:", url);
+    // console.log("🌐 Final URL:", url);
 
     const headers: Record<string, string> = {
       "Content-Type": "application/json",

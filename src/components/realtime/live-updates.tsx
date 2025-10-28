@@ -34,7 +34,6 @@ export function LiveUserStatus() {
       {session && (
         <div className="space-y-2">
           <p className="text-sm">
-            <span className="font-medium">User:</span> {session.user.name}
           </p>
           <p className="text-sm">
             <span className="font-medium">Expires:</span>{' '}

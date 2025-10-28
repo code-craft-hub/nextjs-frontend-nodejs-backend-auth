@@ -97,6 +97,7 @@ export const AiApplyPreferences: React.FC = () => {
         },
       ],
     },
+
     {
       section: "CV Strategy",
       heading: true,
@@ -112,6 +113,23 @@ export const AiApplyPreferences: React.FC = () => {
           description: "Let Cver customize your CV for each job applications",
           type: "toggle",
           key: "generateTailoredCV",
+        },
+      ],
+    },
+    {
+      child: true,
+      options: [
+        {
+          label: "Auto-send Applications",
+          description: "Automatically send applications via email",
+          type: "toggle",
+          key: "autoSendApplications",
+        },
+        {
+          label: "Save as Drafts",
+          description: "Save applications as drafts for review",
+          type: "toggle",
+          key: "saveAsDrafts",
         },
       ],
     },
@@ -154,23 +172,6 @@ export const AiApplyPreferences: React.FC = () => {
       ],
     },
 
-    {
-      child: true,
-      options: [
-        {
-          label: "Auto-send Applications",
-          description: "Automatically send applications via email",
-          type: "toggle",
-          key: "autoSendApplications",
-        },
-        {
-          label: "Save as Drafts",
-          description: "Save applications as drafts for review",
-          type: "toggle",
-          key: "saveAsDrafts",
-        },
-      ],
-    },
     {
       section: "WhatsApp Integration",
       img: "/message.svg",

@@ -1,11 +1,11 @@
 // lib/api/user.server.api.ts
 import { serverApi } from './server.api';
-import { User, PaginationParams, PaginatedResponse } from '@/lib/types';
+import { PaginationParams, PaginatedResponse } from '@/lib/types';
 
 export const userServerApi = {
   getUsers: (_params?: PaginationParams) =>
-    serverApi.get<PaginatedResponse<User>>('/users', ),
+    serverApi.get<PaginatedResponse<any>>('/users', ),
 
   getUser: () => 
-    serverApi.get<User>(`/users`),
+    serverApi.get<any>(`/users`),
 };

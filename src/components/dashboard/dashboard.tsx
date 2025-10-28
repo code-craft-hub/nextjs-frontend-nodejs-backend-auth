@@ -73,7 +73,7 @@ export function Dashboard() {
             <p className="text-gray-500">No cover letters yet</p>
           ) : (
             <ul className="space-y-2">
-              {coverLetters?.data.map((cl) => (
+              {coverLetters?.data.map((cl: any) => (
                 <li
                   key={cl.id}
                   className="p-3 border rounded hover:bg-gray-50 cursor-pointer"
@@ -96,7 +96,7 @@ export function Dashboard() {
             <p className="text-gray-500">No resumes yet</p>
           ) : (
             <ul className="space-y-2">
-              {resumes?.data.map((resume) => (
+              {resumes?.data.map((resume:any) => (
                 <li
                   key={resume.id}
                   className="p-3 border rounded hover:bg-gray-50 cursor-pointer"

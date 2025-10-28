@@ -206,7 +206,8 @@ export const apiService = {
     coverLetterData: CoverLetter | undefined,
     resumeData: Resume | undefined,
     recruiterEmail: string,
-    jobDescription: string
+    jobDescription: string,
+    autoSendApplications?: boolean
   ): Promise<Partial<IUser>> => {
     try {
       const { data } = await authClient.post(
@@ -217,6 +218,7 @@ export const apiService = {
           resumeData,
           recruiterEmail,
           jobDescription,
+          autoSendApplications,
         }
       );
 

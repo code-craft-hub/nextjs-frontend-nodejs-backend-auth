@@ -1,6 +1,6 @@
 import { IUser } from "@/types";
 import { api } from "./client";
-import type { User, PaginatedResponse, PaginationParams } from "@/lib/types";
+import type {  PaginatedResponse, PaginationParams } from "@/lib/types";
 
 export interface CreateUserData {
   email: string;
@@ -16,7 +16,7 @@ export interface UpdateUserData<T = never> {
 export const userApi = {
   // Get all users (with pagination)
   getUsers: (_params?: PaginationParams) =>
-    api.get<PaginatedResponse<User>>("/users"),
+    api.get<PaginatedResponse<IUser>>("/users"),
 
   // Get user by ID
   getUser: async () => {
@@ -25,10 +25,10 @@ export const userApi = {
   },
 
   // Create user
-  createUser: (data: CreateUserData) => api.post<User>("/users", data),
+  createUser: (data: CreateUserData) => api.post<IUser>("/users", data),
 
   // Update user
-  updateUser: (data: UpdateUserData) => api.put<User>(`/update-user`, data),
+  updateUser: (data: UpdateUserData) => api.put<IUser>(`/update-user`, data),
 
   // Delete user
   deleteUser: (id: string) => api.delete<void>(`/users/${id}`),

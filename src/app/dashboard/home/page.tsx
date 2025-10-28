@@ -9,6 +9,10 @@ import { jobsQueries } from "@/lib/queries/jobs.queries";
 import { dehydrate } from "@tanstack/react-query";
 import { JobFilters } from "@/lib/types/jobs";
 import { userQueries } from "@/lib/queries/user.queries";
+import { resumeQueries } from "@/lib/queries/resume.queries";
+import { aiApplyQueries } from "@/lib/queries/ai-apply.queries";
+import { interviewQuestionQueries } from "@/lib/queries/interview.queries";
+import { coverLetterQueries } from "@/lib/queries/cover-letter.queries";
 export const metadata: Metadata = {
   title: "Cverai Dashboard",
   description: "User dashboard",
@@ -21,26 +25,37 @@ export default async function HomePage({
 }) {
   await requireOnboarding();
   const queryClient = createServerQueryClient();
-   await queryClient.fetchQuery(userQueries.detail());
-  // const defaultJobRole = user?.dataSource?.find(
-  //   (ds) => ds.ProfileID === user?.defaultactiveDataSource
-  // );
-  // const roles =
-  //   defaultJobRole?.roleOfInterest?.map((role: any) => role.value).join(", ") ||
-  //   "None";
-
+  await queryClient.fetchQuery(userQueries.detail());
   const { tab, jobDescription } = await searchParams;
 
   const filters: JobFilters = {
     page: 1,
     limit: 20,
-    // jobRole: encodeURIComponent(roles),
   };
-
   await prefetchWithPriority(queryClient, [
     {
       queryKey: jobsQueries.all(filters).queryKey,
       queryFn: jobsQueries.all(filters).queryFn,
+      priority: "high",
+    },
+    {
+      queryKey: resumeQueries.all(filters).queryKey,
+      queryFn: resumeQueries.all(filters).queryFn,
+      priority: "high",
+    },
+    {
+      queryKey: interviewQuestionQueries.all(filters).queryKey,
+      queryFn: interviewQuestionQueries.all(filters).queryFn,
+      priority: "high",
+    },
+    {
+      queryKey: coverLetterQueries.all(filters).queryKey,
+      queryFn: coverLetterQueries.all(filters).queryFn,
+      priority: "high",
+    },
+    {
+      queryKey: aiApplyQueries.all(filters).queryKey,
+      queryFn: aiApplyQueries.all(filters).queryFn,
       priority: "high",
     },
   ]);

@@ -2,7 +2,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { coverLetterApi, type CreateCoverLetterData, type UpdateCoverLetterData } from '@/lib/api/cover-letter.api';
 import { queryKeys } from '@/lib/query/keys';
-import type { CoverLetter, PaginatedResponse } from '@/lib/types';
+import type { PaginatedResponse } from '@/lib/types';
+import { CoverLetter } from '@/types';
 
 export function useCreateCoverLetterMutation() {
   const queryClient = useQueryClient();
@@ -27,7 +28,7 @@ export function useCreateCoverLetterMutation() {
                 ...newCoverLetter,
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString(),
-              } as CoverLetter,
+              } as any,
               ...old.data,
             ],
             total: old.total + 1,

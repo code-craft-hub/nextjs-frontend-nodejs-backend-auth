@@ -10,7 +10,6 @@ import {
   useDuplicateCoverLetterMutation,
 } from '@/lib/mutations/cover-letter.mutations';
 import { useState } from 'react';
-import type { CoverLetter } from '@/lib/types';
 
 export function CoverLetterManager() {
   const [page, setPage] = useState(1);
@@ -60,7 +59,7 @@ export function CoverLetterManager() {
     // Duplicate appears instantly in list
   };
 
-  const startEdit = (coverLetter: CoverLetter) => {
+  const startEdit = (coverLetter: any) => {
     setEditingId(coverLetter.id);
     setFormData({
       title: coverLetter.title,
@@ -184,7 +183,7 @@ export function CoverLetterManager() {
           ) : (
             <>
               <div className="space-y-4">
-                {data?.data.map((coverLetter) => (
+                {data?.data.map((coverLetter: any) => (
                   <div
                     key={coverLetter.id}
                     className={`bg-white rounded-lg shadow p-6 transition ${

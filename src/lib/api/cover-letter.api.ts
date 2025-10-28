@@ -1,7 +1,7 @@
 // lib/api/cover-letter.api.ts
+import { CoverLetter } from "@/types";
 import { api } from "./client";
 import type {
-  CoverLetter,
   PaginatedResponse,
   PaginationParams,
 } from "@/lib/types";
@@ -28,24 +28,32 @@ export interface CoverLetterFilters extends PaginationParams {
 
 export const coverLetterApi = {
   // Get all cover letters
-  getCoverLetters: (_params?: CoverLetterFilters) =>
-    api.get<PaginatedResponse<CoverLetter>>("/cover-letters"),
+  getCoverLetters: (params?: CoverLetterFilters) =>
+    api.get<PaginatedResponse<CoverLetter>>(
+      "/cover-letter/paginated?" +
+        new URLSearchParams(params as Record<string, string>).toString()
+    ),
 
   // Get cover letter by ID
-  getCoverLetter: (id: string) => api.get<CoverLetter>(`/cover-letters/${id}`),
+  getCoverLetter: async (id: string) => {
+    const { data } = await api.get<{ data: CoverLetter }>(
+      `/cover-letter/${id}`
+    );
+    return data;
+  },
 
   // Create cover letter
   createCoverLetter: (data: CreateCoverLetterData) =>
-    api.post<CoverLetter>("/cover-letters", data),
+    api.post<CoverLetter>("/cover-letter", data),
 
   // Update cover letter
   updateCoverLetter: (id: string, data: UpdateCoverLetterData) =>
-    api.patch<CoverLetter>(`/cover-letters/${id}`, data),
+    api.patch<CoverLetter>(`/cover-letter/${id}`, data),
 
   // Delete cover letter
-  deleteCoverLetter: (id: string) => api.delete<void>(`/cover-letters/${id}`),
+  deleteCoverLetter: (id: string) => api.delete<void>(`/cover-letter/${id}`),
 
   // Duplicate cover letter
   duplicateCoverLetter: (id: string) =>
-    api.post<CoverLetter>(`/cover-letters/${id}/duplicate`),
+    api.post<CoverLetter>(`/cover-letter/${id}/duplicate`),
 };

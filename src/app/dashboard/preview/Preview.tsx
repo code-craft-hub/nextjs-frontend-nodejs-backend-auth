@@ -1,16 +1,18 @@
 "use client";
 
-import { apiService, useAuth } from "@/hooks/use-auth";
+import { apiService } from "@/hooks/use-auth";
 import { EditableResume } from "../(dashboard)/ai-apply/components/resume/EditableResume";
 import { ProgressIndicator } from "../(dashboard)/ai-apply/progress-indicator";
 import TailorCoverLetterDisplay from "../tailor-cover-letter/[coverLetterId]/TailorCoverLetterDisplay";
 import { COLLECTIONS } from "@/lib/utils/constants";
-import { CoverLetter, Resume } from "@/types";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
+import { userQueries } from "@/lib/queries/user.queries";
+import { resumeQueries } from "@/lib/queries/resume.queries";
+import { coverLetterQueries } from "@/lib/queries/cover-letter.queries";
 
 const Preview = ({
   coverLetterId,
@@ -25,32 +27,43 @@ const Preview = ({
 }) => {
   const [activeStep, setActiveStep] = useState(3);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { user, useCareerDoc } = useAuth();
   const router = useRouter();
 
-  const {
-    data: resumeData,
-    isLoading: isResumeLoading,
-    // error: resumeError,
-  } = useCareerDoc<Resume>(resumeId, COLLECTIONS.RESUME);
+  const { data: user } = useQuery(userQueries.detail());
 
-  const {
-    data: coverLetterData,
-    isLoading: isCoverLetterLoading,
-    // error: coverLetterError,
-  } = useCareerDoc<CoverLetter>(coverLetterId, COLLECTIONS.COVER_LETTER);
+  const { data: resumeData } = useQuery(resumeQueries.detail(resumeId));
+  const { data: coverLetterData } = useQuery(
+    coverLetterQueries.detail(coverLetterId)
+  );
 
-  console.log(user)
 
-  const isLoading = isResumeLoading || isCoverLetterLoading;
-  // const hasError = resumeError || coverLetterError;
 
   const handleSubmit = async () => {
+    if (!user?.aiApplyPreferences) {
+      toast.error(
+        "Visit the Settings to configure your AI Apply Preferences. Enable Auto Apply in the third card section to get started.",
+        {
+          action: {
+            label: "Enable",
+            onClick: () =>
+              router.push(`/dashboard/settings?tab=ai-applypreference`),
+          },
+          classNames: {
+            // toast: "!bg-yellow-50 !border-yellow-200",
+            actionButton: "!bg-blue-600 hover:!bg-blue-700 !text-white !h-8",
+          },
+        }
+      );
+
+      return;
+    }
+
+
+
     if (!user || !coverLetterData || !resumeData) {
       toast.error("Missing required data");
       return;
     }
-
     try {
       setIsSubmitting(true);
       await apiService.sendApplication(
@@ -58,7 +71,8 @@ const Preview = ({
         coverLetterData,
         resumeData,
         recruiterEmail,
-        jobDescription
+        jobDescription,
+        user?.aiApplyPreferences.autoSendApplications
       );
       setActiveStep(4);
       toast.success("Application Submitted Successfully!");
@@ -69,6 +83,9 @@ const Preview = ({
           action: {
             label: "Authenticate",
             onClick: () => router.push("/dashboard/settings"),
+          },
+          classNames: {
+            actionButton: "!bg-blue-600 hover:!bg-blue-700 !text-white !h-8",
           },
         }
       );
@@ -85,16 +102,6 @@ const Preview = ({
     toast.success("Resume and Cover Letter deleted successfully");
     router.push("/dashboard/home");
   };
-
-  // Show loading state
-  if (isLoading) {
-    return (
-      <div className="space-y-4 sm:space-y-8">
-        <ProgressIndicator activeStep={activeStep} />
-        <EmptySkeleton />
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-4 sm:space-y-8">
@@ -129,36 +136,3 @@ const Preview = ({
 };
 
 export default Preview;
-
-const EmptySkeleton = () => {
-  return (
-    <div className="grid grid-cols-1 gap-4 sm:gap-6">
-      <div className="bg-white border-b w-full border-slate-200 shadow-md rounded-md flex flex-col">
-        <div className="p-4 sm:p-8 overflow-y-auto w-full">
-          <div className="whitespace-pre-wrap text-gray-800 leading-relaxed font-outfit text-md flex flex-col gap-4 sm:gap-8">
-            <div className="flex gap-4 flex-col">
-              {Array.from({ length: 3 }).map((_, index) => (
-                <Skeleton key={index} className="w-[50%] h-8" />
-              ))}
-            </div>
-            <div className="flex gap-4 flex-col">
-              {Array.from({ length: 3 }).map((_, index) => (
-                <Skeleton key={index} className="w-full h-8" />
-              ))}
-            </div>
-            <div className="flex gap-8 flex-col">
-              {Array.from({ length: 3 }).map((_, index) => (
-                <Skeleton key={index} className="w-full h-44" />
-              ))}
-            </div>
-            <div className="flex gap-4 flex-col">
-              {Array.from({ length: 3 }).map((_, index) => (
-                <Skeleton key={index} className="w-[50%] h-8" />
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};

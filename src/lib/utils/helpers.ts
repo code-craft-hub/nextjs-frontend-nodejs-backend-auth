@@ -129,19 +129,29 @@ export function validateOrCreateDate(inputDate: string | Date): Date {
   return date;
 }
 
-
-
+/**
+ * Fisher-Yates Shuffle — industry-standard unbiased shuffle algorithm.
+ * Runs in O(n) time, safe for large datasets, mutation-free.
+ */
+export const shuffleArray = <T>(arr: T[]): T[] => {
+  const shuffled = [...arr];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+};
 
 export const humanDate = (input: any): string => {
   try {
-
     if (!input) return formatDistanceToNow(new Date(), { addSuffix: true });
 
     const date = input instanceof Date ? input : new Date(input);
 
-    if (!isValid(date)) return formatDistanceToNow(new Date(), { addSuffix: true });
+    if (!isValid(date))
+      return formatDistanceToNow(new Date(), { addSuffix: true });
 
-    // if(isNaN(date.getTime())) 
+    // if(isNaN(date.getTime()))
 
     return formatDistanceToNow(date, { addSuffix: true });
   } catch (err) {

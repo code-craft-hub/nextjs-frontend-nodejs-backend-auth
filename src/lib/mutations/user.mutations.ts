@@ -5,7 +5,8 @@ import {
   type CreateUserData,
 } from "@/lib/api/user.api";
 import { queryKeys } from "@/lib/query/keys";
-import type { User, PaginatedResponse } from "@/lib/types";
+import type { PaginatedResponse } from "@/lib/types";
+import { IUser } from "@/types";
 
 export function useCreateUserMutation() {
   const queryClient = useQueryClient();
@@ -20,7 +21,7 @@ export function useCreateUserMutation() {
       const previousUsers = queryClient.getQueryData(queryKeys.users.lists());
 
       // Optimistically update lists
-      queryClient.setQueriesData<PaginatedResponse<User>>(
+      queryClient.setQueriesData<PaginatedResponse<Partial<IUser>>>(
         { queryKey: queryKeys.users.lists() },
         (old) => {
           if (!old) return old;
@@ -32,7 +33,7 @@ export function useCreateUserMutation() {
                 ...newUser,
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString(),
-              } as User,
+              } as Partial<IUser>,
               ...old.data,
             ],
             total: old.total + 1,
@@ -70,13 +71,13 @@ export function useUpdateUserMutation() {
     //   const previousUser = queryClient.getQueryData(queryKeys.users.detail());
 
     //   // Optimistically update detail
-    //   queryClient.setQueryData<User>(queryKeys.users.detail(), (old) => {
+    //   queryClient.setQueryData<IUser>(queryKeys.users.detail(), (old) => {
     //     if (!old) return old;
     //     return { ...old, ...data, updatedAt: new Date().toISOString() };
     //   });
 
     //   // Update in lists
-    //   queryClient.setQueriesData<PaginatedResponse<User>>(
+    //   queryClient.setQueriesData<PaginatedResponse<IUser>>(
     //     { queryKey: queryKeys.users.lists() },
     //     (old) => {
     //       if (!old) return old;
@@ -119,13 +120,13 @@ export function useDeleteUserMutation() {
       const previousUsers = queryClient.getQueryData(queryKeys.users.lists());
 
       // Optimistically remove from lists
-      queryClient.setQueriesData<PaginatedResponse<User>>(
+      queryClient.setQueriesData<PaginatedResponse<IUser>>(
         { queryKey: queryKeys.users.lists() },
         (old) => {
           if (!old) return old;
           return {
             ...old,
-            data: old.data.filter((user) => user.id !== id),
+            data: old.data.filter((user) => user.uid !== id),
             total: old.total - 1,
           };
         }
