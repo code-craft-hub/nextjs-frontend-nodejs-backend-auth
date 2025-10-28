@@ -34,6 +34,7 @@ export type JobType = {
   emailApply: string;
   postedAt: string;
   scrapedDate: string;
+  scrapedAt: string;
   sponsorCategory: string;
   employmentType?: string;
 };

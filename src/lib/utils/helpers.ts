@@ -134,6 +134,7 @@ export function validateOrCreateDate(inputDate: string | Date): Date {
 
 export const humanDate = (input: any): string => {
   try {
+
     if (!input) return formatDistanceToNow(new Date(), { addSuffix: true });
 
     const date = input instanceof Date ? input : new Date(input);

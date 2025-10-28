@@ -29,7 +29,7 @@ export const RecentActivityCard = memo(
             >
               <div className="shrink-0">
                 <img
-                  src={!!job.companyLogo ? job.companyLogo : "/company.svg"}
+                  src={!!job.companyLogo ? job.companyLogo : "/placeholder.jpg"}
                   alt=""
                   loading="lazy"
                   className="size-12"
@@ -86,9 +86,7 @@ export const RecentActivityCard = memo(
                   }}
                   className="absolute top-4 right-4"
                 >
-                  {!!job?.emailApply && (
-                    <MoreHorizontal className="w-4 h-4 text-" />
-                  )}
+                  {<MoreHorizontal className="w-4 h-4 text-" />}
                 </Button>
                 <p className="font-poppins text-cverai-brown text-xs">
                   <span className="max-w-sm overflow-hidden capitalize">

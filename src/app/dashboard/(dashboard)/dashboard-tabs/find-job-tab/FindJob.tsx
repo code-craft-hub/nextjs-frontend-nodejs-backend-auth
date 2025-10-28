@@ -45,7 +45,11 @@ export const getFindJobsColumns =
               {row.getValue("title")}
             </div>
             <div className="bg-blue-50 rounded text-blue-600 px-2 py-1">
-              <span className="text-2xs">{row.original.jobType}</span>
+              <span className="text-2xs">
+                {!!row.original.jobType
+                  ? row.original.jobType
+                  : row.original.employmentType}
+              </span>
             </div>
           </div>
           <div className="flex gap-x-4 mt-1">
@@ -56,13 +60,13 @@ export const getFindJobsColumns =
             <p className="flex gap-1 text-gray-400 items-center">
               <DollarSign className="size-3" />
               <span className="text-2xs">
-                {row.original?.salary ?? "Not disclosed"}
+                {!!row.original?.salary ? row.original?.salary : "Not disclosed"}
               </span>
             </p>
             <p className="flex gap-1 text-gray-400 items-center">
               <Calendar className="size-3" />
               <span className="text-2xs">
-                {humanDate(row.original?.scrapedDate)}
+                {humanDate(row.original?.scrapedAt)}
               </span>
             </p>
             <p className="text-2xs text-green-400">{randomPercentage()}</p>
@@ -129,9 +133,8 @@ export const FindJob = memo(({ filters }: { filters: JobFilters }) => {
   // const updateJobs = useUpdateJobMutation();
 
   // Generate columns with the mutation
-  const columns =
-    getFindJobsColumns();
-    // updateJobs
+  const columns = getFindJobsColumns();
+  // updateJobs
 
   return (
     <div className="flex flex-col font-poppins h-screen relative">
