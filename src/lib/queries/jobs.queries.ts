@@ -45,7 +45,7 @@ export const jobsQueries = {
         return undefined;
       },
       initialPageParam: 1,
-      staleTime: 10 * 60 * 1000, // Match your regular query staleTime
+      staleTime: 10 * 60 * 60 * 1000, // Match your regular query staleTime
     });
   },
 
