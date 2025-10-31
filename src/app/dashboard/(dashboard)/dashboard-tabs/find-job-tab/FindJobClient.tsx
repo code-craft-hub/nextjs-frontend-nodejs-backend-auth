@@ -31,7 +31,6 @@ export default function JobDashboard({
   fingJobsColumns: any;
   filters: Omit<JobFilters, "page">;
   hideToMenus?: boolean;
-
 }) {
   const router = useRouter();
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -41,14 +40,11 @@ export default function JobDashboard({
   const [searchValue, setSearchValue] = useState("");
   const [isAutoFetching, setIsAutoFetching] = useState(false);
 
-  // Remove 'page' from filters if present
   const { page, ...infiniteFilters } = filters as any;
 
-  // Use infinite query
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     useInfiniteQuery(jobsQueries.infinite(infiniteFilters));
 
-  // Flatten all pages into a single array
   const allJobs = useMemo(() => {
     return data?.pages.flatMap((page) => page.data) ?? initialJobs;
   }, [data, initialJobs]);
@@ -59,7 +55,6 @@ export default function JobDashboard({
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
-    // REMOVED: getPaginationRowModel() - This was limiting display to 10 items
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
@@ -72,14 +67,12 @@ export default function JobDashboard({
     },
   });
 
-  // Auto-fetch logic when search returns no results
   useEffect(() => {
     const checkAndFetchMore = async () => {
       const currentSearchValue = table
         .getColumn("title")
         ?.getFilterValue() as string;
 
-      // Only proceed if there's a search value
       if (!currentSearchValue || currentSearchValue.trim() === "") {
         setIsAutoFetching(false);
         return;
@@ -87,7 +80,6 @@ export default function JobDashboard({
 
       const filteredRows = table.getFilteredRowModel().rows;
 
-      // If no results found and there are more pages, fetch next page
       if (filteredRows.length === 0 && hasNextPage && !isFetchingNextPage) {
         setIsAutoFetching(true);
         await fetchNextPage();
@@ -96,9 +88,7 @@ export default function JobDashboard({
       }
     };
 
-    // Debounce the check to avoid too many calls
     const timeoutId = setTimeout(checkAndFetchMore, 300);
-
     return () => clearTimeout(timeoutId);
   }, [
     table.getColumn("title")?.getFilterValue(),
@@ -120,31 +110,33 @@ export default function JobDashboard({
 
   return (
     <div className="w-full flex flex-col gap-6">
-      {!hideToMenus && <ScrollArea className="grid grid-cols-1">
-        <div className="flex flex-row gap-4 py-4 mx-auto w-fit">
-          {menuItems.map((item) => (
-            <div
-              key={item.id}
-              className={cn(
-                item.bgColor,
-                "flex justify-between p-4 items-center rounded-md w-64 hover:shadow-sm hover:cursor-pointer"
-              )}
-              onClick={() => {
-                router.push(item.url);
-              }}
-            >
-              <div className="">
-                <h1 className="font-bold mb-1">{item.count}</h1>
-                <p className="text-xs">{item.label}</p>
+      {!hideToMenus && (
+        <ScrollArea className="grid grid-cols-1">
+          <div className="flex flex-row gap-4 py-4 mx-auto w-fit">
+            {menuItems.map((item) => (
+              <div
+                key={item.id}
+                className={cn(
+                  item.bgColor,
+                  "flex justify-between p-4 items-center rounded-md w-64 hover:shadow-sm hover:cursor-pointer"
+                )}
+                onClick={() => {
+                  router.push(item.url);
+                }}
+              >
+                <div className="">
+                  <h1 className="font-bold mb-1">{item.count}</h1>
+                  <p className="text-xs">{item.label}</p>
+                </div>
+                <div className="bg-white p-3 size-fit rounded-sm">
+                  <img src={item.icon} alt={item.label} className="size-4" />
+                </div>
               </div>
-              <div className="bg-white p-3 size-fit rounded-sm">
-                <img src={item.icon} alt={item.label} className="size-4" />
-              </div>
-            </div>
-          ))}
-        </div>
-        <ScrollBar orientation="horizontal" />
-      </ScrollArea>}
+            ))}
+          </div>
+          <ScrollBar orientation="horizontal" />
+        </ScrollArea>
+      )}
       <div className="bg-white shadow-lg p-4 flex gap-4 justify-between rounded-lg">
         <div className="flex items-center gap-2 w-full">
           <SearchIcon />
@@ -157,9 +149,10 @@ export default function JobDashboard({
               "focus-visible:border-none focus-visible:outline-none w-full"
             )}
           />
-          {isSearching || isLoading && (
-            <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-          )}
+          {isSearching ||
+            (isLoading && (
+              <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+            ))}
         </div>
         <div>
           <Button>Search</Button>

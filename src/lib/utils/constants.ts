@@ -10,6 +10,34 @@ export const contextUser = {
   resumeSample: "",
 };
 
+export const leftMenuItems = [
+  {
+    id: "overview",
+    label: "Overview",
+    icon: "/overview.svg",
+    url: `/dashboard/jobs`,
+    isActive: true,
+  },
+  {
+    id: "ai-recommendations",
+    label: "AI Recommendations",
+    icon: "/ai-recommendation.svg",
+    url: `/dashboard/jobs/category?tab=ai-recommendations`,
+  },
+  {
+    id: "saved-jobs",
+    label: "Saved Jobs",
+    icon: "/saved-job.svg",
+    url: `/dashboard/jobs/category?tab=saved-jobs`,
+  },
+  {
+    id: "application-history",
+    label: "Application history",
+    icon: "/application-history.svg",
+    url: `/dashboard/jobs/category?tab=application-history`,
+  },
+];
+
 export const onBoardingTabs = [
   {
     title: "Basic Information",

@@ -14,7 +14,7 @@ export function normalizeJobFilters(filters: JobFilters): JobFilters {
   return {
     page: normalized.page ?? 1,
     limit: normalized.limit ?? 20,
-    ...(normalized.jobRole && { jobRole: normalized.jobRole }),
+    ...(normalized.title && { title: normalized.title }),
     ...(normalized.search && { search: normalized.search }),
     ...(normalized.status && { status: normalized.status }),
     ...(normalized.locationType && { locationType: normalized.locationType }),

@@ -38,7 +38,7 @@ export interface JobFilters extends PaginationParams {
   salaryMin?: number;
   salaryMax?: number;
   department?: string;
-  jobRole?: string;
+  title?: string;
 }
 
 export interface CreateJobData {

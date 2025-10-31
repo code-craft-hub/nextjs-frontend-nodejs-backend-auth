@@ -13,6 +13,8 @@ import { resumeQueries } from "@/lib/queries/resume.queries";
 import { aiApplyQueries } from "@/lib/queries/ai-apply.queries";
 import { interviewQuestionQueries } from "@/lib/queries/interview.queries";
 import { coverLetterQueries } from "@/lib/queries/cover-letter.queries";
+import { getDataSource } from "@/lib/utils/helpers";
+
 export const metadata: Metadata = {
   title: "Cverai Dashboard",
   description: "User dashboard",
@@ -25,12 +27,14 @@ export default async function HomePage({
 }) {
   await requireOnboarding();
   const queryClient = createServerQueryClient();
-  await queryClient.fetchQuery(userQueries.detail());
+  const user = await queryClient.fetchQuery(userQueries.detail());
   const { tab, jobDescription } = await searchParams;
 
+  const userDataSource = getDataSource(user);
   const filters: JobFilters = {
     page: 1,
     limit: 20,
+    title: userDataSource?.key || userDataSource?.title || "",
   };
   await prefetchWithPriority(queryClient, [
     {

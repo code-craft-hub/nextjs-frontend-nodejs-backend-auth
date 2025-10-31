@@ -1,5 +1,5 @@
 import { formatDistanceToNow, isValid } from "date-fns";
-import { ApiError, QAItem } from "@/types";
+import { ApiError, IUser, QAItem } from "@/types";
 import { jsonrepair } from "jsonrepair";
 import { MouseEvent } from "react";
 
@@ -24,6 +24,13 @@ export const getJwtSecret = () => {
   return secret;
 };
 
+export const getDataSource = (user?: Partial<IUser>) => {
+  return Array.isArray(user?.dataSource)
+    ? user?.dataSource?.find(
+        (profile) => profile.ProfileID === user?.defaultactiveDataSource
+      )
+    : [];
+};
 export const smoothlyScrollToView = (
   e: MouseEvent<HTMLAnchorElement>,
   href: string
