@@ -31,8 +31,6 @@ export const formatAppliedDate = (dateString?: string): string => {
     const date = new Date(dateString ?? "");
 
     // Check if date is valid, use today's date if invalid
-
-    console.log("input date string: ", dateString, "parsed date: ", date);
     const validDate = isNaN(date.getTime()) ? new Date() : date;
 
     // Format: MMM D, YYYY HH:mm
