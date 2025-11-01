@@ -10,7 +10,6 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
-import { overviewColumns } from "./AIRecommendations";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { jobsQueries } from "@/lib/queries/jobs.queries";
 import { useRouter } from "next/navigation";
@@ -143,7 +142,7 @@ export const ApplicationHistory = () => {
                 ) : (
                   <TableRow>
                     <TableCell
-                      colSpan={overviewColumns.length}
+                      colSpan={columns.length}
                       className="h-24 text-center"
                     >
                       No results.

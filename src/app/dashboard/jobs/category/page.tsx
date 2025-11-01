@@ -6,6 +6,7 @@ import { userQueries } from "@/lib/queries/user.queries";
 import { jobsQueries } from "@/lib/queries/jobs.queries";
 import { HydrationBoundary } from "@/components/hydration-boundary";
 import { dehydrate } from "@tanstack/react-query";
+import { getDataSource } from "@/lib/utils/helpers";
 
 const CategoryPage = async ({ searchParams }: any) => {
   await requireOnboarding();
@@ -15,7 +16,9 @@ const CategoryPage = async ({ searchParams }: any) => {
   const user = await queryClient.fetchQuery(userQueries.detail());
   const bookmarkedIds = (user.bookmarkedJobs || []) as string[];
   const appliedJobsIds = (user.appliedJobs?.map((job) => job.id) || []) as string[];
-
+  const userDataSource = getDataSource(user);
+  const userJobTitlePreference =
+    userDataSource?.key || userDataSource?.title || "";
   const filters = {
     limit: 20,
   };
@@ -27,6 +30,11 @@ const CategoryPage = async ({ searchParams }: any) => {
   await queryClient.prefetchInfiniteQuery(
     jobsQueries.appliedJobs(appliedJobsIds, "", 20)
   );
+  await queryClient.prefetchInfiniteQuery(
+  jobsQueries.infinite({title: userJobTitlePreference})
+  );
+
+  console.log("AI Recommendation : ", jobsQueries.infinite({title: userJobTitlePreference}).queryKey)
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <div className="p-4 sm:p-8">

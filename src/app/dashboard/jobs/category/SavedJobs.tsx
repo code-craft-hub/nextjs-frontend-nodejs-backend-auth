@@ -25,6 +25,7 @@ import { jobsQueries } from "@/lib/queries/jobs.queries";
 
 import { SearchBar } from "./JobSearchBar";
 import { getFindJobsColumns } from "../components/Overview";
+import { getDataSource } from "@/lib/utils/helpers";
 
 export const SavedJobs = () => {
   const [searchValue, setSearchValue] = useState("");
@@ -33,12 +34,14 @@ export const SavedJobs = () => {
     []
   );
   const [columnVisibility, setColumnVisibility] =
-  React.useState<VisibilityState>({});
-  
-  const [rowSelection, setRowSelection] = React.useState({});
-  
-  const { data: user } = useQuery(userQueries.detail());
+    React.useState<VisibilityState>({});
 
+  const [rowSelection, setRowSelection] = React.useState({});
+
+  const { data: user } = useQuery(userQueries.detail());
+  const userDataSource = getDataSource(user);
+  const userJobTitlePreference =
+    userDataSource?.key || userDataSource?.title || "";
   const updateJobApplicationHistory = useUpdateJobApplicationHistoryMutation();
 
   const updateJobs = useUpdateJobMutation();
@@ -47,20 +50,30 @@ export const SavedJobs = () => {
 
   const bookmarkedIds = (user?.bookmarkedJobs || []) as string[];
 
-  console.log(bookmarkedIds);
-
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useInfiniteQuery(jobsQueries.bookmarked(bookmarkedIds, searchValue, 20));
 
+  const bookmarkedIdSet = useMemo(() => {
+    return new Set(bookmarkedIds);
+  }, [bookmarkedIds]);
+
   const allJobs = useMemo(() => {
-    return data?.pages.flatMap((page) => page.data) ?? [];
+    const jobs = data?.pages.flatMap((page) => page.data) ?? [];
+
+    return jobs.map((job) => {
+      const jobContent = job?.title + " " + job?.descriptionText;
+      const match = jobContent
+        ?.toLowerCase()
+        ?.includes(userJobTitlePreference?.toLowerCase());
+      return {
+        ...job,
+        isBookmarked: bookmarkedIdSet.has(job.id),
+        matchPercentage: match
+          ? Math.floor(80 + Math.random() * 20).toString()
+          : Math.floor(10 + Math.random() * 10).toString(),
+      };
+    });
   }, [data]);
-
-  // const totalJobs = (data?.pages[0] as any)?.totalCount ?? allJobs.length ?? 0;
-
-  // const userDataSource = getDataSource(user);
-  // const userJobTitlePreference =
-  //   userDataSource?.key || userDataSource?.title || "";
 
   const columns = getFindJobsColumns({
     router,

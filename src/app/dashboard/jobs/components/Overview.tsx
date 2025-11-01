@@ -35,7 +35,7 @@ import {
   SearchIcon,
   Loader2,
 } from "lucide-react";
-import { getDataSource, humanDate } from "@/lib/utils/helpers";
+import { formatAppliedDate, getDataSource } from "@/lib/utils/helpers";
 import { JobType } from "@/types";
 import { Toggle } from "@/components/ui/toggle";
 import { apiService } from "@/hooks/use-auth";
@@ -83,11 +83,30 @@ export default function Overview() {
     },
   });
 
+  const bookmarkedIds = (user?.bookmarkedJobs || []) as string[];
+
+  const bookmarkedIdSet = useMemo(() => {
+    return new Set(bookmarkedIds);
+  }, [bookmarkedIds]);
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useInfiniteQuery(jobsQueries?.infinite(infiniteFilters));
 
   const allJobs = useMemo(() => {
-    return data?.pages.flatMap((page) => page.data) ?? [];
+    const jobs = data?.pages.flatMap((page) => page.data) ?? [];
+
+    return jobs.map((job) => {
+      const jobContent = job?.title + " " + job?.descriptionText;
+      const match = jobContent
+        ?.toLowerCase()
+        ?.includes(userJobTitlePreference?.toLowerCase());
+      return {
+        ...job,
+        isBookmarked: bookmarkedIdSet.has(job.id),
+        matchPercentage: match
+          ? Math.floor(80 + Math.random() * 20).toString()
+          : Math.floor(10 + Math.random() * 10).toString(),
+      };
+    });
   }, [data]);
 
   console.log("allJobs", data?.pages);
@@ -374,10 +393,16 @@ export const getFindJobsColumns = ({
             <p className="flex gap-1 text-gray-400 items-center">
               <Calendar className="size-3" />
               <span className="text-2xs">
-                {humanDate(row.original?.scrapedAt)}
+                {formatAppliedDate(
+                  row.original?.scrapedAt ||
+                    row.original?.postedAt ||
+                    row.original?.updatedAt
+                )}
               </span>
             </p>
-            <p className="text-2xs text-green-400">{matchPercentage}%</p>
+            <p className="text-2xs text-green-400">
+              {row.original.matchPercentage}%
+            </p>
           </div>
         </div>
       );
@@ -386,20 +411,22 @@ export const getFindJobsColumns = ({
   {
     accessorKey: "isBookmarked",
     cell: ({ row }) => {
+      const isBookmarked = row.original.isBookmarked || false;
+
       return (
         <div
           onClick={() => {
             updateJobs.mutate({
               id: String(row.original.id),
               data: {
-                isBookmarked: !row.original.isBookmarked,
+                isBookmarked: !isBookmarked,
               },
             });
           }}
           className="flex justify-end"
         >
           <Toggle
-            pressed={row.original.isBookmarked}
+            pressed={isBookmarked || false}
             aria-label="Toggle bookmark"
             size="sm"
             variant="outline"

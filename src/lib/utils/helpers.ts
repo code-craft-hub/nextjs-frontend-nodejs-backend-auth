@@ -24,11 +24,15 @@ export const getJwtSecret = () => {
   return secret;
 };
 
-export const formatAppliedDate = (dateString: string): string => {
+export const formatAppliedDate = (dateString?: string): string => {
   try {
-    const date = new Date(dateString);
+
+    
+    const date = new Date(dateString ?? "");
 
     // Check if date is valid, use today's date if invalid
+
+    console.log("input date string: ", dateString, "parsed date: ", date);
     const validDate = isNaN(date.getTime()) ? new Date() : date;
 
     // Format: MMM D, YYYY HH:mm

@@ -1,229 +1,102 @@
-import React from "react";
-import { Button } from "@/components/ui/button";
+"use client";
 
-import { ChevronDown } from "lucide-react";
+import React, { useMemo, useState } from "react";
 import {
   ColumnFiltersState,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
   SortingState,
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
 
+import { userQueries } from "@/lib/queries/user.queries";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
+import {
+  useUpdateJobApplicationHistoryMutation,
+  useUpdateJobMutation,
+} from "@/lib/mutations/jobs.mutations";
 
-import { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown, Calendar, MapPin } from "lucide-react";
-import { FaRegBookmark, FaBookmark } from "react-icons/fa";
-import JobDashboard from "../../(dashboard)/dashboard-tabs/find-job-tab/FindJobClient";
-import { useQuery } from "@tanstack/react-query";
-import { jobsQueries } from "@/lib/queries/jobs.queries";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
+import { jobsQueries } from "@/lib/queries/jobs.queries";
+
+import { SearchBar } from "./JobSearchBar";
 import { getFindJobsColumns } from "../components/Overview";
-import { JobType } from "@/types";
-
-export const overviewColumns: ColumnDef<JobType>[] = [
-  {
-    accessorKey: "company",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          company
-          <ArrowUpDown />
-        </Button>
-      );
-    },
-    cell: ({ row }) => (
-      <div className="flex size-10 items-center justify-center shrink-0">
-        <img
-          className="shrink-0"
-          src={
-            !!row.original.companyLogo
-              ? row.original.companyLogo
-              : "/placeholder.jpg"
-          }
-          alt={row.original.companyText}
-        />
-      </div>
-    ),
-  },
-
-  {
-    accessorKey: "title",
-    header: "Title",
-    cell: ({ row }) => (
-      <div className="capitalize">
-        <div className="flex gap-4 items-center">
-          <div className="font-medium text-xs">{row.getValue("title")}</div>
-          <div className="bg-blue-50 rounde text-blue-600">
-            <span className="text-2xs">{row.original.jobType}</span>
-          </div>
-        </div>
-        <div className="flex gap-x-4 mt-1">
-          <p className="flex gap-1 text-gray-400">
-            <MapPin className="size-3" />
-            <span className="text-2xs"> {row.original.location}</span>
-          </p>
-          <p className="flex gap-1 text-gray-400">
-            {/* <DollarSign className="size-3" /> */}
-            <span className="text-2xs"> {row.original.salary}</span>
-          </p>
-          <p className="flex gap-1 text-gray-400">
-            <Calendar className="size-3" />
-            <span className="text-2xs">{row.original.postedTime}</span>
-          </p>
-          <p className="text-2xs text-green-500">
-            %{row.original.matchPercentage}
-          </p>
-        </div>
-      </div>
-    ),
-  },
-
-  {
-    accessorKey: "isBookmarked",
-    header: () => <div className=""></div>,
-    cell: ({ row }) => {
-      return (
-        <div className="flex justify-end">
-          {row.original.isBookmarked ? (
-            <div>
-              <FaBookmark className="size-4" />
-            </div>
-          ) : (
-            <FaRegBookmark className="size-4 text-gray-400" />
-          )}
-        </div>
-      );
-    },
-  },
-  {
-    id: "actions",
-    enableHiding: false,
-    cell: () => {
-      return (
-        <div className="flex justify-end">
-          <Button variant={"button"}>Apply Now</Button>
-        </div>
-      );
-    },
-  },
-];
- const jobsData = [
-  {
-    id: 1,
-    title: "Technical Support Specialist",
-    company: "Google",
-    companyLogo: "bg-white border-2 border-gray-200",
-    companyIcon: "text-blue-500 font-bold text-lg",
-    companyText: "/yt-company.svg",
-    location: "Lagos",
-    salary: "$15K-$20K",
-    postedTime: "2 days ago",
-    matchPercentage: "100 match",
-    jobType: "Full Time",
-    isBookmarked: false,
-    isFilled: false,
-  },
-  {
-    id: 2,
-    title: "Technical Support Specialist",
-    company: "YouTube",
-    companyLogo: "bg-red-600",
-    companyIcon: "text-white",
-    companyText: "/g-company.svg",
-    location: "Lagos",
-    salary: "$15K-$20K",
-    postedTime: "2 days ago",
-    matchPercentage: "100 match",
-    jobType: "Full Time",
-    isBookmarked: false,
-    isFilled: false,
-  },
-  {
-    id: 3,
-    title: "Technical Support Specialist",
-    company: "Reddit",
-    companyLogo: "bg-orange-500",
-    companyIcon: "text-white",
-    companyText: "/r-company.svg",
-    location: "Lagos",
-    salary: "$15K-$20K",
-    postedTime: "2 days ago",
-    matchPercentage: "100 match",
-    jobType: "Full Time",
-    isBookmarked: true,
-    isFilled: false,
-  },
-  {
-    id: 4,
-    title: "Technical Support Specialist",
-    company: "Discord",
-    companyLogo: "bg-blue-600",
-    companyIcon: "text-white",
-    companyText: "/n-company.svg",
-    location: "Lagos",
-    salary: "$15K-$20K",
-    postedTime: "2 days ago",
-    matchPercentage: "100 match",
-    jobType: "Full Time",
-    isBookmarked: false,
-    isFilled: false,
-  },
-  {
-    id: 5,
-    title: "Technical Support Specialist",
-    company: "Instagram",
-    companyLogo: "bg-gradient-to-br from-purple-600 to-pink-500",
-    companyIcon: "text-white",
-    companyText: "/ig-company.svg",
-    location: "Lagos",
-    salary: "$15K-$20K",
-    postedTime: "2 days ago",
-    matchPercentage: "100 match",
-    jobType: "Full Time",
-    isBookmarked: true,
-    isFilled: false,
-  },
-  {
-    id: 6,
-    title: "Technical Support Specialist",
-    company: "Slack",
-    companyLogo: "bg-white border-2 border-gray-200",
-    companyIcon: "text-red-500",
-    companyText: "/sl-company.svg",
-    location: "Lagos",
-    salary: "$15K-$20K",
-    postedTime: "2 days ago",
-    matchPercentage: "100 match",
-    jobType: "Full Time",
-    isBookmarked: false,
-    isFilled: true,
-  },
-];
+import { getDataSource } from "@/lib/utils/helpers";
 
 export const AIRecommendations = () => {
+  const { data: user } = useQuery(userQueries.detail());
+  const userDataSource = getDataSource(user);
+  const userJobTitlePreference =
+    userDataSource?.key || userDataSource?.title || "";
+  const [searchValue, setSearchValue] = useState(() => ({
+    title: userJobTitlePreference,
+  }));
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
+
   const [rowSelection, setRowSelection] = React.useState({});
+
+  const updateJobApplicationHistory = useUpdateJobApplicationHistoryMutation();
+
+  const updateJobs = useUpdateJobMutation();
+
+  const router = useRouter();
+
+  const bookmarkedIds = (user?.bookmarkedJobs || []) as string[];
+
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useInfiniteQuery(
+      jobsQueries.infinite({ title: searchValue.title || userJobTitlePreference })
+    );
+
+  console.log(
+    "AI Recommendation : ",
+    jobsQueries.infinite({ title: searchValue.title || userJobTitlePreference })
+      .queryKey
+  );
+
+  const bookmarkedIdSet = useMemo(() => {
+    return new Set(bookmarkedIds);
+  }, [bookmarkedIds]);
+
+  const allJobs = useMemo(() => {
+    const jobs = data?.pages.flatMap((page) => page.data) ?? [];
+
+    return jobs.map((job) => {
+      const jobContent = job?.title + " " + job?.descriptionText;
+      const match = jobContent
+        ?.toLowerCase()
+        ?.includes(userJobTitlePreference?.toLowerCase());
+      return {
+        ...job,
+        isBookmarked: bookmarkedIdSet.has(job.id),
+        matchPercentage: match
+          ? Math.floor(80 + Math.random() * 20).toString()
+          : Math.floor(10 + Math.random() * 10).toString(),
+      };
+    });
+  }, [data]);
+
+  const columns = getFindJobsColumns({
+    router,
+    updateJobs,
+    updateJobApplicationHistory,
+  });
+
   const table = useReactTable({
-    data: jobsData,
-    columns: overviewColumns,
+    data: allJobs,
+    columns: columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
@@ -236,41 +109,18 @@ export const AIRecommendations = () => {
     },
   });
 
-  const filters: any = {
-    page: 1,
-    limit: 20,
+  const onSubmit = (data: any) => {
+    console.log("Search submitted:", data);
+    setSearchValue(data.username);
   };
 
-  const { data: initialData } = useQuery({
-    ...jobsQueries.all(filters),
-    initialData: undefined, // Let it pull from cache
-  });
-
-  const router = useRouter();
-
-  return (
-    <div className="grid pb-16 bg">
-      <JobDashboard
-        initialJobs={initialData?.data ?? []}
-        fingJobsColumns={getFindJobsColumns({ router })}
-        filters={filters}
-      />
-    </div>
-  );
   return (
     <div className="font-inter grid grid-cols-1 w-full overflow-hidden gap-4 xl:gap-8">
       <div className="space-y-4 w-full">
         <h1 className="text-3xl text-center mb-8 font-medium font-inter">
           AI Recommendations
         </h1>
-        <div className="flex flex-col gap-4">
-          <div className="ml-auto w-fit bg-white p-2">
-            <p className="text-xs flex gap-1 text-gray-400">
-              <span className="">Filter options</span>
-              <ChevronDown className="size-4" />
-            </p>
-          </div>
-        </div>
+        <SearchBar sendDataToParent={onSubmit} allJobs={allJobs} />
 
         <div className="w-full flex flex-col gap-6">
           <div className="overflow-hidden border-none">
@@ -296,16 +146,28 @@ export const AIRecommendations = () => {
                 ) : (
                   <TableRow>
                     <TableCell
-                      colSpan={overviewColumns.length}
+                      colSpan={columns.length}
                       className="h-24 text-center"
                     >
-                      No results.
+                      No saved jobs found.
                     </TableCell>
                   </TableRow>
                 )}
               </TableBody>
             </Table>
           </div>
+
+          {hasNextPage && (
+            <div className="mt-4 flex justify-center">
+              <button
+                onClick={() => fetchNextPage()}
+                disabled={isFetchingNextPage}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+              >
+                {isFetchingNextPage ? "Loading more..." : "Load More"}
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -13,7 +13,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { humanDate, randomPercentage } from "@/lib/utils/helpers";
+import { formatAppliedDate, randomPercentage } from "@/lib/utils/helpers";
 import { JobType } from "@/types";
 import { JobFilters } from "@/lib/types/jobs";
 import { Toggle } from "@/components/ui/toggle";
@@ -28,7 +28,7 @@ import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.share
 // } from "@/components/ui/hover-card";
 // import { Badge } from "@/components/ui/badge";
 // Move column definition outside component and make it a function
- const getFindJobsColumns = (
+const getFindJobsColumns = (
   router: AppRouterInstance
 ): // updateJobs: ReturnType<typeof useUpdateJobMutation>
 ColumnDef<JobType>[] => [
@@ -81,7 +81,11 @@ ColumnDef<JobType>[] => [
           <p className="flex gap-1 text-gray-400 items-center">
             <Calendar className="size-3" />
             <span className="text-2xs">
-              {humanDate(row.original?.scrapedAt)}
+              {formatAppliedDate(
+                row.original?.scrapedAt ||
+                  row.original?.postedAt ||
+                  row.original?.updatedAt
+              )}
             </span>
           </p>
           <p className="text-2xs text-green-400">{randomPercentage(10)}</p>
