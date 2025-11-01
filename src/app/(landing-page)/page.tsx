@@ -12,7 +12,7 @@ import { getSessionFromCookies } from "@/lib/auth.utils";
 
 const LandingPage = async () => {
   const queryClient = createServerQueryClient();
-
+let user = null;
   const cookieUser = await getSessionFromCookies();
   let filters: JobFilters = {
     page: 1,
@@ -20,7 +20,7 @@ const LandingPage = async () => {
     title: "",
   };
   if (cookieUser) {
-    const user = await queryClient.fetchQuery(userQueries.detail());
+    user =  await queryClient.fetchQuery(userQueries.detail());
     const userDataSource = getDataSource(user);
 
     filters = {
@@ -28,17 +28,17 @@ const LandingPage = async () => {
       limit: 10,
       title: userDataSource?.key || userDataSource?.title || "",
     };
-    await prefetchWithPriority(queryClient, [
-      {
-        queryKey: jobsQueries.all(filters).queryKey,
-        queryFn: jobsQueries.all(filters).queryFn,
-        priority: "high",
-      },
-    ]);
   }
+  await prefetchWithPriority(queryClient, [
+    {
+      queryKey: jobsQueries.all(filters).queryKey,
+      queryFn: jobsQueries.all(filters).queryFn,
+      priority: "high",
+    },
+  ]);
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <LandingPageClient filters={filters} />
+      <LandingPageClient filters={filters} user={user} />
     </HydrationBoundary>
   );
 };

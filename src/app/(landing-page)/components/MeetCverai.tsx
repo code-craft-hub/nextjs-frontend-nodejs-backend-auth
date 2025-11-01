@@ -1,7 +1,9 @@
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 import React from "react";
 
 export const MeetCverai = () => {
+  const router = useRouter();
   return (
     <section className="py-20 bg-[url('/meet-cverai-gradient.png')] bg-cover bg-center">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -16,7 +18,12 @@ export const MeetCverai = () => {
               LinkedIn, Telegram, WhatsApp, and more platforms.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button className="max-sm:text-2xs break-words text-white px-8 py-3">
+              <Button
+                onClick={() => {
+                  router.push(`/dashboard/home`);
+                }}
+                className="max-sm:text-2xs break-words text-white px-8 py-3"
+              >
                 Start now - Your job hunt just got easier!
               </Button>
             </div>

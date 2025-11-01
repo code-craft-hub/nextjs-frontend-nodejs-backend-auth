@@ -20,11 +20,14 @@ import { ActionButton } from "./components/ActionButton";
 import { MeetCverai } from "./components/MeetCverai";
 import { FeatureJobs } from "./components/FeatureJobs";
 import { JobFilters } from "@/lib/types/jobs";
+import { IUser } from "@/types";
 
 export const LandingPageClient = ({
   filters,
+  user,
 }: {
   filters: JobFilters;
+  user: Partial<IUser> | null;
 }) => {
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
 
@@ -40,7 +43,7 @@ export const LandingPageClient = ({
           backgroundPosition: "center center",
         }}
       >
-        <Header />
+        <Header user={user} />
         <div className="pt-32 mx-auto">
           <h1 className="text-4xl text-center font-medium s:text-red-900 mb-12 !font-instrument">
             AI Assist To Apply

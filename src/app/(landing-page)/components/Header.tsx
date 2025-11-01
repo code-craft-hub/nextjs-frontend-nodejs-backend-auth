@@ -16,14 +16,17 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { smoothlyScrollToView } from "@/lib/utils/helpers";
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { userQueries } from "@/lib/queries/user.queries";
+import { IUser } from "@/types";
 
-export const Header = ({ url }: { url?: string }) => {
+export const Header = ({
+  url,
+  user,
+}: {
+  url?: string;
+  user?: Partial<IUser> | null;
+}) => {
   const router = useRouter();
   const [modal, setModal] = useState(false);
-
-  const { data: user } = useQuery(userQueries.detail());
 
   return (
     <div>
@@ -131,7 +134,7 @@ export const Header = ({ url }: { url?: string }) => {
                       </Button>
                     </SheetClose>
                   ) : (
-                    <div className="">
+                    <div className="flex flex-col w-full gap-4">
                       <SheetClose asChild>
                         <Button
                           variant="outline"
