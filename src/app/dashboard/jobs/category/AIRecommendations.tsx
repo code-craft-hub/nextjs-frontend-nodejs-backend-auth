@@ -23,7 +23,7 @@ import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { jobsQueries } from "@/lib/queries/jobs.queries";
 
-import { SearchBar } from "./JobSearchBar";
+// import { SearchBar } from "./JobSearchBar";
 import { getFindJobsColumns } from "../components/Overview";
 import { getDataSource } from "@/lib/utils/helpers";
 
@@ -32,7 +32,7 @@ export const AIRecommendations = () => {
   const userDataSource = getDataSource(user);
   const userJobTitlePreference =
     userDataSource?.key || userDataSource?.title || "";
-  const [searchValue, setSearchValue] = useState(() => ({
+  const [searchValue, _setSearchValue] = useState(() => ({
     title: userJobTitlePreference,
   }));
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -54,7 +54,9 @@ export const AIRecommendations = () => {
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useInfiniteQuery(
-      jobsQueries.infinite({ title: searchValue.title || userJobTitlePreference })
+      jobsQueries.infinite({
+        title: searchValue.title || userJobTitlePreference,
+      })
     );
 
   console.log(
@@ -109,10 +111,10 @@ export const AIRecommendations = () => {
     },
   });
 
-  const onSubmit = (data: any) => {
-    console.log("Search submitted:", data);
-    setSearchValue(data.username);
-  };
+  // const onSubmit = (data: any) => {
+  //   console.log("Search submitted:", data);
+  //   setSearchValue(data.username);
+  // };
 
   return (
     <div className="font-inter grid grid-cols-1 w-full overflow-hidden gap-4 xl:gap-8">
@@ -120,7 +122,8 @@ export const AIRecommendations = () => {
         <h1 className="text-3xl text-center mb-8 font-medium font-inter">
           AI Recommendations
         </h1>
-        <SearchBar sendDataToParent={onSubmit} allJobs={allJobs} />
+
+        {/* <AdvancedFilterModal /> */}
 
         <div className="w-full flex flex-col gap-6">
           <div className="overflow-hidden border-none">
