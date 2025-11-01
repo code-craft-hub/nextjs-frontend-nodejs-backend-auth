@@ -109,7 +109,6 @@ export default function Overview() {
     });
   }, [data]);
 
-  console.log("allJobs", data?.pages);
   const commend = useMemo(() => {
     return (
       data?.pages.flatMap((page) =>

@@ -58,8 +58,6 @@ export const jobsQueries = {
           limit,
         });
 
-        console.log(normalized);
-
         return jobsApi.getBookmarkedJobs(
           normalized.bookmarkedIds,
           pageParam,
@@ -95,8 +93,6 @@ export const jobsQueries = {
           searchValue,
           limit,
         });
-
-        console.log(normalized);
 
         return jobsApi.getAppliedJobs(
           normalized.appliedjobsIds,

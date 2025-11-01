@@ -298,8 +298,6 @@ export const useResumeStream = (endpoint: string, resumeId: string): UseResumeSt
       ...prev,
       isConnected: false,
     }));
-
-    console.log("[Stream] Stopped manually");
   }, []);
 
   // Cleanup on unmount

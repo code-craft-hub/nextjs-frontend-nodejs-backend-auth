@@ -14,7 +14,6 @@ import { cn } from "@/lib/utils";
 export const FeatureJobs = ({ filters }: { filters: JobFilters }) => {
   const { data: jobs } = useQuery(jobsQueries.all(filters));
 
-  console.log(jobs);
 
   const router = useRouter();
   return (

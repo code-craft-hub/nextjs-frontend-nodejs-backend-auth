@@ -59,12 +59,7 @@ export const AIRecommendations = () => {
       })
     );
 
-  console.log(
-    "AI Recommendation : ",
-    jobsQueries.infinite({ title: searchValue.title || userJobTitlePreference })
-      .queryKey
-  );
-
+ 
   const bookmarkedIdSet = useMemo(() => {
     return new Set(bookmarkedIds);
   }, [bookmarkedIds]);
@@ -111,10 +106,6 @@ export const AIRecommendations = () => {
     },
   });
 
-  // const onSubmit = (data: any) => {
-  //   console.log("Search submitted:", data);
-  //   setSearchValue(data.username);
-  // };
 
   return (
     <div className="font-inter grid grid-cols-1 w-full overflow-hidden gap-4 xl:gap-8">

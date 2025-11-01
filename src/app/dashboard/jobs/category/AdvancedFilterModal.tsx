@@ -138,7 +138,6 @@ const AdvancedJobFilter: React.FC<AdvancedFilterProps> = ({
           newJobTypes = filters.jobTypes.filter((t) => t !== type);
         }
       }
-      console.log("New JobTypes ", newJobTypes);
       const newFilters = { ...filters, jobTypes: newJobTypes };
       setFilters(newFilters);
       onFilterChange?.(newFilters);

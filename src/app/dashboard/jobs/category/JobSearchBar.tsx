@@ -31,7 +31,6 @@ export const SearchBar = ({
   sendDataToParent?: (data: any) => void;
   allJobs: any[];
 }) => {
-  console.log(allJobs);
   const form = useForm<z.infer<typeof formSchema>>({
     defaultValues: {
       searchValue: "",
@@ -39,13 +38,12 @@ export const SearchBar = ({
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    sendDataToParent && sendDataToParent(values);
     const data = {
       searchValue: values.searchValue,
       ...(location && { location }),
       ...(employmentType && { employmentType }),
     };
-    console.log(data);
+    sendDataToParent && sendDataToParent(data);
   }
 
   const [location, setLocation] = useState(allJobs?.[0]?.location || "");
