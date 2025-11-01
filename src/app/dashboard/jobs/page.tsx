@@ -11,31 +11,17 @@ import { dehydrate } from "@tanstack/react-query";
 const JobListingsPage = async () => {
   await requireOnboarding();
   const queryClient = createServerQueryClient();
-  await queryClient.fetchQuery(userQueries.detail());
+  const user = await queryClient.fetchQuery(userQueries.detail());
+  const bookmarkedIds = (user.bookmarkedJobs || []) as string[];
 
   const filters: JobFilters = {
     limit: 20,
   };
 
-  await queryClient.prefetchInfiniteQuery({
-    queryKey: jobsQueries.infinite(filters).queryKey,
-    initialPageParam: 1,
-    queryFn: async ({
-      queryKey,
-      pageParam = jobsQueries.infinite(filters).initialPageParam,
-    }) => {
-      const infiniteQuery = jobsQueries.infinite(filters);
-      if (!infiniteQuery.queryFn) throw new Error("queryFn is undefined");
-      return await infiniteQuery.queryFn({
-        client: queryClient,
-        queryKey: queryKey as (string | JobFilters)[],
-        signal: new AbortController().signal,
-        pageParam: pageParam as number,
-        direction: "forward",
-        meta: undefined,
-      });
-    },
-  });
+  await queryClient.prefetchInfiniteQuery(jobsQueries.infinite(filters));
+  await queryClient.prefetchInfiniteQuery(
+    jobsQueries.bookmarked(bookmarkedIds, "", 20)
+  );
   return (
     <div className="p-4 sm:p-8">
       <HydrationBoundary state={dehydrate(queryClient)}>

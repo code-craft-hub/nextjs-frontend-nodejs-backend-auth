@@ -1,4 +1,3 @@
-// lib/mutations/jobs.mutations.ts
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { jobsApi } from "@/lib/api/jobs.api";
 import { queryKeys } from "@/lib/query/keys";
@@ -14,7 +13,6 @@ export function useCreateJobMutation() {
 
       const previousJobs = queryClient.getQueryData(queryKeys.jobs.lists());
 
-      // Optimistically add to all matching list queries
       queryClient.setQueriesData<PaginatedResponse<any>>(
         { queryKey: queryKeys.jobs.lists() },
         (old) => {

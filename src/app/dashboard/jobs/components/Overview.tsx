@@ -1,7 +1,6 @@
 "use client";
 import React, { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import {
   ColumnFiltersState,
   flexRender,
@@ -36,10 +35,7 @@ import {
   SearchIcon,
   Loader2,
 } from "lucide-react";
-import {
-  getDataSource,
-  humanDate,
-} from "@/lib/utils/helpers";
+import { getDataSource, humanDate } from "@/lib/utils/helpers";
 import { JobType } from "@/types";
 import { Toggle } from "@/components/ui/toggle";
 import { apiService } from "@/hooks/use-auth";
@@ -48,6 +44,8 @@ import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.share
 import { userQueries } from "@/lib/queries/user.queries";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { useForm } from "react-hook-form";
+import { useUpdateJobMutation } from "@/lib/mutations/jobs.mutations";
+import { ReportCard } from "./ReportCard";
 
 export default function Overview() {
   const router = useRouter();
@@ -68,6 +66,8 @@ export default function Overview() {
     }),
     [searchValue]
   );
+
+  const updateJobs = useUpdateJobMutation();
   const { data: user } = useQuery(userQueries.detail());
   const userDataSource = getDataSource(user);
   const userJobTitlePreference =
@@ -85,6 +85,8 @@ export default function Overview() {
   const allJobs = useMemo(() => {
     return data?.pages.flatMap((page) => page.data) ?? [];
   }, [data]);
+
+  console.log("allJobs", data?.pages);
   const commend = useMemo(() => {
     return (
       data?.pages.flatMap((page) =>
@@ -95,22 +97,28 @@ export default function Overview() {
 
   const totalJobs = (data?.pages[0] as any)?.totalCount ?? allJobs.length ?? 0;
 
-  const matchPercentage =
-    totalJobs > 0
-      ? Math.max(
-          10,
-          Math.min(
-            100,
-            (commend.filter((score) =>
-              score.toLowerCase().includes(userJobTitlePreference.toLowerCase())
-            ).length /
-              totalJobs) *
-              100
+  const matchPercentage = Number(
+    (totalJobs > 0
+      ? Math.ceil(
+          Math.max(
+            10,
+            Math.min(
+              100,
+              (commend.filter((score) =>
+                score
+                  .toLowerCase()
+                  .includes(userJobTitlePreference.toLowerCase())
+              ).length /
+                totalJobs) *
+                100
+            )
           )
         )
-      : 0;
+      : 0
+    )?.toFixed(0) || 0
+  );
 
-  const columns = getFindJobsColumns(router,matchPercentage);
+  const columns = getFindJobsColumns(router, matchPercentage, updateJobs);
   const table = useReactTable({
     data: allJobs,
     columns: columns,
@@ -147,41 +155,6 @@ export default function Overview() {
   const hasNoResults = visibleRows.length === 0;
   const isSearching = isAutoFetching || isFetchingNextPage;
 
-  const menuItems = [
-    {
-      id: "ai-recommendations",
-      count: `${matchPercentage}%`,
-      label: "AI Recommendations",
-      icon: "/bell.svg",
-      bgColor: "bg-green-100",
-      iconColor: "text-green-600",
-      countColor: "text-green-800",
-      labelColor: "text-green-700",
-      url: "/dashboard/jobs/category?tab=ai-recommendations",
-    },
-    {
-      id: "saved-jobs",
-      count: "0",
-      label: "Saved Jobs",
-      icon: "/save.svg",
-      bgColor: "bg-yellow-100",
-      iconColor: "text-yellow-600",
-      countColor: "text-yellow-800",
-      labelColor: "text-yellow-700",
-      url: "/dashboard/jobs/category?tab=saved-jobs",
-    },
-    {
-      id: "application-history",
-      count: "0",
-      label: "Application history",
-      icon: "/briefcase-dasboard.svg",
-      bgColor: "bg-blue-100",
-      iconColor: "text-blue-600",
-      countColor: "text-blue-800",
-      labelColor: "text-blue-700",
-      url: "/dashboard/jobs/category?tab=application-history",
-    },
-  ];
   return (
     <div className="lg:gap-6 lg:flex ">
       <div className="bg-white p-3 h-fit rounded-md hidden lg:flex lg:flex-col gap-1">
@@ -211,31 +184,7 @@ export default function Overview() {
         ))}
       </div>
       <div className="w-full flex flex-col gap-6">
-        <ScrollArea className="grid grid-cols-1">
-          <div className="flex flex-row gap-4 py-4 mx-auto w-fit">
-            {menuItems.map((item) => (
-              <div
-                key={item.id}
-                className={cn(
-                  item.bgColor,
-                  "flex justify-between p-4 items-center rounded-md w-64 hover:shadow-sm hover:cursor-pointer"
-                )}
-                onClick={() => {
-                  router.push(item.url);
-                }}
-              >
-                <div className="">
-                  <h1 className="font-bold mb-1">{item.count}</h1>
-                  <p className="text-xs">{item.label}</p>
-                </div>
-                <div className="bg-white p-3 size-fit rounded-sm">
-                  <img src={item.icon} alt={item.label} className="size-4" />
-                </div>
-              </div>
-            ))}
-          </div>
-          <ScrollBar orientation="horizontal" />
-        </ScrollArea>
+        <ReportCard matchPercentage={matchPercentage} />
         <div className="bg-white shadow-lg px-2 flex gap-4 justify-between rounded-lg">
           <div className="flex items-center gap-2 w-full">
             <SearchIcon className="size-4" />
@@ -303,7 +252,7 @@ export default function Overview() {
                     colSpan={columns.length}
                     className="h-24 text-center"
                   >
-                    {isSearching ? (
+                    {isSearching || isFetchingNextPage ? (
                       <div className="flex items-center justify-center gap-2">
                         <Loader2 className="h-4 w-4 animate-spin" />
                         <span>Searching for matching jobs...</span>
@@ -351,7 +300,8 @@ export default function Overview() {
 
 export const getFindJobsColumns = (
   router: AppRouterInstance,
-  matchPercentage?: number
+  matchPercentage?: number,
+  updateJobs?: any
 ): ColumnDef<JobType>[] => [
   {
     accessorKey: "companyText",
@@ -374,7 +324,7 @@ export const getFindJobsColumns = (
     accessorKey: "title",
     header: "Title",
     cell: ({ row }) => {
-     return (
+      return (
         <div className="capitalize ">
           <div className="flex gap-4 items-center">
             <div className="font-medium text-xs max-w-sm overflow-hidden">
@@ -388,7 +338,9 @@ export const getFindJobsColumns = (
               </span>
             </div>
             <div className="">
-              {matchPercentage && matchPercentage> 30 && <Sparkles className="text-yellow-500 size-4" />}
+              {matchPercentage && matchPercentage > 30 && (
+                <Sparkles className="text-yellow-500 size-4" />
+              )}
             </div>
           </div>
           <div className="flex gap-x-4 mt-1">
@@ -410,9 +362,7 @@ export const getFindJobsColumns = (
                 {humanDate(row.original?.scrapedAt)}
               </span>
             </p>
-            <p className="text-2xs text-green-400">
-              {matchPercentage}%
-            </p>
+            <p className="text-2xs text-green-400">{matchPercentage}%</p>
           </div>
         </div>
       );
@@ -421,17 +371,16 @@ export const getFindJobsColumns = (
 
   {
     accessorKey: "isBookmarked",
-    header: () => <div className=""></div>,
     cell: ({ row }) => {
       return (
         <div
           onClick={() => {
-            // updateJobs.mutate({
-            //   id: String(row.original.id),
-            //   data: {
-            //     isBookmarked: !row.original.isBookmarked,
-            //   },
-            // });
+            updateJobs.mutate({
+              id: String(row.original.id),
+              data: {
+                isBookmarked: !row.original.isBookmarked,
+              },
+            });
           }}
           className="flex justify-end"
         >
@@ -481,7 +430,6 @@ export const getFindJobsColumns = (
                     },
                   }
                 );
-
                 return;
               }
 

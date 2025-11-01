@@ -1,5 +1,5 @@
 import React from "react";
-
+import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import {
   ColumnFiltersState,
   flexRender,
@@ -12,9 +12,7 @@ import {
   VisibilityState,
 } from "@tanstack/react-table";
 
-import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { jobsData, overviewColumns } from "./AIRecommendations";
-import { SearchBar } from "../category/category";
 import { useQuery } from "@tanstack/react-query";
 import { jobsQueries } from "@/lib/queries/jobs.queries";
 import JobDashboard from "../../(dashboard)/dashboard-tabs/find-job-tab/FindJobClient";
@@ -37,7 +35,7 @@ export type IJobType = {
   isFilled: boolean;
 };
 
-export const SavedJobs = () => {
+export const ApplicationHistory = () => {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -75,7 +73,6 @@ export const SavedJobs = () => {
   });
 
   const router = useRouter();
-
   return (
     <div className="grid pb-16 bg">
       <JobDashboard
@@ -90,9 +87,9 @@ export const SavedJobs = () => {
     <div className="font-inter grid grid-cols-1 w-full overflow-hidden gap-4 xl:gap-8">
       <div className="space-y-4 w-full">
         <h1 className="text-3xl text-center mb-8 font-medium font-inter">
-          Saved Jobs
+          Application History
         </h1>
-        <SearchBar />
+        {/* <SearchBar /> */}
         <div className="w-full flex flex-col gap-6">
           <div className="overflow-hidden border-none">
             <Table>

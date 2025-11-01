@@ -1,31 +1,12 @@
 "use client";
-
-import { IUser } from "@/types";
 import { cn } from "@/lib/utils";
 import { JSX, memo, useCallback, useMemo } from "react";
-import { ApplicationHistory } from "../components/ApplicationHistory";
-import { SavedJobs } from "../components/SavedJobs";
-import { AIRecommendations } from "../components/AIRecommendations";
+import { ApplicationHistory } from "./ApplicationHistory";
+import { SavedJobs } from "./SavedJobs";
+import { AIRecommendations } from "./AIRecommendations";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
-import { MdLocationSearching } from "react-icons/md";
-import { Separator } from "@/components/ui/separator";
-import { FaChevronDown } from "react-icons/fa";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Card } from "@/components/ui/card";
-import { IoLocationOutline } from "react-icons/io5";
-import { SearchIcon } from "lucide-react";
 
-// Types
 type ComponentId =
   | "overview"
   | "ai-recommendations"
@@ -40,7 +21,6 @@ interface MenuItem {
 }
 
 interface CategoryProps {
-  initialUser: Partial<IUser>;
   tab: string;
 }
 
@@ -138,7 +118,6 @@ export const Category = memo<CategoryProps>(({ tab }) => {
         return;
       }
 
-      // Navigate to the new URL
       router.push(item.url);
     },
     [router]
@@ -170,76 +149,3 @@ export const Category = memo<CategoryProps>(({ tab }) => {
 
 Category.displayName = "Category";
 
-export const SearchBar = () => {
-  return (
-    <Card className="bg-white grid grid-cols-2 md:grid-cols-4 gap-4 py-4 max-w-screen-md mx-auto rounded-xl items-center px-2 ">
-      <div className="relative w-full">
-        <input
-          type="text"
-          placeholder="Job title / company name"
-          className="w-full bg-transparent focus:outline-none pl-8 "
-        />
-        <SearchIcon className="absolute top-1/2 -translate-y-1/2 left-2 size-4" />
-      </div>
-      <div className="flex gap-1 items-center">
-        <div className="">
-          <Separator
-            className="h-8 w-[1px]  bg-gray-400 mx-2"
-            orientation="vertical"
-          />
-        </div>
-        <IoLocationOutline className="shrink-0 text-black/50" />
-        <DropdownMenu>
-          <DropdownMenuTrigger className="w-full text-start text-black/50 border-none focus:border-none focus:outline-none">
-            Location
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuLabel>Job Locations</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuRadioGroup>
-              <DropdownMenuRadioItem value="united states">
-                United states
-              </DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="united kingdom">
-                United Kingdom
-              </DropdownMenuRadioItem>
-            </DropdownMenuRadioGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-      <div className="flex gap-1 items-center">
-        <div className="">
-          <Separator
-            className="h-8 max-md:hidden w-[0.5px] bg-gray-400 mx-2"
-            orientation="vertical"
-          />
-        </div>
-
-        <DropdownMenu>
-          <DropdownMenuTrigger className="w-full focus:outline-none">
-            <div className="flex gap-2 items-center w-full text-black/50">
-              <MdLocationSearching />
-              <span className="text-black/50">Remote</span>
-              <FaChevronDown />
-            </div>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuLabel>Job Types</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuRadioGroup>
-              <DropdownMenuRadioItem value="remote">
-                Remote
-              </DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="sponsorships">
-                Sponsorship
-              </DropdownMenuRadioItem>
-            </DropdownMenuRadioGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-      <div className="flex mr-2 ml-auto">
-        <Button className="text-xs">Search</Button>
-      </div>
-    </Card>
-  );
-};

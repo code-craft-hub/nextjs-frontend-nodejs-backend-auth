@@ -43,6 +43,7 @@ export interface IUser {
   providerId?: string;
   emailVerified?: boolean;
   dataSource?: any[];
+  bookmarkedJobs: string[];
   role?: any[];
   isAnonymous?: boolean;
   displayName?: string;
@@ -54,6 +55,7 @@ export interface IUser {
   customClaims?: Record<string, any> | undefined;
   provider?: string;
   password?: string;
+  appliedJobs?: string[];
   analytics?: {
     totalApplications: number;
     totalResumes: number;

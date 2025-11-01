@@ -9,7 +9,7 @@ export const jobsQueries = {
   all: (filters: JobFilters = {}) => {
     const normalized = normalizeJobFilters(filters);
     return queryOptions({
-      queryKey: queryKeys.jobs.list(normalized), // Use normalized
+      queryKey: queryKeys.jobs.list(normalized),
       queryFn: () => jobsApi.getJobs(normalized),
       staleTime: 10 * 60 * 1000,
     });
@@ -19,26 +19,19 @@ export const jobsQueries = {
     return infiniteQueryOptions({
       queryKey: [...queryKeys.jobs.lists(), "infinite", baseFilters],
       queryFn: ({ pageParam }) => {
-        // console.log("Fetching page:", pageParam, "with filters:", baseFilters);
-
         return jobsApi.getJobs({
           ...baseFilters,
           page: pageParam,
           limit: baseFilters.limit || 20,
         });
       },
-      getNextPageParam: (
-        lastPage
-        // allPages, lastPageParam
-      ) => {
-        // console.log("Last page info:", { lastPage, allPages, lastPageParam });
+      getNextPageParam: (lastPage) => {
         if (lastPage.page < lastPage.totalPages) {
           return lastPage.page + 1;
         }
         return undefined;
       },
       getPreviousPageParam: (firstPage) => {
-        // console.log("First page info:", firstPage);
         if (firstPage.page > 1) {
           return firstPage.page - 1;
         }
@@ -46,6 +39,44 @@ export const jobsQueries = {
       },
       initialPageParam: 1,
       staleTime: 10 * 60 * 60 * 1000, // Match your regular query staleTime
+    });
+  },
+
+  bookmarked: (
+    bookmarkedIds: string[],
+    searchValue: string = "",
+    limit: number = 20
+  ) => {
+    return infiniteQueryOptions({
+      queryKey: ["jobs", "bookmarked", bookmarkedIds, searchValue, limit],
+      queryFn: ({ pageParam }) => {
+        const normalized = normalizeJobFilters({
+          bookmarkedIds,
+          searchValue,
+          limit,
+        });
+
+        console.log(normalized);
+
+        return jobsApi.getBookmarkedJobs(
+          normalized.bookmarkedIds,
+          pageParam,
+          normalized.limit,
+          normalized.searchValue
+        );
+      },
+      getNextPageParam: (lastPage) => {
+        const page = lastPage.page;
+        const totalPages = lastPage.totalPages;
+        return page < totalPages ? page + 1 : undefined;
+      },
+      getPreviousPageParam: (firstPage) => {
+        const page = firstPage.page;
+        return page > 1 ? page - 1 : undefined;
+      },
+      initialPageParam: 1,
+      staleTime: 5 * 60 * 1000,
+      enabled: bookmarkedIds.length > 0,
     });
   },
 
@@ -91,25 +122,3 @@ export const jobsQueries = {
       staleTime: 15 * 60 * 1000, // 15 minutes - rarely changes
     }),
 };
-// infinite: (filters: JobFilters = {}) =>
-//   infiniteQueryOptions({
-//     queryKey: [...queryKeys.jobs.lists(), 'infinite', filters],
-//     queryFn: ({ pageParam = 1 }) =>
-//       jobsApi.getJobs({ ...filters, page: pageParam, limit: 20 }),
-//     getNextPageParam: (lastPage) => {
-//       if (lastPage.page < lastPage.totalPages) {
-//         return lastPage.page + 1;
-//       }
-//       return undefined;
-//     },
-//     getPreviousPageParam: (firstPage) => {
-//       if (firstPage.page > 1) {
-//         return firstPage.page - 1;
-//       }
-//       return undefined;
-//     },
-//     initialPageParam: 1,
-//     staleTime: 2 * 60 * 1000,
-//   }),
-
-// Job detail
