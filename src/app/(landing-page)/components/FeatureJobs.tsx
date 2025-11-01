@@ -14,14 +14,19 @@ import { cn } from "@/lib/utils";
 export const FeatureJobs = ({ filters }: { filters: JobFilters }) => {
   const { data: jobs } = useQuery(jobsQueries.all(filters));
 
-
   const router = useRouter();
+  if (!jobs || jobs.data.length === 0) {
+    return null;
+  }
   return (
     <section id="feature-jobs" className="pb-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center mb-12">
           <h2 className="text-3xl font-bold text-gray-900">Featured Jobs</h2>
-          <Button variant="cveraiOutline" onClick={() => router.push("/dashboard/home?tab=find-jobs")}>
+          <Button
+            variant="cveraiOutline"
+            onClick={() => router.push("/dashboard/home?tab=find-jobs")}
+          >
             View All <ArrowRight className="w-4 h-4 ml-2" />
           </Button>
         </div>

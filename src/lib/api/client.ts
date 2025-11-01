@@ -101,16 +101,16 @@ export async function apiClient<T>(
     });
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      console.error("❌ API Error:", response.status, errorData);
-      console.error(response.status, response.statusText, errorData);
+      // const errorData = await response.json().catch(() => ({}));
+      // console.error("❌ API Error:", response.status, errorData);
+      // console.error(response.status, response.statusText, errorData);
     }
 
     const data = await response.json();
 
     return data;
   } catch (error) {
-    console.error("🔥 API Client Error:", error);
+    // console.error("🔥 API Client Error:", error);
     throw error;
   }
 }
