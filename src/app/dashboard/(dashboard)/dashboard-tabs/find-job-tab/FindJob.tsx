@@ -28,7 +28,7 @@ import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.share
 // } from "@/components/ui/hover-card";
 // import { Badge } from "@/components/ui/badge";
 // Move column definition outside component and make it a function
-export const getFindJobsColumns = (
+ const getFindJobsColumns = (
   router: AppRouterInstance
 ): // updateJobs: ReturnType<typeof useUpdateJobMutation>
 ColumnDef<JobType>[] => [

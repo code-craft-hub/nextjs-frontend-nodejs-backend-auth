@@ -1,5 +1,6 @@
 "use client";
-import React, { useState } from "react";
+
+import React, { useMemo, useState } from "react";
 import {
   ColumnFiltersState,
   flexRender,
@@ -11,29 +12,34 @@ import {
   VisibilityState,
 } from "@tanstack/react-table";
 
+import { userQueries } from "@/lib/queries/user.queries";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
+import {
+  useUpdateJobApplicationHistoryMutation,
+  useUpdateJobMutation,
+} from "@/lib/mutations/jobs.mutations";
+
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useMemo } from "react";
-import { useUpdateJobMutation } from "@/lib/mutations/jobs.mutations";
-import { getFindJobsColumns } from "../components/Overview";
-import { userQueries } from "@/lib/queries/user.queries";
 import { jobsQueries } from "@/lib/queries/jobs.queries";
 
 import { SearchBar } from "./JobSearchBar";
+import { getFindJobsColumns } from "../components/Overview";
 
 export const SavedJobs = () => {
-  const { data: user } = useQuery(userQueries.detail());
   const [searchValue, setSearchValue] = useState("");
-
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
   const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
-
+  React.useState<VisibilityState>({});
+  
   const [rowSelection, setRowSelection] = React.useState({});
+  
+  const { data: user } = useQuery(userQueries.detail());
+
+  const updateJobApplicationHistory = useUpdateJobApplicationHistoryMutation();
 
   const updateJobs = useUpdateJobMutation();
 
@@ -56,7 +62,11 @@ export const SavedJobs = () => {
   // const userJobTitlePreference =
   //   userDataSource?.key || userDataSource?.title || "";
 
-  const columns = getFindJobsColumns(router, undefined, updateJobs);
+  const columns = getFindJobsColumns({
+    router,
+    updateJobs,
+    updateJobApplicationHistory,
+  });
 
   const table = useReactTable({
     data: allJobs,
@@ -76,22 +86,24 @@ export const SavedJobs = () => {
     },
   });
 
-
-
   const onSubmit = (data: any) => {
     console.log("Search submitted:", data);
     setSearchValue(data.username);
-  }
+  };
+
   return (
     <div className="font-inter grid grid-cols-1 w-full overflow-hidden gap-4 xl:gap-8">
       <div className="space-y-4 w-full">
         <h1 className="text-3xl text-center mb-8 font-medium font-inter">
           Saved Jobs
         </h1>
-        <SearchBar
-         sendDataToParent={onSubmit}
-         allJobs={allJobs}
-        />
+        <SearchBar sendDataToParent={onSubmit} allJobs={allJobs} />
+
+        <div className="w-full bg-[#F1F2F4] p-2 px-4 rounded-sm sm:flex justify-between hidden font-roboto">
+          <p className="text-[#474C54]">Job</p>
+          <p className="text-[#474C54]">Date Applied</p>
+          <p className="text-[#474C54]">Action</p>
+        </div>
         <div className="w-full flex flex-col gap-6">
           <div className="overflow-hidden border-none">
             <Table>

@@ -14,7 +14,7 @@ export type UploadedFile = {
 export type DashboardTab = "ai-apply" | "find-jobs" | "tailor-cv";
 
 export type JobType = {
-  id: number;
+  id: string;
   title: string;
   company: string;
   companyLogo: string;
@@ -31,6 +31,7 @@ export type JobType = {
   descriptionText: string;
   link: string;
   salaryInfo: any;
+  appliedDate?: string;
   emailApply: string;
   postedAt: string;
   scrapedDate: string;
@@ -55,7 +56,7 @@ export interface IUser {
   customClaims?: Record<string, any> | undefined;
   provider?: string;
   password?: string;
-  appliedJobs?: string[];
+  appliedJobs?: { id: string; appliedDate: string }[];
   analytics?: {
     totalApplications: number;
     totalResumes: number;

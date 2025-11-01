@@ -44,7 +44,10 @@ import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.share
 import { userQueries } from "@/lib/queries/user.queries";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { useForm } from "react-hook-form";
-import { useUpdateJobMutation } from "@/lib/mutations/jobs.mutations";
+import {
+  useUpdateJobApplicationHistoryMutation,
+  useUpdateJobMutation,
+} from "@/lib/mutations/jobs.mutations";
 import { ReportCard } from "./ReportCard";
 
 export default function Overview() {
@@ -68,6 +71,7 @@ export default function Overview() {
   );
 
   const updateJobs = useUpdateJobMutation();
+  const updateJobApplicationHistory = useUpdateJobApplicationHistoryMutation();
   const { data: user } = useQuery(userQueries.detail());
   const userDataSource = getDataSource(user);
   const userJobTitlePreference =
@@ -118,7 +122,12 @@ export default function Overview() {
     )?.toFixed(0) || 0
   );
 
-  const columns = getFindJobsColumns(router, matchPercentage, updateJobs);
+  const columns = getFindJobsColumns({
+    router,
+    matchPercentage,
+    updateJobs,
+    updateJobApplicationHistory,
+  });
   const table = useReactTable({
     data: allJobs,
     columns: columns,
@@ -298,11 +307,17 @@ export default function Overview() {
   );
 }
 
-export const getFindJobsColumns = (
-  router: AppRouterInstance,
-  matchPercentage?: number,
-  updateJobs?: any
-): ColumnDef<JobType>[] => [
+export const getFindJobsColumns = ({
+  router,
+  matchPercentage,
+  updateJobs,
+  updateJobApplicationHistory,
+}: {
+  router: AppRouterInstance;
+  matchPercentage?: number;
+  updateJobs?: any;
+  updateJobApplicationHistory?: any;
+}): ColumnDef<JobType>[] => [
   {
     accessorKey: "companyText",
     header: "Company",
@@ -368,7 +383,6 @@ export const getFindJobsColumns = (
       );
     },
   },
-
   {
     accessorKey: "isBookmarked",
     cell: ({ row }) => {
@@ -407,6 +421,12 @@ export const getFindJobsColumns = (
             className="w-full"
             onClick={async () => {
               if (!row.original?.emailApply) {
+                updateJobApplicationHistory.mutate({
+                  id: String(row.original.id),
+                  data: {
+                    appliedJobs: row.original.id,
+                  },
+                });
                 window.open(row.original.link, "__blank");
                 return;
               }
@@ -442,6 +462,13 @@ export const getFindJobsColumns = (
                 "recruiterEmail",
                 encodeURIComponent(row.original?.emailApply)
               );
+
+              updateJobApplicationHistory.mutate({
+                id: String(row.original.id),
+                data: {
+                  appliedJobs: row.original.id,
+                },
+              });
               router.push(
                 `/dashboard/tailor-cover-letter/${uuidv4()}?${params}&aiApply=true`
               );

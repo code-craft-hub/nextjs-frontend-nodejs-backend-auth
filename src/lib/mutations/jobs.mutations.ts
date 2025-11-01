@@ -117,6 +117,67 @@ export function useUpdateJobMutation() {
     },
   });
 }
+export function useUpdateJobApplicationHistoryMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: any }) =>
+      jobsApi.updateJobApplicationHistory(id, data),
+    // onMutate: async ({ id, data }) => {
+    //   await queryClient.cancelQueries({ queryKey: queryKeys.jobs.detail(id) });
+
+    //   const previousJob = queryClient.getQueryData(queryKeys.jobs.detail(id));
+
+    //   // Update detail view
+    //   queryClient.setQueryData<any>(queryKeys.jobs.detail(id), (old: any) => {
+    //     if (!old) return old;
+    //     return { ...old, ...data, updatedAt: new Date().toISOString() };
+    //   });
+
+    //   // Update in all list queries
+    //   queryClient.setQueriesData<PaginatedResponse<any>>(
+    //     { queryKey: queryKeys.jobs.lists() },
+    //     (old) => {
+    //       if (!old) return old;
+    //       return {
+    //         ...old,
+    //         data: old.data.map((job) =>
+    //           job.id === id
+    //             ? { ...job, ...data, updatedAt: new Date().toISOString() }
+    //             : job
+    //         ),
+    //       };
+    //     }
+    //   );
+
+    //   return { previousJob };
+    // },
+    // onError: (_err, { id }, context) => {
+    //   if (context?.previousJob) {
+    //     queryClient.setQueryData(
+    //       queryKeys.jobs.detail(id),
+    //       context.previousJob
+    //     );
+    //   }
+    // },
+    onSuccess: (_updatedJob) => {
+      // Update stats if status changed
+      // queryClient.invalidateQueries({ queryKey: queryKeys.jobs.stats() });
+      
+      // Invalidate similar jobs if tags or other metadata changed
+      // queryClient.invalidateQueries({
+        //   queryKey: [...queryKeys.jobs.all, "similar"],
+        // });
+      },
+      onSettled: (_data, _error, 
+        // { id }
+      ) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.users.all });
+      // queryClient.invalidateQueries({ queryKey: queryKeys.jobs.detail(id) });
+      // queryClient.invalidateQueries({ queryKey: queryKeys.jobs.lists() });
+    },
+  });
+}
 
 export function useDeleteJobMutation() {
   const queryClient = useQueryClient();

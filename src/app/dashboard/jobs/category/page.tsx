@@ -14,6 +14,7 @@ const CategoryPage = async ({ searchParams }: any) => {
   const queryClient = createServerQueryClient();
   const user = await queryClient.fetchQuery(userQueries.detail());
   const bookmarkedIds = (user.bookmarkedJobs || []) as string[];
+  const appliedJobsIds = (user.appliedJobs?.map((job) => job.id) || []) as string[];
 
   const filters = {
     limit: 20,
@@ -22,6 +23,9 @@ const CategoryPage = async ({ searchParams }: any) => {
   await queryClient.prefetchInfiniteQuery(jobsQueries.infinite(filters));
   await queryClient.prefetchInfiniteQuery(
     jobsQueries.bookmarked(bookmarkedIds, "", 20)
+  );
+  await queryClient.prefetchInfiniteQuery(
+    jobsQueries.appliedJobs(appliedJobsIds, "", 20)
   );
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>

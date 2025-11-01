@@ -19,6 +19,10 @@ export const jobsApi = {
   // Update job
   updateJob: (id: string, data: any) => api.patch<JobType>(`/jobs/${id}`, data),
 
+  // Update application history of a job
+  updateJobApplicationHistory: (id: string, data: any) =>
+    api.patch<JobType>(`/jobs/application-history/${id}`, data),
+
   // Delete job
   deleteJob: (id: string) => api.delete<void>(`/job-recommendations/${id}`),
 
@@ -73,6 +77,15 @@ export const jobsApi = {
   // Body: { jobIds: string[], page?: number, limit?: number, title?: string }
   getBookmarkedJobs: (jobIds: string[], page = 1, limit = 20, title?: string) =>
     api.post<PaginatedResponse<JobType>>("/job-recommendations/bookmarked", {
+      jobIds,
+      page,
+      limit,
+      title,
+    }),
+  // Fetch applied jobs by IDs with pagination (client passes user's applied job IDs)
+  // Body: { jobIds: string[], page?: number, limit?: number, title?: string }
+  getAppliedJobs: (jobIds: string[], page = 1, limit = 20, title?: string) =>
+    api.post<PaginatedResponse<JobType>>("/job-recommendations/applied-jobs", {
       jobIds,
       page,
       limit,

@@ -14,6 +14,7 @@ export const jobsQueries = {
       staleTime: 10 * 60 * 1000,
     });
   },
+  
   infinite: (filters: Omit<JobFilters, "page">) => {
     const baseFilters = normalizeJobFilters(filters as JobFilters);
     return infiniteQueryOptions({
@@ -41,6 +42,7 @@ export const jobsQueries = {
       staleTime: 10 * 60 * 60 * 1000, // Match your regular query staleTime
     });
   },
+
 
   bookmarked: (
     bookmarkedIds: string[],
@@ -79,6 +81,45 @@ export const jobsQueries = {
       enabled: bookmarkedIds.length > 0,
     });
   },
+
+  appliedJobs: (
+    appliedjobsIds: string[],
+    searchValue: string = "",
+    limit: number = 20
+  ) => {
+    return infiniteQueryOptions({
+      queryKey: ["jobs", "appliedJobs", appliedjobsIds, searchValue, limit],
+      queryFn: ({ pageParam }) => {
+        const normalized = normalizeJobFilters({
+          appliedjobsIds,
+          searchValue,
+          limit,
+        });
+
+        console.log(normalized);
+
+        return jobsApi.getAppliedJobs(
+          normalized.appliedjobsIds,
+          pageParam,
+          normalized.limit,
+          normalized.searchValue
+        );
+      },
+      getNextPageParam: (lastPage) => {
+        const page = lastPage.page;
+        const totalPages = lastPage.totalPages;
+        return page < totalPages ? page + 1 : undefined;
+      },
+      getPreviousPageParam: (firstPage) => {
+        const page = firstPage.page;
+        return page > 1 ? page - 1 : undefined;
+      },
+      initialPageParam: 1,
+      staleTime: 5 * 60 * 1000,
+      enabled: appliedjobsIds.length > 0,
+    });
+  },
+
 
   detail: (id: string) =>
     queryOptions({

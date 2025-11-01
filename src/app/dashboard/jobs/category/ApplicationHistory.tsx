@@ -1,41 +1,42 @@
-import React from "react";
-import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
+"use client";
+import React, { useMemo, useState } from "react";
 import {
   ColumnFiltersState,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
   SortingState,
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
-
-import { jobsData, overviewColumns } from "./AIRecommendations";
-import { useQuery } from "@tanstack/react-query";
+import { overviewColumns } from "./AIRecommendations";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { jobsQueries } from "@/lib/queries/jobs.queries";
-import JobDashboard from "../../(dashboard)/dashboard-tabs/find-job-tab/FindJobClient";
-import { getFindJobsColumns } from "../../(dashboard)/dashboard-tabs/find-job-tab/FindJob";
 import { useRouter } from "next/navigation";
+import { SearchBar } from "./JobSearchBar";
 
-export type IJobType = {
-  id: number;
-  title: string;
-  company: string;
-  companyLogo: string;
-  companyIcon: string;
-  companyText: string;
-  location: string;
-  salary: string;
-  postedTime: string;
-  matchPercentage: string;
-  jobType: string;
-  isBookmarked: boolean;
-  isFilled: boolean;
-};
+import { Button } from "@/components/ui/button";
+import { ColumnDef } from "@tanstack/react-table";
+import {
+  DollarSign,
+  MapPin,
+  Sparkles,
+} from "lucide-react";
+import {
+  formatAppliedDate,
+} from "@/lib/utils/helpers";
+import { JobType } from "@/types";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+import { userQueries } from "@/lib/queries/user.queries";
+import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
+import {
+  useUpdateJobApplicationHistoryMutation,
+  useUpdateJobMutation,
+} from "@/lib/mutations/jobs.mutations";
 
 export const ApplicationHistory = () => {
+  const [searchValue, setSearchValue] = useState("");
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -43,13 +44,51 @@ export const ApplicationHistory = () => {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
-  const table = useReactTable({
-    data: jobsData,
-    columns: overviewColumns,
+
+  const { data: user } = useQuery(userQueries.detail());
+
+  const appliedJobsMap = useMemo(() => {
+    return new Map(
+      user?.appliedJobs?.map((job) => [job.id, job.appliedDate]) || []
+    );
+  }, [user?.appliedJobs]);
+
+  const updateJobApplicationHistory = useUpdateJobApplicationHistoryMutation();
+
+  const updateJobs = useUpdateJobMutation();
+
+  const router = useRouter();
+
+  const appliedJobsIds = (user?.appliedJobs?.map((job) => job.id) ||
+    []) as string[];
+
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useInfiniteQuery(jobsQueries.appliedJobs(appliedJobsIds, searchValue, 20));
+
+  // const allJobs = useMemo(() => {
+  //   return data?.pages.flatMap((page) => page.data) ?? [];
+  // }, [data]);
+
+  const allJobs = useMemo(() => {
+    const jobs = data?.pages.flatMap((page) => page.data) ?? [];
+    return jobs.map((job) => ({
+      ...job,
+      appliedDate: appliedJobsMap.get(job.id) || null,
+    }));
+  }, [data, appliedJobsMap]);
+
+  const columns = getFindJobsColumns({
+    router,
+    updateJobs,
+    updateJobApplicationHistory,
+  });
+
+  const table = useReactTable<(typeof allJobs)[number]>({
+    data: allJobs,
+    columns: columns as ColumnDef<(typeof allJobs)[number]>[],
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
@@ -62,26 +101,10 @@ export const ApplicationHistory = () => {
     },
   });
 
-  const filters: any = {
-    page: 1,
-    limit: 20,
+  const onSubmit = (data: any) => {
+    console.log("Search submitted:", data);
+    setSearchValue(data.username);
   };
-
-  const { data: initialData } = useQuery({
-    ...jobsQueries.all(filters),
-    initialData: undefined, // Let it pull from cache
-  });
-
-  const router = useRouter();
-  return (
-    <div className="grid pb-16 bg">
-      <JobDashboard
-        initialJobs={initialData?.data ?? []}
-        fingJobsColumns={getFindJobsColumns(router)}
-        filters={filters}
-      />
-    </div>
-  );
 
   return (
     <div className="font-inter grid grid-cols-1 w-full overflow-hidden gap-4 xl:gap-8">
@@ -89,7 +112,13 @@ export const ApplicationHistory = () => {
         <h1 className="text-3xl text-center mb-8 font-medium font-inter">
           Application History
         </h1>
-        {/* <SearchBar /> */}
+        <SearchBar sendDataToParent={onSubmit} allJobs={allJobs} />
+
+        <div className="w-full bg-[#F1F2F4] p-2 px-4 rounded-sm sm:flex justify-between hidden font-roboto">
+          <p className="text-[#474C54]">Job</p>
+          <p className="text-[#474C54]">Date Applied</p>
+          <p className="text-[#474C54]">Action</p>
+        </div>
         <div className="w-full flex flex-col gap-6">
           <div className="overflow-hidden border-none">
             <Table>
@@ -124,8 +153,120 @@ export const ApplicationHistory = () => {
               </TableBody>
             </Table>
           </div>
+          {hasNextPage && (
+            <div className="mt-4 flex justify-center">
+              <button
+                onClick={() => fetchNextPage()}
+                disabled={isFetchingNextPage}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+              >
+                {isFetchingNextPage ? "Loading more..." : "Load More"}
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
   );
 };
+
+const getFindJobsColumns = ({
+  // router,
+  matchPercentage,
+}: {
+  router: AppRouterInstance;
+  matchPercentage?: number;
+  updateJobs?: any;
+  updateJobApplicationHistory?: any;
+}): ColumnDef<JobType>[] => [
+  {
+    accessorKey: "companyText",
+    header: "Company",
+    cell: ({ row }) => (
+      <div className="shrink-0 flex items-center justify-center size-16">
+        <img
+          src={
+            !!row.original.companyLogo
+              ? row.original.companyLogo
+              : "/placeholder.jpg"
+          }
+          alt={row.original.companyText}
+          className="size-12"
+        />
+      </div>
+    ),
+  },
+  {
+    accessorKey: "title",
+    header: "Title",
+    cell: ({ row }) => {
+      return (
+        <div className="capitalize ">
+          <div className="flex gap-4 items-center">
+            <div className="font-medium text-xs max-w-44 truncate line-clamp-1 overflow-hidden">
+              {row.getValue("title")}
+            </div>
+            <div className="bg-blue-50 rounded-2xl text-blue-600 px-2 py-1">
+              <span className="text-2xs">
+                {!!row.original.jobType
+                  ? row.original.jobType
+                  : row.original.employmentType}
+              </span>
+            </div>
+            <div className="">
+              {matchPercentage && matchPercentage > 30 && (
+                <Sparkles className="text-yellow-500 size-4" />
+              )}
+            </div>
+          </div>
+          <div className="flex gap-x-4 mt-1">
+            <p className="flex gap-1 text-gray-400 items-center">
+              <MapPin className="size-3" />
+              <span className="text-2xs">{row.original.location}</span>
+            </p>
+            <p className="flex gap-1 text-gray-400 items-center">
+              <DollarSign className="size-3" />
+              <span className="text-2xs">
+                {!!row.original?.salary
+                  ? row.original?.salary
+                  : "Not disclosed"}
+              </span>
+            </p>
+          </div>
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "appliedDate",
+    header: "Applied Date",
+    cell: ({ row }) => {
+      return (
+        <div className="capitalize ">
+          <div className="flex gap-4 items-center">
+            <div className="font-medium text-xs max-w-sm overflow-hidden">
+              {formatAppliedDate(row.getValue("appliedDate"))}
+            </div>
+          </div>
+        </div>
+      );
+    },
+  },
+  {
+    id: "actions",
+    enableHiding: false,
+    cell: () => {
+      return (
+        <div className="flex justify-end">
+          <Button
+            className="w-full bg-[#F1F2F4] hover:bg-[#E2E4E8] text-primary border-0"
+            onClick={async () => {}}
+            variant={"outline"}
+          >
+            View Details
+          </Button>
+        </div>
+      );
+    },
+  },
+];

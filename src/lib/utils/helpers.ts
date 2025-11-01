@@ -24,6 +24,39 @@ export const getJwtSecret = () => {
   return secret;
 };
 
+export const formatAppliedDate = (dateString: string): string => {
+  try {
+    const date = new Date(dateString);
+
+    // Check if date is valid, use today's date if invalid
+    const validDate = isNaN(date.getTime()) ? new Date() : date;
+
+    // Format: MMM D, YYYY HH:mm
+    const options: Intl.DateTimeFormatOptions = {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    };
+
+    return new Intl.DateTimeFormat("en-US", options).format(validDate);
+  } catch (error) {
+    // Return today's date on any error
+    const today = new Date();
+    const options: Intl.DateTimeFormatOptions = {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    };
+    return new Intl.DateTimeFormat("en-US", options).format(today);
+  }
+};
+
 export const getDataSource = (user?: Partial<IUser>) => {
   return Array.isArray(user?.dataSource)
     ? user?.dataSource?.find(

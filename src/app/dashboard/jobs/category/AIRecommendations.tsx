@@ -22,25 +22,11 @@ import { FaRegBookmark, FaBookmark } from "react-icons/fa";
 import JobDashboard from "../../(dashboard)/dashboard-tabs/find-job-tab/FindJobClient";
 import { useQuery } from "@tanstack/react-query";
 import { jobsQueries } from "@/lib/queries/jobs.queries";
-import { getFindJobsColumns } from "../../(dashboard)/dashboard-tabs/find-job-tab/FindJob";
 import { useRouter } from "next/navigation";
+import { getFindJobsColumns } from "../components/Overview";
+import { JobType } from "@/types";
 
-export type IJobType = {
-  id: number;
-  title: string;
-  company: string;
-  companyLogo: string;
-  companyIcon: string;
-  companyText: string;
-  location: string;
-  salary: string;
-  postedTime: string;
-  matchPercentage: string;
-  jobType: string;
-  isBookmarked: boolean;
-  isFilled: boolean;
-};
-export const overviewColumns: ColumnDef<IJobType>[] = [
+export const overviewColumns: ColumnDef<JobType>[] = [
   {
     accessorKey: "company",
     header: ({ column }) => {
@@ -124,15 +110,13 @@ export const overviewColumns: ColumnDef<IJobType>[] = [
     cell: () => {
       return (
         <div className="flex justify-end">
-          <Button variant={"button"} >
-            Apply Now
-          </Button>
+          <Button variant={"button"}>Apply Now</Button>
         </div>
       );
     },
   },
 ];
-export const jobsData = [
+ const jobsData = [
   {
     id: 1,
     title: "Technical Support Specialist",
@@ -268,7 +252,7 @@ export const AIRecommendations = () => {
     <div className="grid pb-16 bg">
       <JobDashboard
         initialJobs={initialData?.data ?? []}
-        fingJobsColumns={getFindJobsColumns(router)}
+        fingJobsColumns={getFindJobsColumns({ router })}
         filters={filters}
       />
     </div>
