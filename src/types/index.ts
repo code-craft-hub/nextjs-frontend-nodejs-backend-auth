@@ -31,6 +31,7 @@ export type JobType = {
   companyName: string;
   descriptionText: string;
   link: string;
+  isApplied: boolean;
   salaryInfo: any;
   appliedDate?: string;
   emailApply: string;

@@ -84,10 +84,22 @@ export default function Overview() {
   });
 
   const bookmarkedIds = (user?.bookmarkedJobs || []) as string[];
+  const appliedJobsIds = (user?.appliedJobs?.map((job) => job.id) ||
+    []) as string[];
 
-  const bookmarkedIdSet = useMemo(() => {
-    return new Set(bookmarkedIds);
-  }, [bookmarkedIds]);
+  const bookmarkedIdSet = useMemo(
+    () => new Set(bookmarkedIds),
+    [bookmarkedIds]
+  );
+
+  const appliedJobsIdSet = useMemo(
+    () => new Set(appliedJobsIds),
+    [appliedJobsIds]
+  );
+
+
+  // console.count("OVERVIEW COMPONENT RENDERED");
+
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useInfiniteQuery(jobsQueries?.infinite(infiniteFilters));
 
@@ -99,15 +111,17 @@ export default function Overview() {
       const match = jobContent
         ?.toLowerCase()
         ?.includes(userJobTitlePreference?.toLowerCase());
+
       return {
         ...job,
         isBookmarked: bookmarkedIdSet.has(job.id),
+        isApplied: appliedJobsIdSet.has(job.id),
         matchPercentage: match
           ? Math.floor(80 + Math.random() * 20).toString()
           : Math.floor(10 + Math.random() * 10).toString(),
       };
     });
-  }, [data]);
+  }, [data, bookmarkedIdSet, appliedJobsIdSet]);
 
   const commend = useMemo(() => {
     return (
@@ -142,7 +156,6 @@ export default function Overview() {
 
   const columns = getFindJobsColumns({
     router,
-    matchPercentage,
     updateJobs,
     updateJobApplicationHistory,
   });
@@ -327,12 +340,10 @@ export default function Overview() {
 
 export const getFindJobsColumns = ({
   router,
-  matchPercentage,
   updateJobs,
   updateJobApplicationHistory,
 }: {
   router: AppRouterInstance;
-  matchPercentage?: number;
   updateJobs?: any;
   updateJobApplicationHistory?: any;
 }): ColumnDef<JobType>[] => [
@@ -357,6 +368,7 @@ export const getFindJobsColumns = ({
     accessorKey: "title",
     header: "Title",
     cell: ({ row }) => {
+      const matchPercentage = Number(row.original.matchPercentage) || 0;
       return (
         <div className="capitalize ">
           <div className="flex gap-4 items-center">
@@ -429,7 +441,7 @@ export const getFindJobsColumns = ({
             aria-label="Toggle bookmark"
             size="sm"
             variant="outline"
-            className="data-[state=on]:bg-transparent data-[state=on]:*:[svg]:fill-blue-500 data-[state=on]:*:[svg]:stroke-blue-500"
+            className="data-[state=on]:bg-transparent data-[state=on]:*:[svg]:fill-black data-[state=on]:*:[svg]:stroke-black"
           >
             <BookmarkIcon />
           </Toggle>
@@ -444,7 +456,8 @@ export const getFindJobsColumns = ({
       return (
         <div className="flex justify-end">
           <Button
-            className="w-full"
+            disabled={row.original.isApplied}
+            className="w-full disabled:opacity-50 disabled:cursor-not-allowed disabled:text-gray-400"
             onClick={async () => {
               if (!row.original?.emailApply) {
                 updateJobApplicationHistory.mutate({
