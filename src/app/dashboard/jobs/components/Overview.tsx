@@ -361,6 +361,9 @@ export const getFindJobsColumns = ({
       </div>
     ),
   },
+  { accessorKey: "location", cell: () => <div></div> },
+  { accessorKey: "jobType", cell: () => <div></div> },
+  { accessorKey: "employmentType", cell: () => <div></div> },
   {
     accessorKey: "title",
     header: "Title",

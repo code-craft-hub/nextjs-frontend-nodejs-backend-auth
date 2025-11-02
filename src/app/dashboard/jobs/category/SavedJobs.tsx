@@ -110,7 +110,7 @@ export const SavedJobs = () => {
         <h1 className="text-3xl text-center mb-8 font-medium font-inter">
           Saved Jobs
         </h1>
-        <SearchBar  allJobs={allJobs} />
+        <SearchBar table={table} allJobs={allJobs} />
 
         <div className="w-full bg-[#F1F2F4] p-2 px-4 rounded-sm sm:flex justify-between hidden font-roboto">
           <p className="text-[#474C54]">Job</p>

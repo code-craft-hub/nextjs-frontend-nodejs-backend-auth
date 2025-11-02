@@ -135,12 +135,12 @@ export const SearchBar = ({
                   {location || "Location"}
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-56">
-                  <DropdownMenuLabel className="flex justify-between">
+                  <DropdownMenuLabel className="flex justify-between hover:cursor-pointer">
                     Select your location
                     <HoverCard>
                       <HoverCardTrigger>
                         <X
-                          className="size-4"
+                          className="size-4 hover:cursor-pointer"
                           onClick={() => {
                             table
                               .getColumn("location")
@@ -189,7 +189,7 @@ export const SearchBar = ({
                   </div>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-56">
-                  <DropdownMenuLabel className="flex justify-between">
+                  <DropdownMenuLabel className="flex justify-between hover:cursor-pointer">
                     Select Job type
                     <HoverCard>
                       <HoverCardTrigger>
