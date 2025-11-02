@@ -28,7 +28,7 @@ import { getFindJobsColumns } from "../components/Overview";
 import { getDataSource } from "@/lib/utils/helpers";
 
 export const SavedJobs = () => {
-  const [searchValue, setSearchValue] = useState("");
+  const [searchValue, _setSearchValue] = useState("");
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -99,10 +99,10 @@ export const SavedJobs = () => {
     },
   });
 
-  const onSubmit = (data: any) => {
-    console.log("Search submitted:", data);
-    setSearchValue(data.username);
-  };
+  // const onSubmit = (data: any) => {
+  //   console.log("Search submitted:", data);
+  //   setSearchValue(data.username);
+  // };
 
   return (
     <div className="font-inter grid grid-cols-1 w-full overflow-hidden gap-4 xl:gap-8">
@@ -110,7 +110,7 @@ export const SavedJobs = () => {
         <h1 className="text-3xl text-center mb-8 font-medium font-inter">
           Saved Jobs
         </h1>
-        <SearchBar sendDataToParent={onSubmit} allJobs={allJobs} />
+        <SearchBar  allJobs={allJobs} />
 
         <div className="w-full bg-[#F1F2F4] p-2 px-4 rounded-sm sm:flex justify-between hidden font-roboto">
           <p className="text-[#474C54]">Job</p>

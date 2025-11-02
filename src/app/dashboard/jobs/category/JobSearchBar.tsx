@@ -113,7 +113,7 @@ export const SearchBar = ({
                         variant="ghost"
                         size="icon"
                         onClick={handleClear}
-                        className="h-9 w-9"
+                        className="h-9 w-9 hover:cursor-pointer"
                       >
                         <X className="h-4 w-4" />
                       </Button>
@@ -194,7 +194,7 @@ export const SearchBar = ({
                     <HoverCard>
                       <HoverCardTrigger>
                         <X
-                          className="size-4"
+                          className="size-4 hover:cursor-pointer"
                           onClick={() => {
                             table
                               .getColumn("location")
