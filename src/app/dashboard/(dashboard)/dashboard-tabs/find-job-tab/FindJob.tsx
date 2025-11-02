@@ -218,8 +218,6 @@ export const FindJob = memo(({ filters }: { filters: JobFilters }) => {
   });
   // updateJobs
 
-  console.count("FIND JOB RENDER");
-
   return (
     <div className="flex flex-col font-poppins h-screen relative">
       <h1 className="font-instrument text-3xl text-center tracking-tighter mb-8">

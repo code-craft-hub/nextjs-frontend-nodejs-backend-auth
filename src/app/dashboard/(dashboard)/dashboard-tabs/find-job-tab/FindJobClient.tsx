@@ -11,13 +11,15 @@ import {
 } from "@tanstack/react-table";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { JobType } from "@/types";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { jobsQueries } from "@/lib/queries/jobs.queries";
 import React, { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { JobFilters } from "@/lib/types/jobs";
 import { ReportCard } from "@/app/dashboard/jobs/components/ReportCard";
 import JobSearchInput from "@/components/shared/JobSearchInput";
+import { userQueries } from "@/lib/queries/user.queries";
+import { getDataSource } from "@/lib/utils/helpers";
 
 export default function JobDashboard({
   hideToMenus,
@@ -42,11 +44,39 @@ export default function JobDashboard({
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     useInfiniteQuery(jobsQueries.infinite(searchValue));
 
-  const allJobs = useMemo(() => {
-    return data?.pages.flatMap((page) => page.data) ?? initialJobs;
-  }, [data, initialJobs]);
+  const { data: user } = useQuery(userQueries.detail());
+  const userDataSource = getDataSource(user);
+  const userJobTitlePreference =
+    userDataSource?.key || userDataSource?.title || "";
 
-  console.count("FINDJOB CLIENT RENDER");
+  const allJobs = useMemo(() => {
+    const bookmarkedIdSet = new Set(user?.bookmarkedJobs || []);
+
+    const appliedJobsIdSet = new Set(
+      user?.appliedJobs?.map((job) => job.id) || []
+    );
+    const jobs = data?.pages.flatMap((page) => page.data) ?? [];
+    return jobs.map((job) => {
+      const jobContent = job?.title + " " + job?.descriptionText;
+      const match = jobContent
+        ?.toLowerCase()
+        ?.includes(userJobTitlePreference?.toLowerCase());
+
+      return {
+        ...job,
+        isBookmarked: bookmarkedIdSet.has(job.id),
+        isApplied: appliedJobsIdSet.has(job.id),
+        matchPercentage: match
+          ? Math.floor(80 + Math.random() * 20).toString()
+          : Math.floor(10 + Math.random() * 10).toString(),
+      };
+    });
+  }, [
+    data,
+    initialJobs,
+    user?.bookmarkedJobs?.length,
+    user?.appliedJobs?.length,
+  ]);
 
   const table = useReactTable({
     data: allJobs,

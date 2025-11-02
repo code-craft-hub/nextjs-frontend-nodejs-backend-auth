@@ -97,8 +97,6 @@ export default function Overview() {
     [appliedJobsIds]
   );
 
-  // console.count("OVERVIEW COMPONENT RENDERED");
-
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useInfiniteQuery(jobsQueries?.infinite(infiniteFilters));
 
@@ -120,7 +118,7 @@ export default function Overview() {
           : Math.floor(10 + Math.random() * 10).toString(),
       };
     });
-  }, [data, bookmarkedIdSet, appliedJobsIdSet]);
+  }, [data, user?.bookmarkedJobs?.length, user?.appliedJobs?.length]);
 
   const commend = useMemo(() => {
     return (

@@ -62,8 +62,6 @@ export const ResumeGenerator = ({
     }
   }, [user, jobDescription, existingResume, isFetched, status]);
 
-  console.count("RESUME GENERATOR RENDERED");
-
   const resumeData = existingResume || streamData;
 
   return (

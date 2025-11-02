@@ -40,13 +40,11 @@ export const TailorInterviewQuestion = ({
     }
   }, [qaData.length, isGenerating]);
 
-  console.count("Render TailorInterviewQuestion");
   useEffect(() => {
     if (isFetched && status === "success") {
       if (jobDescription?.trim() && !hasGeneratedRef.current && !data) {
         hasGeneratedRef.current = true;
 
-        console.count("API CALLED TailorInterviewQuestion");
         toast.promise(handleSubmit(), {
           loading: "I'm generating your tailored interview questions...",
           success: () => {

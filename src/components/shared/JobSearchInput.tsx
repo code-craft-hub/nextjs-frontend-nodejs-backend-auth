@@ -15,7 +15,6 @@ import { SearchIcon, X } from "lucide-react";
 
 
 const JobSearchInput = ({ table, handleSearchSubmit }: any) => {
-//   console.count("JOB SEARCH INPUT RENDER");
   const [showClearButton, setShowClearButton] = useState(false);
 
   const formSchema = z.object({

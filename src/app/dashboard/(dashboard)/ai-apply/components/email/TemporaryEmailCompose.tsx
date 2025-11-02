@@ -15,7 +15,6 @@ export const TemporaryEmailCompose = memo<{
   coverLetterId: string;
   aiApply?: boolean;
 }>(({ jobDescription, coverLetterId, aiApply }) => {
-  console.count("TEMP EMAIL COMPOSE RENDERED");
 
   const { generatedContent, isGenerating, error, generateCoverLetter } =
     useCoverLetterGenerator();
