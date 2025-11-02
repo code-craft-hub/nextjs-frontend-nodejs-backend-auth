@@ -1,5 +1,4 @@
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { ArrowRight, SearchIcon, Loader2 } from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react";
 import {
   ColumnFiltersState,
   flexRender,
@@ -11,15 +10,14 @@ import {
   VisibilityState,
 } from "@tanstack/react-table";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
-import { cn } from "@/lib/utils";
 import { JobType } from "@/types";
-import { useRouter } from "next/navigation";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { jobsQueries } from "@/lib/queries/jobs.queries";
 import React, { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { JobFilters } from "@/lib/types/jobs";
-import { menuItems } from "@/lib/utils/constants";
+import { ReportCard } from "@/app/dashboard/jobs/components/ReportCard";
+import JobSearchInput from "@/components/shared/JobSearchInput";
 
 export default function JobDashboard({
   hideToMenus,
@@ -32,22 +30,23 @@ export default function JobDashboard({
   filters: Omit<JobFilters, "page">;
   hideToMenus?: boolean;
 }) {
-  const router = useRouter();
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
-  const [searchValue, setSearchValue] = useState("");
+  const [searchValue, setSearchValue] = useState(() => {
+    return filters;
+  });
   const [isAutoFetching, setIsAutoFetching] = useState(false);
 
-  const { page, ...infiniteFilters } = filters as any;
-
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
-    useInfiniteQuery(jobsQueries.infinite(infiniteFilters));
+    useInfiniteQuery(jobsQueries.infinite(searchValue));
 
   const allJobs = useMemo(() => {
     return data?.pages.flatMap((page) => page.data) ?? initialJobs;
   }, [data, initialJobs]);
+
+  // console.count("FINDJOB CLIENT RENDER");
 
   const table = useReactTable({
     data: allJobs,
@@ -87,9 +86,7 @@ export default function JobDashboard({
         setIsAutoFetching(false);
       }
     };
-
-    const timeoutId = setTimeout(checkAndFetchMore, 300);
-    return () => clearTimeout(timeoutId);
+    checkAndFetchMore();
   }, [
     table.getColumn("title")?.getFilterValue(),
     table.getFilteredRowModel().rows.length,
@@ -98,66 +95,17 @@ export default function JobDashboard({
     fetchNextPage,
   ]);
 
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value;
-    setSearchValue(value);
-    table.getColumn("title")?.setFilterValue(value);
-  };
-
   const visibleRows = table.getRowModel().rows;
   const hasNoResults = visibleRows.length === 0;
-  const isSearching = isAutoFetching || isFetchingNextPage;
+
+  const handleSearchSubmit = (data: any) => {
+    setSearchValue((prev) => ({ ...prev, title: data }));
+  };
 
   return (
     <div className="w-full flex flex-col gap-6">
-      {!hideToMenus && (
-        <ScrollArea className="grid grid-cols-1">
-          <div className="flex flex-row gap-4 py-4 mx-auto w-fit">
-            {menuItems.map((item) => (
-              <div
-                key={item.id}
-                className={cn(
-                  item.bgColor,
-                  "flex justify-between p-4 items-center rounded-md w-64 hover:shadow-sm hover:cursor-pointer"
-                )}
-                onClick={() => {
-                  router.push(item.url);
-                }}
-              >
-                <div className="">
-                  <h1 className="font-bold mb-1">{item.count}</h1>
-                  <p className="text-xs">{item.label}</p>
-                </div>
-                <div className="bg-white p-3 size-fit rounded-sm">
-                  <img src={item.icon} alt={item.label} className="size-4" />
-                </div>
-              </div>
-            ))}
-          </div>
-          <ScrollBar orientation="horizontal" />
-        </ScrollArea>
-      )}
-      <div className="bg-white shadow-lg p-4 flex gap-4 justify-between rounded-lg">
-        <div className="flex items-center gap-2 w-full">
-          <SearchIcon />
-          <input
-            type="text"
-            value={searchValue}
-            onChange={handleSearchChange}
-            placeholder="Job title / Company name"
-            className={cn(
-              "focus-visible:border-none focus-visible:outline-none w-full"
-            )}
-          />
-          {isSearching ||
-            (isLoading && (
-              <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-            ))}
-        </div>
-        <div>
-          <Button>Search</Button>
-        </div>
-      </div>
+      {!hideToMenus && <ReportCard />}
+      <JobSearchInput table={table} handleSearchSubmit={handleSearchSubmit} />
       <div className="flex flex-col gap-4">
         <div className="flex justify-between">
           <div className="">All Jobs</div>
@@ -194,7 +142,7 @@ export default function JobDashboard({
                   colSpan={fingJobsColumns.length}
                   className="h-24 text-center"
                 >
-                  {isSearching ? (
+                  {isLoading ? (
                     <div className="flex items-center justify-center gap-2">
                       <Loader2 className="h-4 w-4 animate-spin" />
                       <span>Searching for matching jobs...</span>

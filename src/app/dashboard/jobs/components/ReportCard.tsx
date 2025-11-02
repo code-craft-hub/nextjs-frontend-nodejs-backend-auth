@@ -1,6 +1,7 @@
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { userQueries } from "@/lib/queries/user.queries";
 import { cn } from "@/lib/utils";
+import { randomNumber } from "@/lib/utils/helpers";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
@@ -12,7 +13,7 @@ export const ReportCard = ({matchPercentage}: {matchPercentage?: number}) => {
   const menuItems = [
     {
       id: "ai-recommendations",
-      count: `${matchPercentage}`,
+      count: `${matchPercentage ?? randomNumber(-1)}`,
       label: "AI Recommendations",
       icon: "/bell.svg",
       bgColor: "bg-green-100",

@@ -34,7 +34,6 @@ const CategoryPage = async ({ searchParams }: any) => {
   jobsQueries.infinite({title: userJobTitlePreference})
   );
 
-  console.log("AI Recommendation : ", jobsQueries.infinite({title: userJobTitlePreference}).queryKey)
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <div className="p-4 sm:p-8">
