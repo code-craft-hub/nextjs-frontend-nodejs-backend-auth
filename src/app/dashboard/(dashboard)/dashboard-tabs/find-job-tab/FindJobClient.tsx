@@ -46,7 +46,7 @@ export default function JobDashboard({
     return data?.pages.flatMap((page) => page.data) ?? initialJobs;
   }, [data, initialJobs]);
 
-  // console.count("FINDJOB CLIENT RENDER");
+  console.count("FINDJOB CLIENT RENDER");
 
   const table = useReactTable({
     data: allJobs,

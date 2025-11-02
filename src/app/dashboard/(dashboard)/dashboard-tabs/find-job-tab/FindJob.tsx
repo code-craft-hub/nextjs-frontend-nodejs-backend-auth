@@ -21,17 +21,20 @@ import { apiService } from "@/hooks/use-auth";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-// import {
-//   HoverCard,
-//   HoverCardContent,
-//   HoverCardTrigger,
-// } from "@/components/ui/hover-card";
-// import { Badge } from "@/components/ui/badge";
-// Move column definition outside component and make it a function
-const getFindJobsColumns = (
-  router: AppRouterInstance
-): // updateJobs: ReturnType<typeof useUpdateJobMutation>
-ColumnDef<JobType>[] => [
+import {
+  useUpdateJobApplicationHistoryMutation,
+  useUpdateJobMutation,
+} from "@/lib/mutations/jobs.mutations";
+
+const getFindJobsColumns = ({
+  router,
+  updateJobs,
+  updateJobApplicationHistory,
+}: {
+  router: AppRouterInstance;
+  updateJobs: any;
+  updateJobApplicationHistory: any;
+}): ColumnDef<JobType>[] => [
   {
     accessorKey: "companyText",
     header: "Company",
@@ -49,7 +52,6 @@ ColumnDef<JobType>[] => [
       </div>
     ),
   },
-
   {
     accessorKey: "title",
     header: "Title",
@@ -98,20 +100,22 @@ ColumnDef<JobType>[] => [
     accessorKey: "isBookmarked",
     header: () => <div className=""></div>,
     cell: ({ row }) => {
+      const isBookmarked = row.original.isBookmarked || false;
+
       return (
         <div
           onClick={() => {
-            // updateJobs.mutate({
-            //   id: String(row.original.id),
-            //   data: {
-            //     isBookmarked: !row.original.isBookmarked,
-            //   },
-            // });
+            updateJobs.mutate({
+              id: String(row.original.id),
+              data: {
+                isBookmarked: !isBookmarked,
+              },
+            });
           }}
           className="flex justify-end"
         >
           <Toggle
-            pressed={row.original.isBookmarked}
+            pressed={isBookmarked}
             aria-label="Toggle bookmark"
             size="sm"
             variant="outline"
@@ -129,13 +133,20 @@ ColumnDef<JobType>[] => [
     cell: ({ row }) => {
       return (
         <div className="flex justify-end">
-          {/* <HoverCard>
-            <HoverCardTrigger> */}
           <Button
             className="w-full"
             onClick={async () => {
               if (!row.original?.emailApply) {
-                window.open(row.original.link, "__blank");
+                  updateJobApplicationHistory.mutate({
+                  id: String(row.original.id),
+                  data: {
+                    appliedJobs: row.original.id,
+                  },
+                });
+                window.open(
+                  row.original?.applyUrl ?? row.original?.link,
+                  "__blank"
+                );
                 return;
               }
 
@@ -182,16 +193,6 @@ ColumnDef<JobType>[] => [
               <Sparkles className="text-3 text-yellow" />
             )}
           </Button>
-          {/* </HoverCardTrigger>
-            <HoverCardContent className="w-fit font-garamond">
-              <p className="w-full p-1 bg-slate-100 mb-1">Recruiter email:</p>
-              <p className="w-full p-1 text-xs bg-slate-100">
-                {row.original?.emailApply
-                  ? row.original?.emailApply
-                  : "Not available"}
-              </p>
-            </HoverCardContent>
-          </HoverCard> */}
         </div>
       );
     },
@@ -199,17 +200,25 @@ ColumnDef<JobType>[] => [
 ];
 
 export const FindJob = memo(({ filters }: { filters: JobFilters }) => {
+  const updateJobApplicationHistory = useUpdateJobApplicationHistoryMutation();
+
   const { data: initialData } = useQuery({
     ...jobsQueries.all(filters),
     initialData: undefined, // Let it pull from cache
   });
   const router = useRouter();
 
-  // const updateJobs = useUpdateJobMutation();
+  const updateJobs = useUpdateJobMutation();
 
   // Generate columns with the mutation
-  const columns = getFindJobsColumns(router);
+  const columns = getFindJobsColumns({
+    router,
+    updateJobs,
+    updateJobApplicationHistory,
+  });
   // updateJobs
+
+  console.count("FIND JOB RENDER");
 
   return (
     <div className="flex flex-col font-poppins h-screen relative">

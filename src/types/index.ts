@@ -26,6 +26,7 @@ export type JobType = {
   matchPercentage: string;
   jobType: string;
   updatedAt?: string;
+  applyUrl?: string;
   isBookmarked: boolean;
   isFilled: boolean;
   companyName: string;

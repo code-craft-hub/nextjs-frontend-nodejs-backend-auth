@@ -97,7 +97,6 @@ export default function Overview() {
     [appliedJobsIds]
   );
 
-
   // console.count("OVERVIEW COMPONENT RENDERED");
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
@@ -466,7 +465,10 @@ export const getFindJobsColumns = ({
                     appliedJobs: row.original.id,
                   },
                 });
-                window.open(row.original.link, "__blank");
+                window.open(
+                  row.original?.applyUrl ?? row.original?.link,
+                  "__blank"
+                );
                 return;
               }
 
