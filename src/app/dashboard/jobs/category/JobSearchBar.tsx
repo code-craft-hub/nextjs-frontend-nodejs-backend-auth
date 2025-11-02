@@ -18,19 +18,43 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Card } from "@/components/ui/card";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { X } from "lucide-react";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 
 const formSchema = z.object({
   searchValue: z.string(),
 });
 
 export const SearchBar = ({
-  sendDataToParent,
   allJobs,
+  table,
 }: {
-  sendDataToParent?: (data: any) => void;
-  allJobs: any[];
+  allJobs?: any[];
+  table?: any;
 }) => {
+  const [showClearButton, setShowClearButton] = useState(false);
+  const [location, setLocation] = useState(allJobs?.[0]?.location || "");
+  const [employmentType, setEmploymentType] = useState(
+    allJobs?.[0]?.employmentType || ""
+  );
+  const hasValueRef = useRef(false);
+
+  const handleLocationChange = (value: string) => {
+    setLocation(value);
+    console.log("LOCATION", location);
+    table.getColumn("location")?.setFilterValue(value);
+  };
+
+  const handleEmploymentTypeChange = (value: string) => {
+    setEmploymentType(value);
+    table.getColumn("employmentType")?.setFilterValue(value);
+  };
+
   const form = useForm<z.infer<typeof formSchema>>({
     defaultValues: {
       searchValue: "",
@@ -38,18 +62,27 @@ export const SearchBar = ({
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    const data = {
-      searchValue: values.searchValue,
-      ...(location && { location }),
-      ...(employmentType && { employmentType }),
-    };
-    sendDataToParent && sendDataToParent(data);
+    table.getColumn("title")?.setFilterValue(values.searchValue);
   }
 
-  const [location, setLocation] = useState(allJobs?.[0]?.location || "");
-  const [employmentType, setEmploymentType] = useState(
-    allJobs?.[0]?.employmentType || ""
-  );
+  const handleClear = () => {
+    form.reset();
+    table.getColumn("title")?.setFilterValue(undefined);
+    table.getColumn("employmentType")?.setFilterValue(undefined);
+    table.getColumn("location")?.setFilterValue(undefined);
+  };
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    onChange: (...event: any[]) => void
+  ) => {
+    onChange(e);
+    const hasValue = e.target.value.length > 0;
+
+    if (hasValue !== hasValueRef.current) {
+      hasValueRef.current = hasValue;
+      setShowClearButton(hasValue);
+    }
+  };
 
   return (
     <div className="relative w-full">
@@ -64,15 +97,27 @@ export const SearchBar = ({
                 control={form.control}
                 name="searchValue"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="flex justify-between">
                     <FormControl>
                       <input
                         {...field}
+                        onChange={(e) => handleInputChange(e, field.onChange)}
                         type="text"
                         placeholder="Job title / company name"
                         className="w-full outline-none pl-3 placeholder:text-xs"
                       />
-                    </FormControl>
+                    </FormControl>{" "}
+                    {showClearButton && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={handleClear}
+                        className="h-9 w-9"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    )}
                     <FormMessage />
                   </FormItem>
                 )}
@@ -90,27 +135,40 @@ export const SearchBar = ({
                   {location || "Location"}
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-56">
-                  <DropdownMenuLabel>Select your location</DropdownMenuLabel>
+                  <DropdownMenuLabel className="flex justify-between">
+                    Select your location
+                    <HoverCard>
+                      <HoverCardTrigger>
+                        <X
+                          className="size-4"
+                          onClick={() => {
+                            table
+                              .getColumn("location")
+                              ?.setFilterValue(undefined);
+                            table.getColumn("title")?.setFilterValue(undefined);
+                            table
+                              .getColumn("employmentType")
+                              ?.setFilterValue(undefined);
+                          }}
+                        />{" "}
+                      </HoverCardTrigger>
+                      <HoverCardContent className="w-fit">
+                        <p>Clear all filters</p>
+                      </HoverCardContent>
+                    </HoverCard>
+                  </DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuRadioGroup
                     value={location}
-                    onValueChange={setLocation}
+                    onValueChange={(value) => handleLocationChange(value)}
                   >
-                    {[...new Set(allJobs.map((job) => job.location))].map(
+                    {[...new Set(allJobs?.map((job) => job.location))].map(
                       (location) => (
                         <DropdownMenuRadioItem key={location} value={location}>
                           {location}
                         </DropdownMenuRadioItem>
                       )
                     )}
-                    {/* {allJobs.map((job) => (
-                        <DropdownMenuRadioItem
-                          key={job.id}
-                          value={job.location}
-                        >
-                          {job.location}
-                        </DropdownMenuRadioItem>
-                      ))} */}
                   </DropdownMenuRadioGroup>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -123,23 +181,48 @@ export const SearchBar = ({
                     <span className="text-black/50 text-xs">
                       {employmentType}
                     </span>
-                    <img src="/chevron-down.svg" className="size-2 text-gray-300" alt="chevron" />
+                    <img
+                      src="/chevron-down.svg"
+                      className="size-2 text-gray-300"
+                      alt="chevron"
+                    />
                   </div>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-56">
-                  <DropdownMenuLabel>Select Job type</DropdownMenuLabel>
+                  <DropdownMenuLabel className="flex justify-between">
+                    Select Job type
+                    <HoverCard>
+                      <HoverCardTrigger>
+                        <X
+                          className="size-4"
+                          onClick={() => {
+                            table
+                              .getColumn("location")
+                              ?.setFilterValue(undefined);
+                            table.getColumn("title")?.setFilterValue(undefined);
+                            table
+                              .getColumn("employmentType")
+                              ?.setFilterValue(undefined);
+                          }}
+                        />
+                      </HoverCardTrigger>
+                      <HoverCardContent className="w-fit">
+                        <p>Clear all filters</p>
+                      </HoverCardContent>
+                    </HoverCard>
+                  </DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuRadioGroup
                     value={employmentType}
-                    onValueChange={setEmploymentType}
+                    onValueChange={(value) => handleEmploymentTypeChange(value)}
                   >
-                    {[...new Set(allJobs.map((job) => job.employmentType))].map(
-                      (jobType) => (
-                        <DropdownMenuRadioItem key={jobType} value={jobType}>
-                          {jobType}
-                        </DropdownMenuRadioItem>
-                      )
-                    )}
+                    {[
+                      ...new Set(allJobs?.map((job) => job.employmentType)),
+                    ].map((jobType) => (
+                      <DropdownMenuRadioItem key={jobType} value={jobType}>
+                        {jobType}
+                      </DropdownMenuRadioItem>
+                    ))}
                   </DropdownMenuRadioGroup>
                 </DropdownMenuContent>
               </DropdownMenu>

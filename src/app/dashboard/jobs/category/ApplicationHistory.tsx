@@ -1,5 +1,5 @@
 "use client";
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import {
   ColumnFiltersState,
   flexRender,
@@ -17,14 +17,8 @@ import { SearchBar } from "./JobSearchBar";
 
 import { Button } from "@/components/ui/button";
 import { ColumnDef } from "@tanstack/react-table";
-import {
-  DollarSign,
-  MapPin,
-  Sparkles,
-} from "lucide-react";
-import {
-  formatAppliedDate,
-} from "@/lib/utils/helpers";
+import { DollarSign, MapPin, Sparkles } from "lucide-react";
+import { formatAppliedDate } from "@/lib/utils/helpers";
 import { JobType } from "@/types";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { userQueries } from "@/lib/queries/user.queries";
@@ -35,7 +29,6 @@ import {
 } from "@/lib/mutations/jobs.mutations";
 
 export const ApplicationHistory = () => {
-  const [searchValue, setSearchValue] = useState("");
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -62,11 +55,7 @@ export const ApplicationHistory = () => {
     []) as string[];
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useInfiniteQuery(jobsQueries.appliedJobs(appliedJobsIds, searchValue, 20));
-
-  // const allJobs = useMemo(() => {
-  //   return data?.pages.flatMap((page) => page.data) ?? [];
-  // }, [data]);
+    useInfiniteQuery(jobsQueries.appliedJobs(appliedJobsIds, "", 20));
 
   const allJobs = useMemo(() => {
     const jobs = data?.pages.flatMap((page) => page.data) ?? [];
@@ -100,18 +89,13 @@ export const ApplicationHistory = () => {
     },
   });
 
-  const onSubmit = (data: any) => {
-    console.log("Search submitted:", data);
-    setSearchValue(data.username);
-  };
-
   return (
     <div className="font-inter grid grid-cols-1 w-full overflow-hidden gap-4 xl:gap-8">
       <div className="space-y-4 w-full">
         <h1 className="text-3xl text-center mb-8 font-medium font-inter">
           Application History
         </h1>
-        <SearchBar sendDataToParent={onSubmit} allJobs={allJobs} />
+        <SearchBar allJobs={allJobs} table={table} />
 
         <div className="w-full bg-[#F1F2F4] p-2 px-4 rounded-sm sm:flex justify-between hidden font-roboto">
           <p className="text-[#474C54]">Job</p>
@@ -236,6 +220,9 @@ const getFindJobsColumns = ({
       );
     },
   },
+  { accessorKey: "location", cell: () => <div></div> },
+  { accessorKey: "jobType", cell: () => <div></div> },
+  { accessorKey: "employmentType", cell: () => <div></div> },
   {
     accessorKey: "appliedDate",
     header: "Applied Date",
