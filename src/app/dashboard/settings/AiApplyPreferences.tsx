@@ -97,25 +97,24 @@ export const AiApplyPreferences: React.FC = () => {
         },
       ],
     },
-
-    {
-      section: "CV Strategy",
-      heading: true,
-      options: [
-        {
-          label: "Use Master CV",
-          description: "Use your original uploaded CV for all applications",
-          type: "toggle",
-          key: "useMasterCV",
-        },
-        {
-          label: "Generate Tailored CV",
-          description: "Let Cver customize your CV for each job applications",
-          type: "toggle",
-          key: "generateTailoredCV",
-        },
-      ],
-    },
+    // {
+    //   section: "CV Strategy",
+    //   heading: true,
+    //   options: [
+    //     {
+    //       label: "Use Master CV",
+    //       description: "Use your original uploaded CV for all applications",
+    //       type: "toggle",
+    //       key: "useMasterCV",
+    //     },
+    //     {
+    //       label: "Generate Tailored CV",
+    //       description: "Let Cver customize your CV for each job applications",
+    //       type: "toggle",
+    //       key: "generateTailoredCV",
+    //     },
+    //   ],
+    // },
     {
       child: true,
       options: [
@@ -133,45 +132,44 @@ export const AiApplyPreferences: React.FC = () => {
         },
       ],
     },
-    {
-      section: "Form Filing Method",
-      options: [
-        {
-          label: "Review Before Submit",
-          description:
-            "AI fills forms but waits for your approval before submitting",
-          type: "toggle",
-          key: "reviewBeforeSubmit",
-        },
-        {
-          label: "Auto Submit",
-          description:
-            "AI automatically submits applications after filing forms",
-          type: "toggle",
-          key: "autoSubmit",
-        },
-      ],
-    },
-    {
-      section: "Handling Unknown Questions",
-      options: [
-        {
-          label: "Intelligent Answers",
-          description:
-            "AI provides smart answers for questions outside its knowledge base",
-          type: "toggle",
-          key: "intelligentAnswers",
-        },
-        {
-          label: "Pause for Input",
-          description:
-            "AI pauses and requests your input for unknown questions",
-          type: "toggle",
-          key: "pauseForInput",
-        },
-      ],
-    },
-
+    // {
+    //   section: "Form Filing Method",
+    //   options: [
+    //     {
+    //       label: "Review Before Submit",
+    //       description:
+    //         "AI fills forms but waits for your approval before submitting",
+    //       type: "toggle",
+    //       key: "reviewBeforeSubmit",
+    //     },
+    //     {
+    //       label: "Auto Submit",
+    //       description:
+    //         "AI automatically submits applications after filing forms",
+    //       type: "toggle",
+    //       key: "autoSubmit",
+    //     },
+    //   ],
+    // },
+    // {
+    //   section: "Handling Unknown Questions",
+    //   options: [
+    //     {
+    //       label: "Intelligent Answers",
+    //       description:
+    //         "AI provides smart answers for questions outside its knowledge base",
+    //       type: "toggle",
+    //       key: "intelligentAnswers",
+    //     },
+    //     {
+    //       label: "Pause for Input",
+    //       description:
+    //         "AI pauses and requests your input for unknown questions",
+    //       type: "toggle",
+    //       key: "pauseForInput",
+    //     },
+    //   ],
+    // },
     {
       section: "WhatsApp Integration",
       img: "/message.svg",
@@ -182,13 +180,8 @@ export const AiApplyPreferences: React.FC = () => {
           label: "WhatsApp Connection",
           description: `Connected: ${user?.phoneNumber || "Not Connected"}`,
           type: "buttons",
-          actions: ["Disconnect", "Edit"],
+          // actions: ["Disconnect", "Edit"],
         },
-      ],
-    },
-    {
-      child: true,
-      options: [
         {
           label: "Enable WhatsApp Applications",
           description: "Allow applications via WhatsApp",
@@ -197,6 +190,17 @@ export const AiApplyPreferences: React.FC = () => {
         },
       ],
     },
+    // {
+    //   child: true,
+    //   options: [
+    //     {
+    //       label: "Enable WhatsApp Applications",
+    //       description: "Allow applications via WhatsApp",
+    //       type: "toggle",
+    //       key: "enableWhatsAppApplications",
+    //     },
+    //   ],
+    // },
   ];
 
   // Initialize state for all toggle switches

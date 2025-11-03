@@ -4,7 +4,7 @@ import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AiApplyPreferences } from "./AiApplyPreferences";
 import { User } from "lucide-react";
-import { AdvancedProfileManagement } from "./AdvancedProfileManagement";
+// import { AdvancedProfileManagement } from "./AdvancedProfileManagement";
 import { ProfileManagement } from "./ProfileManagement";
 import { useRouter } from "next/navigation";
 
@@ -34,7 +34,7 @@ const Settings = ({ tab }: { tab: string; }) => {
             <img src="/ai-apply.svg" alt="AI apply" className="size-4" />
             <span className="max-sm:hidden">AI Apply Preferences</span>
           </TabsTrigger>
-          <TabsTrigger
+          {/* <TabsTrigger
             className="text-xs font-medium"
             value="advanced-settings"
             onClick={() => {
@@ -43,7 +43,7 @@ const Settings = ({ tab }: { tab: string; }) => {
           >
             <img src="/select-profile.svg" alt="AI apply" className="size-4" />
             <span className="max-sm:hidden">Advanced Settings</span>
-          </TabsTrigger>
+          </TabsTrigger> */}
         </TabsList>
         <TabsContent value="profile-management" className="text-md font-medium">
           <ProfileManagement/>
@@ -51,9 +51,9 @@ const Settings = ({ tab }: { tab: string; }) => {
         <TabsContent value="ai-applypreference">
           <AiApplyPreferences />
         </TabsContent>
-        <TabsContent value="advanced-settings">
+        {/* <TabsContent value="advanced-settings">
           <AdvancedProfileManagement />
-        </TabsContent>
+        </TabsContent> */}
       </Tabs>
     </div>
   );

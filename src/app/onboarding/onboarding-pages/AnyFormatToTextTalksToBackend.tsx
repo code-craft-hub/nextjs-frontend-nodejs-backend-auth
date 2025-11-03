@@ -70,6 +70,7 @@ const extractDocumentText = async (
   const response = await fetch(API_BASE_URL, {
     method: 'POST',
     body: formData,
+    credentials: "include",
   });
 
   if (!response.ok) {

@@ -52,6 +52,7 @@ export const useStreamingContent = () => {
         },
         body: JSON.stringify(config),
         signal: abortControllerRef.current.signal,
+        credentials: "include",
       });
 
       if (!response.ok) {

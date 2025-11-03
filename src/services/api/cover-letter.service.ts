@@ -35,7 +35,8 @@ export const generateCoverLetterStream = async (
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(request),
-      signal
+      signal,
+      credentials: "include",
     });
 
     if (!response.ok) {

@@ -2,6 +2,8 @@
 import { cn } from "@/lib/utils";
 import React from "react";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { userQueries } from "@/lib/queries/user.queries";
+import { useQuery } from "@tanstack/react-query";
 
 interface StatItem {
   id: string;
@@ -14,53 +16,6 @@ interface StatItem {
   trendColor: string;
   shadow: string;
 }
-
-const statsData: StatItem[] = [
-  {
-    id: "1",
-    count: 0,
-    title: "Auto Applications",
-    subtitle: "18 minutes saved per application",
-    iconBg: "bg-white",
-    iconColor: "text-gray-600",
-    trend: "up",
-    trendColor: "text-green-500",
-    shadow: "shadow-gray-300",
-  },
-  {
-    id: "2",
-    count: 0,
-    title: "Tailored Resume",
-    subtitle: "12 tailored resumes this week",
-    iconBg: "bg-blue-50",
-    iconColor: "text-blue-600",
-    trend: "up",
-    trendColor: "text-green-500",
-    shadow: "shadow-blue-200",
-  },
-  {
-    id: "3",
-    count: 0,
-    title: "Tailored Cover Letters",
-    subtitle: "4 tailored cover letters this week",
-    iconBg: "bg-green-50",
-    iconColor: "text-green-600",
-    trend: "down",
-    trendColor: "text-red-500",
-    shadow: "shadow-green-200",
-  },
-  {
-    id: "4",
-    count: 0,
-    title: "Tailored Interview Questions",
-    subtitle: "4 tailored interview questions this week",
-    iconBg: "bg-orange-50",
-    iconColor: "text-orange-600",
-    trend: "down",
-    trendColor: "text-red-500",
-    shadow: "shadow-gray-200",
-  },
-];
 
 const StatCard: React.FC<{ stat: StatItem }> = ({ stat }) => {
   const getIcon = (title: string) => {
@@ -190,7 +145,53 @@ const StatCard: React.FC<{ stat: StatItem }> = ({ stat }) => {
 };
 
 export const AnalyticsCard: React.FC = () => {
-  // const {data: user} = useQuery(userQueries.detail())
+  const { data: user } = useQuery(userQueries.detail());
+  const statsData: StatItem[] = [
+    {
+      id: "1",
+      count: user?.analytics?.totalApplications || 0,
+      title: "Auto Applications",
+      subtitle: "18 minutes saved per application",
+      iconBg: "bg-white",
+      iconColor: "text-gray-600",
+      trend: "up",
+      trendColor: "text-green-500",
+      shadow: "shadow-gray-300",
+    },
+    {
+      id: "2",
+      count: user?.analytics?.totalResumes || 0,
+      title: "Tailored Resume",
+      subtitle: "12 tailored resumes this week",
+      iconBg: "bg-blue-50",
+      iconColor: "text-blue-600",
+      trend: "up",
+      trendColor: "text-green-500",
+      shadow: "shadow-blue-200",
+    },
+    {
+      id: "3",
+      count: user?.analytics?.totalCoverLetters || 0,
+      title: "Tailored Cover Letters",
+      subtitle: "4 tailored cover letters this week",
+      iconBg: "bg-green-50",
+      iconColor: "text-green-600",
+      trend: "down",
+      trendColor: "text-red-500",
+      shadow: "shadow-green-200",
+    },
+    {
+      id: "4",
+      count: user?.analytics?.totalInterviewQuestions || 0,
+      title: "Tailored Interview Questions",
+      subtitle: "4 tailored interview questions this week",
+      iconBg: "bg-orange-50",
+      iconColor: "text-orange-600",
+      trend: "down",
+      trendColor: "text-red-500",
+      shadow: "shadow-gray-200",
+    },
+  ];
   return (
     <div className="grid grid-cols-1">
       <ScrollArea>

@@ -81,6 +81,7 @@ export const TailorInterviewQuestion = ({
             jobDescription,
             user,
           }),
+          credentials: "include",
         }
       );
 

@@ -3,18 +3,18 @@ import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip } from "recha
 import { ChevronDown } from "lucide-react";
 
 const data = [
-  { month: "JAN", value: 50 },
-  { month: "FEB", value: 58 },
-  { month: "MAR", value: 58 },
-  { month: "APR", value: 78 },
-  { month: "MAY", value: 85 },
-  { month: "JUN", value: 70 },
-  { month: "JUL", value: 77 },
-  { month: "AUG", value: 50 },
-  { month: "SEP", value: 85 },
-  { month: "OCT", value: 93 },
-  { month: "NOV", value: 96 },
-  { month: "DEC", value: 100 },
+  { month: "JAN", value: 0 },
+  { month: "FEB", value: 1 },
+  { month: "MAR", value: 2 },
+  { month: "APR", value: 3 },
+  { month: "MAY", value: 4 },
+  { month: "JUN", value: 5 },
+  { month: "JUL", value: 6 },
+  { month: "AUG", value: 7 },
+  { month: "SEP", value: 8 },
+  { month: "OCT", value: 9 },
+  { month: "NOV", value: 16 },
+  { month: "DEC", value: 0 },
 ];
 const CustomTooltip = ({ active, payload }: any) => {
   if (active && payload && payload.length) {

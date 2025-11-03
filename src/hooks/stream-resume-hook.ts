@@ -205,6 +205,7 @@ export const useResumeStream = (endpoint: string, resumeId: string): UseResumeSt
             jobDescription,
           } as RequestPayload),
           signal: abortControllerRef.current.signal,
+          credentials: "include",
         });
 
         if (!response.ok) {
