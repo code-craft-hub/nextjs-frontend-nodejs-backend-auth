@@ -26,6 +26,7 @@ import { jobsQueries } from "@/lib/queries/jobs.queries";
 // import { SearchBar } from "./JobSearchBar";
 import { getFindJobsColumns } from "../components/Overview";
 import { getDataSource } from "@/lib/utils/helpers";
+import { jobMatcher } from "@/services/job-recommendation";
 
 export const AIRecommendations = () => {
   const { data: user } = useQuery(userQueries.detail());
@@ -59,7 +60,6 @@ export const AIRecommendations = () => {
       })
     );
 
- 
   const bookmarkedIdSet = useMemo(() => {
     return new Set(bookmarkedIds);
   }, [bookmarkedIds]);
@@ -67,19 +67,24 @@ export const AIRecommendations = () => {
   const allJobs = useMemo(() => {
     const jobs = data?.pages.flatMap((page) => page.data) ?? [];
 
-    return jobs.map((job) => {
-      const jobContent = job?.title + " " + job?.descriptionText;
-      const match = jobContent
-        ?.toLowerCase()
-        ?.includes(userJobTitlePreference?.toLowerCase());
-      return {
-        ...job,
-        isBookmarked: bookmarkedIdSet.has(job.id),
-        matchPercentage: match
-          ? Math.floor(80 + Math.random() * 20).toString()
-          : Math.floor(10 + Math.random() * 10).toString(),
-      };
-    });
+    return jobs
+      .map((job) => {
+        const jobContent = job?.title + " " + job?.descriptionText;
+
+        const completeMatch = jobMatcher.calculateMatch(
+          userJobTitlePreference,
+          jobContent || ""
+        );
+        return {
+          ...job,
+          isBookmarked: bookmarkedIdSet.has(job.id),
+          matchPercentage: completeMatch.score.toString(),
+          matchDetails: completeMatch,
+        };
+      })
+      .sort((a, b) => {
+        return parseInt(b.matchPercentage) - parseInt(a.matchPercentage);
+      });
   }, [data]);
 
   const columns = getFindJobsColumns({
@@ -105,7 +110,6 @@ export const AIRecommendations = () => {
       rowSelection,
     },
   });
-
 
   return (
     <div className="font-inter grid grid-cols-1 w-full overflow-hidden gap-4 xl:gap-8">

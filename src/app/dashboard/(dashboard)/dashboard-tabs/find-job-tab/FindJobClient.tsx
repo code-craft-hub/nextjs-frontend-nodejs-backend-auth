@@ -13,13 +13,14 @@ import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { JobType } from "@/types";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { jobsQueries } from "@/lib/queries/jobs.queries";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { JobFilters } from "@/lib/types/jobs";
 import { ReportCard } from "@/app/dashboard/jobs/components/ReportCard";
 import JobSearchInput from "@/components/shared/JobSearchInput";
 import { userQueries } from "@/lib/queries/user.queries";
 import { getDataSource } from "@/lib/utils/helpers";
+import { jobMatcher } from "@/services/job-recommendation";
 
 export default function JobDashboard({
   hideToMenus,
@@ -40,6 +41,7 @@ export default function JobDashboard({
     return filters;
   });
   const [isAutoFetching, setIsAutoFetching] = useState(false);
+  const totalScoreRef = useRef<number>(0);
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     useInfiniteQuery(jobsQueries.infinite(searchValue));
@@ -51,26 +53,37 @@ export default function JobDashboard({
 
   const allJobs = useMemo(() => {
     const bookmarkedIdSet = new Set(user?.bookmarkedJobs || []);
-
+    const scores = [];
     const appliedJobsIdSet = new Set(
       user?.appliedJobs?.map((job) => job.id) || []
     );
     const jobs = data?.pages.flatMap((page) => page.data) ?? [];
-    return jobs.map((job) => {
-      const jobContent = job?.title + " " + job?.descriptionText;
-      const match = jobContent
-        ?.toLowerCase()
-        ?.includes(userJobTitlePreference?.toLowerCase());
+    const jobData = jobs
+      .map((job) => {
+        const jobContent = job?.title + " " + job?.descriptionText;
 
-      return {
-        ...job,
-        isBookmarked: bookmarkedIdSet.has(job.id),
-        isApplied: appliedJobsIdSet.has(job.id),
-        matchPercentage: match
-          ? Math.floor(80 + Math.random() * 20).toString()
-          : Math.floor(10 + Math.random() * 10).toString(),
-      };
-    });
+        const completeMatch = jobMatcher.calculateMatch(
+          userJobTitlePreference,
+          jobContent || ""
+        );
+
+        if (completeMatch.score >= 50) {
+          scores.push(completeMatch.score);
+        }
+        return {
+          ...job,
+          isBookmarked: bookmarkedIdSet.has(job.id),
+          isApplied: appliedJobsIdSet.has(job.id),
+          matchPercentage: completeMatch.score.toString(),
+          matchDetails: completeMatch,
+        };
+      })
+      .sort((a, b) => {
+        return parseInt(b.matchPercentage) - parseInt(a.matchPercentage);
+      });
+
+    totalScoreRef.current = scores.length;
+    return jobData;
   }, [
     data,
     initialJobs,
@@ -134,7 +147,7 @@ export default function JobDashboard({
 
   return (
     <div className="w-full flex flex-col gap-6">
-      {!hideToMenus && <ReportCard />}
+      {!hideToMenus && <ReportCard matchPercentage={totalScoreRef.current} />}
       <JobSearchInput table={table} handleSearchSubmit={handleSearchSubmit} />
       <div className="flex flex-col gap-4">
         <div className="flex justify-between">

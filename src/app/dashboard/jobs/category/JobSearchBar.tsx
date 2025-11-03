@@ -46,7 +46,6 @@ export const SearchBar = ({
 
   const handleLocationChange = (value: string) => {
     setLocation(value);
-    console.log("LOCATION", location);
     table.getColumn("location")?.setFilterValue(value);
   };
 

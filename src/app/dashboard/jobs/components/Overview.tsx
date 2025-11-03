@@ -1,5 +1,5 @@
 "use client";
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   ColumnFiltersState,
@@ -49,6 +49,7 @@ import {
   useUpdateJobMutation,
 } from "@/lib/mutations/jobs.mutations";
 import { ReportCard } from "./ReportCard";
+import { jobMatcher } from "@/services/job-recommendation";
 
 export default function Overview() {
   const router = useRouter();
@@ -61,6 +62,7 @@ export default function Overview() {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
+  const totalScoreRef = useRef<number>(0);
 
   const infiniteFilters = useMemo(
     () => ({
@@ -102,54 +104,34 @@ export default function Overview() {
 
   const allJobs = useMemo(() => {
     const jobs = data?.pages.flatMap((page) => page.data) ?? [];
+    const scores = [];
 
-    return jobs.map((job) => {
-      const jobContent = job?.title + " " + job?.descriptionText;
-      const match = jobContent
-        ?.toLowerCase()
-        ?.includes(userJobTitlePreference?.toLowerCase());
+    const jobData = jobs
+      .map((job) => {
+        const jobContent = job?.title + " " + job?.descriptionText;
 
-      return {
-        ...job,
-        isBookmarked: bookmarkedIdSet.has(job.id),
-        isApplied: appliedJobsIdSet.has(job.id),
-        matchPercentage: match
-          ? Math.floor(80 + Math.random() * 20).toString()
-          : Math.floor(10 + Math.random() * 10).toString(),
-      };
-    });
+        const completeMatch = jobMatcher.calculateMatch(
+          userJobTitlePreference,
+          jobContent || ""
+        );
+
+        if (completeMatch.score >= 50) {
+          scores.push(completeMatch.score);
+        }
+        return {
+          ...job,
+          isBookmarked: bookmarkedIdSet.has(job.id),
+          isApplied: appliedJobsIdSet.has(job.id),
+          matchPercentage: completeMatch.score.toString(),
+          matchDetails: completeMatch,
+        };
+      })
+      .sort((a, b) => {
+        return parseInt(b.matchPercentage) - parseInt(a.matchPercentage);
+      });
+    totalScoreRef.current = scores.length;
+    return jobData;
   }, [data, user?.bookmarkedJobs?.length, user?.appliedJobs?.length]);
-
-  const commend = useMemo(() => {
-    return (
-      data?.pages.flatMap((page) =>
-        page.data?.map((job) => job?.title + " " + job?.descriptionText)
-      ) ?? []
-    );
-  }, [data]);
-
-  const totalJobs = (data?.pages[0] as any)?.totalCount ?? allJobs.length ?? 0;
-
-  const matchPercentage = Number(
-    (totalJobs > 0
-      ? Math.ceil(
-          Math.max(
-            10,
-            Math.min(
-              100,
-              (commend.filter((score) =>
-                score
-                  .toLowerCase()
-                  .includes(userJobTitlePreference.toLowerCase())
-              ).length /
-                totalJobs) *
-                100
-            )
-          )
-        )
-      : 0
-    )?.toFixed(0) || 0
-  );
 
   const columns = getFindJobsColumns({
     router,
@@ -221,7 +203,7 @@ export default function Overview() {
         ))}
       </div>
       <div className="w-full flex flex-col gap-6">
-        <ReportCard matchPercentage={matchPercentage} />
+        <ReportCard matchPercentage={totalScoreRef.current} />
         <div className="bg-white shadow-lg px-2 flex gap-4 justify-between rounded-lg">
           <div className="flex items-center gap-2 w-full">
             <SearchIcon className="size-4" />
@@ -383,7 +365,7 @@ export const getFindJobsColumns = ({
               </span>
             </div>
             <div className="">
-              {matchPercentage && matchPercentage > 30 && (
+              {matchPercentage > 50 && (
                 <Sparkles className="text-yellow-500 size-4" />
               )}
             </div>
@@ -411,9 +393,9 @@ export const getFindJobsColumns = ({
                 )}
               </span>
             </p>
-            <p className="text-2xs text-green-400">
-              {row.original.matchPercentage}%
-            </p>
+            {matchPercentage > 0 && (
+              <p className="text-2xs text-green-400">{matchPercentage}%</p>
+            )}
           </div>
         </div>
       );

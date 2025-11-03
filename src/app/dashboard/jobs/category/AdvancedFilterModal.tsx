@@ -7,10 +7,10 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import {
   Dialog,
-  DialogClose,
+  // DialogClose,
   DialogContent,
   DialogDescription,
-  DialogFooter,
+  // DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -201,16 +201,16 @@ const AdvancedJobFilter: React.FC<AdvancedFilterProps> = ({
       className={`relative  bg-white  border-gray-200 rounded-lg shadow-lg ${className}`}
     >
       {/* Apply Button - Positioned exactly as in design */}
-      <div className="p-4 w-fit ml-auto">
+      <div className="mb-4 ml-4 w-fit">
         <Button
           onClick={handleApply}
           className="bg-blue-600 hover:bg-blue-700 text-white rounded text-base font-semibold"
         >
-          Apply
+          Apply filter
         </Button>
       </div>
 
-      <div className="grid grid-cols-4">
+      <div className="grid grid-cols-1 lg:grid-cols-4">
         {/* Match Options Section */}
         <div className="space-y-4 border p-4">
           <h3 className="text-gray-900 font-medium text-base">Match options</h3>
@@ -345,10 +345,10 @@ export default function AdvancedFilterModal() {
         <DialogTrigger asChild>
           <Button variant="outline">Filter options <ChevronDown className="size-3" /> </Button>
         </DialogTrigger>
-        <DialogContent className="!w-screen  max-w-3xl">
+        <DialogContent className="!w-[90svw] p-0  !max-w-none h-fit overflow-auto bg-white ">
           <DialogHeader>
-            <DialogTitle>Edit profile</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="sr-only">Edit profile</DialogTitle>
+            <DialogDescription className="sr-only">
               Make changes to your profile here. Click save when you&apos;re
               done.
             </DialogDescription>
@@ -357,12 +357,6 @@ export default function AdvancedFilterModal() {
             onFilterChange={handleFilterChange}
             onApplyFilters={handleApplyFilters}
           />
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
-            </DialogClose>
-            <Button type="submit">Save changes</Button>
-          </DialogFooter>
         </DialogContent>
       </form>
     </Dialog>

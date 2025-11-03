@@ -13,7 +13,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { formatAppliedDate, randomPercentage } from "@/lib/utils/helpers";
+import { formatAppliedDate } from "@/lib/utils/helpers";
 import { JobType } from "@/types";
 import { JobFilters } from "@/lib/types/jobs";
 import { Toggle } from "@/components/ui/toggle";
@@ -55,45 +55,58 @@ const getFindJobsColumns = ({
   {
     accessorKey: "title",
     header: "Title",
-    cell: ({ row }) => (
-      <div className="capitalize">
-        <div className="flex gap-4 items-center">
-          <div className="font-medium text-xs max-w-sm overflow-hidden">
-            {row.getValue("title")}
-          </div>
-          <div className="bg-blue-50 rounded text-blue-600 px-2 py-1">
-            <span className="text-2xs">
-              {!!row.original.jobType
-                ? row.original.jobType
-                : row.original.employmentType}
-            </span>
-          </div>
-        </div>
-        <div className="flex gap-x-4 mt-1">
-          <p className="flex gap-1 text-gray-400 items-center">
-            <MapPin className="size-3" />
-            <span className="text-2xs">{row.original.location}</span>
-          </p>
-          <p className="flex gap-1 text-gray-400 items-center">
-            <DollarSign className="size-3" />
-            <span className="text-2xs">
-              {!!row.original?.salary ? row.original?.salary : "Not disclosed"}
-            </span>
-          </p>
-          <p className="flex gap-1 text-gray-400 items-center">
-            <Calendar className="size-3" />
-            <span className="text-2xs">
-              {formatAppliedDate(
-                row.original?.scrapedAt ||
-                  row.original?.postedAt ||
-                  row.original?.updatedAt
+    cell: ({ row }) => {
+      const matchPercentage = Number(row.original.matchPercentage) || 0;
+
+      return (
+        <div className="capitalize">
+          <div className="flex gap-4 items-center">
+            <div className="font-medium text-xs overflow-hidden truncate max-w-44">
+              {row.getValue("title")}
+            </div>
+            <div className="bg-blue-50 rounded text-blue-600 px-2 py-1">
+              <span className="text-2xs">
+                {!!row.original.jobType
+                  ? row.original.jobType
+                  : row.original.employmentType}
+              </span>
+            </div>
+            <div className="">
+              {matchPercentage > 50 && (
+                <Sparkles className="text-yellow-500 size-4" />
               )}
-            </span>
-          </p>
-          <p className="text-2xs text-green-400">{randomPercentage(10)}</p>
+            </div>
+          </div>
+          <div className="flex gap-x-4 mt-1">
+            <p className="flex gap-1 text-gray-400 items-center">
+              <MapPin className="size-3" />
+              <span className="text-2xs w-20 overflow-hidden truncate">{row.original.location}</span>
+            </p>
+            <p className="flex gap-1 text-gray-400 items-center">
+              <DollarSign className="size-3" />
+              <span className="text-2xs">
+                {!!row.original?.salary
+                  ? row.original?.salary
+                  : "Not disclosed"}
+              </span>
+            </p>
+            <p className="flex gap-1 text-gray-400 items-center">
+              <Calendar className="size-3" />
+              <span className="text-2xs">
+                {formatAppliedDate(
+                  row.original?.scrapedAt ||
+                    row.original?.postedAt ||
+                    row.original?.updatedAt
+                )}
+              </span>
+            </p>
+            {matchPercentage > 0 && (
+              <p className="text-2xs text-green-400">{matchPercentage}%</p>
+            )}{" "}
+          </div>
         </div>
-      </div>
-    ),
+      );
+    },
   },
 
   {
@@ -137,7 +150,7 @@ const getFindJobsColumns = ({
             className="w-full"
             onClick={async () => {
               if (!row.original?.emailApply) {
-                  updateJobApplicationHistory.mutate({
+                updateJobApplicationHistory.mutate({
                   id: String(row.original.id),
                   data: {
                     appliedJobs: row.original.id,
