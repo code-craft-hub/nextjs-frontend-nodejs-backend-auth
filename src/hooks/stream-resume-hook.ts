@@ -196,15 +196,15 @@ export const useResumeStream = (endpoint: string, resumeId: string): UseResumeSt
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Accept: "text/event-stream",
-            "Cache-Control": "no-cache",
+            // Accept: "text/event-stream",
+            // "Cache-Control": "no-cache",
           },
           body: JSON.stringify({
             resumeId,
             user,
             jobDescription,
           } as RequestPayload),
-          signal: abortControllerRef.current.signal,
+          // signal: abortControllerRef.current.signal,
           credentials: "include",
         });
 

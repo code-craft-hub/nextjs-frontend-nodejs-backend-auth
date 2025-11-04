@@ -22,7 +22,7 @@ export const RecentActivityCard = memo(
       <Card className="p-4 sm:p-7 gap-4">
         <h1 className="font-bold text-xl">Personalized Recommendation</h1>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-y-4 sm:gap-8">
-          {jobs?.data.map((job) => (
+          {jobs?.data?.map((job) => (
             <div
               key={job.id}
               className="flex bg-slate-50 p-4 sm:p-6 rounded-xl gap-4 sm:gap-6 border border-[#cbd5e1] relative"
