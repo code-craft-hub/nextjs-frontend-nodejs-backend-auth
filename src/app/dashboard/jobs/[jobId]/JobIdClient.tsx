@@ -9,27 +9,41 @@ import {
   Instagram,
   Youtube,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import React from "react";
 
-const JobIdClient = ({ jobId }: { jobId: string }) => {
+export const JobIdClient = ({
+  jobId,
+  referrer,
+}: {
+  jobId: string;
+  referrer: string;
+}) => {
   const { data } = useQuery(jobsQueries.detail(jobId));
   const job = data?.data;
+
+  const router = useRouter();
+
+  const handleBackClick = () => {
+    if (referrer === "recent-activity") {
+      router.push("/dashboard/home");
+    } else {
+      router.push("/dashboard/jobs");
+    }
+  };
   return (
     <div>
       <div className="min-h-screen bg-gray-50">
-        {/* Header */}
-        <div className="bg-white border-b">
-          <div className="max-w-6xl mx-auto px-6 py-4">
-            <button className="flex items-center text-blue-600 font-medium hover:text-blue-700">
-              <ArrowLeft className="w-5 h-5 mr-2" />
-              Back
-            </button>
-          </div>
-        </div>
-
         {/* Main Content */}
-        <div className="max-w-6xl mx-auto px-6 py-8">
-          <h1 className="text-4xl font-bold text-center mb-8">
+        <div className="max-w-6xl mx-auto px-4 sm:px-8 py-8">
+          <button
+            onClick={() => handleBackClick()}
+            className="flex items-center hover:cursor-pointer text-blue-600 font-medium hover:text-blue-700"
+          >
+            <ArrowLeft className="w-5 h-5 mr-2" />
+            Back
+          </button>
+          <h1 className="text-2xl sm:text-4xl font-bold text-center my-8">
             AI Recommendations
           </h1>
 
@@ -37,12 +51,14 @@ const JobIdClient = ({ jobId }: { jobId: string }) => {
           <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <div className="w-14 h-14 rounded-xl flex items-center justify-center mr-4">
-                  <img
-                    src={job?.companyLogo ?? ""}
-                    className="size-full text-white"
-                  />
-                </div>
+                {!!job?.companyLogo && (
+                  <div className="w-14 h-14 rounded-xl flex items-center justify-center mr-4">
+                    <img
+                      src={job?.companyLogo ?? ""}
+                      className="size-full text-white"
+                    />
+                  </div>
+                )}
                 <div>
                   <h2 className="text-xl font-semibold text-gray-900">
                     Twitter
@@ -52,7 +68,7 @@ const JobIdClient = ({ jobId }: { jobId: string }) => {
                   </p>
                 </div>
               </div>
-              <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-medium">
+              <button className="bg-blue-600 max-sm:text-2xs hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-medium">
                 Apply Now
               </button>
             </div>
@@ -67,15 +83,17 @@ const JobIdClient = ({ jobId }: { jobId: string }) => {
                   Job Description
                 </h3>
                 <div className="text-gray-600 leading-relaxed space-y-3">
-                  <div
+                  {!!job?.descriptionHtml ? <div
                     dangerouslySetInnerHTML={{
                       __html: job?.descriptionHtml ?? "",
                     }}
-                  />
+                  />: <div>
+                    {job?.descriptionText}
+                    </div>}
                 </div>
                 <div className="border-t pt-6 mt-6">
                   <p className="text-gray-700 mb-3">Share profile:</p>
-                  <div className="flex gap-3">
+                  <div className="flex flex-wrap gap-3">
                     <button className="flex items-center gap-2 px-4 py-2 text-blue-600 bg-blue-50 rounded hover:bg-blue-100">
                       <Facebook className="w-4 h-4" />
                       <span className="text-sm">Facebook</span>
@@ -90,7 +108,6 @@ const JobIdClient = ({ jobId }: { jobId: string }) => {
                   </div>
                 </div>
               </div>
-             
             </div>
 
             {/* Right Column */}
@@ -100,14 +117,15 @@ const JobIdClient = ({ jobId }: { jobId: string }) => {
                 <div className="grid grid-cols-2 gap-6">
                   <div>
                     <div className="flex items-center justify-center w-10 h-10 shrink-0 rounded-lg mb-2">
-                      <img src="/Calender.svg" className="w-5 h-5 text-blue-600" />
+                      <img
+                        src="/Calender.svg"
+                        className="w-5 h-5 text-blue-600"
+                      />
                     </div>
                     <p className="text-xs text-gray-500 uppercase mb-1">
                       Founded in
                     </p>
-                    <p className="text-sm font-semibold text-gray-900">
-                      N/A
-                    </p>
+                    <p className="text-sm font-semibold text-gray-900">N/A</p>
                   </div>
                   <div>
                     <div className="flex items-center justify-center w-10 h-10 shrink-0 rounded-lg mb-2">
@@ -128,12 +146,15 @@ const JobIdClient = ({ jobId }: { jobId: string }) => {
                       Team size
                     </p>
                     <p className="text-sm font-semibold text-gray-900">
-                     100+ Candidates
+                      100+ Candidates
                     </p>
                   </div>
                   <div>
                     <div className="flex items-center justify-center w-10 h-10 shrink-0 rounded-lg mb-2">
-                      <img src="/briefcase.svg" className="w-5 h-5 text-blue-600" />
+                      <img
+                        src="/briefcase.svg"
+                        className="w-5 h-5 text-blue-600"
+                      />
                     </div>
                     <p className="text-xs text-gray-500 uppercase mb-1">
                       Industry types
@@ -153,7 +174,10 @@ const JobIdClient = ({ jobId }: { jobId: string }) => {
                 <div className="space-y-4">
                   <div className="flex items-start">
                     <div className="flex items-center justify-center w-10 h-10 shrink-0 rounded-lg mr-3">
-                      <img src="/GlobeSimple.svg" className="w-5 h-5 text-blue-600" />
+                      <img
+                        src="/GlobeSimple.svg"
+                        className="w-5 h-5 text-blue-600"
+                      />
                     </div>
                     <div>
                       <p className="text-xs text-gray-500 uppercase mb-1">
@@ -169,7 +193,10 @@ const JobIdClient = ({ jobId }: { jobId: string }) => {
                   </div>
                   <div className="flex items-start">
                     <div className="flex items-center justify-center w-10 h-10 shrink-0 rounded-lg mr-3">
-                      <img src="/phone-call-duotone.svg" className="w-5 h-5 text-blue-600" />
+                      <img
+                        src="/phone-call-duotone.svg"
+                        className="w-5 h-5 text-blue-600"
+                      />
                     </div>
                     <div>
                       <p className="text-xs text-gray-500 uppercase mb-1">
@@ -185,7 +212,10 @@ const JobIdClient = ({ jobId }: { jobId: string }) => {
                   </div>
                   <div className="flex items-start">
                     <div className="flex items-center justify-center w-10 h-10 shrink-0 rounded-lg mr-3">
-                      <img src={"/Envelope.svg"} className="w-5 h-5 text-blue-600" />
+                      <img
+                        src={"/Envelope.svg"}
+                        className="w-5 h-5 text-blue-600"
+                      />
                     </div>
                     <div>
                       <p className="text-xs text-gray-500 uppercase mb-1">
@@ -229,5 +259,3 @@ const JobIdClient = ({ jobId }: { jobId: string }) => {
     </div>
   );
 };
-
-export default JobIdClient;

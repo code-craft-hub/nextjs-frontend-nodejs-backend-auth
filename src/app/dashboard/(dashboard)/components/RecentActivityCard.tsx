@@ -14,10 +14,53 @@ import { useRouter } from "next/navigation";
 import { memo } from "react";
 import { toast } from "sonner";
 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { JobType } from "@/types";
+
 export const RecentActivityCard = memo(
   ({ filters }: { filters: JobFilters }) => {
     const { data: jobs } = useQuery(jobsQueries.all(filters));
     const router = useRouter();
+
+    const handleJobClick = async (job: JobType) => {
+      if (!job?.emailApply) {
+        window.open(job.link, "__blank");
+        return;
+      }
+
+      const { isAuthorized } = await apiService.gmailOauthStatus();
+
+      if (!isAuthorized) {
+        toast.error(
+          "✨ Go to the Settings page and enable authorization for Cverai to send emails on your behalf. This option is located in the second card.",
+          {
+            action: {
+              label: "Authorize now",
+              onClick: () =>
+                router.push(`/dashboard/settings?tab=ai-applypreference`),
+            },
+            classNames: {
+              actionButton: "!bg-blue-600 hover:!bg-blue-700 !text-white !h-8",
+            },
+          }
+        );
+
+        return;
+      }
+
+      const params = new URLSearchParams();
+      params.set("jobDescription", JSON.stringify(job?.descriptionText || ""));
+      params.set("recruiterEmail", encodeURIComponent(job?.emailApply));
+      router.push(
+        `/dashboard/tailor-cover-letter/${uuidv4()}?${params}&aiApply=true`
+      );
+    };
     return (
       <Card className="p-4 sm:p-7 gap-4">
         <h1 className="font-bold text-xl">Personalized Recommendation</h1>
@@ -39,55 +82,28 @@ export const RecentActivityCard = memo(
                 <h1 className="font-inter line-clamp-1 capitalize">
                   {job.title}
                 </h1>
-                <Button
-                  variant={"ghost"}
-                  onClick={async () => {
-                    if (!job?.emailApply) {
-                      window.open(job.link, "__blank");
-                      return;
-                    }
 
-                    const { isAuthorized } =
-                      await apiService.gmailOauthStatus();
-
-                    if (!isAuthorized) {
-                      toast.error(
-                        "✨ Go to the Settings page and enable authorization for Cverai to send emails on your behalf. This option is located in the second card.",
-                        {
-                          action: {
-                            label: "Authorize now",
-                            onClick: () =>
-                              router.push(
-                                `/dashboard/settings?tab=ai-applypreference`
-                              ),
-                          },
-                          classNames: {
-                            actionButton:
-                              "!bg-blue-600 hover:!bg-blue-700 !text-white !h-8",
-                          },
-                        }
-                      );
-
-                      return;
-                    }
-
-                    const params = new URLSearchParams();
-                    params.set(
-                      "jobDescription",
-                      JSON.stringify(job?.descriptionText || "")
-                    );
-                    params.set(
-                      "recruiterEmail",
-                      encodeURIComponent(job?.emailApply)
-                    );
-                    router.push(
-                      `/dashboard/tailor-cover-letter/${uuidv4()}?${params}&aiApply=true`
-                    );
-                  }}
-                  className="absolute top-4 right-4"
-                >
-                  {<MoreHorizontal className="w-4 h-4 text-" />}
-                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger
+                    asChild
+                    className="absolute top-4 right-4"
+                  >
+                    <Button variant="ghost">
+                      <MoreHorizontal className="w-4 h-4 text-" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56" align="start">
+                    <DropdownMenuItem onClick={() => handleJobClick(job)}>
+                      <img src="/cube.svg" className="size-4" alt="" />
+                      Auto apply
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => {router.push(`/dashboard/jobs/${job.id}?referrer=recent-activity&title=${job.title}`);}}>
+                      <img src="/preview.svg" className="size-4" alt="" />
+                      Previow
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
                 <p className="font-poppins text-cverai-brown text-xs">
                   <span className="max-w-sm overflow-hidden capitalize">
                     {job.companyName}
