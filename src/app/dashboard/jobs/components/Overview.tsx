@@ -50,6 +50,7 @@ import {
 } from "@/lib/mutations/jobs.mutations";
 import { ReportCard } from "./ReportCard";
 import { jobMatcher } from "@/services/job-recommendation";
+import { PiOfficeChairFill } from "react-icons/pi";
 
 export default function Overview() {
   const router = useRouter();
@@ -343,9 +344,6 @@ export const getFindJobsColumns = ({
       </div>
     ),
   },
-  { accessorKey: "location", cell: () => <div></div> },
-  { accessorKey: "jobType", cell: () => <div></div> },
-  { accessorKey: "employmentType", cell: () => <div></div> },
   {
     accessorKey: "title",
     header: "Title",
@@ -376,13 +374,15 @@ export const getFindJobsColumns = ({
               <span className="text-2xs">{row.original.location}</span>
             </p>
             <p className="flex gap-1 text-gray-400 items-center">
-              <DollarSign className="size-3" />
-              <span className="text-2xs">
-                {!!row.original?.salary
-                  ? row.original?.salary
-                  : "Not disclosed"}
-              </span>
+              <PiOfficeChairFill className="size-3" />
+              <span className="text-2xs">{row.original.companyName}</span>
             </p>
+            {!!row.original?.salary && (
+              <p className="flex gap-1 text-gray-400 items-center">
+                <DollarSign className="size-3" />
+                <span className="text-2xs">{row.original?.salary}</span>
+              </p>
+            )}
             <p className="flex gap-1 text-gray-400 items-center">
               <Calendar className="size-3" />
               <span className="text-2xs">
@@ -401,6 +401,9 @@ export const getFindJobsColumns = ({
       );
     },
   },
+  { accessorKey: "location", cell: () => <div></div> },
+  { accessorKey: "jobType", cell: () => <div></div> },
+  { accessorKey: "employmentType", cell: () => <div></div> },
   {
     accessorKey: "isBookmarked",
     cell: ({ row }) => {

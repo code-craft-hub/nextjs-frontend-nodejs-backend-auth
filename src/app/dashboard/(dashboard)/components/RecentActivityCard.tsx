@@ -94,9 +94,7 @@ export const RecentActivityCard = memo(
                   </span>{" "}
                   ·{" "}
                   <span className="font-inter text-gray-400">
-                    {!isEmpty(job.salaryInfo)
-                      ? job?.salaryInfo
-                      : "Not disclosed"}
+                    {!isEmpty(job.salaryInfo) ? job?.salaryInfo : ""}
                   </span>
                 </p>
                 <div className="flex flex-wrap gap-2">

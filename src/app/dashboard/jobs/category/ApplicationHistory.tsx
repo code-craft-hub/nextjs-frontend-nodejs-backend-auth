@@ -27,6 +27,7 @@ import {
   useUpdateJobApplicationHistoryMutation,
   useUpdateJobMutation,
 } from "@/lib/mutations/jobs.mutations";
+import { PiOfficeChairFill } from "react-icons/pi";
 
 export const ApplicationHistory = () => {
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -208,13 +209,15 @@ const getFindJobsColumns = ({
               <span className="text-2xs">{row.original.location}</span>
             </p>
             <p className="flex gap-1 text-gray-400 items-center">
-              <DollarSign className="size-3" />
-              <span className="text-2xs">
-                {!!row.original?.salary
-                  ? row.original?.salary
-                  : "Not disclosed"}
-              </span>
+              <PiOfficeChairFill className="size-3" />
+              <span className="text-2xs">{row.original.companyName}</span>
             </p>
+            {!!row.original?.salary && (
+              <p className="flex gap-1 text-gray-400 items-center">
+                <DollarSign className="size-3" />
+                <span className="text-2xs">{row.original?.salary}</span>
+              </p>
+            )}
           </div>
         </div>
       );

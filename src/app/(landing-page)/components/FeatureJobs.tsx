@@ -57,7 +57,7 @@ export const FeatureJobs = ({ filters }: { filters: JobFilters }) => {
                     : "On-site"}
                 </span>
                 <span className=" text-gray-400 text-xs">
-                  Salary: {job?.salary ?? "Not Disclosed"}
+                  Salary: {job?.salary ?? ""}
                 </span>
               </div>
               <div className="flex items-center gap-4">

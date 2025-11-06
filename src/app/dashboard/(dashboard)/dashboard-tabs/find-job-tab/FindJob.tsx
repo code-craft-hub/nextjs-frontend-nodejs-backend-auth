@@ -25,6 +25,7 @@ import {
   useUpdateJobApplicationHistoryMutation,
   useUpdateJobMutation,
 } from "@/lib/mutations/jobs.mutations";
+import { PiOfficeChairFill } from "react-icons/pi";
 
 const getFindJobsColumns = ({
   router,
@@ -80,16 +81,20 @@ const getFindJobsColumns = ({
           <div className="flex gap-x-4 mt-1">
             <p className="flex gap-1 text-gray-400 items-center">
               <MapPin className="size-3" />
-              <span className="text-2xs w-20 overflow-hidden truncate">{row.original.location}</span>
-            </p>
-            <p className="flex gap-1 text-gray-400 items-center">
-              <DollarSign className="size-3" />
-              <span className="text-2xs">
-                {!!row.original?.salary
-                  ? row.original?.salary
-                  : "Not disclosed"}
+              <span className="text-2xs w-20 overflow-hidden truncate">
+                {row.original.location}
               </span>
             </p>
+            <p className="flex gap-1 text-gray-400 items-center">
+              <PiOfficeChairFill className="size-3" />
+              <span className="text-2xs">{row.original.companyName}</span>
+            </p>
+            {!!row.original?.salary && (
+              <p className="flex gap-1 text-gray-400 items-center">
+                <DollarSign className="size-3" />
+                <span className="text-2xs">{row.original?.salary}</span>
+              </p>
+            )}
             <p className="flex gap-1 text-gray-400 items-center">
               <Calendar className="size-3" />
               <span className="text-2xs">

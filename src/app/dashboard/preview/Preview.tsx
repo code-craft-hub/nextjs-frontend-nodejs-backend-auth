@@ -13,6 +13,7 @@ import { useQuery } from "@tanstack/react-query";
 import { userQueries } from "@/lib/queries/user.queries";
 import { resumeQueries } from "@/lib/queries/resume.queries";
 import { coverLetterQueries } from "@/lib/queries/cover-letter.queries";
+import { CongratulationModal } from "@/components/shared/CongratulationModal";
 
 const Preview = ({
   coverLetterId,
@@ -27,6 +28,7 @@ const Preview = ({
 }) => {
   const [activeStep, setActiveStep] = useState(3);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [openModal, setOpenModal] = useState(false);
   const router = useRouter();
 
   const { data: user } = useQuery(userQueries.detail());
@@ -36,7 +38,9 @@ const Preview = ({
     coverLetterQueries.detail(coverLetterId)
   );
 
-
+  const handleOpenModal = (value: boolean) => {
+    setOpenModal(value);
+  };
 
   const handleSubmit = async () => {
     if (!user?.aiApplyPreferences) {
@@ -58,8 +62,6 @@ const Preview = ({
       return;
     }
 
-
-
     if (!user || !coverLetterData || !resumeData) {
       toast.error("Missing required data");
       return;
@@ -76,6 +78,7 @@ const Preview = ({
       );
       setActiveStep(4);
       toast.success("Application Submitted Successfully!");
+      setOpenModal(true);
     } catch (error: any) {
       toast.error(
         error?.response?.data || "Auto apply failed. Please try again.",
@@ -120,6 +123,10 @@ const Preview = ({
           Delete
         </Button>
       </div>
+      <CongratulationModal
+        openModal={openModal}
+        handleOpenModal={handleOpenModal}
+      />
       <TailorCoverLetterDisplay
         user={user}
         data={coverLetterData}

@@ -3,6 +3,7 @@ import { ArrowUpDown, Calendar, DollarSign, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FaRegBookmark, FaBookmark } from "react-icons/fa";
 import { JobType } from "@/types";
+import { PiOfficeChairFill } from "react-icons/pi";
 
 export const overviewColumns: ColumnDef<JobType>[] = [
   {
@@ -48,10 +49,14 @@ export const overviewColumns: ColumnDef<JobType>[] = [
             <MapPin className="size-3" />
             <span className="text-2xs"> {row.original.location}</span>
           </p>
-          <p className="flex gap-1 text-gray-400">
+          <p className="flex gap-1 text-gray-400 items-center">
+            <PiOfficeChairFill className="size-3" />
+            <span className="text-2xs">{row.original.companyName}</span>
+          </p>
+          {!!row.original?.salary && (<p className="flex gap-1 text-gray-400">
             <DollarSign className="size-3" />
             <span className="text-2xs"> {row.original.salary}</span>
-          </p>
+          </p>)}
           <p className="flex gap-1 text-gray-400">
             <Calendar className="size-3" />
             <span className="text-2xs">{row.original.postedTime}</span>

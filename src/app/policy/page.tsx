@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import {Footer} from "@/components/landing-page/Footer";
+import { Footer } from "@/components/landing-page/Footer";
 import { Header } from "../(landing-page)/components/Header";
 
 const Policy = () => {
@@ -8,15 +8,17 @@ const Policy = () => {
     <div>
       <Header url="/" />
       <div className="flex flex-col p-4 md:p-8 gap-4 md:gap-8 items-center justify-center max-w-screen-md mx-auto text-start mt-16">
-        <h1 className="font-bold text-2xl ">PRIVACY POLICY FOR CVER JOB APPLICATIONS LTD</h1>
+        <h1 className="font-bold text-2xl ">
+          PRIVACY POLICY FOR CVER JOB APPLICATIONS LTD
+        </h1>
         <p className="">
-          Cver Job Applications LTD understands that your privacy is important to you and that
-          you care about how your personal data is used and shared online. We do
-          not collect personal data about you unless you contact us. Any
-          personal data We do collect will only be used as permitted by law. We
-          are committed to protecting and respecting your Privacy whilst
-          remaining compliant with the Nigeria Data Protection Act, 2023 and
-          International Data Protection Laws.
+          Cver Job Applications LTD understands that your privacy is important
+          to you and that you care about how your personal data is used and
+          shared online. We do not collect personal data about you unless you
+          contact us. Any personal data We do collect will only be used as
+          permitted by law. We are committed to protecting and respecting your
+          Privacy whilst remaining compliant with the Nigeria Data Protection
+          Act, 2023 and International Data Protection Laws.
         </p>
         <p className="">
           It is important that you read this privacy policy together with any
@@ -41,17 +43,23 @@ const Policy = () => {
           person who can be directly or indirectly identified from that data.
           This definition shall, where applicable, incorporate the definitions
           provided in the Nigeria Data Protection Act, 2023 and International
-          Data Protection Laws. <br /><br />We may collect, use, store and transfer
-          different kinds of personal data about you which we have grouped
-          together as follows:
+          Data Protection Laws. <br />
+          <br />
+          We may collect, use, store and transfer different kinds of personal
+          data about you which we have grouped together as follows:
         </p>
         <div>
-          <p className="text-start w-full"> 1. Identity data includes first name and last name</p>
+          <p className="text-start w-full">
+            {" "}
+            1. Identity data includes first name and last name
+          </p>
           <p className="text-start w-full">
             2. Contact data includes home address, email address and telephone
             number
           </p>
-          <p className="text-start w-full">3. Profile data includes your username and password</p>
+          <p className="text-start w-full">
+            3. Profile data includes your username and password
+          </p>
           <p className="text-start w-full">
             4. Technical data includes internet protocol (ip) address, browser
             type and version, time zone setting and location, browser plug-in
@@ -60,21 +68,23 @@ const Policy = () => {
           </p>
         </div>
         <p className="text-start w-full">
-          We/Us/Our: means Cver Job Applications LTD, a limited company registered in Nigeria
-          with RC No: RC7777736 whose registered office is at Close 33, House
-          11, Satellite Town.
-        </p>
-        <p className="text-start w-full">
-          Our Site: www.cver job applications ltd and any other website we use to provide the
-          Services.
-        </p>
-        <p className="text-start w-full">Information About Us</p>
-        <p className="text-start w-full">
-          Our Site is owned and operated by Cver Job Applications LTD, a limited company
+          We/Us/Our: means Cver Job Applications LTD, a limited company
           registered in Nigeria with RC No: RC7777736 whose registered office is
           at Close 33, House 11, Satellite Town.
         </p>
-        <p className="text-start w-full font-bold text-lg">Our TIN number is 31652159</p>
+        <p className="text-start w-full">
+          Our Site: www.cver job applications ltd and any other website we use
+          to provide the Services.
+        </p>
+        <p className="text-start w-full">Information About Us</p>
+        <p className="text-start w-full">
+          Our Site is owned and operated by Cver Job Applications LTD, a limited
+          company registered in Nigeria with RC No: RC7777736 whose registered
+          office is at Close 33, House 11, Satellite Town.
+        </p>
+        <p className="text-start w-full font-bold text-lg">
+          Our TIN number is 31652159
+        </p>
         <p className="text-start w-full">
           Our Data Protection Officer can be contacted by email at
           info@cverai.com
@@ -212,10 +222,10 @@ const Policy = () => {
         <p className="text-start w-full">
           <span className="font-bold text-xl">Recipients of Personal Data</span>{" "}
           <br />
-          Cver Job Applications LTD may be required to transfer the personal information
-          provided by you to third parties in order to fulfil its contractual
-          obligations. The following are categories of recipients that customer
-          information could be transferred to;
+          Cver Job Applications LTD may be required to transfer the personal
+          information provided by you to third parties in order to fulfil its
+          contractual obligations. The following are categories of recipients
+          that customer information could be transferred to;
           <br /> 1. Data centers to ensure your data is stored securely
           <br /> 2. Helpdesk software to allow us to manage customer contact
           <br /> We cannot guarantee the secure transmission of your data
@@ -230,9 +240,9 @@ const Policy = () => {
           purposes and only permit them to process your personal data for
           specified purposes and in accordance with our instructions.
           <br />
-          Whenever we transfer your personal data out of the cver job applications ltd, we
-          ensure a similar degree of protection is afforded to it by ensuring
-          the following safeguard is implemented;
+          Whenever we transfer your personal data out of the cver job
+          applications ltd, we ensure a similar degree of protection is afforded
+          to it by ensuring the following safeguard is implemented;
           <br />
           •Where we use providers based in the US, we may transfer data to them
           if they are part of the Privacy Shield which requires them to provide
@@ -276,10 +286,9 @@ const Policy = () => {
           We may need to request specific information from you to help us
           confirm your identity and ensure your right to access your personal
           data (or to exercise any of your other rights). This is a security
-          measure to ensure that personal data is not disclosed to any person
-          who has no right to receive it. We may also contact you to ask you for
-          further information in relation to your request to speed up our
-          response.
+          measure to ensure that personal data is to any person who has no right
+          to receive it. We may also contact you to ask you for further
+          information in relation to your request to speed up our response.
         </p>
         <p className="text-start w-full">
           <span className="font-bold text-xl">Time limit to respond</span>
