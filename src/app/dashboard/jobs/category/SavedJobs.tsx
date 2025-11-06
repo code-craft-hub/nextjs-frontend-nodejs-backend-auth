@@ -137,6 +137,11 @@ export const SavedJobs = () => {
                 {table.getRowModel().rows?.length ? (
                   table.getRowModel().rows.map((row) => (
                     <TableRow
+                     onClick={() => {
+                        router.push(
+                          `/dashboard/jobs/${row.original.id}?referrer=saved-jobs&title=${row.original.title}`
+                        );
+                      }}
                       key={row.id}
                       data-state={row.getIsSelected() && "selected"}
                       className="hover:bg-white border-b !rounded-3xl hover:border-primary hover:border-[2px] hover:rounded-2xl hover:cursor-pointer"

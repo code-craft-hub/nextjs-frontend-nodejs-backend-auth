@@ -180,7 +180,9 @@ export default function Overview() {
       <div className="bg-white p-3 h-fit rounded-md hidden lg:flex lg:flex-col gap-1">
         {leftMenuItems.map((item) => (
           <div
-            onClick={() => router.push(item.url)}
+            onClick={() => {
+              router.push(item.url);
+            }}
             key={item.id}
             className={cn(
               "group flex gap-2 data-[state=active]:bg-primary  data-[state=active]:text-white  p-2 hover:bg-primary hover:text-white hover-cursor-pointer items-center justify-start rounded-md w-44  hover:shadow-sm hover:cursor-pointer",
@@ -252,6 +254,11 @@ export default function Overview() {
               {visibleRows.length ? (
                 visibleRows.map((row) => (
                   <TableRow
+                    onClick={() => {
+                    router.push(
+                      `/dashboard/jobs/${row.original.id}?referrer=jobs&title=${row.original.title}`
+                    );
+                  }}
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
                     className="hover:bg-white border-b !rounded-3xl hover:border-primary hover:border-[2px] hover:rounded-2xl hover:cursor-pointer"
@@ -298,7 +305,11 @@ export default function Overview() {
         {hasNextPage && !isAutoFetching && (
           <div className="flex justify-center">
             <Button
-              onClick={() => fetchNextPage()}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                fetchNextPage();
+              }}
               disabled={isFetchingNextPage}
               variant="outline"
             >
@@ -411,7 +422,9 @@ export const getFindJobsColumns = ({
 
       return (
         <div
-          onClick={() => {
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
             updateJobs.mutate({
               id: String(row.original.id),
               data: {
@@ -443,7 +456,9 @@ export const getFindJobsColumns = ({
           <Button
             disabled={row.original.isApplied}
             className="w-full disabled:opacity-50 disabled:cursor-not-allowed disabled:text-gray-400"
-            onClick={async () => {
+            onClick={async (e) => {
+              e.preventDefault();
+              e.stopPropagation();
               if (!row.original?.emailApply) {
                 updateJobApplicationHistory.mutate({
                   id: String(row.original.id),

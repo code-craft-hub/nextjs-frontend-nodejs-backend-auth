@@ -25,8 +25,14 @@ export const JobIdClient = ({
   const router = useRouter();
 
   const handleBackClick = () => {
-    if (referrer === "recent-activity") {
+    if (referrer === "dashboard") {
       router.push("/dashboard/home");
+    } else if (referrer === "ai-recommendations") {
+      router.push("/dashboard/jobs/category?tab=ai-recommendations");
+    } else if (referrer === "saved-jobs") {
+      router.push("/dashboard/jobs/category?tab=saved-jobs");
+    } else if (referrer === "application-history") {
+      router.push("/dashboard/jobs/category?tab=application-history");
     } else {
       router.push("/dashboard/jobs");
     }
@@ -83,13 +89,15 @@ export const JobIdClient = ({
                   Job Description
                 </h3>
                 <div className="text-gray-600 leading-relaxed space-y-3">
-                  {!!job?.descriptionHtml ? <div
-                    dangerouslySetInnerHTML={{
-                      __html: job?.descriptionHtml ?? "",
-                    }}
-                  />: <div>
-                    {job?.descriptionText}
-                    </div>}
+                  {!!job?.descriptionHtml ? (
+                    <div
+                      dangerouslySetInnerHTML={{
+                        __html: job?.descriptionHtml ?? "",
+                      }}
+                    />
+                  ) : (
+                    <div>{job?.descriptionText}</div>
+                  )}
                 </div>
                 <div className="border-t pt-6 mt-6">
                   <p className="text-gray-700 mb-3">Share profile:</p>

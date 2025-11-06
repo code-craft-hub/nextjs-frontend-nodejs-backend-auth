@@ -122,7 +122,9 @@ const getFindJobsColumns = ({
 
       return (
         <div
-          onClick={() => {
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
             updateJobs.mutate({
               id: String(row.original.id),
               data: {
@@ -153,7 +155,9 @@ const getFindJobsColumns = ({
         <div className="flex justify-end">
           <Button
             className="w-full"
-            onClick={async () => {
+            onClick={async (e) => {
+              e.preventDefault();
+              e.stopPropagation();
               if (!row.original?.emailApply) {
                 updateJobApplicationHistory.mutate({
                   id: String(row.original.id),

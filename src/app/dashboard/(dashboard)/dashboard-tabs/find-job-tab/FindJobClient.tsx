@@ -21,6 +21,7 @@ import JobSearchInput from "@/components/shared/JobSearchInput";
 import { userQueries } from "@/lib/queries/user.queries";
 import { getDataSource } from "@/lib/utils/helpers";
 import { jobMatcher } from "@/services/job-recommendation";
+import { useRouter } from "next/navigation";
 
 export default function JobDashboard({
   hideToMenus,
@@ -145,6 +146,8 @@ export default function JobDashboard({
     setSearchValue((prev) => ({ ...prev, title: data }));
   };
 
+  const router = useRouter();
+
   return (
     <div className="w-full flex flex-col gap-6">
       {!hideToMenus && <ReportCard matchPercentage={totalScoreRef.current} />}
@@ -165,6 +168,11 @@ export default function JobDashboard({
             {visibleRows.length ? (
               visibleRows.map((row) => (
                 <TableRow
+                  onClick={() => {
+                    router.push(
+                      `/dashboard/jobs/${row.original.id}?referrer=dashboard&title=${row.original.title}`
+                    );
+                  }}
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
                   className="hover:bg-white border-b !rounded-3xl hover:border-primary hover:border-[2px] hover:rounded-2xl hover:cursor-pointer"

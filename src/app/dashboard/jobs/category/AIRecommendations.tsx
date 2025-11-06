@@ -22,8 +22,6 @@ import {
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { jobsQueries } from "@/lib/queries/jobs.queries";
-
-// import { SearchBar } from "./JobSearchBar";
 import { getFindJobsColumns } from "../components/Overview";
 import { getDataSource } from "@/lib/utils/helpers";
 import { jobMatcher } from "@/services/job-recommendation";
@@ -127,6 +125,11 @@ export const AIRecommendations = () => {
                 {table.getRowModel().rows?.length ? (
                   table.getRowModel().rows.map((row) => (
                     <TableRow
+                      onClick={() => {
+                        router.push(
+                          `/dashboard/jobs/${row.original.id}?referrer=ai-recommendations&title=${row.original.title}`
+                        );
+                      }}
                       key={row.id}
                       data-state={row.getIsSelected() && "selected"}
                       className="hover:bg-white border-b !rounded-3xl hover:border-primary hover:border-[2px] hover:rounded-2xl hover:cursor-pointer"

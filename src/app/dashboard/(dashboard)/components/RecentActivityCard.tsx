@@ -98,7 +98,7 @@ export const RecentActivityCard = memo(
                       Auto apply
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => {router.push(`/dashboard/jobs/${job.id}?referrer=recent-activity&title=${job.title}`);}}>
+                    <DropdownMenuItem onClick={() => {router.push(`/dashboard/jobs/${job.id}?referrer=dashboard&title=${job.title}`);}}>
                       <img src="/preview.svg" className="size-4" alt="" />
                       Previow
                     </DropdownMenuItem>
