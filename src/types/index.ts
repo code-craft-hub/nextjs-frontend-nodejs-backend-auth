@@ -31,6 +31,7 @@ export type JobType = {
   isFilled: boolean;
   companyName: string;
   descriptionText: string;
+  descriptionHtml: string;
   link: string;
   isApplied: boolean;
   salaryInfo: any;

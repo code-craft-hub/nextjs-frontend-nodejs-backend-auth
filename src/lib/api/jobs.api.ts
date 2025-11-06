@@ -11,7 +11,16 @@ export const jobsApi = {
     }),
 
   // Get job by ID
-  getJob: (id: string) => api.get<JobType>(`/job-recommendations/${id}`),
+  getJob: async (id: string) => {
+    try {
+      const data = await api.get<{ data: JobType }>(
+        `/job-recommendations/${id}`
+      );
+      return data;
+    } catch (error) {
+      throw error;
+    }
+  },
 
   // Create job
   createJob: (data: any) => api.post<JobType>("/job-recommendations", data),

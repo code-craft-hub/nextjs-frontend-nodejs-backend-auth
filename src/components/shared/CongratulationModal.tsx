@@ -39,7 +39,7 @@ export const CongratulationModal = ({
           Application Sent!
         </DialogTitle>
         <DialogDescription className="text-2xs text-center text-black">
-          Check your email's drafts folder for a copy of your application.
+          Check your email&aptos;s drafts folder for a copy of your application.
         </DialogDescription>
         <DialogFooter className="mt-4 !justify-center">
           <DialogClose asChild>

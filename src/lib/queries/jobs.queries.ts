@@ -151,7 +151,6 @@ export const jobsQueries = {
       enabled: !!id,
     }),
 
-  // Filter options (for faceted search)
   filters: () =>
     queryOptions({
       queryKey: queryKeys.jobs.filters(),

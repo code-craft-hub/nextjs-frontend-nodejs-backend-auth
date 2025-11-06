@@ -28,6 +28,7 @@ import {
   useUpdateJobMutation,
 } from "@/lib/mutations/jobs.mutations";
 import { PiOfficeChairFill } from "react-icons/pi";
+import { usePrefetchJob } from "@/hooks/usePrefetchJob";
 
 export const ApplicationHistory = () => {
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -37,6 +38,8 @@ export const ApplicationHistory = () => {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
+
+  const { prefetchJob } = usePrefetchJob();
 
   const { data: user } = useQuery(userQueries.detail());
 
@@ -70,6 +73,7 @@ export const ApplicationHistory = () => {
     router,
     updateJobs,
     updateJobApplicationHistory,
+    prefetchJob,
   });
 
   const table = useReactTable<(typeof allJobs)[number]>({
@@ -155,13 +159,15 @@ export const ApplicationHistory = () => {
 };
 
 const getFindJobsColumns = ({
-  // router,
+  router,
   matchPercentage,
+  prefetchJob,
 }: {
   router: AppRouterInstance;
   matchPercentage?: number;
   updateJobs?: any;
   updateJobApplicationHistory?: any;
+  prefetchJob: (jobId: string) => void;
 }): ColumnDef<JobType>[] => [
   {
     accessorKey: "companyText",
@@ -244,13 +250,17 @@ const getFindJobsColumns = ({
   {
     id: "actions",
     enableHiding: false,
-    cell: () => {
+    cell: ({ row }) => {
       return (
         <div className="flex justify-end">
           <Button
             className="w-full bg-[#F1F2F4] hover:bg-[#E2E4E8] text-primary border-0"
-            onClick={async () => {}}
+            onClick={async () => {
+              router.push(`/dashboard/jobs/${row.original.id}`);
+            }}
             variant={"outline"}
+            onMouseEnter={() => prefetchJob(row.original.id)}
+            onFocus={() => prefetchJob(row.original.id)}
           >
             View Details
           </Button>

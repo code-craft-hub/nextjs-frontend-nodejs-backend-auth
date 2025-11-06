@@ -40,7 +40,7 @@ export const overviewColumns: ColumnDef<JobType>[] = [
       <div className="capitalize">
         <div className="flex gap-4 items-center">
           <div className="font-medium text-xs">{row.getValue("title")}</div>
-          <div className="bg-blue-50 rounde text-blue-600">
+          <div className="bg-blue-50 rounded-md text-blue-600">
             <span className="text-2xs">{row.original.jobType}</span>
           </div>
         </div>
