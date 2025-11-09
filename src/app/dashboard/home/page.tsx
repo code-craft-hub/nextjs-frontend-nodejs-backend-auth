@@ -30,7 +30,7 @@ export default async function HomePage({
   const user = await queryClient.fetchQuery(userQueries.detail());
   const { tab, jobDescription } = await searchParams;
 
-  const { title } = getDataSource(user);
+  const title = getDataSource(user)?.title;
   const filters: JobFilters = {
     page: 1,
     limit: 20,
