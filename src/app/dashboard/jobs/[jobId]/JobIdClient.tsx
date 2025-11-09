@@ -1,5 +1,6 @@
 "use client";
 import { apiService } from "@/hooks/use-auth";
+import { useUpdateJobApplicationHistoryMutation } from "@/lib/mutations/jobs.mutations";
 import { jobsQueries } from "@/lib/queries/jobs.queries";
 import { userQueries } from "@/lib/queries/user.queries";
 import { useQuery } from "@tanstack/react-query";
@@ -26,6 +27,8 @@ export const JobIdClient = ({
 }) => {
   const { data } = useQuery(jobsQueries.detail(jobId));
   const { data: user } = useQuery(userQueries.detail());
+  const updateJobApplicationHistory = useUpdateJobApplicationHistoryMutation();
+
   const job = data?.data;
   const router = useRouter();
 
@@ -74,6 +77,12 @@ export const JobIdClient = ({
       return;
     }
 
+    updateJobApplicationHistory.mutate({
+      id: job.id,
+      data: {
+        appliedJobs: job.id,
+      },
+    });
     const params = new URLSearchParams();
     params.set("jobDescription", JSON.stringify(job?.descriptionText || ""));
     params.set("recruiterEmail", encodeURIComponent(job?.emailApply));
