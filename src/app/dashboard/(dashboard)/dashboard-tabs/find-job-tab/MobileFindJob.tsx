@@ -177,4 +177,6 @@ const MobileFindJob = memo(({ allJobs }: { allJobs: JobType[] }) => {
   );
 });
 
+MobileFindJob.displayName = "MobileFindJob";  
+
 export default MobileFindJob;
