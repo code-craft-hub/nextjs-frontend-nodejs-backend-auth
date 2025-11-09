@@ -14,9 +14,12 @@ import { FileUploadZone, useDocumentExtraction } from "./AnyFormatToText";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import { onboardingApi } from "@/lib/api/onboarding.api";
+import { useQuery } from "@tanstack/react-query";
+import { userQueries } from "@/lib/queries/user.queries";
 
 export const OnBoardingForm2 = ({ onNext, onPrev }: OnboardingFormProps) => {
-  const { isUpdatingUserLoading, user } = useAuth();
+  const { isUpdatingUserLoading } = useAuth();
+  const {data: user} = useQuery(userQueries.detail());
   const [loading, setLoading] = useState(false);
   const {
     processDocument,

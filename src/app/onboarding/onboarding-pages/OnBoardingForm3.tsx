@@ -31,6 +31,8 @@ import Progress from "./Progress";
 import { SelectCreatable } from "@/components/shared/SelectCreatable";
 import { Badge } from "@/components/ui/badge";
 import { badgeColors, jobExamples } from "@/lib/utils/constants";
+import { userQueries } from "@/lib/queries/user.queries";
+import { useQuery } from "@tanstack/react-query";
 
 const formSchema = z.object({
   partTime: z.boolean().default(false).optional(),
@@ -47,7 +49,8 @@ const formSchema = z.object({
 });
 
 export const OnBoardingForm3 = ({ onNext, onPrev }: OnboardingFormProps) => {
-  const { updateUser, isUpdatingUserLoading, user } = useAuth();
+  const { updateUser, isUpdatingUserLoading } = useAuth();
+  const { data: user } = useQuery(userQueries.detail());
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -64,6 +67,7 @@ export const OnBoardingForm3 = ({ onNext, onPrev }: OnboardingFormProps) => {
     },
   });
 
+  console.log(user?.dataSource);
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       const dataSource = [
@@ -391,11 +395,7 @@ export const OnBoardingForm3 = ({ onNext, onPrev }: OnboardingFormProps) => {
                     </div>
                   )}
                 />
-                <div
-                  className={cn(
-                    "flex gap-2 flex-wrap","mt"
-                  )}
-                >
+                <div className={cn("flex gap-2 flex-wrap", "mt")}>
                   {jobExamples?.map((job, index) => (
                     <Badge
                       key={job}

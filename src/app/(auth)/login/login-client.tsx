@@ -148,7 +148,7 @@ export const LoginClient = () => {
 
   return (
     <div className=" flex font-poppins">
-      <div className="flex-1 flex items-center justify-center p-8 bg-white">
+      <div className="flex-1 min-h-screen flex items-center justify-center p-8 bg-white">
         <div className="w-full max-w-md space-y-8">
           <div className="space-y-6">
             <div className="flex items-center space-x-2">
@@ -289,7 +289,7 @@ export const LoginClient = () => {
         </div>
       </div>
 
-      <div className="hidden lg:flex flex-1 relative overflow-hidden h-full bg-blue-500 ">
+      <div className="hidden lg:flex flex-1 relative overflow-hidden  bg-blue-500 ">
         <img
           src="/auth-page.png"
           alt="Auth Image"

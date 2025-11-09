@@ -21,6 +21,8 @@ import OnboardingTabs from "./OnBoardingTabs";
 import Progress from "./Progress";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { FloatingLabelInput } from "./FloatingInput";
+import { userQueries } from "@/lib/queries/user.queries";
+import { useQuery } from "@tanstack/react-query";
 
 const formSchema = z.object({
   tailoringIssue: z.boolean().default(false).optional(),
@@ -33,7 +35,9 @@ const formSchema = z.object({
 });
 
 export const OnBoardingForm4 = ({ onNext, onPrev }: OnboardingFormProps) => {
-  const { updateUser, isUpdatingUserLoading, user } = useAuth();
+  const { updateUser, isUpdatingUserLoading } = useAuth();
+    const {data: user} = useQuery(userQueries.detail());
+  
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {

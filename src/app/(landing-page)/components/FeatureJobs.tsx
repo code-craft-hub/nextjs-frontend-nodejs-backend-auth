@@ -41,7 +41,9 @@ export const FeatureJobs = ({ filters }: { filters: JobFilters }) => {
               )}
             >
               <div className="flex justify-between">
-                <h3 className="font-medium mb-1 line-clamp-1">{job?.title}</h3>
+                <h3 className="font-medium mb-1 line-clamp-1 capitalize">
+                  {job?.title}
+                </h3>
                 <p className="">
                   {!!job?.emailApply && (
                     <Sparkles className="w-4 h-4 text-yellow-500 animate-bounce" />
@@ -56,18 +58,20 @@ export const FeatureJobs = ({ filters }: { filters: JobFilters }) => {
                     ? job.employmentType
                     : "On-site"}
                 </span>
-                <span className=" text-gray-400 text-xs">
-                  Salary: {job?.salary ?? ""}
-                </span>
+                {job?.salary && (
+                  <span className=" text-gray-400 text-xs">
+                    Salary: {job?.salary ?? ""}
+                  </span>
+                )}
               </div>
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-sm bg-gray-200 flex items-center justify-center text-2xl shrink-0">
+                <div className="rounded-sm flex items-center justify-center text-2xl shrink-0">
                   <img
                     src={
                       !!job?.companyLogo ? job?.companyLogo : "/placeholder.jpg"
                     }
                     alt="company logo"
-                    className="size-10"
+                    className="size-12"
                   />
                 </div>
                 <div className="">
@@ -83,7 +87,10 @@ export const FeatureJobs = ({ filters }: { filters: JobFilters }) => {
                   <Button
                     onClick={async () => {
                       if (!job?.emailApply) {
-                        window.open(!!job.link ? job?.link : job?.applyUrl, "__blank");
+                        window.open(
+                          !!job.link ? job?.link : job?.applyUrl,
+                          "__blank"
+                        );
                         return;
                       }
 

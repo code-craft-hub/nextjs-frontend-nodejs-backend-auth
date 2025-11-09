@@ -22,9 +22,20 @@ import { FloatingLabelInput } from "./FloatingInput";
 import Progress from "./Progress";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { userQueries } from "@/lib/queries/user.queries";
+import { useQuery } from "@tanstack/react-query";
 const formSchema = z.object({
   type: z
-    .enum(["linkedin", "instagram", "tiktok", "google", "friend", "whatsapp", "twitter", "telegram"])
+    .enum([
+      "linkedin",
+      "instagram",
+      "tiktok",
+      "google",
+      "friend",
+      "whatsapp",
+      "twitter",
+      "telegram",
+    ])
     .refine((val) => !!val, {
       message: "You need to select a notification type.",
     }),
@@ -32,7 +43,9 @@ const formSchema = z.object({
 });
 
 export const OnBoardingForm5 = ({ onNext, onPrev }: OnboardingFormProps) => {
-  const { updateUser, isUpdatingUserLoading, user } = useAuth();
+  const { updateUser, isUpdatingUserLoading } = useAuth();
+  const { data: user } = useQuery(userQueries.detail());
+
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {

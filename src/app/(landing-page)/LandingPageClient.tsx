@@ -21,6 +21,7 @@ import { MeetCverai } from "./components/MeetCverai";
 import { FeatureJobs } from "./components/FeatureJobs";
 import { JobFilters } from "@/lib/types/jobs";
 import { IUser } from "@/types";
+import { useRouter } from "next/navigation";
 
 export const LandingPageClient = ({
   filters,
@@ -31,7 +32,7 @@ export const LandingPageClient = ({
 }) => {
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
 
-
+  const router = useRouter();
   return (
     <div className="min-h-screen bg-white font-poppins">
       <section
@@ -220,6 +221,7 @@ export const LandingPageClient = ({
                 <Button
                   variant="outline"
                   className="bg-primary/10 hover:bg-primary/30 !h-12 text-blue-500 hover:text-blue-500"
+                  onClick={() => router.push(`/dashboard/home`)}
                 >
                   Choose this plan
                 </Button>
