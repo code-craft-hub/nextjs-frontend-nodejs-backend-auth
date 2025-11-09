@@ -345,10 +345,11 @@ export default function ProfileManagementModal({
                         pressed={field.value}
                         onPressedChange={(pressed) => {
                           field.onChange(pressed);
-
-                          setDefaultDataSource.mutate({
-                            profileId: profile?.id!,
-                          });
+                          if (pressed && profile) {
+                            setDefaultDataSource.mutate({
+                              profileId: profile.id,
+                            });
+                          }
                           setOpen(false);
                           toast.success(
                             `${profile?.title} is now your default profile!`
