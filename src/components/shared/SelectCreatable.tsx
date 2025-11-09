@@ -1,7 +1,7 @@
 "use client";
 
 import { customStyles } from "@/lib/utils/constants";
-import React, { KeyboardEventHandler } from "react";
+import React, { KeyboardEventHandler, useState } from "react";
 import CreatableSelect from "react-select/creatable";
 
 const components = {
@@ -29,28 +29,51 @@ export const SelectCreatable = ({
   onChange,
   placeholder,
 }: SelectCreatableProps) => {
-  const [inputValue, setInputValue] = React.useState("");
+  const [inputValue, setInputValue] = useState("");
+const [lastKeyWasSpace, setLastKeyWasSpace] = useState(false);
 
-  const handleKeyDown: KeyboardEventHandler = (event) => {
-    if (!inputValue) return;
-    switch (event.key) {
-      case "Enter":
-      case "Tab":
-        if (onChange) {
-          onChange([...value, createOption(inputValue)]);
-        }
-        setInputValue("");
-        event.preventDefault();
-        break;
-      case ",":
-        if (onChange) {
-          onChange([...value, createOption(inputValue)]);
-        }
-        setInputValue("");
-        event.preventDefault();
-        break;
+const handleKeyDown: KeyboardEventHandler = (event) => {
+  if (!inputValue) return;
+  
+  // Handle double space
+  if (event.key === " ") {
+    if (lastKeyWasSpace) {
+      // Second space detected
+      if (onChange) {
+        onChange([...value, createOption(inputValue)]);
+      }
+      setInputValue("");
+      setLastKeyWasSpace(false);
+      event.preventDefault();
+      return;
+    } else {
+      // First space
+      setLastKeyWasSpace(true);
+      return;
     }
-  };
+  } else {
+    // Reset if any other key is pressed
+    setLastKeyWasSpace(false);
+  }
+  
+  switch (event.key) {
+    case "Enter":
+    case "Tab":
+      if (onChange) {
+        onChange([...value, createOption(inputValue)]);
+      }
+      setInputValue("");
+      event.preventDefault();
+      break;
+    case ",":
+      if (onChange) {
+        onChange([...value, createOption(inputValue)]);
+      }
+      setInputValue("");
+      event.preventDefault();
+      break;
+  }
+};
 
   return (
     <CreatableSelect

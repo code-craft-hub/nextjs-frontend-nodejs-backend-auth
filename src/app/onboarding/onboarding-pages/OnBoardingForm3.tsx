@@ -33,6 +33,7 @@ import { Badge } from "@/components/ui/badge";
 import { badgeColors, jobExamples } from "@/lib/utils/constants";
 import { userQueries } from "@/lib/queries/user.queries";
 import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
 
 const formSchema = z.object({
   partTime: z.boolean().default(false).optional(),
@@ -68,6 +69,23 @@ export const OnBoardingForm3 = ({ onNext, onPrev }: OnboardingFormProps) => {
   });
 
   console.log(user?.dataSource);
+
+  useEffect(() => {
+    if (user?.dataSource) {
+      form.setValue(
+        "rolesOfInterest",
+        user.dataSource[0]?.rolesOfInterest || []
+      );
+      form.setValue("location", user.dataSource[0]?.location || "");
+      form.setValue("partTime", user.dataSource[0]?.partTime || false);
+      form.setValue("fullTime", user.dataSource[0]?.fullTime || false);
+      form.setValue("intership", user.dataSource[0]?.intership || false);
+      form.setValue("contract", user.dataSource[0]?.contract || false);
+      form.setValue("hybrid", user.dataSource[0]?.hybrid || false);
+      form.setValue("remote", user.dataSource[0]?.remote || false);
+      form.setValue("onsite", user.dataSource[0]?.onsite || false);
+    }
+  }, [user, form]);
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       const dataSource = [
