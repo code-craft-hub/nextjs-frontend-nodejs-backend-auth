@@ -29,6 +29,7 @@ import { Toggle } from "@/components/ui/toggle";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { ProfileData } from "@/types";
+import {v4 as uuidv4} from 'uuid';
 
 const jobLevel = ["Entry Level", "Mid Level", "Senior Level"];
 const jobTypes = ["Full Time", "Part Time", "Contract"];
@@ -53,6 +54,7 @@ export default function ProfileManagementModal({
 
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
+      title: "",
       jobLevelPreference: jobLevel[0],
       jobTypePreference: jobTypes[0],
       rolesOfInterest: profile?.rolesOfInterest ?? ([] as Option[]),
@@ -69,6 +71,7 @@ export default function ProfileManagementModal({
   useEffect(() => {
     if (profile) {
       reset({
+        title: profile.title || "",
         jobLevelPreference: profile.jobLevelPreference || jobLevel[0],
         jobTypePreference: profile.jobTypePreference || jobTypes[0],
         rolesOfInterest: profile.rolesOfInterest || [],
@@ -104,7 +107,7 @@ export default function ProfileManagementModal({
     } else {
       createDataSource.mutate(
         {
-          profileData: { ...userProfile, id: crypto.randomUUID() },
+          profileData: { ...userProfile, id: uuidv4() },
         },
         {
           onSuccess: () => {
@@ -126,6 +129,7 @@ export default function ProfileManagementModal({
     setOpen(false);
     if (profile) {
       reset({
+        title: profile.title || "",
         jobLevelPreference: profile.jobLevelPreference || jobLevel[0],
         jobTypePreference: profile.jobTypePreference || jobTypes[0],
         rolesOfInterest: profile.rolesOfInterest || [],
@@ -158,6 +162,20 @@ export default function ProfileManagementModal({
             </div>
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-8 w-full">
+                   <div className="space-y-1.5 col-span-2">
+                  <h1 className="">Profile Title</h1>
+                  <Controller
+                    name="title"
+                    control={control}
+                    render={({ field }) => (
+                      <Input
+                        className=""
+                        placeholder="Profile title is also used for job recommendations. e.g Software Engineer, Marketing Specialist"
+                        {...field}
+                      />
+                    )}
+                  />
+                </div>
                 <div className="space-y-1.5">
                   <h1 className="font-medium">Job Level Preference</h1>
                   <Controller

@@ -13,21 +13,17 @@ import OnboardingTabs from "./OnBoardingTabs";
 import { FileUploadZone, useDocumentExtraction } from "./AnyFormatToText";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
-import { onboardingApi } from "@/lib/api/onboarding.api";
 import { useQuery } from "@tanstack/react-query";
 import { userQueries } from "@/lib/queries/user.queries";
+import { useCreateOnboardingMutation } from "@/lib/mutations/onboarding.mutations";
 
 export const OnBoardingForm2 = ({ onNext, onPrev }: OnboardingFormProps) => {
   const { isUpdatingUserLoading } = useAuth();
-  const {data: user} = useQuery(userQueries.detail());
+  const { data: user } = useQuery(userQueries.detail());
+  const onboardingMutation = useCreateOnboardingMutation();
   const [loading, setLoading] = useState(false);
-  const {
-    processDocument,
-    error,
-    currentFile,
-    clearError,
-    clearFile,
-  } = useDocumentExtraction();
+  const { processDocument, error, currentFile, clearError, clearFile } =
+    useDocumentExtraction();
 
   const handleFileSelect = useCallback(
     async (file: File) => {
@@ -36,10 +32,8 @@ export const OnBoardingForm2 = ({ onNext, onPrev }: OnboardingFormProps) => {
       setLoading(true);
       const formData = new FormData();
       formData.append("file", file);
-      const data = await onboardingApi.createFirstProfile(formData);
-      if (data?.success) {
-        toast.success(`${user?.firstName}, your resume is saved!`);
-      }
+      await onboardingMutation.mutateAsync(formData);
+      toast.success(`${user?.firstName}, your resume is saved!`);
       setLoading(false);
       onNext();
     },
@@ -118,7 +112,9 @@ export const OnBoardingForm2 = ({ onNext, onPrev }: OnboardingFormProps) => {
                 disabled={isUpdatingUserLoading || loading}
                 className="onboarding-btn"
               >
-                {isUpdatingUserLoading || loading ? "Saving..." : "Save and Continue"}{" "}
+                {isUpdatingUserLoading || loading
+                  ? "Saving..."
+                  : "Save and Continue"}{" "}
               </Button>
             </div>
           </form>

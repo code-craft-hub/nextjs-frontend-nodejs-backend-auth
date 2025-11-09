@@ -68,8 +68,6 @@ export const OnBoardingForm3 = ({ onNext, onPrev }: OnboardingFormProps) => {
     },
   });
 
-  console.log(user?.dataSource);
-
   useEffect(() => {
     if (user?.dataSource) {
       form.setValue(

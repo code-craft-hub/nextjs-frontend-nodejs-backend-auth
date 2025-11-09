@@ -2,7 +2,6 @@
 import { AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import { apiService } from "@/hooks/use-auth";
-import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { OnBoardingForm0 } from "./onboarding-pages/OnBoardingForm0";
@@ -13,12 +12,9 @@ import { OnBoardingForm4 } from "./onboarding-pages/OnBoardingForm4";
 import { OnBoardingForm5 } from "./onboarding-pages/OnBoardingForm5";
 import { OnBoardingForm6 } from "./onboarding-pages/OnBoardingForm6";
 import { OnBoardingForm7 } from "./onboarding-pages/OnBoardingForm7";
+import { useRouter } from "next/navigation";
 
 export default function OnboardingClient() {
-  useQuery({
-    queryKey: ["auth", "user"],
-    queryFn: apiService.getUser,
-  });
   const [currentStep, setCurrentStep] = useState(0);
   const steps = [
     OnBoardingForm0,
@@ -32,6 +28,12 @@ export default function OnboardingClient() {
   ];
   const totalSteps = steps.length;
 
+  const router = useRouter();
+  const signOut = async () => {
+    await apiService.logout();
+    router.push("/login");
+  };
+
   const nextStep = () => {
     if (currentStep < totalSteps - 1) {
       setCurrentStep((prev) => prev + 1);
@@ -40,7 +42,7 @@ export default function OnboardingClient() {
 
   const fromDataSourceStep = () => {
     setCurrentStep(3);
-  }
+  };
 
   const prevStep = () => {
     if (currentStep > 0) {
@@ -62,9 +64,7 @@ export default function OnboardingClient() {
           <Button
             className="text-blue-500 lg:text-white"
             variant={"ghost"}
-            onClick={async () => {
-              await apiService.logout();
-            }}
+            onClick={signOut}
           >
             <X />
           </Button>
