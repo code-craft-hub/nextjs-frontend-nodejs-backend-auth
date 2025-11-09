@@ -61,6 +61,18 @@ export const TailorCoverLetter = memo<{
 
               await new Promise((resolve) => setTimeout(resolve, 5000));
 
+              if (user?.defaultDataSource) {
+                router.push(
+                  `/dashboard/preview?baseResume=${
+                    user?.defaultDataSource
+                  }?aiApply=true&recruiterEmail=${recruiterEmail}&${orderedParams.toString()}`
+                );
+
+                //           router.push(
+                //   `/dashboard/preview?resumeId=${resumeId}&coverLetterId=${coverLetterId}&recruiterEmail=${recruiterEmail}&jobDescription=${jobDescription}`
+                // );
+                return;
+              }
               router.push(
                 `/dashboard/tailor-resume/${uuidv4()}?aiApply=true&recruiterEmail=${recruiterEmail}&${orderedParams.toString()}`
               );

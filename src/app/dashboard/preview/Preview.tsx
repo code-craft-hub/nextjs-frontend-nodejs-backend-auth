@@ -20,11 +20,13 @@ const Preview = ({
   resumeId,
   recruiterEmail,
   jobDescription,
+  baseResume,
 }: {
   coverLetterId: string;
   resumeId: string;
   jobDescription: string;
   recruiterEmail: string;
+  baseResume: string;
 }) => {
   const [activeStep, setActiveStep] = useState(3);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -36,6 +38,10 @@ const Preview = ({
   const { data: resumeData } = useQuery(resumeQueries.detail(resumeId));
   const { data: coverLetterData } = useQuery(
     coverLetterQueries.detail(coverLetterId)
+  );
+
+  const defaultResume = user?.dataSource?.find(
+    (resume) => resume.id === user?.defaultDataSource
   );
 
   const handleOpenModal = (value: boolean) => {
@@ -132,7 +138,17 @@ const Preview = ({
         data={coverLetterData}
         recruiterEmail={recruiterEmail}
       />
-      <EditableResume data={resumeData!} resumeId={resumeId} />
+      {baseResume ? (
+        <div className="w-full h-[600px]">
+          <iframe
+            src={`${defaultResume.url}#toolbar=0&navpanes=0&scrollbar=0`}
+            className="w-full h-full border-0"
+            title="Resume PDF"
+          />
+        </div>
+      ) : (
+        <EditableResume data={resumeData!} resumeId={resumeId} />
+      )}
       <div className="flex items-center justify-center">
         <Button disabled={isSubmitting} onClick={handleSubmit} className="w-64">
           Submit

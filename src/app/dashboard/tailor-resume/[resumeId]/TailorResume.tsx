@@ -27,12 +27,11 @@ export const TailorResume = ({
 }) => {
   const { data: user } = useQuery(userQueries.detail());
 
-  const defaultResume = user?.dataSource?.find(
-    (resume) => resume.id === user?.defaultDataSource
-  );
+  // const defaultResume = user?.dataSource?.find(
+  //   (resume) => resume.id === user?.defaultDataSource
+  // );
 
   // TODO: CHECK THE EXPIRY OF THE URL AND REFRESH IF NEEDED IN THE SERVER OR CLIENT
-  console.log("USER DATA IN TAILOR RESUME COMPONENT", defaultResume?.url);
 
   const { data, status, isFetched } = useQuery(resumeQueries.detail(resumeId));
   const resultsEndRef = useRef<HTMLDivElement>(null);
@@ -95,7 +94,6 @@ export const TailorResume = ({
   };
   return (
     <div className="space-y-4 sm:space-y-8">
-     
       {aiApply && <ProgressIndicator activeStep={2} />}
       <div className="flex w-full gap-3 items-center  p-4  bg-white justify-between">
         <p className="text-xl font-medium font-inter">Tailored Resume</p>
@@ -108,11 +106,21 @@ export const TailorResume = ({
           Delete
         </Button>
       </div>
+      {/* {defaultResume?.url ? (
+        <div className="w-full h-[600px]">
+          <iframe
+            src={`${defaultResume.url}#toolbar=0&navpanes=0&scrollbar=0`}
+            className="w-full h-full border-0"
+            title="Resume PDF"
+          />
+        </div>
+      ) : ( */}
       <EditableResume
         data={shouldUseDbData ? data! : streamData}
         resumeId={resumeId}
         isStreaming={streamStatus.isComplete}
       />
+      {/* )} */}
       <div ref={resultsEndRef} className="" />
     </div>
   );
