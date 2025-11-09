@@ -2,7 +2,7 @@
 import React, { useEffect, useRef } from "react";
 import { useResumeStream } from "@/hooks/stream-resume-hook";
 import { toast } from "sonner";
-import { apiService, useAuth } from "@/hooks/use-auth";
+import { apiService } from "@/hooks/use-auth";
 import { COLLECTIONS } from "@/lib/utils/constants";
 import { EditableResume } from "../../(dashboard)/ai-apply/components/resume/EditableResume";
 import { ProgressIndicator } from "../../(dashboard)/ai-apply/progress-indicator";
@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { resumeQueries } from "@/lib/queries/resume.queries";
+import { userQueries } from "@/lib/queries/user.queries";
 
 export const TailorResume = ({
   jobDescription,
@@ -24,11 +25,14 @@ export const TailorResume = ({
   aiApply: boolean;
   recruiterEmail: string;
 }) => {
-  const { user } = useAuth();
-  // const { data,  } = useCareerDoc<Resume>(
-  //   resumeId,
-  //   COLLECTIONS.RESUME
-  // );
+  const { data: user } = useQuery(userQueries.detail());
+
+  const defaultResume = user?.dataSource?.find(
+    (resume) => resume.id === user?.defaultDataSource
+  );
+
+  // TODO: CHECK THE EXPIRY OF THE URL AND REFRESH IF NEEDED IN THE SERVER OR CLIENT
+  console.log("USER DATA IN TAILOR RESUME COMPONENT", defaultResume?.url);
 
   const { data, status, isFetched } = useQuery(resumeQueries.detail(resumeId));
   const resultsEndRef = useRef<HTMLDivElement>(null);
@@ -91,17 +95,7 @@ export const TailorResume = ({
   };
   return (
     <div className="space-y-4 sm:space-y-8">
-      {/* {JSON.stringify(streamStatus)}
-      {streamStatus.isComplete ? (
-        <div> streaming isComplete is True</div>
-      ) : (
-        <div>streaming isComplete is False</div>
-      )}
-      {streamStatus.isConnected ? (
-        <div> streaming isConnected is True</div>
-      ) : (
-        <div>streaming isConnected is False</div>
-      )} */}
+     
       {aiApply && <ProgressIndicator activeStep={2} />}
       <div className="flex w-full gap-3 items-center  p-4  bg-white justify-between">
         <p className="text-xl font-medium font-inter">Tailored Resume</p>
