@@ -9,9 +9,9 @@ import { randomPercentage } from "@/lib/utils/helpers";
 import { useQuery } from "@tanstack/react-query";
 import { isEmpty } from "lodash";
 import { v4 as uuidv4 } from "uuid";
-import { MoreHorizontal } from "lucide-react";
+import { MoreHorizontal, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import { toast } from "sonner";
 
 import {
@@ -26,6 +26,17 @@ import { JobType } from "@/types";
 export const RecentActivityCard = memo(
   ({ filters }: { filters: JobFilters }) => {
     const { data: jobs } = useQuery(jobsQueries.all(filters));
+
+    const sortedJobs = useMemo(() => {
+      if (!jobs?.data) return [];
+
+      return [...jobs.data].sort((a, b) => {
+        if (a.emailApply && !b.emailApply) return -1;
+        if (!a.emailApply && b.emailApply) return 1;
+        return 0;
+      });
+    }, [jobs?.data]);
+
     const router = useRouter();
 
     const handleJobClick = async (job: JobType) => {
@@ -66,11 +77,12 @@ export const RecentActivityCard = memo(
       <Card className="p-4 sm:p-7 gap-4">
         <h1 className="font-bold text-xl">Personalized Recommendation</h1>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-y-4 sm:gap-8">
-          {jobs?.data?.map((job) => (
+          {sortedJobs?.map((job) => (
             <div
               key={job.id}
               className="flex bg-slate-50 p-4 sm:p-6 rounded-xl gap-4 sm:gap-6 border border-[#cbd5e1] relative"
             >
+              <Sparkles className="absolute bottom-4 left-4 text-gray-200 w-5 h-5" />
               <div className="shrink-0">
                 <img
                   src={!!job.companyLogo ? job.companyLogo : "/placeholder.jpg"}

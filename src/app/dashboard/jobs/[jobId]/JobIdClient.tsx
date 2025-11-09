@@ -1,5 +1,7 @@
 "use client";
+import { apiService } from "@/hooks/use-auth";
 import { jobsQueries } from "@/lib/queries/jobs.queries";
+import { userQueries } from "@/lib/queries/user.queries";
 import { useQuery } from "@tanstack/react-query";
 import {
   ArrowLeft,
@@ -8,9 +10,12 @@ import {
   Twitter,
   Instagram,
   Youtube,
+  Sparkles,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React from "react";
+import { toast } from "sonner";
+import { v4 as uuidv4 } from "uuid";
 
 export const JobIdClient = ({
   jobId,
@@ -20,8 +25,8 @@ export const JobIdClient = ({
   referrer: string;
 }) => {
   const { data } = useQuery(jobsQueries.detail(jobId));
+  const { data: user } = useQuery(userQueries.detail());
   const job = data?.data;
-
   const router = useRouter();
 
   const handleBackClick = () => {
@@ -36,6 +41,45 @@ export const JobIdClient = ({
     } else {
       router.push("/dashboard/jobs");
     }
+  };
+
+  const handleApplyClick = async () => {
+    if (user?.email) {
+      const { isAuthorized } = await apiService.gmailOauthStatus();
+
+      if (!isAuthorized) {
+        toast(
+          "Please authorize Cverai to send emails on your behalf from the settings page.  ",
+          {
+            action: {
+              label: "Authorize now",
+              onClick: () =>
+                router.push(`/dashboard/settings?tab=ai-applypreference`),
+            },
+            classNames: {
+              // toast: "!bg-yellow-50 !border-yellow-200",
+              actionButton: "!bg-blue-600 hover:!bg-blue-700 !text-white !h-8",
+            },
+          }
+        );
+
+        return;
+      }
+    }
+
+    if (!job?.emailApply) {
+      toast.error(
+        "No destination email found in job description. Please include the destination email in the job description."
+      );
+      return;
+    }
+
+    const params = new URLSearchParams();
+    params.set("jobDescription", JSON.stringify(job?.descriptionText || ""));
+    params.set("recruiterEmail", encodeURIComponent(job?.emailApply));
+    router.push(
+      `/dashboard/tailor-cover-letter/${uuidv4()}?${params}&aiApply=true`
+    );
   };
   return (
     <div>
@@ -74,8 +118,14 @@ export const JobIdClient = ({
                   </p>
                 </div>
               </div>
-              <button className="bg-blue-600 max-sm:text-2xs hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-medium max-sm:w-full">
-                Apply Now
+              <button
+                onClick={() => handleApplyClick()}
+                className="bg-blue-600 max-sm:text-2xs hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-medium max-sm:w-full"
+              >
+                Apply Now{" "}
+                {job?.emailApply && (
+                  <Sparkles className="w-4 h-4 inline-block ml-1" />
+                )}
               </button>
             </div>
           </div>
