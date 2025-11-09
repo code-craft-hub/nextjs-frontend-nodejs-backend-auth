@@ -6,6 +6,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { usePathname, useRouter } from "next/navigation";
 
@@ -23,15 +24,17 @@ export function NavMain({
     }[];
   }[];
 }) {
-  
   const pathname = usePathname();
   const router = useRouter();
+  const { isMobile, toggleSidebar } = useSidebar();
+
   return (
     <SidebarGroup>
       <SidebarMenu>
         {items.map((item) => {
           const isItemActive =
-            pathname === item.url || pathname.startsWith(item.url) ||
+            pathname === item.url ||
+            pathname.startsWith(item.url) ||
             // item.items?.some((subItem) => pathname === subItem.url) ||
             false;
           return (
@@ -47,6 +50,13 @@ export function NavMain({
                     tooltip={item.title}
                     isActive={isItemActive}
                     onClick={() => {
+                      if (isMobile) {
+                        toggleSidebar();
+                        setTimeout(() => {
+                          router.push(item.url);
+                        }, 500);
+                        return;
+                      }
                       router.push(item.url);
                     }}
                   >

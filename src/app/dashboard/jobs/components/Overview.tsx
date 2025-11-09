@@ -7,6 +7,7 @@ import {
   getCoreRowModel,
   getFilteredRowModel,
   getSortedRowModel,
+  Row,
   SortingState,
   useReactTable,
   VisibilityState,
@@ -51,6 +52,7 @@ import {
 import { ReportCard } from "./ReportCard";
 import { jobMatcher } from "@/services/job-recommendation";
 import { PiOfficeChairFill } from "react-icons/pi";
+import MobileOverview from "./MobileOverview";
 
 export default function Overview() {
   const router = useRouter();
@@ -121,9 +123,9 @@ export default function Overview() {
         }
         return {
           ...job,
-          isBookmarked: bookmarkedIdSet.has(job.id),
-          isApplied: appliedJobsIdSet.has(job.id),
-          matchPercentage: completeMatch.score.toString(),
+          isBookmarked: bookmarkedIdSet?.has(job?.id),
+          isApplied: appliedJobsIdSet?.has(job?.id),
+          matchPercentage: completeMatch?.score?.toString(),
           matchDetails: completeMatch,
         };
       })
@@ -134,10 +136,63 @@ export default function Overview() {
     return jobData;
   }, [data, user?.bookmarkedJobs?.length, user?.appliedJobs?.length]);
 
+  const handleApply = async ({ e, row }: { e: any; row: Row<JobType> }) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!row.original?.emailApply) {
+      updateJobApplicationHistory.mutate({
+        id: String(row.original.id),
+        data: {
+          appliedJobs: row.original.id,
+        },
+      });
+      window.open(
+        !!row.original?.applyUrl ? row.original?.applyUrl : row.original?.link,
+        "__blank"
+      );
+      return;
+    }
+
+    const { isAuthorized } = await apiService.gmailOauthStatus();
+
+    if (!isAuthorized) {
+      toast.error(
+        "✨ Go to the Settings page and enable authorization for Cverai to send emails on your behalf. This option is located in the second card.",
+        {
+          action: {
+            label: "Authorize now",
+            onClick: () =>
+              router.push(`/dashboard/settings?tab=ai-applypreference`),
+          },
+          classNames: {
+            actionButton: "!bg-blue-600 hover:!bg-blue-700 !text-white !h-8",
+          },
+        }
+      );
+      return;
+    }
+
+    const params = new URLSearchParams();
+    params.set(
+      "jobDescription",
+      JSON.stringify(row.original?.descriptionText || "")
+    );
+    params.set("recruiterEmail", encodeURIComponent(row.original?.emailApply));
+
+    updateJobApplicationHistory.mutate({
+      id: String(row.original.id),
+      data: {
+        appliedJobs: row.original.id,
+      },
+    });
+    router.push(
+      `/dashboard/tailor-cover-letter/${uuidv4()}?${params}&aiApply=true`
+    );
+  };
   const columns = getFindJobsColumns({
     router,
     updateJobs,
-    updateJobApplicationHistory,
+    handleApply,
   });
   const table = useReactTable({
     data: allJobs,
@@ -209,7 +264,7 @@ export default function Overview() {
         <ReportCard matchPercentage={totalScoreRef.current} />
         <div className="bg-white shadow-lg px-2 flex gap-4 justify-between rounded-lg">
           <div className="flex items-center gap-2 w-full">
-            <SearchIcon className="size-4" />
+            <SearchIcon className="size-4 " />
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
@@ -248,17 +303,17 @@ export default function Overview() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 ">
+        <div className="hidden lg:grid grid-cols-1">
           <Table>
             <TableBody>
               {visibleRows.length ? (
                 visibleRows.map((row) => (
                   <TableRow
                     onClick={() => {
-                    router.push(
-                      `/dashboard/jobs/${row.original.id}?referrer=jobs&title=${row.original.title}`
-                    );
-                  }}
+                      router.push(
+                        `/dashboard/jobs/${row.original.id}?referrer=jobs&title=${row.original.title}`
+                      );
+                    }}
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
                     className="hover:bg-white border-b !rounded-3xl hover:border-primary hover:border-[2px] hover:rounded-2xl hover:cursor-pointer"
@@ -301,7 +356,11 @@ export default function Overview() {
             </TableBody>
           </Table>
         </div>
-
+        <MobileOverview
+          allJobs={allJobs}
+          updateJobs={updateJobs}
+          handleApply={handleApply}
+        />
         {hasNextPage && !isAutoFetching && (
           <div className="flex justify-center">
             <Button
@@ -330,13 +389,12 @@ export default function Overview() {
 }
 
 export const getFindJobsColumns = ({
-  router,
   updateJobs,
-  updateJobApplicationHistory,
+  handleApply,
 }: {
   router: AppRouterInstance;
   updateJobs?: any;
-  updateJobApplicationHistory?: any;
+  handleApply?: any;
 }): ColumnDef<JobType>[] => [
   {
     accessorKey: "companyText",
@@ -456,65 +514,7 @@ export const getFindJobsColumns = ({
           <Button
             disabled={row.original.isApplied}
             className="w-full disabled:opacity-50 disabled:cursor-not-allowed disabled:text-gray-400"
-            onClick={async (e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              if (!row.original?.emailApply) {
-                updateJobApplicationHistory.mutate({
-                  id: String(row.original.id),
-                  data: {
-                    appliedJobs: row.original.id,
-                  },
-                });
-                window.open(
-                  row.original?.applyUrl ?? row.original?.link,
-                  "__blank"
-                );
-                return;
-              }
-
-              const { isAuthorized } = await apiService.gmailOauthStatus();
-
-              if (!isAuthorized) {
-                toast.error(
-                  "✨ Go to the Settings page and enable authorization for Cverai to send emails on your behalf. This option is located in the second card.",
-                  {
-                    action: {
-                      label: "Authorize now",
-                      onClick: () =>
-                        router.push(
-                          `/dashboard/settings?tab=ai-applypreference`
-                        ),
-                    },
-                    classNames: {
-                      actionButton:
-                        "!bg-blue-600 hover:!bg-blue-700 !text-white !h-8",
-                    },
-                  }
-                );
-                return;
-              }
-
-              const params = new URLSearchParams();
-              params.set(
-                "jobDescription",
-                JSON.stringify(row.original?.descriptionText || "")
-              );
-              params.set(
-                "recruiterEmail",
-                encodeURIComponent(row.original?.emailApply)
-              );
-
-              updateJobApplicationHistory.mutate({
-                id: String(row.original.id),
-                data: {
-                  appliedJobs: row.original.id,
-                },
-              });
-              router.push(
-                `/dashboard/tailor-cover-letter/${uuidv4()}?${params}&aiApply=true`
-              );
-            }}
+            onClick={(event) => handleApply({ event, row })}
             variant={"button"}
           >
             {row.original?.emailApply ? "Auto Apply" : "Apply Now"}

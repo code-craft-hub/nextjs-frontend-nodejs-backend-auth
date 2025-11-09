@@ -30,7 +30,8 @@ export const RecentActivityCard = memo(
 
     const handleJobClick = async (job: JobType) => {
       if (!job?.emailApply) {
-        window.open(job.link, "__blank");
+        //!!row.original?.applyUrl ? row.original?.applyUrl : row.original?.link
+        window.open(!!job.link ? job?.link : job?.applyUrl, "__blank");
         return;
       }
 
@@ -98,7 +99,13 @@ export const RecentActivityCard = memo(
                       Auto apply
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => {router.push(`/dashboard/jobs/${job.id}?referrer=dashboard&title=${job.title}`);}}>
+                    <DropdownMenuItem
+                      onClick={() => {
+                        router.push(
+                          `/dashboard/jobs/${job.id}?referrer=dashboard&title=${job.title}`
+                        );
+                      }}
+                    >
                       <img src="/preview.svg" className="size-4" alt="" />
                       Previow
                     </DropdownMenuItem>

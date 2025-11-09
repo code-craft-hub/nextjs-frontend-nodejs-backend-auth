@@ -3,7 +3,7 @@ import { IUser } from "@/types";
 export interface ProfileData {
   jobLevelPreference: string;
   jobTypePreference: string;
-  roleOfInterest: string;
+  rolesOfInterest: string;
   remoteWorkPreference: string;
   relocationWillingness: string;
   location: string;
@@ -35,7 +35,6 @@ export interface RegisterData {
   name: string;
 }
 
-
 export interface InterviewQuestion {
   id: string;
   userId: string;
@@ -46,7 +45,6 @@ export interface InterviewQuestion {
   createdAt: string;
   updatedAt: string;
 }
-
 
 export interface Blog {
   id: string;

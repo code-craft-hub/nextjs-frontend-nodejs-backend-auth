@@ -30,11 +30,11 @@ export default async function HomePage({
   const user = await queryClient.fetchQuery(userQueries.detail());
   const { tab, jobDescription } = await searchParams;
 
-  const userDataSource = getDataSource(user);
+  const { title } = getDataSource(user);
   const filters: JobFilters = {
     page: 1,
     limit: 20,
-    title: userDataSource?.key || userDataSource?.title || "",
+    title: title || "",
   };
   await prefetchWithPriority(queryClient, [
     {

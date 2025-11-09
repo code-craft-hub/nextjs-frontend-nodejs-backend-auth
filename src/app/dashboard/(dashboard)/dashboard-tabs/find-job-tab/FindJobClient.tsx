@@ -22,6 +22,7 @@ import { userQueries } from "@/lib/queries/user.queries";
 import { getDataSource } from "@/lib/utils/helpers";
 import { jobMatcher } from "@/services/job-recommendation";
 import { useRouter } from "next/navigation";
+import MobileFindJob from "./MobileFindJob";
 
 export default function JobDashboard({
   hideToMenus,
@@ -162,7 +163,7 @@ export default function JobDashboard({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 ">
+      <div className="hidden lg:grid grid-cols-1">
         <Table>
           <TableBody>
             {visibleRows.length ? (
@@ -209,7 +210,7 @@ export default function JobDashboard({
           </TableBody>
         </Table>
       </div>
-
+      <MobileFindJob allJobs={allJobs} />
       {hasNextPage && !isAutoFetching && (
         <div className="flex justify-center">
           <Button

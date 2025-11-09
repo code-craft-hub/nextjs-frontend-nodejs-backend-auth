@@ -2,11 +2,7 @@ import React, { useState, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import {
-  FileCheck,
-  Loader2,
-  X,
-} from "lucide-react";
+import { FileCheck, Loader2, PlusIcon, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -300,6 +296,7 @@ interface FileUploadZoneProps {
   disabled: boolean;
   currentFile: File | null;
   onClearFile: () => void;
+  profile?: boolean;
 }
 
 export const FileUploadZone: React.FC<FileUploadZoneProps> = ({
@@ -307,6 +304,7 @@ export const FileUploadZone: React.FC<FileUploadZoneProps> = ({
   disabled,
   currentFile,
   onClearFile,
+  profile,
 }) => {
   const [isDragging, setIsDragging] = useState(false);
 
@@ -346,7 +344,12 @@ export const FileUploadZone: React.FC<FileUploadZoneProps> = ({
 
   if (currentFile) {
     return (
-      <div className={cn("flex items-center justify-between p-4 border rounded-lg bg-slate-50 w-full h-24", disabled && "border-blue-500 animate-pulse border-2")}>
+      <div
+        className={cn(
+          "flex items-center justify-between p-4 border rounded-lg bg-slate-50 w-full h-24",
+          disabled && "border-blue-500 animate-pulse border-2"
+        )}
+      >
         <div className="flex items-center gap-3">
           <FileCheck className="w-5 h-5 text-blue-600" />
           <div>
@@ -374,22 +377,26 @@ export const FileUploadZone: React.FC<FileUploadZoneProps> = ({
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
-      className={`
-        !border-blue-500 border-2 border-dashed rounded-lg p-8 w-full text-center transition-colors
+      className={cn(
+        `
+        !border-blue-500 border-2 border-dashed rounded-lg w-full text-center transition-colors
         ${isDragging ? "border-blue-400 bg-blue-50" : "border-slate-300"}
         ${
           disabled
-            ? "opacity-50 cursor-not-allowed"
+            ? "cursor-not-allowed animate-pulse"
             : "cursor-pointer hover:border-blue-400"
         }
-      `}
+      `,
+        profile ? "p-4" : "p-8"
+      )}
     >
       <input
         type="file"
         id="file-upload"
         className="hidden"
         onChange={handleFileInput}
-        accept=".jpg,.jpeg,.png,.gif,.webp,.bmp,.pdf,.doc,.docx"
+        accept=".jpg,.jpeg,.png,.gif,.webp,.bmp,.pdf"
+        // ,.doc,.docx
         disabled={disabled}
       />
       <label
@@ -398,21 +405,47 @@ export const FileUploadZone: React.FC<FileUploadZoneProps> = ({
           disabled ? "cursor-not-allowed" : "cursor-pointer"
         }`}
       >
-        <p className="text-neutral-600 flex flex-col items-center">
-          <img
-            src={"/upload.svg"}
-            alt="upload icon"
-            className=" text-neutral-600 dark:text-neutral-400"
-          />
-        </p>
-        <div>
-          <p className="text-sm font-medium text-slate-700">
-            Drop your file(s) or <span className="text-primary">browse </span>
+        {!profile && (
+          <p className="text-neutral-600 flex flex-col items-center">
+            <img
+              src={"/upload.svg"}
+              alt="upload icon"
+              className=" text-neutral-600 dark:text-neutral-400"
+            />
           </p>
-          <p className="text-xs text-slate-500 mt-1">
-           Max 10 MB files are allowed.
-          </p>
-        </div>
+        )}
+        {disabled ? (
+          <div>
+            <ul className="mt-2 space-y-1.5 text-sm text-slate-600">
+              <li className="flex items-start gap-2">
+                <span className="text-slate-400 mt-0.5">•</span>
+                <span>Extracting text from your document.</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-slate-400 mt-0.5">•</span>
+                <span>Analyzing and formatting with our AI model.</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-slate-400 mt-0.5">•</span>
+                Uploading the original document to cloud storage for future use
+              </li>
+            </ul>
+          </div>
+        ) : profile ? (
+          <div className="gap-2 flex">
+            <PlusIcon className="w-5 h-5 text-gray-500" />
+            <span className="text-gray-500 font-medium">Add new profile</span>
+          </div>
+        ) : (
+          <div>
+            <p className="text-sm font-medium text-slate-700">
+              Drop your file(s) or <span className="text-primary">browse </span>
+            </p>
+            <p className="text-xs text-slate-500 mt-1">
+              Max 10 MB files are allowed.
+            </p>
+          </div>
+        )}
       </label>
     </div>
   );

@@ -1,6 +1,6 @@
 "use client";
 import { cn } from "@/lib/utils";
-import { JSX, memo, useCallback, useMemo } from "react";
+import { memo, useCallback, useMemo } from "react";
 import { ApplicationHistory } from "./ApplicationHistory";
 import { SavedJobs } from "./SavedJobs";
 import { AIRecommendations } from "./AIRecommendations";
@@ -52,12 +52,18 @@ const MENU_ITEMS: ReadonlyArray<MenuItem> = [
   },
 ] as const;
 
-// Component registry pattern for better scalability
-const COMPONENT_MAP: Record<ComponentId, () => JSX.Element> = {
-  overview: AIRecommendations,
-  "ai-recommendations": AIRecommendations,
-  "saved-jobs": SavedJobs,
-  "application-history": ApplicationHistory,
+const COMPONENT_MAP: Record<
+  ComponentId,
+  React.ComponentType<{ children?: React.ReactNode }>
+> = {
+  overview: ({ children }) => <AIRecommendations>{children}</AIRecommendations>,
+  "ai-recommendations": ({ children }) => (
+    <AIRecommendations>{children}</AIRecommendations>
+  ),
+  "saved-jobs": ({ children }) => <SavedJobs>{children}</SavedJobs>,
+  "application-history": ({ children }) => (
+    <ApplicationHistory>{children}</ApplicationHistory>
+  ),
 };
 
 // Extracted MenuItem component for better performance and separation of concerns
@@ -94,7 +100,7 @@ const MenuItem = memo<{
           )}
         />
       </div>
-      <span className="text-xs font-medium hidden lg:flex">{item.label}</span>
+      <span className="text-xs font-medium hidden sm:flex">{item.label}</span>
     </button>
   );
 });
@@ -129,6 +135,45 @@ export const Category = memo<CategoryProps>(({ tab }) => {
   }, [activeTab]);
 
   return (
+    <div className="">
+      <div className="lg:hidden">
+        <ActiveComponent>
+          <div className="flex flex-col md:flex-row  gap-4 lg:gap-6">
+            <nav className="bg-white p-3 justify-between h-fit w-full rounded-md flex flex-row gap-1">
+              {MENU_ITEMS.map((item) => (
+                <MenuItem
+                  key={item.id}
+                  item={item}
+                  isActive={activeTab === item.id}
+                  onClick={handleComponentChange}
+                />
+              ))}
+            </nav>
+          </div>
+        </ActiveComponent>
+      </div>
+      <div className="hidden lg:flex  gap-4 lg:gap-6">
+        <nav className="bg-white p-3 h-fit rounded-md flex flex-col gap-1">
+          {MENU_ITEMS.map((item) => (
+            <MenuItem
+              key={item.id}
+              item={item}
+              isActive={activeTab === item.id}
+              onClick={handleComponentChange}
+            />
+          ))}
+        </nav>
+        <main className="flex-1">
+          <ActiveComponent />
+        </main>
+      </div>
+    </div>
+  );
+});
+
+Category.displayName = "Category";
+
+`  return (
     <div className="flex  gap-4 lg:gap-6">
       <nav className="bg-white p-3 h-fit rounded-md flex flex-col gap-1">
         {MENU_ITEMS.map((item) => (
@@ -145,7 +190,4 @@ export const Category = memo<CategoryProps>(({ tab }) => {
       </main>
     </div>
   );
-});
-
-Category.displayName = "Category";
-
+});`;

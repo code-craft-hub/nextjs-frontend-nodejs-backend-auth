@@ -26,7 +26,9 @@ const FormSchema = z.object({
   authorized: z.boolean().default(false).optional(),
 });
 
-const AuthorizeGoogle: React.FC = () => {
+const AuthorizeGoogle: React.FC<{
+  checkAuth?: (checkValue: any) => Promise<void>;
+}> = ({ checkAuth }) => {
   const [_isLoading, setIsLoading] = useState(false);
   // const pathname = usePathname();
   // const navigate = useNavigate();
@@ -86,7 +88,10 @@ const AuthorizeGoogle: React.FC = () => {
 
   useEffect(() => {
     const callCheckAuthOnce = async () => {
-      await handleCheckAuthStatus();
+      const checkValue = await handleCheckAuthStatus();
+      if (checkAuth) {
+        checkAuth(checkValue);
+      }
     };
     callCheckAuthOnce();
   }, []);

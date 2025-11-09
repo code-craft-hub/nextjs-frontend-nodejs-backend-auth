@@ -37,11 +37,49 @@ export const useUpdateDataSource = () => {
     },
   });
 };
+export const useSetDefaultDataSource = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: profileApi.setDefaultDataSource,
+    onSuccess: (data, _variables) => {
+      queryClient.invalidateQueries({
+        queryKey: profileKeys.detail(),
+      });
+      queryClient.invalidateQueries({
+        queryKey: userQueries.detail().queryKey,
+      });
+      queryClient.setQueryData(profileKeys.detail(), data);
+    },
+    onError: (error: any) => {
+      console.error("Failed to update profile:", error);
+    },
+  });
+};
 export const useDeleteDataSource = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: profileApi.deleteDataSource,
+    onSuccess: (_data, _variables) => {
+      queryClient.invalidateQueries({
+        queryKey: profileKeys.detail(),
+      });
+      queryClient.invalidateQueries({
+        queryKey: userQueries.detail().queryKey,
+      });
+    },
+    onError: (error: any) => {
+      console.error("Failed to update profile:", error);
+    },
+  });
+};
+export const useDeleteDataSourceWithGCS = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ profileId }: { profileId: string }) =>
+      profileApi.deleteDataSourceWithGCS({ profileId }),
     onSuccess: (_data, _variables) => {
       queryClient.invalidateQueries({
         queryKey: profileKeys.detail(),

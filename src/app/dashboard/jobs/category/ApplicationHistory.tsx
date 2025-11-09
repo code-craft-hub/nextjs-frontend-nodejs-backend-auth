@@ -29,8 +29,13 @@ import {
 } from "@/lib/mutations/jobs.mutations";
 import { PiOfficeChairFill } from "react-icons/pi";
 import { usePrefetchJob } from "@/hooks/usePrefetchJob";
+import MobileOverview from "../components/MobileOverview";
 
-export const ApplicationHistory = () => {
+export const ApplicationHistory = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -100,6 +105,7 @@ export const ApplicationHistory = () => {
         <h1 className="text-3xl text-center mb-8 font-medium font-inter">
           Application History
         </h1>
+        {children}
         <SearchBar allJobs={allJobs} table={table} />
 
         <div className="w-full bg-[#F1F2F4] p-2 px-4 rounded-sm sm:flex justify-between hidden font-roboto">
@@ -108,7 +114,7 @@ export const ApplicationHistory = () => {
           <p className="text-[#474C54]">Action</p>
         </div>
         <div className="w-full flex flex-col gap-6">
-          <div className="overflow-hidden border-none">
+          <div className="overflow-hidden border-none hidden lg:grid grid-cols-1">
             <Table>
               <TableBody className="">
                 {table.getRowModel().rows?.length ? (
@@ -146,6 +152,12 @@ export const ApplicationHistory = () => {
               </TableBody>
             </Table>
           </div>
+
+          <MobileOverview
+            allJobs={allJobs as JobType[]}
+            updateJobs={updateJobs}
+            // handleApply={handleApply}
+          />
           {hasNextPage && (
             <div className="mt-4 flex justify-center">
               <button

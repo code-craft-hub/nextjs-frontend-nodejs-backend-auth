@@ -1,6 +1,6 @@
 // lib/api/client.ts
 
-const baseURL =
+export const baseURL =
   process.env.NEXT_PUBLIC_AUTH_API_URL || "http://localhost:8080/api";
 
 export class APIError extends Error {

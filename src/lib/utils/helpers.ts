@@ -56,7 +56,7 @@ export const formatAppliedDate = (dateString?: string): string => {
 export const getDataSource = (user?: Partial<IUser>) => {
   return Array.isArray(user?.dataSource)
     ? user?.dataSource?.find(
-        (profile) => profile.ProfileID === user?.defaultactiveDataSource
+        (profile) => profile.id === user?.defaultDataSource
       )
     : [];
 };

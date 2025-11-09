@@ -7,11 +7,12 @@ import {
   getCoreRowModel,
   getFilteredRowModel,
   getSortedRowModel,
+  Row,
   SortingState,
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
-
+import {v4 as uuidv4} from "uuid";
 import { userQueries } from "@/lib/queries/user.queries";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import {
@@ -25,8 +26,16 @@ import { jobsQueries } from "@/lib/queries/jobs.queries";
 import { getFindJobsColumns } from "../components/Overview";
 import { getDataSource } from "@/lib/utils/helpers";
 import { jobMatcher } from "@/services/job-recommendation";
+import { apiService } from "@/hooks/use-auth";
+import { toast } from "sonner";
+import { JobType } from "@/types";
+import MobileOverview from "../components/MobileOverview";
 
-export const AIRecommendations = () => {
+export const AIRecommendations = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
   const { data: user } = useQuery(userQueries.detail());
   const userDataSource = getDataSource(user);
   const userJobTitlePreference =
@@ -85,10 +94,64 @@ export const AIRecommendations = () => {
       });
   }, [data]);
 
+  const handleApply = async ({ e, row }: { e: any; row: Row<JobType> }) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!row.original?.emailApply) {
+      updateJobApplicationHistory.mutate({
+        id: String(row.original.id),
+        data: {
+          appliedJobs: row.original.id,
+        },
+      });
+      window.open(
+        !!row.original?.applyUrl ? row.original?.applyUrl : row.original?.link,
+        "__blank"
+      );
+      return;
+    }
+
+    const { isAuthorized } = await apiService.gmailOauthStatus();
+
+    if (!isAuthorized) {
+      toast.error(
+        "✨ Go to the Settings page and enable authorization for Cverai to send emails on your behalf. This option is located in the second card.",
+        {
+          action: {
+            label: "Authorize now",
+            onClick: () =>
+              router.push(`/dashboard/settings?tab=ai-applypreference`),
+          },
+          classNames: {
+            actionButton: "!bg-blue-600 hover:!bg-blue-700 !text-white !h-8",
+          },
+        }
+      );
+      return;
+    }
+
+    const params = new URLSearchParams();
+    params.set(
+      "jobDescription",
+      JSON.stringify(row.original?.descriptionText || "")
+    );
+    params.set("recruiterEmail", encodeURIComponent(row.original?.emailApply));
+
+    updateJobApplicationHistory.mutate({
+      id: String(row.original.id),
+      data: {
+        appliedJobs: row.original.id,
+      },
+    });
+    router.push(
+      `/dashboard/tailor-cover-letter/${uuidv4()}?${params}&aiApply=true`
+    );
+  };
+
   const columns = getFindJobsColumns({
     router,
     updateJobs,
-    updateJobApplicationHistory,
+    handleApply,
   });
 
   const table = useReactTable({
@@ -116,10 +179,10 @@ export const AIRecommendations = () => {
           AI Recommendations
         </h1>
 
-        {/* <AdvancedFilterModal /> */}
+        {children}
 
         <div className="w-full flex flex-col gap-6">
-          <div className="overflow-hidden border-none">
+          <div className="overflow-hidden border-none hidden lg:grid grid-cols-1">
             <Table>
               <TableBody className="">
                 {table.getRowModel().rows?.length ? (
@@ -157,7 +220,11 @@ export const AIRecommendations = () => {
               </TableBody>
             </Table>
           </div>
-
+        <MobileOverview
+          allJobs={allJobs}
+          updateJobs={updateJobs}
+          handleApply={handleApply}
+        />
           {hasNextPage && (
             <div className="mt-4 flex justify-center">
               <button

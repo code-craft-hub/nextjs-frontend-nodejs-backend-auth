@@ -11,31 +11,15 @@ import Progress from "./Progress";
 import OnboardingTabs from "./OnBoardingTabs";
 
 import { FileUploadZone, useDocumentExtraction } from "./AnyFormatToText";
-import { useCallback, useEffect } from "react";
+import { useCallback, useState } from "react";
 import { toast } from "sonner";
+import { onboardingApi } from "@/lib/api/onboarding.api";
 
-const dataSource: {
-  description: string;
-  ProfileID: string;
-  title: string;
-}[] = [];
-
-export const OnBoardingForm2 = ({
-  onNext,
-  onPrev,
-  fromDataSourceStep,
-}: OnboardingFormProps) => {
-  const { updateUser, isUpdatingUserLoading, user } = useAuth();
-
-  useEffect(() => {
-    if (user?.dataSource && Array.isArray(user.dataSource)) {
-      fromDataSourceStep && fromDataSourceStep();
-    }
-  }, [user]);
-
+export const OnBoardingForm2 = ({ onNext, onPrev }: OnboardingFormProps) => {
+  const { isUpdatingUserLoading, user } = useAuth();
+  const [loading, setLoading] = useState(false);
   const {
     processDocument,
-    isProcessing,
     error,
     currentFile,
     clearError,
@@ -45,14 +29,15 @@ export const OnBoardingForm2 = ({
   const handleFileSelect = useCallback(
     async (file: File) => {
       clearError();
-      const result = await processDocument(file);
-      dataSource.push({
-        description: result?.text || "",
-        ProfileID: crypto.randomUUID(),
-        title: file.name,
-      });
-      await updateUser({ dataSource: dataSource });
-      toast.success(`${user?.firstName}, your base resume is saved!`);
+
+      setLoading(true);
+      const formData = new FormData();
+      formData.append("file", file);
+      const data = await onboardingApi.createFirstProfile(formData);
+      if (data?.success) {
+        toast.success(`${user?.firstName}, your resume is saved!`);
+      }
+      setLoading(false);
       onNext();
     },
     [processDocument, clearError]
@@ -86,7 +71,7 @@ export const OnBoardingForm2 = ({
           </div>
           <FileUploadZone
             onFileSelect={handleFileSelect}
-            disabled={isProcessing}
+            disabled={loading}
             currentFile={currentFile}
             onClearFile={() => {
               clearFile();
@@ -121,15 +106,16 @@ export const OnBoardingForm2 = ({
                 variant={"outline"}
                 onClick={() => onPrev()}
                 className="onboarding-btn"
+                disabled={isUpdatingUserLoading || loading}
               >
                 Previous
               </Button>
               <Button
                 type="submit"
-                disabled={isUpdatingUserLoading}
+                disabled={isUpdatingUserLoading || loading}
                 className="onboarding-btn"
               >
-                {isUpdatingUserLoading ? "Saving..." : "Save and Continue"}{" "}
+                {isUpdatingUserLoading || loading ? "Saving..." : "Save and Continue"}{" "}
               </Button>
             </div>
           </form>

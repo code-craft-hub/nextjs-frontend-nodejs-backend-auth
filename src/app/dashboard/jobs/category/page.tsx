@@ -1,5 +1,5 @@
 import React from "react";
-import { Category } from "./category";
+import { Category } from "./CategoryClient";
 import { requireOnboarding } from "@/lib/server-auth";
 import { createServerQueryClient } from "@/lib/query/prefetch";
 import { userQueries } from "@/lib/queries/user.queries";

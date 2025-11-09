@@ -18,6 +18,18 @@ export const profileApi = {
     return data;
   },
 
+  setDefaultDataSource: async ({
+    profileId,
+  }: {
+    profileId: string;
+  }): Promise<ProfileResponse> => {
+    const data = await api.patch<ProfileResponse>(
+      `/users/set-default-data-source`,
+      { profileId }
+    );
+    return data;
+  },
+
   createDataSource: async (payload: {
     profileData: ProfileData;
   }): Promise<ProfileResponse> => {
@@ -33,6 +45,23 @@ export const profileApi = {
     try {
       const data = await api.delete<ProfileResponse>(
         "/users/delete-data-source"
+      );
+      return data;
+    } catch (error) {
+      console.error("Error deleting data source:", error);
+      throw error;
+    }
+  },
+
+  // GCS
+  deleteDataSourceWithGCS: async ({
+    profileId,
+  }: {
+    profileId: string;
+  }): Promise<ProfileResponse> => {
+    try {
+      const data = await api.delete<ProfileResponse>(
+        `/onboarding-user/${profileId}`
       );
       return data;
     } catch (error) {

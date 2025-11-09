@@ -88,7 +88,13 @@ export const OnBoardingForm7 = ({ onNext, onPrev }: OnboardingFormProps) => {
                       seletePlan?.toLowerCase() === plan.tier.toLowerCase() &&
                         "border-2 border-blue-500"
                     )}
-                    onClick={() => setSeletePlan(plan.tier.toLowerCase())}
+                    onClick={() => {
+                      setSeletePlan(plan.tier.toLowerCase());
+                      if (plan.tier.toLowerCase() === "free") {
+                        handleComplete();
+                      }
+                    }}
+                    disabled={isOnboardingLoading}
                     type="button"
                   >
                     Choose this plan

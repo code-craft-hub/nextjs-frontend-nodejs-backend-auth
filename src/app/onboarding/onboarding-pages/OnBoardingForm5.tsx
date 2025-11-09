@@ -24,7 +24,7 @@ import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 const formSchema = z.object({
   type: z
-    .enum(["linkedin", "instagram", "tiktok", "google", "friend", "whatsapp"])
+    .enum(["linkedin", "instagram", "tiktok", "google", "friend", "whatsapp", "twitter", "telegram"])
     .refine((val) => !!val, {
       message: "You need to select a notification type.",
     }),
@@ -184,6 +184,38 @@ export const OnBoardingForm5 = ({ onNext, onPrev }: OnboardingFormProps) => {
                             htmlFor="google"
                           >
                             Google
+                          </FormLabel>
+                        </FormItem>
+                        <FormItem className="flex flex-row items-center border p-4 rounded-sm gap-3">
+                          <FormControl>
+                            <RadioGroupItem id="twitter" value="twitter" />
+                          </FormControl>
+                          <FormLabel
+                            className={cn(
+                              field.value
+                                ? "text-black"
+                                : "text-muted-foreground font-normal",
+                              "h1"
+                            )}
+                            htmlFor="twitter"
+                          >
+                            Twitter
+                          </FormLabel>
+                        </FormItem>
+                        <FormItem className="flex flex-row items-center border p-4 rounded-sm gap-3">
+                          <FormControl>
+                            <RadioGroupItem id="telegram" value="telegram" />
+                          </FormControl>
+                          <FormLabel
+                            className={cn(
+                              field.value
+                                ? "text-black"
+                                : "text-muted-foreground font-normal",
+                              "h1"
+                            )}
+                            htmlFor="telegram"
+                          >
+                            Telegram
                           </FormLabel>
                         </FormItem>
                         <FormItem className="flex flex-row items-center border p-4 rounded-sm gap-3">

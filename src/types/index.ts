@@ -43,6 +43,28 @@ export type JobType = {
   sponsorCategory: string;
   employmentType?: string;
 };
+
+export interface ProfileData {
+  id: string;
+  title: string;
+  description: string;
+  date: string;
+  key?: string;
+  data?: string;
+  jobLevelPreference?: string;
+  jobTypePreference?: string;
+  rolesOfInterest?: { label: string; value: string }[];
+  remoteWorkPreference?: string;
+  relocationWillingness?: string;
+  location?: string;
+  salaryExpectation?: string;
+  availabilityToStart?: string;
+  defaultDataSource?: string;
+  activeDataSource?: string;
+  profile: string;
+  originalName: string;
+}
+
 export interface IUser {
   uid?: string;
   providerId?: string;
@@ -53,7 +75,7 @@ export interface IUser {
   isAnonymous?: boolean;
   displayName?: string;
   countryCode?: string;
-  defaultactiveDataSource?: string;
+  defaultDataSource?: string;
   firstName?: string;
   lastName?: string;
   cvJobTitle?: string;

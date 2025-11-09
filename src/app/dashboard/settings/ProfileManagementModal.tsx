@@ -20,12 +20,15 @@ import {
 import { BookmarkIcon, Loader2 } from "lucide-react";
 import {
   useCreateDataSource,
+  useSetDefaultDataSource,
   useUpdateDataSource,
 } from "@/lib/mutations/profile.mutations";
-import { ProfileData } from "./ProfileManagement";
 import { Option, SelectCreatable } from "@/components/shared/SelectCreatable";
 import { Textarea } from "@/components/ui/textarea";
 import { Toggle } from "@/components/ui/toggle";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { ProfileData } from "@/types";
 
 const jobLevel = ["Entry Level", "Mid Level", "Senior Level"];
 const jobTypes = ["Full Time", "Part Time", "Contract"];
@@ -34,22 +37,25 @@ const availability = ["Yes", "No"];
 interface ProfileManagementModalProps {
   children: React.ReactNode;
   profile?: ProfileData;
+  dataSource?: any;
 }
 
 export default function ProfileManagementModal({
   children,
   profile,
+  dataSource,
 }: ProfileManagementModalProps) {
   const [open, setOpen] = useState(false);
 
   const updateDataSource = useUpdateDataSource();
+  const setDefaultDataSource = useSetDefaultDataSource();
   const createDataSource = useCreateDataSource();
 
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
       jobLevelPreference: jobLevel[0],
       jobTypePreference: jobTypes[0],
-      roleOfInterest: [] as Option[],
+      rolesOfInterest: profile?.rolesOfInterest ?? ([] as Option[]),
       remoteWorkPreference: availability[0],
       relocationWillingness: "",
       location: "",
@@ -60,20 +66,20 @@ export default function ProfileManagementModal({
     },
   });
 
-  // Update form when profile data loads
   useEffect(() => {
     if (profile) {
       reset({
         jobLevelPreference: profile.jobLevelPreference || jobLevel[0],
         jobTypePreference: profile.jobTypePreference || jobTypes[0],
-        roleOfInterest: profile.roleOfInterest || [],
+        rolesOfInterest: profile.rolesOfInterest || [],
         remoteWorkPreference: profile.remoteWorkPreference || availability[0],
         relocationWillingness: profile.relocationWillingness || "",
         location: profile.location || "",
         salaryExpectation: profile.salaryExpectation || "",
         availabilityToStart: profile.availabilityToStart || "",
-        description: profile.description || profile.data || "",
-        defaultDataSource: profile.activeDataSource === "" && true,
+        description:
+          profile.description || profile.data || profile.profile || "",
+        defaultDataSource: dataSource?.defaultDataSource === profile.id,
       });
     }
   }, [profile, reset]);
@@ -98,7 +104,7 @@ export default function ProfileManagementModal({
     } else {
       createDataSource.mutate(
         {
-          profileData: { ...userProfile, ProfileID: crypto.randomUUID() },
+          profileData: { ...userProfile, id: crypto.randomUUID() },
         },
         {
           onSuccess: () => {
@@ -122,7 +128,7 @@ export default function ProfileManagementModal({
       reset({
         jobLevelPreference: profile.jobLevelPreference || jobLevel[0],
         jobTypePreference: profile.jobTypePreference || jobTypes[0],
-        roleOfInterest: profile.roleOfInterest || [],
+        rolesOfInterest: profile.rolesOfInterest || [],
         remoteWorkPreference: profile.remoteWorkPreference || availability[0],
         relocationWillingness: profile.relocationWillingness || "",
         location: profile.location || "",
@@ -134,6 +140,8 @@ export default function ProfileManagementModal({
   };
 
   const isSubmitting = updateDataSource.isPending || createDataSource.isPending;
+
+  const router = useRouter();
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -206,10 +214,10 @@ export default function ProfileManagementModal({
                   />
                 </div>
 
-                <div className="space-y-1.5">
+                <div className="space-y-1.5 col-span-2">
                   <h1 className="">Role of Interest</h1>
                   <Controller
-                    name="roleOfInterest"
+                    name="rolesOfInterest"
                     control={control}
                     render={({ field }) => (
                       <SelectCreatable
@@ -310,14 +318,14 @@ export default function ProfileManagementModal({
                     )}
                   />
                 </div>
-                <div className="space-y-1.5">
+                <div className="space-y-1.5 col-span-2">
                   <h1 className="">Description</h1>
                   <Controller
                     name="description"
                     control={control}
                     render={({ field }) => (
                       <Textarea
-                      className="max-h-32"
+                        className=""
                         placeholder="Tell Cverai a bit about this profile — it'll help personalize your career documents when needed."
                         {...field}
                       ></Textarea>
@@ -332,16 +340,27 @@ export default function ProfileManagementModal({
                       <Toggle
                         aria-label="Toggle bookmark"
                         size="sm"
+                        disabled={isSubmitting || field.value}
                         variant="outline"
                         pressed={field.value}
-                        onPressedChange={field.onChange}
+                        onPressedChange={(pressed) => {
+                          field.onChange(pressed);
+
+                          setDefaultDataSource.mutate({
+                            profileId: profile?.id!,
+                          });
+                          setOpen(false);
+                          toast.success(
+                            `${profile?.title} is now your default profile!`
+                          );
+                          setTimeout(() => {
+                            router.refresh();
+                          }, 300);
+                        }}
                         className="data-[state=on]:bg-transparent data-[state=on]:*:[svg]:fill-primary data-[state=on]:*:[svg]:stroke-primary"
                       >
                         <BookmarkIcon />
-                        <span className="mt-0.5">
-
-                        Make default profile
-                        </span>
+                        <span className="mt-0.5">Make default profile</span>
                       </Toggle>
                     )}
                   />

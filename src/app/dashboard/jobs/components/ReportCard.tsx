@@ -5,9 +5,13 @@ import { randomNumber } from "@/lib/utils/helpers";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
-export const ReportCard = ({matchPercentage}: {matchPercentage?: number}) => {
+export const ReportCard = ({
+  matchPercentage,
+}: {
+  matchPercentage?: number;
+}) => {
   const router = useRouter();
-    const { data: user } = useQuery(userQueries.detail());
+  const { data: user } = useQuery(userQueries.detail());
   const bookmarkedJobs = user?.bookmarkedJobs?.length || 0;
   const appliedJobs = user?.appliedJobs?.length || 0;
   const menuItems = [
@@ -46,22 +50,47 @@ export const ReportCard = ({matchPercentage}: {matchPercentage?: number}) => {
     },
   ];
   return (
-    <ScrollArea className="grid grid-cols-1">
-      <div className="flex flex-row gap-4 py-4 mx-auto w-fit">
+    <div>
+      <ScrollArea className="hidden md:grid grid-cols-1">
+        <div className="flex flex-row gap-4 py-4 mx-auto w-fit">
+          {menuItems.map((item) => (
+            <div
+              key={item.id}
+              className={cn(
+                item.bgColor,
+                "flex justify-between p-4 items-center rounded-md w-64 hover:shadow-sm hover:cursor-pointer"
+              )}
+              onClick={() => {
+                router.push(item.url);
+              }}
+            >
+              <div className="">
+                <h1 className="font-bold mb-1">{item.count}</h1>
+                <p className="text-xs">{item.label}</p>
+              </div>
+              <div className="bg-white p-3 size-fit rounded-sm">
+                <img src={item.icon} alt={item.label} className="size-4" />
+              </div>
+            </div>
+          ))}
+        </div>
+        <ScrollBar orientation="horizontal" />
+      </ScrollArea>
+      <div className="md:hidden flex flex-col w-full gap-4 py-4 mx-auto">
         {menuItems.map((item) => (
           <div
             key={item.id}
             className={cn(
               item.bgColor,
-              "flex justify-between p-4 items-center rounded-md w-64 hover:shadow-sm hover:cursor-pointer"
+              "flex justify-between p-4 items-center rounded-md w-full hover:shadow-sm hover:cursor-pointer"
             )}
             onClick={() => {
               router.push(item.url);
             }}
           >
             <div className="">
-              <h1 className="font-bold mb-1">{item.count}</h1>
-              <p className="text-xs">{item.label}</p>
+              <h1 className="font-bold font-inter mb-1">{item.count}</h1>
+              <p className="text-xs font-inter">{item.label}</p>
             </div>
             <div className="bg-white p-3 size-fit rounded-sm">
               <img src={item.icon} alt={item.label} className="size-4" />
@@ -69,7 +98,6 @@ export const ReportCard = ({matchPercentage}: {matchPercentage?: number}) => {
           </div>
         ))}
       </div>
-      <ScrollBar orientation="horizontal" />
-    </ScrollArea>
+    </div>
   );
 };

@@ -255,7 +255,6 @@ export const AnyFormatToTextTalksToBackend = () => {
 
   const onSubmit = useCallback((values: FormSchema) => {
     console.log('Form submitted:', values);
-    // Handle final submission (e.g., save to database, process further)
   }, []);
 
   return (

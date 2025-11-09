@@ -3,7 +3,7 @@ import React from "react";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AiApplyPreferences } from "./AiApplyPreferences";
-import { User } from "lucide-react";
+import { Sparkles, User } from "lucide-react";
 // import { AdvancedProfileManagement } from "./AdvancedProfileManagement";
 import { ProfileManagement } from "./ProfileManagement";
 import { useRouter } from "next/navigation";
@@ -31,7 +31,8 @@ const Settings = ({ tab }: { tab: string; }) => {
               router.push(`/dashboard/settings?tab=ai-applypreference`);
             }}
           >
-            <img src="/ai-apply.svg" alt="AI apply" className="size-4" />
+            <Sparkles className="size-4 sm:hidden" />
+            <img src="/ai-apply.svg" alt="AI apply" className="size-4 hidden sm:flex" />
             <span className="max-sm:hidden">AI Apply Preferences</span>
           </TabsTrigger>
           {/* <TabsTrigger

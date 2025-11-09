@@ -101,7 +101,6 @@ export const OnBoardingForm4 = ({ onNext, onPrev }: OnboardingFormProps) => {
               onSubmit={form.handleSubmit(onSubmit)}
             >
               <div className="space-y-4">
-                <h1 className="h1">Job Type</h1>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
@@ -220,7 +219,6 @@ export const OnBoardingForm4 = ({ onNext, onPrev }: OnboardingFormProps) => {
                 </div>
               </div>
               <div className="space-y-4">
-                <h1 className="h1">Work mode</h1>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}

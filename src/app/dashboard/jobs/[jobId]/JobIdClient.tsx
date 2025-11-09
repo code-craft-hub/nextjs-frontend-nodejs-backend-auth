@@ -55,10 +55,10 @@ export const JobIdClient = ({
 
           {/* Company Header Card */}
           <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
               <div className="flex items-center">
                 {!!job?.companyLogo && (
-                  <div className="w-14 h-14 rounded-xl flex items-center justify-center mr-4">
+                  <div className="w-14 h-14 shrink-0 rounded-xl flex items-center justify-center mr-4">
                     <img
                       src={job?.companyLogo ?? ""}
                       className="size-full text-white"
@@ -67,14 +67,14 @@ export const JobIdClient = ({
                 )}
                 <div>
                   <h2 className="text-xl font-semibold text-gray-900">
-                    Twitter
+                    {job?.companyName}
                   </h2>
                   <p className="text-gray-500 text-sm capitalize">
                     {job?.title}
                   </p>
                 </div>
               </div>
-              <button className="bg-blue-600 max-sm:text-2xs hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-medium">
+              <button className="bg-blue-600 max-sm:text-2xs hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-medium max-sm:w-full">
                 Apply Now
               </button>
             </div>

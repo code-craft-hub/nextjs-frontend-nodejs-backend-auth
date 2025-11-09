@@ -166,7 +166,9 @@ const getFindJobsColumns = ({
                   },
                 });
                 window.open(
-                  row.original?.applyUrl ?? row.original?.link,
+                  !!row.original?.applyUrl
+                    ? row.original?.applyUrl
+                    : row.original?.link,
                   "__blank"
                 );
                 return;

@@ -29,6 +29,8 @@ import OnboardingTabs from "./OnBoardingTabs";
 import { useIsMobile } from "@/hooks/use-mobile";
 import Progress from "./Progress";
 import { SelectCreatable } from "@/components/shared/SelectCreatable";
+import { Badge } from "@/components/ui/badge";
+import { badgeColors, jobExamples } from "@/lib/utils/constants";
 
 const formSchema = z.object({
   partTime: z.boolean().default(false).optional(),
@@ -38,10 +40,10 @@ const formSchema = z.object({
   hybrid: z.boolean().default(false).optional(),
   remote: z.boolean().default(false).optional(),
   onsite: z.boolean().default(false).optional(),
-  location: z.string(),
-  roleOfInterest: z
+  location: z.string().min(1, "Please select a preferred location"),
+  rolesOfInterest: z
     .array(z.object({ label: z.string(), value: z.string() }))
-    .optional(),
+    .min(1, "Please add at least one role of interest"),
 });
 
 export const OnBoardingForm3 = ({ onNext, onPrev }: OnboardingFormProps) => {
@@ -58,7 +60,7 @@ export const OnBoardingForm3 = ({ onNext, onPrev }: OnboardingFormProps) => {
       remote: false,
       onsite: false,
       location: "",
-      roleOfInterest: [],
+      rolesOfInterest: [],
     },
   });
 
@@ -73,7 +75,7 @@ export const OnBoardingForm3 = ({ onNext, onPrev }: OnboardingFormProps) => {
 
       await updateUser({
         dataSource: dataSource,
-        defaultactiveDataSource: user?.dataSource?.[0]?.ProfileID,
+        defaultDataSource: user?.dataSource?.[0]?.id,
       });
       toast.success(`${user?.firstName} Your data has be saved!`);
       onNext();
@@ -131,7 +133,6 @@ export const OnBoardingForm3 = ({ onNext, onPrev }: OnboardingFormProps) => {
               onSubmit={form.handleSubmit(onSubmit)}
             >
               <div className="space-y-4">
-                <h1 className="h1">Job Type</h1>
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
@@ -246,7 +247,6 @@ export const OnBoardingForm3 = ({ onNext, onPrev }: OnboardingFormProps) => {
                 </div>
               </div>
               <div className="space-y-4">
-                <h1 className="h1">Work mode</h1>
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
@@ -333,6 +333,7 @@ export const OnBoardingForm3 = ({ onNext, onPrev }: OnboardingFormProps) => {
                   />
                 </div>
               </div>
+
               <div className="mt-8 space-y-4">
                 <FormField
                   control={form.control}
@@ -367,30 +368,46 @@ export const OnBoardingForm3 = ({ onNext, onPrev }: OnboardingFormProps) => {
                   )}
                 />
                 <Controller
-                  name="roleOfInterest"
+                  name="rolesOfInterest"
                   control={form.control}
-                  render={({ field }) => (
-                    <SelectCreatable
-                      placeholder="Marketing, Software Development"
-                      {...field}
-                    />
+                  render={({ field, fieldState }) => (
+                    <div className="space-y-2  rounded-md">
+                      {/* <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                        
+                      </label> */}
+                      <p className="absolute z-10  text-muted-foreground bg-background px-2 -mt-2 ml-4 text-2xs">
+                        Roles of Interest{" "}
+                      </p>
+                      <SelectCreatable
+                        placeholder="Cver AI will use this field to recommend jobs that match your interests. (E.g., Software Engineer)"
+                        value={field.value}
+                        onChange={field.onChange}
+                      />
+                      {fieldState.error && (
+                        <p className="text-sm font-medium text-destructive ">
+                          {fieldState.error.message}
+                        </p>
+                      )}
+                    </div>
                   )}
                 />
-                {/* <FormField
-                  control={form.control}
-                  name="role"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <FloatingLabelInput
-                          label="Preferred Roles"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
+                <div
+                  className={cn(
+                    "flex gap-2 flex-wrap","mt"
                   )}
-                /> */}
+                >
+                  {jobExamples?.map((job, index) => (
+                    <Badge
+                      key={job}
+                      variant="outline"
+                      className={`cursor-pointer ${
+                        badgeColors[index % badgeColors.length]
+                      }`}
+                    >
+                      {job}
+                    </Badge>
+                  ))}
+                </div>
               </div>
 
               <div className="flex gap-4">

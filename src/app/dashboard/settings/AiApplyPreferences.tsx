@@ -71,6 +71,12 @@ export const AiApplyPreferences: React.FC = () => {
   const updateUser = useUpdateUserMutation();
   const { data: user } = useQuery(userQueries.detail());
 
+  const [oauthState, setOauthState] = useState(false);
+
+  const checkAuth = async (value: { isAuthorized: boolean }): Promise<void> => {
+    setOauthState(value.isAuthorized);
+  };
+
   const settings: Setting[] = [
     {
       section: "Auto Apply Configuration",
@@ -90,31 +96,33 @@ export const AiApplyPreferences: React.FC = () => {
       img: "/email.svg",
       options: [
         {
-          label: "Gmail Connected",
-          description: `Connected: ${user?.email}`,
+          label: `Gmail ${oauthState ? "Connected" : "Not Connected"} `,
+          description: `${
+            oauthState ? "Connected : " : "Your Gmail is not connected:"
+          } ${user?.email}`,
           type: "custom",
           actions: ["Disconnect", "Edit"],
         },
       ],
     },
-    // {
-    //   section: "CV Strategy",
-    //   heading: true,
-    //   options: [
-    //     {
-    //       label: "Use Master CV",
-    //       description: "Use your original uploaded CV for all applications",
-    //       type: "toggle",
-    //       key: "useMasterCV",
-    //     },
-    //     {
-    //       label: "Generate Tailored CV",
-    //       description: "Let Cver customize your CV for each job applications",
-    //       type: "toggle",
-    //       key: "generateTailoredCV",
-    //     },
-    //   ],
-    // },
+    {
+      section: "CV Strategy",
+      heading: true,
+      options: [
+        {
+          label: "Use Master CV",
+          description: "Use your original uploaded CV for all applications",
+          type: "toggle",
+          key: "useMasterCV",
+        },
+        {
+          label: "Generate Tailored CV",
+          description: "Let Cver customize your CV for each job applications",
+          type: "toggle",
+          key: "generateTailoredCV",
+        },
+      ],
+    },
     {
       child: true,
       options: [
@@ -354,7 +362,7 @@ export const AiApplyPreferences: React.FC = () => {
                       ) : option.type === "custom" && option.actions ? (
                         <div>
                           <div className="flex gap-2">
-                            <AuthorizeGoogle />
+                            <AuthorizeGoogle checkAuth={checkAuth} />
                           </div>
                         </div>
                       ) : null}

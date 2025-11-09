@@ -79,7 +79,7 @@ export const customStyles = {
     minHeight: "20px",
     borderRadius: "10px",
     border: "2px solid #4680EE",
-    backgroundColor: "#F5F7FA",
+    backgroundColor: "white",
     // boxShadow:
     //   "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
     padding: "2px 0px",
@@ -177,4 +177,35 @@ export const menuItems = [
     labelColor: "text-blue-700",
     url: "/dashboard/jobs/category?tab=application-history",
   },
+];
+
+
+export const jobExamples = [
+  "Software Engineer",
+  "Data Scientist",
+  "Product Manager",
+  "Nurse",
+  "Marketing Specialist",
+  "Sales Manager",
+  "Graphic Designer",
+  "Financial Analyst",
+];
+
+// Array of color variants for badges
+export const badgeColors = [
+  "bg-blue-50 text-blue-500 border-blue-300",
+  "bg-green-50 text-green-500 border-green-300",
+  "bg-purple-50 text-purple-500 border-purple-300",
+  "bg-pink-50 text-pink-500 border-pink-300",
+  "bg-yellow-50 text-yellow-500 border-yellow-300",
+  "bg-indigo-50 text-indigo-500 border-indigo-300",
+  "bg-red-50 text-red-500 border-red-300",
+  "bg-orange-50 text-orange-500 border-orange-300",
+  "bg-teal-50 text-teal-500 border-teal-300",
+  "bg-cyan-50 text-cyan-500 border-cyan-300",
+  "bg-lime-50 text-lime-500 border-lime-300",
+  "bg-emerald-50 text-emerald-500 border-emerald-300",
+  "bg-violet-50 text-violet-500 border-violet-300",
+  "bg-fuchsia-50 text-fuchsia-500 border-fuchsia-300",
+  "bg-rose-50 text-rose-500 border-rose-300",
 ];
