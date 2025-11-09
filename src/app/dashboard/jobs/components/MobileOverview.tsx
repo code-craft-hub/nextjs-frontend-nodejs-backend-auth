@@ -20,11 +20,11 @@ const MobileOverview = memo(
   }: {
     allJobs: JobType[];
     updateJobs: any;
-    handleApply?: any;
+    handleApply: any;
   }) => {
     const router = useRouter();
     return (
-      <div className="space-y-4 lg:hidden">
+      <div className="space-y-4 md:hidden">
         {allJobs.map((job) => {
           const isBookmarked = job.isBookmarked || false;
           return (
@@ -115,12 +115,8 @@ const MobileOverview = memo(
                       }}
                       className=" bg-blue-50 text-blue-600 px-2 py-2 text-2xs rounded-lg hover:bg-blue-100 transition-colors flex items-center gap-2 font-medium"
                     >
-                      Apply Now{" "}
-                      {job?.emailApply ? (
-                        <Sparkles className="size-3 text-blue-500" />
-                      ) : (
-                        <ArrowRight className="size-3" />
-                      )}
+                      Apply Now {job?.emailApply && <Sparkles className="text-2 text-yellow-500" />}
+                      <ArrowRight className="size-3" />
                     </button>
                   </div>
                 </div>
@@ -132,5 +128,7 @@ const MobileOverview = memo(
     );
   }
 );
+
+MobileOverview.displayName = "MobileOverview";
 
 export default MobileOverview;
