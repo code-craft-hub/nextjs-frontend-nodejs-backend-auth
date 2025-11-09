@@ -19,8 +19,8 @@ const MobileOverview = memo(
     handleApply,
   }: {
     allJobs: JobType[];
-    updateJobs: any;
-    handleApply: any;
+    updateJobs?: any;
+    handleApply?: any;
   }) => {
     const router = useRouter();
     return (
