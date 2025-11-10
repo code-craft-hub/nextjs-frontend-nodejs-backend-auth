@@ -82,7 +82,9 @@ export const RecentActivityCard = memo(
               key={job.id}
               className="flex bg-slate-50 p-4 sm:p-6 rounded-xl gap-4 sm:gap-6 border border-[#cbd5e1] relative"
             >
-              <Sparkles className="absolute bottom-4 left-4 text-gray-200 w-5 h-5" />
+              {job?.emailApply && (
+                <Sparkles className="absolute bottom-4 left-4 text-gray-200 w-5 h-5" />
+              )}
               <div className="shrink-0">
                 <img
                   src={!!job.companyLogo ? job.companyLogo : "/placeholder.jpg"}
