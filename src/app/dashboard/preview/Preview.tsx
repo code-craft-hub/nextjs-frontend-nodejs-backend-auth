@@ -14,6 +14,7 @@ import { userQueries } from "@/lib/queries/user.queries";
 import { resumeQueries } from "@/lib/queries/resume.queries";
 import { coverLetterQueries } from "@/lib/queries/cover-letter.queries";
 import { CongratulationModal } from "@/components/shared/CongratulationModal";
+import { Sparkles } from "lucide-react";
 
 const Preview = ({
   coverLetterId,
@@ -44,11 +45,13 @@ const Preview = ({
     (resume) => resume.id === user?.defaultDataSource
   );
 
+  console.log(defaultResume)
   const handleOpenModal = (value: boolean) => {
     setOpenModal(value);
   };
 
   const handleSubmit = async () => {
+    const frontendURL = process.env.NEXT_PUBLIC_APP_URL;
     if (!user?.aiApplyPreferences) {
       toast.error(
         "Visit the Settings to configure your AI Apply Preferences. Enable Auto Apply in the third card section to get started.",
@@ -56,7 +59,9 @@ const Preview = ({
           action: {
             label: "Enable",
             onClick: () =>
-              router.push(`/dashboard/settings?tab=ai-applypreference`),
+              window.open(
+                `${frontendURL}/dashboard/settings?tab=ai-applypreference`
+              ),
           },
           classNames: {
             // toast: "!bg-yellow-50 !border-yellow-200",
@@ -68,7 +73,7 @@ const Preview = ({
       return;
     }
 
-    if (!user || !coverLetterData || !resumeData) {
+    if (!user || !coverLetterData) {
       toast.error("Missing required data");
       return;
     }
@@ -80,7 +85,8 @@ const Preview = ({
         resumeData,
         recruiterEmail,
         jobDescription,
-        user?.aiApplyPreferences.autoSendApplications
+        user?.aiApplyPreferences.autoSendApplications,
+        defaultResume?.gcsPath
       );
       setActiveStep(4);
       toast.success("Application Submitted Successfully!");
@@ -139,19 +145,19 @@ const Preview = ({
         recruiterEmail={recruiterEmail}
       />
       {baseResume ? (
-        <div className="w-full h-[600px]">
+        <div className="h-[80svh] overflow-hidden">
           <iframe
-            src={`${defaultResume.url}#toolbar=0&navpanes=0&scrollbar=0`}
-            className="w-full h-full border-0"
+            src={`${defaultResume?.url}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`}
+            className="w-full h-[85svh] overflow-hidden border-0"
             title="Resume PDF"
           />
         </div>
       ) : (
         <EditableResume data={resumeData!} resumeId={resumeId} />
       )}
-      <div className="flex items-center justify-center">
+      <div className="flex items-center justify-center fixed bottom-4 left-1/2 -translate-x-1/2">
         <Button disabled={isSubmitting} onClick={handleSubmit} className="w-64">
-          Submit
+          Submit <Sparkles className="ml-2 h-4 w-4" />
         </Button>
       </div>
     </div>

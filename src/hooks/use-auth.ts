@@ -207,7 +207,8 @@ export const apiService = {
     resumeData: Resume | undefined,
     recruiterEmail: string,
     jobDescription: string,
-    autoSendApplications?: boolean
+    autoSendApplications?: boolean,
+    gcsPath?: string
   ): Promise<Partial<IUser>> => {
     try {
       const { data } = await authClient.post(
@@ -219,6 +220,7 @@ export const apiService = {
           recruiterEmail,
           jobDescription,
           autoSendApplications,
+          gcsPath,
         }
       );
 

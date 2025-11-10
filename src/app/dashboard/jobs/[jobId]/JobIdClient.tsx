@@ -14,7 +14,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import React from "react";
+import React, { useState } from "react";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
 
@@ -29,6 +29,7 @@ export const JobIdClient = ({
   const { data: user } = useQuery(userQueries.detail());
   const updateJobApplicationHistory = useUpdateJobApplicationHistoryMutation();
 
+  const [pageTitle, setPageTitle] = useState("AI Recommendations");
   const job = data?.data;
   const router = useRouter();
 
@@ -36,10 +37,13 @@ export const JobIdClient = ({
     if (referrer === "dashboard") {
       router.push("/dashboard/home");
     } else if (referrer === "ai-recommendations") {
+      setPageTitle("AI Recommendations");
       router.push("/dashboard/jobs/category?tab=ai-recommendations");
     } else if (referrer === "saved-jobs") {
+      setPageTitle("Saved Jobs");
       router.push("/dashboard/jobs/category?tab=saved-jobs");
     } else if (referrer === "application-history") {
+      setPageTitle("Application History");
       router.push("/dashboard/jobs/category?tab=application-history");
     } else {
       router.push("/dashboard/jobs");
@@ -96,6 +100,9 @@ export const JobIdClient = ({
         {/* Main Content */}
         <div className="max-w-6xl mx-auto px-4 sm:px-8 py-8">
           <button
+
+
+
             onClick={() => handleBackClick()}
             className="flex items-center hover:cursor-pointer text-blue-600 font-medium hover:text-blue-700"
           >
@@ -103,7 +110,7 @@ export const JobIdClient = ({
             Back
           </button>
           <h1 className="text-2xl sm:text-4xl font-bold text-center my-8">
-            AI Recommendations
+            {pageTitle}
           </h1>
 
           {/* Company Header Card */}

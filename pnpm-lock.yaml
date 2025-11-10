@@ -207,8 +207,8 @@ importers:
         specifier: ^5.20.2
         version: 5.20.2(zod@4.1.5)
       pdfjs-dist:
-        specifier: ^5.4.149
-        version: 5.4.149
+        specifier: 5.4.296
+        version: 5.4.296
       pnpm:
         specifier: ^10.16.1
         version: 10.16.1
@@ -3746,10 +3746,6 @@ packages:
   path-type@4.0.0:
     resolution: {integrity: sha512-gDKb8aZMDeD/tZWs9P6+q0J9Mwkdl6xMV8TjnGP3qJVJ06bdMgkbBlLU8IdfOsIsFz2BW1rNVT3XuNEl8zPAvw==}
     engines: {node: '>=8'}
-
-  pdfjs-dist@5.4.149:
-    resolution: {integrity: sha512-Xe8/1FMJEQPUVSti25AlDpwpUm2QAVmNOpFP0SIahaPIOKBKICaefbzogLdwey3XGGoaP4Lb9wqiw2e9Jqp0LA==}
-    engines: {node: '>=20.16.0 || >=22.3.0'}
 
   pdfjs-dist@5.4.296:
     resolution: {integrity: sha512-DlOzet0HO7OEnmUmB6wWGJrrdvbyJKftI1bhMitK7O2N8W2gc757yyYBbINy9IDafXAV9wmKr9t7xsTaNKRG5Q==}
@@ -8406,10 +8402,6 @@ snapshots:
   path-parse@1.0.7: {}
 
   path-type@4.0.0: {}
-
-  pdfjs-dist@5.4.149:
-    optionalDependencies:
-      '@napi-rs/canvas': 0.1.80
 
   pdfjs-dist@5.4.296:
     optionalDependencies:

@@ -24,7 +24,7 @@ const MobileOverview = memo(
   }) => {
     const router = useRouter();
     return (
-      <div className="space-y-4 md:hidden">
+      <div className="space-y-4 lg:hidden">
         {allJobs.map((job) => {
           const isBookmarked = job.isBookmarked || false;
           return (
@@ -50,7 +50,7 @@ const MobileOverview = memo(
                 <div className="flex-1">
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center gap-3">
-                      <h2 className="text-sm font-semibold text-gray-900 capitalize max-w-24 sm:max-w-44 truncate">
+                      <h2 className="text-sm font-semibold text-gray-900 capitalize max-w-24 4xs:max-w-44 sm:max-w-sm truncate">
                         {job.title}
                       </h2>
                       <span className="px-3 py-1 bg-blue-50 text-blue-600 text-2xs text-nowrap sm:text-xs rounded-full">
@@ -115,8 +115,17 @@ const MobileOverview = memo(
                       }}
                       className=" bg-blue-50 text-blue-600 px-2 py-2 text-2xs rounded-lg hover:bg-blue-100 transition-colors flex items-center gap-2 font-medium"
                     >
-                      Apply Now {job?.emailApply && <Sparkles className="text-2 text-yellow-500" />}
-                      <ArrowRight className="size-3" />
+                      {job?.emailApply ? (
+                        <>
+                          Auto Apply
+                          <Sparkles className="size-3 text-blue-500" />
+                        </>
+                      ) : (
+                        <>
+                          Apply Now
+                          <ArrowRight className="size-3" />
+                        </>
+                      )}
                     </button>
                   </div>
                 </div>

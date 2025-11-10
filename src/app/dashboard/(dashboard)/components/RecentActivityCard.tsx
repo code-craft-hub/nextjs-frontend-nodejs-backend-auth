@@ -119,7 +119,7 @@ export const RecentActivityCard = memo(
                       }}
                     >
                       <img src="/preview.svg" className="size-4" alt="" />
-                      Previow
+                      Preview
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>

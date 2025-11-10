@@ -14,7 +14,7 @@ const PreviewPage = async ({ searchParams }: any) => {
 
   const { coverLetterId, resumeId, recruiterEmail, jobDescription } =
     await searchParams;
-const baseResume = searchParams?.baseResume;
+  const baseResume = (await searchParams)?.baseResume;
   await prefetchWithPriority(queryClient, [
     {
       queryKey: resumeQueries.detail(resumeId).queryKey,
@@ -28,9 +28,8 @@ const baseResume = searchParams?.baseResume;
     },
   ]);
 
-
   return (
-    <div className="p-4 sm:p-8">
+    <div className="p-4 sm:p-8 relative">
       <HydrationBoundary state={dehydrate(queryClient)}>
         <Preview
           coverLetterId={coverLetterId}

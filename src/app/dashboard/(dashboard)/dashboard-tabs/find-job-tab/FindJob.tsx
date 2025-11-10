@@ -245,7 +245,7 @@ export const FindJob = memo(({ filters }: { filters: JobFilters }) => {
   return (
     <div className="flex flex-col font-poppins h-screen relative">
       <h1 className="font-instrument text-3xl text-center tracking-tighter mb-8">
-        AI Job Document Recommendation
+        AI Job Recommendation
       </h1>
       <div className="grid pb-16 bg">
         <JobDashboard
