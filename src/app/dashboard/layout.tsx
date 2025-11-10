@@ -8,6 +8,10 @@ import {
 import { UserMenu } from "@/components/UserMenu";
 import { DynamicBreadcrumb } from "./components/DynamicBreadcrumb";
 import { requireAuth } from "@/lib/server-auth";
+import { createServerQueryClient } from "@/lib/query/prefetch";
+import { userQueries } from "@/lib/queries/user.queries";
+import { HydrationBoundary } from "@/components/hydration-boundary";
+import { dehydrate } from "@tanstack/react-query";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -16,30 +20,31 @@ interface DashboardLayoutProps {
 }
 
 const DashboardLayout = async ({ children }: DashboardLayoutProps) => {
-  const session = await requireAuth();
-
+  await requireAuth();
+  const queryClient = createServerQueryClient();
+  await queryClient.prefetchQuery(userQueries.detail());
   return (
-    <SidebarProvider>
-      <AppSidebar />
-      <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 bg-white/70 sticky top-0 z-30 border-b backdrop-blur-3xl">
-          <div className="flex items-center gap-2 px-4">
-            <SidebarTrigger className="-ml-1" />
-            <Separator
-              orientation="vertical"
-              className="mr-2 data-[orientation=vertical]:h-4"
-            />
-            <DynamicBreadcrumb />
-          </div>
-          <div className="ml-auto">
-            <UserMenu initialUser={session} />
-          </div>
-        </header>
-        <div className="w-full min-h-screen bg-[#F5F7FA]">
-          {children}
-        </div>
-      </SidebarInset>
-    </SidebarProvider>
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <SidebarProvider>
+        <AppSidebar />
+        <SidebarInset>
+          <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 bg-white/70 sticky top-0 z-30 border-b backdrop-blur-3xl">
+            <div className="flex items-center gap-2 px-4">
+              <SidebarTrigger className="-ml-1" />
+              <Separator
+                orientation="vertical"
+                className="mr-2 data-[orientation=vertical]:h-4"
+              />
+              <DynamicBreadcrumb />
+            </div>
+            <div className="ml-auto">
+              <UserMenu />
+            </div>
+          </header>
+          <div className="w-full min-h-screen bg-[#F5F7FA]">{children}</div>
+        </SidebarInset>
+      </SidebarProvider>
+    </HydrationBoundary>
   );
 };
 

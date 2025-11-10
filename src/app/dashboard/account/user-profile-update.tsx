@@ -1,6 +1,5 @@
 "use client";
 import React, { useEffect } from "react";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import {
@@ -25,6 +24,7 @@ import { toast } from "sonner";
 import { userQueries } from "@/lib/queries/user.queries";
 import { useQuery } from "@tanstack/react-query";
 import { useUserLocation } from "@/hooks/get-user-location";
+import { useUpdateUserMutation } from "@/lib/mutations/user.mutations";
 
 // Zod validation schema
 const profileSchema = z.object({
@@ -39,17 +39,6 @@ const profileSchema = z.object({
 
 type ProfileFormData = z.infer<typeof profileSchema>;
 
-const countries = [
-  { value: "nigeria", label: "Nigeria" },
-  { value: "usa", label: "United States" },
-  { value: "uk", label: "United Kingdom" },
-];
-
-const states = [
-  { value: "lagos", label: "Lagos" },
-  { value: "abuja", label: "Abuja" },
-  { value: "rivers", label: "Rivers" },
-];
 
 const countryCodes = [
   { value: "NG", label: "NG" },
@@ -60,9 +49,9 @@ const countryCodes = [
 export const UserProfileForm: React.FC = () => {
   const { data: user } = useQuery(userQueries.detail());
   const { continent_code } = useUserLocation();
-  
+  const updateUser = useUpdateUserMutation();
   const form = useForm<ProfileFormData>({
-    resolver: zodResolver(profileSchema),
+    // resolver: zodResolver(profileSchema),
     defaultValues: {
       firstName: "",
       lastName: "",
@@ -84,7 +73,10 @@ export const UserProfileForm: React.FC = () => {
     form.setValue("phoneNumber", user?.phoneNumber || "");
   }, [form, user]);
 
-  const onSubmit = () => {};
+  const onSubmit = (value: z.infer<typeof profileSchema>) => {
+    updateUser.mutate({ data: value });
+    toast.success("Profile updated successfully!");
+  };
 
   return (
     <div className="flex flex-col items-start p-10 gap-2.5 bg-white rounded-lg">
@@ -113,7 +105,7 @@ export const UserProfileForm: React.FC = () => {
             type="button"
             className="flex items-center max-sm:hidden justify-center px-4 py-2 bg-[#4182F9] text-white text-[13.85px] rounded-[6.93px] font-normal"
             onClick={() => {
-              toast.success("Account info updated!");
+              form.handleSubmit(onSubmit)();
             }}
           >
             Update
@@ -179,26 +171,13 @@ export const UserProfileForm: React.FC = () => {
                     <FormLabel className="text-sm font-medium text-[#344054] leading-5">
                       Country
                     </FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger className="box-border flex flex-row justify-between items-center w-full h-11 px-3.5 py-2.5 bg-[#F9FAFB] border border-[#D0D5DD] rounded-lg text-xs leading-6">
-                          <SelectValue
-                            placeholder="Select country"
-                            className="text-[#667085]"
-                          />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {countries.map((country) => (
-                          <SelectItem key={country.value} value={country.value}>
-                            {country.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <FormControl>
+                      <Input
+                        placeholder="Enter last name"
+                        {...field}
+                        className="box-border flex flex-row items-start w-full h-11 px-3.5 py-2.5 bg-[#F9FAFB] border border-[#D0D5DD] rounded-lg text-xs leading-6 text-[#667085] placeholder:text-[#667085] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      />
+                    </FormControl>
                     <FormMessage className="text-xs text-red-500" />
                   </FormItem>
                 )}
@@ -212,26 +191,13 @@ export const UserProfileForm: React.FC = () => {
                     <FormLabel className="text-sm font-medium text-[#344054] leading-5">
                       State
                     </FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger className="box-border flex flex-row justify-between items-center w-full h-11 px-3.5 py-2.5 bg-[#F9FAFB] border border-[#D0D5DD] rounded-lg text-xs leading-6">
-                          <SelectValue
-                            placeholder="Select state"
-                            className="text-[#667085]"
-                          />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {states.map((state) => (
-                          <SelectItem key={state.value} value={state.value}>
-                            {state.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <FormControl>
+                      <Input
+                        placeholder="Enter last name"
+                        {...field}
+                        className="box-border flex flex-row items-start w-full h-11 px-3.5 py-2.5 bg-[#F9FAFB] border border-[#D0D5DD] rounded-lg text-xs leading-6 text-[#667085] placeholder:text-[#667085] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      />
+                    </FormControl>
                     <FormMessage className="text-xs text-red-500" />
                   </FormItem>
                 )}
@@ -307,6 +273,7 @@ export const UserProfileForm: React.FC = () => {
                     <FormControl>
                       <Input
                         type="email"
+                        disabled={true}
                         placeholder="Enter email address"
                         {...field}
                         className="box-border flex flex-row items-start w-full h-11 px-3.5 py-2.5 bg-[#F9FAFB] border border-[#D0D5DD] rounded-lg text-xs leading-6 text-[#667085] placeholder:text-[#667085] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -319,11 +286,9 @@ export const UserProfileForm: React.FC = () => {
             </div>
 
             <button
-              type="button"
+              type="submit"
               className="items-center hidden max-sm:flex w-full mt-4 justify-center px-4 py-2 bg-[#4182F9] text-white text-[13.85px] rounded-[6.93px] font-normal"
-              onClick={() => {
-                toast.success("Account info updated!");
-              }}
+             
             >
               Update
             </button>

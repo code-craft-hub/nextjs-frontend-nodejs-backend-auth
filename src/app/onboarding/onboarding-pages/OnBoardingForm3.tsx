@@ -29,11 +29,10 @@ import OnboardingTabs from "./OnBoardingTabs";
 import { useIsMobile } from "@/hooks/use-mobile";
 import Progress from "./Progress";
 import { SelectCreatable } from "@/components/shared/SelectCreatable";
-import { Badge } from "@/components/ui/badge";
-import { badgeColors, jobExamples } from "@/lib/utils/constants";
 import { userQueries } from "@/lib/queries/user.queries";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
+import { FloatingLabelInput } from "./FloatingInput";
 
 const formSchema = z.object({
   partTime: z.boolean().default(false).optional(),
@@ -44,6 +43,7 @@ const formSchema = z.object({
   remote: z.boolean().default(false).optional(),
   onsite: z.boolean().default(false).optional(),
   location: z.string().min(1, "Please select a preferred location"),
+  title: z.string().min(1, "Please select a job title"),
   rolesOfInterest: z
     .array(z.object({ label: z.string(), value: z.string() }))
     .min(1, "Please add at least one role of interest"),
@@ -64,6 +64,7 @@ export const OnBoardingForm3 = ({ onNext, onPrev }: OnboardingFormProps) => {
       remote: false,
       onsite: false,
       location: "",
+      title: "",
       rolesOfInterest: [],
     },
   });
@@ -80,8 +81,9 @@ export const OnBoardingForm3 = ({ onNext, onPrev }: OnboardingFormProps) => {
       form.setValue("intership", user.dataSource[0]?.intership || false);
       form.setValue("contract", user.dataSource[0]?.contract || false);
       form.setValue("hybrid", user.dataSource[0]?.hybrid || false);
-      form.setValue("remote", user.dataSource[0]?.remote || false);
+      form.setValue("remote", user.dataSource[0]?.remote || []);
       form.setValue("onsite", user.dataSource[0]?.onsite || false);
+      form.setValue("title", user.dataSource[0]?.title || "");
     }
   }, [user, form]);
   async function onSubmit(values: z.infer<typeof formSchema>) {
@@ -387,6 +389,29 @@ export const OnBoardingForm3 = ({ onNext, onPrev }: OnboardingFormProps) => {
                     </FormItem>
                   )}
                 />
+                <FormField
+                  control={form.control}
+                  name="title"
+                  render={({ field }) => (
+                    <FormItem className="relative">
+                      <p className="absolute text-muted-foreground bg-background px-2 -mt-2 ml-4 text-2xs">
+                        Job Title
+                      </p>
+                      <FormControl>
+                        <FloatingLabelInput
+                          label="Job Title"
+
+                          isUpdatingUserLoading={isUpdatingUserLoading}
+                          {...field}
+                          placeholder="Software engineer, Backend developer"
+                          className="rounded-sm"
+                        />
+                      </FormControl>
+
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 <Controller
                   name="rolesOfInterest"
                   control={form.control}
@@ -399,7 +424,7 @@ export const OnBoardingForm3 = ({ onNext, onPrev }: OnboardingFormProps) => {
                         Roles of Interest{" "}
                       </p>
                       <SelectCreatable
-                        placeholder="Cver AI will use this field to recommend jobs that match your interests. (E.g., Software Engineer)"
+                        placeholder="This field will be used to recommend jobs to you. (E.g., Software Engineer)"
                         value={field.value}
                         onChange={field.onChange}
                       />
@@ -411,19 +436,6 @@ export const OnBoardingForm3 = ({ onNext, onPrev }: OnboardingFormProps) => {
                     </div>
                   )}
                 />
-                <div className={cn("flex gap-2 flex-wrap", "mt")}>
-                  {jobExamples?.map((job, index) => (
-                    <Badge
-                      key={job}
-                      variant="outline"
-                      className={`cursor-pointer ${
-                        badgeColors[index % badgeColors.length]
-                      }`}
-                    >
-                      {job}
-                    </Badge>
-                  ))}
-                </div>
               </div>
 
               <div className="flex gap-4">

@@ -86,7 +86,7 @@ const getColumns = (
     cell: ({ row }) => (
       <div className="">
         <Badge variant="outline" className={cn("border-0 px-1.5 font-inter")}>
-          {(row.original?.generatedAt)?.split(".")[0]}
+          {row.original?.generatedAt?.split(".")[0]}
         </Badge>
       </div>
     ),
@@ -114,19 +114,21 @@ const getColumns = (
   },
   {
     id: "actions",
-    cell: ({ row }) => (
-      <Button
-        variant={"ghost"}
-        className="text-blue-500 font-jakarta"
-        onClick={() => {
-          router.push(
-            `/dashboard/preview?resumeId=${row.original.resumeId}&coverLetterId=${row.original.coverLetterId}&recruiterEmail=${row.original.recruiterEmail}&jobDescription=${row.original.jobDescription}`
-          );
-        }}
-      >
-        Show Details
-      </Button>
-    ),
+    cell: ({ row }) => {
+      return (
+        <Button
+          variant={"ghost"}
+          className="text-blue-500 font-jakarta"
+          onClick={() => {
+            router.push(
+              `/dashboard/preview?resumeId=${row.original.resumeId}&coverLetterId=${row.original.coverLetterId}&recruiterEmail=${row.original.recruiterEmail}&jobDescription=${row.original.jobDescription}`
+            );
+          }}
+        >
+          Show Details
+        </Button>
+      );
+    },
   },
 ];
 

@@ -6,6 +6,7 @@ import { ResumeFormData } from "@/lib/schema-validations/resume.schema";
 import { createApiError } from "@/lib/utils/helpers";
 import { COLLECTIONS } from "@/lib/utils/constants";
 import authClient from "@/lib/axios/auth-api";
+import { resumeQueries } from "@/lib/queries/resume.queries";
 
 const updateResumeField = async <T>(
   payload: UpdatePayload<T>,
@@ -85,7 +86,7 @@ export const useResumeData = (
         if (!pendingUpdatesRef.current.has(key as ResumeField)) {
           const prevValue = (prev as Record<string, unknown>)[key];
           const newValue = (initialData as Record<string, unknown>)[key];
-          
+
           if (JSON.stringify(prevValue) !== JSON.stringify(newValue)) {
             updates[key] = newValue;
             hasChanges = true;
@@ -152,7 +153,6 @@ export const useResumeData = (
     },
 
     onSuccess: (data, payload, context) => {
-      
       if (context?.field) {
         pendingUpdatesRef.current.delete(context.field);
       }
@@ -169,6 +169,7 @@ export const useResumeData = (
     onSettled: (_data, _error, payload) => {
       // Ensure field is removed from pending updates
       pendingUpdatesRef.current.delete(payload.field);
+      queryClient.invalidateQueries(resumeQueries.detail(resumeId));
 
       // Invalidate queries without refetching immediately
       queryClient.invalidateQueries({

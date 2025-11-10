@@ -25,6 +25,7 @@ import { CoverLetter, IUser } from "@/types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { EditIcon, Loader } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { coverLetterQueries } from "@/lib/queries/cover-letter.queries";
 
 // Validation schema
 const coverLetterSchema = z.object({
@@ -75,6 +76,15 @@ const TailorCoverLetterDisplay = ({
     },
     onSuccess: () => {
       // Invalidate and refetch
+      queryClient.invalidateQueries({
+        queryKey: [
+          "auth",
+          "careerDoc",
+          COLLECTIONS.COVER_LETTER,
+          currentData?.id,
+        ],
+      });
+      queryClient.invalidateQueries(coverLetterQueries.detail(currentData?.id!));
       queryClient.invalidateQueries({
         queryKey: [
           "auth",

@@ -44,11 +44,11 @@ export const AccountPage = ({ tab }: any) => {
           Security Settings
         </button>
       </div>
-      {tab === "account" ? (
+      {tab === "account" || tab === undefined ? (
         <UserProfileForm />
-      ) : tab === "billing" ? (
-        <PasswordUpdateForm />
       ) : (
+        // ) : tab === "billing" ? (
+        //   <PasswordUpdateForm />
         <PasswordUpdateForm />
       )}
 

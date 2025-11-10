@@ -21,13 +21,11 @@ const Preview = ({
   resumeId,
   recruiterEmail,
   jobDescription,
-  baseResume,
 }: {
   coverLetterId: string;
   resumeId: string;
   jobDescription: string;
   recruiterEmail: string;
-  baseResume: string;
 }) => {
   const [activeStep, setActiveStep] = useState(3);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -116,7 +114,6 @@ const Preview = ({
     toast.success("Resume and Cover Letter deleted successfully");
     router.push("/dashboard/home");
   };
-
   return (
     <div className="space-y-4 sm:space-y-8">
       <ProgressIndicator activeStep={activeStep} />
@@ -143,7 +140,7 @@ const Preview = ({
         data={coverLetterData}
         recruiterEmail={recruiterEmail}
       />
-      {baseResume ? (
+      {user?.aiApplyPreferences?.useMasterCV ? (
         <div className="h-[80svh] overflow-hidden">
           <iframe
             src={`${defaultResume?.url}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`}
