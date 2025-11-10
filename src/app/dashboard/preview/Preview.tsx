@@ -45,7 +45,6 @@ const Preview = ({
     (resume) => resume.id === user?.defaultDataSource
   );
 
-  console.log(defaultResume)
   const handleOpenModal = (value: boolean) => {
     setOpenModal(value);
   };

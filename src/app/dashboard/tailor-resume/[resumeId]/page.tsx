@@ -13,9 +13,8 @@ const TailorResumePage = async ({ searchParams, params }: any) => {
 
   const queryClient = createServerQueryClient();
   await queryClient.prefetchQuery(resumeQueries.detail(resumeId));
-  const user = await queryClient.fetchQuery(userQueries.detail());
-  const useMasterCV = user?.aiApplyPreferences?.useMasterCV;
-  console.log(useMasterCV);
+  await queryClient.fetchQuery(userQueries.detail());
+  // const useMasterCV = user?.aiApplyPreferences?.useMasterCV;
 
   // TODO: CHECK THE EXPIRY OF THE URL AND REFRESH IF NEEDED IN THE SERVER OR CLIENT
 

@@ -71,7 +71,6 @@ export const AiApplyPreferences: React.FC = () => {
   const updateUser = useUpdateUserMutation();
   const { data: user } = useQuery(userQueries.detail());
 
-  console.log(user)
   const [oauthState, setOauthState] = useState(false);
 
   const checkAuth = async (value: { isAuthorized: boolean }): Promise<void> => {
