@@ -84,7 +84,7 @@ const TailorCoverLetterDisplay = ({
           currentData?.id,
         ],
       });
-      queryClient.invalidateQueries(coverLetterQueries.detail(currentData?.id!));
+      queryClient.invalidateQueries(coverLetterQueries.detail(currentData?.id ?? ""));
       queryClient.invalidateQueries({
         queryKey: [
           "auth",
