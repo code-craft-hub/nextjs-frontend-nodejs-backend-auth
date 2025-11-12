@@ -150,8 +150,8 @@ const Preview = ({
         </div>
       ) : (
         <EditableResume data={resumeData!} resumeId={resumeId} />
-      )}
-      <div className="flex items-center justify-center fixed bottom-4 left-1/2 -translate-x-1/2">
+      )}{" "}
+      <div className="flex items-center justify-center max-sm:fixed w-full h-16 bottom-4 left-0 ">
         <Button disabled={isSubmitting} onClick={handleSubmit} className="w-64">
           Submit <Sparkles className="ml-2 h-4 w-4" />
         </Button>

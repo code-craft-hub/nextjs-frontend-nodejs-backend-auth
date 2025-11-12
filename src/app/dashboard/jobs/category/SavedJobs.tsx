@@ -28,7 +28,7 @@ import { jobsQueries } from "@/lib/queries/jobs.queries";
 import { SearchBar } from "./JobSearchBar";
 import { getFindJobsColumns } from "../components/Overview";
 import { getDataSource } from "@/lib/utils/helpers";
-import { jobMatcher } from "@/services/job-recommendation";
+import { jobMatcher } from "@/services/job-matcher";
 import { toast } from "sonner";
 import { apiService } from "@/hooks/use-auth";
 import { JobType } from "@/types";

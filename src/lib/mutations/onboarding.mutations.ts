@@ -44,12 +44,10 @@ export function useCreateOnboardingMutation() {
       // }
     },
     onSuccess: () => {
-      console.log("Onboarding created successfully");
       // Invalidate stats after creating
       queryClient.invalidateQueries({ queryKey: queryKeys.users.all });
     },
     onSettled: () => {
-      console.log("Onboarding creation settled");
       queryClient.invalidateQueries({ queryKey: queryKeys.users.lists() });
     },
   });

@@ -50,7 +50,7 @@ import {
   useUpdateJobMutation,
 } from "@/lib/mutations/jobs.mutations";
 import { ReportCard } from "./ReportCard";
-import { jobMatcher } from "@/services/job-recommendation";
+import { jobMatcher } from "@/services/job-matcher";
 import { PiOfficeChairFill } from "react-icons/pi";
 import MobileOverview from "./MobileOverview";
 

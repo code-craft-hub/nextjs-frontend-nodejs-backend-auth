@@ -82,6 +82,7 @@ export interface IUser {
   customClaims?: Record<string, any> | undefined;
   provider?: string;
   password?: string;
+  recommendationsData?: any[];
   appliedJobs?: { id: string; appliedDate: string }[];
   analytics?: {
     totalApplications: number;

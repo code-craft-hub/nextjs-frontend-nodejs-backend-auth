@@ -101,8 +101,7 @@ export const LandingPageClient = ({
         </div>
       </section>
 
-      {/* Featured Jobs */}
-      <FeatureJobs filters={filters} />
+      {user && <FeatureJobs filters={filters} />}
 
       {/* Core Features */}
       <section id="features" className="py-20">

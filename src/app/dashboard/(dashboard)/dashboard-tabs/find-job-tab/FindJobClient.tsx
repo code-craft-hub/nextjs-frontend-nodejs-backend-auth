@@ -20,7 +20,7 @@ import { ReportCard } from "@/app/dashboard/jobs/components/ReportCard";
 import JobSearchInput from "@/components/shared/JobSearchInput";
 import { userQueries } from "@/lib/queries/user.queries";
 import { getDataSource } from "@/lib/utils/helpers";
-import { jobMatcher } from "@/services/job-recommendation";
+import { jobMatcher } from "@/services/job-matcher";
 import { useRouter } from "next/navigation";
 import MobileFindJob from "./MobileFindJob";
 

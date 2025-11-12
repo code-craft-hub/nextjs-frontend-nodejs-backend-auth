@@ -5,7 +5,6 @@ import { apiService } from "@/hooks/use-auth";
 import { jobsQueries } from "@/lib/queries/jobs.queries";
 import { JobFilters } from "@/lib/types/jobs";
 import { cn } from "@/lib/utils";
-import { randomPercentage } from "@/lib/utils/helpers";
 import { useQuery } from "@tanstack/react-query";
 import { isEmpty } from "lodash";
 import { v4 as uuidv4 } from "uuid";
@@ -22,19 +21,36 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { JobType } from "@/types";
+import { userQueries } from "@/lib/queries/user.queries";
 
 export const RecentActivityCard = memo(
   ({ filters }: { filters: JobFilters }) => {
     const { data: jobs } = useQuery(jobsQueries.all(filters));
+    const { data: user } = useQuery(userQueries.detail());
 
     const sortedJobs = useMemo(() => {
       if (!jobs?.data) return [];
 
-      return [...jobs.data].sort((a, b) => {
-        if (a.emailApply && !b.emailApply) return -1;
-        if (!a.emailApply && b.emailApply) return 1;
-        return 0;
-      });
+      const recommendationsData = new Set(
+        user?.recommendationsData?.map((rec: any) => rec.jobId) || []
+      );
+      const job = jobs.data
+        ?.map((job) => ({
+          ...job,
+          isRecommended: recommendationsData.has(job.id),
+          score: recommendationsData.has(job.id)
+            ? user?.recommendationsData?.find(
+                (rec: any) => rec.jobId === job.id
+              )?.score || 0
+            : 0,
+        }))
+        .sort((a, b) => {
+          if (a.emailApply && !b.emailApply) return -1;
+          if (!a.emailApply && b.emailApply) return 1;
+          return 0;
+        });
+
+      return job;
     }, [jobs?.data]);
 
     const router = useRouter();
@@ -160,7 +176,7 @@ export const RecentActivityCard = memo(
                       )}
                     >
                       {/* {job.scrapedDate} */}
-                      {randomPercentage(10)} match
+                      {job?.score}% match
                     </Badge>
                   </div>
                 </div>

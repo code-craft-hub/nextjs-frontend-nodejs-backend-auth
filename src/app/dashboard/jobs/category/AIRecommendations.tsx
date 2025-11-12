@@ -12,7 +12,7 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
-import {v4 as uuidv4} from "uuid";
+import { v4 as uuidv4 } from "uuid";
 import { userQueries } from "@/lib/queries/user.queries";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import {
@@ -25,7 +25,7 @@ import { useRouter } from "next/navigation";
 import { jobsQueries } from "@/lib/queries/jobs.queries";
 import { getFindJobsColumns } from "../components/Overview";
 import { getDataSource } from "@/lib/utils/helpers";
-import { jobMatcher } from "@/services/job-recommendation";
+import { jobMatcher } from "@/services/job-matcher";
 import { apiService } from "@/hooks/use-auth";
 import { toast } from "sonner";
 import { JobType } from "@/types";
@@ -220,11 +220,11 @@ export const AIRecommendations = ({
               </TableBody>
             </Table>
           </div>
-        <MobileOverview
-          allJobs={allJobs}
-          updateJobs={updateJobs}
-          handleApply={handleApply}
-        />
+          <MobileOverview
+            allJobs={allJobs}
+            updateJobs={updateJobs}
+            handleApply={handleApply}
+          />
           {hasNextPage && (
             <div className="mt-4 flex justify-center">
               <button
