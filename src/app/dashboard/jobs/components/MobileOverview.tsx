@@ -30,7 +30,7 @@ const MobileOverview = memo(
           return (
             <div
               key={job.id}
-              className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow"
+              className="bg-white 3xs:bg-red-500 2xs:bg-purple-500 xs:bg-yellow-500 xs2:bg-cyan-700   rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow"
               onClick={() => {
                 router.push(
                   `/dashboard/jobs/${job?.id}?referrer=jobs&title=${job?.title}`
@@ -50,10 +50,10 @@ const MobileOverview = memo(
                 <div className="flex-1">
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center gap-3">
-                      <h2 className="text-sm font-semibold text-gray-900 capitalize max-w-24 4xs:max-w-44 sm:max-w-sm truncate">
+                      <h2 className="text-sm font-semibold text-gray-900 capitalize  bg-red-500 truncate">
                         {job.title}
                       </h2>
-                      <span className="px-3 py-1 bg-blue-50 text-blue-600 text-2xs text-nowrap sm:text-xs rounded-full">
+                      <span className="px-3 hidden sm:flex py-1 bg-blue-50 text-blue-600 text-2xs text-nowrap sm:text-xs rounded-full">
                         {job.employmentType || job.jobType}
                       </span>
                     </div>

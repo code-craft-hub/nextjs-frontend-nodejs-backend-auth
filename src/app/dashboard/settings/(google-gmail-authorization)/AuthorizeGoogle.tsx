@@ -65,7 +65,7 @@ const AuthorizeGoogle: React.FC<{
         }
       } catch (err: any) {
         console.error("OAuth callback error:", err);
-        toast.error(err.message || "Unknown error");
+        // toast.error(err.message || "Unknown error");
         router.push(location.pathname);
       } finally {
         setIsLoading(false);
@@ -110,7 +110,8 @@ const AuthorizeGoogle: React.FC<{
       // ✅ Start Google OAuth
       window.location.href = data.authUrl;
     } catch (err: any) {
-      toast.error(`Error: ${err.message}`);
+      // toast.error(`Error: ${err.message}`);
+      console.error("Authorization error:", err);
     } finally {
       setIsLoading(false);
     }

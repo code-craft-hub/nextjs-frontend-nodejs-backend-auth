@@ -104,6 +104,7 @@ export default function Overview() {
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useInfiniteQuery(jobsQueries?.infinite(infiniteFilters));
+    console.log('Job data:', data);
 
   const allJobs = useMemo(() => {
     const jobs = data?.pages.flatMap((page) => page.data) ?? [];

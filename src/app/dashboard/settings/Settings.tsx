@@ -1,24 +1,26 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AiApplyPreferences } from "./AiApplyPreferences";
 import { Sparkles, User } from "lucide-react";
-// import { AdvancedProfileManagement } from "./AdvancedProfileManagement";
 import { ProfileManagement } from "./ProfileManagement";
-import { useRouter } from "next/navigation";
 
-const Settings = ({ tab }: { tab: string; }) => {
-  const router = useRouter();
+const Settings = ({ tab }: { tab: string }) => {
+  const [currentTab, setCurrentTab] = useState(tab ?? "profile-management");
+  
+  const handleTabChange = (value: string) => {
+    setCurrentTab(value);
+  };
   return (
     <div>
-      <Tabs defaultValue={tab ?? "profile-management"}>
+      <Tabs defaultValue={currentTab}>
         <TabsList className="bg-white w-full p-1 font-roboto gap-x-4">
           <TabsTrigger
             value="profile-management"
             className="text-xs font-medium"
             onClick={() => {
-              router.push(`/dashboard/settings?tab=profile-management`);
+              handleTabChange("profile-management");
             }}
           >
             <User className="w-4 h-4" />
@@ -28,33 +30,25 @@ const Settings = ({ tab }: { tab: string; }) => {
             value="ai-applypreference"
             className="text-xs font-medium"
             onClick={() => {
-              router.push(`/dashboard/settings?tab=ai-applypreference`);
+              handleTabChange("ai-applypreference");
             }}
           >
             <Sparkles className="size-4 sm:hidden" />
-            <img src="/ai-apply.svg" alt="AI apply" className="size-4 hidden sm:flex" />
+            <img
+              src="/ai-apply.svg"
+              alt="AI apply"
+              className="size-4 hidden sm:flex"
+            />
             <span className="max-sm:hidden">AI Apply Preferences</span>
           </TabsTrigger>
-          {/* <TabsTrigger
-            className="text-xs font-medium"
-            value="advanced-settings"
-            onClick={() => {
-              router.push(`/dashboard/settings?tab=advanced-settings`);
-            }}
-          >
-            <img src="/select-profile.svg" alt="AI apply" className="size-4" />
-            <span className="max-sm:hidden">Advanced Settings</span>
-          </TabsTrigger> */}
+         
         </TabsList>
         <TabsContent value="profile-management" className="text-md font-medium">
-          <ProfileManagement/>
+          <ProfileManagement />
         </TabsContent>
         <TabsContent value="ai-applypreference">
           <AiApplyPreferences />
         </TabsContent>
-        {/* <TabsContent value="advanced-settings">
-          <AdvancedProfileManagement />
-        </TabsContent> */}
       </Tabs>
     </div>
   );

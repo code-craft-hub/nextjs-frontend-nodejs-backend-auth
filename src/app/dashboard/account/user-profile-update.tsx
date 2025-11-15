@@ -39,7 +39,6 @@ const profileSchema = z.object({
 
 type ProfileFormData = z.infer<typeof profileSchema>;
 
-
 const countryCodes = [
   { value: "NG", label: "NG" },
   { value: "US", label: "US" },
@@ -79,25 +78,27 @@ export const UserProfileForm: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col items-start p-10 gap-2.5 bg-white rounded-lg">
+    <div className="flex flex-col items-start p-4 sm:p-8 gap-2.5 bg-white rounded-lg">
       <div className="flex flex-col items-center gap-11 w-full h-full">
         {/* Header with profile info */}
         <div className="flex flex-col sm:flex-row justify-between items-center w-full">
-          <div className="flex flex-row items-center gap-4">
-            <Avatar className="size-24">
-              <AvatarImage src={user?.photoURL as string} alt="@avatar" />
-              <AvatarFallback>
-                {user?.firstName?.charAt(0)}
-                {user?.lastName?.charAt(0)}{" "}
-              </AvatarFallback>
-            </Avatar>
-            <div>
-              <h2 className="font-medium text-[17.32px] leading-[21px] text-black">
-                {user?.firstName} {user?.lastName}
-              </h2>
-              <p className="font-normal text-[13.85px] leading-[17px] text-black opacity-50">
-                {user?.email}
-              </p>
+          <div className="w-full">
+            <div className="flex flex-row items-center gap-4">
+              <Avatar className="size-12 sm:size-16">
+                <AvatarImage src={user?.photoURL as string} alt="@avatar" />
+                <AvatarFallback>
+                  {user?.firstName?.charAt(0)}
+                  {user?.lastName?.charAt(0)}{" "}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <h2 className="font-medium text-[17.32px] leading-[21px] text-black">
+                  {user?.firstName} {user?.lastName}
+                </h2>
+                <p className="font-normal text-[13.85px] leading-[17px] text-black opacity-50">
+                  {user?.email}
+                </p>
+              </div>
             </div>
           </div>
 
@@ -288,7 +289,6 @@ export const UserProfileForm: React.FC = () => {
             <button
               type="submit"
               className="items-center hidden max-sm:flex w-full mt-4 justify-center px-4 py-2 bg-[#4182F9] text-white text-[13.85px] rounded-[6.93px] font-normal"
-             
             >
               Update
             </button>

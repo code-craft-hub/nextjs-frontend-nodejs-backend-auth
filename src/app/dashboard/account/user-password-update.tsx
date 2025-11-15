@@ -88,7 +88,7 @@ export const PasswordUpdateForm: React.FC = () => {
   );
 
   return (
-    <div className="p-8 bg-white rounded-lg">
+    <div className="p-4 sm:p-8 bg-white rounded-lg">
       {/* flex flex-col items-start p-10 gap-2.5 bg-white */}
       <Form {...form}>
         <div className="space-y-6">
