@@ -65,7 +65,6 @@ export const SavedJobs = ({ children }: { children: React.ReactNode }) => {
 
   const allJobs = useMemo(() => {
     const jobs = data?.pages.flatMap((page) => page.data) ?? [];
-    console.log(jobs);
     return jobs
       .map((job) => {
         const jobContent = job?.title + " " + job?.descriptionText;

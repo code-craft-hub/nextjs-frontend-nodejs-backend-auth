@@ -15,6 +15,6 @@ export const userQueries = {
     queryOptions({
       queryKey: queryKeys.users.detail(),
       queryFn: () => userApi.getUser(),
-      staleTime: 5 * 60 * 1000,
+      staleTime: 10 * 60 * 1000,
     }),
 };

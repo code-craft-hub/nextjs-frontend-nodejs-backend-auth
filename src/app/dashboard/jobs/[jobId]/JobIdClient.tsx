@@ -125,7 +125,7 @@ export const JobIdClient = ({
                   </div>
                 )}
                 <div>
-                  <h2 className="text-xl font-semibold text-gray-900">
+                  <h2 className="text-xl font-semibold text-gray-900 capitalize">
                     {job?.title}
                   </h2>
                   <p className="text-gray-500 text-sm capitalize">
