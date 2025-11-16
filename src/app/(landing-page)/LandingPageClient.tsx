@@ -1,6 +1,5 @@
 "use client";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import "./glass.css";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -9,7 +8,6 @@ import {
   actionButtons,
   blogs,
   coreFeatures,
-  creditCard,
   faqItems,
   howItWorks,
   testimonials,
@@ -22,6 +20,7 @@ import { FeatureJobs } from "./components/FeatureJobs";
 import { JobFilters } from "@/lib/types/jobs";
 import { IUser } from "@/types";
 import { useRouter } from "next/navigation";
+import Pricing from "./components/Pricing";
 
 export const LandingPageClient = ({
   filters,
@@ -175,7 +174,7 @@ export const LandingPageClient = ({
       </section>
 
       {/* Pricing Section */}
-      <section id="pricing" className="py-20">
+      {/* <section id="pricing" className="py-20">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-gray-900 text-center mb-4">
             Pricing
@@ -228,8 +227,11 @@ export const LandingPageClient = ({
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
 
+      <section id="pricing" className="py-20">
+        <Pricing />
+      </section>
       {/* Testimonials Section */}
       <section
         id="testimonials"

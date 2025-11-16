@@ -1,6 +1,6 @@
 import { IUser } from "@/types";
 import { api } from "./client";
-import type {  PaginatedResponse, PaginationParams } from "@/lib/types";
+import type { PaginatedResponse, PaginationParams } from "@/lib/types";
 
 export interface CreateUserData {
   email: string;
@@ -20,8 +20,12 @@ export const userApi = {
 
   // Get user by ID
   getUser: async () => {
-    const { data } = await api.get<{ data: Partial<IUser> }>(`/users`);
-    return data;
+    const data = await api.get<{ data: Partial<IUser>; success: boolean }>(
+      `/users`
+    );
+    console.log(data);
+    if (data?.success) return data.data;
+    throw new Error("Failed to fetch user data");
   },
 
   // Create user

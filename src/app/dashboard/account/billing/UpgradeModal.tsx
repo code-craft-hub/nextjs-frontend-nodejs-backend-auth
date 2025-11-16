@@ -103,7 +103,7 @@ export function UpgradeModal({
 
             <Button
               variant="outline"
-              className="w-full mt-8 border-2 border-blue-500 text-blue-600 hover:bg-blue-50 hover:text-blue-600"
+              className="w-full font-bold font-inter mt-8 border-2 border-blue-500 text-blue-600 hover:bg-blue-50 hover:text-blue-600"
             >
               Choose Plan
             </Button>
@@ -195,12 +195,11 @@ export function UpgradeModal({
               </div>
             </div>
 
-            <Button className="w-full mt-8 bg-white text-blue-600 hover:bg-gray-50 hover:text-blue-600">
+            <Button className="w-full font-bold font-inter mt-8 bg-white text-blue-600 hover:bg-gray-50 hover:text-blue-600">
               Choose Pro
             </Button>
           </div>
         </div>
-
         <div className="bg-white rounded-2xl p-8 shadow-lg">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-gray-900">
@@ -211,116 +210,9 @@ export function UpgradeModal({
 
           <Form {...form}>
             <form
-              // onSubmit={form.handleSubmit(onSubmit)}
               className="space-y-6"
             >
-              {/* <div className="grid md:grid-cols-2 gap-6">
-                <FormField
-                  control={form.control}
-                  name="cardNumber"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Card Number</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="1234 5678 9012 3456"
-                          {...field}
-                          onChange={(e) => {
-                            const formatted = formatCardNumber(e.target.value);
-                            field.onChange(formatted);
-                          }}
-                          maxLength={19}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="cardholderName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Cardholder Name</FormLabel>
-                      <FormControl>
-                        <Input placeholder="John Doe" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <div className="grid grid-cols-3 gap-6">
-                <FormField
-                  control={form.control}
-                  name="expiryDate"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Expiry Date</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="MM/YY"
-                          {...field}
-                          onChange={(e) => {
-                            const formatted = formatExpiryDate(e.target.value);
-                            field.onChange(formatted);
-                          }}
-                          maxLength={5}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="cvv"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>CVV</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="123"
-                          {...field}
-                          onChange={(e) => {
-                            const cleaned = e.target.value
-                              .replace(/\D/g, "")
-                              .slice(0, 3);
-                            field.onChange(cleaned);
-                          }}
-                          maxLength={3}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="zipCode"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>ZIP Code</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="12345"
-                          {...field}
-                          onChange={(e) => {
-                            const cleaned = e.target.value
-                              .replace(/\D/g, "")
-                              .slice(0, 5);
-                            field.onChange(cleaned);
-                          }}
-                          maxLength={5}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div> */}
-
+            
               <div className="flex justify-between items-center py-4 border-t border-b border-gray-200">
                 <span className="text-gray-600">Selected Plan</span>
                 <span className="font-semibold text-gray-900 capitalize">

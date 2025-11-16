@@ -15,7 +15,7 @@ export const FeatureJobs = ({ filters }: { filters: JobFilters }) => {
   const { data: jobs } = useQuery(jobsQueries.all(filters));
 
   const router = useRouter();
-  if (!jobs || jobs.data.length === 0) {
+  if (!jobs || jobs.data?.length === 0) {
     return null;
   }
   return (
