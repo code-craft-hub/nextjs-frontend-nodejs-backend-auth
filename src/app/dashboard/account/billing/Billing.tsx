@@ -125,7 +125,7 @@ export const Billing = ({ reference }: any) => {
                   </p>
                   <p className="ml-6 font-['Inter'] font-normal text-[12px] leading-[18px] text-[#667085]">
                     Share your code with friends. When 5 people sign up using
-                    your code during your trial, you'll receive 7 extra days of
+                    your code during your trial, you&apos;ll receive 7 extra days of
                     access
                   </p>
                 </div>

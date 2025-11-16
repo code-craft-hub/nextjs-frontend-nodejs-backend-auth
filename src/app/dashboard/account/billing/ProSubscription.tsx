@@ -190,7 +190,7 @@ export function ProModal() {
               Cancellation Policy
             </h3>
             <p className="text-[#92400E] text-sm leading-relaxed">
-              If you cancel your subscription, you'll continue to have access
+              If you cancel your subscription, you&apos;ll continue to have access
               until the end of your current billing period (Nov 23, 2025). No
               refunds are provided for partial months.
             </p>

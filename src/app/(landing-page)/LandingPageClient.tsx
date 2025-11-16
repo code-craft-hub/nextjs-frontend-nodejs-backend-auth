@@ -19,7 +19,6 @@ import { MeetCverai } from "./components/MeetCverai";
 import { FeatureJobs } from "./components/FeatureJobs";
 import { JobFilters } from "@/lib/types/jobs";
 import { IUser } from "@/types";
-import { useRouter } from "next/navigation";
 import Pricing from "./components/Pricing";
 
 export const LandingPageClient = ({
@@ -31,7 +30,6 @@ export const LandingPageClient = ({
 }) => {
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
 
-  const router = useRouter();
   return (
     <div className="min-h-screen bg-white font-poppins">
       <section
