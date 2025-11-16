@@ -50,7 +50,7 @@ export const ApplicationHistory = ({
 
   const appliedJobsMap = useMemo(() => {
     return new Map(
-      user?.appliedJobs?.map((job) => [job.id, job.appliedDate]) || []
+      user?.appliedJobs?.map((job) => [job?.id, job?.appliedDate]) || []
     );
   }, [user?.appliedJobs]);
 
@@ -70,9 +70,9 @@ export const ApplicationHistory = ({
     const jobs = data?.pages.flatMap((page) => page.data) ?? [];
     return jobs.map((job) => ({
       ...job,
-      appliedDate: appliedJobsMap.get(job.id) || null,
+      appliedDate: appliedJobsMap?.get(job?.id) || null,
     }));
-  }, [data, appliedJobsMap]);
+  }, [data, user?.appliedJobs?.length]);
 
   const columns = getFindJobsColumns({
     router,

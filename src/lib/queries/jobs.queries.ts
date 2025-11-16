@@ -14,7 +14,7 @@ export const jobsQueries = {
       staleTime: 10 * 60 * 1000,
     });
   },
-  
+
   infinite: (filters: Omit<JobFilters, "page">) => {
     const baseFilters = normalizeJobFilters(filters as JobFilters);
     return infiniteQueryOptions({
@@ -43,6 +43,43 @@ export const jobsQueries = {
     });
   },
 
+  autoApply: (filters: JobFilters = {}) => {
+    const normalized = normalizeJobFilters(filters);
+    return queryOptions({
+      queryKey: queryKeys.jobs.auto(normalized),
+      queryFn: () => jobsApi.autoApply(normalized),
+      staleTime: 10 * 60 * 1000,
+    });
+  },
+
+  // Infinite scroll version for auto-apply jobs
+  autoApplyInfinite: (filters: Omit<JobFilters, "page"> = {}) => {
+    const baseFilters = normalizeJobFilters(filters as JobFilters);
+    return infiniteQueryOptions({
+      queryKey: [...queryKeys.jobs.auto(baseFilters), "infinite"],
+      queryFn: ({ pageParam }) => {
+        return jobsApi.autoApply({
+          ...baseFilters,
+          page: pageParam,
+          limit: baseFilters.limit || 20,
+        });
+      },
+      getNextPageParam: (lastPage) => {
+        if (lastPage.page < lastPage.totalPages) {
+          return lastPage.page + 1;
+        }
+        return undefined;
+      },
+      getPreviousPageParam: (firstPage) => {
+        if (firstPage.page > 1) {
+          return firstPage.page - 1;
+        }
+        return undefined;
+      },
+      initialPageParam: 1,
+      staleTime: 10 * 60 * 1000,
+    });
+  },
 
   bookmarked: (
     bookmarkedIds: string[],
@@ -115,7 +152,6 @@ export const jobsQueries = {
       enabled: appliedjobsIds.length > 0,
     });
   },
-
 
   detail: (id: string) =>
     queryOptions({

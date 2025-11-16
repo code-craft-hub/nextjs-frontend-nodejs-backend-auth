@@ -35,6 +35,8 @@ export const lastNameSchema = z
   )
   .transform((val) => val.trim());
 
+export const referralCodeSchema = z.string().optional();
+
 export const phoneSchema = z
   .string()
   .min(1, "Phone number is required")
@@ -51,6 +53,7 @@ export const registerUserSchema = z
     firstName: firstNameSchema,
     lastName: lastNameSchema,
     confirmPassword: passwordSchema,
+    referralCode: referralCodeSchema,
     agreeToTerms: z.boolean().refine((value) => value === true, {
       message: "You must agree to the terms and privacy policies.",
     }),

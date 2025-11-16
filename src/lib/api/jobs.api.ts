@@ -9,6 +9,11 @@ export const jobsApi = {
     api.get<PaginatedResponse<JobType>>("/job-recommendations/search/ilike", {
       params,
     }),
+  // Get all jobs with advanced filtering
+  autoApply: (params?: any) =>
+    api.get<PaginatedResponse<JobType>>("/job-recommendations/search/auto-apply", {
+      params,
+    }),
 
   // Get job by ID
   getJob: async (id: string) => {

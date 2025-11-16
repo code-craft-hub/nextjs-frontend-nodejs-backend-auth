@@ -23,9 +23,9 @@ const MobileFindJob = memo(({ allJobs }: { allJobs: JobType[] }) => {
   const updateJobApplicationHistory = useUpdateJobApplicationHistoryMutation();
 
   const updateJobs = useUpdateJobMutation();
-  const handleApply = async ({ e, job }: { e: any; job: JobType }) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const handleApply = async ({ event, job }: { event: any; job: JobType }) => {
+    event.preventDefault();
+    event.stopPropagation();
     if (!job.emailApply) {
       updateJobApplicationHistory.mutate({
         id: String(job.id),
@@ -96,10 +96,10 @@ const MobileFindJob = memo(({ allJobs }: { allJobs: JobType[] }) => {
               <div className="flex-1">
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-3">
-                    <h2 className="text-sm font-semibold text-gray-900 capitalize max-w-24 4xs:max-w-44 sm:max-w-sm truncate">
+                    <h2 className="text-sm font-semibold text-gray-900 capitalize break-words">
                       {job.title}
                     </h2>
-                    <span className="px-3 max-sm:max-w-18 truncate py-1 bg-blue-50 text-blue-600 text-2xs text-nowrap sm:text-xs rounded-full">
+                    <span className="px-3 hidden sm:flex py-1 bg-blue-50 text-blue-600 text-2xs text-nowrap sm:text-xs rounded-full">
                       {job.employmentType || job.jobType}
                     </span>
                   </div>
@@ -128,7 +128,7 @@ const MobileFindJob = memo(({ allJobs }: { allJobs: JobType[] }) => {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
+                <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-3">
                   <div className="flex items-center gap-1">
                     <MapPin className="size-3 shrink-0" />
                     <span className="text-xs">{job.location}</span>
@@ -147,6 +147,9 @@ const MobileFindJob = memo(({ allJobs }: { allJobs: JobType[] }) => {
                       )}
                     </span>
                   </div>
+                  <span className="px-3 sm:hidden py-1 bg-blue-50 text-blue-600 text-2xs text-nowrap sm:text-xs rounded-full">
+                    {job.employmentType || job.jobType}
+                  </span>
                 </div>
 
                 <div className="flex items-center justify-between">
@@ -155,8 +158,8 @@ const MobileFindJob = memo(({ allJobs }: { allJobs: JobType[] }) => {
                     <span>{job.matchPercentage} match</span>
                   </div>
                   <button
-                    onClick={(e) => {
-                      handleApply({ e, job });
+                    onClick={(event) => {
+                      handleApply({ event, job });
                     }}
                     className=" bg-blue-50 text-blue-600 px-2 py-2 text-2xs rounded-lg hover:bg-blue-100 transition-colors flex items-center gap-2 font-medium"
                   >

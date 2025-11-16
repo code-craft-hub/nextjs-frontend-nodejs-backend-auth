@@ -4,7 +4,7 @@ import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
-import { useState, useId, JSX, useEffect } from "react";
+import { useState, JSX } from "react";
 import {
   Form,
   FormControl,
@@ -13,107 +13,20 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Eye, EyeOff } from "lucide-react";
+import {  EyeIcon, EyeOffIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
   registerUserSchema,
   RegisterUserSchema,
 } from "@/lib/schema-validations";
 import { cn } from "@/lib/utils";
+import { inputField } from "@/lib/utils/constants";
 
-export default function RegisterClient() {
+export default function RegisterClient({ referral }: { referral?: string }) {
   const { register, isRegisterLoading } = useAuth();
-  interface FloatingLabelInputProps
-    extends React.InputHTMLAttributes<HTMLInputElement> {
-    id?: string;
-    label: string;
-    type?: string;
-    className?: string;
-    showPasswordToggle?: boolean;
-  }
 
-  function FloatingLabelInput({
-    id,
-    label,
-    type = "text",
-    className = "",
-    showPasswordToggle = false,
-    value,
-    ...props
-  }: FloatingLabelInputProps) {
-    const [isFocused, setIsFocused] = useState(false);
-    const [hasValue, setHasValue] = useState(false);
-    const [showPassword, setShowPassword] = useState(false);
-    const inputId = useId();
-    const actualId = id || inputId;
 
-    const handleFocus = () => setIsFocused(true);
-
-    useEffect(() => {
-      setHasValue(Boolean(value && String(value).length > 0));
-    }, [value]);
-
-    const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-      setIsFocused(false);
-      setHasValue(e.target.value.length > 0);
-      props.onBlur?.(e);
-    };
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      setHasValue(e.target.value.length > 0);
-      props.onChange?.(e);
-    };
-
-    const isLabelFloated = isFocused || hasValue;
-    const inputType = showPasswordToggle
-      ? showPassword
-        ? "text"
-        : "password"
-      : type;
-
-    return (
-      <div className="group relative">
-        <label
-          htmlFor={actualId}
-          className={`
-          absolute left-3 z-10 px-1 text-sm font-medium
-          bg-background text-muted-foreground
-          transition-all duration-200 ease-in-out
-          pointer-events-none font-poppins
-          ${isLabelFloated ? "-top-2.5 text-xs text-foreground" : "top-3"}
-        `}
-        >
-          {label}
-        </label>
-        <div className="relative">
-          <Input
-            id={actualId}
-            type={inputType}
-            className={`
-            h-12  px-3 pr-${showPasswordToggle ? "12" : "3"}
-            transition-colors duration-200 font-poppins
-            border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-[4px]
-            ${className}
-          `}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
-            onChange={handleChange}
-            {...props}
-          />
-          {showPasswordToggle && (
-            <button
-              type="button"
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors "
-              onClick={() => setShowPassword(!showPassword)}
-            >
-              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-            </button>
-          )}
-        </div>
-      </div>
-    );
-  }
-
+  console.count("render RegisterClient");
   // Social Login Button Component
   function SocialButton({
     icon,
@@ -146,14 +59,21 @@ export default function RegisterClient() {
       firstName: "",
       lastName: "",
       confirmPassword: "",
+      referralCode: referral || "",
       agreeToTerms: false,
     },
   });
 
   const onSubmit = async (values: RegisterUserSchema) => {
+    console.log("Registering user with values:", values);
     await register(values);
   };
 
+  const [isVisible, setIsVisible] = useState<boolean>(false);
+  const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
+  const toggleVisibility = () => setIsVisible((prevState) => !prevState);
+  const toggleConfirmPasswordVisibility = () =>
+    setConfirmPasswordVisible((prevState) => !prevState);
   return (
     <div className="min-h-screen flex font-poppins">
       {/* Left side - Form */}
@@ -184,7 +104,20 @@ export default function RegisterClient() {
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
-                        <FloatingLabelInput label="First Name" {...field} />
+                        <div className="group relative">
+                          <label
+                            htmlFor={field.name}
+                            className={cn(inputField)}
+                          >
+                            <span className="inline-flex px-2">First Name</span>
+                          </label>
+                          <Input
+                            id={field.name}
+                            placeholder=" "
+                            {...field}
+                            className="h-12 !rounded-sm"
+                          />
+                        </div>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -196,7 +129,20 @@ export default function RegisterClient() {
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
-                        <FloatingLabelInput label="Last Name" {...field} />
+                        <div className="group relative">
+                          <label
+                            htmlFor={field.name}
+                            className={cn(inputField)}
+                          >
+                            <span className="inline-flex px-2">Last Name</span>
+                          </label>
+                          <Input
+                            id={field.name}
+                            placeholder=" "
+                            {...field}
+                            className="h-12 !rounded-sm"
+                          />
+                        </div>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -211,11 +157,18 @@ export default function RegisterClient() {
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <FloatingLabelInput
-                        label="Email"
-                        type="email"
-                        {...field}
-                      />
+                      <div className="group relative">
+                        <label htmlFor={field.name} className={cn(inputField)}>
+                          <span className="inline-flex px-2">Email</span>
+                        </label>
+                        <Input
+                          id={field.name}
+                          placeholder=" "
+                          type="email"
+                          {...field}
+                          className="h-12 !rounded-sm"
+                        />
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -229,12 +182,98 @@ export default function RegisterClient() {
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <FloatingLabelInput
-                        label="Password"
-                        type="password"
-                        showPasswordToggle
-                        {...field}
-                      />
+                      {/* <div className="*:not-first:mt-2">
+                        <Label htmlFor={field.name}>Show/hide password input</Label>
+                        <div className="relative">
+                          <Input
+                            id={field.name}
+                            className="pe-9"
+                            placeholder="Password"
+                            
+                          />
+                          
+                        </div>
+                      </div> */}
+                      <div className="group relative">
+                        <label htmlFor={field.name} className={cn(inputField)}>
+                          <span className="inline-flex px-2">Password</span>
+                        </label>
+                        <Input
+                          id={field.name}
+                          placeholder=" "
+                          type={isVisible ? "text" : "password"}
+                          {...field}
+                          className="h-12 !rounded-sm"
+                        />
+                        <button
+                          className="absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-md text-muted-foreground/80 transition-[color,box-shadow] outline-none hover:text-foreground focus:z-10 focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
+                          type="button"
+                          onClick={toggleVisibility}
+                          aria-label={
+                            isVisible ? "Hide password" : "Show password"
+                          }
+                          aria-pressed={isVisible}
+                          aria-controls="password"
+                        >
+                          {isVisible ? (
+                            <EyeOffIcon size={16} aria-hidden="true" />
+                          ) : (
+                            <EyeIcon size={16} aria-hidden="true" />
+                          )}
+                        </button>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              {/* <div className="group relative">
+                  <label htmlFor={field.name} className={cn(inputField)}>
+                    <span className="inline-flex px-2">Password</span>
+                  </label>
+                  <Input
+                    id={field.name}
+                    placeholder=" "
+                    type="password"
+                    {...field}
+                    className="h-12 !rounded-sm"
+                  />
+                </div> */}
+
+              <FormField
+                control={form.control}
+                name="confirmPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <div className="group relative">
+                        <label htmlFor={field.name} className={cn(inputField)}>
+                          <span className="inline-flex px-2">Confirm Password</span>
+                        </label>
+                        <Input
+                          id={field.name}
+                          placeholder=" "
+                          type={confirmPasswordVisible ? "text" : "password"}
+                          {...field}
+                          className="h-12 !rounded-sm"
+                        />
+                        <button
+                          className="absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-md text-muted-foreground/80 transition-[color,box-shadow] outline-none hover:text-foreground focus:z-10 focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
+                          type="button"
+                          onClick={toggleConfirmPasswordVisibility}
+                          aria-label={
+                            confirmPasswordVisible ? "Hide password" : "Show password"
+                          }
+                          aria-pressed={confirmPasswordVisible}
+                          aria-controls="password"
+                        >
+                          {confirmPasswordVisible ? (
+                            <EyeOffIcon size={16} aria-hidden="true" />
+                          ) : (
+                            <EyeIcon size={16} aria-hidden="true" />
+                          )}
+                        </button>
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -243,16 +282,21 @@ export default function RegisterClient() {
 
               <FormField
                 control={form.control}
-                name="confirmPassword"
+                name="referralCode"
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <FloatingLabelInput
-                        label="Confirm Password"
-                        type="password"
-                        showPasswordToggle
-                        {...field}
-                      />
+                      <div className="group relative">
+                        <label htmlFor={field.name} className={cn(inputField)}>
+                          <span className="inline-flex px-2">Input referral code</span>
+                        </label>
+                        <Input
+                          id={field.name}
+                          placeholder=" "
+                          {...field}
+                          className="h-12 !rounded-sm"
+                        />
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -274,11 +318,17 @@ export default function RegisterClient() {
                     <div className="space-y-1 leading-none">
                       <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                         I agree to all the{" "}
-                        <Link href="/terms" className="text-blue-600 hover:underline">
+                        <Link
+                          href="/terms"
+                          className="text-blue-600 hover:underline"
+                        >
                           Terms
                         </Link>{" "}
                         and{" "}
-                        <Link href="/policy" className="text-blue-600 hover:underline">
+                        <Link
+                          href="/policy"
+                          className="text-blue-600 hover:underline"
+                        >
                           Privacy Policies
                         </Link>
                       </label>

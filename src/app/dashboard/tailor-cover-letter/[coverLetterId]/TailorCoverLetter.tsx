@@ -61,7 +61,7 @@ export const TailorCoverLetter = memo<{
 
               await new Promise((resolve) => setTimeout(resolve, 5000));
 
-              if (user?.defaultDataSource) {
+              if (user?.aiApplyPreferences?.useMasterCV) {
                 router.push(
                   `/dashboard/preview?baseResume=${
                     user?.defaultDataSource

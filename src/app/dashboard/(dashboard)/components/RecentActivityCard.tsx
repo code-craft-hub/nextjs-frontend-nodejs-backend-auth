@@ -25,8 +25,10 @@ import { userQueries } from "@/lib/queries/user.queries";
 
 export const RecentActivityCard = memo(
   ({ filters }: { filters: JobFilters }) => {
-    const { data: jobs } = useQuery(jobsQueries.all(filters));
+    const { data: jobs } = useQuery(jobsQueries.autoApply(filters));
     const { data: user } = useQuery(userQueries.detail());
+
+    console.count("RecentActivityCard Rendered");
 
     const sortedJobs = useMemo(() => {
       if (!jobs?.data) return [];
@@ -34,8 +36,14 @@ export const RecentActivityCard = memo(
       const recommendationsData = new Set(
         user?.recommendationsData?.map((rec: any) => rec.jobId) || []
       );
+
+      const appliedJobs = new Set(
+        user?.appliedJobs?.map((job: any) => job.id) || []
+      );
+
       const job = jobs.data
-        ?.map((job) => ({
+        ?.filter((job) => !appliedJobs.has(job.id))
+        .map((job) => ({
           ...job,
           isRecommended: recommendationsData.has(job.id),
           score: recommendationsData.has(job.id)
@@ -51,7 +59,7 @@ export const RecentActivityCard = memo(
         });
 
       return job;
-    }, [jobs?.data]);
+    }, [jobs?.data, user?.appliedJobs?.length]);
 
     const router = useRouter();
 
@@ -169,15 +177,16 @@ export const RecentActivityCard = memo(
                     >
                       {job.location}
                     </Badge>
-                    <Badge
-                      className={cn(
-                        "rounded-full font-epilogue font-semibold text-cverai-orange border-cverai-orange bg-white",
-                        " truncate overflow-hidden text-start"
-                      )}
-                    >
-                      {/* {job.scrapedDate} */}
-                      {job?.score}% match
-                    </Badge>
+                    {job?.score > 40 && (
+                      <Badge
+                        className={cn(
+                          "rounded-full font-epilogue font-semibold text-cverai-orange border-cverai-orange bg-white",
+                          " truncate overflow-hidden text-start"
+                        )}
+                      >
+                        {job?.score}% match
+                      </Badge>
+                    )}
                   </div>
                 </div>
               </div>

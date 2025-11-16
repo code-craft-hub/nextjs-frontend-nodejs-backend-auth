@@ -52,7 +52,6 @@ export const queryKeys = {
     detail: (id: string) => [...queryKeys.resumes.details(), id] as const,
   },
 
-
   // AI Apply keys
   aiApply: {
     all: ["ai-apply"] as const,
@@ -76,6 +75,8 @@ export const queryKeys = {
   jobs: {
     all: ["jobs"] as const,
     lists: () => [...queryKeys.jobs.all, "list"] as const,
+    autos: () => [...queryKeys.jobs.all, "auto"] as const,
+
     list: (filters: JobFilters) => {
       // Create a clean object without undefined values
       const cleanFilters: Record<string, any> = {};
@@ -87,6 +88,19 @@ export const queryKeys = {
       });
 
       return [...queryKeys.jobs.lists(), cleanFilters] as const;
+    },
+
+    auto: (filters: JobFilters) => {
+      // Create a clean object without undefined values
+      const cleanFilters: Record<string, any> = {};
+
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== "") {
+          cleanFilters[key] = value;
+        }
+      });
+
+      return [...queryKeys.jobs.autos(), cleanFilters] as const;
     },
     // list: (filters: Record<string, any>) =>
     //   [...queryKeys.jobs.lists(), filters] as const,

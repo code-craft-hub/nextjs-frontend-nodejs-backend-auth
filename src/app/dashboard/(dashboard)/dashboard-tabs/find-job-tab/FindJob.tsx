@@ -73,7 +73,7 @@ const getFindJobsColumns = ({
               </span>
             </div>
             <div className="">
-              {matchPercentage > 50 && (
+              {matchPercentage > 40 && (
                 <Sparkles className="text-yellow-500 size-4" />
               )}
             </div>
@@ -105,7 +105,7 @@ const getFindJobsColumns = ({
                 )}
               </span>
             </p>
-            {matchPercentage > 0 && (
+            {matchPercentage > 40 && (
               <p className="text-2xs text-green-400">{matchPercentage}%</p>
             )}{" "}
           </div>

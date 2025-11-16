@@ -30,7 +30,7 @@ const MobileOverview = memo(
           return (
             <div
               key={job.id}
-              className="bg-white 3xs:bg-red-500 2xs:bg-purple-500 xs:bg-yellow-500 xs2:bg-cyan-700   rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow"
+              className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow"
               onClick={() => {
                 router.push(
                   `/dashboard/jobs/${job?.id}?referrer=jobs&title=${job?.title}`
@@ -48,9 +48,9 @@ const MobileOverview = memo(
                   />
                 </div>
                 <div className="flex-1">
-                  <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-start overflow-hidden justify-between mb-3">
                     <div className="flex items-center gap-3">
-                      <h2 className="text-sm font-semibold text-gray-900 capitalize  bg-red-500 truncate">
+                      <h2 className="text-sm font-semibold text-gray-900 capitalize break-words  ">
                         {job.title}
                       </h2>
                       <span className="px-3 hidden sm:flex py-1 bg-blue-50 text-blue-600 text-2xs text-nowrap sm:text-xs rounded-full">
@@ -68,7 +68,7 @@ const MobileOverview = memo(
                           },
                         });
                       }}
-                      className="flex justify-end -mt-2 -mr-2"
+                      className="flex shrink-0 justify-end -mt-2 -mr-2"
                     >
                       <Toggle
                         pressed={isBookmarked || false}
@@ -82,7 +82,7 @@ const MobileOverview = memo(
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
+                  <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-3">
                     <div className="flex items-center gap-1">
                       <MapPin className="size-3 shrink-0" />
                       <span className="text-xs">{job.location}</span>
@@ -101,6 +101,9 @@ const MobileOverview = memo(
                         )}
                       </span>
                     </div>
+                    <span className="px-3 sm:hidden py-1 bg-blue-50 text-blue-600 text-2xs text-nowrap sm:text-xs rounded-full">
+                      {job.employmentType || job.jobType}
+                    </span>
                   </div>
 
                   <div className="flex items-center justify-between">
@@ -109,9 +112,9 @@ const MobileOverview = memo(
                       <span>{job.matchPercentage} match</span>
                     </div>
                     <button
-                      onClick={(e) => {
+                      onClick={(event) => {
                         const row = { original: job };
-                        handleApply({ e, row });
+                        handleApply({ event, row });
                       }}
                       className=" bg-blue-50 text-blue-600 px-2 py-2 text-2xs rounded-lg hover:bg-blue-100 transition-colors flex items-center gap-2 font-medium"
                     >

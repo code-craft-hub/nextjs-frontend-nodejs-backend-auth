@@ -104,7 +104,6 @@ export default function Overview() {
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useInfiniteQuery(jobsQueries?.infinite(infiniteFilters));
-    console.log('Job data:', data);
 
   const allJobs = useMemo(() => {
     const jobs = data?.pages.flatMap((page) => page.data) ?? [];
@@ -137,9 +136,9 @@ export default function Overview() {
     return jobData;
   }, [data, user?.bookmarkedJobs?.length, user?.appliedJobs?.length]);
 
-  const handleApply = async ({ e, row }: { e: any; row: Row<JobType> }) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const handleApply = async ({ event, row }: { event: any; row: Row<JobType> }) => {
+    event.preventDefault();
+    event.stopPropagation();
     if (!row.original?.emailApply) {
       updateJobApplicationHistory.mutate({
         id: String(row.original.id),
@@ -433,7 +432,7 @@ export const getFindJobsColumns = ({
               </span>
             </div>
             <div className="">
-              {matchPercentage > 50 && (
+              {matchPercentage > 40 && (
                 <Sparkles className="text-yellow-500 size-4" />
               )}
             </div>
@@ -463,7 +462,7 @@ export const getFindJobsColumns = ({
                 )}
               </span>
             </p>
-            {matchPercentage > 0 && (
+            {matchPercentage > 40 && (
               <p className="text-2xs text-green-400">{matchPercentage}%</p>
             )}
           </div>

@@ -65,6 +65,7 @@ export const SavedJobs = ({ children }: { children: React.ReactNode }) => {
 
   const allJobs = useMemo(() => {
     const jobs = data?.pages.flatMap((page) => page.data) ?? [];
+    console.log(jobs);
     return jobs
       .map((job) => {
         const jobContent = job?.title + " " + job?.descriptionText;
@@ -73,22 +74,27 @@ export const SavedJobs = ({ children }: { children: React.ReactNode }) => {
           userJobTitlePreference,
           jobContent || ""
         );
-
         return {
           ...job,
-          isBookmarked: bookmarkedIdSet.has(job.id),
-          matchPercentage: completeMatch.score.toString(),
+          isBookmarked: bookmarkedIdSet?.has(job?.id),
+          matchPercentage: completeMatch?.score?.toString(),
           matchDetails: completeMatch,
         };
       })
       .sort((a, b) => {
-        return parseInt(b.matchPercentage) - parseInt(a.matchPercentage);
+        return parseInt(b?.matchPercentage) - parseInt(a?.matchPercentage);
       });
-  }, [data]);
+  }, [data, user?.bookmarkedJobs?.length]);
 
-  const handleApply = async ({ e, row }: { e: any; row: Row<JobType> }) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const handleApply = async ({
+    event,
+    row,
+  }: {
+    event: any;
+    row: Row<JobType>;
+  }) => {
+    event.preventDefault();
+    event.stopPropagation();
     if (!row.original?.emailApply) {
       updateJobApplicationHistory.mutate({
         id: String(row.original.id),

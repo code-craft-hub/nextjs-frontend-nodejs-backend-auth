@@ -4,7 +4,7 @@ import { apiService } from "@/hooks/use-auth";
 import { EditableResume } from "../(dashboard)/ai-apply/components/resume/EditableResume";
 import { ProgressIndicator } from "../(dashboard)/ai-apply/progress-indicator";
 import TailorCoverLetterDisplay from "../tailor-cover-letter/[coverLetterId]/TailorCoverLetterDisplay";
-import { COLLECTIONS } from "@/lib/utils/constants";
+// import { COLLECTIONS } from "@/lib/utils/constants";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useState } from "react";
@@ -14,7 +14,7 @@ import { userQueries } from "@/lib/queries/user.queries";
 import { resumeQueries } from "@/lib/queries/resume.queries";
 import { coverLetterQueries } from "@/lib/queries/cover-letter.queries";
 import { CongratulationModal } from "@/components/shared/CongratulationModal";
-import { Sparkles } from "lucide-react";
+import { Save, Sparkles } from "lucide-react";
 
 const Preview = ({
   coverLetterId,
@@ -106,35 +106,21 @@ const Preview = ({
     }
   };
 
-  const handleCoverLetterDelete = async () => {
-    Promise.all([
-      apiService.deleteCareerDoc(coverLetterId, COLLECTIONS.COVER_LETTER),
-      apiService.deleteCareerDoc(resumeId, COLLECTIONS.RESUME),
-    ]);
-    toast.success("Resume and Cover Letter deleted successfully");
-    router.push("/dashboard/home");
-  };
-  return (
+  return openModal ? (
+    <CongratulationModal handleOpenModal={handleOpenModal} />
+  ) : (
     <div className="space-y-4 sm:space-y-8">
       <ProgressIndicator activeStep={activeStep} />
       <div className="flex w-full gap-3 items-center  p-4 bg-white justify-between">
-        <p className="text-md font-medium font-inter">
-          Preview Resume and Cover Letter
-        </p>
+        <p className="text-md font-medium font-inter">Preview Application</p>
         <Button
           disabled={isSubmitting}
-          className="text-2xs"
-          onClick={() => {
-            handleCoverLetterDelete();
-          }}
+          className="text-xs"
+          onClick={handleSubmit}
         >
-          Delete
+          <Save /> Save
         </Button>
       </div>
-      <CongratulationModal
-        openModal={openModal}
-        handleOpenModal={handleOpenModal}
-      />
       <TailorCoverLetterDisplay
         user={user}
         data={coverLetterData}

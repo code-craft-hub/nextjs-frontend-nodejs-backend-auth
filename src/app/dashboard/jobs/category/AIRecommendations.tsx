@@ -84,19 +84,25 @@ export const AIRecommendations = ({
         );
         return {
           ...job,
-          isBookmarked: bookmarkedIdSet.has(job.id),
-          matchPercentage: completeMatch.score.toString(),
+          isBookmarked: bookmarkedIdSet?.has(job?.id),
+          matchPercentage: completeMatch?.score?.toString(),
           matchDetails: completeMatch,
         };
       })
       .sort((a, b) => {
-        return parseInt(b.matchPercentage) - parseInt(a.matchPercentage);
+        return parseInt(b?.matchPercentage) - parseInt(a?.matchPercentage);
       });
-  }, [data]);
+  }, [data, user?.bookmarkedJobs?.length, user?.appliedJobs?.length]);
 
-  const handleApply = async ({ e, row }: { e: any; row: Row<JobType> }) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const handleApply = async ({
+    event,
+    row,
+  }: {
+    event: any;
+    row: Row<JobType>;
+  }) => {
+    event.preventDefault();
+    event.stopPropagation();
     if (!row.original?.emailApply) {
       updateJobApplicationHistory.mutate({
         id: String(row.original.id),

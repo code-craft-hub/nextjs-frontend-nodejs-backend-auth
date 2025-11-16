@@ -172,22 +172,3 @@ export const Category = memo<CategoryProps>(({ tab }) => {
 });
 
 Category.displayName = "Category";
-
-`  return (
-    <div className="flex  gap-4 lg:gap-6">
-      <nav className="bg-white p-3 h-fit rounded-md flex flex-col gap-1">
-        {MENU_ITEMS.map((item) => (
-          <MenuItem
-            key={item.id}
-            item={item}
-            isActive={activeTab === item.id}
-            onClick={handleComponentChange}
-          />
-        ))}
-      </nav>
-      <main className="flex-1">
-        <ActiveComponent />
-      </main>
-    </div>
-  );
-});`;

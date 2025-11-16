@@ -43,6 +43,11 @@ export default async function HomePage({
       priority: "high",
     },
     {
+      queryKey: jobsQueries.autoApply(filters).queryKey,
+      queryFn: jobsQueries.autoApply(filters).queryFn,
+      priority: "high",
+    },
+    {
       queryKey: resumeQueries.all(filters).queryKey,
       queryFn: resumeQueries.all(filters).queryFn,
       priority: "high",

@@ -53,17 +53,21 @@ export const overviewColumns: ColumnDef<JobType>[] = [
             <PiOfficeChairFill className="size-3" />
             <span className="text-2xs">{row.original.companyName}</span>
           </p>
-          {!!row.original?.salary && (<p className="flex gap-1 text-gray-400">
-            <DollarSign className="size-3" />
-            <span className="text-2xs"> {row.original.salary}</span>
-          </p>)}
+          {!!row.original?.salary && (
+            <p className="flex gap-1 text-gray-400">
+              <DollarSign className="size-3" />
+              <span className="text-2xs"> {row.original.salary}</span>
+            </p>
+          )}
           <p className="flex gap-1 text-gray-400">
             <Calendar className="size-3" />
             <span className="text-2xs">{row.original.postedTime}</span>
           </p>
-          <p className="text-2xs text-green-400">
-            %{row.original.matchPercentage}
-          </p>
+          {Number(row.original.matchPercentage) > 40 && (
+            <p className="text-2xs text-green-400">
+              %{row.original.matchPercentage}
+            </p>
+          )}
         </div>
       </div>
     ),

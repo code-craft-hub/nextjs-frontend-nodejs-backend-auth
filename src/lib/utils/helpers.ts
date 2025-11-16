@@ -4,12 +4,14 @@ import { ApiError, IUser, QAItem } from "@/types";
 import { jsonrepair } from "jsonrepair";
 import { MouseEvent } from "react";
 
-
-export function getDaysUntilProPlanExpiry(expiryDate?: string | Date | null): number {
+export function getDaysUntilProPlanExpiry(
+  expiryDate?: string | Date | null
+): number {
   if (!expiryDate) return 0;
 
   // Normalize to Date instance
-  const target = typeof expiryDate === "string" ? new Date(expiryDate) : expiryDate;
+  const target =
+    typeof expiryDate === "string" ? new Date(expiryDate) : expiryDate;
 
   if (isNaN(target.getTime())) {
     throw new Error("Invalid expiry date format.");
@@ -18,7 +20,6 @@ export function getDaysUntilProPlanExpiry(expiryDate?: string | Date | null): nu
   const today = new Date();
   return differenceInCalendarDays(target, today);
 }
-
 
 export const getJwtSecret = () => {
   const secret = process.env.JWT_SECRET?.trim();
@@ -41,10 +42,16 @@ export const getJwtSecret = () => {
   return secret;
 };
 
+export const postedDate = (dateString?: string): string => {
+  return new Date(dateString || "")?.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+};
+
 export const formatAppliedDate = (dateString?: string): string => {
   try {
-
-    
     const date = new Date(dateString ?? "");
 
     // Check if date is valid, use today's date if invalid

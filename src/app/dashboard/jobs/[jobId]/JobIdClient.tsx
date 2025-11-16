@@ -3,15 +3,17 @@ import { apiService } from "@/hooks/use-auth";
 import { useUpdateJobApplicationHistoryMutation } from "@/lib/mutations/jobs.mutations";
 import { jobsQueries } from "@/lib/queries/jobs.queries";
 import { userQueries } from "@/lib/queries/user.queries";
+import { postedDate } from "@/lib/utils/helpers";
 import { useQuery } from "@tanstack/react-query";
 import {
   ArrowLeft,
-  Users,
   Facebook,
   Twitter,
   Instagram,
   Youtube,
   Sparkles,
+  Wallet,
+  MapPin,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
@@ -100,9 +102,6 @@ export const JobIdClient = ({
         {/* Main Content */}
         <div className="max-w-6xl mx-auto px-4 sm:px-8 py-8">
           <button
-
-
-
             onClick={() => handleBackClick()}
             className="flex items-center hover:cursor-pointer text-blue-600 font-medium hover:text-blue-700"
           >
@@ -127,10 +126,10 @@ export const JobIdClient = ({
                 )}
                 <div>
                   <h2 className="text-xl font-semibold text-gray-900">
-                    {job?.companyName}
+                    {job?.title}
                   </h2>
                   <p className="text-gray-500 text-sm capitalize">
-                    {job?.title}
+                    {job?.companyName}
                   </p>
                 </div>
               </div>
@@ -187,7 +186,7 @@ export const JobIdClient = ({
             {/* Right Column */}
             <div className="space-y-6">
               {/* Job Info Card */}
-              <div className="bg-white rounded-lg shadow-sm p-6">
+              <div className="bg-white rounded-lg shadow-sm p-6  border-blue-100 border">
                 <div className="grid grid-cols-2 gap-6">
                   <div>
                     <div className="flex items-center justify-center w-10 h-10 shrink-0 rounded-lg mb-2">
@@ -197,30 +196,32 @@ export const JobIdClient = ({
                       />
                     </div>
                     <p className="text-xs text-gray-500 uppercase mb-1">
-                      Founded in
-                    </p>
-                    <p className="text-sm font-semibold text-gray-900">N/A</p>
-                  </div>
-                  <div>
-                    <div className="flex items-center justify-center w-10 h-10 shrink-0 rounded-lg mb-2">
-                      <img src="/Timer.svg" className="w-5 h-5 text-blue-600" />
-                    </div>
-                    <p className="text-xs text-gray-500 uppercase mb-1">
-                      Organization type
+                      Date posted
                     </p>
                     <p className="text-sm font-semibold text-gray-900">
-                      Private Company
+                      {postedDate(job?.postedAt || "")}
                     </p>
                   </div>
                   <div>
                     <div className="flex items-center justify-center w-10 h-10 shrink-0 rounded-lg mb-2">
-                      <Users className="w-5 h-5 text-blue-600" />
+                      <MapPin className="w-5 h-5 text-blue-600" />
                     </div>
                     <p className="text-xs text-gray-500 uppercase mb-1">
-                      Team size
+                      Location
                     </p>
                     <p className="text-sm font-semibold text-gray-900">
-                      100+ Candidates
+                      {job?.location || "Remote"}
+                    </p>
+                  </div>
+                  <div>
+                    <div className="flex items-center justify-center w-10 h-10 shrink-0 rounded-lg mb-2">
+                      <Wallet className="w-5 h-5 text-blue-600" />
+                    </div>
+                    <p className="text-xs text-gray-500 uppercase mb-1">
+                      Salary Info
+                    </p>
+                    <p className="text-sm font-semibold text-gray-900">
+                      {job?.salary || "N/A"}
                     </p>
                   </div>
                   <div>
@@ -231,17 +232,17 @@ export const JobIdClient = ({
                       />
                     </div>
                     <p className="text-xs text-gray-500 uppercase mb-1">
-                      Industry types
+                      Employment Type
                     </p>
                     <p className="text-sm font-semibold text-gray-900">
-                      Technology
+                      {job?.employmentType || "N/A"}
                     </p>
                   </div>
                 </div>
               </div>
 
               {/* Contact Information */}
-              <div className="bg-white rounded-lg shadow-sm p-6">
+              <div className="bg-white rounded-lg shadow-sm p-6 border-blue-100 border">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">
                   Contact Information
                 </h3>
@@ -255,7 +256,7 @@ export const JobIdClient = ({
                     </div>
                     <div>
                       <p className="text-xs text-gray-500 uppercase mb-1">
-                        Website
+                        JOB LINK/WEBSITE
                       </p>
                       <p
                         // href="https://www.estherhoward.com"
@@ -265,14 +266,14 @@ export const JobIdClient = ({
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-start">
+                  <div className="flex items-start border-t pt-4">
                     <div className="flex items-center justify-center w-10 h-10 shrink-0 rounded-lg mr-3">
                       <img
                         src="/phone-call-duotone.svg"
                         className="w-5 h-5 text-blue-600"
                       />
                     </div>
-                    <div>
+                    <div className=" ">
                       <p className="text-xs text-gray-500 uppercase mb-1">
                         Phone
                       </p>
@@ -284,7 +285,7 @@ export const JobIdClient = ({
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-start">
+                  <div className="flex items-start border-t pt-4">
                     <div className="flex items-center justify-center w-10 h-10 shrink-0 rounded-lg mr-3">
                       <img
                         src={"/Envelope.svg"}
@@ -307,7 +308,7 @@ export const JobIdClient = ({
               </div>
 
               {/* Follow Us */}
-              <div className="bg-white rounded-lg shadow-sm p-6">
+              <div className="bg-white rounded-lg shadow-sm p-6  border-blue-100 border">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">
                   Follow us on:
                 </h3>

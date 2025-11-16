@@ -53,8 +53,7 @@ export function UpgradeModal({
   return (
     <div className="flex items-center justify-center">
       <div className="w-full">
-        <div className="grid md:grid-cols-2 gap-6 mb-8">
-          {/* Free Tier */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <div
             onClick={() => setSelectedPlan("free")}
             className={`bg-white rounded-2xl p-8 border-2 transition-all cursor-pointer ${
