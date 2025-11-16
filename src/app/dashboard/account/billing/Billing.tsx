@@ -12,12 +12,15 @@ import { UpgradeModal } from "./UpgradeModal";
 import { SegmentedProgress } from "./SegmentedProgress";
 import { useState } from "react";
 import { ProModal } from "./ProSubscription";
+import { PaystackPaymentGateway } from "@/app/paystack/Paystack";
 // import { UpdatePaymentPlan } from "./UpdatePaymentPlan";
-export const Billing = () => {
+export const Billing = ({reference}: any) => {
   const [completed, setCompleted] = useState(false);
   const handleStateChange = (value: boolean) => {
     setCompleted(value);
   };
+
+  const handlePaystackPayment = () => {};
 
   // return <ProModal />;
   // return <UpdatePaymentPlan />;
@@ -146,7 +149,10 @@ export const Billing = () => {
           </p>
         </div>
 
-        <Dialog>
+        <Button className="max-sm:w-full" variant={"outline"}>
+          Upgrade Now
+        </Button>
+        {/* <Dialog>
           <form className="max-sm:w-full">
             <DialogTrigger asChild>
               <Button className="max-sm:w-full" variant={"outline"}>
@@ -164,8 +170,9 @@ export const Billing = () => {
               <UpgradeModal handleStateChange={handleStateChange} />
             </DialogContent>
           </form>
-        </Dialog>
+        </Dialog> */}
       </main>
+      <PaystackPaymentGateway trxReference={reference}/>
     </div>
   ) : (
     <ProModal />

@@ -6,13 +6,14 @@ import { HydrationBoundary } from "@/components/hydration-boundary";
 
 const ProfilePage = async ({ searchParams }: any) => {
   const tab = (await searchParams)?.tab;
+  const reference = (await searchParams)?.reference;
   const queryClient = createServerQueryClient();
   await queryClient.prefetchQuery(userQueries.detail());
 
   return (
     <div className="p-4 sm:p-8">
       <HydrationBoundary state={dehydrate(queryClient)}>
-        <AccountPage tab={tab} />
+        <AccountPage tab={tab} reference={reference}/>
       </HydrationBoundary>
     </div>
   );
