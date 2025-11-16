@@ -2,18 +2,10 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 // import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Check, X, Sparkles } from "lucide-react";
+import { Check,Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { toast } from "sonner";
+import { Form } from "@/components/ui/form";
+import { PaystackPaymentGateway } from "@/app/paystack/Paystack";
 
 const paymentFormSchema = z.object({
   cardNumber: z
@@ -40,7 +32,11 @@ const paymentFormSchema = z.object({
 
 type PaymentFormValues = z.infer<typeof paymentFormSchema>;
 
-export function UpgradeModal({handleStateChange}: {handleStateChange: any}) {
+export function UpgradeModal({
+  handleStateChange,
+  trxReference,
+  handleShowPlan,
+}: any) {
   const [selectedPlan, setSelectedPlan] = useState("pro");
 
   const form = useForm<PaymentFormValues>({
@@ -53,28 +49,6 @@ export function UpgradeModal({handleStateChange}: {handleStateChange: any}) {
       zipCode: "",
     },
   });
-
-  const formatCardNumber = (value: string) => {
-    const cleaned = value.replace(/\s/g, "");
-    const formatted = cleaned.match(/.{1,4}/g)?.join(" ") || cleaned;
-    return formatted.slice(0, 19);
-  };
-
-  const formatExpiryDate = (value: string) => {
-    let cleaned = value.replace(/\D/g, "");
-    if (cleaned.length >= 2) {
-      cleaned = cleaned.slice(0, 2) + "/" + cleaned.slice(2, 4);
-    }
-    return cleaned.slice(0, 5);
-  };
-
-  const onSubmit = (data: PaymentFormValues) => {
-    console.log("Payment submitted:", { ...data, plan: selectedPlan });
-    toast("Payment Successful!", {
-      description: `You've successfully upgraded to the ${selectedPlan} plan.`,
-    });
-    handleStateChange(true)
-  };
 
   return (
     <div className="flex items-center justify-center">
@@ -233,18 +207,15 @@ export function UpgradeModal({handleStateChange}: {handleStateChange: any}) {
             <h2 className="text-2xl font-bold text-gray-900">
               Payment Details
             </h2>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-gray-400 hover:text-gray-600"
-            >
-              <X className="w-6 h-6" />
-            </Button>
+           
           </div>
 
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <div className="grid md:grid-cols-2 gap-6">
+            <form
+              // onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-6"
+            >
+              {/* <div className="grid md:grid-cols-2 gap-6">
                 <FormField
                   control={form.control}
                   name="cardNumber"
@@ -349,7 +320,7 @@ export function UpgradeModal({handleStateChange}: {handleStateChange: any}) {
                     </FormItem>
                   )}
                 />
-              </div>
+              </div> */}
 
               <div className="flex justify-between items-center py-4 border-t border-b border-gray-200">
                 <span className="text-gray-600">Selected Plan</span>
@@ -372,15 +343,25 @@ export function UpgradeModal({handleStateChange}: {handleStateChange: any}) {
               </div>
 
               <div className="grid md:grid-cols-2 gap-4">
-                <Button type="button" variant="outline" className="w-full">
+                <Button
+                  onClick={() => handleShowPlan(false)}
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                >
                   Cancel
                 </Button>
-                <Button
+                {/* <Button
                   type="submit"
                   className="w-full bg-blue-600 hover:bg-blue-700"
                 >
                   Complete Upgrade
-                </Button>
+                </Button> */}
+                <PaystackPaymentGateway
+                  active={selectedPlan !== "free"}
+                  trxReference={trxReference}
+                  handleStateChange={handleStateChange}
+                />
               </div>
             </form>
           </Form>

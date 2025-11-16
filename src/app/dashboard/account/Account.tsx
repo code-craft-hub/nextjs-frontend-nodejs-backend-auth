@@ -8,7 +8,7 @@ import { apiService } from "@/hooks/use-auth";
 import { Billing } from "./billing/Billing";
 import { CreditCard, Shield, User2 } from "lucide-react";
 
-export const AccountPage = ({ tab,reference }: any) => {
+export const AccountClient = ({ tab,reference }: any) => {
   const [currentTab, setCurrentTab] = useState(!!tab ? tab : "account");
   const handleTabChange = (value: string) => {
     setCurrentTab(value);

@@ -1,7 +1,24 @@
+import { differenceInCalendarDays } from "date-fns";
 import { formatDistanceToNow, isValid } from "date-fns";
 import { ApiError, IUser, QAItem } from "@/types";
 import { jsonrepair } from "jsonrepair";
 import { MouseEvent } from "react";
+
+
+export function getDaysUntilProPlanExpiry(expiryDate?: string | Date | null): number {
+  if (!expiryDate) return 0;
+
+  // Normalize to Date instance
+  const target = typeof expiryDate === "string" ? new Date(expiryDate) : expiryDate;
+
+  if (isNaN(target.getTime())) {
+    throw new Error("Invalid expiry date format.");
+  }
+
+  const today = new Date();
+  return differenceInCalendarDays(target, today);
+}
+
 
 export const getJwtSecret = () => {
   const secret = process.env.JWT_SECRET?.trim();

@@ -73,8 +73,7 @@ export function UpdatePaymentPlan({
     return cleaned.slice(0, 5);
   };
 
-  const onSubmit = async (data: PaymentFormValues) => {
-    console.log("Payment submitted:", { ...data, plan: selectedPlan });
+  const onSubmit = async () => {
 
     const ok = await confirm();
 

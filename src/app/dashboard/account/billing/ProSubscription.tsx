@@ -1,12 +1,41 @@
-import React from "react";
+import React, { useState } from "react";
 import { Switch } from "@/components/ui/switch";
 import { SegmentedProgress } from "./SegmentedProgress";
+import { userQueries } from "@/lib/queries/user.queries";
+import { useQuery } from "@tanstack/react-query";
+import {
+  formatAppliedDate,
+  getDaysUntilProPlanExpiry,
+} from "@/lib/utils/helpers";
+import { cn } from "@/lib/utils";
+import { useConfirm } from "@/hooks/use-confirm";
+import { toast } from "sonner";
 
 export function ProModal() {
-  const [autoRenewal, setAutoRenewal] = React.useState(false);
+  const [autoRenewal, setAutoRenewal] = useState(true);
+  const { data: user } = useQuery(userQueries.detail());
 
+  const cancelSubscription = async () => {
+    const ok = await confirm();
+
+    if (!ok) {
+      toast.success("Subscription cancelled", {
+        description: `Your subscription has been cancelled. You will retain access until the end of your billing period.`,
+      });
+    } else {
+      toast.info("Cancellation aborted", {
+        description: `Your subscription is still active.`,
+      });
+    }
+  };
+
+  const [ConfirmDialog, confirm] = useConfirm(
+    "Cancel Subscription",
+    "Are you sure you want to cancel your subscription?"
+  );
   return (
     <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
+      <ConfirmDialog />
       <div className="max-w-5xl mx-auto space-y-6">
         {/* Pro Plan Card */}
         <div className="bg-[#2D60FF] rounded-2xl p-4 sm:p-8 text-white shadow-lg">
@@ -14,7 +43,7 @@ export function ProModal() {
             {/* Left Section */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
               <SegmentedProgress
-                percentage={40}
+                percentage={99}
                 size={64}
                 bgColor="bg-blue-600"
                 segmentColor="white"
@@ -35,7 +64,8 @@ export function ProModal() {
 
                 <div className="pt-4 space-y-0.5">
                   <p className="font-semibold">
-                    Next billing date: Nov 23, 2025
+                    Next billing date:{" "}
+                    {formatAppliedDate(user?.proPlanExpiryDate as any)}
                   </p>
                   <p className="text-white/70 text-sm">
                     Your subscription will automatically renew
@@ -46,7 +76,9 @@ export function ProModal() {
 
             {/* Right Section - Days Counter */}
             <div className="bg-white/20 rounded-xl px-6 py-4 text-center sm:min-w-[140px]">
-              <div className="text-4xl font-bold">12</div>
+              <div className="text-4xl font-bold">
+                {getDaysUntilProPlanExpiry(user?.proPlanExpiryDate)}
+              </div>
               <div className="text-sm text-white/80 mt-1">
                 days until renewal
               </div>
@@ -90,7 +122,7 @@ export function ProModal() {
                   Payment Method
                 </span>
                 <span className="text-[#344054] font-semibold">
-                  •••• •••• •••• 4242
+                  •••• •••• •••• ••••
                 </span>
               </div>
 
@@ -103,7 +135,14 @@ export function ProModal() {
                     onCheckedChange={setAutoRenewal}
                     className="data-[state=checked]:bg-[#2D60FF]"
                   />
-                  <span className="text-[#DC2626] font-semibold">Disabled</span>
+                  <span
+                    className={cn(
+                      autoRenewal ? "text-green-500" : "text-[#DC2626]",
+                      "font-semibold"
+                    )}
+                  >
+                    {autoRenewal ? "Enabled" : "Disabled"}
+                  </span>
                 </div>
               </div>
             </div>
@@ -111,10 +150,17 @@ export function ProModal() {
 
           {/* Action Buttons */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-6 sm:p-8 pt-0">
-            <button className="px-6 py-3 border-2 border-gray-300 rounded-lg text-[#344054] font-semibold hover:bg-gray-50 transition-colors">
+            <button onClick={() => {
+              toast.success("Your account details is update to date.")
+            }} className="px-6 py-3 border-2 border-gray-300 rounded-lg text-[#344054] font-semibold hover:bg-gray-50 transition-colors">
               Update Payment Method
             </button>
-            <button className="px-6 py-3 border-2 border-[#FECACA] rounded-lg text-[#DC2626] font-semibold hover:bg-red-50 transition-colors">
+            <button
+              onClick={() => {
+                cancelSubscription();
+              }}
+              className="px-6 py-3 border-2 border-[#FECACA] rounded-lg text-[#DC2626] font-semibold hover:bg-red-50 transition-colors"
+            >
               Cancel Subscription
             </button>
           </div>

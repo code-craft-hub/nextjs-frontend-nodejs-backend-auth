@@ -23,6 +23,7 @@ import JobIcon from "./icons/jobIcon";
 import AnalyticIcon from "./icons/analyticIcon";
 import SettingIcon from "./icons/settingIcon";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user } = useAuth();
@@ -69,6 +70,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     ],
   };
 
+  const router = useRouter();
+  const handleCardClick = () => {
+    router.push(`/dashboard/account?tab=billing`);
+  };
+
   return (
     <Sidebar className="" {...props}>
       <SidebarHeader>
@@ -91,7 +97,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavMain items={leftSidebarData.menus} />
       </SidebarContent>
       <SidebarFooter>
-        <div className={cn("p-3", !open && "hidden")}>
+        <div
+          onClick={() => {
+            handleCardClick();
+          }}
+          className={cn("p-3", !open && "hidden")}
+        >
           <div className="bg-primary text-white p-4 rounded-2xl">
             <div className="rounded-full bg-white p-2 w-fit">
               <BsExclamationCircle className="rotate-180 size-6 text-primary " />

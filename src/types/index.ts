@@ -79,6 +79,8 @@ export interface IUser {
   firstName?: string;
   lastName?: string;
   cvJobTitle?: string;
+  isPro?: boolean;
+  proPlanExpiryDate?: string | Date;
   customClaims?: Record<string, any> | undefined;
   provider?: string;
   password?: string;
