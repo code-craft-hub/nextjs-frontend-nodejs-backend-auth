@@ -28,8 +28,6 @@ export const RecentActivityCard = memo(
     const { data: jobs } = useQuery(jobsQueries.autoApply(filters));
     const { data: user } = useQuery(userQueries.detail());
 
-    console.count("RecentActivityCard Rendered");
-
     const sortedJobs = useMemo(() => {
       if (!jobs?.data) return [];
 
