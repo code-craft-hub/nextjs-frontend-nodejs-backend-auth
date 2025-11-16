@@ -23,7 +23,6 @@ export const userApi = {
     const data = await api.get<{ data: Partial<IUser>; success: boolean }>(
       `/users`
     );
-    console.log(data);
     if (data?.success) return data.data;
     throw new Error("Failed to fetch user data");
   },
