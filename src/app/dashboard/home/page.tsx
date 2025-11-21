@@ -31,10 +31,20 @@ export default async function HomePage({
   const { tab, jobDescription } = await searchParams;
 
   const title = getDataSource(user)?.title;
+  const rolesOfInterest = getDataSource(user)?.rolesOfInterest?.map(
+    (role: any) => role.value
+  );
+  console.log(rolesOfInterest);
   const filters: JobFilters = {
     page: 1,
     limit: 20,
     title: title || "",
+  };
+  const autoApplyFilters: JobFilters = {
+    page: 1,
+    limit: 20,
+    title: title || "",
+    skills: JSON.stringify(rolesOfInterest),
   };
   await prefetchWithPriority(queryClient, [
     {
@@ -43,8 +53,8 @@ export default async function HomePage({
       priority: "high",
     },
     {
-      queryKey: jobsQueries.autoApply(filters).queryKey,
-      queryFn: jobsQueries.autoApply(filters).queryFn,
+      queryKey: jobsQueries.autoApply(autoApplyFilters).queryKey,
+      queryFn: jobsQueries.autoApply(autoApplyFilters).queryFn,
       priority: "high",
     },
     {

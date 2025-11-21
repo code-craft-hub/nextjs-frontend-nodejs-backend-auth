@@ -11,7 +11,7 @@ export const jobsApi = {
     }),
   // Get all jobs with advanced filtering
   autoApply: (params?: any) =>
-    api.get<PaginatedResponse<JobType>>("/job-recommendations/search/auto-apply", {
+    api.get<PaginatedResponse<JobType>>("/job-recommendations/search/jobs", {
       params,
     }),
 

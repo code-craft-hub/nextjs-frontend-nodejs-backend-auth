@@ -71,6 +71,7 @@ export interface IUser {
   emailVerified?: boolean;
   dataSource?: any[];
   bookmarkedJobs: string[];
+  rolesOfInterest?: { label: string; value: string }[];
   role?: any[];
   isAnonymous?: boolean;
   displayName?: string;

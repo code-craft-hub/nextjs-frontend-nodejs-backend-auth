@@ -45,6 +45,7 @@ export const jobsQueries = {
 
   autoApply: (filters: JobFilters = {}) => {
     const normalized = normalizeJobFilters(filters);
+    console.log(normalized)
     return queryOptions({
       queryKey: queryKeys.jobs.auto(normalized),
       queryFn: () => jobsApi.autoApply(normalized),

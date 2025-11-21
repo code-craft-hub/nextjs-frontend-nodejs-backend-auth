@@ -34,6 +34,7 @@ export interface JobFilters extends PaginationParams {
   search?: string;
   company?: string;
   location?: string;
+  skills?: string;
   tags?: string[];
   salaryMin?: number;
   salaryMax?: number;
