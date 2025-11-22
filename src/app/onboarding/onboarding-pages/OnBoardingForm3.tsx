@@ -69,6 +69,7 @@ export const OnBoardingForm3 = ({ onNext, onPrev }: OnboardingFormProps) => {
     },
   });
 
+  console.log(user?.dataSource)
   useEffect(() => {
     if (user?.dataSource) {
       form.setValue(
@@ -81,7 +82,7 @@ export const OnBoardingForm3 = ({ onNext, onPrev }: OnboardingFormProps) => {
       form.setValue("intership", user.dataSource[0]?.intership || false);
       form.setValue("contract", user.dataSource[0]?.contract || false);
       form.setValue("hybrid", user.dataSource[0]?.hybrid || false);
-      form.setValue("remote", user.dataSource[0]?.remote || []);
+      form.setValue("remote", user.dataSource[0]?.remote || false);
       form.setValue("onsite", user.dataSource[0]?.onsite || false);
       form.setValue("title", user.dataSource[0]?.title || "");
     }

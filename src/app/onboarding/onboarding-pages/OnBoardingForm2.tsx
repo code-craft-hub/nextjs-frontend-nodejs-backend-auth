@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 
 import { cn } from "@/lib/utils";
-import { Checkbox } from "@/components/ui/checkbox";
 import { useAuth } from "@/hooks/use-auth";
 import { OnboardingFormProps } from "@/types";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -32,8 +31,13 @@ export const OnBoardingForm2 = ({ onNext, onPrev }: OnboardingFormProps) => {
       setLoading(true);
       const formData = new FormData();
       formData.append("file", file);
-      await onboardingMutation.mutateAsync(formData);
-      toast.success(`${user?.firstName}, your resume is saved!`);
+      const data = await onboardingMutation.mutateAsync(formData);
+      if (data.success) {
+        toast.success(`${user?.firstName}, your resume is saved!`);
+      } else {
+        toast.error(data.message);
+      }
+      console.log("data from the server upload", data);
       setLoading(false);
       onNext();
     },
@@ -75,7 +79,7 @@ export const OnBoardingForm2 = ({ onNext, onPrev }: OnboardingFormProps) => {
             }}
           />
           <form className="space-y-6 w-full">
-            <div className="flex flex-row items-center border p-3 gap-2 rounded-sm ">
+            {/* <div className="flex flex-row items-center border p-3 gap-2 rounded-sm ">
               <Checkbox
                 id="create-from-scratch"
                 // checked={field.value}
@@ -89,7 +93,7 @@ export const OnBoardingForm2 = ({ onNext, onPrev }: OnboardingFormProps) => {
               <label htmlFor="create-from-scratch" className="h1">
                 Create from scratch
               </label>
-            </div>
+            </div> */}
             {error && (
               <div className="text-red-500 w-full p-3">
                 {typeof error === "string"
