@@ -10,10 +10,14 @@ export const jobsApi = {
       params,
     }),
   // Get all jobs with advanced filtering
-  autoApply: (params?: any) =>
-    api.get<PaginatedResponse<JobType>>("/job-recommendations/search/jobs", {
-      params,
-    }),
+  autoApply: (params?: any) => {
+    return api.get<PaginatedResponse<JobType>>(
+      "/job-recommendations/search/jobs",
+      {
+        params,
+      }
+    );
+  },
 
   // Get job by ID
   getJob: async (id: string) => {

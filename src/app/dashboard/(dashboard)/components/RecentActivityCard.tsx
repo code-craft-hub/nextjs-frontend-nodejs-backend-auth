@@ -31,6 +31,7 @@ export const RecentActivityCard = memo(
     const sortedJobs = useMemo(() => {
       if (!jobs?.data) return [];
 
+      console.log(jobs)
       const recommendationsData = new Set(
         user?.recommendationsData?.map((rec: any) => rec.jobId) || []
       );
@@ -40,24 +41,25 @@ export const RecentActivityCard = memo(
       );
 
       const job = jobs.data
-        ?.filter((job) => !appliedJobs.has(job.id))
-        .map((job) => ({
-          ...job,
-          isRecommended: recommendationsData.has(job.id),
-          score: recommendationsData.has(job.id)
-            ? user?.recommendationsData?.find(
-                (rec: any) => rec.jobId === job.id
-              )?.score || 0
-            : 0,
-        }))
-        .sort((a, b) => {
-          if (a.emailApply && !b.emailApply) return -1;
-          if (!a.emailApply && b.emailApply) return 1;
-          return 0;
-        });
+      //   ?.filter((job) => !appliedJobs.has(job.id))
+      //   .map((job) => ({
+      //     ...job,
+      //     isRecommended: recommendationsData.has(job.id),
+      //     score: recommendationsData.has(job.id)
+      //       ? user?.recommendationsData?.find(
+      //           (rec: any) => rec.jobId === job.id
+      //         )?.score || 0
+      //       : 0,
+      //   }))
+      //   .sort((a, b) => {
+      //     if (a.emailApply && !b.emailApply) return -1;
+      //     if (!a.emailApply && b.emailApply) return 1;
+      //     return 0;
+      //   });
 
       return job;
     }, [jobs?.data, user?.appliedJobs?.length]);
+
 
     const router = useRouter();
 

@@ -34,7 +34,6 @@ export default async function HomePage({
   const rolesOfInterest = getDataSource(user)?.rolesOfInterest?.map(
     (role: any) => role.value
   );
-  console.log(rolesOfInterest);
   const filters: JobFilters = {
     page: 1,
     limit: 20,
@@ -83,7 +82,7 @@ export default async function HomePage({
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <HomeClient tab={tab} jobDescription={jobDescription} filters={filters} />
+      <HomeClient tab={tab} jobDescription={jobDescription} filters={filters} autoApplyFilters={autoApplyFilters} />
     </HydrationBoundary>
   );
 }

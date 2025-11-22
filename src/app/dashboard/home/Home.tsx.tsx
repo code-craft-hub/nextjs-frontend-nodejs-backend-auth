@@ -16,10 +16,12 @@ export const HomeClient = memo(
     tab,
     jobDescription,
     filters,
+    autoApplyFilters
   }: {
     tab: DashboardTab;
     jobDescription: string;
     filters: JobFilters;
+    autoApplyFilters: JobFilters;
   }) => {
     // w-[calc(100vw-500px)]
 
@@ -54,10 +56,10 @@ export const HomeClient = memo(
             </TabsList>
 
             <TabsContent value="ai-apply">
-              <AIApply jobDescription={jobDescription} filters={filters} />
+              <AIApply jobDescription={jobDescription} filters={autoApplyFilters} />
             </TabsContent>
             <TabsContent value="tailor-cv">
-              <AIJobCustomization filters={filters} />
+              <AIJobCustomization filters={autoApplyFilters} />
             </TabsContent>
             <TabsContent value="find-jobs">
               <FindJob filters={filters} />
