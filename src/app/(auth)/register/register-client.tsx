@@ -65,7 +65,6 @@ export default function RegisterClient({ referral }: { referral?: string }) {
   });
 
   const onSubmit = async (values: RegisterUserSchema) => {
-    console.log("Registering user with values:", values);
     await register(values);
   };
 

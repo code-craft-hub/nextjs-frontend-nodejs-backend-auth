@@ -37,7 +37,6 @@ export const OnBoardingForm2 = ({ onNext, onPrev }: OnboardingFormProps) => {
       } else {
         toast.error(data.message);
       }
-      console.log("data from the server upload", data);
       setLoading(false);
       onNext();
     },

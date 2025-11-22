@@ -22,6 +22,7 @@ export type JobType = {
   companyText: string;
   location: string;
   salary: string;
+  relevanceScore: number,
   postedTime: string;
   matchPercentage: string;
   jobType: string;

@@ -31,7 +31,6 @@ export const RecentActivityCard = memo(
     const sortedJobs = useMemo(() => {
       if (!jobs?.data) return [];
 
-      console.log(jobs)
       const recommendationsData = new Set(
         user?.recommendationsData?.map((rec: any) => rec.jobId) || []
       );
@@ -41,25 +40,16 @@ export const RecentActivityCard = memo(
       );
 
       const job = jobs.data
-      //   ?.filter((job) => !appliedJobs.has(job.id))
-      //   .map((job) => ({
-      //     ...job,
-      //     isRecommended: recommendationsData.has(job.id),
-      //     score: recommendationsData.has(job.id)
-      //       ? user?.recommendationsData?.find(
-      //           (rec: any) => rec.jobId === job.id
-      //         )?.score || 0
-      //       : 0,
-      //   }))
-      //   .sort((a, b) => {
-      //     if (a.emailApply && !b.emailApply) return -1;
-      //     if (!a.emailApply && b.emailApply) return 1;
-      //     return 0;
-      //   });
+        ?.filter((job) => !appliedJobs.has(job.id))
+        .map((job) => {
+          return {
+            ...job,
+            isRecommended: recommendationsData.has(job.id),
+          };
+        });
 
       return job;
     }, [jobs?.data, user?.appliedJobs?.length]);
-
 
     const router = useRouter();
 
@@ -177,14 +167,14 @@ export const RecentActivityCard = memo(
                     >
                       {job.location}
                     </Badge>
-                    {job?.score > 40 && (
+                    {job?.relevanceScore > 40 && (
                       <Badge
                         className={cn(
                           "rounded-full font-epilogue font-semibold text-cverai-orange border-cverai-orange bg-white",
                           " truncate overflow-hidden text-start"
                         )}
                       >
-                        {job?.score}% match
+                        {job?.relevanceScore}% match
                       </Badge>
                     )}
                   </div>

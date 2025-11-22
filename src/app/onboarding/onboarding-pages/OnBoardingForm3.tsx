@@ -33,6 +33,7 @@ import { userQueries } from "@/lib/queries/user.queries";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { FloatingLabelInput } from "./FloatingInput";
+import { useUserLocation } from "@/hooks/get-user-location";
 
 const formSchema = z.object({
   partTime: z.boolean().default(false).optional(),
@@ -51,6 +52,8 @@ const formSchema = z.object({
 
 export const OnBoardingForm3 = ({ onNext, onPrev }: OnboardingFormProps) => {
   const { updateUser, isUpdatingUserLoading } = useAuth();
+  const { continent } = useUserLocation();
+
   const { data: user } = useQuery(userQueries.detail());
 
   const form = useForm({
@@ -69,24 +72,21 @@ export const OnBoardingForm3 = ({ onNext, onPrev }: OnboardingFormProps) => {
     },
   });
 
-  console.log(user?.dataSource)
   useEffect(() => {
     if (user?.dataSource) {
-      form.setValue(
-        "rolesOfInterest",
-        user.dataSource[0]?.rolesOfInterest || []
-      );
-      form.setValue("location", user.dataSource[0]?.location || "");
-      form.setValue("partTime", user.dataSource[0]?.partTime || false);
-      form.setValue("fullTime", user.dataSource[0]?.fullTime || false);
-      form.setValue("intership", user.dataSource[0]?.intership || false);
-      form.setValue("contract", user.dataSource[0]?.contract || false);
-      form.setValue("hybrid", user.dataSource[0]?.hybrid || false);
-      form.setValue("remote", user.dataSource[0]?.remote || false);
-      form.setValue("onsite", user.dataSource[0]?.onsite || false);
-      form.setValue("title", user.dataSource[0]?.title || "");
+      const data = user.dataSource[0];
+      form.setValue("rolesOfInterest", data?.rolesOfInterest || []);
+      form.setValue("location", data?.location || continent || "");
+      form.setValue("partTime", data?.partTime || false);
+      form.setValue("fullTime", data?.fullTime || false);
+      form.setValue("intership", data?.intership || false);
+      form.setValue("contract", data?.contract || false);
+      form.setValue("hybrid", data?.hybrid || false);
+      form.setValue("remote", data?.remote || false);
+      form.setValue("onsite", data?.onsite || false);
+      form.setValue("title", data?.title || "");
     }
-  }, [user, form]);
+  }, [user, form, continent]);
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       const dataSource = [
@@ -401,7 +401,6 @@ export const OnBoardingForm3 = ({ onNext, onPrev }: OnboardingFormProps) => {
                       <FormControl>
                         <FloatingLabelInput
                           label="Job Title"
-
                           isUpdatingUserLoading={isUpdatingUserLoading}
                           {...field}
                           placeholder="Software engineer, Backend developer"

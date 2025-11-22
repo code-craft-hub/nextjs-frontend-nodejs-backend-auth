@@ -23,6 +23,8 @@ import Progress from "./Progress";
 import { FloatingLabelInput } from "./FloatingInput";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { userQueries } from "@/lib/queries/user.queries";
+import { useQuery } from "@tanstack/react-query";
 const formSchema = z.object({
   country: z.string({ message: "Please enter a valid country name." }),
   state: z.string({ message: "Please enter a valid state name." }),
@@ -31,11 +33,9 @@ const formSchema = z.object({
   }),
 });
 
-export const OnBoardingForm1 = ({
-  onNext,
-  onPrev,
-}: OnboardingFormProps) => {
-  const { updateUser, isUpdatingUserLoading, user } = useAuth();
+export const OnBoardingForm1 = ({ onNext, onPrev }: OnboardingFormProps) => {
+  const { updateUser, isUpdatingUserLoading } = useAuth();
+  const { data: user } = useQuery(userQueries.detail());
 
   const { country, region, country_code } = useUserLocation();
   const form = useForm({
@@ -49,8 +49,8 @@ export const OnBoardingForm1 = ({
 
   useEffect(() => {
     form.setValue("country", country);
-    form.setValue("state", region);
-  }, [country, region, form]);
+    form.setValue("state", user?.state || region);
+  }, [country, region, form, user]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
@@ -89,11 +89,7 @@ export const OnBoardingForm1 = ({
               "fixed top-0 left-0 width-full px-4 pt-5 backdrop-blur-2xl z-50 pb-4"
           )}
         >
-          <img
-            src="/cverai-logo.png"
-            className="w-28 h-8"
-            alt=""
-          />
+          <img src="/cverai-logo.png" className="w-28 h-8" alt="" />
           <Progress min={1} max={7} progress={10} />
         </div>
         <div className="onboarding-card">

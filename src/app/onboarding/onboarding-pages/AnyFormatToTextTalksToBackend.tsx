@@ -63,9 +63,7 @@ const extractDocumentText = async (
   formData.append('language', language);
   formData.append('sanitize', 'true');
 
-  // for(const [key, value]  of formData.entries()){
-  //   console.log('FormData entry:', key , " : ", value);
-  // }
+
 
   const response = await fetch(API_BASE_URL, {
     method: 'POST',
@@ -253,8 +251,7 @@ export const AnyFormatToTextTalksToBackend = () => {
     form.reset();
   }, [form]);
 
-  const onSubmit = useCallback((values: FormSchema) => {
-    console.log('Form submitted:', values);
+  const onSubmit = useCallback(() => {
   }, []);
 
   return (
