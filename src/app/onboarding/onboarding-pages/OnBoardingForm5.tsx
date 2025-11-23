@@ -24,6 +24,7 @@ import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { userQueries } from "@/lib/queries/user.queries";
 import { useQuery } from "@tanstack/react-query";
+import { expireNextThreeDays } from "@/lib/utils/helpers";
 const formSchema = z.object({
   type: z
     .enum([
@@ -55,7 +56,11 @@ export const OnBoardingForm5 = ({ onNext, onPrev }: OnboardingFormProps) => {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      await updateUser({ discovery: values });
+      await updateUser({
+        discovery: values,
+        expiryTime: expireNextThreeDays,
+        credit: 10,
+      });
       toast.success(`${user?.firstName} Your data has be saved!`);
       onNext();
     } catch (error) {

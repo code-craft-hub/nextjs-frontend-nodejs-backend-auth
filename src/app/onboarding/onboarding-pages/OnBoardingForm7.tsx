@@ -7,14 +7,85 @@ import { Button } from "@/components/ui/button";
 import { creditCard } from "@/app/(landing-page)/constants";
 import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
+import { generateIdempotencyKey } from "@/lib/utils/helpers";
+import { baseURL } from "@/lib/api/client";
+import { useQuery } from "@tanstack/react-query";
+import { userQueries } from "@/lib/queries/user.queries";
 
-export const OnBoardingForm7 = ({ onNext, onPrev }: OnboardingFormProps) => {
+export const OnBoardingForm7 = ({ onPrev }: OnboardingFormProps) => {
   const [seletePlan, setSeletePlan] = useState("free");
   const { completeOnboarding, isOnboardingLoading } = useAuth();
-  const handleComplete = async () => {
+  const { data: user } = useQuery(userQueries.detail());
+
+  const router = useRouter();
+  const handleComplete = async (plan: string) => {
     try {
       await completeOnboarding();
-      onNext();
+      if (plan === "free") {
+        router.push("/dashboard/home");
+        return;
+      }
+
+      try {
+        const idempotencyKey = generateIdempotencyKey();
+
+        const response = await fetch(
+          `${baseURL}/paystack/payments/initialize`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Idempotency-Key": idempotencyKey,
+            },
+            credentials: "include",
+            body: JSON.stringify({
+              email: user?.email,
+              amount: parseFloat(
+                process.env.NEXT_PUBLIC_PAYSTACK_AMOUNT || "4999"
+              ),
+              currency: "NGN",
+              metadata: {
+                first_name: user?.firstName,
+                last_name: user?.lastName,
+                phone: user?.phoneNumber,
+                custom_fields: [
+                  {
+                    display_name: "Customer Name",
+                    variable_name: "customer_name",
+                    value: `${user?.firstName} ${user?.lastName}`,
+                  },
+                ],
+              },
+              channels: [
+                "card",
+                "bank",
+                "ussd",
+                "qr",
+                "mobile_money",
+                "bank_transfer",
+              ],
+            }),
+          }
+        );
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || "Payment initialization failed");
+        }
+
+        const result = await response.json();
+
+        if (result.status === "success" && result.data?.data) {
+          const paymentData = result.data.data;
+          window.location.href = paymentData.authorization_url;
+        } else {
+          throw new Error(result.message || "Payment initialization failed");
+        }
+      } catch (err: any) {
+        console.error("Payment error:", err);
+      } finally {
+      }
     } catch (error) {
       console.error("Onboarding completion failed:", error);
     }
@@ -90,9 +161,7 @@ export const OnBoardingForm7 = ({ onNext, onPrev }: OnboardingFormProps) => {
                     )}
                     onClick={() => {
                       setSeletePlan(plan.tier.toLowerCase());
-                      if (plan.tier.toLowerCase() === "free") {
-                        handleComplete();
-                      }
+                      handleComplete(plan.tier.toLowerCase());
                     }}
                     disabled={isOnboardingLoading}
                     type="button"
@@ -114,7 +183,7 @@ export const OnBoardingForm7 = ({ onNext, onPrev }: OnboardingFormProps) => {
               <Button
                 disabled={isOnboardingLoading}
                 onClick={() => {
-                  handleComplete();
+                  handleComplete("free");
                 }}
               >
                 Continue

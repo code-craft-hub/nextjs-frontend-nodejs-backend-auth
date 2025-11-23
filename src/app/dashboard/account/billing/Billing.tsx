@@ -6,6 +6,7 @@ import { useState } from "react";
 import { ProModal } from "./ProSubscription";
 import { useQuery } from "@tanstack/react-query";
 import { userQueries } from "@/lib/queries/user.queries";
+import { getDaysRemaining } from "@/lib/utils/helpers";
 
 export const Billing = ({ reference }: any) => {
   const { data: user } = useQuery(userQueries.detail());
@@ -17,6 +18,10 @@ export const Billing = ({ reference }: any) => {
   const handleShowPlan = (value: boolean) => {
     setShowPlan(value);
   };
+
+  console.log(user);
+
+  const remainingDays = getDaysRemaining(user?.expiryTime ?? "");
 
   return !completed ? (
     showPlan ? (
@@ -37,10 +42,10 @@ export const Billing = ({ reference }: any) => {
             </div>
             <div className="flex shrink-0 flex-col justify-center items-center gap-[4px] w-[97.67px] h-[81px] bg-[rgba(255,255,255,0.2)] rounded-[8px]">
               <p className="font-inter text-center font-semibold text-[32px] leading-[32px] text-white">
-                3
+                {remainingDays}
               </p>
               <p className="font-inter font-medium text-[14px] leading-[21px] text-center text-white">
-                days left
+                day{Number(remainingDays) > 1 && "s"} left
               </p>
             </div>
           </div>
@@ -85,7 +90,7 @@ export const Billing = ({ reference }: any) => {
               <div className="flex flex-col sm:flex-row justify-between gap-4">
                 <div className="box-border flex flex-col justify-center p-2 px-4 w-full bg-[#F9FAFB] border border-[#D0D5DD] rounded-[8px]">
                   <p className="font-semibold text-[16px] leading-[24px] text-[#101828] tracking-[0.8px]">
-                    ALEXA2024XYZ
+                    {user?.referral_code ?? "ALEXA2024XYZ"}
                   </p>
                 </div>
                 <Button className="h-12">
@@ -102,15 +107,22 @@ export const Billing = ({ reference }: any) => {
                 </p>
                 <p className=" relative">
                   <span className="font-inter font-semibold text-[14px] leading-[21px] text-[#4680EE]">
-                    2 of 5 completed
+                    {user?.usersReferred} of 5 completed
                   </span>
                 </p>
               </div>
-              <div className="flex flex-row items-center  w-full h-[10px] bg-[#E5E7EB] rounded-full relative">
-                <div className="w-[397.59px] h-[10px] bg-[#4680EE] rounded-full" />
+              <div className="flex items-center w-full h-[10px] bg-[#E5E7EB] rounded-full relative">
+                <div
+                  className="h-[10px] bg-[#4680EE] rounded-full"
+                  style={{
+                    width: `${Math.min((user?.usersReferred || 0) * 10, 100)}%`, // max 100% of parent
+                  }}
+                />
               </div>
+
               <p className="font-['Inter'] mt-3 font-normal text-[12px] leading-[18px] text-[#667085] ">
-                3 more referrals needed to unlock 7 extra days
+                {5 - (user?.usersReferred || 0)} more referrals needed to unlock
+                7 extra days
               </p>
             </section>
 
@@ -125,8 +137,8 @@ export const Billing = ({ reference }: any) => {
                   </p>
                   <p className="ml-6 font-['Inter'] font-normal text-[12px] leading-[18px] text-[#667085]">
                     Share your code with friends. When 5 people sign up using
-                    your code during your trial, you&apos;ll receive 7 extra days of
-                    access
+                    your code during your trial, you&apos;ll receive 7 extra
+                    days of access
                   </p>
                 </div>
               </div>

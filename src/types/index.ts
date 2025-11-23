@@ -70,11 +70,14 @@ export interface IUser {
   uid?: string;
   providerId?: string;
   emailVerified?: boolean;
+  expiryTime?: string | Date;
+  usersReferred?: number;
   dataSource?: any[];
   bookmarkedJobs: string[];
   rolesOfInterest?: { label: string; value: string }[];
   role?: any[];
   isAnonymous?: boolean;
+  referral_code?: string;
   displayName?: string;
   countryCode?: string;
   defaultDataSource?: string;

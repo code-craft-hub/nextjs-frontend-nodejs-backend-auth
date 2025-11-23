@@ -4,6 +4,36 @@ import { ApiError, IUser, QAItem } from "@/types";
 import { jsonrepair } from "jsonrepair";
 import { MouseEvent } from "react";
 
+/**
+ * Calculates days remaining from a Firebase timestamp
+ * @param {{ _seconds: number, _nanoseconds: number }} firebaseTimestamp 
+ * @returns {string} e.g., "3 days remaining"
+ */
+export function getDaysRemaining(firebaseTimestamp: any) {
+  if (!firebaseTimestamp || typeof firebaseTimestamp._seconds !== "number") {
+    throw new Error("Invalid Firebase timestamp object");
+  }
+
+  // Convert Firebase timestamp to milliseconds
+  const expiryDate = new Date(
+    firebaseTimestamp._seconds * 1000 + Math.floor(firebaseTimestamp._nanoseconds / 1e6)
+  );
+
+  const now = new Date();
+
+  // Calculate difference in milliseconds (use numeric values)
+  const diffMs = expiryDate.getTime() - now.getTime();
+
+  if (diffMs <= 0) {
+    return "Expired";
+  }
+
+  // Convert milliseconds to days (1 day = 24 * 60 * 60 * 1000 ms)
+  const daysRemaining = Math.ceil(diffMs / (24 * 60 * 60 * 1000));
+
+  return `${daysRemaining}`;
+}
+
 export function getDaysUntilProPlanExpiry(
   expiryDate?: string | Date | null
 ): number {
@@ -20,6 +50,21 @@ export function getDaysUntilProPlanExpiry(
   const today = new Date();
   return differenceInCalendarDays(target, today);
 }
+
+  export const generateIdempotencyKey = () => {
+    return `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  };
+export const expireNextThreeDays = () => {
+  const now = new Date();
+  const nextMinute = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate() + 3,
+    now.getHours(),
+    now.getMinutes()
+  );
+  return nextMinute.toISOString();
+};
 
 export const getJwtSecret = () => {
   const secret = process.env.JWT_SECRET?.trim();

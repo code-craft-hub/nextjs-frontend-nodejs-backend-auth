@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { userQueries } from "@/lib/queries/user.queries";
 import { baseURL } from "@/lib/api/client";
+import { generateIdempotencyKey } from "@/lib/utils/helpers";
 
 export const PaystackPaymentGateway = ({
   active,
@@ -16,10 +17,6 @@ export const PaystackPaymentGateway = ({
   const [reference, setReference] = useState(trxReference ?? "");
 
   // Update to match new backend URL structure
-
-  const generateIdempotencyKey = () => {
-    return `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-  };
 
   const initializePayment = async () => {
     setLoading(true);
@@ -37,7 +34,7 @@ export const PaystackPaymentGateway = ({
         credentials: "include",
         body: JSON.stringify({
           email: user?.email,
-          amount: parseFloat("100"),
+          amount: parseFloat(process.env.NEXT_PUBLIC_PAYSTACK_AMOUNT || "4999"),
           currency: "NGN",
           metadata: {
             first_name: user?.firstName,
@@ -108,7 +105,7 @@ export const PaystackPaymentGateway = ({
       }
     } catch (err: any) {
       console.error("Verification error:", err);
-    } 
+    }
   };
 
   useEffect(() => {

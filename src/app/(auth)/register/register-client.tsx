@@ -26,7 +26,6 @@ export default function RegisterClient({ referral }: { referral?: string }) {
   const { register, isRegisterLoading } = useAuth();
 
 
-  console.count("render RegisterClient");
   // Social Login Button Component
   function SocialButton({
     icon,

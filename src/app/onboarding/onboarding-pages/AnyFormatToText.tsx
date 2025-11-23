@@ -395,8 +395,8 @@ export const FileUploadZone: React.FC<FileUploadZoneProps> = ({
         id="file-upload"
         className="hidden"
         onChange={handleFileInput}
-        accept=".jpg,.jpeg,.png,.gif,.webp,.bmp,.pdf"
-        // ,.doc,.docx
+        accept=".pdf"
+        // ,.doc,.docx.jpg,.jpeg,.png,.gif,.webp,.bmp,
         disabled={disabled}
       />
       <label

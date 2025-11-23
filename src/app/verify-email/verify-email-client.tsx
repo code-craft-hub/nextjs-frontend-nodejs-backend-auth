@@ -20,6 +20,7 @@ import { IUser } from "@/types";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { X } from "lucide-react";
 
 const formSchema = z.object({
   code: z.string().min(5, "Please enter the 5-digit verification code"),
@@ -68,7 +69,7 @@ export const VerifyEmailClient = ({
       setCanResend(false);
       setTimeLeft(60); // 1 minute cooldown
     } catch (error: any) {
-      console.error(error.response.status);
+      console.error(error);
       if (error.response.status === 401) {
         router.replace("/login");
         return;
@@ -103,10 +104,15 @@ export const VerifyEmailClient = ({
       setCompletedEmailVerification(true);
     } catch (error: any) {
       toast.error(
-        typeof error.message === "string"
-          ? error.message
-          : JSON.stringify(error.message)
+        error?.response?.data
+          ? error?.response?.data?.error
+          : JSON.stringify(error.response?.data) || "Verification failed"
       );
+      // toast.error(
+      //   typeof error.message === "string"
+      //     ? error.message
+      //     : error.response.data || JSON.stringify(error.message)
+      // );
     } finally {
       setIsVerifying(false);
     }
@@ -185,7 +191,16 @@ export const VerifyEmailClient = ({
                 </p>
               </div>
             </div>
-
+            <Button
+              variant={"ghost"}
+              className="absolute top-4 right-5"
+              onClick={async () => {
+                await authClient.delete("/delete");
+                router.push('/register')
+              }}
+            >
+              <X className="size-4" />
+            </Button>
             <Form {...form}>
               <div className="space-" onSubmit={form.handleSubmit(onSubmit)}>
                 <FormField
