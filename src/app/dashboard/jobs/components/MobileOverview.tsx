@@ -107,10 +107,12 @@ const MobileOverview = memo(
                   </div>
 
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1 text-green-600 text-xs font-medium">
-                      <span>%</span>
-                      <span>{job.matchPercentage} match</span>
-                    </div>
+                    {Number(job?.matchPercentage || 0) > 40 && (
+                      <div className="flex items-center gap-1 text-green-600 text-xs font-medium">
+                        <span>%</span>
+                        <span>{job.matchPercentage} match</span>
+                      </div>
+                    )}
                     <button
                       onClick={(event) => {
                         const row = { original: job };
