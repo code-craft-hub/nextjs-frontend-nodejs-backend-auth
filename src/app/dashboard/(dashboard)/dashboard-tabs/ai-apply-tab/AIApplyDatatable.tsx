@@ -95,7 +95,7 @@ const getColumns = (
     accessorKey: "type",
     header: "Application Method",
     cell: ({ row }) => (
-      <div className="bg-red-500">
+      <div className="">
         <div>
           <Badge
             variant="outline"
