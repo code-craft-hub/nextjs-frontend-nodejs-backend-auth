@@ -19,7 +19,6 @@ export const Billing = ({ reference }: any) => {
     setShowPlan(value);
   };
 
-  console.log(user);
 
   const remainingDays = getDaysRemaining(user?.expiryTime ?? "");
 

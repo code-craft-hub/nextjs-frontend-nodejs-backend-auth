@@ -28,7 +28,6 @@ export default async function HomePage({
   await requireOnboarding();
   const queryClient = createServerQueryClient();
   const user = await queryClient.fetchQuery(userQueries.detail());
-  console.log(Object.keys(user)?.join(','))
   const { tab, jobDescription } = await searchParams;
 
   const title = getDataSource(user)?.title;

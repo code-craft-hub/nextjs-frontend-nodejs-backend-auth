@@ -95,7 +95,7 @@ const getColumns = (
     accessorKey: "type",
     header: "Application Method",
     cell: ({ row }) => (
-      <div className="flex gap-2 items-center justify-center">
+      <div className="bg-red-500">
         <div>
           <Badge
             variant="outline"
