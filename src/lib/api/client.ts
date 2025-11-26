@@ -50,45 +50,45 @@ export async function apiClient<T>(
   endpoint: string,
   options: FetchOptions = {}
 ): Promise<T> {
+  const { params, ...fetchOptions } = options;
+
+  const isServerSide = isServer();
+  let url = `${baseURL}${endpoint}`;
+  if (params) {
+    const searchParams = new URLSearchParams();
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== "") {
+        searchParams.append(key, String(value));
+      }
+    });
+
+    const queryString = searchParams.toString();
+    if (queryString) {
+      url += `?${queryString}`;
+    }
+  }
+
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+
+  // Add any additional headers from options
+  if (fetchOptions.headers) {
+    const existingHeaders = new Headers(fetchOptions.headers);
+    existingHeaders.forEach((value, key) => {
+      headers[key] = value;
+    });
+  }
+
+  // 🔑 AUTOMATIC: Get and forward cookies if on server
+  if (isServerSide) {
+    const serverCookies = await getServerCookies();
+    if (serverCookies) {
+      headers["Cookie"] = serverCookies;
+    }
+  }
+
   try {
-    const { params, ...fetchOptions } = options;
-
-    const isServerSide = isServer();
-    let url = `${baseURL}${endpoint}`;
-    if (params) {
-      const searchParams = new URLSearchParams();
-      Object.entries(params).forEach(([key, value]) => {
-        if (value !== undefined && value !== null && value !== "") {
-          searchParams.append(key, String(value));
-        }
-      });
-
-      const queryString = searchParams.toString();
-      if (queryString) {
-        url += `?${queryString}`;
-      }
-    }
-
-    const headers: Record<string, string> = {
-      "Content-Type": "application/json",
-    };
-
-    // Add any additional headers from options
-    if (fetchOptions.headers) {
-      const existingHeaders = new Headers(fetchOptions.headers);
-      existingHeaders.forEach((value, key) => {
-        headers[key] = value;
-      });
-    }
-
-    // 🔑 AUTOMATIC: Get and forward cookies if on server
-    if (isServerSide) {
-      const serverCookies = await getServerCookies();
-      if (serverCookies) {
-        headers["Cookie"] = serverCookies;
-      }
-    }
-
     const response = await fetch(url, {
       ...fetchOptions,
       headers,
@@ -101,16 +101,15 @@ export async function apiClient<T>(
     });
 
     if (!response.ok) {
-      // const errorData = await response.json().catch(() => ({}));
-      // console.error("❌ API Error:", response.status, errorData);
-      // console.error(response.status, response.statusText, errorData);
+      console.log(response);
     }
 
     const data = await response.json();
+    console.log("API RESPONSE DATA:", data);
 
     return data;
   } catch (error) {
-    // console.error("🔥 API Client Error:", error);
+    console.error("API Request Error:", error);
     throw error;
   }
 }

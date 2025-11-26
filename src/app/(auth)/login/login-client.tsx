@@ -250,7 +250,7 @@ export const LoginClient = () => {
               </div>
 
               {/* Social Login Buttons */}
-              <div className="grid  gap-4">
+              <div className="w-full flex justify-center items-center">
                 <GoogleLogin
                   size="large"
                   onSuccess={handleLogin}

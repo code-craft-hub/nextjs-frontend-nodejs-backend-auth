@@ -23,6 +23,7 @@ authClient.interceptors.response.use(
   (error) => {
     // Handle auth-specific errors
     if (error.response?.status === 401) {
+      console.log("LOGOUT OUT USER : IN 401", error)
       // For auth API, don't redirect - just clear any stored tokens
       if (typeof window !== "undefined") {
         // Dispatch logout event or call logout function
