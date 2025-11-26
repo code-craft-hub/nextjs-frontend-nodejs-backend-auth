@@ -34,10 +34,10 @@ export const ResetPassword = ({email}: {email: string}) => {
   const toggleVisibility = () => setIsVisible((prevState) => !prevState);
 
   const [emailSent, setEmailSent] = useState(false);
-  const [isSending, setIsSending] = useState(false);
-  const [completedEmailVerification, setCompletedEmailVerification] =
+  const [isSending, _setIsSending] = useState(false);
+  const [completedEmailVerification, _setCompletedEmailVerification] =
     useState(false);
-  const [canResend, setCanResend] = useState(true);
+  const [_canResend, setCanResend] = useState(true);
   const [timeLeft, setTimeLeft] = useState(0);
 
   useEffect(() => {
@@ -56,32 +56,7 @@ export const ResetPassword = ({email}: {email: string}) => {
     }
   }, [emailSent]);
 
-  const sendVerificationCode = async () => {
-    setIsVerifying(true);
-    setIsSending(true);
 
-    try {
-      await authClient.post("/send-verification");
-
-      toast.success(`Verification code sent to your email!`);
-      setCanResend(false);
-      setTimeLeft(60); // 1 minute cooldown
-    } catch (error: any) {
-      console.error(error);
-      if (error.response.status === 401) {
-        router.replace("/login");
-        return;
-      }
-      toast.error(
-        typeof error.message === "string"
-          ? error.message
-          : JSON.stringify(error.message)
-      );
-    } finally {
-      setIsSending(false);
-      setIsVerifying(false);
-    }
-  };
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -103,6 +78,7 @@ export const ResetPassword = ({email}: {email: string}) => {
       // setCompletedEmailVerification(true);
 
     } catch (error: any) {
+      console.error(error);
       // toast.error(
       //   error?.response?.data
       //     ? error?.response?.data?.error
