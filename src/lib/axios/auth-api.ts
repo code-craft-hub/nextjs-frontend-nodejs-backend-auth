@@ -1,7 +1,4 @@
-import {
-  createApiClient,
-  setupInterceptors,
-} from "./base";
+import { createApiClient, setupInterceptors } from "./base";
 
 const authClient = createApiClient({
   baseURL: process.env.NEXT_PUBLIC_AUTH_API_URL || "http://localhost:8080",
@@ -21,15 +18,6 @@ authClient.interceptors.request.use((config) => {
 authClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    // Handle auth-specific errors
-    if (error.response?.status === 401) {
-      console.log("LOGOUT OUT USER : IN 401", error)
-      // For auth API, don't redirect - just clear any stored tokens
-      if (typeof window !== "undefined") {
-        // Dispatch logout event or call logout function
-        // window.dispatchEvent(new CustomEvent("auth:logout"));
-      }
-    }
     return Promise.reject(error);
   }
 );

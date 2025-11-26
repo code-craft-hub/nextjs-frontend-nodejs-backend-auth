@@ -105,7 +105,6 @@ export async function apiClient<T>(
     }
 
     const data = await response.json();
-    console.log("API RESPONSE DATA:", data);
 
     return data;
   } catch (error) {

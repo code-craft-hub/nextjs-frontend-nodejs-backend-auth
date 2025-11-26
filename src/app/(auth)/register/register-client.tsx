@@ -26,6 +26,7 @@ import { cn } from "@/lib/utils";
 import { inputField } from "@/lib/utils/constants";
 import { api } from "@/lib/api/client";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export default function RegisterClient({ referral }: { referral?: string }) {
   const { register, isRegisterLoading } = useAuth();
@@ -33,10 +34,15 @@ export default function RegisterClient({ referral }: { referral?: string }) {
   const router = useRouter();
 
   const handleLogin = async (response: any) => {
-    const credentials = jwtDecode(response.credential) as { email: string };
-    const data: any = await api.post("/google-login-register", credentials);
-    if (data?.success) {
-      router.push("/dashboard/home");
+    try {
+      const credentials = jwtDecode(response.credential) as { email: string };
+      const data: any = await api.post("/google-login-register", credentials);
+      if (data?.success) {
+        router.push("/dashboard/home");
+      }
+    } catch (error) {
+      console.error("Google registeration Error:", error);
+      toast.error("Google registeration failed. Please try again.");
     }
   };
 
@@ -375,7 +381,6 @@ export default function RegisterClient({ referral }: { referral?: string }) {
                   }}
                   useOneTap
                 />
-              
               </div>
             </form>
           </Form>
