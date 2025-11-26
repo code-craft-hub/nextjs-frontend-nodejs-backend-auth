@@ -20,7 +20,7 @@ import { NavMain } from "./nav-main";
 import HomeIcon from "./icons/homeIcon";
 import UserIcon from "./icons/userIcon";
 import JobIcon from "./icons/jobIcon";
-import AnalyticIcon from "./icons/analyticIcon";
+// import AnalyticIcon from "./icons/analyticIcon";
 import SettingIcon from "./icons/settingIcon";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -52,11 +52,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         icon: JobIcon,
         url: "/dashboard/jobs",
       },
-      {
-        title: "Analytics",
-        icon: AnalyticIcon,
-        url: "/dashboard/analytics",
-      },
+      // {
+      //   title: "Analytics",
+      //   icon: AnalyticIcon,
+      //   url: "/dashboard/analytics",
+      // },
       {
         title: "Settings",
         icon: SettingIcon,

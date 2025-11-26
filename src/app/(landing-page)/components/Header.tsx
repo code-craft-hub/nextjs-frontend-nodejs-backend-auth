@@ -81,7 +81,7 @@ export const Header = ({
                   <Menu size={24} />
                 </Button>
               </SheetTrigger>
-              <SheetContent className="w-[50%]">
+              <SheetContent className="w-">
                 <SheetTitle
                   className="sr-only"
                   aria-describedby="Mobile Sidebar"
