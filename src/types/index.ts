@@ -13,6 +13,13 @@ export type UploadedFile = {
 };
 export type DashboardTab = "ai-apply" | "find-jobs" | "tailor-cv";
 
+export interface Login {
+  email: string;
+  password?: string;
+  provider?: string;
+
+}
+
 export type JobType = {
   id: string;
   title: string;

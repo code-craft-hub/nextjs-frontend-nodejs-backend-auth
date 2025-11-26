@@ -2,18 +2,15 @@
 
 import authClient from "@/lib/axios/auth-api";
 import { RegisterUserSchema } from "@/lib/schema-validations";
-import { CoverLetter, IUser, Resume } from "@/types";
+import { CoverLetter, IUser, Login, Resume } from "@/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 export const apiService = {
-  login: async (email: string, password: string): Promise<Partial<IUser>> => {
+  login: async (loginData: Login): Promise<Partial<IUser>> => {
     try {
-      const { data } = await authClient.post("/login", {
-        email,
-        password,
-      });
+      const { data } = await authClient.post("/login", loginData);
 
       return data.data;
     } catch (error: any) {
@@ -283,8 +280,7 @@ export function useAuth(initialUser?: Partial<IUser>) {
   });
   // Login mutation
   const loginMutation = useMutation({
-    mutationFn: ({ email, password }: { email: string; password: string }) =>
-      apiService.login(email, password),
+    mutationFn: (loginData: Login) => apiService.login(loginData),
     onSuccess: (data) => {
       queryClient.setQueryData(["auth", "user"], data);
       // Check email verification first, then onboarding

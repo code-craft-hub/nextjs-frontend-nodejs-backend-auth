@@ -78,21 +78,6 @@ export const OnBoardingForm2 = ({ onNext, onPrev }: OnboardingFormProps) => {
             }}
           />
           <form className="space-y-6 w-full">
-            {/* <div className="flex flex-row items-center border p-3 gap-2 rounded-sm ">
-              <Checkbox
-                id="create-from-scratch"
-                // checked={field.value}
-                onCheckedChange={async () => {
-                  // await updateUser({
-                  //   baseResume: "",
-                  // });
-                  onNext();
-                }}
-              />
-              <label htmlFor="create-from-scratch" className="h1">
-                Create from scratch
-              </label>
-            </div> */}
             {error && (
               <div className="text-red-500 w-full p-3">
                 {typeof error === "string"

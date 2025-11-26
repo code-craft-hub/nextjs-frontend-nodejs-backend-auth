@@ -27,7 +27,7 @@ async function verifySessionToken(
   }
 }
 
-const publicPaths = ["/login", "/register"];
+const publicPaths = ["/login", "/register", "/reset-password"];
 const protectedPaths = ["/dashboard/home"];
 const verifyEmailPath = "/verify-email";
 const onboardingPath = "/onboarding";
