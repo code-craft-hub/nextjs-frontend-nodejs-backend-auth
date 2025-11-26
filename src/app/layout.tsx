@@ -13,6 +13,7 @@ import {
   Geist,
 } from "next/font/google";
 import { Metadata } from "next";
+import Script from "next/script";
 
 const ebGaramond = EB_Garamond({
   subsets: ["latin"],
@@ -80,6 +81,26 @@ export default function RootLayout({
       <body>
         <Providers>{children}</Providers>
       </body>
+      {/* <script type="text/javascript">window.$crisp=[];window.CRISP_WEBSITE_ID="e4f34063-228f-4ae1-8f14-ce9a5b7d4a1d";(function(){d=document;s=d.createElement("script");s.src="https://client.crisp.chat/l.js";s.async=1;d.getElementsByTagName("head")[0].appendChild(s);})();</script> */}
+
+      {/* Crisp Chat */}
+      <Script
+        id="crisp-chat"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{
+          __html: `
+              window.$crisp = [];
+              window.CRISP_WEBSITE_ID = "e4f34063-228f-4ae1-8f14-ce9a5b7d4a1d";
+              (function() {
+                var d = document;
+                var s = d.createElement("script");
+                s.src = "https://client.crisp.chat/l.js";
+                s.async = 1;
+                d.getElementsByTagName("head")[0].appendChild(s);
+              })();
+            `,
+        }}
+      />
     </html>
   );
 }
