@@ -1,12 +1,13 @@
 import { Button } from "@/components/ui/button";
 import { Copy, Info } from "lucide-react";
 import { UpgradeModal } from "./UpgradeModal";
-import { SegmentedProgress } from "./SegmentedProgress";
+// import { SegmentedProgress } from "./SegmentedProgress";
 import { useState } from "react";
 import { ProModal } from "./ProSubscription";
 import { useQuery } from "@tanstack/react-query";
 import { userQueries } from "@/lib/queries/user.queries";
 import { getDaysRemaining } from "@/lib/utils/helpers";
+import { toast } from "sonner";
 
 export const Billing = ({ reference }: any) => {
   const { data: user } = useQuery(userQueries.detail());
@@ -19,8 +20,17 @@ export const Billing = ({ reference }: any) => {
     setShowPlan(value);
   };
 
-
+  const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
   const remainingDays = getDaysRemaining(user?.expiryTime ?? "");
+  const REFERRAL = `${APP_URL}/register?referral=${
+    user?.referralCode ?? "ALEXA2024XYZ"
+  }`;
+  const usersReferred = user?.usersReferred?.length || 0;
+
+  const handleReferralCopy = () => {
+    navigator.clipboard.writeText(REFERRAL);
+    toast.success("Referral code copied to clipboard!");
+  };
 
   return !completed ? (
     showPlan ? (
@@ -39,24 +49,24 @@ export const Billing = ({ reference }: any) => {
                 Explore all features with your trial period
               </p>
             </div>
-            <div className="flex shrink-0 flex-col justify-center items-center gap-[4px] w-[97.67px] h-[81px] bg-[rgba(255,255,255,0.2)] rounded-[8px]">
+           {Number(remainingDays) > 0 && <div className="flex shrink-0 flex-col justify-center items-center gap-[4px] w-[97.67px] h-[81px] bg-[rgba(255,255,255,0.2)] rounded-[8px]">
               <p className="font-inter text-center font-semibold text-[32px] leading-[32px] text-white">
                 {remainingDays}
               </p>
               <p className="font-inter font-medium text-[14px] leading-[21px] text-center text-white">
                 day{Number(remainingDays) > 1 && "s"} left
               </p>
-            </div>
+            </div>}
           </div>
           <div className="flex flex-wrap items-center  gap-4 relative">
-            <SegmentedProgress
+            {/* <SegmentedProgress
               percentage={40}
               size={64}
               bgColor="bg-blue-600"
               segmentColor="white"
               textColor="text-white"
               fontSize="text-lg"
-            />
+            /> */}
             <div className="flex flex-col items-start gap-[4px]">
               <p className="relative">
                 <span className=" font-['Inter'] font-medium text-[14px] leading-[21px] text-white">
@@ -89,10 +99,10 @@ export const Billing = ({ reference }: any) => {
               <div className="flex flex-col sm:flex-row justify-between gap-4">
                 <div className="box-border flex flex-col justify-center p-2 px-4 w-full bg-[#F9FAFB] border border-[#D0D5DD] rounded-[8px]">
                   <p className="font-semibold text-[16px] leading-[24px] text-[#101828] tracking-[0.8px]">
-                    {user?.referral_code ?? "ALEXA2024XYZ"}
+                    {REFERRAL}
                   </p>
                 </div>
-                <Button className="h-12">
+                <Button className="h-12" onClick={handleReferralCopy}>
                   <Copy /> Copy Code
                 </Button>
               </div>
@@ -106,7 +116,7 @@ export const Billing = ({ reference }: any) => {
                 </p>
                 <p className=" relative">
                   <span className="font-inter font-semibold text-[14px] leading-[21px] text-[#4680EE]">
-                    {user?.usersReferred} of 5 completed
+                    {usersReferred} of 5 completed
                   </span>
                 </p>
               </div>
@@ -114,14 +124,13 @@ export const Billing = ({ reference }: any) => {
                 <div
                   className="h-[10px] bg-[#4680EE] rounded-full"
                   style={{
-                    width: `${Math.min((user?.usersReferred || 0) * 10, 100)}%`, // max 100% of parent
+                    width: `${Math.min( ((usersReferred * 10)+50), 100)}%`,
                   }}
                 />
               </div>
 
               <p className="font-['Inter'] mt-3 font-normal text-[12px] leading-[18px] text-[#667085] ">
-                {5 - (user?.usersReferred || 0)} more referrals needed to unlock
-                7 extra days
+                {5 - usersReferred} more referrals needed to unlock 7 extra days
               </p>
             </section>
 

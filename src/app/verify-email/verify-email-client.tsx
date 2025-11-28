@@ -21,6 +21,7 @@ import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { X } from "lucide-react";
+import { apiService } from "@/hooks/use-auth";
 
 const formSchema = z.object({
   code: z.string().min(5, "Please enter the 5-digit verification code"),
@@ -53,7 +54,8 @@ export const VerifyEmailClient = ({
   useEffect(() => {
     if (!emailSent) {
       setEmailSent(true);
-      sendVerificationCode();
+      // TAKE THIS OUT LATER
+      // sendVerificationCode();
     }
   }, [emailSent]);
   const sendVerificationCode = async () => {
@@ -177,6 +179,18 @@ export const VerifyEmailClient = ({
       <div className="flex items-center justify-center flex-1 ">
         <div className="flex-1 flex items-center justify-center bg-white max-w-3xl shadow-2xl rounded-lg p-8 sm:p-16">
           <div className="w-full max-w-2xl space-y-8">
+            {/* 
+              TAKE THIS OUT LATER
+            */}
+            <Button
+              onClick={async () => {
+                await apiService.deleteUser();
+              }}
+              variant={"destructive"}
+              className="mt-8"
+            >
+              Delete Account
+            </Button>
             {/* Logo and Header */}
             <div className="space-y-6">
               <div className="flex items-center space-x-2">
@@ -196,7 +210,7 @@ export const VerifyEmailClient = ({
               className="absolute top-4 right-5"
               onClick={async () => {
                 await authClient.delete("/delete");
-                router.push('/register')
+                router.push("/register");
               }}
             >
               <X className="size-4" />

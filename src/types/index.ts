@@ -78,13 +78,13 @@ export interface IUser {
   providerId?: string;
   emailVerified?: boolean;
   expiryTime?: string | Date;
-  usersReferred?: number;
+  usersReferred?: [];
   dataSource?: any[];
   bookmarkedJobs: string[];
   rolesOfInterest?: { label: string; value: string }[];
   role?: any[];
   isAnonymous?: boolean;
-  referral_code?: string;
+  referralCode?: string;
   displayName?: string;
   countryCode?: string;
   defaultDataSource?: string;

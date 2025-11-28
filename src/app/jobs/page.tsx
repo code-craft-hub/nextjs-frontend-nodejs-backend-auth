@@ -7,7 +7,7 @@ import { dehydrate } from "@tanstack/react-query";
 import { JobFilters } from "@/lib/types/jobs";
 
 export const metadata = {
-  title: "Jobs | Career Platform",
+  title: "Cver AI - Never Miss a Job Again",
   description: "Browse and manage job listings",
 };
 

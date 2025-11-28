@@ -46,7 +46,7 @@ const poppins = Poppins({
 const roboto = Roboto({ subsets: ["latin"], variable: "--font-roboto" });
 
 export const metadata: Metadata = {
-  title: "Career Platform",
+  title: "Cver AI - Never Miss a Job Again",
   description: "Manage your career documents and interview prep",
 };
 export default function RootLayout({
