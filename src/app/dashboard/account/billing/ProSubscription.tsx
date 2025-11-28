@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Switch } from "@/components/ui/switch";
-import { SegmentedProgress } from "./SegmentedProgress";
+// import { SegmentedProgress } from "./SegmentedProgress";
 import { userQueries } from "@/lib/queries/user.queries";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -42,14 +42,14 @@ export function ProModal() {
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
             {/* Left Section */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
-              <SegmentedProgress
+              {/* <SegmentedProgress
                 percentage={99}
                 size={64}
                 bgColor="bg-blue-600"
                 segmentColor="white"
                 textColor="text-white"
                 fontSize="text-lg"
-              />
+              /> */}
 
               <div className="space-y-1">
                 <div className="flex items-center gap-3">

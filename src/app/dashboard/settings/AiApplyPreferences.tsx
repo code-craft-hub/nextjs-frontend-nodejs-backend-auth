@@ -92,7 +92,7 @@ export const AiApplyPreferences: React.FC = () => {
     },
     {
       section: "Email Integration",
-      subTitle: "Connect your Gmail account for email-based job applications",
+      subTitle: `Connect your Gmail account for email-based job applications `,
       img: "/email.svg",
       options: [
         {
@@ -326,7 +326,17 @@ export const AiApplyPreferences: React.FC = () => {
               </div>
             )}
             {setting.subTitle && (
-              <p className="text-gray-600 text-md mb-4">{setting.subTitle}</p>
+              <div className="mb-4">
+                <p className="text-gray-600 text-md">{setting.subTitle}</p>
+                {settingIndex === 1 && (
+                  <p className="text-2xs text-gray-400 mt-1 max-w-xl">
+                    "We are still in the process of verifying our Gmail
+                    integration, so you will get a message saying "Google
+                    hasn&apos;t verified this app" Please click on "Advance" and
+                    continue to give access of sending emails to Cver AI"
+                  </p>
+                )}
+              </div>
             )}
 
             <div className="space-y-4">

@@ -49,14 +49,16 @@ export const Billing = ({ reference }: any) => {
                 Explore all features with your trial period
               </p>
             </div>
-           {Number(remainingDays) > 0 && <div className="flex shrink-0 flex-col justify-center items-center gap-[4px] w-[97.67px] h-[81px] bg-[rgba(255,255,255,0.2)] rounded-[8px]">
-              <p className="font-inter text-center font-semibold text-[32px] leading-[32px] text-white">
-                {remainingDays}
-              </p>
-              <p className="font-inter font-medium text-[14px] leading-[21px] text-center text-white">
-                day{Number(remainingDays) > 1 && "s"} left
-              </p>
-            </div>}
+            {Number(remainingDays) > 0 && (
+              <div className="flex shrink-0 flex-col justify-center items-center gap-[4px] w-[97.67px] h-[81px] bg-[rgba(255,255,255,0.2)] rounded-[8px]">
+                <p className="font-inter text-center font-semibold text-[32px] leading-[32px] text-white">
+                  {remainingDays}
+                </p>
+                <p className="font-inter font-medium text-[14px] leading-[21px] text-center text-white">
+                  day{Number(remainingDays) > 1 && "s"} left
+                </p>
+              </div>
+            )}
           </div>
           <div className="flex flex-wrap items-center  gap-4 relative">
             {/* <SegmentedProgress
@@ -124,7 +126,10 @@ export const Billing = ({ reference }: any) => {
                 <div
                   className="h-[10px] bg-[#4680EE] rounded-full"
                   style={{
-                    width: `${Math.min( ((usersReferred * 10)+50), 100)}%`,
+                    width: `${Math.min(
+                      usersReferred * 10 + (usersReferred > 0 ? 50 : 2),
+                      100
+                    )}%`,
                   }}
                 />
               </div>
