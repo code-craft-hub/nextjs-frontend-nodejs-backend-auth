@@ -83,7 +83,7 @@ const Preview = ({
         recruiterEmail,
         jobDescription,
         user?.aiApplyPreferences.autoSendApplications,
-        defaultResume?.gcsPath
+       user?.aiApplyPreferences?.useMasterCV && defaultResume?.gcsPath
       );
       setActiveStep(4);
       toast.success("Application Submitted Successfully!");

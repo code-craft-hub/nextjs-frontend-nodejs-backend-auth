@@ -3,19 +3,18 @@ import React, { useRef, useEffect, memo } from "react";
 import { Loader2 } from "lucide-react";
 import { useCoverLetterGenerator } from "@/hooks/useCoverLetterGenerator";
 import { useAuth } from "@/hooks/use-auth";
-import {  useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { createCoverLetterOrderedParams } from "@/lib/utils/helpers";
 import { toast } from "sonner";
 import { isEmpty } from "lodash";
 import { COLLECTIONS } from "@/lib/utils/constants";
 import { v4 as uuidv4 } from "uuid";
 
-export const TemporaryEmailCompose = memo<{
+export const EmailCompose = memo<{
   jobDescription: string;
   coverLetterId: string;
   aiApply?: boolean;
 }>(({ jobDescription, coverLetterId, aiApply }) => {
-
   const { generatedContent, isGenerating, error, generateCoverLetter } =
     useCoverLetterGenerator();
 
@@ -29,10 +28,7 @@ export const TemporaryEmailCompose = memo<{
   );
   const router = useRouter();
 
-
   useEffect(() => {
-   
-
     if (isFetched && status === "success") {
       if (user && jobDescription && !hasGeneratedRef.current && !data) {
         hasGeneratedRef.current = true;
@@ -68,7 +64,9 @@ export const TemporaryEmailCompose = memo<{
     aiApply,
     coverLetterId,
     generateCoverLetter,
-    router,status,isFetched
+    router,
+    status,
+    isFetched,
   ]);
   // Removed hasGeneratedRef.current from dependencies
   // Added data and all other used variables
@@ -127,4 +125,4 @@ export const TemporaryEmailCompose = memo<{
   );
 });
 
-TemporaryEmailCompose.displayName = "TemporaryEmailCompose";
+EmailCompose.displayName = "TemporaryEmailCompose";
