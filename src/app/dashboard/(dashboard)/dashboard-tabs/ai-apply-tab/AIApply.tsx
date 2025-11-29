@@ -55,7 +55,7 @@ export const AIApply = memo(
         </div>
         <div className="grid gap-y-16">
           <AIApplyInput jobDescription={jobDescription} />
-          <AIApplyDatatable data={aiApply?.data!} jobs={jobs} />
+          <AIApplyDatatable data={aiApply?.data ?? []} jobs={jobs} />
           <RecentActivityCard filters={filters} />
         </div>
       </div>
