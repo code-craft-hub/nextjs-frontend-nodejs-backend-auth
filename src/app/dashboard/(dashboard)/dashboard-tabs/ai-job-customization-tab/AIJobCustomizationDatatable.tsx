@@ -139,7 +139,7 @@ const getColumns = (
 export function AIJobCustomizationDatatable({
   data,
 }: {
-  data: z.infer<typeof schema>[];
+  data: any[];
 }) {
   const router = useRouter();
 

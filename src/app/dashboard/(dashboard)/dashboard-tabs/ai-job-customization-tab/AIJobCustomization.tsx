@@ -25,11 +25,7 @@ export const AIJobCustomization = memo(
         ...(interviewQuestion?.data ?? []),
         ...(coverLetter?.data ?? []),
         ...(resumes?.data ?? []),
-      ].map((item: any) => ({
-        ...item.data,
-        id: item?.id,
-        _type: item?.type ?? "unknown",
-      }));
+      ];
 
       return shuffleArray(merged);
     }, [interviewQuestion?.data, coverLetter?.data, resumes?.data]);
@@ -42,7 +38,7 @@ export const AIJobCustomization = memo(
 
         <div className="grid gap-y-16">
           <AIJobCustomizationInput />
-          {isEmpty(data) ? null : <AIJobCustomizationDatatable data={data} />}
+          {isEmpty(data) ? null : <AIJobCustomizationDatatable data={data ?? []} />}
           <RecentActivityCard filters={filters} />
         </div>
       </div>
