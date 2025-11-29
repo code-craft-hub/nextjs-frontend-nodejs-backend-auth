@@ -20,11 +20,11 @@ export const AIApply = memo(
   }) => {
     const [notification, setNotification] = useState(false);
     const { data: aiApply } = useQuery(aiApplyQueries.all(filters));
-    const aiApplyData =
-      aiApply?.data?.map((item: any) => ({ ...item.data, id: item?.id })) || [];
+    // const aiApplyData =
+    //   aiApply?.data?.map((item: any) => ({ ...item.data, id: item?.id })) || [];
 
     const { data: jobs } = useQuery(jobsQueries.all(filters));
-
+    
     useEffect(() => {
       const checkAuthorization = async () => {
         const authStatus = await checkAuthStatus();
@@ -55,7 +55,7 @@ export const AIApply = memo(
         </div>
         <div className="grid gap-y-16">
           <AIApplyInput jobDescription={jobDescription} />
-          <AIApplyDatatable data={aiApplyData} jobs={jobs} />
+          <AIApplyDatatable data={aiApply?.data!} jobs={jobs} />
           <RecentActivityCard filters={filters} />
         </div>
       </div>

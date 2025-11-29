@@ -7,8 +7,8 @@ import { Sparkles, User } from "lucide-react";
 import { ProfileManagement } from "./ProfileManagement";
 
 const Settings = ({ tab }: { tab: string }) => {
-  const [currentTab, setCurrentTab] = useState(tab ?? "profile-management");
-  
+  const [currentTab, setCurrentTab] = useState(tab ?? "ai-applypreference");
+
   const handleTabChange = (value: string) => {
     setCurrentTab(value);
   };
@@ -16,16 +16,6 @@ const Settings = ({ tab }: { tab: string }) => {
     <div>
       <Tabs defaultValue={currentTab}>
         <TabsList className="bg-white w-full p-1 font-roboto gap-x-4">
-          <TabsTrigger
-            value="profile-management"
-            className="text-xs font-medium"
-            onClick={() => {
-              handleTabChange("profile-management");
-            }}
-          >
-            <User className="w-4 h-4" />
-            <span className="max-sm:hidden">Profile Management</span>
-          </TabsTrigger>
           <TabsTrigger
             value="ai-applypreference"
             className="text-xs font-medium"
@@ -41,7 +31,16 @@ const Settings = ({ tab }: { tab: string }) => {
             />
             <span className="max-sm:hidden">AI Apply Preferences</span>
           </TabsTrigger>
-         
+          <TabsTrigger
+            value="profile-management"
+            className="text-xs font-medium"
+            onClick={() => {
+              handleTabChange("profile-management");
+            }}
+          >
+            <User className="w-4 h-4" />
+            <span className="max-sm:hidden">Profile Management</span>
+          </TabsTrigger>
         </TabsList>
         <TabsContent value="profile-management" className="text-md font-medium">
           <ProfileManagement />
