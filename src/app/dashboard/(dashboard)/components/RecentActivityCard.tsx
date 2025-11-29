@@ -27,7 +27,6 @@ export const RecentActivityCard = memo(
   ({ filters }: { filters: JobFilters }) => {
     const { data: jobs } = useQuery(jobsQueries.autoApply(filters));
     const { data: user } = useQuery(userQueries.detail());
-
     const sortedJobs = useMemo(() => {
       if (!jobs?.data) return [];
 

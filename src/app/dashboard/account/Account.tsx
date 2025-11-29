@@ -55,7 +55,7 @@ export const AccountClient = ({ tab,reference }: any) => {
           await apiService.deleteUser();
         }}
         variant={"destructive"}
-        className="mt-8"
+        className=""
       >
         Delete Account
       </Button>

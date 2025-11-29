@@ -330,10 +330,10 @@ export const AiApplyPreferences: React.FC = () => {
                 <p className="text-gray-600 text-md">{setting.subTitle}</p>
                 {settingIndex === 1 && (
                   <p className="text-2xs text-gray-400 mt-1 max-w-xl">
-                    "We are still in the process of verifying our Gmail
-                    integration, so you will get a message saying "Google
-                    hasn&apos;t verified this app" Please click on "Advance" and
-                    continue to give access of sending emails to Cver AI"
+                    &ldquo;We are still in the process of verifying our Gmail
+                    integration, so you will get a message saying &ldquo;Google
+                    hasn&apos;t verified this app&ldquo; Please click on &ldquo;Advance&ldquo; and
+                    continue to give access of sending emails to Cver AI&ldquo;
                   </p>
                 )}
               </div>
