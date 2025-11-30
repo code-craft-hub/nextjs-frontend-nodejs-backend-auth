@@ -101,7 +101,6 @@ export async function apiClient<T>(
     });
 
     if (!response.ok) {
-      // console.log(response);
     }
 
     const data = await response.json();
