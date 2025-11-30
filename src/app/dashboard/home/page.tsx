@@ -16,8 +16,8 @@ import { coverLetterQueries } from "@/lib/queries/cover-letter.queries";
 import { getDataSource } from "@/lib/utils/helpers";
 
 export const metadata: Metadata = {
-  title: "Cverai Dashboard",
-  description: "User dashboard",
+  title: "Cver AI - Never Miss a Job Again",
+  description: "Manage your career documents and interview prep",
 };
 
 export default async function HomePage({

@@ -58,7 +58,7 @@ export const JobIdClient = ({
 
       if (!isAuthorized) {
         toast(
-          "Please authorize Cverai to send emails on your behalf from the settings page.  ",
+          "Please authorize Cver AI to send emails on your behalf from the settings page.  ",
           {
             action: {
               label: "Authorize now",

@@ -63,7 +63,7 @@ export const RecentActivityCard = memo(
 
       if (!isAuthorized) {
         toast.error(
-          "✨ Go to the Settings page and enable authorization for Cverai to send emails on your behalf. This option is located in the second card.",
+          "✨ Go to the Settings page and enable authorization for Cver AI to send emails on your behalf. This option is located in the second card.",
           {
             action: {
               label: "Authorize now",

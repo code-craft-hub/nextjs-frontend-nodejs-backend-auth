@@ -71,7 +71,7 @@ export const AIApplyInput = memo(
         setUploadedFiles({ file, preview, type: fileType });
         try {
           toast.promise(processDocument(file), {
-            loading: `Cverai is converting this ${fileType} into text.`,
+            loading: `Cver AI is converting this ${fileType} into text.`,
             success: (data) => {
               setExtractedText(data?.text ?? "");
               return `Done processing the ${fileType}`;
@@ -102,7 +102,7 @@ export const AIApplyInput = memo(
 
           if (!isAuthorized) {
             toast(
-              "Please authorize Cverai to send emails on your behalf from the settings page.  ",
+              "Please authorize Cver AI to send emails on your behalf from the settings page.  ",
               {
                 action: {
                   label: "Authorize now",

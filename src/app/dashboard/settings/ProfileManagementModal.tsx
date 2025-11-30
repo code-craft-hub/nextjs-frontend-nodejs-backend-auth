@@ -233,7 +233,7 @@ export default function ProfileManagementModal({
                 </div>
 
                 <div className="space-y-1.5 col-span-2">
-                  <h1 className="">Role of Interest</h1>
+                  <h1 className="">Role of Interest <span className="text-2xs">(Avoid ambigious words)</span> </h1>
                   <Controller
                     name="rolesOfInterest"
                     control={control}
@@ -344,7 +344,7 @@ export default function ProfileManagementModal({
                     render={({ field }) => (
                       <Textarea
                         className=""
-                        placeholder="Tell Cverai a bit about this profile — it'll help personalize your career documents when needed."
+                        placeholder="Tell Cver AI a bit about this profile — it'll help personalize your career documents when needed."
                         {...field}
                       ></Textarea>
                     )}
