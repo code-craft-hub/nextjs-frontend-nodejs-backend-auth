@@ -196,25 +196,22 @@ export const AIApplyInput = memo(
                 className="hidden "
               />
 
-              {PROFILE_OPTIONS.slice(1).map(
-                ({ label, icon: Icon }, index) => (
-                  <div>
-                    <label
-                      htmlFor="file-upload"
-                      key={label}
-                      className={cn(
-                        "gap-2 p-2 group hover:text-primary hover:cursor-pointer flex items-center text-xs"
-                      )}
-                    >
-                      {Icon && (
-                        <Icon className="size-4 group-hover:text-primary" />
-                      )}
-                      <span className="group-hover:text-primary">{label}</span>
-                    </label>
-                    <Separator className={cn(index == 1 && "hidden", "m")} />
-                  </div>
-                )
-              )}
+              {PROFILE_OPTIONS.slice(1).map(({ label, icon: Icon }, index) => (
+                <div key={label}>
+                  <label
+                    htmlFor="file-upload"
+                    className={cn(
+                      "gap-2 p-2 group hover:text-primary hover:cursor-pointer flex items-center text-xs"
+                    )}
+                  >
+                    {Icon && (
+                      <Icon className="size-4 group-hover:text-primary" />
+                    )}
+                    <span className="group-hover:text-primary">{label}</span>
+                  </label>
+                  <Separator className={cn(index == 1 && "hidden", "m")} />
+                </div>
+              ))}
             </DropdownMenuContent>
           </DropdownMenu>
           <button

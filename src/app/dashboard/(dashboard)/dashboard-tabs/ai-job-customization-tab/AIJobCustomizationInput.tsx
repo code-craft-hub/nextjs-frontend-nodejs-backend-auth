@@ -167,10 +167,9 @@ export const AIJobCustomizationInput = memo(() => {
 
                     {PROFILE_OPTIONS.slice(1).map(
                       ({ label, value, icon: Icon }, index) => (
-                        <div>
+                        <div key={value}>
                           <label
                             htmlFor="file-upload"
-                            key={value}
                             className={cn(
                               "gap-2 p-2 group hover:text-primary hover:cursor-pointer flex items-center text-xs"
                             )}
