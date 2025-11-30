@@ -1,7 +1,6 @@
 "use client";
 import { AnimatePresence } from "framer-motion";
 import { useState } from "react";
-import { apiService } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { OnBoardingForm0 } from "./onboarding-pages/OnBoardingForm0";
@@ -13,6 +12,7 @@ import { OnBoardingForm5 } from "./onboarding-pages/OnBoardingForm5";
 import { OnBoardingForm6 } from "./onboarding-pages/OnBoardingForm6";
 import { OnBoardingForm7 } from "./onboarding-pages/OnBoardingForm7";
 import { useRouter } from "next/navigation";
+import { api } from "@/lib/api/client";
 
 export default function OnboardingClient() {
   const [currentStep, setCurrentStep] = useState(0);
@@ -30,7 +30,7 @@ export default function OnboardingClient() {
 
   const router = useRouter();
   const signOut = async () => {
-    await apiService.logout();
+    await api.delete('/delete');
     router.push("/login");
   };
 

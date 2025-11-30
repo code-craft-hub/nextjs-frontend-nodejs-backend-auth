@@ -15,6 +15,7 @@ import { resumeQueries } from "@/lib/queries/resume.queries";
 import { coverLetterQueries } from "@/lib/queries/cover-letter.queries";
 import { CongratulationModal } from "@/components/shared/CongratulationModal";
 import { Save, Sparkles } from "lucide-react";
+import { api } from "@/lib/api/client";
 
 const Preview = ({
   coverLetterId,
@@ -83,7 +84,7 @@ const Preview = ({
         recruiterEmail,
         jobDescription,
         user?.aiApplyPreferences.autoSendApplications,
-       user?.aiApplyPreferences?.useMasterCV && defaultResume?.gcsPath
+        user?.aiApplyPreferences?.useMasterCV && defaultResume?.gcsPath
       );
       setActiveStep(4);
       toast.success("Application Submitted Successfully!");
@@ -106,6 +107,24 @@ const Preview = ({
     }
   };
 
+  const saveApplication = async () => {
+    const gcsPath =
+      user?.aiApplyPreferences?.useMasterCV && defaultResume?.gcsPath;
+    const data = await api.post(
+      "/send-email-with-resume-and-coverletter/save",
+      {
+        user,
+        coverLetterData,
+        resumeData,
+        recruiterEmail,
+        jobDescription,
+        gcsPath,
+      }
+    );
+
+    console.log(data);
+  };
+
   return openModal ? (
     <CongratulationModal handleOpenModal={handleOpenModal} />
   ) : (
@@ -116,7 +135,7 @@ const Preview = ({
         <Button
           disabled={isSubmitting}
           className="text-xs"
-          onClick={handleSubmit}
+          onClick={saveApplication}
         >
           <Save /> Save
         </Button>

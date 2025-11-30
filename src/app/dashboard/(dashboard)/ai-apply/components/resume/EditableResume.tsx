@@ -150,7 +150,7 @@ export const EditableResume: React.FC<PreviewResumeProps> = ({
                 </h2>
                 {hasProfile ? (
                   <p className="leading-relaxed font-merriweather whitespace-pre-wrap">
-                    {profile}
+                    {normalizeToString(profile)}
                   </p>
                 ) : isStreaming ? (
                   <div className="space-y-2">
