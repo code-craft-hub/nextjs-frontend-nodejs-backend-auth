@@ -1,12 +1,10 @@
 "use client";
 import { ArrowUp, Plus } from "lucide-react";
-import {v4 as uuidv4} from "uuid";
+import { v4 as uuidv4 } from "uuid";
 
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { memo, useState } from "react";
@@ -26,10 +24,16 @@ import {
   ActionValue,
   PROFILE_OPTIONS,
 } from "../../components/constants";
-import { SelectOptions } from "../../components/SelectOptions";
-import LockIcon from "@/components/icons/LockIcon";
+import { SelectOptions, SelectProfile } from "../../components/SelectOptions";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
+import { useDocumentExtraction } from "@/app/onboarding/onboarding-pages/AnyFormatToText";
+import { UploadedFile } from "@/types";
+import { userQueries } from "@/lib/queries/user.queries";
+import { useQuery } from "@tanstack/react-query";
+import { Separator } from "@/components/ui/separator";
+import { FileUploadForm } from "@/components/FileUploadForm";
+import { isEmpty } from "lodash";
 
 const FORM_SCHEMA = z.object({
   jobDescription: z.string().min(2, {
@@ -38,18 +42,19 @@ const FORM_SCHEMA = z.object({
 });
 
 export const AIJobCustomizationInput = memo(() => {
-  const [dataSource, setDataSource] = useState<string>("select-profile");
+  const { data: user } = useQuery(userQueries.detail());
+  const profile = user?.dataSource;
   const [docsInput, setDocsInput] = useState<ActionValue>("tailor-resume");
-  const [userProfile, setUserProfile] = useState<string>("profile1");
+  const [userProfile, setUserProfile] = useState<string>(() => {
+    return profile?.[0]?.id || "";
+  });
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [uploadedFiles, setUploadedFiles] = useState<UploadedFile | null>(null);
+  const [extractedText, setExtractedText] = useState<string>("");
+
   const router = useRouter();
 
-  const changeDataSource = (value: string) => {
-    setDataSource(value);
-  };
-
-  const onDocumentChange = (value: ActionValue) => {
-    setDocsInput(value);
-  };
+  const isSelectedFile = !isEmpty(uploadedFiles);
 
   const form = useForm<z.infer<typeof FORM_SCHEMA>>({
     // resolver: zodResolver(FORM_SCHEMA),
@@ -59,20 +64,63 @@ export const AIJobCustomizationInput = memo(() => {
   });
 
   const onSubmit = ({ jobDescription }: z.infer<typeof FORM_SCHEMA>) => {
-
-
+    // console.log(extractedText); return;
     router.push(
-      `/dashboard/${docsInput}/${uuidv4()}?dataSource=${dataSource}&profile=${userProfile}&jobDescription=${jobDescription}`
+      `/dashboard/${docsInput}/${uuidv4()}?profile=${userProfile}&jobDescription=${
+        jobDescription + extractedText
+      }&aiApply=false`
     );
   };
 
-  const profiles = [
-    { value: "profile1", label: "Base profile", icon: LockIcon },
-  ];
+  const { processDocument, isProcessing } = useDocumentExtraction();
+
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+
+    const file = files[0];
+
+    const fileType = file.type.startsWith("image/") ? "image" : "pdf";
+    const reader = new FileReader();
+
+    reader.onload = async (e) => {
+      const preview = e.target?.result as string;
+      setUploadedFiles({ file, preview, type: fileType });
+      try {
+        toast.promise(processDocument(file), {
+          loading: `Cver AI is converting this ${fileType} into text.`,
+          success: (data) => {
+            setExtractedText(data?.text ?? "");
+            return `Done processing the ${fileType}`;
+          },
+          error: "Error",
+        });
+      } catch (error) {
+        console.error("Error extracting text:", error);
+      }
+    };
+
+    reader.readAsDataURL(file);
+
+    event.target.value = "";
+
+    setIsDropdownOpen(false);
+  };
 
   return (
     <div className="!relative h-36">
-      <div className="relative shadow-blue-200 border-blue-500 rounded-2xl border-r shadow-xl h-38">
+      <div
+        // className="relative shadow-blue-200 border-blue-500 rounded-2xl border-r shadow-xl h-38"
+        className={cn(
+          "relative shadow-blue-200 border-blue-500 rounded-2xl border-r shadow-xl  flex flex-col justify-between",
+          isSelectedFile ? "" : "h-38"
+        )}
+      >
+        <FileUploadForm
+          uploadedFiles={uploadedFiles}
+          setUploadedFiles={setUploadedFiles}
+          isProcessing={isProcessing}
+        />
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
             <FormField
@@ -83,7 +131,11 @@ export const AIJobCustomizationInput = memo(() => {
                   <FormControl>
                     <textarea
                       placeholder="Let's get started"
-                      className="w-full outline-none focus:outline-none text-xs focus:border-none p-2 resize-none pl-4 pt-2 border-none placeholder:font-medium focus-visible:border-none h-26"
+                      // className="w-full outline-none focus:outline-none text-xs focus:border-none p-2 resize-none pl-4 pt-2 border-none placeholder:font-medium focus-visible:border-none h-26"
+                      className={cn(
+                        "w-full outline-none focus:outline-none focus:border-none p-2 resize-none pl-4 pt-2 border-none placeholder:font-medium focus-visible:border-none  text-xs",
+                        isSelectedFile ? "" : "h-26"
+                      )}
                       {...field}
                     />
                   </FormControl>
@@ -94,7 +146,51 @@ export const AIJobCustomizationInput = memo(() => {
 
             <div className="flex  justify-between bg-yellow py-2">
               <div className="flex gap-2 px-3">
-                <DropdownMenu>
+                <DropdownMenu
+                  open={isDropdownOpen}
+                  onOpenChange={setIsDropdownOpen}
+                >
+                  <DropdownMenuTrigger className="data-[state=open]:!shadow-2xl rounded-full border-blue-500 p-1 hover:cursor-pointer z-20 border-2">
+                    <Plus className="text-blue-400 size-4 font-bold" />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    className="p-0 flex flex-col gap-"
+                    align="start"
+                  >
+                    <input
+                      id="file-upload"
+                      type="file"
+                      accept="image/*,.pdf"
+                      onChange={handleFileUpload}
+                      className="hidden "
+                    />
+
+                    {PROFILE_OPTIONS.slice(1).map(
+                      ({ label, value, icon: Icon }, index) => (
+                        <div>
+                          <label
+                            htmlFor="file-upload"
+                            key={value}
+                            className={cn(
+                              "gap-2 p-2 group hover:text-primary hover:cursor-pointer flex items-center text-xs"
+                            )}
+                          >
+                            {Icon && (
+                              <Icon className="size-4 group-hover:text-primary" />
+                            )}
+                            <span className="group-hover:text-primary">
+                              {label}
+                            </span>
+                          </label>
+                          <Separator
+                            className={cn(index == 1 && "hidden", "m")}
+                          />
+                        </div>
+                      )
+                    )}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                {/* <DropdownMenu>
                   <DropdownMenuTrigger className=" data-[state=open]:!shadow-2xl  rounded-full  border-blue-500 p-1 hover:cursor-pointer z-20 border-2">
                     <Plus className="text-blue-400 size-4 font-bold" />
                   </DropdownMenuTrigger>
@@ -119,12 +215,12 @@ export const AIJobCustomizationInput = memo(() => {
                       ))}
                     </DropdownMenuGroup>
                   </DropdownMenuContent>
-                </DropdownMenu>
+                </DropdownMenu> */}
                 <div className="hover:cursor-pointer z-20">
                   <SelectOptions
                     options={ACTION_OPTIONS}
                     value={docsInput}
-                    onValueChange={(value) => onDocumentChange(value)}
+                    onValueChange={(value) => setDocsInput(value)}
                     placeholder="Tailor Resume"
                     triggerClassName={
                       " border-2 border-primary/70 rounded-xl text-primary hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 [&_svg]:!text-primary  text-2xs"
@@ -135,8 +231,8 @@ export const AIJobCustomizationInput = memo(() => {
               </div>
               <div className="flex gap-2 px-3">
                 <div className="hover:cursor-pointer ">
-                  <SelectOptions
-                    options={profiles}
+                  <SelectProfile
+                    options={profile ?? []}
                     value={userProfile}
                     onValueChange={(value) => {
                       setUserProfile(value);

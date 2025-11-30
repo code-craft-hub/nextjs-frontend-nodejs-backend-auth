@@ -53,7 +53,22 @@ export const JobIdClient = ({
   };
 
   const handleApplyClick = async () => {
-    if (user?.email) {
+    if (!job) return;
+
+    updateJobApplicationHistory.mutate({
+      id: job.id,
+      data: {
+        appliedJobs: job.id,
+      },
+    });
+
+    if(!job?.emailApply){
+      window.open(!!job.link ? job?.link : job?.applyUrl, "__blank");
+      return;
+    }
+
+
+    if (user?.email && job?.emailApply) {
       const { isAuthorized } = await apiService.gmailOauthStatus();
 
       if (!isAuthorized) {
@@ -76,19 +91,6 @@ export const JobIdClient = ({
       }
     }
 
-    if (!job?.emailApply) {
-      toast.error(
-        "No destination email found in job description. Please include the destination email in the job description."
-      );
-      return;
-    }
-
-    updateJobApplicationHistory.mutate({
-      id: job.id,
-      data: {
-        appliedJobs: job.id,
-      },
-    });
     const params = new URLSearchParams();
     params.set("jobDescription", JSON.stringify(job?.descriptionText || ""));
     params.set("recruiterEmail", encodeURIComponent(job?.emailApply));
@@ -260,7 +262,7 @@ export const JobIdClient = ({
                       </p>
                       <p
                         // href="https://www.estherhoward.com"
-                        className="text-sm text-gray-900 hover:text-blue-600"
+                        className="text-sm text-gray-900 hover:text-blue-600 break-all"
                       >
                         {job?.companyLogo?.split("/")[2] ?? "N/A"}
                       </p>
@@ -298,7 +300,7 @@ export const JobIdClient = ({
                       </p>
                       <p
                         // href="mailto:esther.howard@gmail.com"
-                        className="text-sm text-gray-900 hover:text-blue-600"
+                        className="text-sm text-gray-900 hover:text-blue-600 break-all"
                       >
                         {job?.companyLogo?.split("/")[2] ?? "N/A"}
                       </p>

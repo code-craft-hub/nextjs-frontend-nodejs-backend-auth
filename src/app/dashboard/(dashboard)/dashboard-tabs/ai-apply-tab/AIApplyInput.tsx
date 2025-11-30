@@ -6,7 +6,6 @@ import { v4 as uuidv4 } from "uuid";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { memo, useCallback, useState } from "react";
@@ -29,7 +28,10 @@ import { UploadedFile } from "@/types";
 import { cn } from "@/lib/utils";
 import { useDocumentExtraction } from "@/app/onboarding/onboarding-pages/AnyFormatToText";
 import { isEmpty } from "lodash";
-import { apiService, useAuth } from "@/hooks/use-auth";
+import { apiService } from "@/hooks/use-auth";
+import { Separator } from "@/components/ui/separator";
+import { userQueries } from "@/lib/queries/user.queries";
+import { useQuery } from "@tanstack/react-query";
 
 const FORM_SCHEMA = z.object({
   jobDescription: z.string().min(2, {
@@ -39,7 +41,7 @@ const FORM_SCHEMA = z.object({
 
 export const AIApplyInput = memo(
   ({ jobDescription }: { jobDescription: string }) => {
-    const { user } = useAuth();
+    const { data: user } = useQuery(userQueries.detail());
     const [uploadedFiles, setUploadedFiles] = useState<UploadedFile | null>(
       null
     );
@@ -177,13 +179,13 @@ export const AIApplyInput = memo(
             />
           </form>
         </Form>
-        <div className="flex justify-between  p-2">
+        <div className="flex justify-between p-2">
           <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
             <DropdownMenuTrigger className="data-[state=open]:!shadow-2xl rounded-full border-blue-500 p-1 hover:cursor-pointer z-20 border-2">
               <Plus className="text-blue-400 size-4 font-bold" />
             </DropdownMenuTrigger>
             <DropdownMenuContent
-              className="p-2 flex flex-col gap-2"
+              className="p-0 flex flex-col gap-"
               align="start"
             >
               <input
@@ -194,19 +196,25 @@ export const AIApplyInput = memo(
                 className="hidden "
               />
 
-              {PROFILE_OPTIONS.slice(1).map(({ label, value, icon: Icon }) => (
-                <label
-                  htmlFor="file-upload"
-                  key={value}
-                  className={cn(
-                    "gap-2 group hover:text-primary hover:cursor-pointer p-0 flex items-center text-xs"
-                  )}
-                >
-                  {Icon && <Icon className="size-4 group-hover:text-primary" />}
-                  <span className="group-hover:text-primary">{label}</span>
-                  <DropdownMenuSeparator />
-                </label>
-              ))}
+              {PROFILE_OPTIONS.slice(1).map(
+                ({ label, icon: Icon }, index) => (
+                  <div>
+                    <label
+                      htmlFor="file-upload"
+                      key={label}
+                      className={cn(
+                        "gap-2 p-2 group hover:text-primary hover:cursor-pointer flex items-center text-xs"
+                      )}
+                    >
+                      {Icon && (
+                        <Icon className="size-4 group-hover:text-primary" />
+                      )}
+                      <span className="group-hover:text-primary">{label}</span>
+                    </label>
+                    <Separator className={cn(index == 1 && "hidden", "m")} />
+                  </div>
+                )
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
           <button
