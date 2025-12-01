@@ -4,7 +4,6 @@ import { apiService } from "@/hooks/use-auth";
 import { EditableResume } from "../(dashboard)/ai-apply/components/resume/EditableResume";
 import { ProgressIndicator } from "../(dashboard)/ai-apply/progress-indicator";
 import TailorCoverLetterDisplay from "../tailor-cover-letter/[coverLetterId]/TailorCoverLetterDisplay";
-// import { COLLECTIONS } from "@/lib/utils/constants";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useState } from "react";
@@ -15,7 +14,7 @@ import { resumeQueries } from "@/lib/queries/resume.queries";
 import { coverLetterQueries } from "@/lib/queries/cover-letter.queries";
 import { CongratulationModal } from "@/components/shared/CongratulationModal";
 import { Save, Sparkles } from "lucide-react";
-import { api } from "@/lib/api/client";
+// import { api } from "@/lib/api/client";
 
 const Preview = ({
   coverLetterId,
@@ -107,23 +106,36 @@ const Preview = ({
     }
   };
 
-  const saveApplication = async () => {
-    const gcsPath =
-      user?.aiApplyPreferences?.useMasterCV && defaultResume?.gcsPath;
-    const data = await api.post(
-      "/send-email-with-resume-and-coverletter/save",
-      {
-        user,
-        coverLetterData,
-        resumeData,
-        recruiterEmail,
-        jobDescription,
-        gcsPath,
-      }
-    );
+  // const saveApplication = async () => {
+  //   const gcsPath =
+  //     user?.aiApplyPreferences?.useMasterCV && defaultResume?.gcsPath;
+  //  await api.post(
+  //     "/send-email-with-resume-and-coverletter/save",
+  //     {
+  //       user,
+  //       coverLetterData,
+  //       resumeData,
+  //       recruiterEmail,
+  //       jobDescription,
+  //       gcsPath,
+  //     }
+  //   );
+  // };
 
-    console.log(data);
-  };
+  const buildViewerSrc = (rawUrl: string) => {
+  const url = rawUrl.split("?")[0].toLowerCase();
+  const isPDF = url.endsWith(".pdf");
+
+  if (isPDF) {
+    return `${rawUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`;
+  }
+
+  // Word or any Office document
+  return `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(
+    rawUrl
+  )}`;
+};
+ const viewerSrc = buildViewerSrc(defaultResume?.url);
 
   return openModal ? (
     <CongratulationModal handleOpenModal={handleOpenModal} />
@@ -135,9 +147,9 @@ const Preview = ({
         <Button
           disabled={isSubmitting}
           className="text-xs"
-          onClick={saveApplication}
+          onClick={handleSubmit}
         >
-          <Save /> Save
+          <Save /> Submit <Sparkles className="ml-2 h-4 w-4" />
         </Button>
       </div>
       <TailorCoverLetterDisplay
@@ -148,7 +160,8 @@ const Preview = ({
       {user?.aiApplyPreferences?.useMasterCV ? (
         <div className="h-[80svh] overflow-hidden">
           <iframe
-            src={`${defaultResume?.url}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`}
+            src={viewerSrc}
+            // src={`${defaultResume?.url}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`}
             className="w-full h-[85svh] overflow-hidden border-0"
             title="Resume PDF"
           />

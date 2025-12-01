@@ -64,7 +64,6 @@ export const AIJobCustomizationInput = memo(() => {
   });
 
   const onSubmit = ({ jobDescription }: z.infer<typeof FORM_SCHEMA>) => {
-    // console.log(extractedText); return;
     router.push(
       `/dashboard/${docsInput}/${uuidv4()}?profile=${userProfile}&jobDescription=${
         jobDescription + extractedText

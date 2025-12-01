@@ -87,7 +87,6 @@ export const SelectProfile = memo(
     contentClassName?: string;
     triggerClassName?: string;
   }) => {
-    console.log(options);
     return (
       <div className={cn("", className)}>
         <Select value={value} onValueChange={onValueChange}>
