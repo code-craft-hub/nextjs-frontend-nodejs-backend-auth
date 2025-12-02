@@ -12,30 +12,35 @@ import { getSessionFromCookies } from "@/lib/auth.utils";
 
 const LandingPage = async () => {
   const queryClient = createServerQueryClient();
-let user = null;
-  const cookieUser = await getSessionFromCookies();
+  let user = null;
   let filters: JobFilters = {
     page: 1,
     limit: 10,
     title: "",
   };
-  if (cookieUser) {
-    user =  await queryClient.fetchQuery(userQueries.detail());
-    const userDataSource = getDataSource(user);
-
-    filters = {
-      page: 1,
-      limit: 10,
-      title: userDataSource?.key || userDataSource?.title || "",
-    };
+  try {
+    const cookieUser = await getSessionFromCookies();
+    
+    if (cookieUser) {
+      user = await queryClient.fetchQuery(userQueries.detail());
+      const userDataSource = getDataSource(user);
+  
+      filters = {
+        page: 1,
+        limit: 10,
+        title: userDataSource?.key || userDataSource?.title || "",
+      };
+    }
+    await prefetchWithPriority(queryClient, [
+      {
+        queryKey: jobsQueries.all(filters).queryKey,
+        queryFn: jobsQueries.all(filters).queryFn,
+        priority: "high",
+      },
+    ]);
+  } catch (error) {
+   console.error("Error in landing Page : ", error) 
   }
-  await prefetchWithPriority(queryClient, [
-    {
-      queryKey: jobsQueries.all(filters).queryKey,
-      queryFn: jobsQueries.all(filters).queryFn,
-      priority: "high",
-    },
-  ]);
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <LandingPageClient filters={filters} user={user} />
