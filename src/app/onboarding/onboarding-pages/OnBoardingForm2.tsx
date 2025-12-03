@@ -15,7 +15,7 @@ import { userQueries } from "@/lib/queries/user.queries";
 import { useResumeUploadWithProgress } from "@/hooks/useResumeUploadWithProgress";
 import { queryKeys } from "@/lib/query/keys";
 
-export const OnBoardingForm2 = ({ onNext, onPrev }: OnboardingFormProps) => {
+export const OnBoardingForm2 = ({ onNext, onPrev, children }: OnboardingFormProps) => {
   const queryClient = useQueryClient();
 
   const { isUpdatingUserLoading } = useAuth();
@@ -42,6 +42,14 @@ export const OnBoardingForm2 = ({ onNext, onPrev }: OnboardingFormProps) => {
         onNext();
       } else {
         toast.error(result.error || "Failed to upload resume");
+        toast("Skip this process", {
+          action: {
+            label: "Skip",
+            onClick: () => {
+              onNext();
+            },
+          },
+        });
       }
     },
     [uploadResume, clearError, user?.firstName, onNext]
@@ -60,6 +68,7 @@ export const OnBoardingForm2 = ({ onNext, onPrev }: OnboardingFormProps) => {
       transition={{ duration: 0.3, ease: "easeInOut" }}
       className="min-h-screen items-center justify-center flex flex-col font-poppins"
     >
+      <div className="absolute right-4 top-2 z-50">{children}</div>
       <div className="onboarding-container">
         <div
           className={cn(
@@ -129,8 +138,7 @@ export const OnBoardingForm2 = ({ onNext, onPrev }: OnboardingFormProps) => {
                 disabled={isUpdatingUserLoading || isUploading}
                 className="onboarding-btn overflow-hidden"
               >
-                {isUploading ? "Processing..."
-                  : "Save and Continue"}
+                {isUploading ? "Processing..." : "Save and Continue"}
               </Button>
             </div>
           </form>

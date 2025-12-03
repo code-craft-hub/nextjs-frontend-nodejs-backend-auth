@@ -2,10 +2,7 @@
 import { AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  // LogOut,
-  X,
-} from "lucide-react";
+import { X } from "lucide-react";
 import { OnBoardingForm0 } from "./onboarding-pages/OnBoardingForm0";
 import { OnBoardingForm1 } from "./onboarding-pages/OnBoardingForm1";
 import { OnBoardingForm2 } from "./onboarding-pages/OnBoardingForm2";
@@ -36,10 +33,6 @@ export default function OnboardingClient() {
     await api.delete("/delete");
     router.push("/login");
   };
-  // const signOut = async () => {
-  //   await api.post("/logout");
-  //   router.push("/login");
-  // };
 
   const nextStep = () => {
     if (currentStep < totalSteps - 1) {
@@ -69,13 +62,6 @@ export default function OnboardingClient() {
           fromDataSourceStep={fromDataSourceStep}
         >
           <div className="">
-            {/* <Button
-              className="text-blue-500 lg:text-white"
-              variant={"ghost"}
-              onClick={signOut}
-            >
-              <LogOut />
-            </Button> */}
             <Button className="" variant={"ghost"} onClick={deleteAccount}>
               <X />
             </Button>

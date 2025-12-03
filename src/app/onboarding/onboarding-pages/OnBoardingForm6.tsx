@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { features } from "./constants";
 import { motion } from "framer-motion";
 
-export const OnBoardingForm6 = ({ onNext, onPrev }: OnboardingFormProps) => {
+export const OnBoardingForm6 = ({ onNext, onPrev, children }: OnboardingFormProps) => {
   return (
     <motion.div
       initial={{ opacity: 0, x: 100 }}
@@ -18,6 +18,7 @@ export const OnBoardingForm6 = ({ onNext, onPrev }: OnboardingFormProps) => {
           "linear-gradient(117.28deg, rgba(130, 172, 241, 0.55) -78.15%, #FFFFFF 36.71%, #FFFFFF 67.82%)",
       }}
     >
+      <div className="absolute right-4 top-2 z-50">{children}</div>
       <div className="flex flex-col items-start gap-9 w-full max-w-[1114px]">
         <div className="flex flex-row justify-between items-center w-full">
           <div className="flex col-span-2 items-center space-x-2">

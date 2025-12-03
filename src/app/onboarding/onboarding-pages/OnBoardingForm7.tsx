@@ -12,8 +12,9 @@ import { generateIdempotencyKey } from "@/lib/utils/helpers";
 import { baseURL } from "@/lib/api/client";
 import { useQuery } from "@tanstack/react-query";
 import { userQueries } from "@/lib/queries/user.queries";
+import { toast } from "sonner";
 
-export const OnBoardingForm7 = ({ onPrev }: OnboardingFormProps) => {
+export const OnBoardingForm7 = ({ onPrev, children }: OnboardingFormProps) => {
   const [seletePlan, setSeletePlan] = useState("free");
   const { completeOnboarding, isOnboardingLoading } = useAuth();
   const { data: user } = useQuery(userQueries.detail());
@@ -28,7 +29,7 @@ export const OnBoardingForm7 = ({ onPrev }: OnboardingFormProps) => {
       }
 
       try {
-        const idempotencyKey = generateIdempotencyKey();
+        const idempotencyKey: string = generateIdempotencyKey();
 
         const response = await fetch(
           `${baseURL}/paystack/payments/initialize`,
@@ -84,10 +85,26 @@ export const OnBoardingForm7 = ({ onPrev }: OnboardingFormProps) => {
         }
       } catch (err: any) {
         console.error("Payment error:", err);
+        toast("Skip this process", {
+          action: {
+            label: "Skip",
+            onClick: () => {
+              router.push(`/dashboard/home`);
+            },
+          },
+        });
       } finally {
       }
     } catch (error) {
       console.error("Onboarding completion failed:", error);
+      toast("Skip this process", {
+        action: {
+          label: "Skip",
+          onClick: () => {
+            router.push(`/dashboard/home`);
+          },
+        },
+      });
     }
   };
   return (
@@ -102,6 +119,7 @@ export const OnBoardingForm7 = ({ onPrev }: OnboardingFormProps) => {
           "linear-gradient(117.28deg, rgba(130, 172, 241, 0.55) -78.15%, #FFFFFF 36.71%, #FFFFFF 67.82%)",
       }}
     >
+      <div className="absolute right-4 top-2 z-50">{children}</div>
       <div className="flex flex-col items-start gap-9 w-full max-w-screen-2xl">
         <div className="flex flex-row justify-between items-center w-full">
           <div className="flex col-span-2 items-center space-x-2">

@@ -1,6 +1,7 @@
 "use client";
 
 import authClient from "@/lib/axios/auth-api";
+import { userQueries } from "@/lib/queries/user.queries";
 import { RegisterUserSchema } from "@/lib/schema-validations";
 import { CoverLetter, IUser, Login, Resume } from "@/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -275,6 +276,7 @@ export function useAuth(initialUser?: Partial<IUser>) {
     mutationFn: (data: any) => apiService.updateUser(data),
     onSuccess: (data) => {
       queryClient.setQueryData(["auth", "user"], data);
+      queryClient.invalidateQueries(userQueries.detail())
       // router.push("/dashboard/home");
     },
   });

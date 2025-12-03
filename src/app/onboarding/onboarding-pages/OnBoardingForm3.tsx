@@ -50,7 +50,7 @@ const formSchema = z.object({
     .min(1, "Please add at least one role of interest"),
 });
 
-export const OnBoardingForm3 = ({ onNext, onPrev }: OnboardingFormProps) => {
+export const OnBoardingForm3 = ({ onNext, onPrev , children}: OnboardingFormProps) => {
   const { updateUser, isUpdatingUserLoading } = useAuth();
   const { continent } = useUserLocation();
 
@@ -107,7 +107,9 @@ export const OnBoardingForm3 = ({ onNext, onPrev }: OnboardingFormProps) => {
       toast("Skip this process", {
         action: {
           label: "Skip",
-          onClick: () => () => onNext(),
+          onClick: () => {
+            onNext();
+          },
         },
       });
     }
@@ -132,6 +134,7 @@ export const OnBoardingForm3 = ({ onNext, onPrev }: OnboardingFormProps) => {
       transition={{ duration: 0.3, ease: "easeInOut" }}
       className="min-h-screen items-center justify-center flex flex-col font-poppins"
     >
+      <div className="absolute right-4 top-2 z-50">{children}</div>
       <div className="onboarding-container">
         <div
           className={cn(

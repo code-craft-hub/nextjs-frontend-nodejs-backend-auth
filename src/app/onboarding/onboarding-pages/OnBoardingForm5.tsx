@@ -43,7 +43,7 @@ const formSchema = z.object({
   others: z.string().optional(),
 });
 
-export const OnBoardingForm5 = ({ onNext, onPrev }: OnboardingFormProps) => {
+export const OnBoardingForm5 = ({ onNext, onPrev , children}: OnboardingFormProps) => {
   const { updateUser, isUpdatingUserLoading } = useAuth();
   const { data: user } = useQuery(userQueries.detail());
 
@@ -59,7 +59,7 @@ export const OnBoardingForm5 = ({ onNext, onPrev }: OnboardingFormProps) => {
       await updateUser({
         discovery: values,
         expiryTime: expireNextThreeDays,
-        credit: 10,
+        credit: 5,
       });
       toast.success(`${user?.firstName} Your data has be saved!`);
       onNext();
@@ -69,7 +69,7 @@ export const OnBoardingForm5 = ({ onNext, onPrev }: OnboardingFormProps) => {
       toast("Skip this process", {
         action: {
           label: "Skip",
-          onClick: () => () => onNext(),
+          onClick: () => onNext(),
         },
       });
     }
@@ -84,6 +84,7 @@ export const OnBoardingForm5 = ({ onNext, onPrev }: OnboardingFormProps) => {
       transition={{ duration: 0.3, ease: "easeInOut" }}
       className="min-h-screen items-center justify-center flex flex-col font-poppins"
     >
+      <div className="absolute right-4 top-2 z-50">{children}</div>
       <div className="onboarding-container !mt-4">
         <div
           className={cn(

@@ -47,7 +47,7 @@ const countryCodes = [
 
 export const UserProfileForm: React.FC = () => {
   const { data: user } = useQuery(userQueries.detail());
-  const { continent_code } = useUserLocation();
+  const { continent_code, country } = useUserLocation();
   const updateUser = useUpdateUserMutation();
   const form = useForm<ProfileFormData>({
     // resolver: zodResolver(profileSchema),
@@ -62,11 +62,13 @@ export const UserProfileForm: React.FC = () => {
     },
   });
 
+
   useEffect(() => {
+    const countryName = typeof user?.country == "object" ? (user?.country as any)?.name : country;
     form.setValue("firstName", user?.firstName || "");
     form.setValue("lastName", user?.lastName || "");
     form.setValue("emailAddress", user?.email || "");
-    form.setValue("country", user?.country || "");
+    form.setValue("country",  countryName  || "");
     form.setValue("state", user?.state || "");
     form.setValue("countryCode", user?.countryCode || continent_code || "");
     form.setValue("phoneNumber", user?.phoneNumber || "");
