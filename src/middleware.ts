@@ -13,7 +13,6 @@ async function verifySessionToken(
       issuer: "nextjs-app",
     });
 
-    console.log("Email verified : ", payload.emailVerified)
     return {
       uid: payload.uid as string,
       email: payload.email as string,

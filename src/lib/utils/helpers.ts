@@ -11,8 +11,6 @@ import { MouseEvent } from "react";
  */
 export function getDaysRemaining(firebaseTimestamp: any) {
   const date = new Date(firebaseTimestamp);
-  console.log("firebase time stamp : ", firebaseTimestamp)
-  console.log(date, isNaN(date?.getTime()), date.getTime());
 
   if (isNaN(date?.getTime())) {
     return 0;

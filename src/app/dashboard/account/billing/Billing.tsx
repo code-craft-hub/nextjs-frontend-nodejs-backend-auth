@@ -29,8 +29,6 @@ export const Billing = ({ reference }: any) => {
   }`;
   const usersReferred = user?.usersReferred?.length || 0;
 
-  // console.log(usersReferred, user?.expiryTime);
-
   const handleReferralCopy = () => {
     navigator.clipboard.writeText(REFERRAL);
     toast.success("Referral code copied to clipboard!");

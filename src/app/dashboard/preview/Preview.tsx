@@ -123,19 +123,20 @@ const Preview = ({
   // };
 
   const buildViewerSrc = (rawUrl: string) => {
-  const url = rawUrl.split("?")[0].toLowerCase();
-  const isPDF = url.endsWith(".pdf");
+    const url = rawUrl.split("?")[0].toLowerCase();
+    const isPDF = url.endsWith(".pdf");
 
-  if (isPDF) {
-    return `${rawUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`;
-  }
+    if (isPDF) {
+      return `${rawUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`;
+    }
 
-  // Word or any Office document
-  return `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(
-    rawUrl
-  )}`;
-};
- const viewerSrc = buildViewerSrc(defaultResume?.url);
+    // Word or any Office document
+    return `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(
+      rawUrl
+    )}`;
+  };
+  const viewerSrc = buildViewerSrc(defaultResume?.url);
+
 
   return openModal ? (
     <CongratulationModal handleOpenModal={handleOpenModal} />
