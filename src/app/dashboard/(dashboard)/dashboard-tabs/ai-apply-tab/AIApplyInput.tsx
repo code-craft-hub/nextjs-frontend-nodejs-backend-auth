@@ -191,7 +191,7 @@ export const AIApplyInput = memo(
               <input
                 id="file-upload"
                 type="file"
-                accept="image/*,.pdf"
+                accept="image/*,.pdf,.doc,.docx,.txt"
                 onChange={handleFileUpload}
                 className="hidden "
               />
