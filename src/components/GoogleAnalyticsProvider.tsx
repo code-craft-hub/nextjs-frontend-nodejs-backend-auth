@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useEffect } from "react";
-import { usePathname, useSearchParams } from "next/navigation";
-import { initGA, logPageView } from "@/lib/analytics";
+import { useEffect } from 'react';
+import { usePathname } from 'next/navigation';
+import { initGA, logPageView } from '@/lib/analytics';
 
 export default function GoogleAnalyticsProvider({
   children,
@@ -10,24 +10,22 @@ export default function GoogleAnalyticsProvider({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
 
+  // Initialize GA once on mount
   useEffect(() => {
-    // Initialize GA on mount
     initGA();
   }, []);
 
+  // Track page views on route change
   useEffect(() => {
-    // Track page views on route change
-    if (pathname) {
-      const url =
-        pathname +
-        (searchParams?.toString() ? `?${searchParams.toString()}` : "");
-      const title = document.title;
-      logPageView(url, title);
-    }
-  }, [pathname, searchParams]);
+    if (!pathname) return;
+
+    // Read query string directly from window.location
+    const search = typeof window !== 'undefined' ? window.location.search : '';
+    const url = pathname + search;
+
+    logPageView(url, document.title);
+  }, [pathname]);
 
   return <>{children}</>;
 }
-

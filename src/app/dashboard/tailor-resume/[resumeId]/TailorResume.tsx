@@ -130,7 +130,6 @@ export const TailorResume = ({
         resumeId={resumeId}
         isStreaming={streamStatus.isComplete}
       />
-      {/* )} */}
       <div ref={resultsEndRef} className="" />
     </div>
   );
