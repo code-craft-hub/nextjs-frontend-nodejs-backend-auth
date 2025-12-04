@@ -11,7 +11,7 @@ import { coverLetterQueries } from "@/lib/queries/cover-letter.queries";
 const PreviewPage = async ({ searchParams }: any) => {
   const queryClient = createServerQueryClient();
    await queryClient.prefetchQuery(userQueries.detail());
-  const { coverLetterId, resumeId, recruiterEmail, jobDescription } =
+  const { coverLetterId, resumeId, recruiterEmail, jobDescription, aiApplyId } =
     await searchParams;
   // const baseResume = (await searchParams)?.baseResume;
   await prefetchWithPriority(queryClient, [
@@ -35,7 +35,7 @@ const PreviewPage = async ({ searchParams }: any) => {
           resumeId={resumeId}
           recruiterEmail={recruiterEmail}
           jobDescription={jobDescription}
-          // baseResume={baseResume}
+          aiApplyId={aiApplyId}
         />
       </HydrationBoundary>
     </div>

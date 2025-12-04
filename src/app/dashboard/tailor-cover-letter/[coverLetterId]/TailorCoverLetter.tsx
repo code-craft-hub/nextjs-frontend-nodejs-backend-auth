@@ -3,14 +3,11 @@
 import React, { useRef, useEffect, memo } from "react";
 import { Loader2 } from "lucide-react";
 import { useCoverLetterGenerator } from "@/hooks/useCoverLetterGenerator";
-import { apiService } from "@/hooks/use-auth";
 import { useRouter } from "next/navigation";
 import { createCoverLetterOrderedParams } from "@/lib/utils/helpers";
 import { toast } from "sonner";
 import { isEmpty } from "lodash";
-import { COLLECTIONS } from "@/lib/utils/constants";
 import { v4 as uuidv4 } from "uuid";
-import { Button } from "@/components/ui/button";
 import { ProgressIndicator } from "../../(dashboard)/ai-apply/progress-indicator";
 import { useQuery } from "@tanstack/react-query";
 import { userQueries } from "@/lib/queries/user.queries";
@@ -34,14 +31,14 @@ export const TailorCoverLetter = memo<{
     coverLetterQueries.detail(coverLetterId)
   );
 
-    useEffect(() => {
-      if (user?.firstName)
-        logEvent(
-          "Tailor Cover Letter Page",
-          "View Tailor Cover Letter Page",
-          `${user?.firstName} Viewed Tailor Cover Letter Page`
-        );
-    }, [user?.firstName]);
+  useEffect(() => {
+    if (user?.firstName)
+      logEvent(
+        "Tailor Cover Letter Page",
+        "View Tailor Cover Letter Page",
+        `${user?.firstName} Viewed Tailor Cover Letter Page`
+      );
+  }, [user?.firstName]);
 
   const router = useRouter();
   useEffect(() => {
@@ -119,26 +116,23 @@ export const TailorCoverLetter = memo<{
     ? data?.coverLetter
     : generatedContent;
 
-  const handleCoverLetterDelete = async () => {
-    await apiService.deleteCareerDoc(coverLetterId, COLLECTIONS.COVER_LETTER);
-    toast.success("Cover letter deleted successfully");
-    router.push("/dashboard/home");
-  };
+  // const handleCoverLetterDelete = async () => {
+  //   await api.delete(
+  //     `/delete-document/${data?.id}?docType=${COLLECTIONS.COVER_LETTER}`
+  //   );
+  //   toast.success("Cover letter deleted successfully");
+  //   router.push("/dashboard/home");
+  //   await queryClient.invalidateQueries(coverLetterQueries.all());
+  // };
 
   return (
     <div className="grid grid-cols-1 gap-4 sm:gap-6">
       {aiApply && <ProgressIndicator activeStep={1} />}
       <div className="flex w-full gap-3 items-center  p-4  bg-white justify-between">
         <p className="text-xl font-medium font-inter">Tailored Cover Letter</p>
-        <Button
-          className="text-2xs"
-          onClick={() => {
-            handleCoverLetterDelete();
-          }}
-        >
-          Delete
-        </Button>
+        
       </div>
+      
       <div className="bg-slate-50 border-b  border-slate-200 shadow-md rounded-xl flex flex-col items-center justify-between">
         <div
           ref={contentRef}

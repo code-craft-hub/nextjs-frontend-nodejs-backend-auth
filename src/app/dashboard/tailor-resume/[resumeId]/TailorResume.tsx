@@ -2,16 +2,18 @@
 import React, { useEffect, useRef } from "react";
 import { useResumeStream } from "@/hooks/stream-resume-hook";
 import { toast } from "sonner";
-import { apiService } from "@/hooks/use-auth";
 import { COLLECTIONS } from "@/lib/utils/constants";
 import { EditableResume } from "../../(dashboard)/ai-apply/components/resume/EditableResume";
 import { ProgressIndicator } from "../../(dashboard)/ai-apply/progress-indicator";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { resumeQueries } from "@/lib/queries/resume.queries";
 import { userQueries } from "@/lib/queries/user.queries";
 import { logEvent } from "@/lib/analytics";
+import { ResumeDownloadButton } from "./ResumeDownloadButton";
+import { TrashIcon } from "lucide-react";
+import { api } from "@/lib/api/client";
 
 export const TailorResume = ({
   jobDescription,
@@ -27,7 +29,7 @@ export const TailorResume = ({
   recruiterEmail: string;
 }) => {
   const { data: user } = useQuery(userQueries.detail());
-
+  const queryClient = useQueryClient();
   useEffect(() => {
     if (user?.firstName)
       logEvent(
@@ -98,33 +100,34 @@ export const TailorResume = ({
   const shouldUseDbData = streamData.profile === "";
 
   const handleCoverLetterDelete = async () => {
-    await apiService.deleteCareerDoc(resumeId, COLLECTIONS.RESUME);
+    await api.delete(
+      `/delete-document/${resumeId}?docType=${COLLECTIONS.RESUME}`
+    );
     toast.success("Resume deleted successfully");
     router.push("/dashboard/home");
+    await queryClient.invalidateQueries(resumeQueries.detail(resumeId));
   };
   return (
     <div className="space-y-4 sm:space-y-8">
       {aiApply && <ProgressIndicator activeStep={2} />}
       <div className="flex w-full gap-3 items-center  p-4  bg-white justify-between">
         <p className="text-xl font-medium font-inter">Tailored Resume</p>
-        <Button
-          className="text-2xs"
-          onClick={() => {
-            handleCoverLetterDelete();
-          }}
-        >
-          Delete
-        </Button>
-      </div>
-      {/* {defaultResume?.url ? (
-        <div className="w-full h-[600px]">
-          <iframe
-            src={`${defaultResume.url}#toolbar=0&navpanes=0&scrollbar=0`}
-            className="w-full h-full border-0"
-            title="Resume PDF"
+        <div className="flex gap-2">
+          <ResumeDownloadButton
+            resumeData={shouldUseDbData ? data! : streamData}
           />
+          <Button
+            className=""
+            variant={"destructive"}
+            onClick={() => {
+              handleCoverLetterDelete();
+            }}
+          >
+            <TrashIcon className="w-5 h-5 " />
+          </Button>
         </div>
-      ) : ( */}
+      </div>
+
       <EditableResume
         data={shouldUseDbData ? data! : streamData}
         resumeId={resumeId}

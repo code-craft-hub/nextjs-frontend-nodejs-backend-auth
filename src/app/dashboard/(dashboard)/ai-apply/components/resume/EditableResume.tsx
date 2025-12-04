@@ -103,10 +103,10 @@ export const EditableResume: React.FC<PreviewResumeProps> = ({
   return (
     <Card
       className={cn(
-        " p-4 sm:px-5 text-gray-800 font-merriweather py-16 relative rounded-sm"
+        "text-gray-800 font-merriweather relative rounded-sm", hasProfile ? "p-4 sm:px-5 py-16 " : "hidden"
       )}
     >
-      {fullName && (
+      {hasProfile && (
         <EditDialog
           trigger={
             <SectionWrapper show={!!fullName || isStreaming}>

@@ -121,7 +121,7 @@ const getColumns = (
           className="text-blue-500 font-jakarta"
           onClick={() => {
             router.push(
-              `/dashboard/preview?resumeId=${row.original.resumeId}&coverLetterId=${row.original.coverLetterId}&recruiterEmail=${row.original.recruiterEmail}&jobDescription=${row.original.jobDescription}`
+              `/dashboard/preview?aiApplyId=${row.original.id}&resumeId=${row.original.resumeId}&coverLetterId=${row.original.coverLetterId}&recruiterEmail=${row.original.recruiterEmail}&jobDescription=${row.original.jobDescription}`
             );
           }}
         >

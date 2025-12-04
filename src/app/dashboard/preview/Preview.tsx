@@ -8,13 +8,17 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { userQueries } from "@/lib/queries/user.queries";
 import { resumeQueries } from "@/lib/queries/resume.queries";
 import { coverLetterQueries } from "@/lib/queries/cover-letter.queries";
 import { CongratulationModal } from "@/components/shared/CongratulationModal";
-import { Save, Sparkles } from "lucide-react";
+import { Send, Sparkles, Trash } from "lucide-react";
 import { logEvent } from "@/lib/analytics";
+import { api } from "@/lib/api/client";
+import { COLLECTIONS } from "@/lib/utils/constants";
+import { aiApplyQueries } from "@/lib/queries/ai-apply.queries";
+import { isEmpty } from "lodash";
 // import { api } from "@/lib/api/client";
 
 const Preview = ({
@@ -22,16 +26,19 @@ const Preview = ({
   resumeId,
   recruiterEmail,
   jobDescription,
+  aiApplyId,
 }: {
   coverLetterId: string;
   resumeId: string;
   jobDescription: string;
   recruiterEmail: string;
+  aiApplyId: string;
 }) => {
   const [activeStep, setActiveStep] = useState(3);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [openModal, setOpenModal] = useState(false);
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const { data: user } = useQuery(userQueries.detail());
 
@@ -46,6 +53,20 @@ const Preview = ({
 
   const handleOpenModal = (value: boolean) => {
     setOpenModal(value);
+  };
+
+  const handleCoverLetterDelete = async () => {
+    await api.delete(
+      `/delete-document/${aiApplyId}?docType=${COLLECTIONS.AI_APPLY}&resumeId=${resumeId}&coverLetterId=${coverLetterId}`
+    );
+    toast.success("Cover letter deleted successfully");
+    router.push("/dashboard/home");
+    await Promise.all([
+      queryClient.invalidateQueries(resumeQueries.all()),
+      queryClient.invalidateQueries(coverLetterQueries.all()),
+      queryClient.invalidateQueries(aiApplyQueries.all()),
+      queryClient.invalidateQueries(userQueries.detail()),
+    ]);
   };
 
   const handleSubmit = async () => {
@@ -127,7 +148,6 @@ const Preview = ({
   //   const url = rawUrl.split("?")[0].toLowerCase();
   //   const isPDF = url.endsWith(".pdf");
 
-
   //   if (isPDF) {
   //     return `${rawUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`;
   //   }
@@ -141,29 +161,27 @@ const Preview = ({
 
   const BUCKET_PUBLIC_URL = "https://storage.googleapis.com/cverai";
 
-const buildViewerSrc = (gcsPath: string) => {
-  if (!gcsPath) return "";
+  const buildViewerSrc = (gcsPath: string) => {
+    if (!gcsPath) return "";
 
-  // Construct permanent public URL
-  const publicUrl = `${BUCKET_PUBLIC_URL}/${encodeURIComponent(gcsPath)}`;
+    // Construct permanent public URL
+    const publicUrl = `${BUCKET_PUBLIC_URL}/${encodeURIComponent(gcsPath)}`;
 
-  const isPDF = publicUrl.toLowerCase().endsWith(".pdf");
+    const isPDF = publicUrl.toLowerCase().endsWith(".pdf");
 
+    if (isPDF) {
+      // PDF viewer options
+      return `${publicUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`;
+    }
 
-  if (isPDF) {
-    // PDF viewer options
-    return `${publicUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`;
-  }
+    // Word or any Office document
+    return `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(
+      publicUrl
+    )}`;
+  };
 
-  // Word or any Office document
-  return `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(
-    publicUrl
-  )}`;
-};
-
-// Usage
-const viewerSrc = buildViewerSrc(defaultResume?.gcsPath);
-
+  // Usage
+  const viewerSrc = buildViewerSrc(defaultResume?.gcsPath);
 
   useEffect(() => {
     if (user?.firstName)
@@ -174,6 +192,8 @@ const viewerSrc = buildViewerSrc(defaultResume?.gcsPath);
       );
   }, [user?.firstName]);
 
+  const allDataIsEmpty = isEmpty(coverLetterData) && isEmpty(resumeData);
+
   return openModal ? (
     <CongratulationModal handleOpenModal={handleOpenModal} />
   ) : (
@@ -181,19 +201,34 @@ const viewerSrc = buildViewerSrc(defaultResume?.gcsPath);
       <ProgressIndicator activeStep={activeStep} />
       <div className="flex w-full gap-3 items-center  p-4 bg-white justify-between">
         <p className="text-md font-medium font-inter">Preview Application</p>
-        <Button
-          disabled={isSubmitting}
-          className="text-xs"
-          onClick={handleSubmit}
-        >
-          <Save /> Submit <Sparkles className="ml-2 h-4 w-4" />
-        </Button>
+
+        <div className="flex gap-2">
+          <Button
+            className="text-2xs"
+            variant={"destructive"}
+            onClick={() => {
+              handleCoverLetterDelete();
+            }}
+          >
+            <Trash className="size-4" />
+          </Button>
+          <Button
+            disabled={isSubmitting}
+            variant={"outline"}
+            className="text-xs"
+            onClick={handleSubmit}
+          >
+            <Send />
+          </Button>
+        </div>
       </div>
-      <TailorCoverLetterDisplay
-        user={user}
-        data={coverLetterData}
-        recruiterEmail={recruiterEmail}
-      />
+      {isEmpty(coverLetterData) ? null : (
+        <TailorCoverLetterDisplay
+          user={user}
+          data={coverLetterData}
+          recruiterEmail={recruiterEmail}
+        />
+      )}
       {user?.aiApplyPreferences?.useMasterCV ? (
         <div className="h-[80svh] overflow-hidden">
           <iframe
@@ -205,12 +240,18 @@ const viewerSrc = buildViewerSrc(defaultResume?.gcsPath);
         </div>
       ) : (
         <EditableResume data={resumeData!} resumeId={resumeId} />
-      )}{" "}
-      <div className="flex items-center justify-center max-sm:fixed w-full h-16 bottom-4 left-0 ">
-        <Button disabled={isSubmitting} onClick={handleSubmit} className="w-64">
-          Submit <Sparkles className="ml-2 h-4 w-4" />
-        </Button>
-      </div>
+      )}
+      {allDataIsEmpty ? null : (
+        <div className="flex items-center justify-center max-sm:fixed w-full h-16 bottom-4 left-0 ">
+          <Button
+            disabled={isSubmitting}
+            onClick={handleSubmit}
+            className="w-64"
+          >
+            Submit <Sparkles className="ml-2 h-4 w-4" />
+          </Button>
+        </div>
+      )}
     </div>
   );
 };
