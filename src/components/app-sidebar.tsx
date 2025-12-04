@@ -85,7 +85,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <Image
                   src={"/cverai-logo.png"}
                   width={70}
-                  height={70}
+                  height={100}
                   alt={"Logo"}
                 />
               </Link>

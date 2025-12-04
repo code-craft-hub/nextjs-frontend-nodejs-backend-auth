@@ -81,9 +81,7 @@ export default function RootLayout({
       <body>
         <Providers>{children}</Providers>
       </body>
-      {/* <script type="text/javascript">window.$crisp=[];window.CRISP_WEBSITE_ID="e4f34063-228f-4ae1-8f14-ce9a5b7d4a1d";(function(){d=document;s=d.createElement("script");s.src="https://client.crisp.chat/l.js";s.async=1;d.getElementsByTagName("head")[0].appendChild(s);})();</script> */}
 
-      {/* Crisp Chat */}
       <Script
         id="crisp-chat"
         strategy="afterInteractive"
