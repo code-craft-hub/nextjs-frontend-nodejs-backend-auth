@@ -1,5 +1,5 @@
 "use client";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import {
   ColumnFiltersState,
   flexRender,
@@ -30,6 +30,7 @@ import {
 import { PiOfficeChairFill } from "react-icons/pi";
 import { usePrefetchJob } from "@/hooks/usePrefetchJob";
 import MobileOverview from "../components/MobileOverview";
+import { logEvent } from "@/lib/analytics";
 
 export const ApplicationHistory = ({
   children,
@@ -47,6 +48,14 @@ export const ApplicationHistory = ({
   const { prefetchJob } = usePrefetchJob();
 
   const { data: user } = useQuery(userQueries.detail());
+    useEffect(() => {
+      if (user?.firstName)
+        logEvent(
+          "Application History Page",
+          "View Application History Page",
+          `${user?.firstName} viewed Application History Page`
+        );
+    }, [user?.firstName]);
 
   const appliedJobsMap = useMemo(() => {
     return new Map(

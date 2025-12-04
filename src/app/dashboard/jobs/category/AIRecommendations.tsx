@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   ColumnFiltersState,
   flexRender,
@@ -30,6 +30,7 @@ import { apiService } from "@/hooks/use-auth";
 import { toast } from "sonner";
 import { JobType } from "@/types";
 import MobileOverview from "../components/MobileOverview";
+import { logEvent } from "@/lib/analytics";
 
 export const AIRecommendations = ({
   children,
@@ -51,6 +52,15 @@ export const AIRecommendations = ({
     React.useState<VisibilityState>({});
 
   const [rowSelection, setRowSelection] = React.useState({});
+
+  useEffect(() => {
+    if (user?.firstName)
+      logEvent(
+        "AI Recommendations Page",
+        "View AI Recommendations Page",
+        `${user?.firstName} viewed AI Recommendations Page`
+      );
+  }, [user?.firstName]);
 
   const updateJobApplicationHistory = useUpdateJobApplicationHistoryMutation();
 

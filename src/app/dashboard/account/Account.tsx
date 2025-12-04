@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { UserProfileForm } from "./user-profile-update";
 import { PasswordUpdateForm } from "./user-password-update";
 import { cn } from "@/lib/utils";
@@ -7,12 +7,25 @@ import { Button } from "@/components/ui/button";
 import { apiService } from "@/hooks/use-auth";
 import { Billing } from "./billing/Billing";
 import { CreditCard, Shield, User2 } from "lucide-react";
+import { logEvent } from "@/lib/analytics";
+import { useQuery } from "@tanstack/react-query";
+import { userQueries } from "@/lib/queries/user.queries";
 
-export const AccountClient = ({ tab,reference }: any) => {
+export const AccountClient = ({ tab, reference }: any) => {
   const [currentTab, setCurrentTab] = useState(!!tab ? tab : "account");
+  const { data: user } = useQuery(userQueries.detail());
   const handleTabChange = (value: string) => {
     setCurrentTab(value);
   };
+
+  useEffect(() => {
+    if (user?.firstName)
+      logEvent(
+        "Account Page",
+        "View Account",
+        `${user?.firstName} viewed Account Page`
+      );
+  }, [user?.firstName]);
 
   const tabs = [
     { id: "account", value: "Account Settings", icon: <User2 /> },

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import {
   ColumnFiltersState,
   flexRender,
@@ -33,6 +33,7 @@ import { toast } from "sonner";
 import { apiService } from "@/hooks/use-auth";
 import { JobType } from "@/types";
 import MobileOverview from "../components/MobileOverview";
+import { logEvent } from "@/lib/analytics";
 
 export const SavedJobs = ({ children }: { children: React.ReactNode }) => {
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -45,6 +46,15 @@ export const SavedJobs = ({ children }: { children: React.ReactNode }) => {
   const [rowSelection, setRowSelection] = React.useState({});
 
   const { data: user } = useQuery(userQueries.detail());
+
+  useEffect(() => {
+    if (user?.firstName)
+      logEvent(
+        "Saved Jobs Page",
+        "View Saved Jobs Page",
+        `${user?.firstName} viewed Saved Jobs Page`
+      );
+  }, [user?.firstName]);
   const userDataSource = getDataSource(user);
   const userJobTitlePreference =
     userDataSource?.key || userDataSource?.title || "";

@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { resumeQueries } from "@/lib/queries/resume.queries";
 import { userQueries } from "@/lib/queries/user.queries";
+import { logEvent } from "@/lib/analytics";
 
 export const TailorResume = ({
   jobDescription,
@@ -26,6 +27,15 @@ export const TailorResume = ({
   recruiterEmail: string;
 }) => {
   const { data: user } = useQuery(userQueries.detail());
+
+  useEffect(() => {
+    if (user?.firstName)
+      logEvent(
+        "Tailor Resume Page",
+        "View Tailor Resume Page",
+        `${user?.firstName} Viewed Tailor Resume Page`
+      );
+  }, [user?.firstName]);
 
   // const defaultResume = user?.dataSource?.find(
   //   (resume) => resume.id === user?.defaultDataSource

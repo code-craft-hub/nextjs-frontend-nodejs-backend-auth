@@ -6,7 +6,7 @@ import { ProgressIndicator } from "../(dashboard)/ai-apply/progress-indicator";
 import TailorCoverLetterDisplay from "../tailor-cover-letter/[coverLetterId]/TailorCoverLetterDisplay";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { userQueries } from "@/lib/queries/user.queries";
@@ -14,6 +14,7 @@ import { resumeQueries } from "@/lib/queries/resume.queries";
 import { coverLetterQueries } from "@/lib/queries/cover-letter.queries";
 import { CongratulationModal } from "@/components/shared/CongratulationModal";
 import { Save, Sparkles } from "lucide-react";
+import { logEvent } from "@/lib/analytics";
 // import { api } from "@/lib/api/client";
 
 const Preview = ({
@@ -137,6 +138,14 @@ const Preview = ({
   };
   const viewerSrc = buildViewerSrc(defaultResume?.url);
 
+  useEffect(() => {
+    if (user?.firstName)
+      logEvent(
+        "Preview Page",
+        "View Preview Page",
+        `${user?.firstName} viewed Preview Page`
+      );
+  }, [user?.firstName]);
 
   return openModal ? (
     <CongratulationModal handleOpenModal={handleOpenModal} />

@@ -10,6 +10,8 @@ import { AIJobCustomization } from "../(dashboard)/dashboard-tabs/ai-job-customi
 import { TopGradient } from "@/components/shared/TopGradient";
 import { JobFilters } from "@/lib/types/jobs";
 import { logEvent, logUserActivityToGoogle } from "@/lib/analytics";
+import { userQueries } from "@/lib/queries/user.queries";
+import { useQuery } from "@tanstack/react-query";
 
 export const HomeClient = memo(
   ({
@@ -23,10 +25,16 @@ export const HomeClient = memo(
     filters: JobFilters;
     autoApplyFilters: JobFilters;
   }) => {
-    useEffect(() => {
-      logEvent("Dashboard", "View Dashboard", "Dashboard Page Viewed");
-    }, []);
+    const { data: user } = useQuery(userQueries.detail());
 
+    useEffect(() => {
+      if (user?.firstName)
+        logEvent(
+          "Dashboard",
+          "View Dashboard",
+          `${user?.firstName} viewed Dashboard Page`
+        );
+    }, [user?.firstName]);
 
     return (
       <>

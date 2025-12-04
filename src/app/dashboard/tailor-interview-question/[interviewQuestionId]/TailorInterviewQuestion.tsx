@@ -10,6 +10,7 @@ import TailorInterviewQuestionEmptyState from "./TailorInterviewQuestionEmptySta
 import { useQuery } from "@tanstack/react-query";
 import { interviewQuestionQueries } from "@/lib/queries/interview.queries";
 import { userQueries } from "@/lib/queries/user.queries";
+import { logEvent } from "@/lib/analytics";
 
 export const TailorInterviewQuestion = ({
   jobDescription,
@@ -27,6 +28,15 @@ export const TailorInterviewQuestion = ({
     interviewQuestionQueries.detail(interviewQuestionId)
   );
 
+
+    useEffect(() => {
+      if (user?.firstName)
+        logEvent(
+          "Tailor Interview Question Page",
+          "View Tailor Interview Question Page",
+          `${user?.firstName} Viewed Tailor Interview Question Page`
+        );
+    }, [user?.firstName]);
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const resultsEndRef = useRef<HTMLDivElement>(null);
 

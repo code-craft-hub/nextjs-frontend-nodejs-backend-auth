@@ -67,10 +67,16 @@ export default function Overview() {
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
   const totalScoreRef = useRef<number>(0);
+  const { data: user } = useQuery(userQueries.detail());
 
   useEffect(() => {
-    logEvent("Job Page", "View Job Page", "Job Page Viewed");
-  }, []);
+    if (user?.firstName)
+      logEvent(
+        "Job Page",
+        "View Job Page",
+        `${user?.firstName} viewed Job Page`
+      );
+  }, [user?.firstName]);
 
   const infiniteFilters = useMemo(
     () => ({
@@ -82,7 +88,6 @@ export default function Overview() {
 
   const updateJobs = useUpdateJobMutation();
   const updateJobApplicationHistory = useUpdateJobApplicationHistoryMutation();
-  const { data: user } = useQuery(userQueries.detail());
   const userDataSource = getDataSource(user);
   const userJobTitlePreference =
     userDataSource?.key || userDataSource?.title || "";

@@ -15,6 +15,7 @@ import { ProgressIndicator } from "../../(dashboard)/ai-apply/progress-indicator
 import { useQuery } from "@tanstack/react-query";
 import { userQueries } from "@/lib/queries/user.queries";
 import { coverLetterQueries } from "@/lib/queries/cover-letter.queries";
+import { logEvent } from "@/lib/analytics";
 
 export const TailorCoverLetter = memo<{
   jobDescription: string;
@@ -32,6 +33,15 @@ export const TailorCoverLetter = memo<{
   const { data, status, isFetched } = useQuery(
     coverLetterQueries.detail(coverLetterId)
   );
+
+    useEffect(() => {
+      if (user?.firstName)
+        logEvent(
+          "Tailor Cover Letter Page",
+          "View Tailor Cover Letter Page",
+          `${user?.firstName} Viewed Tailor Cover Letter Page`
+        );
+    }, [user?.firstName]);
 
   const router = useRouter();
   useEffect(() => {
