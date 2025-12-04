@@ -54,6 +54,9 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const GA_MEASUREMENT_ID =
+    process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || "G-CDMCYEXE2W";
+    
   return (
     <html
       lang="en"
@@ -79,6 +82,29 @@ export default function RootLayout({
         />
       </head>
       <body>
+        {/* Google Analytics */}
+        {GA_MEASUREMENT_ID && (
+          <>
+            <Script
+              strategy="afterInteractive"
+              src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+            />
+            <Script
+              id="google-analytics"
+              strategy="afterInteractive"
+              dangerouslySetInnerHTML={{
+                __html: `
+                  window.dataLayer = window.dataLayer || [];
+                  function gtag(){dataLayer.push(arguments);}
+                  gtag('js', new Date());
+                  gtag('config', '${GA_MEASUREMENT_ID}', {
+                    page_path: window.location.pathname,
+                  });
+                `,
+              }}
+            />
+          </>
+        )}
         <Providers>{children}</Providers>
       </body>
 

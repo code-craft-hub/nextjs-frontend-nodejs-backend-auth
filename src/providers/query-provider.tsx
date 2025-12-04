@@ -1,5 +1,6 @@
 "use client";
 
+import GoogleAnalyticsProvider from "@/components/GoogleAnalyticsProvider";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
@@ -63,14 +64,18 @@ export function Providers({ children }: ProvidersProps) {
   const queryClient = getQueryClient();
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}>
-        {children}
-        {process.env.NODE_ENV === "development" && (
-          <ReactQueryDevtools initialIsOpen={false} position="right" />
-        )}
-        <Toaster richColors={true} position="top-right" />
-      </GoogleOAuthProvider>
-    </QueryClientProvider>
+    <GoogleAnalyticsProvider>
+      <QueryClientProvider client={queryClient}>
+        <GoogleOAuthProvider
+          clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}
+        >
+          {children}
+          {process.env.NODE_ENV === "development" && (
+            <ReactQueryDevtools initialIsOpen={false} position="right" />
+          )}
+          <Toaster richColors={true} position="top-right" />
+        </GoogleOAuthProvider>
+      </QueryClientProvider>
+    </GoogleAnalyticsProvider>
   );
 }

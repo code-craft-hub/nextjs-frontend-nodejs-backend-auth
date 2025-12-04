@@ -1,5 +1,5 @@
 "use client";
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   ColumnFiltersState,
@@ -53,6 +53,7 @@ import { ReportCard } from "./ReportCard";
 import { jobMatcher } from "@/services/job-matcher";
 import { PiOfficeChairFill } from "react-icons/pi";
 import MobileOverview from "./MobileOverview";
+import { logEvent, logUserActivityToGoogle } from "@/lib/analytics";
 
 export default function Overview() {
   const router = useRouter();
@@ -66,6 +67,10 @@ export default function Overview() {
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
   const totalScoreRef = useRef<number>(0);
+
+  useEffect(() => {
+    logEvent("Job Page", "View Job Page", "Job Page Viewed");
+  }, []);
 
   const infiniteFilters = useMemo(
     () => ({
@@ -136,7 +141,13 @@ export default function Overview() {
     return jobData;
   }, [data, user?.bookmarkedJobs?.length, user?.appliedJobs?.length]);
 
-  const handleApply = async ({ event, row }: { event: any; row: Row<JobType> }) => {
+  const handleApply = async ({
+    event,
+    row,
+  }: {
+    event: any;
+    row: Row<JobType>;
+  }) => {
     event.preventDefault();
     event.stopPropagation();
     if (!row.original?.emailApply) {
@@ -214,6 +225,11 @@ export default function Overview() {
 
   const onSubmit = async ({ username }: any) => {
     const trimmedSearch = username.trim();
+    logUserActivityToGoogle({
+      page: `Job Page Search - ${username}`,
+      userEvent: `User searched for this job title  ${username}`,
+      description: `User searched for the job title ${username} on the job page`,
+    });
     setSearchValue(trimmedSearch);
     table.getColumn("title")?.setFilterValue(trimmedSearch);
 
