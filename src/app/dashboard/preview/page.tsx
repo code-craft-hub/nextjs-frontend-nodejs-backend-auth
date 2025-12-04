@@ -10,8 +10,7 @@ import { coverLetterQueries } from "@/lib/queries/cover-letter.queries";
 
 const PreviewPage = async ({ searchParams }: any) => {
   const queryClient = createServerQueryClient();
-  await queryClient.prefetchQuery(userQueries.detail());
-
+   await queryClient.prefetchQuery(userQueries.detail());
   const { coverLetterId, resumeId, recruiterEmail, jobDescription } =
     await searchParams;
   // const baseResume = (await searchParams)?.baseResume;

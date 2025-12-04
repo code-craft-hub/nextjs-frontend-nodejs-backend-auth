@@ -123,20 +123,47 @@ const Preview = ({
   //   );
   // };
 
-  const buildViewerSrc = (rawUrl: string) => {
-    const url = rawUrl.split("?")[0].toLowerCase();
-    const isPDF = url.endsWith(".pdf");
+  // const buildViewerSrc = (rawUrl: string) => {
+  //   const url = rawUrl.split("?")[0].toLowerCase();
+  //   const isPDF = url.endsWith(".pdf");
 
-    if (isPDF) {
-      return `${rawUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`;
-    }
 
-    // Word or any Office document
-    return `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(
-      rawUrl
-    )}`;
-  };
-  const viewerSrc = buildViewerSrc(defaultResume?.url);
+  //   if (isPDF) {
+  //     return `${rawUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`;
+  //   }
+
+  //   // Word or any Office document
+  //   return `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(
+  //     rawUrl
+  //   )}`;
+  // };
+  // const viewerSrc = buildViewerSrc(defaultResume?.url);
+
+  const BUCKET_PUBLIC_URL = "https://storage.googleapis.com/cverai";
+
+const buildViewerSrc = (gcsPath: string) => {
+  if (!gcsPath) return "";
+
+  // Construct permanent public URL
+  const publicUrl = `${BUCKET_PUBLIC_URL}/${encodeURIComponent(gcsPath)}`;
+
+  const isPDF = publicUrl.toLowerCase().endsWith(".pdf");
+
+
+  if (isPDF) {
+    // PDF viewer options
+    return `${publicUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`;
+  }
+
+  // Word or any Office document
+  return `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(
+    publicUrl
+  )}`;
+};
+
+// Usage
+const viewerSrc = buildViewerSrc(defaultResume?.gcsPath);
+
 
   useEffect(() => {
     if (user?.firstName)
