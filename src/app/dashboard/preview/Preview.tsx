@@ -161,8 +161,6 @@ const Preview = ({
       );
   }, [user?.firstName]);
 
-  const allDataIsEmpty = isEmpty(coverLetterData) && isEmpty(resumeData);
-  console.log("allDataIsEmpty", coverLetterData, resumeData, allDataIsEmpty);
 
   return openModal ? (
     <CongratulationModal handleOpenModal={handleOpenModal} />
