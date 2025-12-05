@@ -162,6 +162,7 @@ const Preview = ({
   }, [user?.firstName]);
 
   const allDataIsEmpty = isEmpty(coverLetterData) && isEmpty(resumeData);
+  console.log("allDataIsEmpty", coverLetterData, resumeData, allDataIsEmpty);
 
   return openModal ? (
     <CongratulationModal handleOpenModal={handleOpenModal} />
@@ -213,7 +214,6 @@ const Preview = ({
       ) : (
         <EditableResume data={resumeData!} resumeId={resumeId} />
       )}
-      {allDataIsEmpty ? null : (
         <div className="flex items-center justify-center max-sm:fixed w-full h-16 bottom-4 left-0 ">
           <Button
             disabled={isSubmitting}
@@ -223,7 +223,6 @@ const Preview = ({
             Submit <Sparkles className="ml-2 h-4 w-4" />
           </Button>
         </div>
-      )}
     </div>
   );
 };
