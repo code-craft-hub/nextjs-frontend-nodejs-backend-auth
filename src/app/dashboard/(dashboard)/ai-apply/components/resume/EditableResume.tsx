@@ -48,24 +48,23 @@ export const EditableResume: React.FC<PreviewResumeProps> = ({
 
   const { resumeData, updateField } = useResumeData(data || {}, {
     resumeId,
-    onSuccess: () => {
-    },
+    onSuccess: () => {},
     onError: (error, field) => {
       console.error(`✗ Failed to update ${field}:`, error);
     },
   });
 
   // Use resumeData as the single source of truth once streaming is complete
-  const displayData = isStreaming ?data  : resumeData;
+  const displayData = isStreaming ? data : resumeData;
 
   const initialData = useMemo(
     () => ({
-      firstName: displayData.contact?.firstName ?? user?.firstName ?? "",
-      lastName: displayData.contact?.lastName ?? user?.lastName ?? "",
-      email: displayData.contact?.email ?? user?.email ?? "",
-      phoneNumber: displayData.contact?.phoneNumber ?? user?.phoneNumber ?? "",
-      address: displayData.contact?.address ?? user?.address ?? "",
-      portfolio: displayData.contact?.portfolio ?? "",
+      firstName: (displayData as any)?.firstName ?? user?.firstName ?? "",
+      lastName: (displayData as any)?.lastName ?? user?.lastName ?? "",
+      email: (displayData as any)?.email ?? user?.email ?? "",
+      phoneNumber: (displayData as any)?.phoneNumber ?? user?.phoneNumber ?? "",
+      address: (displayData as any)?.address ?? user?.address ?? "",
+      portfolio: (displayData as any)?.portfolio ?? "",
     }),
     [displayData.contact, user]
   );
@@ -103,7 +102,8 @@ export const EditableResume: React.FC<PreviewResumeProps> = ({
   return (
     <Card
       className={cn(
-        "text-gray-800 font-merriweather relative rounded-sm", hasProfile ? "p-4 sm:px-5 py-16 " : "hidden"
+        "text-gray-800 font-merriweather relative rounded-sm",
+        hasProfile ? "p-4 sm:px-5 py-16 " : "hidden"
       )}
     >
       {hasProfile && (

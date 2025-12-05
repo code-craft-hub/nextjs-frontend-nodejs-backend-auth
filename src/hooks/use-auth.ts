@@ -3,7 +3,7 @@
 import authClient from "@/lib/axios/auth-api";
 import { userQueries } from "@/lib/queries/user.queries";
 import { RegisterUserSchema } from "@/lib/schema-validations";
-import { CoverLetter, IUser, Login, Resume } from "@/types";
+import { IUser, Login } from "@/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -201,8 +201,8 @@ export const apiService = {
   },
   sendApplication: async (
     user: Partial<IUser>,
-    coverLetterData: CoverLetter | undefined,
-    resumeData: Resume | undefined,
+    coverLetterId: string | undefined,
+    resumeId: string | undefined,
     recruiterEmail: string,
     jobDescription: string,
     autoSendApplications?: boolean,
@@ -213,8 +213,8 @@ export const apiService = {
         "/send-email-with-resume-and-coverletter",
         {
           user,
-          coverLetterData,
-          resumeData,
+          coverLetterId,
+          resumeId,
           recruiterEmail,
           jobDescription,
           autoSendApplications,

@@ -16,7 +16,10 @@ export const CongratulationModal = ({ handleOpenModal }: any) => {
       </div>
       <X
         className="absolute top-4 right-4 hover:cursor-pointer hover:text-blue-500 text-gray-300"
-        onClick={() => handleOpenModal(false)}
+        onClick={() => {
+          router.push(`/dashboard/home`);
+          handleOpenModal(false);
+        }}
       />
       <div className="flex-1 flex items-center my-16 justify-center">
         <img

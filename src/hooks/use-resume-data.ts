@@ -13,13 +13,18 @@ const updateResumeField = async <T>(
   baseUrl: string = process.env.NEXT_PUBLIC_AUTH_API_URL || ""
 ): Promise<any> => {
   try {
+    console.log(payload);
+    const updates =
+      payload.field === "contact"
+        ? payload.value
+        : { [payload.field]: payload.value };
+
     const { data } = await authClient.patch(
       `${baseUrl}/career-doc/${COLLECTIONS.RESUME}/${payload.resumeId}`,
       {
         resumeId: payload.resumeId,
-        updates: {
-          [payload.field]: payload.value,
-        },
+        updates,
+        // { [payload.field]: payload.value },
       }
     );
 

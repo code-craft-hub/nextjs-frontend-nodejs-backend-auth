@@ -26,6 +26,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { EditIcon, Loader } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { coverLetterQueries } from "@/lib/queries/cover-letter.queries";
+import { cn } from "@/lib/utils";
 
 // Validation schema
 const coverLetterSchema = z.object({
@@ -84,7 +85,9 @@ const TailorCoverLetterDisplay = ({
           currentData?.id,
         ],
       });
-      queryClient.invalidateQueries(coverLetterQueries.detail(currentData?.id ?? ""));
+      queryClient.invalidateQueries(
+        coverLetterQueries.detail(currentData?.id ?? "")
+      );
       queryClient.invalidateQueries({
         queryKey: [
           "auth",
@@ -133,13 +136,12 @@ const TailorCoverLetterDisplay = ({
       const currentValue = formValues[fieldName];
       const originalValue = currentData?.[fieldName] || "";
 
-      if(fieldName === "recruiterEmail" && currentValue) {
+      if (fieldName === "recruiterEmail" && currentValue) {
         const url = new URL(window.location.href);
         url.searchParams.set("recruiterEmail", currentValue);
         // window.history.replaceState({}, "", url.toString());
 
         router.replace(url.toString());
-      
       }
 
       if (currentValue !== originalValue) {
@@ -163,7 +165,12 @@ const TailorCoverLetterDisplay = ({
   return (
     <>
       <div className="grid grid-cols-1 gap-4 sm:gap-6">
-        <div className="bg-slate-50 relative border-b w-full border-slate-200 shadow-md rounded-xl flex flex-col items-center justify-between">
+        <div
+          className={cn(
+            "bg-slate-50 relative border-b w-full border-slate-200 shadow-md rounded-xl flex flex-col items-center justify-between",
+            { "opacity-50 pointer-events-none": updateMutation.isPending }
+          )}
+        >
           <div
             className="bg-white p-4 sm:p-8 overflow-y-auto w-full cursor-pointer transition-colors"
             onClick={() => setIsDialogOpen(true)}
@@ -217,7 +224,9 @@ const TailorCoverLetterDisplay = ({
             <DialogTitle>Edit Cover Letter</DialogTitle>
           </DialogHeader>
           <DialogDescription></DialogDescription>
-          {updateMutation.isPending && <Loader className="absolute top-4 right-4 animate-spin" />}
+          {updateMutation.isPending && (
+            <Loader className="absolute top-4 right-4 animate-spin" />
+          )}
           <Form {...form}>
             <form className="space-y-6">
               <FormField
@@ -229,6 +238,7 @@ const TailorCoverLetterDisplay = ({
                     <FormControl>
                       <Input
                         {...field}
+                        disabled={updateMutation.isPending}
                         placeholder="hiring@company.com"
                         onBlur={() => handleFieldBlur("recruiterEmail")}
                       />
@@ -247,6 +257,7 @@ const TailorCoverLetterDisplay = ({
                     <FormControl>
                       <Input
                         {...field}
+                        disabled={updateMutation.isPending}
                         placeholder="Application for Software Engineer Position"
                         onBlur={() => handleFieldBlur("title")}
                       />
@@ -264,6 +275,7 @@ const TailorCoverLetterDisplay = ({
                     <FormControl>
                       <Input
                         {...field}
+                        disabled={updateMutation.isPending}
                         placeholder="Dear Hiring Manager,"
                         onBlur={() => handleFieldBlur("salutation")}
                       />
@@ -282,6 +294,7 @@ const TailorCoverLetterDisplay = ({
                     <FormControl>
                       <Textarea
                         {...field}
+                        disabled={updateMutation.isPending}
                         placeholder="Write your cover letter here..."
                         rows={12}
                         className="resize-y"
@@ -303,6 +316,7 @@ const TailorCoverLetterDisplay = ({
                       <FormControl>
                         <Input
                           {...field}
+                          disabled={updateMutation.isPending}
                           placeholder="John"
                           onBlur={() => handleFieldBlur("firstName")}
                         />
@@ -321,6 +335,7 @@ const TailorCoverLetterDisplay = ({
                       <FormControl>
                         <Input
                           {...field}
+                          disabled={updateMutation.isPending}
                           placeholder="Doe"
                           onBlur={() => handleFieldBlur("lastName")}
                         />
@@ -340,6 +355,7 @@ const TailorCoverLetterDisplay = ({
                     <FormControl>
                       <Input
                         {...field}
+                        disabled={updateMutation.isPending}
                         placeholder="+1 (555) 123-4567"
                         onBlur={() => handleFieldBlur("phoneNumber")}
                       />

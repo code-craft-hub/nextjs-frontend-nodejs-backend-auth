@@ -13,7 +13,7 @@ import { userQueries } from "@/lib/queries/user.queries";
 import { resumeQueries } from "@/lib/queries/resume.queries";
 import { coverLetterQueries } from "@/lib/queries/cover-letter.queries";
 import { CongratulationModal } from "@/components/shared/CongratulationModal";
-import { Send, Sparkles, Trash } from "lucide-react";
+import { Loader, Send, Sparkles, Trash } from "lucide-react";
 import { logEvent } from "@/lib/analytics";
 import { api } from "@/lib/api/client";
 import { COLLECTIONS } from "@/lib/utils/constants";
@@ -100,8 +100,8 @@ const Preview = ({
       setIsSubmitting(true);
       await apiService.sendApplication(
         user,
-        coverLetterData,
-        resumeData,
+        coverLetterId,
+        resumeId,
         recruiterEmail,
         jobDescription,
         user?.aiApplyPreferences.autoSendApplications,
@@ -127,37 +127,6 @@ const Preview = ({
       setIsSubmitting(false);
     }
   };
-
-  // const saveApplication = async () => {
-  //   const gcsPath =
-  //     user?.aiApplyPreferences?.useMasterCV && defaultResume?.gcsPath;
-  //  await api.post(
-  //     "/send-email-with-resume-and-coverletter/save",
-  //     {
-  //       user,
-  //       coverLetterData,
-  //       resumeData,
-  //       recruiterEmail,
-  //       jobDescription,
-  //       gcsPath,
-  //     }
-  //   );
-  // };
-
-  // const buildViewerSrc = (rawUrl: string) => {
-  //   const url = rawUrl.split("?")[0].toLowerCase();
-  //   const isPDF = url.endsWith(".pdf");
-
-  //   if (isPDF) {
-  //     return `${rawUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`;
-  //   }
-
-  //   // Word or any Office document
-  //   return `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(
-  //     rawUrl
-  //   )}`;
-  // };
-  // const viewerSrc = buildViewerSrc(defaultResume?.url);
 
   const BUCKET_PUBLIC_URL = "https://storage.googleapis.com/cverai";
 
@@ -200,12 +169,15 @@ const Preview = ({
     <div className="space-y-4 sm:space-y-8">
       <ProgressIndicator activeStep={activeStep} />
       <div className="flex w-full gap-3 items-center  p-4 bg-white justify-between">
-        <p className="text-md font-medium font-inter">Preview Application</p>
+        <p className="text-md font-medium font-inter">
+          {isSubmitting ? "Sending application... " : "Preview Application"}
+        </p>
 
         <div className="flex gap-2">
           <Button
             className="text-2xs"
             variant={"destructive"}
+            disabled={isSubmitting}
             onClick={() => {
               handleCoverLetterDelete();
             }}
@@ -218,7 +190,7 @@ const Preview = ({
             className="text-xs"
             onClick={handleSubmit}
           >
-            <Send />
+            {isSubmitting ? <Loader className="animate-spin" /> : <Send />}
           </Button>
         </div>
       </div>
