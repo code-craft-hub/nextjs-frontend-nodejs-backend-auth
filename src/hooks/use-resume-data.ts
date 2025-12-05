@@ -13,7 +13,6 @@ const updateResumeField = async <T>(
   baseUrl: string = process.env.NEXT_PUBLIC_AUTH_API_URL || ""
 ): Promise<any> => {
   try {
-    console.log(payload);
     const updates =
       payload.field === "contact"
         ? payload.value
