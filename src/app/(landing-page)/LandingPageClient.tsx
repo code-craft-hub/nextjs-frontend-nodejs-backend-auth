@@ -21,6 +21,7 @@ import { JobFilters } from "@/lib/types/jobs";
 import { IUser } from "@/types";
 import Pricing from "./components/Pricing";
 
+
 export const LandingPageClient = ({
   filters,
   user,
