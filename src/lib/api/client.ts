@@ -1,5 +1,3 @@
-// lib/api/client.ts
-
 export const baseURL =
   process.env.NEXT_PUBLIC_AUTH_API_URL || "http://localhost:8080/api";
 
@@ -93,11 +91,6 @@ export async function apiClient<T>(
       ...fetchOptions,
       headers,
       credentials: "include",
-      cache: "no-store",
-      next: {
-        revalidate: 0,
-        ...fetchOptions.next,
-      },
     });
 
     if (!response.ok) {

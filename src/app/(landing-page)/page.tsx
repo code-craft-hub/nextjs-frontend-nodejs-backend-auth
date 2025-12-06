@@ -10,6 +10,9 @@ import { userQueries } from "@/lib/queries/user.queries";
 import { getDataSource } from "@/lib/utils/helpers";
 import { getSessionFromCookies } from "@/lib/auth.utils";
 
+export const dynamic = "force-dynamic";
+
+
 const LandingPage = async () => {
   const queryClient = createServerQueryClient();
   let user = null;

@@ -5,6 +5,9 @@ import { HydrationBoundary } from "@/components/hydration-boundary";
 import { dehydrate } from "@tanstack/react-query";
 import AnalyticsClient from "./AnalyticsClient";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 const AnalyticsPage = async () => {
   const queryClient = createServerQueryClient();
   await queryClient.prefetchQuery(userQueries.detail());

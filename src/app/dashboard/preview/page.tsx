@@ -8,6 +8,10 @@ import { prefetchWithPriority } from "@/lib/query/parallel-prefetch";
 import { resumeQueries } from "@/lib/queries/resume.queries";
 import { coverLetterQueries } from "@/lib/queries/cover-letter.queries";
 
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 const PreviewPage = async ({ searchParams }: any) => {
   const queryClient = createServerQueryClient();
    await queryClient.prefetchQuery(userQueries.detail());
