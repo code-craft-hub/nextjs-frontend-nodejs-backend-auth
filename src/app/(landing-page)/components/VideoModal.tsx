@@ -20,9 +20,9 @@ export const VideoModal: React.FC = () => {
   }, []);
 
   return (
-    <div className="relative overflow-hidden pt-16 max-w-screen-2xl w-full mx-auto">
-      <div className="max-w-screen-xl mx-auto px-6">
-        <div className="relative mb-6 mt-0 overflow-hidden rounded-xl bg-transparent p-0.5 shadow-2xl">
+    <div className="relative overflow-hidden max-w-screen-2xl w-full mx-auto">
+      <div className="max-w-screen-xl mx-auto ">
+        <div className="relative mt-0 overflow-hidden rounded-xl bg-transparent p-0.5 ">
           {/* Animated Border Container */}
           <div className="absolute inset-0 pointer-events-none">
             <svg

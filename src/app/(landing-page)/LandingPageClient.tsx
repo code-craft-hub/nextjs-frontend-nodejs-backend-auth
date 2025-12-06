@@ -50,7 +50,7 @@ export const LandingPageClient = ({
         </div>
       </section>
       <section className="relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 pb-20 sm:px-6 lg:px-8 lg:pb-32 space-y-8">
+        <div className="max-w-7xl mx-auto px-4 pb-20 sm:px-6 lg:px-8 space-y-8">
           <div className="flex flex-row items-center justify-center mx-auto gap-4">
             {actionButtons.map((option) => (
               <ActionButton key={option.name} option={option} />
