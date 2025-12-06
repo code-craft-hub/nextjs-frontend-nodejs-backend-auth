@@ -20,7 +20,7 @@ import { FeatureJobs } from "./components/FeatureJobs";
 import { JobFilters } from "@/lib/types/jobs";
 import { IUser } from "@/types";
 import Pricing from "./components/Pricing";
-
+import { VideoModal } from "./components/VideoModal";
 
 export const LandingPageClient = ({
   filters,
@@ -99,6 +99,9 @@ export const LandingPageClient = ({
         </div>
       </section>
 
+      <div className="mb-20 px-4">
+        <VideoModal />
+      </div>
       {user && <FeatureJobs filters={filters} />}
 
       {/* Core Features */}
