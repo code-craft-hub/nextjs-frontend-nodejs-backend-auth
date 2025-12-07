@@ -5,12 +5,10 @@ import { useState } from "react";
 import { ProModal } from "./ProSubscription";
 import { useQuery } from "@tanstack/react-query";
 import { userQueries } from "@/lib/queries/user.queries";
-import { expireNextThreeDays, getDaysRemaining } from "@/lib/utils/helpers";
+import { getDaysRemaining } from "@/lib/utils/helpers";
 import { toast } from "sonner";
-import { useAuth } from "@/hooks/use-auth";
 
 export const Billing = ({ reference }: any) => {
-  const { updateUser } = useAuth();
 
   const { data: user } = useQuery(userQueries.detail());
   const [completed, setCompleted] = useState(user?.isPro || false);
@@ -43,14 +41,6 @@ export const Billing = ({ reference }: any) => {
       />
     ) : (
       <div className="flex flex-col items-center gap-[30px] relative ">
-        <button
-          onClick={async () => {
-            await updateUser({
-              expiryTime: expireNextThreeDays(),
-              credit: 5,
-            });
-          }}
-        >Update expiry time</button>
         <section className="bg-gradient-to-b space-y-4 from-[#FF9A56] to-[#FF6B35] rounded-[12px] w-full p-4 sm:p-8">
           <div className="flex gap-4 justify-between w-full">
             <div className="text-white space-y-2">
