@@ -22,7 +22,7 @@ export const VideoModal: React.FC = () => {
   return (
     <div className="relative overflow-hidden max-w-screen-2xl w-full mx-auto">
       <div className="max-w-screen-xl mx-auto ">
-        <div className="relative mt-0 overflow-hidden rounded-xl bg-transparent p-0.5 ">
+        <div className="relative mt-0 overflow-hidden rounded-xl bg-transparent p-0.5 md:h-[80svh] md:w-[70svw] 2xl:h-full 2xl:w-full mx-auto">
           {/* Animated Border Container */}
           <div className="absolute inset-0 pointer-events-none">
             <svg
@@ -50,7 +50,7 @@ export const VideoModal: React.FC = () => {
           </div>
 
           {/* Video Content Container */}
-          <div className="relative w-full overflow-hidden rounded-xl border border-slate-100 bg-slate-50/80 backdrop-blur-3xl aspect-video dark:border-slate-900 dark:bg-slate-900/80">
+          <div className="relative w-full overflow-hidden rounded-xl aspect-video">
             {/* Cover Image */}
             {!isPlaying && (
               <img
