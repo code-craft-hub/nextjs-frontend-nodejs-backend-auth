@@ -1,4 +1,3 @@
-// src/lib/axios/base.ts
 import axios, {
   AxiosInstance,
   AxiosResponse,

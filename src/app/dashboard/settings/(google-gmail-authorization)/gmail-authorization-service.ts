@@ -1,4 +1,5 @@
-import authClient from "@/lib/axios/auth-api";
+import { api } from "@/lib/api/client";
+// import authClient from "@/lib/axios/auth-api";
 import { fileToBase64 } from "@/lib/utils/helpers";
 // import { fileToBase64 } from "@/utils/file";
 
@@ -12,28 +13,31 @@ export interface EmailFormData {
 }
 
 export const checkAuthStatus = async () => {
-  const { data } = await authClient.get(
+  const data = await api.get<any>(
     `/google-gmail-oauth/auth-status/`
   );
-  return data;
+  console.log("Data Oauth : ", data)
+  return data?.data;
 };
 
 export const requestAuthUrl = async () => {
-  const { data } = await authClient.get(
+  const data = await api.get<any>(
     `/google-gmail-oauth/auth-url/`
   );
-  return data;
+  console.log("Data Oauth : ", data)
+  return data?.data;
 };
 
 export const sendAuthorizationCode = async (
   userEmail: string,
   code: string
 ) => {
-  const { data } = await authClient.post(`/google-gmail-oauth/auth-callback`, {
+  const data = await api.post<any>(`/google-gmail-oauth/auth-callback`, {
     userEmail,
     code,
   });
-  return data;
+  console.log("Data Oauth : ", data)
+  return data?.data;
 };
 
 export const sendEmail = async (formData: EmailFormData) => {
@@ -47,6 +51,7 @@ export const sendEmail = async (formData: EmailFormData) => {
     };
   }
 
-  const { data } = await authClient.post(`/google-gmail-oauth/send`, payload);
-  return data;
+  const data = await api.post<any>(`/google-gmail-oauth/send`, payload);
+  console.log("Data Oauth : ", data)
+  return data?.data;
 };
