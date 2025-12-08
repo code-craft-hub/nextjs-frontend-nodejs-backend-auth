@@ -54,7 +54,7 @@ export const VideoModal: React.FC = () => {
             {/* Cover Image */}
             {!isPlaying && (
               <img
-                alt="Editor with Nx features"
+                alt="Cverai Video Cover"
                 loading="eager"
                 className="w-full h-full object-cover block"
                 src="https://nx.dev/_next/image?url=%2Fimages%2Fhome%2Fnx-dev-video-cover.avif&w=3840&q=75"

@@ -87,6 +87,7 @@ export async function apiClient<T>(
   }
 
   try {
+    console.log("API Request:", headers["Cookie"]);
     const response = await fetch(url, {
       ...fetchOptions,
       headers,
