@@ -14,6 +14,7 @@ import { aiApplyQueries } from "@/lib/queries/ai-apply.queries";
 import { interviewQuestionQueries } from "@/lib/queries/interview.queries";
 import { coverLetterQueries } from "@/lib/queries/cover-letter.queries";
 import { getDataSource } from "@/lib/utils/helpers";
+import { getCookiesToken } from "@/lib/auth.utils";
 
 export const metadata: Metadata = {
   title: "Cver AI - Never Miss a Job Again",
@@ -26,8 +27,9 @@ export default async function HomePage({
   searchParams: Promise<{ tab: DashboardTab; jobDescription: string }>;
 }) {
   await requireOnboarding();
+  const token = (await getCookiesToken()) ?? "";
   const queryClient = createServerQueryClient();
-  const user = await queryClient.fetchQuery(userQueries.detail());
+  const user = await queryClient.fetchQuery(userQueries.detail(token));
   const { tab, jobDescription } = await searchParams;
 
   const title = getDataSource(user)?.title;
@@ -48,32 +50,32 @@ export default async function HomePage({
   await prefetchWithPriority(queryClient, [
     {
       queryKey: jobsQueries.all(filters).queryKey,
-      queryFn: jobsQueries.all(filters).queryFn,
+      queryFn: jobsQueries.all(filters, token).queryFn,
       priority: "high",
     },
     {
       queryKey: jobsQueries.autoApply(autoApplyFilters).queryKey,
-      queryFn: jobsQueries.autoApply(autoApplyFilters).queryFn,
+      queryFn: jobsQueries.autoApply(autoApplyFilters, token).queryFn,
       priority: "high",
     },
     {
       queryKey: resumeQueries.all(filters).queryKey,
-      queryFn: resumeQueries.all(filters).queryFn,
+      queryFn: resumeQueries.all(filters, token ).queryFn,
       priority: "high",
     },
     {
       queryKey: interviewQuestionQueries.all(filters).queryKey,
-      queryFn: interviewQuestionQueries.all(filters).queryFn,
+      queryFn: interviewQuestionQueries.all(filters, token).queryFn,
       priority: "high",
     },
     {
       queryKey: coverLetterQueries.all(filters).queryKey,
-      queryFn: coverLetterQueries.all(filters).queryFn,
+      queryFn: coverLetterQueries.all(filters, token).queryFn,
       priority: "high",
     },
     {
       queryKey: aiApplyQueries.all(filters).queryKey,
-      queryFn: aiApplyQueries.all(filters).queryFn,
+      queryFn: aiApplyQueries.all(filters, token).queryFn,
       priority: "high",
     },
   ]);

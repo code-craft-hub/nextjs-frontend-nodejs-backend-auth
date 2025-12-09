@@ -4,17 +4,17 @@ import { interviewQuestionApi, type InterviewQuestionFilters } from '@/lib/api/i
 import { queryKeys } from '@/lib/query/keys';
 
 export const interviewQuestionQueries = {
-  all: (params: InterviewQuestionFilters = {}) =>
+  all: (params: InterviewQuestionFilters = {}, token?: string) =>
     queryOptions({
       queryKey: queryKeys.interviewQuestions.list(params),
-      queryFn: () => interviewQuestionApi.getInterviewQuestions(params),
+      queryFn: () => interviewQuestionApi.getInterviewQuestions(params, token),
       staleTime: 5 * 60 * 1000,
     }),
 
-  detail: (id: string) =>
+  detail: (id: string, token?: string) =>
     queryOptions({
       queryKey: queryKeys.interviewQuestions.detail(id),
-      queryFn: () => interviewQuestionApi.getInterviewQuestion(id),
+      queryFn: () => interviewQuestionApi.getInterviewQuestion(id, token),
       staleTime: 5 * 60 * 1000,
       enabled: !!id,
     }),

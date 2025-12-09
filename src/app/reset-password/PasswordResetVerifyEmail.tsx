@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import authClient from "@/lib/axios/auth-api";
+import {axiosApiClient} from "@/lib/axios/auth-api";
 import { useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -63,7 +63,7 @@ export const PasswordResetVerifyEmail = ({
     setIsSending(true);
 
     try {
-      await authClient.post("/send-verification", { email });
+      await axiosApiClient.post("/send-verification", { email });
 
       toast.success(`${username}, verification code sent to your email!`);
       setCanResend(false);
@@ -97,7 +97,7 @@ export const PasswordResetVerifyEmail = ({
     setIsVerifying(true);
 
     try {
-      await authClient.post("/verify-email", { code, email });
+      await axiosApiClient.post("/verify-email", { code, email });
 
       toast.success(`${username}, your email has been verified successfully!`);
       setCompletedEmailVerification(true);
@@ -195,7 +195,7 @@ export const PasswordResetVerifyEmail = ({
               variant={"ghost"}
               className="absolute top-4 right-5"
               onClick={async () => {
-                await authClient.delete("/delete");
+                await axiosApiClient.delete("/delete");
                 router.push("/register");
               }}
             >

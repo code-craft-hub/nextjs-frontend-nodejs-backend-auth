@@ -170,6 +170,9 @@ importers:
       framer-motion:
         specifier: ^12.23.12
         version: 12.23.12(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      import-in-the-middle:
+        specifier: ^2.0.0
+        version: 2.0.0
       input-otp:
         specifier: ^1.4.2
         version: 1.4.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -293,6 +296,9 @@ importers:
       remark-gfm:
         specifier: ^4.0.1
         version: 4.0.1
+      require-in-the-middle:
+        specifier: ^8.0.1
+        version: 8.0.1
       resend:
         specifier: ^6.0.3
         version: 6.0.3(@react-email/render@1.2.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0))

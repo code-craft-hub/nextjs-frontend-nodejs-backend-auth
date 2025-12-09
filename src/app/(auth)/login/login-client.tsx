@@ -16,10 +16,11 @@ import { GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
 import { Input } from "@/components/ui/input";
 import { Eye, EyeOff } from "lucide-react";
-import { useAuth } from "@/hooks/use-auth";
-import { api } from "@/lib/api/client";
+// import { useAuth } from "@/hooks/use-auth";
+// import { api } from "@/lib/api/client";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { axiosApiClient } from "@/lib/axios/auth-api";
 
 const LoginSchema = z.object({
   email: z.email({ message: "Please enter a valid email address." }),
@@ -116,18 +117,25 @@ function FloatingLabelInput({
 
 export const LoginClient = () => {
   const router = useRouter();
-  const { login, isLoginLoading } = useAuth();
+  const [isLoginLoading, setIsLoginLoading] = useState(false);
+  // const { login, isLoginLoading } = useAuth();
 
   const handleLogin = async (response: any) => {
     try {
+      setIsLoginLoading(true);
       const credentials = jwtDecode(response.credential) as { email: string };
-      const data: any = await api.post("/google-login-register", credentials);
+      const data: any = await axiosApiClient.post(
+        "/google-login-register",
+        credentials
+      );
       if (data?.success) {
         router.push("/dashboard/home");
       }
     } catch (error) {
       console.error("Google Login Error:", error);
       toast.error("Google login failed. Please try again.");
+    } finally {
+      setIsLoginLoading(false);
     }
   };
 
@@ -140,7 +148,24 @@ export const LoginClient = () => {
   });
 
   const onSubmit = async (values: z.infer<typeof LoginSchema>) => {
-    await login(values);
+    try {
+      setIsLoginLoading(true);
+      const response = await axiosApiClient.post("/login", {
+        email: values.email,
+        password: values.password,
+      });
+      console.log("Login response:", response);
+      toast.success("Login successful!");
+      router.push("/dashboard/home");
+    } catch (error: any) {
+      console.error("Login error:", error);
+      toast.error(
+        error?.response?.data?.message || "Login failed. Please try again."
+      );
+      return;
+    } finally {
+      setIsLoginLoading(false);
+    }
   };
 
   const handlePasswordReset = async () => {

@@ -11,10 +11,10 @@ export const userQueries = {
       staleTime: 5 * 60 * 1000,
     }),
 
-  detail: () =>
+  detail: (token?: string) =>
     queryOptions({
       queryKey: queryKeys.users.detail(),
-      queryFn: () => userApi.getUser(),
+      queryFn: () => userApi.getUser(token),
       staleTime: 10 * 60 * 1000,
     }),
 };

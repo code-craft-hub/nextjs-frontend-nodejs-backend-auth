@@ -16,97 +16,70 @@ export interface FetchOptions extends RequestInit {
   params?: Record<string, string | number | boolean>;
 }
 
-// 🔑 Helper to detect if we're on the server
-function isServer() {
-  return typeof window === "undefined";
-}
-
-// 🔑 Helper to get cookies on server-side
-async function getServerCookies(): Promise<string | null> {
-  if (!isServer()) {
-    return null; // Client-side, return null
-  }
-
-  try {
-    const { cookies } = await import("next/headers");
-
-    const cookieStore = await cookies();
-    const cookieString = cookieStore
-      .getAll()
-      .map((cookie) => `${cookie.name}=${cookie.value}`)
-      .join("; ");
-
-    return cookieString || null;
-  } catch (error) {
-    // cookies() might throw in some contexts (like route handlers in some cases)
-    console.warn("⚠️ Could not access cookies:", error);
-    return null;
-  }
+export interface FetchOptions extends RequestInit {
+  token?: string;
 }
 
 export async function apiClient<T>(
   endpoint: string,
   options: FetchOptions = {}
 ): Promise<T> {
-  const { params, ...fetchOptions } = options;
+  const { token, ...fetchOptions } = options;
 
-  const isServerSide = isServer();
-  let url = `${baseURL}${endpoint}`;
-  if (params) {
-    const searchParams = new URLSearchParams();
-    Object.entries(params).forEach(([key, value]) => {
-      if (value !== undefined && value !== null && value !== "") {
-        searchParams.append(key, String(value));
-      }
-    });
+  console.log(
+    "🔍 apiClient called with endpoint:",
+    endpoint,
+    "with token:",
+    token
+  );
 
-    const queryString = searchParams.toString();
-    if (queryString) {
-      url += `?${queryString}`;
-    }
-  }
-
-  const headers: Record<string, string> = {
+  const headers: HeadersInit = {
     "Content-Type": "application/json",
+    ...(fetchOptions.headers || {}),
   };
 
-  // Add any additional headers from options
-  if (fetchOptions.headers) {
-    const existingHeaders = new Headers(fetchOptions.headers);
-    existingHeaders.forEach((value, key) => {
-      headers[key] = value;
-    });
+
+  if (token) {
+    (headers as any)["Authorization"] = `Bearer ${token}`;
+    console.log("📤 Server request: Authorization header added");
   }
 
-  // 🔑 AUTOMATIC: Get and forward cookies if on server
-  if (isServerSide) {
-    const serverCookies = await getServerCookies();
-    if (serverCookies) {
-      headers["Cookie"] = serverCookies;
-    }
-  }
+  const isClientSide = typeof window !== "undefined";
+  const credentials: RequestCredentials = isClientSide ? "include" : "omit";
 
-  try {
-    console.log("API Request:", headers["Cookie"]);
-    const response = await fetch(url, {
+  console.log(`📡 Request: ${endpoint}`, {
+    environment: isClientSide ? "Client" : "Server",
+    hasToken: !!token,
+    credentials,
+    willSendCookies: credentials === "include",
+    willSendHeader: !!token,
+    headers
+  });
+
+  const response = await fetch(
+    `${baseURL}${endpoint}`,
+    {
       ...fetchOptions,
       headers,
-      credentials: "include",
-    });
-
-    if (!response.ok) {
+      credentials,
     }
+  );
 
-    const data = await response.json();
+  console.log(
+    `📥 Response: ${endpoint} - Status ${response.status}`,
+    response,
+  );
 
-    return data;
-  } catch (error) {
-    console.error("API Request Error:", error);
-    throw error;
+  if (!response.ok) {
+    const error = await response
+      .json()
+      .catch(() => ({ error: "Request failed" }));
+    throw new APIError(response.status, error.error || "Request failed", error);
   }
+
+  return response.json();
 }
 
-// Helper methods - now fully automatic!
 export const api = {
   get: <T>(endpoint: string, options?: FetchOptions) =>
     apiClient<T>(endpoint, { ...options, method: "GET" }),

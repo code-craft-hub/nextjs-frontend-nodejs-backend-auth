@@ -19,9 +19,10 @@ export const userApi = {
     api.get<PaginatedResponse<IUser>>("/users"),
 
   // Get user by ID
-  getUser: async () => {
+  getUser: async (token?: string) => {
     const data = await api.get<{ data: Partial<IUser>; success: boolean }>(
-      `/users`
+      `/users`,
+      { token }
     );
     if (data?.success) return data.data;
     throw new Error("Failed to fetch user data");

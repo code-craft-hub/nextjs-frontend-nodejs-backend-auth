@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import authClient from "@/lib/axios/auth-api";
+import {axiosApiClient} from "@/lib/axios/auth-api";
 import { useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -22,12 +22,10 @@ import { toast } from "sonner";
 import { EyeIcon, EyeOffIcon, X } from "lucide-react";
 
 const formSchema = z.object({
-  password: z
-    .string()
-    .min(5, "Please enter your new password"),
+  password: z.string().min(5, "Please enter your new password"),
 });
 
-export const ResetPassword = ({email}: {email: string}) => {
+export const ResetPassword = ({ email }: { email: string }) => {
   const router = useRouter();
   const [isVerifying, setIsVerifying] = useState(false);
   const [isVisible, setIsVisible] = useState<boolean>(false);
@@ -56,8 +54,6 @@ export const ResetPassword = ({email}: {email: string}) => {
     }
   }, [emailSent]);
 
-
-
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -69,14 +65,15 @@ export const ResetPassword = ({email}: {email: string}) => {
     setIsVerifying(true);
 
     try {
-      await authClient.post("/update-user-password", { password, email });
+      await axiosApiClient.post("/update-user-password", { password, email });
 
       toast.success(
-        `${email?.split("@")[0]}, We've updated your password, redirect to the login page now.`
+        `${
+          email?.split("@")[0]
+        }, We've updated your password, redirect to the login page now.`
       );
-      router.push("/login")
+      router.push("/login");
       // setCompletedEmailVerification(true);
-
     } catch (error: any) {
       console.error(error);
       // toast.error(
@@ -137,7 +134,7 @@ export const ResetPassword = ({email}: {email: string}) => {
                       </FormItem>
                     )}
                   />
-                 
+
                   <Button
                     type="submit"
                     disabled={isVerifying || isSending}
@@ -201,7 +198,7 @@ export const ResetPassword = ({email}: {email: string}) => {
               variant={"ghost"}
               className="absolute top-4 right-5"
               onClick={async () => {
-                await authClient.delete("/delete");
+                await axiosApiClient.delete("/delete");
                 router.push("/register");
               }}
             >

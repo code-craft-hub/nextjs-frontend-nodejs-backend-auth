@@ -1,6 +1,6 @@
 "use client";
 
-import authClient from "@/lib/axios/auth-api";
+import {axiosApiClient} from "@/lib/axios/auth-api";
 import { userQueries } from "@/lib/queries/user.queries";
 import { RegisterUserSchema } from "@/lib/schema-validations";
 import { IUser, Login } from "@/types";
@@ -11,7 +11,7 @@ import { toast } from "sonner";
 export const apiService = {
   login: async (loginData: Login): Promise<Partial<IUser>> => {
     try {
-      const { data } = await authClient.post("/login", loginData);
+      const { data } = await axiosApiClient.post("/login", loginData);
 
       return data.data;
     } catch (error: any) {
@@ -27,20 +27,20 @@ export const apiService = {
 
   register: async (user: RegisterUserSchema): Promise<Partial<IUser>> => {
     try {
-      const { data } = await authClient.post("/register", user);
+      const { data } = await axiosApiClient.post("/register", user);
       toast.success("Registration successful! Please verify your email.");
 
       return data.data;
     } catch (error: any) {
       console.error("ERROR IN REGISTER FUNCTION : ", error);
-      toast.error(error?.response?.data?.error || "Registration failed");
-      throw new Error(error?.response.data.error || "Registration failed");
+      toast.error(error?.response?.data?.message || "Registration failed");
+      throw new Error(error?.response.data.message || "Registration failed");
     }
   },
 
   logout: async (): Promise<{ success: boolean }> => {
     try {
-      const { data } = await authClient.post("/logout");
+      const { data } = await axiosApiClient.post("/logout");
       return data.data;
     } catch (error: any) {
       throw new Error(error.error || "Logout failed");
@@ -49,7 +49,7 @@ export const apiService = {
 
   deleteUser: async (): Promise<{ success: boolean }> => {
     try {
-      const { data } = await authClient.delete("/delete");
+      const { data } = await axiosApiClient.delete("/delete");
       toast.success("User account deleted successfully");
       window.location.href = "/register";
       return data.data;
@@ -60,7 +60,7 @@ export const apiService = {
 
   getUser: async (): Promise<IUser> => {
     try {
-      const { data } = await authClient.get("/users");
+      const { data } = await axiosApiClient.get("/users");
       return data.data;
     } catch (error: any) {
       throw new Error(
@@ -71,7 +71,9 @@ export const apiService = {
   },
   gmailOauthStatus: async (): Promise<{ isAuthorized: boolean }> => {
     try {
-      const { data } = await authClient.get(`/google-gmail-oauth/auth-status/`);
+      const { data } = await axiosApiClient.get(
+        `/google-gmail-oauth/auth-status/`
+      );
       return data.data;
     } catch (error: any) {
       throw new Error(
@@ -86,7 +88,7 @@ export const apiService = {
     message: string;
   }> => {
     try {
-      const { data } = await authClient.post("/send-verification");
+      const { data } = await axiosApiClient.post("/send-verification");
       return data.data;
     } catch (error: any) {
       throw new Error(error.error || "Login failed");
@@ -95,7 +97,7 @@ export const apiService = {
 
   verifyEmail: async (code: string): Promise<Partial<IUser>> => {
     try {
-      const { data } = await authClient.post("/verify-email", { code });
+      const { data } = await axiosApiClient.post("/verify-email", { code });
 
       return data.data;
     } catch (error: any) {
@@ -105,7 +107,7 @@ export const apiService = {
 
   completeOnboarding: async (): Promise<Partial<IUser>> => {
     try {
-      const { data } = await authClient.post("/complete-onboarding");
+      const { data } = await axiosApiClient.post("/complete-onboarding");
       return data.data;
     } catch (error: any) {
       throw new Error(error.error || "Login failed");
@@ -113,7 +115,7 @@ export const apiService = {
   },
   updateUser: async (input: any): Promise<Partial<IUser>> => {
     try {
-      const { data } = await authClient.put("/update", input);
+      const { data } = await axiosApiClient.put("/update", input);
       return data.data;
     } catch (error: any) {
       throw new Error(error.error || "Updating user failed");
@@ -125,7 +127,7 @@ export const apiService = {
     collection: string
   ): Promise<T> => {
     try {
-      const { data } = await authClient.get(
+      const { data } = await axiosApiClient.get(
         `/career-doc/${documentId}?collection=${collection}`
       );
       return data.data;
@@ -143,7 +145,7 @@ export const apiService = {
     input: Partial<T>
   ) => {
     try {
-      const { data } = await authClient.patch(
+      const { data } = await axiosApiClient.patch(
         `/career-doc/${collection}/${documentId}`,
         {
           updates: input,
@@ -160,7 +162,7 @@ export const apiService = {
 
   getAllDoc: async <T>(collection: string): Promise<T> => {
     try {
-      const { data } = await authClient.get(
+      const { data } = await axiosApiClient.get(
         `/career-doc/?collection=${collection}`
       );
       return data.data;
@@ -174,7 +176,7 @@ export const apiService = {
 
   getPaginatedDoc: async <T>(collection: string): Promise<T> => {
     try {
-      const { data } = await authClient.get(
+      const { data } = await axiosApiClient.get(
         `/career-doc/paginated/?collection=${collection}`
       );
       return data.data;
@@ -191,7 +193,7 @@ export const apiService = {
     collection: string
   ): Promise<Partial<IUser>> => {
     try {
-      const { data } = await authClient.delete(
+      const { data } = await axiosApiClient.delete(
         `/career-doc/${id}/${collection}`
       );
       return data.data;
@@ -209,7 +211,7 @@ export const apiService = {
     gcsPath?: string
   ): Promise<Partial<IUser>> => {
     try {
-      const { data } = await authClient.post(
+      const { data } = await axiosApiClient.post(
         "/send-email-with-resume-and-coverletter",
         {
           user,
@@ -276,7 +278,7 @@ export function useAuth(initialUser?: Partial<IUser>) {
     mutationFn: (data: any) => apiService.updateUser(data),
     onSuccess: (data) => {
       queryClient.setQueryData(["auth", "user"], data);
-      queryClient.invalidateQueries(userQueries.detail())
+      queryClient.invalidateQueries(userQueries.detail());
       // router.push("/dashboard/home");
     },
   });

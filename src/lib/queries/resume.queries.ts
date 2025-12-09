@@ -4,17 +4,17 @@ import { resumeApi, type ResumeFilters } from '@/lib/api/resume.api';
 import { queryKeys } from '@/lib/query/keys';
 
 export const resumeQueries = {
-  all: (params: ResumeFilters = {}) =>
+  all: (params: ResumeFilters = {}, token?:string) =>
     queryOptions({
       queryKey: queryKeys.resumes.list(params),
-      queryFn: () => resumeApi.getResumes(params),
+      queryFn: () => resumeApi.getResumes(params, token),
       staleTime: 5 * 60 * 1000,
     }),
 
-  detail: (id: string) =>
+  detail: (id: string, token?: string) =>
     queryOptions({
       queryKey: queryKeys.resumes.detail(id),
-      queryFn: () => resumeApi.getResume(id),
+      queryFn: () => resumeApi.getResume(id, token),
       staleTime: 5 * 60 * 1000,
       enabled: !!id,
     }),

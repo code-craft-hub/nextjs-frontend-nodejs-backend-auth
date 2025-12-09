@@ -78,5 +78,12 @@ export async function getSessionFromCookies(): Promise<Partial<IUser> | null> {
   return verifySessionToken(sessionToken);
 }
 
+export async function getCookiesToken(): Promise<string | null> {
+  const cookieStore = await cookies();
+  const sessionToken = cookieStore.get("session")?.value;
+  if (!sessionToken) return null;
+  return sessionToken;
+}
+
 
 

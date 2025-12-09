@@ -5,7 +5,7 @@ import { ResumeField, UpdatePayload, UseResumeDataOptions } from "@/types";
 import { ResumeFormData } from "@/lib/schema-validations/resume.schema";
 import { createApiError } from "@/lib/utils/helpers";
 import { COLLECTIONS } from "@/lib/utils/constants";
-import authClient from "@/lib/axios/auth-api";
+import {axiosApiClient} from "@/lib/axios/auth-api";
 import { resumeQueries } from "@/lib/queries/resume.queries";
 
 const updateResumeField = async <T>(
@@ -18,7 +18,7 @@ const updateResumeField = async <T>(
         ? payload.value
         : { [payload.field]: payload.value };
 
-    const { data } = await authClient.patch(
+    const { data } = await axiosApiClient.patch(
       `${baseUrl}/career-doc/${COLLECTIONS.RESUME}/${payload.resumeId}`,
       {
         resumeId: payload.resumeId,

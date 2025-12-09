@@ -1,5 +1,4 @@
 "use client";
-import { useAuth } from "@/hooks/use-auth";
 import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -24,25 +23,29 @@ import {
 } from "@/lib/schema-validations";
 import { cn } from "@/lib/utils";
 import { inputField } from "@/lib/utils/constants";
-import { api } from "@/lib/api/client";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import {axiosApiClient} from "@/lib/axios/auth-api";
 
 export default function RegisterClient({ referral }: { referral?: string }) {
-  const { register, isRegisterLoading } = useAuth();
+  const [loading, setLoading] = useState(false);
+  // const { register, isRegisterLoading } = useAuth();
 
   const router = useRouter();
 
   const handleLogin = async (response: any) => {
     try {
+      setLoading(true);
       const credentials = jwtDecode(response.credential) as { email: string };
-      const data: any = await api.post("/google-login-register", credentials);
+      const data: any = await axiosApiClient.post("/google-login-register", credentials);
       if (data?.success) {
         router.push("/dashboard/home");
       }
     } catch (error) {
       console.error("Google registeration Error:", error);
       toast.error("Google registeration failed. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -60,7 +63,27 @@ export default function RegisterClient({ referral }: { referral?: string }) {
   });
 
   const onSubmit = async (values: RegisterUserSchema) => {
-    await register(values);
+    try {
+      setLoading(true);
+      const response = await axiosApiClient.post("/register", {
+        email: values.email,
+        password: values.password,
+      });
+      console.log("Registration response:", response);
+      if (response?.data?.success) {
+        toast.success("Registration successful! Please check your email.");
+        router.push("/verify-email");
+      }
+    } catch (error: any) {
+      console.error("Registration error:", error);
+      toast.error(
+        error?.response?.data?.message ||
+          "Registration failed. Please try again."
+      );
+      return;
+    } finally {
+      setLoading(false);
+    }
   };
 
   const [isVisible, setIsVisible] = useState<boolean>(false);
@@ -342,7 +365,7 @@ export default function RegisterClient({ referral }: { referral?: string }) {
               <Button
                 type="submit"
                 className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors"
-                disabled={isRegisterLoading}
+                disabled={loading}
                 onClick={form.handleSubmit(onSubmit)}
               >
                 Create account

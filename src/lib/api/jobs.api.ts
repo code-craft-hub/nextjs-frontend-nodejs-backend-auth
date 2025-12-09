@@ -5,16 +5,18 @@ import type { PaginatedResponse } from "@/lib/types";
 
 export const jobsApi = {
   // Get all jobs with advanced filtering
-  getJobs: (params?: any) =>
+  getJobs: (params?: any, token?: string) =>
     api.get<PaginatedResponse<JobType>>("/job-recommendations/search/ilike", {
       params,
+      token,
     }),
   // Get all jobs with advanced filtering
-  autoApply: (params?: any) => {
+  autoApply: (params?: any, token?: string) => {
     return api.get<PaginatedResponse<JobType>>(
       "/job-recommendations/search/jobs",
       {
         params,
+        token,
       }
     );
   },

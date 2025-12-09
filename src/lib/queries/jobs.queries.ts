@@ -6,16 +6,16 @@ import type { JobFilters } from "@/lib/types/jobs";
 import { normalizeJobFilters } from "../query/normalize-filters";
 
 export const jobsQueries = {
-  all: (filters: JobFilters = {}) => {
+  all: (filters: JobFilters = {}, token?: string) => {
     const normalized = normalizeJobFilters(filters);
     return queryOptions({
       queryKey: queryKeys.jobs.list(normalized),
-      queryFn: () => jobsApi.getJobs(normalized),
+      queryFn: () => jobsApi.getJobs(normalized, token),
       staleTime: 10 * 60 * 1000,
     });
   },
 
-  infinite: (filters: Omit<JobFilters, "page">) => {
+  infinite: (filters: Omit<JobFilters, "page">, token?: string) => {
     const baseFilters = normalizeJobFilters(filters as JobFilters);
     return infiniteQueryOptions({
       queryKey: [...queryKeys.jobs.lists(), "infinite", baseFilters],
@@ -24,7 +24,7 @@ export const jobsQueries = {
           ...baseFilters,
           page: pageParam,
           limit: baseFilters.limit || 20,
-        });
+        }, token);
       },
       getNextPageParam: (lastPage) => {
         if (lastPage.page < lastPage.totalPages) {
@@ -43,17 +43,17 @@ export const jobsQueries = {
     });
   },
 
-  autoApply: (filters: JobFilters = {}) => {
+  autoApply: (filters: JobFilters = {}, token?: string) => {
     const normalized = normalizeJobFilters(filters);
     return queryOptions({
       queryKey: queryKeys.jobs.auto(normalized),
-      queryFn: () => jobsApi.autoApply(normalized),
+      queryFn: () => jobsApi.autoApply(normalized, token),
       staleTime: 10 * 60 * 1000,
     });
   },
 
   // Infinite scroll version for auto-apply jobs
-  autoApplyInfinite: (filters: Omit<JobFilters, "page"> = {}) => {
+  autoApplyInfinite: (filters: Omit<JobFilters, "page"> = {}, token?: string) => {
     const baseFilters = normalizeJobFilters(filters as JobFilters);
     return infiniteQueryOptions({
       queryKey: [...queryKeys.jobs.auto(baseFilters), "infinite"],
@@ -62,7 +62,7 @@ export const jobsQueries = {
           ...baseFilters,
           page: pageParam,
           limit: baseFilters.limit || 20,
-        });
+        }, token);
       },
       getNextPageParam: (lastPage) => {
         if (lastPage.page < lastPage.totalPages) {

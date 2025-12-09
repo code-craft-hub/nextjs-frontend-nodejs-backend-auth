@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import authClient from "@/lib/axios/auth-api";
+import { axiosApiClient } from "@/lib/axios/auth-api";
 import { useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -16,21 +16,20 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { IUser } from "@/types";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { X } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { userQueries } from "@/lib/queries/user.queries";
 
 const formSchema = z.object({
   code: z.string().min(5, "Please enter the 5-digit verification code"),
 });
 
-export const VerifyEmailClient = ({
-  initialUser,
-}: {
-  initialUser: Partial<IUser>;
-}) => {
+export const VerifyEmailClient = () => {
+  const { data: user } = useQuery(userQueries.detail());
+  console.log("user in verify email client:", user);
   const router = useRouter();
   const [isVerifying, setIsVerifying] = useState(false);
 
@@ -61,10 +60,10 @@ export const VerifyEmailClient = ({
     setIsSending(true);
 
     try {
-      await authClient.post("/send-verification");
+      await axiosApiClient.post("/send-verification");
 
       toast.success(
-        `${initialUser.firstName}, verification code sent to your email!`
+        `${user?.firstName}, verification code sent to your email!`
       );
       setCanResend(false);
       setTimeLeft(60); // 1 minute cooldown
@@ -96,10 +95,10 @@ export const VerifyEmailClient = ({
     setIsVerifying(true);
 
     try {
-      await authClient.post("/verify-email", { code });
+      await axiosApiClient.post("/verify-email", { code });
 
       toast.success(
-        `${initialUser.firstName}, your email has been verified successfully!`
+        `${user?.firstName}, your email has been verified successfully!`
       );
       setCompletedEmailVerification(true);
     } catch (error: any) {
@@ -195,7 +194,7 @@ export const VerifyEmailClient = ({
               variant={"ghost"}
               className="absolute top-4 right-5"
               onClick={async () => {
-                await authClient.delete("/delete");
+                await axiosApiClient.delete("/delete");
                 router.push("/register");
               }}
             >
