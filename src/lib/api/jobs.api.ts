@@ -22,10 +22,11 @@ export const jobsApi = {
   },
 
   // Get job by ID
-  getJob: async (id: string) => {
+  getJob: async (id: string, token?: string) => {
     try {
       const data = await api.get<{ data: JobType }>(
-        `/job-recommendations/${id}`
+        `/job-recommendations/${id}`,
+        { token }
       );
       return data;
     } catch (error) {
@@ -95,20 +96,40 @@ export const jobsApi = {
     }>("/job-recommendations/filters"),
   // Fetch bookmarked jobs by IDs with pagination (client passes user's bookmarked IDs)
   // Body: { jobIds: string[], page?: number, limit?: number, title?: string }
-  getBookmarkedJobs: (jobIds: string[], page = 1, limit = 20, title?: string) =>
-    api.post<PaginatedResponse<JobType>>("/job-recommendations/bookmarked", {
-      jobIds,
-      page,
-      limit,
-      title,
-    }),
+  getBookmarkedJobs: (
+    jobIds: string[],
+    page = 1,
+    limit = 20,
+    title?: string,
+    token?: string
+  ) =>
+    api.post<PaginatedResponse<JobType>>(
+      "/job-recommendations/bookmarked",
+      {
+        jobIds,
+        page,
+        limit,
+        title,
+      },
+      { token }
+    ),
   // Fetch applied jobs by IDs with pagination (client passes user's applied job IDs)
   // Body: { jobIds: string[], page?: number, limit?: number, title?: string }
-  getAppliedJobs: (jobIds: string[], page = 1, limit = 20, title?: string) =>
-    api.post<PaginatedResponse<JobType>>("/job-recommendations/applied-jobs", {
-      jobIds,
-      page,
-      limit,
-      title,
-    }),
+  getAppliedJobs: (
+    jobIds: string[],
+    page = 1,
+    limit = 20,
+    title?: string,
+    token?: string
+  ) =>
+    api.post<PaginatedResponse<JobType>>(
+      "/job-recommendations/applied-jobs",
+      {
+        jobIds,
+        page,
+        limit,
+        title,
+      },
+      { token }
+    ),
 };

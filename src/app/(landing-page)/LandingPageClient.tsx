@@ -99,9 +99,10 @@ export const LandingPageClient = ({
         </div>
       </section>
 
-      <div className="md:mb-20 px-4">
+      <div className=" px-4 bg-geen-500">
         <VideoModal />
       </div>
+
       {user && <FeatureJobs filters={filters} />}
 
       {/* Core Features */}

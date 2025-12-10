@@ -80,7 +80,7 @@ export default async function HomePage({
     },
   ]);
 
-  await queryClient.prefetchInfiniteQuery(jobsQueries.infinite(filters));
+  await queryClient.prefetchInfiniteQuery(jobsQueries.infinite(filters, token));
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>

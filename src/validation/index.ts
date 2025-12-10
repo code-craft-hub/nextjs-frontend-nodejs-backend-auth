@@ -23,30 +23,56 @@ export const SignupValidation = z
     path: ["confirmPassword"],
   });
 export const SigninValidation = z.object({
-  email: z.string().email({ message: "Invalid email address" }),
+  email: z.email({ message: "Invalid email address" }),
   password: z.string(),
 });
+
 
 export const onBoardingValidation = z.object({
   portfolio: z.string().optional(),
   linkedin: z.string().optional(),
+
   file: z
-    .instanceof(FileList)
-    .refine((files) => files.length === 1, "Please upload a file")
-    .refine((files) => {
+    .custom<FileList>(
+      (value) =>
+        typeof window !== "undefined" &&
+        value instanceof FileList &&
+        value.length > 0,
+      "Please upload a file"
+    )
+    .superRefine((files, ctx) => {
+      if (!files || files.length !== 1) {
+        ctx.addIssue({
+          code: "custom",
+          message: "Please upload exactly one file",
+        });
+        return;
+      }
+
       const file = files[0];
-      return (
-        file.type === "application/pdf" ||
-        file.type === "application/msword" ||
-        file.type ===
-          "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-      );
-    }, "File must be a PDF, DOC, or DOCX")
-    .refine(
-      (files) => files[0].size <= 5 * 1024 * 1024,
-      "File size must be less than 5MB"
-    ),
+
+      const allowedTypes = [
+        "application/pdf",
+        "application/msword",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      ];
+
+      if (!allowedTypes.includes(file.type)) {
+        ctx.addIssue({
+          code: "custom",
+          message: "File must be a PDF, DOC, or DOCX",
+        });
+      }
+
+      if (file.size > 5 * 1024 * 1024) {
+        ctx.addIssue({
+          code: "custom",
+          message: "File size must be less than 5MB",
+        });
+      }
+    }),
 });
+
 
 export const userDetails = z.object({
   firstName: z

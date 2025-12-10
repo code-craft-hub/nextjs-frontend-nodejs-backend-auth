@@ -5,9 +5,12 @@ import { HydrationBoundary } from "@/components/hydration-boundary";
 import { api } from "@/lib/api/client";
 import { redirect } from "next/navigation";
 import { AccountClient } from "./Account";
+import { getCookiesToken } from "@/lib/auth.utils";
 
 const AccountPage = async ({ searchParams }: any) => {
   const tab = (await searchParams)?.tab;
+  const token = (await getCookiesToken()) ?? "";
+
   const reference = (await searchParams)?.reference;
 
   const queryClient = createServerQueryClient();
@@ -29,7 +32,7 @@ const AccountPage = async ({ searchParams }: any) => {
 
   // Fetch user data AFTER payment verification
   const user = await queryClient.fetchQuery({
-    ...userQueries.detail(),
+    ...userQueries.detail(token),
     // Force a fresh fetch if there was a payment reference
     staleTime: reference ? 0 : undefined,
   });

@@ -7,13 +7,15 @@ import { jobsQueries } from "@/lib/queries/jobs.queries";
 import { HydrationBoundary } from "@/components/hydration-boundary";
 import { dehydrate } from "@tanstack/react-query";
 import { getDataSource } from "@/lib/utils/helpers";
+import { getCookiesToken } from "@/lib/auth.utils";
 
 const CategoryPage = async ({ searchParams }: any) => {
   await requireOnboarding();
   const tab = (await searchParams)?.tab;
+  const token = (await getCookiesToken()) ?? "";
 
   const queryClient = createServerQueryClient();
-  const user = await queryClient.fetchQuery(userQueries.detail());
+  const user = await queryClient.fetchQuery(userQueries.detail(token));
   const bookmarkedIds = (user.bookmarkedJobs || []) as string[];
   const appliedJobsIds = (user.appliedJobs?.map((job) => job.id) || []) as string[];
   const userDataSource = getDataSource(user);
@@ -23,15 +25,15 @@ const CategoryPage = async ({ searchParams }: any) => {
     limit: 20,
   };
 
-  await queryClient.prefetchInfiniteQuery(jobsQueries.infinite(filters));
+  await queryClient.prefetchInfiniteQuery(jobsQueries.infinite(filters, token));
   await queryClient.prefetchInfiniteQuery(
-    jobsQueries.bookmarked(bookmarkedIds, "", 20)
+    jobsQueries.bookmarked(bookmarkedIds, "", 20, token)
   );
   await queryClient.prefetchInfiniteQuery(
-    jobsQueries.appliedJobs(appliedJobsIds, "", 20)
+    jobsQueries.appliedJobs(appliedJobsIds, "", 20, token)
   );
   await queryClient.prefetchInfiniteQuery(
-  jobsQueries.infinite({title: userJobTitlePreference})
+  jobsQueries.infinite({title: userJobTitlePreference}, token)
   );
 
   return (

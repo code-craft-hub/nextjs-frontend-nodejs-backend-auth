@@ -5,9 +5,10 @@ import type { PaginatedResponse } from "@/lib/types";
 
 export const onboardingApi = {
   // Get all jobs with advanced filtering
-  getJobs: (params?: any) =>
+  getJobs: (params?: any, token?: string) =>
     api.get<PaginatedResponse<JobType>>("/onboarding-user", {
       params,
+      token,
     }),
 
   // Get job by ID

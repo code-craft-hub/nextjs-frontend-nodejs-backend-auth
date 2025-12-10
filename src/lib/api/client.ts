@@ -1,5 +1,7 @@
+const isClientSide = typeof window !== "undefined";
+const isDevelopment = process.env.NODE_ENV === "development";
 export const baseURL =
-  process.env.NEXT_PUBLIC_AUTH_API_URL || "http://localhost:8080/api";
+  isClientSide && isDevelopment ? "/api" : process.env.NEXT_PUBLIC_AUTH_API_URL;
 
 export class APIError extends Error {
   constructor(
@@ -38,37 +40,34 @@ export async function apiClient<T>(
     ...(fetchOptions.headers || {}),
   };
 
-
   if (token) {
     (headers as any)["Authorization"] = `Bearer ${token}`;
     console.log("📤 Server request: Authorization header added");
   }
 
-  const isClientSide = typeof window !== "undefined";
-  const credentials: RequestCredentials = isClientSide ? "include" : "omit";
+  // const credentials: RequestCredentials = isClientSide ? "include" : "omit";
 
-  console.log(`📡 Request: ${endpoint}`, {
+  console.log(`📡 Request: ${baseURL}${endpoint}`, {
     environment: isClientSide ? "Client" : "Server",
     hasToken: !!token,
-    credentials,
-    willSendCookies: credentials === "include",
+    // credentials,
+    // willSendCookies: credentials === "include",
     willSendHeader: !!token,
-    headers
+    headers,
   });
 
-  const response = await fetch(
-    `${baseURL}${endpoint}`,
-    {
-      ...fetchOptions,
-      headers,
-      credentials,
-    }
-  );
+  const isServerSide = typeof window === "undefined";
 
-  console.log(
-    `📥 Response: ${endpoint} - Status ${response.status}`,
-    response,
-  );
+
+  const response = await fetch(`${baseURL}${endpoint}`, {
+    ...fetchOptions,
+    headers,
+    credentials: isServerSide ? "omit" : "include", // Important distinction
+  });
+
+  const data = await response.json();
+
+  console.log(`📥 Response: ${endpoint} - Status ${response.status}`, data);
 
   if (!response.ok) {
     const error = await response
@@ -77,7 +76,7 @@ export async function apiClient<T>(
     throw new APIError(response.status, error.error || "Request failed", error);
   }
 
-  return response.json();
+  return data;
 }
 
 export const api = {

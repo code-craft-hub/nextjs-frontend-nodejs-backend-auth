@@ -1,7 +1,8 @@
+import { baseURL } from "../api/client";
 import { createApiClient, setupInterceptors } from "./base";
 
 export const axiosApiClient = createApiClient({
-  baseURL: process.env.NEXT_PUBLIC_AUTH_API_URL || "http://localhost:8080",
+  baseURL: baseURL ?? "/api",
   timeout: 60000, // Longer timeout for authentication operations
   withCredentials: true, // Important for httpOnly cookies
 });

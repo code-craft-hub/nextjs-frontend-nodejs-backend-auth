@@ -5,16 +5,18 @@ import { interviewQuestionQueries } from "@/lib/queries/interview.queries";
 import { HydrationBoundary } from "@/components/hydration-boundary";
 import { dehydrate } from "@tanstack/react-query";
 import { userQueries } from "@/lib/queries/user.queries";
+import { getCookiesToken } from "@/lib/auth.utils";
 const TailorInterviewQuestionPage = async ({ searchParams, params }: any) => {
   const { jobDescription } = await searchParams;
   const { interviewQuestionId } = await params;
+  const token = (await getCookiesToken()) ?? "";
 
   const queryClient = createServerQueryClient();
   await queryClient.prefetchQuery(
-    interviewQuestionQueries.detail(interviewQuestionId)
+    interviewQuestionQueries.detail(interviewQuestionId, token)
   );
   await queryClient.prefetchQuery(
-    userQueries.detail()
+    userQueries.detail(token)
   );
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>

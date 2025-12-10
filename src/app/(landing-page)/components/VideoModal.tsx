@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback } from "react";
 
 /**
  * Enterprise-grade video player component with animated borders and play overlay
@@ -6,15 +6,16 @@ import React, { useState, useCallback } from 'react';
  */
 export const VideoModal: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const [videoSrc, setVideoSrc] = useState<string>('');
+  const [videoSrc, setVideoSrc] = useState<string>("https://www.youtube.com/embed/6Uss1_YleJk");
 
   /**
    * Handle play button click - loads and autoplays YouTube video
    */
   const handlePlayClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
-    
-    const embedUrl = 'https://www.youtube.com/embed/6Uss1_YleJk?autoplay=1&rel=0';
+
+    const embedUrl =
+      "https://www.youtube.com/embed/6Uss1_YleJk?autoplay=1&rel=0";
     setVideoSrc(embedUrl);
     setIsPlaying(true);
   }, []);
@@ -22,7 +23,7 @@ export const VideoModal: React.FC = () => {
   return (
     <div className="relative overflow-hidden max-w-screen-2xl w-full mx-auto">
       <div className="max-w-screen-xl mx-auto ">
-        <div className="relative mt-0 overflow-hidden rounded-xl bg-transparent p-0.5 md:h-[80svh] md:w-[70svw] 2xl:h-full 2xl:w-full mx-auto">
+        <div className="relative mt-0 overflow-hidden rounded-xl bg-transparent p-0.5 lg:h-[80svh] md:w-[70svw] 2xl:h-full 2xl:w-full max-lg:mb-16 mx-auto">
           {/* Animated Border Container */}
           <div className="absolute inset-0 pointer-events-none">
             <svg
@@ -32,15 +33,9 @@ export const VideoModal: React.FC = () => {
               height="100%"
               className="absolute w-full h-full"
             >
-              <rect
-                fill="none"
-                width="100%"
-                height="100%"
-                rx="5%"
-                ry="5%"
-              />
+              <rect fill="none" width="100%" height="100%" rx="5%" ry="5%" />
             </svg>
-            
+
             {/* Gradient Orb Animation */}
             <div className="absolute top-0 left-0 inline-block pointer-events-none">
               <div className="w-20 h-20 animate-[moveOrbOuter_8s_ease-in-out_infinite]">
@@ -54,16 +49,18 @@ export const VideoModal: React.FC = () => {
             {/* Cover Image */}
             {!isPlaying && (
               <img
-                alt="Cverai Video Cover"
+                alt="Cver AI - Video Cover"
                 loading="eager"
                 className="w-full h-full object-cover block"
-                src="https://nx.dev/_next/image?url=%2Fimages%2Fhome%2Fnx-dev-video-cover.avif&w=3840&q=75"
+                src="/thumbnail.png"
               />
             )}
 
             {/* YouTube Video Player */}
             <iframe
-              className={`w-full h-full rounded-xl ${isPlaying ? 'block' : 'hidden'}`}
+              className={`w-full h-full rounded-xl ${
+                isPlaying ? "block" : "hidden"
+              }`}
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
               src={videoSrc}
@@ -73,7 +70,7 @@ export const VideoModal: React.FC = () => {
             {/* Play Button Overlay */}
             {!isPlaying && (
               <div className="absolute inset-0 z-10 grid h-full w-full place-items-center">
-                <div className="relative overflow-hidden rounded-full bg-transparent p-px shadow-lg transition-all duration-300 hover:scale-105">
+                <div className="relative overflow-hidden rounded-full bg-transparent p-px  transition-all duration-300 hover:scale-105">
                   {/* Play Button Border Animation */}
                   <div className="absolute inset-0 pointer-events-none">
                     <svg
@@ -91,7 +88,7 @@ export const VideoModal: React.FC = () => {
                         ry="5%"
                       />
                     </svg>
-                    
+
                     {/* Button Gradient Orb */}
                     <div className="absolute top-0 left-0 inline-block pointer-events-none">
                       <div className="w-20 h-20 animate-[moveOrbButton_3s_ease-in-out_infinite]">
@@ -142,18 +139,31 @@ export const VideoModal: React.FC = () => {
 
       <style jsx>{`
         @keyframes moveOrbOuter {
-          0%, 100% { transform: translate(0, 0); }
-          25% { transform: translate(400px, 0); }
-          50% { transform: translate(800px, 0); }
-          75% { transform: translate(400px, 0); }
+          0%,
+          100% {
+            transform: translate(0, 0);
+          }
+          25% {
+            transform: translate(400px, 0);
+          }
+          50% {
+            transform: translate(800px, 0);
+          }
+          75% {
+            transform: translate(400px, 0);
+          }
         }
 
         @keyframes moveOrbButton {
-          0%, 100% { transform: translate(40px, 40px); }
-          50% { transform: translate(0, 80px); }
+          0%,
+          100% {
+            transform: translate(40px, 40px);
+          }
+          50% {
+            transform: translate(0, 80px);
+          }
         }
       `}</style>
     </div>
   );
 };
-

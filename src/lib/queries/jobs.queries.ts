@@ -84,7 +84,8 @@ export const jobsQueries = {
   bookmarked: (
     bookmarkedIds: string[],
     searchValue: string = "",
-    limit: number = 20
+    limit: number = 20,
+    token?: string
   ) => {
     return infiniteQueryOptions({
       queryKey: ["jobs", "bookmarked", bookmarkedIds, searchValue, limit],
@@ -99,7 +100,8 @@ export const jobsQueries = {
           normalized.bookmarkedIds,
           pageParam,
           normalized.limit,
-          normalized.searchValue
+          normalized.searchValue,
+          token
         );
       },
       getNextPageParam: (lastPage) => {
@@ -120,7 +122,8 @@ export const jobsQueries = {
   appliedJobs: (
     appliedjobsIds: string[],
     searchValue: string = "",
-    limit: number = 20
+    limit: number = 20,
+    token?: string
   ) => {
     return infiniteQueryOptions({
       queryKey: ["jobs", "appliedJobs", appliedjobsIds, searchValue, limit],
@@ -135,7 +138,8 @@ export const jobsQueries = {
           normalized.appliedjobsIds,
           pageParam,
           normalized.limit,
-          normalized.searchValue
+          normalized.searchValue,
+          token
         );
       },
       getNextPageParam: (lastPage) => {
@@ -153,10 +157,10 @@ export const jobsQueries = {
     });
   },
 
-  detail: (id: string) =>
+  detail: (id: string, token?: string) =>
     queryOptions({
       queryKey: queryKeys.jobs.detail(id),
-      queryFn: () => jobsApi.getJob(id),
+      queryFn: () => jobsApi.getJob(id, token),
       staleTime: 5 * 60 * 1000, // 5 minutes
       enabled: !!id,
     }),

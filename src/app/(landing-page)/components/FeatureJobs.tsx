@@ -31,7 +31,7 @@ export const FeatureJobs = ({ filters }: { filters: JobFilters }) => {
           </Button>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
           {jobs?.data?.map((job, index) => (
             <div
               key={index}

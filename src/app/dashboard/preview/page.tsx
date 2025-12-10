@@ -7,26 +7,27 @@ import { userQueries } from "@/lib/queries/user.queries";
 import { prefetchWithPriority } from "@/lib/query/parallel-prefetch";
 import { resumeQueries } from "@/lib/queries/resume.queries";
 import { coverLetterQueries } from "@/lib/queries/cover-letter.queries";
-
+import { getCookiesToken } from "@/lib/auth.utils";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 const PreviewPage = async ({ searchParams }: any) => {
+  const token = (await getCookiesToken()) ?? "";
   const queryClient = createServerQueryClient();
-   await queryClient.prefetchQuery(userQueries.detail());
+  await queryClient.prefetchQuery(userQueries.detail(token));
   const { coverLetterId, resumeId, recruiterEmail, jobDescription, aiApplyId } =
     await searchParams;
   // const baseResume = (await searchParams)?.baseResume;
   await prefetchWithPriority(queryClient, [
     {
       queryKey: resumeQueries.detail(resumeId).queryKey,
-      queryFn: resumeQueries.detail(resumeId).queryFn,
+      queryFn: resumeQueries.detail(resumeId, token).queryFn,
       priority: "high",
     },
     {
       queryKey: coverLetterQueries.detail(coverLetterId).queryKey,
-      queryFn: coverLetterQueries.detail(coverLetterId).queryFn,
+      queryFn: coverLetterQueries.detail(coverLetterId, token).queryFn,
       priority: "high",
     },
   ]);

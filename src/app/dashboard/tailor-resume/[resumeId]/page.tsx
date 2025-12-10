@@ -5,15 +5,17 @@ import { resumeQueries } from "@/lib/queries/resume.queries";
 import { HydrationBoundary } from "@/components/hydration-boundary";
 import { dehydrate } from "@tanstack/react-query";
 import { userQueries } from "@/lib/queries/user.queries";
+import { getCookiesToken } from "@/lib/auth.utils";
 
 const TailorResumePage = async ({ searchParams, params }: any) => {
   const { jobDescription, aiApply, coverLetterId, recruiterEmail } =
     await searchParams;
   const { resumeId } = await params;
+  const token = (await getCookiesToken()) ?? "";
 
   const queryClient = createServerQueryClient();
-  await queryClient.prefetchQuery(resumeQueries.detail(resumeId));
-  await queryClient.fetchQuery(userQueries.detail());
+  await queryClient.prefetchQuery(resumeQueries.detail(resumeId, token));
+  await queryClient.fetchQuery(userQueries.detail(token));
   // const useMasterCV = user?.aiApplyPreferences?.useMasterCV;
 
   // TODO: CHECK THE EXPIRY OF THE URL AND REFRESH IF NEEDED IN THE SERVER OR CLIENT
