@@ -5,7 +5,8 @@ import { coverLetterQueries } from "@/lib/queries/cover-letter.queries";
 import { userQueries } from "@/lib/queries/user.queries";
 import { getCookiesToken } from "@/lib/auth.utils";
 import { HydrationBoundary } from "@/components/hydration-boundary";
-import { dehydrate } from "@/lib/react-query";
+import { dehydrate } from "@tanstack/react-query";
+// import { dehydrate } from "@/lib/react-query";
 const TailorCoverLetterPage = async ({ searchParams, params }: any) => {
   const { jobDescription, aiApply, recruiterEmail } = await searchParams;
     const token = (await getCookiesToken()) ?? "";
