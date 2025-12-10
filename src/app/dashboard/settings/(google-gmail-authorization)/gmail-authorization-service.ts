@@ -1,7 +1,5 @@
 import { api } from "@/lib/api/client";
-// import authClient from "@/lib/axios/auth-api";
 import { fileToBase64 } from "@/lib/utils/helpers";
-// import { fileToBase64 } from "@/utils/file";
 
 export interface EmailFormData {
   userEmail: string;
@@ -16,14 +14,18 @@ export const checkAuthStatus = async () => {
   const data = await api.get<any>(
     `/google-gmail-oauth/auth-status/`
   );
-  return data?.data;
+
+  console.log("Auth Status Data:", data);
+  return data;
 };
 
 export const requestAuthUrl = async () => {
   const data = await api.get<any>(
     `/google-gmail-oauth/auth-url/`
   );
-  return data?.data;
+
+  console.log("Auth URL Data:", data);
+  return data;
 };
 
 export const sendAuthorizationCode = async (
@@ -34,7 +36,7 @@ export const sendAuthorizationCode = async (
     userEmail,
     code,
   });
-  return data?.data;
+  return data;
 };
 
 export const sendEmail = async (formData: EmailFormData) => {
@@ -49,5 +51,5 @@ export const sendEmail = async (formData: EmailFormData) => {
   }
 
   const data = await api.post<any>(`/google-gmail-oauth/send`, payload);
-  return data?.data;
+  return data;
 };
