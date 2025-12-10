@@ -15,7 +15,6 @@ export const checkAuthStatus = async () => {
     `/google-gmail-oauth/auth-status/`
   );
 
-  console.log("Auth Status Data:", data);
   return data;
 };
 
@@ -23,8 +22,6 @@ export const requestAuthUrl = async () => {
   const data = await api.get<any>(
     `/google-gmail-oauth/auth-url/`
   );
-
-  console.log("Auth URL Data:", data);
   return data;
 };
 
