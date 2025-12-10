@@ -33,7 +33,7 @@ import { toast } from "sonner";
 import { apiService } from "@/hooks/use-auth";
 import { JobType } from "@/types";
 import MobileOverview from "../components/MobileOverview";
-import { logEvent } from "@/lib/analytics";
+import { sendGTMEvent } from "@next/third-parties/google";
 
 export const SavedJobs = ({ children }: { children: React.ReactNode }) => {
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -47,14 +47,15 @@ export const SavedJobs = ({ children }: { children: React.ReactNode }) => {
 
   const { data: user } = useQuery(userQueries.detail());
 
-  useEffect(() => {
-    if (user?.firstName)
-      logEvent(
-        "Saved Jobs Page",
-        "View Saved Jobs Page",
-        `${user?.firstName} viewed Saved Jobs Page`
-      );
-  }, [user?.firstName]);
+
+
+        useEffect(() => {
+        if (user?.firstName)
+          sendGTMEvent({
+            event: `Saved Jobs Page`,
+            value: `${user?.firstName} viewed Saved Jobs Page`,
+          });
+      }, [user?.firstName]);
   const userDataSource = getDataSource(user);
   const userJobTitlePreference =
     userDataSource?.key || userDataSource?.title || "";

@@ -12,7 +12,7 @@ import { ProgressIndicator } from "../../(dashboard)/ai-apply/progress-indicator
 import { useQuery } from "@tanstack/react-query";
 import { userQueries } from "@/lib/queries/user.queries";
 import { coverLetterQueries } from "@/lib/queries/cover-letter.queries";
-import { logEvent } from "@/lib/analytics";
+import { sendGTMEvent } from "@next/third-parties/google";
 
 export const TailorCoverLetter = memo<{
   jobDescription: string;
@@ -33,11 +33,10 @@ export const TailorCoverLetter = memo<{
 
   useEffect(() => {
     if (user?.firstName)
-      logEvent(
-        "Tailor Cover Letter Page",
-        "View Tailor Cover Letter Page",
-        `${user?.firstName} Viewed Tailor Cover Letter Page`
-      );
+      sendGTMEvent({
+        event: `Tailor Cover Letter Page`,
+        value: `${user?.firstName} viewed Tailor Cover Letter Page`,
+      });
   }, [user?.firstName]);
 
   const router = useRouter();
@@ -130,9 +129,8 @@ export const TailorCoverLetter = memo<{
       {aiApply && <ProgressIndicator activeStep={1} />}
       <div className="flex w-full gap-3 items-center  p-4  bg-white justify-between">
         <p className="text-xl font-medium font-inter">Tailored Cover Letter</p>
-        
       </div>
-      
+
       <div className="bg-slate-50 border-b  border-slate-200 shadow-md rounded-xl flex flex-col items-center justify-between">
         <div
           ref={contentRef}

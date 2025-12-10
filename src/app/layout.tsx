@@ -14,6 +14,7 @@ import {
 } from "next/font/google";
 import { Metadata } from "next";
 import Script from "next/script";
+import { GoogleTagManager } from "@next/third-parties/google";
 
 const ebGaramond = EB_Garamond({
   subsets: ["latin"],
@@ -56,7 +57,7 @@ export default function RootLayout({
 }) {
   const GA_MEASUREMENT_ID =
     process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || "G-CDMCYEXE2W";
-    
+
   return (
     <html
       lang="en"
@@ -105,6 +106,7 @@ export default function RootLayout({
             />
           </>
         )}
+        <GoogleTagManager gtmId={GA_MEASUREMENT_ID} />
         <Providers>{children}</Providers>
       </body>
 

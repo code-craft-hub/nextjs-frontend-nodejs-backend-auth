@@ -4,13 +4,13 @@ import { useState, useEffect, useRef } from "react";
 import { jsonrepair } from "jsonrepair";
 import { toast } from "sonner";
 import { isEmpty } from "lodash";
-import {  QAItem } from "@/types";
+import { QAItem } from "@/types";
 import { extractCompleteJsonObjects } from "@/lib/utils/helpers";
 import TailorInterviewQuestionEmptyState from "./TailorInterviewQuestionEmptyState";
 import { useQuery } from "@tanstack/react-query";
 import { interviewQuestionQueries } from "@/lib/queries/interview.queries";
 import { userQueries } from "@/lib/queries/user.queries";
-import { logEvent } from "@/lib/analytics";
+import { sendGTMEvent } from "@next/third-parties/google";
 
 export const TailorInterviewQuestion = ({
   jobDescription,
@@ -23,20 +23,18 @@ export const TailorInterviewQuestion = ({
 
   const [qaData, setQaData] = useState<QAItem[]>([]);
 
-  const {data: user } = useQuery(userQueries.detail());
+  const { data: user } = useQuery(userQueries.detail());
   const { data, status, isFetched } = useQuery(
     interviewQuestionQueries.detail(interviewQuestionId)
   );
 
-
-    useEffect(() => {
-      if (user?.firstName)
-        logEvent(
-          "Tailor Interview Question Page",
-          "View Tailor Interview Question Page",
-          `${user?.firstName} Viewed Tailor Interview Question Page`
-        );
-    }, [user?.firstName]);
+  useEffect(() => {
+    if (user?.firstName)
+      sendGTMEvent({
+        event: `Tailor Interview Question Page`,
+        value: `${user?.firstName} viewed Tailor Interview Question Page`,
+      });
+  }, [user?.firstName]);
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const resultsEndRef = useRef<HTMLDivElement>(null);
 
@@ -68,6 +66,14 @@ export const TailorInterviewQuestion = ({
       }
     }
   }, [user, jobDescription, data, status, isFetched]);
+
+  useEffect(() => {
+    if (user?.firstName)
+      sendGTMEvent({
+        event: `Tailor Interview Question Page`,
+        value: `${user?.firstName} viewed Tailor Interview Question Page`,
+      });
+  }, [user?.firstName]);
 
   const handleSubmit = async () => {
     if (!jobDescription.trim()) {

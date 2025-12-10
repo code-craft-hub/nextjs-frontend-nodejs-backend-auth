@@ -7,9 +7,9 @@ import { Button } from "@/components/ui/button";
 import { apiService } from "@/hooks/use-auth";
 import { Billing } from "./billing/Billing";
 import { CreditCard, Shield, User2 } from "lucide-react";
-import { logEvent } from "@/lib/analytics";
 import { useQuery } from "@tanstack/react-query";
 import { userQueries } from "@/lib/queries/user.queries";
+import { sendGTMEvent } from "@next/third-parties/google";
 
 export const AccountClient = ({ tab, reference }: any) => {
   const [currentTab, setCurrentTab] = useState(!!tab ? tab : "account");
@@ -18,14 +18,14 @@ export const AccountClient = ({ tab, reference }: any) => {
     setCurrentTab(value);
   };
 
-  useEffect(() => {
-    if (user?.firstName)
-      logEvent(
-        "Account Page",
-        "View Account",
-        `${user?.firstName} viewed Account Page`
-      );
-  }, [user?.firstName]);
+
+      useEffect(() => {
+      if (user?.firstName)
+        sendGTMEvent({
+          event: `Accounts Page`,
+          value: `${user?.firstName} viewed Accounts Page`,
+        });
+    }, [user?.firstName]);
 
   const tabs = [
     { id: "account", value: "Account Settings", icon: <User2 /> },

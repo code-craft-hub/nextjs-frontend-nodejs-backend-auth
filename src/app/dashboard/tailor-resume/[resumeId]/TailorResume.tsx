@@ -10,10 +10,10 @@ import { Button } from "@/components/ui/button";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { resumeQueries } from "@/lib/queries/resume.queries";
 import { userQueries } from "@/lib/queries/user.queries";
-import { logEvent } from "@/lib/analytics";
 import { ResumeDownloadButton } from "./ResumeDownloadButton";
 import { TrashIcon } from "lucide-react";
 import { api } from "@/lib/api/client";
+import { sendGTMEvent } from "@next/third-parties/google";
 
 export const TailorResume = ({
   jobDescription,
@@ -32,11 +32,10 @@ export const TailorResume = ({
   const queryClient = useQueryClient();
   useEffect(() => {
     if (user?.firstName)
-      logEvent(
-        "Tailor Resume Page",
-        "View Tailor Resume Page",
-        `${user?.firstName} Viewed Tailor Resume Page`
-      );
+      sendGTMEvent({
+        event: `Tailor Resume Page`,
+        value: `${user?.firstName} viewed Tailor Resume Page`,
+      });
   }, [user?.firstName]);
 
   // const defaultResume = user?.dataSource?.find(
@@ -56,6 +55,14 @@ export const TailorResume = ({
     backendUrl + "/new-resume-generation",
     resumeId
   );
+
+  useEffect(() => {
+    if (user?.firstName)
+      sendGTMEvent({
+        event: `Tailor Resume Page`,
+        value: `${user?.firstName} viewed Tailor Resume Page`,
+      });
+  }, [user?.firstName]);
 
   useEffect(() => {
     if (!streamStatus.isComplete) {

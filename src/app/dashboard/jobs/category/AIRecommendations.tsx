@@ -19,7 +19,6 @@ import {
   useUpdateJobApplicationHistoryMutation,
   useUpdateJobMutation,
 } from "@/lib/mutations/jobs.mutations";
-
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { jobsQueries } from "@/lib/queries/jobs.queries";
@@ -30,7 +29,7 @@ import { apiService } from "@/hooks/use-auth";
 import { toast } from "sonner";
 import { JobType } from "@/types";
 import MobileOverview from "../components/MobileOverview";
-import { logEvent } from "@/lib/analytics";
+import { sendGTMEvent } from "@next/third-parties/google";
 
 export const AIRecommendations = ({
   children,
@@ -55,11 +54,10 @@ export const AIRecommendations = ({
 
   useEffect(() => {
     if (user?.firstName)
-      logEvent(
-        "AI Recommendations Page",
-        "View AI Recommendations Page",
-        `${user?.firstName} viewed AI Recommendations Page`
-      );
+      sendGTMEvent({
+        event: `AI Recommendations Page`,
+        value: `${user?.firstName} viewed AI Recommendations Page`,
+      });
   }, [user?.firstName]);
 
   const updateJobApplicationHistory = useUpdateJobApplicationHistoryMutation();

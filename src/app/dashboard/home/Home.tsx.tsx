@@ -9,9 +9,9 @@ import { TAB_ITEMS } from "../../(landing-page)/constants";
 import { AIJobCustomization } from "../(dashboard)/dashboard-tabs/ai-job-customization-tab/AIJobCustomization";
 import { TopGradient } from "@/components/shared/TopGradient";
 import { JobFilters } from "@/lib/types/jobs";
-import { logEvent, logUserActivityToGoogle } from "@/lib/analytics";
 import { userQueries } from "@/lib/queries/user.queries";
 import { useQuery } from "@tanstack/react-query";
+import { sendGTMEvent } from "@next/third-parties/google";
 
 export const HomeClient = memo(
   ({
@@ -29,11 +29,10 @@ export const HomeClient = memo(
 
     useEffect(() => {
       if (user?.firstName)
-        logEvent(
-          "Dashboard",
-          "View Dashboard",
-          `${user?.firstName} viewed Dashboard Page`
-        );
+        sendGTMEvent({
+          event: `Dashboard`,
+          value: `${user?.firstName} viewed Dashboard Page`,
+        });
     }, [user?.firstName]);
 
     return (
@@ -53,10 +52,9 @@ export const HomeClient = memo(
                   )}
                   value={item.value}
                   onClick={() => {
-                    logUserActivityToGoogle({
-                      page: `Dashboard - ${item.title}`,
-                      userEvent: `Clicked on ${item.title} Tab`,
-                      description: `User clicked on the ${item.title} tab in the dashboard`,
+                    sendGTMEvent({
+                      event: `Dashboard - ${item.title}`,
+                      value: `User clicked on the ${item.title} tab in the dashboard`,
                     });
                   }}
                 >

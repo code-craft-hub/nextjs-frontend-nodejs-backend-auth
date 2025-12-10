@@ -53,7 +53,7 @@ import { ReportCard } from "./ReportCard";
 import { jobMatcher } from "@/services/job-matcher";
 import { PiOfficeChairFill } from "react-icons/pi";
 import MobileOverview from "./MobileOverview";
-import { logEvent, logUserActivityToGoogle } from "@/lib/analytics";
+import { sendGTMEvent } from "@next/third-parties/google";
 
 export default function Overview() {
   const router = useRouter();
@@ -71,11 +71,10 @@ export default function Overview() {
 
   useEffect(() => {
     if (user?.firstName)
-      logEvent(
-        "Job Page",
-        "View Job Page",
-        `${user?.firstName} viewed Job Page`
-      );
+      sendGTMEvent({
+        event: `Job Page`,
+        value: `${user?.firstName} viewed Job Page`,
+      });
   }, [user?.firstName]);
 
   const infiniteFilters = useMemo(
@@ -230,10 +229,9 @@ export default function Overview() {
 
   const onSubmit = async ({ username }: any) => {
     const trimmedSearch = username.trim();
-    logUserActivityToGoogle({
-      page: `Job Page Search - ${username}`,
-      userEvent: `User searched for this job title  ${username}`,
-      description: `User searched for the job title ${username} on the job page`,
+    sendGTMEvent({
+      event: `Job Page Search - ${username}`,
+      value: `${user?.firstName} viewed Job Page`,
     });
     setSearchValue(trimmedSearch);
     table.getColumn("title")?.setFilterValue(trimmedSearch);

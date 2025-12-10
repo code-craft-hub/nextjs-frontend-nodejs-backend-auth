@@ -30,7 +30,7 @@ import {
 import { PiOfficeChairFill } from "react-icons/pi";
 import { usePrefetchJob } from "@/hooks/usePrefetchJob";
 import MobileOverview from "../components/MobileOverview";
-import { logEvent } from "@/lib/analytics";
+import { sendGTMEvent } from "@next/third-parties/google";
 
 export const ApplicationHistory = ({
   children,
@@ -48,14 +48,14 @@ export const ApplicationHistory = ({
   const { prefetchJob } = usePrefetchJob();
 
   const { data: user } = useQuery(userQueries.detail());
-    useEffect(() => {
-      if (user?.firstName)
-        logEvent(
-          "Application History Page",
-          "View Application History Page",
-          `${user?.firstName} viewed Application History Page`
-        );
-    }, [user?.firstName]);
+
+  useEffect(() => {
+    if (user?.firstName)
+      sendGTMEvent({
+        event: `Application History Page`,
+        value: `${user?.firstName} viewed Application History Page`,
+      });
+  }, [user?.firstName]);
 
   const appliedJobsMap = useMemo(() => {
     return new Map(

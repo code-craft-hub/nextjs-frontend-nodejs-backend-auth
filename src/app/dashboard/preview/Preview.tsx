@@ -14,11 +14,11 @@ import { resumeQueries } from "@/lib/queries/resume.queries";
 import { coverLetterQueries } from "@/lib/queries/cover-letter.queries";
 import { CongratulationModal } from "@/components/shared/CongratulationModal";
 import { Loader, Send, Sparkles, Trash } from "lucide-react";
-import { logEvent } from "@/lib/analytics";
 import { api } from "@/lib/api/client";
 import { COLLECTIONS } from "@/lib/utils/constants";
 import { aiApplyQueries } from "@/lib/queries/ai-apply.queries";
 import { isEmpty } from "lodash";
+import { sendGTMEvent } from "@next/third-parties/google";
 // import { api } from "@/lib/api/client";
 
 const Preview = ({
@@ -154,14 +154,11 @@ const Preview = ({
 
   useEffect(() => {
     if (user?.firstName)
-      logEvent(
-        "Preview Page",
-        "View Preview Page",
-        `${user?.firstName} viewed Preview Page`
-      );
+      sendGTMEvent({
+        event: `Preview Page`,
+        value: `${user?.firstName} viewed Preview Page`,
+      });
   }, [user?.firstName]);
-
-
   return openModal ? (
     <CongratulationModal handleOpenModal={handleOpenModal} />
   ) : (
@@ -212,15 +209,11 @@ const Preview = ({
       ) : (
         <EditableResume data={resumeData!} resumeId={resumeId} />
       )}
-        <div className="flex items-center justify-center max-sm:fixed w-full h-16 bottom-4 left-0 ">
-          <Button
-            disabled={isSubmitting}
-            onClick={handleSubmit}
-            className="w-64"
-          >
-            Submit <Sparkles className="ml-2 h-4 w-4" />
-          </Button>
-        </div>
+      <div className="flex items-center justify-center max-sm:fixed w-full h-16 bottom-4 left-0 ">
+        <Button disabled={isSubmitting} onClick={handleSubmit} className="w-64">
+          Submit <Sparkles className="ml-2 h-4 w-4" />
+        </Button>
+      </div>
     </div>
   );
 };
