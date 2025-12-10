@@ -150,11 +150,10 @@ export const LoginClient = () => {
   const onSubmit = async (values: z.infer<typeof LoginSchema>) => {
     try {
       setIsLoginLoading(true);
-      const response = await axiosApiClient.post("/login", {
+      await axiosApiClient.post("/login", {
         email: values.email,
         password: values.password,
       });
-      console.log("Login response:", response);
       toast.success("Login successful!");
       router.push("/dashboard/home");
     } catch (error: any) {

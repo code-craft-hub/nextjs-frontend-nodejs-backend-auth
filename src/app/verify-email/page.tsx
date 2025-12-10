@@ -11,8 +11,6 @@ export default async function VerifyEmailPage() {
   const session = await requireAuth();
   const token = (await getCookiesToken()) ?? "";
 
-  console.log("Token : ", token);
-  console.log("Session : ", session);
 
   // Redirect if email already verified
   if (session.emailVerified) {
@@ -24,8 +22,7 @@ export default async function VerifyEmailPage() {
   }
 
   const queryClient = createServerQueryClient();
-  const user = await queryClient.fetchQuery(userQueries.detail(token));
-  console.log("user in verify email page:", user);
+  await queryClient.fetchQuery(userQueries.detail(token));
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <VerifyEmailClient />

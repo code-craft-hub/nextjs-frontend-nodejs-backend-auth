@@ -16,7 +16,6 @@ export const checkAuthStatus = async () => {
   const data = await api.get<any>(
     `/google-gmail-oauth/auth-status/`
   );
-  console.log("Data Oauth : ", data)
   return data?.data;
 };
 
@@ -24,7 +23,6 @@ export const requestAuthUrl = async () => {
   const data = await api.get<any>(
     `/google-gmail-oauth/auth-url/`
   );
-  console.log("Data Oauth : ", data)
   return data?.data;
 };
 
@@ -36,7 +34,6 @@ export const sendAuthorizationCode = async (
     userEmail,
     code,
   });
-  console.log("Data Oauth : ", data)
   return data?.data;
 };
 
@@ -52,6 +49,5 @@ export const sendEmail = async (formData: EmailFormData) => {
   }
 
   const data = await api.post<any>(`/google-gmail-oauth/send`, payload);
-  console.log("Data Oauth : ", data)
   return data?.data;
 };

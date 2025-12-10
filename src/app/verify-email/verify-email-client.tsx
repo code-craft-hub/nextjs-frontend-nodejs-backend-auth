@@ -29,7 +29,6 @@ const formSchema = z.object({
 
 export const VerifyEmailClient = () => {
   const { data: user } = useQuery(userQueries.detail());
-  console.log("user in verify email client:", user);
   const router = useRouter();
   const [isVerifying, setIsVerifying] = useState(false);
 

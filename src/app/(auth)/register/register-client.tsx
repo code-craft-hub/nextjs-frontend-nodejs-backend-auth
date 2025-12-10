@@ -69,7 +69,6 @@ export default function RegisterClient({ referral }: { referral?: string }) {
         email: values.email,
         password: values.password,
       });
-      console.log("Registration response:", response);
       if (response?.data?.success) {
         toast.success("Registration successful! Please check your email.");
         router.push("/verify-email");

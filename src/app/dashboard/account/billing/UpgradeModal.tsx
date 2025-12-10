@@ -5,7 +5,7 @@ import * as z from "zod";
 import { Check,Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-import { PaystackPaymentGateway } from "@/app/paystack/Paystack";
+import { PaystackPaymentGateway } from "./Paystack";
 
 const paymentFormSchema = z.object({
   cardNumber: z

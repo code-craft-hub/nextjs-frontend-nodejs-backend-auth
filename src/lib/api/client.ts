@@ -28,13 +28,6 @@ export async function apiClient<T>(
 ): Promise<T> {
   const { token, ...fetchOptions } = options;
 
-  console.log(
-    "🔍 apiClient called with endpoint:",
-    endpoint,
-    "with token:",
-    token
-  );
-
   const headers: HeadersInit = {
     "Content-Type": "application/json",
     ...(fetchOptions.headers || {}),
@@ -42,19 +35,7 @@ export async function apiClient<T>(
 
   if (token) {
     (headers as any)["Authorization"] = `Bearer ${token}`;
-    console.log("📤 Server request: Authorization header added");
   }
-
-  // const credentials: RequestCredentials = isClientSide ? "include" : "omit";
-
-  console.log(`📡 Request: ${baseURL}${endpoint}`, {
-    environment: isClientSide ? "Client" : "Server",
-    hasToken: !!token,
-    // credentials,
-    // willSendCookies: credentials === "include",
-    willSendHeader: !!token,
-    headers,
-  });
 
   const isServerSide = typeof window === "undefined";
 
@@ -67,7 +48,6 @@ export async function apiClient<T>(
 
   const data = await response.json();
 
-  console.log(`📥 Response: ${endpoint} - Status ${response.status}`, data);
 
   if (!response.ok) {
     const error = await response
