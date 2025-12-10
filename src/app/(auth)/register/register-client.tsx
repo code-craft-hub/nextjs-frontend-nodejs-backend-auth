@@ -25,7 +25,7 @@ import { cn } from "@/lib/utils";
 import { inputField } from "@/lib/utils/constants";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import {axiosApiClient} from "@/lib/axios/auth-api";
+import { axiosApiClient } from "@/lib/axios/auth-api";
 
 export default function RegisterClient({ referral }: { referral?: string }) {
   const [loading, setLoading] = useState(false);
@@ -37,10 +37,11 @@ export default function RegisterClient({ referral }: { referral?: string }) {
     try {
       setLoading(true);
       const credentials = jwtDecode(response.credential) as { email: string };
-      const data: any = await axiosApiClient.post("/google-login-register", credentials);
-      if (data?.success) {
-        router.push("/dashboard/home");
-      }
+       await axiosApiClient.post(
+        "/google-login-register",
+        credentials
+      );
+      router.push("/dashboard/home");
     } catch (error) {
       console.error("Google registeration Error:", error);
       toast.error("Google registeration failed. Please try again.");
@@ -69,6 +70,7 @@ export default function RegisterClient({ referral }: { referral?: string }) {
         email: values.email,
         password: values.password,
       });
+
       if (response?.data?.success) {
         toast.success("Registration successful! Please check your email.");
         router.push("/verify-email");

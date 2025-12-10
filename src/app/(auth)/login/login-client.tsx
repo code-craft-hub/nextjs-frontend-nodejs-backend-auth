@@ -124,13 +124,12 @@ export const LoginClient = () => {
     try {
       setIsLoginLoading(true);
       const credentials = jwtDecode(response.credential) as { email: string };
-      const data: any = await axiosApiClient.post(
+     await axiosApiClient.post(
         "/google-login-register",
         credentials
       );
-      if (data?.success) {
-        router.push("/dashboard/home");
-      }
+
+      router.push("/dashboard/home");
     } catch (error) {
       console.error("Google Login Error:", error);
       toast.error("Google login failed. Please try again.");
