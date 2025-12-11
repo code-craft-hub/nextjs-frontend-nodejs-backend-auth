@@ -84,6 +84,7 @@ export const AIRecommendations = ({
 
     return jobs
       .map((job) => {
+        // console.log("AI Recommended Job:", new Date(job?.createdAt));
         const jobContent = job?.title + " " + job?.descriptionText;
 
         const completeMatch = jobMatcher.calculateMatch(
@@ -97,9 +98,9 @@ export const AIRecommendations = ({
           matchDetails: completeMatch,
         };
       })
-      .sort((a, b) => {
-        return parseInt(b?.matchPercentage) - parseInt(a?.matchPercentage);
-      });
+      // .sort((a, b) => {
+      //   return parseInt(b?.createdAt) - parseInt(a?.createdAt);
+      // });
   }, [data, user?.bookmarkedJobs?.length, user?.appliedJobs?.length]);
 
   const handleApply = async ({
