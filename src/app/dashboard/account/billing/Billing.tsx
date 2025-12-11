@@ -32,7 +32,6 @@ export const Billing = ({ reference }: any) => {
     toast.success("Referral code copied to clipboard!");
   };
 
-  console.log(user?.usersReferred)
 
   return !completed ? (
     showPlan ? (

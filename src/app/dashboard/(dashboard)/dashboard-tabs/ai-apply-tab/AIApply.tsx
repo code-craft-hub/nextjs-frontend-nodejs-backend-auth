@@ -9,6 +9,7 @@ import { JobFilters } from "@/lib/types/jobs";
 import { aiApplyQueries } from "@/lib/queries/ai-apply.queries";
 import { checkAuthStatus } from "@/app/dashboard/settings/(google-gmail-authorization)/gmail-authorization-service";
 import { useRouter } from "next/navigation";
+import { userQueries } from "@/lib/queries/user.queries";
 
 export const AIApply = memo(
   ({
@@ -20,11 +21,14 @@ export const AIApply = memo(
   }) => {
     const [notification, setNotification] = useState(false);
     const { data: aiApply } = useQuery(aiApplyQueries.all(filters));
+    const { data: user } = useQuery(userQueries.detail());
+
+    const noDataSource = user?.dataSource?.length === 0;
     // const aiApplyData =
     //   aiApply?.data?.map((item: any) => ({ ...item.data, id: item?.id })) || [];
 
     const { data: jobs } = useQuery(jobsQueries.all(filters));
-    
+
     useEffect(() => {
       const checkAuthorization = async () => {
         const authStatus = await checkAuthStatus();
@@ -50,6 +54,16 @@ export const AIApply = memo(
               className="text-center mx-auto text-gray-400 text-xs mt-2 hover:underline cursor-pointer"
             >
               Authorize your email account to use email Auto apply
+            </p>
+          )}
+          {noDataSource && (
+            <p
+              onClick={() =>
+                router.push("/dashboard/settings?tab=ai-applypreference")
+              }
+              className="text-center mx-auto text-gray-400 text-xs  hover:underline cursor-pointer"
+            >
+              Please add at least one profile/resume, it'll be used for your job personalisation and applications.
             </p>
           )}
         </div>

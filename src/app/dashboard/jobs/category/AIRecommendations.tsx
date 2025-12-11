@@ -84,7 +84,6 @@ export const AIRecommendations = ({
 
     return jobs
       .map((job) => {
-        // console.log("AI Recommended Job:", new Date(job?.createdAt));
         const jobContent = job?.title + " " + job?.descriptionText;
 
         const completeMatch = jobMatcher.calculateMatch(
