@@ -26,7 +26,29 @@ export async function apiClient<T>(
   endpoint: string,
   options: FetchOptions = {}
 ): Promise<T> {
-  const { token, ...fetchOptions } = options;
+  const { token, params, ...fetchOptions } = options;
+
+ let url: URL;
+
+  // Handle absolute vs relative baseURL
+  if (baseURL?.startsWith("http")) {
+    url = new URL(`${baseURL}${endpoint}`);
+  } else {
+    // Relative URL: must use window.location.origin on client
+    const origin =
+      typeof window !== "undefined" ? window.location.origin : "http://localhost";
+    url = new URL(`${baseURL}${endpoint}`, origin);
+  }
+
+  // Append params
+  if (params) {
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        url.searchParams.append(key, String(value));
+      }
+    });
+  }
+  
 
   const headers: HeadersInit = {
     "Content-Type": "application/json",
@@ -39,15 +61,13 @@ export async function apiClient<T>(
 
   const isServerSide = typeof window === "undefined";
 
-
-  const response = await fetch(`${baseURL}${endpoint}`, {
+  const response = await fetch(url.toString(), {
     ...fetchOptions,
     headers,
     credentials: isServerSide ? "omit" : "include", // Important distinction
   });
 
   const data = await response.json();
-
 
   if (!response.ok) {
     const error = await response
