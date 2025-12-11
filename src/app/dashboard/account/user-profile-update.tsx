@@ -72,7 +72,7 @@ export const UserProfileForm: React.FC = () => {
     form.setValue("state", user?.state || "");
     form.setValue("countryCode", user?.countryCode || continent_code || "");
     form.setValue("phoneNumber", user?.phoneNumber || "");
-  }, [form, user]);
+  }, [form, user, country, continent_code]);
 
   const onSubmit = (value: z.infer<typeof profileSchema>) => {
     updateUser.mutate({ data: value });
@@ -176,7 +176,7 @@ export const UserProfileForm: React.FC = () => {
                     </FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="Enter last name"
+                        placeholder="Enter country"
                         {...field}
                         className="box-border flex flex-row items-start w-full h-11 px-3.5 py-2.5 bg-[#F9FAFB] border border-[#D0D5DD] rounded-lg text-xs leading-6 text-[#667085] placeholder:text-[#667085] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       />
