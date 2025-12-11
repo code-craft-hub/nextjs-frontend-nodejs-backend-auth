@@ -63,7 +63,7 @@ export const AIApply = memo(
               }
               className="text-center mx-auto text-gray-400 text-xs  hover:underline cursor-pointer"
             >
-              Please add at least one profile/resume, it&apto;ll be used for your job personalisation and applications.
+              Please add at least one profile/resume, it&apos;ll be used for your job personalisation and applications.
             </p>
           )}
         </div>
