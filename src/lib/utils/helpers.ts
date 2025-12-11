@@ -280,6 +280,44 @@ export function monthYear(input: Date | string) {
     })
   );
 }
+
+export const formatFirestoreDate = (
+  value: any // can be Firestore timestamp, Date, string, or number
+): string => {
+  let date: Date;
+
+  // Detect Firestore Timestamp-like object
+  const isFirestoreTimestamp =
+    value &&
+    typeof value === "object" &&
+    typeof value._seconds === "number" &&
+    typeof value._nanoseconds === "number";
+
+  if (isFirestoreTimestamp) {
+    date = new Date(
+      value._seconds * 1000 + Math.floor(value._nanoseconds / 1_000_000)
+    );
+  } else {
+    // Fallback to regular date parsing
+    date = value instanceof Date ? value : new Date(value);
+  }
+
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "2-digit",
+  });
+};
+
+export const formatDate = (date: Date | string | number): string => {
+  const d = date instanceof Date ? date : new Date(date);
+
+  return d.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short", // → "Nov"
+    day: "2-digit", // → "14"
+  });
+};
 export const formatCurrencyUSA = (amount: number) => {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -288,6 +326,8 @@ export const formatCurrencyUSA = (amount: number) => {
     minimumFractionDigits: 2,
   }).format(amount);
 };
+
+
 export const formatCurrencyNG = (amount: number) => {
   return new Intl.NumberFormat("en-NG", {
     style: "currency",

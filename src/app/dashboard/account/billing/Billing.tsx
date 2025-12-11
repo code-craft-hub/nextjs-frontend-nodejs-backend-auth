@@ -5,7 +5,7 @@ import { useState } from "react";
 import { ProModal } from "./ProSubscription";
 import { useQuery } from "@tanstack/react-query";
 import { userQueries } from "@/lib/queries/user.queries";
-import { getDaysRemaining } from "@/lib/utils/helpers";
+import { formatFirestoreDate, getDaysRemaining } from "@/lib/utils/helpers";
 import { toast } from "sonner";
 
 export const Billing = ({ reference }: any) => {
@@ -31,6 +31,8 @@ export const Billing = ({ reference }: any) => {
     navigator.clipboard.writeText(REFERRAL);
     toast.success("Referral code copied to clipboard!");
   };
+
+  console.log(user?.usersReferred)
 
   return !completed ? (
     showPlan ? (
@@ -72,7 +74,7 @@ export const Billing = ({ reference }: any) => {
             <div className="flex flex-col items-start gap-[4px]">
               <p className="relative">
                 <span className=" font-['Inter'] font-medium text-[14px] leading-[21px] text-white">
-                  Trial expires on Nov 14, 2025
+                  Trial expires on {formatFirestoreDate(user?.expiryTime ?? "")}
                 </span>
               </p>
               <p className=" opacity-80 relative">
