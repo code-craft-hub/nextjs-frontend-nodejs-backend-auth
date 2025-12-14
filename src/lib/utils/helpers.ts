@@ -10,7 +10,6 @@ import { MouseEvent } from "react";
  * @returns {string} e.g., "3 days remaining"
  */
 export function getDaysRemaining(firebaseTimestamp: any) {
-  // console.log(firebaseTimestamp)
   const date = new Date(firebaseTimestamp);
 
   if (isNaN(date?.getTime())) {
@@ -41,6 +40,73 @@ export function getDaysRemaining(firebaseTimestamp: any) {
 
   return `${daysRemaining}`;
 }
+
+/**
+ * Returns the number of days difference between today and the target date.
+ * Positive = in the future, Negative = in the past
+ */
+export function daysFromToday(value: any): number | null {
+  const targetDate = normalizeToDate(value);
+  if (!targetDate) return null;
+
+  const now = new Date();
+  const diffMs = targetDate.getTime() - now.getTime();
+  const diffDays = diffMs / (1000 * 60 * 60 * 24); // convert ms to days
+
+  return Math.round(diffDays); // round to nearest day
+}
+
+
+/**
+ * Normalizes various timestamp shapes into a JS Date
+ * - Firestore Timestamp (serialized)
+ * - Date
+ * - ISO string
+ * - epoch milliseconds
+ */
+export function normalizeToDate(
+  value:
+    | { _seconds: number; _nanoseconds?: number }
+    | Date
+    | string
+    | number
+    | null
+    | undefined
+): Date | null {
+  if (!value) return null;
+
+  // Firestore Timestamp-like object
+  if (
+    typeof value === "object" &&
+    "_seconds" in value &&
+    typeof value._seconds === "number"
+  ) {
+    const seconds = value._seconds;
+    const nanos = value._nanoseconds ?? 0;
+
+    return new Date(seconds * 1000 + Math.floor(nanos / 1_000_000));
+  }
+
+  // Already a Date
+  if (value instanceof Date) {
+    return isNaN(value.getTime()) ? null : value;
+  }
+
+  // Epoch milliseconds
+  if (typeof value === "number") {
+    const d = new Date(value);
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  // ISO string
+  if (typeof value === "string") {
+    const d = new Date(value);
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  return null;
+}
+
 
 export function getDaysUntilProPlanExpiry(
   expiryDate?: string | Date | null

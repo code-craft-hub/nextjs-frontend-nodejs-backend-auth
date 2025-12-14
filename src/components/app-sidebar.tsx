@@ -13,22 +13,22 @@ import {
   SidebarRail,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { useAuth } from "@/hooks/use-auth";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { NavMain } from "./nav-main";
 import HomeIcon from "./icons/homeIcon";
 import UserIcon from "./icons/userIcon";
 import JobIcon from "./icons/jobIcon";
-// import AnalyticIcon from "./icons/analyticIcon";
 import SettingIcon from "./icons/settingIcon";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
+import { userQueries } from "@/lib/queries/user.queries";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { user } = useAuth();
-
+  const { data: user } = useQuery(userQueries.detail());
   const { open } = useSidebar();
+  const isPro = user?.isPro;
 
   const leftSidebarData = {
     user: {
@@ -97,22 +97,24 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavMain items={leftSidebarData.menus} />
       </SidebarContent>
       <SidebarFooter>
-        <div
-          onClick={() => {
-            handleCardClick();
-          }}
-          className={cn("p-3", !open && "hidden")}
-        >
-          <div className="bg-primary text-white p-4 rounded-2xl">
-            <div className="rounded-full bg-white p-2 w-fit">
-              <BsExclamationCircle className="rotate-180 size-6 text-primary " />
+        {!isPro && (
+          <div
+            onClick={() => {
+              handleCardClick();
+            }}
+            className={cn("p-3", !open && "hidden")}
+          >
+            <div className="bg-primary text-white p-4 rounded-2xl">
+              <div className="rounded-full bg-white p-2 w-fit">
+                <BsExclamationCircle className="rotate-180 size-6 text-primary " />
+              </div>
+              <h1 className="font-medium my-2">Upgrade</h1>
+              <p className="text-sm">
+                Unlock more - upgrade your account for new and improved features
+              </p>
             </div>
-            <h1 className="font-medium my-2">Upgrade</h1>
-            <p className="text-sm">
-              Unlock more - upgrade your account for new and improved features
-            </p>
           </div>
-        </div>
+        )}
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

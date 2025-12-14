@@ -1,11 +1,10 @@
 import React, { useState } from "react";
 import { Switch } from "@/components/ui/switch";
-// import { SegmentedProgress } from "./SegmentedProgress";
 import { userQueries } from "@/lib/queries/user.queries";
 import { useQuery } from "@tanstack/react-query";
 import {
+  daysFromToday,
   formatAppliedDate,
-  getDaysUntilProPlanExpiry,
 } from "@/lib/utils/helpers";
 import { cn } from "@/lib/utils";
 import { useConfirm } from "@/hooks/use-confirm";
@@ -14,6 +13,7 @@ import { toast } from "sonner";
 export function ProModal() {
   const [autoRenewal, setAutoRenewal] = useState(true);
   const { data: user } = useQuery(userQueries.detail());
+  console.log(user)
 
   const cancelSubscription = async () => {
     const ok = await confirm();
@@ -77,7 +77,7 @@ export function ProModal() {
             {/* Right Section - Days Counter */}
             <div className="bg-white/20 rounded-xl px-6 py-4 text-center sm:min-w-[140px]">
               <div className="text-4xl font-bold">
-                {getDaysUntilProPlanExpiry(user?.proPlanExpiryDate)}
+                {daysFromToday(user?.expiryTime)}
               </div>
               <div className="text-sm text-white/80 mt-1">
                 days until renewal
