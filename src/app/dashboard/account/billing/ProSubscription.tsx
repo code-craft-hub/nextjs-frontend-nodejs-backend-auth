@@ -65,7 +65,7 @@ export function ProModal() {
                 <div className="pt-4 space-y-0.5">
                   <p className="font-semibold">
                     Next billing date:{" "}
-                    {formatAppliedDate(user?.proPlanExpiryDate as any)}
+                    {formatAppliedDate(user?.expiryTime as any)}
                   </p>
                   <p className="text-white/70 text-sm">
                     Your subscription will automatically renew

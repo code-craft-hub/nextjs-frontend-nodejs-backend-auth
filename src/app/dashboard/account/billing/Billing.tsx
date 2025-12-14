@@ -11,7 +11,7 @@ import { toast } from "sonner";
 export const Billing = ({ reference }: any) => {
 
   const { data: user } = useQuery(userQueries.detail());
-  const [completed, setCompleted] = useState(user?.isPro || false);
+  const [completed, setCompleted] = useState(Boolean(user?.isPro) || false);
   const [showPlan, setShowPlan] = useState(false);
   const handleStateChange = (value: boolean) => {
     setCompleted(value);

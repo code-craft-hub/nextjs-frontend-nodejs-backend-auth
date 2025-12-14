@@ -10,6 +10,7 @@ import { MouseEvent } from "react";
  * @returns {string} e.g., "3 days remaining"
  */
 export function getDaysRemaining(firebaseTimestamp: any) {
+  // console.log(firebaseTimestamp)
   const date = new Date(firebaseTimestamp);
 
   if (isNaN(date?.getTime())) {

@@ -18,14 +18,13 @@ export const AccountClient = ({ tab, reference }: any) => {
     setCurrentTab(value);
   };
 
-
-      useEffect(() => {
-      if (user?.firstName)
-        sendGTMEvent({
-          event: `Accounts Page`,
-          value: `${user?.firstName} viewed Accounts Page`,
-        });
-    }, [user?.firstName]);
+  useEffect(() => {
+    if (user?.firstName)
+      sendGTMEvent({
+        event: `Accounts Page`,
+        value: `${user?.firstName} viewed Accounts Page`,
+      });
+  }, [user?.firstName]);
 
   const tabs = [
     { id: "account", value: "Account Settings", icon: <User2 /> },
