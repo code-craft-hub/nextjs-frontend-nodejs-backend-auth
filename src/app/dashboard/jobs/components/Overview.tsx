@@ -54,6 +54,7 @@ import { jobMatcher } from "@/services/job-matcher";
 import { PiOfficeChairFill } from "react-icons/pi";
 import MobileOverview from "./MobileOverview";
 import { sendGTMEvent } from "@next/third-parties/google";
+import InsufficientCreditsModal from "@/components/shared/InsufficientCreditsModal";
 
 export default function Overview() {
   const router = useRouter();
@@ -68,6 +69,7 @@ export default function Overview() {
   const [rowSelection, setRowSelection] = React.useState({});
   const totalScoreRef = useRef<number>(0);
   const { data: user } = useQuery(userQueries.detail());
+  const noCredit = user?.credit === 0;
 
   useEffect(() => {
     if (user?.firstName)
@@ -251,6 +253,7 @@ export default function Overview() {
 
   return (
     <div className="lg:gap-6 lg:flex ">
+      {noCredit && <InsufficientCreditsModal />}
       <div className="bg-white p-3 h-fit rounded-md hidden lg:flex lg:flex-col gap-1">
         {leftMenuItems.map((item) => (
           <div

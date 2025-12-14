@@ -19,10 +19,10 @@ export default function InsufficientCreditsModal() {
       <AlertDialogContent>
         <AlertDialogHeader>
           <div className="flex-between">
-            <p className="p-16-semibold text-dark-400">Insufficient Credits</p>
+            {/* <p className="p-16-semibold text-dark-400">Insufficient Credits</p> */}
             <AlertDialogCancel
-              className="border-0 p-0 hover:bg-transparent"
-              onClick={() => router.push("/dashboard/credit")}
+              className="bg-transparent border-0"
+              onClick={() => router.push("/dashboard/account?tab=billing")}
             >
               <img
                 src="/assets/icons/close.svg"
@@ -46,22 +46,16 @@ export default function InsufficientCreditsModal() {
           </AlertDialogTitle>
 
           <AlertDialogDescription className="p-16-regular py-3">
-            No worries, though - you can keep enjoying our services by grabbing
-            more credits.
+            No worries, though - you can keep enjoying our services by upgrading or refer Cver AI to someone.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel
-            className="button w-full bg-sky-100 text-black"
-            onClick={() => router.push("/dashboard/credit")}
-          >
-            No, Cancel
-          </AlertDialogCancel>
+         
           <AlertDialogAction
             className="button w-full bg-blue-400  bg-cover"
-            onClick={() => router.push("/dashboard/credit")}
+            onClick={() => router.push("/dashboard/account?tab=billing")}
           >
-            Yes, Proceed
+            Upgrade or Refer a friend.
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

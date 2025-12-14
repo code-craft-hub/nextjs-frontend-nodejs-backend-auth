@@ -53,6 +53,7 @@ export const AIJobCustomizationInput = memo(() => {
   const [extractedText, setExtractedText] = useState<string>("");
 
   const router = useRouter();
+  const noCredit = user?.credit === 0;
 
   const isSelectedFile = !isEmpty(uploadedFiles);
 
@@ -64,6 +65,10 @@ export const AIJobCustomizationInput = memo(() => {
   });
 
   const onSubmit = ({ jobDescription }: z.infer<typeof FORM_SCHEMA>) => {
+    if (noCredit) {
+      toast.error(`Please upgrade or refer more people to Cver AI`);
+      return;
+    }
     router.push(
       `/dashboard/${docsInput}/${uuidv4()}?profile=${userProfile}&jobDescription=${
         jobDescription + extractedText

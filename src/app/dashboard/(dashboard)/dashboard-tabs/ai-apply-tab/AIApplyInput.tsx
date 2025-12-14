@@ -32,6 +32,7 @@ import { apiService } from "@/hooks/use-auth";
 import { Separator } from "@/components/ui/separator";
 import { userQueries } from "@/lib/queries/user.queries";
 import { useQuery } from "@tanstack/react-query";
+import InsufficientCreditsModal from "@/components/shared/InsufficientCreditsModal";
 
 const FORM_SCHEMA = z.object({
   jobDescription: z.string().min(2, {
@@ -42,6 +43,8 @@ const FORM_SCHEMA = z.object({
 export const AIApplyInput = memo(
   ({ jobDescription }: { jobDescription: string }) => {
     const { data: user } = useQuery(userQueries.detail());
+    const noCredit = user?.credit === 0;
+
     const [uploadedFiles, setUploadedFiles] = useState<UploadedFile | null>(
       null
     );
@@ -94,6 +97,10 @@ export const AIApplyInput = memo(
 
     const onSubmit = useCallback(
       async ({ jobDescription }: z.infer<typeof FORM_SCHEMA>) => {
+        if (noCredit) {
+          toast.error(`Please upgrade or refer more people to Cver AI`);
+          return;
+        }
         const foundEmails =
           jobDescription.match(emailRegex) ||
           extractedText.match(emailRegex) ||
@@ -150,6 +157,7 @@ export const AIApplyInput = memo(
           isSelectedFile ? "" : "h-38"
         )}
       >
+        {noCredit && <InsufficientCreditsModal />}
         <FileUploadForm
           uploadedFiles={uploadedFiles}
           setUploadedFiles={setUploadedFiles}
