@@ -23,7 +23,7 @@ export const Billing = ({ reference }: any) => {
   const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
   const remainingDays = getDaysRemaining(user?.expiryTime ?? "");
   const REFERRAL = `${APP_URL}/register?referral=${
-    user?.referralCode ?? "ALEXA2024XYZ"
+    user?.referralCode ?? "EXA0Q4YZ"
   }`;
   const usersReferred = user?.usersReferred?.length || 0;
 

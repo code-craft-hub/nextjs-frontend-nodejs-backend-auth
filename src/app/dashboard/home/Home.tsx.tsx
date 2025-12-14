@@ -16,6 +16,7 @@ import { ShieldAlert } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useRouter } from "next/navigation";
 import { checkAuthStatus } from "../settings/(google-gmail-authorization)/gmail-authorization-service";
+import InsufficientCreditsModal from "@/components/shared/InsufficientCreditsModal";
 
 export const HomeClient = memo(
   ({
@@ -31,8 +32,9 @@ export const HomeClient = memo(
   }) => {
     const { data: user } = useQuery(userQueries.detail());
     const [notification, setNotification] = useState(false);
+    const [userCredit, setUserCredit] = useState(Number(user?.credit) === 0);
     const noDataSource = user?.dataSource?.length === 0;
-    const noCredit = user?.credit === 0;
+
     useEffect(() => {
       if (user?.firstName)
         sendGTMEvent({
@@ -48,18 +50,22 @@ export const HomeClient = memo(
         if (authStatus?.success) {
           setNotification(authStatus?.data?.isAuthorized);
         }
+        setUserCredit(Number(user?.credit) === 0);
       };
       checkAuthorization();
-    }, [notification]);
+    }, [notification, user?.credit]);
+
 
     return (
       <>
         <TopGradient />
+        {userCredit && <InsufficientCreditsModal />}
+
         <div className="container">
           <div className="w-full mt-4">
-            <Alert>
-              <ShieldAlert />
-              {!notification && (
+            {!notification && (
+              <Alert>
+                <ShieldAlert />
                 <AlertTitle
                   onClick={() =>
                     router.push("/dashboard/settings?tab=ai-applypreference")
@@ -68,29 +74,31 @@ export const HomeClient = memo(
                 >
                   Authorize your email account to use email Auto apply
                 </AlertTitle>
-              )}
-              {noDataSource && (
-                <AlertDescription
-                  onClick={() =>
-                    router.push("/dashboard/settings?tab=ai-applypreference")
-                  }
-                  className="hover:cursor-pointer hover:underline"
-                >
-                  Please add at least one profile/resume, it&apos;ll be used for
-                  your job personalisation and applications.
-                </AlertDescription>
-              )}
-              {noCredit && (
-                <AlertDescription
-                  onClick={() =>
-                    router.push("/dashboard/account?tab=billing")
-                  }
-                  className="hover:cursor-pointer hover:underline"
-                >
-                  Free plan expired, upgrade to Pro or refer 5 people to Cver AI
-                </AlertDescription>
-              )}
-            </Alert>
+
+                {noDataSource && (
+                  <AlertDescription
+                    onClick={() =>
+                      router.push("/dashboard/settings?tab=ai-applypreference")
+                    }
+                    className="hover:cursor-pointer hover:underline"
+                  >
+                    Please add at least one profile/resume, it&apos;ll be used
+                    for your job personalisation and applications.
+                  </AlertDescription>
+                )}
+                {userCredit && (
+                  <AlertDescription
+                    onClick={() =>
+                      router.push("/dashboard/account?tab=billing")
+                    }
+                    className="hover:cursor-pointer hover:underline"
+                  >
+                    Free plan expired, upgrade to Pro or refer 5 people to Cver
+                    AI
+                  </AlertDescription>
+                )}
+              </Alert>
+            )}
           </div>
           <Tabs
             defaultValue={tab ?? "ai-apply"}

@@ -69,7 +69,8 @@ export default function Overview() {
   const [rowSelection, setRowSelection] = React.useState({});
   const totalScoreRef = useRef<number>(0);
   const { data: user } = useQuery(userQueries.detail());
-  const noCredit = user?.credit === 0;
+  // const noCredit = user?.credit === 0;
+  const [userCredit, setUserCredit] = useState(Number(user?.credit) === 0);
 
   useEffect(() => {
     if (user?.firstName)
@@ -78,6 +79,10 @@ export default function Overview() {
         value: `${user?.firstName} viewed Job Page`,
       });
   }, [user?.firstName]);
+
+  useEffect(() => {
+      setUserCredit(Number(user?.credit) === 0);
+  }, [user?.credit]);
 
   const infiniteFilters = useMemo(
     () => ({
@@ -253,7 +258,7 @@ export default function Overview() {
 
   return (
     <div className="lg:gap-6 lg:flex ">
-      {noCredit && <InsufficientCreditsModal />}
+      {userCredit && <InsufficientCreditsModal />}
       <div className="bg-white p-3 h-fit rounded-md hidden lg:flex lg:flex-col gap-1">
         {leftMenuItems.map((item) => (
           <div
