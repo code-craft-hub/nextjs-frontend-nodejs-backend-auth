@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Copy, Info } from "lucide-react";
 import { UpgradeModal } from "./UpgradeModal";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ProModal } from "./ProSubscription";
 import { useQuery } from "@tanstack/react-query";
 import { userQueries } from "@/lib/queries/user.queries";
@@ -9,7 +9,6 @@ import { formatFirestoreDate, getDaysRemaining } from "@/lib/utils/helpers";
 import { toast } from "sonner";
 
 export const Billing = ({ reference }: any) => {
-
   const { data: user } = useQuery(userQueries.detail());
   const [completed, setCompleted] = useState(Boolean(user?.isPro) || false);
   const [showPlan, setShowPlan] = useState(false);
@@ -32,6 +31,10 @@ export const Billing = ({ reference }: any) => {
     toast.success("Referral code copied to clipboard!");
   };
 
+
+  useEffect(() => {
+    setCompleted(Boolean(user?.isPro));
+  }, [user?.isPro]);
 
   return !completed ? (
     showPlan ? (

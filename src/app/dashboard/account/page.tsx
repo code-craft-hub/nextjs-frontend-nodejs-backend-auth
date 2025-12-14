@@ -21,9 +21,9 @@ const AccountPage = async ({ searchParams }: any) => {
         data: {
           status: string;
           isPro: boolean;
-          proPlanExpiryDate?: string | Date;
+          expiryTime?: string | Date;
         };
-      }>(`/paystack/payments/verify/${reference}`);
+      }>(`/paystack/payments/verify/${reference}`, {token});
       initialData = data;
     } catch (error) {
       console.error("Error verifying payment:", error);
@@ -34,15 +34,15 @@ const AccountPage = async ({ searchParams }: any) => {
   const user = await queryClient.fetchQuery({
     ...userQueries.detail(token),
     // Force a fresh fetch if there was a payment reference
-    staleTime: reference ? 0 : undefined,
+    // staleTime: reference ? 0 : undefined,
   });
 
   const isPro = user.isPro || initialData?.isPro;
-  const proPlanExpiryDate =
-    user.proPlanExpiryDate || initialData?.proPlanExpiryDate;
+  const expiryTime =
+    user.expiryTime || initialData?.expiryTime;
 
-  const isExpired = proPlanExpiryDate
-    ? new Date(proPlanExpiryDate) < new Date()
+  const isExpired = expiryTime
+    ? new Date(expiryTime) < new Date()
     : true;
 
   // Check if we need to clean the URL (remove search params except 'tab')

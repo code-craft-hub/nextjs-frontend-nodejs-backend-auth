@@ -34,7 +34,7 @@ const profileSchema = z.object({
   state: z.string().min(1, "State is required"),
   countryCode: z.string().min(1, "Country code is required"),
   phoneNumber: z.string().min(1, "Phone number is required"),
-  emailAddress: z.string().email("Invalid email address"),
+  email: z.string().email("Invalid email address"),
 });
 
 type ProfileFormData = z.infer<typeof profileSchema>;
@@ -58,24 +58,26 @@ export const UserProfileForm: React.FC = () => {
       state: "",
       countryCode: "",
       phoneNumber: "",
-      emailAddress: "",
+      email: "",
     },
   });
 
-
   useEffect(() => {
-    const countryName = typeof user?.country == "object" ? (user?.country as any)?.name : country;
+    const countryName =
+      typeof user?.country == "object" ? (user?.country as any)?.name : country;
     form.setValue("firstName", user?.firstName || "");
     form.setValue("lastName", user?.lastName || "");
-    form.setValue("emailAddress", user?.email || "");
-    form.setValue("country",  countryName  || "");
+    form.setValue("email", user?.email || "");
+    form.setValue("country", countryName || "");
     form.setValue("state", user?.state || "");
     form.setValue("countryCode", user?.countryCode || continent_code || "");
     form.setValue("phoneNumber", user?.phoneNumber || "");
   }, [form, user, country, continent_code]);
 
   const onSubmit = (value: z.infer<typeof profileSchema>) => {
-    updateUser.mutate({ data: value });
+    updateUser.mutate({
+      data: { ...value, displayName: `${value.firstName} ${value.lastName}` },
+    });
     toast.success("Profile updated successfully!");
   };
 
@@ -267,7 +269,7 @@ export const UserProfileForm: React.FC = () => {
 
               <FormField
                 control={form.control}
-                name="emailAddress"
+                name="email"
                 render={({ field }) => (
                   <FormItem className="flex flex-col items-start gap-1.5 w-full">
                     <FormLabel className="text-sm font-medium text-[#344054] leading-5">

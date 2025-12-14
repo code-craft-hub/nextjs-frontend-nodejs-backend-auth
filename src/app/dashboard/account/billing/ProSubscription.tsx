@@ -13,7 +13,6 @@ import { toast } from "sonner";
 export function ProModal() {
   const [autoRenewal, setAutoRenewal] = useState(true);
   const { data: user } = useQuery(userQueries.detail());
-  console.log(user)
 
   const cancelSubscription = async () => {
     const ok = await confirm();
