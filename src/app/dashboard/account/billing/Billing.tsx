@@ -31,7 +31,6 @@ export const Billing = ({ reference }: any) => {
     toast.success("Referral code copied to clipboard!");
   };
 
-
   useEffect(() => {
     setCompleted(Boolean(user?.isPro));
   }, [user?.isPro]);
@@ -74,11 +73,14 @@ export const Billing = ({ reference }: any) => {
               fontSize="text-lg"
             /> */}
             <div className="flex flex-col items-start gap-[4px]">
-              <p className="relative">
-                <span className=" font-['Inter'] font-medium text-[14px] leading-[21px] text-white">
-                  Trial expires on {formatFirestoreDate(user?.expiryTime ?? "")}
-                </span>
-              </p>
+              {user?.expiryTime && (
+                <p className="relative">
+                  <span className=" font-['Inter'] font-medium text-[14px] leading-[21px] text-white">
+                    Trial expires on{" "}
+                    {formatFirestoreDate(user?.expiryTime ?? "")}
+                  </span>
+                </p>
+              )}
               <p className=" opacity-80 relative">
                 <span className="font-inter font-normal text-[12px] leading-[18px] text-white">
                   Upgrade now or refer friends to extend access

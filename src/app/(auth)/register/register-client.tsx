@@ -37,10 +37,7 @@ export default function RegisterClient({ referral }: { referral?: string }) {
     try {
       setLoading(true);
       const credentials = jwtDecode(response.credential) as { email: string };
-       await axiosApiClient.post(
-        "/google-login-register",
-        credentials
-      );
+      await axiosApiClient.post("/google-login-register", credentials);
       router.push("/dashboard/home");
     } catch (error) {
       console.error("Google registeration Error:", error);
@@ -66,10 +63,7 @@ export default function RegisterClient({ referral }: { referral?: string }) {
   const onSubmit = async (values: RegisterUserSchema) => {
     try {
       setLoading(true);
-      const response = await axiosApiClient.post("/register", {
-        email: values.email,
-        password: values.password,
-      });
+      const response = await axiosApiClient.post("/register", { values });
 
       if (response?.data?.success) {
         toast.success("Registration successful! Please check your email.");
