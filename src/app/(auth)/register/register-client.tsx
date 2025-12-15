@@ -63,7 +63,7 @@ export default function RegisterClient({ referral }: { referral?: string }) {
   const onSubmit = async (values: RegisterUserSchema) => {
     try {
       setLoading(true);
-      const response = await axiosApiClient.post("/register", { values });
+      const response = await axiosApiClient.post("/register", values);
 
       if (response?.data?.success) {
         toast.success("Registration successful! Please check your email.");
