@@ -38,8 +38,6 @@ export default function RegisterClient({ referral }: { referral?: string }) {
       setLoading(true);
       const credentials = jwtDecode(response.credential) as { email: string };
 
-      console.log(credentials, form.getValues("referralCode"));
-      // return;
       await axiosApiClient.post("/google-login-register", {
         ...credentials,
         referralCode: form.getValues("referralCode"),
