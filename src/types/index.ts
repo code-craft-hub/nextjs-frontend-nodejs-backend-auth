@@ -77,7 +77,7 @@ export interface IUser {
   uid?: string;
   providerId?: string;
   emailVerified?: boolean;
-  
+  referralCount?: number;
   expiryTime?: string | Date;
   usersReferred?: [];
   dataSource?: any[];

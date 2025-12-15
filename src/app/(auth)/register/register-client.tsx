@@ -37,7 +37,13 @@ export default function RegisterClient({ referral }: { referral?: string }) {
     try {
       setLoading(true);
       const credentials = jwtDecode(response.credential) as { email: string };
-      await axiosApiClient.post("/google-login-register", credentials);
+
+      console.log(credentials, form.getValues("referralCode"));
+      // return;
+      await axiosApiClient.post("/google-login-register", {
+        ...credentials,
+        referralCode: form.getValues("referralCode"),
+      });
       router.push("/dashboard/home");
     } catch (error) {
       console.error("Google registeration Error:", error);

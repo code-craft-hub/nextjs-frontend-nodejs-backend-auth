@@ -13,13 +13,13 @@ import {
 } from "@/components/ui/form";
 
 import { cn } from "@/lib/utils";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+// import {
+//   Select,
+//   SelectContent,
+//   SelectItem,
+//   SelectTrigger,
+//   SelectValue,
+// } from "@/components/ui/select";
 import { OnboardingFormProps } from "@/types";
 import { Checkbox } from "@/components/ui/checkbox";
 import { motion } from "framer-motion";
@@ -43,7 +43,7 @@ const formSchema = z.object({
   hybrid: z.boolean().default(false).optional(),
   remote: z.boolean().default(false).optional(),
   onsite: z.boolean().default(false).optional(),
-  location: z.string().min(1, "Please select a preferred location"),
+  // location: z.string().min(1, "Please select a preferred location"),
   title: z.string().min(1, "Please select a job title"),
   rolesOfInterest: z
     .array(z.object({ label: z.string(), value: z.string() }))
@@ -66,7 +66,7 @@ export const OnBoardingForm3 = ({ onNext, onPrev , children}: OnboardingFormProp
       hybrid: false,
       remote: false,
       onsite: false,
-      location: "",
+      // location: "",
       title: "",
       rolesOfInterest: [],
     },
@@ -76,7 +76,7 @@ export const OnBoardingForm3 = ({ onNext, onPrev , children}: OnboardingFormProp
     if (user?.dataSource) {
       const data = user.dataSource[0];
       form.setValue("rolesOfInterest", data?.rolesOfInterest || []);
-      form.setValue("location", data?.location || continent || "");
+      // form.setValue("location", data?.location || continent || "");
       form.setValue("partTime", data?.partTime || false);
       form.setValue("fullTime", data?.fullTime || false);
       form.setValue("intership", data?.intership || false);
@@ -115,14 +115,14 @@ export const OnBoardingForm3 = ({ onNext, onPrev , children}: OnboardingFormProp
     }
   }
 
-  const locations = [
-    "North America",
-    "South America",
-    "Europe",
-    "Asia",
-    "Africa",
-    "Oceania",
-  ];
+  // const locations = [
+  //   "North America",
+  //   "South America",
+  //   "Europe",
+  //   "Asia",
+  //   "Africa",
+  //   "Oceania",
+  // ];
 
   const isMobile = useIsMobile();
 
@@ -361,7 +361,7 @@ export const OnBoardingForm3 = ({ onNext, onPrev , children}: OnboardingFormProp
               </div>
 
               <div className="mt-8 space-y-4">
-                <FormField
+                {/* <FormField
                   control={form.control}
                   name="location"
                   render={({ field }) => (
@@ -392,7 +392,7 @@ export const OnBoardingForm3 = ({ onNext, onPrev , children}: OnboardingFormProp
                       <FormMessage />
                     </FormItem>
                   )}
-                />
+                /> */}
                 <FormField
                   control={form.control}
                   name="title"

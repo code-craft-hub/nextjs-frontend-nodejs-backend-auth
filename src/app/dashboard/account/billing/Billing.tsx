@@ -24,7 +24,7 @@ export const Billing = ({ reference }: any) => {
   const REFERRAL = `${APP_URL}/register?referral=${
     user?.referralCode ?? "EXA0Q4YZ"
   }`;
-  const usersReferred = user?.usersReferred?.length || 0;
+  const usersReferred = user?.referralCount || user?.usersReferred?.length || 0;
 
   const handleReferralCopy = () => {
     navigator.clipboard.writeText(REFERRAL);
