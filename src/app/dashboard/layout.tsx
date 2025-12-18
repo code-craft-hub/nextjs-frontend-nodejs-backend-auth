@@ -12,6 +12,7 @@ import { createServerQueryClient } from "@/lib/query/prefetch";
 import { userQueries } from "@/lib/queries/user.queries";
 import { HydrationBoundary } from "@/components/hydration-boundary";
 import { dehydrate } from "@tanstack/react-query";
+import { getCookiesToken } from "@/lib/auth.utils";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -21,8 +22,9 @@ interface DashboardLayoutProps {
 
 const DashboardLayout = async ({ children }: DashboardLayoutProps) => {
   await requireAuth();
+  const token = (await getCookiesToken()) ?? "";
   const queryClient = createServerQueryClient();
-  await queryClient.prefetchQuery(userQueries.detail());
+  await queryClient.prefetchQuery(userQueries.detail(token));
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <SidebarProvider>

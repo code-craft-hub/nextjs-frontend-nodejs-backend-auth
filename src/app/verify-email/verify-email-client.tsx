@@ -50,7 +50,7 @@ export const VerifyEmailClient = () => {
 
   useEffect(() => {
     if (!emailSent) {
-      setEmailSent(true);
+      setEmailSent(true);      
       sendVerificationCode();
     }
   }, [emailSent]);

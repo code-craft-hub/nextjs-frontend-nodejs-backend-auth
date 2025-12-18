@@ -33,14 +33,14 @@ const LandingPage = async () => {
         limit: 10,
         title: userDataSource?.key || userDataSource?.title || "",
       };
+      await prefetchWithPriority(queryClient, [
+        {
+          queryKey: jobsQueries.all(filters).queryKey,
+          queryFn: jobsQueries.all(filters, token).queryFn,
+          priority: "high",
+        },
+      ]);
     }
-    await prefetchWithPriority(queryClient, [
-      {
-        queryKey: jobsQueries.all(filters).queryKey,
-        queryFn: jobsQueries.all(filters, token).queryFn,
-        priority: "high",
-      },
-    ]);
   } catch (error) {
     console.error("Error in landing Page : ", error);
   }

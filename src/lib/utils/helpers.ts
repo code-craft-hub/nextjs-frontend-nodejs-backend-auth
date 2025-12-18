@@ -5,41 +5,82 @@ import { jsonrepair } from "jsonrepair";
 import { MouseEvent } from "react";
 
 /**
- * Calculates days remaining from a Firebase timestamp
- * @param {{ _seconds: number, _nanoseconds: number }} firebaseTimestamp
- * @returns {string} e.g., "3 days remaining"
+ * Calculates the number of full days remaining until a future date.
+ * Supports:
+ *  - Firestore Timestamp ({ seconds, nanoseconds } or toDate())
+ *  - ISO date strings
+ *  - Epoch timestamps (seconds or milliseconds)
+ *  - JavaScript Date objects
+ *
+ * @param input Future time value
+ * @returns number of days remaining (>= 0)
  */
-export function getDaysRemaining(firebaseTimestamp: any) {
-  const date = new Date(firebaseTimestamp);
+export function getDaysRemaining(input: unknown): number {
+  try {
+    if (!input) return 0;
 
-  if (isNaN(date?.getTime())) {
+    let targetDate: Date | null = null;
+
+    // 1. Firestore Timestamp (admin / client SDK)
+    if (
+      typeof input === "object" &&
+      input !== null
+    ) {
+      // Firestore Timestamp with toDate()
+      if (typeof (input as any).toDate === "function") {
+        targetDate = (input as any).toDate();
+      }
+      // Firestore Timestamp raw format
+      else if (
+        typeof (input as any).seconds === "number"
+      ) {
+        const seconds = (input as any).seconds;
+        const nanoseconds = (input as any).nanoseconds ?? 0;
+        targetDate = new Date(
+          seconds * 1000 + Math.floor(nanoseconds / 1_000_000)
+        );
+      }
+      // Native Date object
+      else if (input instanceof Date) {
+        targetDate = input;
+      }
+    }
+
+    // 2. Epoch timestamp (number)
+    if (!targetDate && typeof input === "number") {
+      // Heuristic: seconds vs milliseconds
+      targetDate =
+        input < 1e12
+          ? new Date(input * 1000)
+          : new Date(input);
+    }
+
+    // 3. ISO / RFC strings
+    if (!targetDate && typeof input === "string") {
+      const parsed = new Date(input);
+      if (!Number.isNaN(parsed.getTime())) {
+        targetDate = parsed;
+      }
+    }
+
+    if (!targetDate || Number.isNaN(targetDate.getTime())) {
+      return 0;
+    }
+
+    const now = Date.now();
+    const diffMs = targetDate.getTime() - now;
+
+    if (diffMs <= 0) return 0;
+
+    const MS_PER_DAY = 1000 * 60 * 60 * 24;
+
+    // Round down → "days remaining"
+    return Math.floor(diffMs / MS_PER_DAY);
+  } catch {
     return 0;
   }
-
-  if (!firebaseTimestamp || typeof firebaseTimestamp._seconds !== "number") {
-    return 3;
-  }
-
-  // Convert Firebase timestamp to milliseconds
-  const expiryDate = new Date(
-    firebaseTimestamp._seconds * 1000 +
-      Math.floor(firebaseTimestamp._nanoseconds / 1e6)
-  );
-
-  const now = new Date();
-
-  // Calculate difference in milliseconds (use numeric values)
-  const diffMs = expiryDate.getTime() - now.getTime();
-
-  if (diffMs <= 0) {
-    return 0;
-  }
-
-  // Convert milliseconds to days (1 day = 24 * 60 * 60 * 1000 ms)
-  const daysRemaining = Math.ceil(diffMs / (24 * 60 * 60 * 1000));
-
-  return `${daysRemaining}`;
 }
+
 
 /**
  * Returns the number of days difference between today and the target date.

@@ -32,7 +32,7 @@ export const HomeClient = memo(
   }) => {
     const { data: user } = useQuery(userQueries.detail());
     const [notification, setNotification] = useState(false);
-    const [userCredit, setUserCredit] = useState(Number(user?.credit) === 0);
+    const [userCredit, setUserCredit] = useState(Number(user?.credit ?? 0) === 0);
     const noDataSource = user?.dataSource?.length === 0;
 
     useEffect(() => {
@@ -50,11 +50,12 @@ export const HomeClient = memo(
         if (authStatus?.success) {
           setNotification(authStatus?.data?.isAuthorized);
         }
-        setUserCredit(Number(user?.credit) === 0);
+        setUserCredit(Number(user?.credit ?? 0) === 0);
       };
       checkAuthorization();
     }, [notification, user?.credit]);
-
+    
+    console.log(Number(user?.credit ?? 0) === 0)
 
     return (
       <>

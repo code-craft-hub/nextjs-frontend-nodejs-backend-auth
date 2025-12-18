@@ -26,8 +26,6 @@ export const Billing = ({ reference }: any) => {
   }`;
   const usersReferred = user?.referralCount || user?.usersReferred?.length || 0;
 
-  console.log(usersReferred)
-
   const handleReferralCopy = () => {
     navigator.clipboard.writeText(REFERRAL);
     toast.success("Referral code copied to clipboard!");
@@ -66,14 +64,6 @@ export const Billing = ({ reference }: any) => {
             )}
           </div>
           <div className="flex flex-wrap items-center  gap-4 relative">
-            {/* <SegmentedProgress
-              percentage={40}
-              size={64}
-              bgColor="bg-blue-600"
-              segmentColor="white"
-              textColor="text-white"
-              fontSize="text-lg"
-            /> */}
             <div className="flex flex-col items-start gap-[4px]">
               {user?.expiryTime && (
                 <p className="relative">
@@ -85,7 +75,11 @@ export const Billing = ({ reference }: any) => {
               )}
               <p className=" opacity-80 relative">
                 <span className="font-inter font-normal text-[12px] leading-[18px] text-white">
-                  Upgrade now or refer friends to extend access
+                  Upgrade now or refer friends to extend your access. In the
+                  main time you have{" "}
+                  <span className="font-bold underline">
+                    {user?.credit ?? 0} credits
+                  </span>
                 </span>
               </p>
             </div>

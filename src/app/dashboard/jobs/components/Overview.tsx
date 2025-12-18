@@ -70,7 +70,7 @@ export default function Overview() {
   const totalScoreRef = useRef<number>(0);
   const { data: user } = useQuery(userQueries.detail());
   // const noCredit = user?.credit === 0;
-  const [userCredit, setUserCredit] = useState(Number(user?.credit) === 0);
+  const [userCredit, setUserCredit] = useState(Number(user?.credit ?? 0) === 0);
 
   useEffect(() => {
     if (user?.firstName)
@@ -81,7 +81,7 @@ export default function Overview() {
   }, [user?.firstName]);
 
   useEffect(() => {
-      setUserCredit(Number(user?.credit) === 0);
+      setUserCredit(Number(user?.credit ?? 0) === 0);
   }, [user?.credit]);
 
   const infiniteFilters = useMemo(
