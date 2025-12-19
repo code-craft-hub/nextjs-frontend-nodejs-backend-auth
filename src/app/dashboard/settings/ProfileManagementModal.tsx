@@ -29,7 +29,7 @@ import { Toggle } from "@/components/ui/toggle";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { ProfileData } from "@/types";
-import {v4 as uuidv4} from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 
 const jobLevel = ["Entry Level", "Mid Level", "Senior Level"];
 const jobTypes = ["Full Time", "Part Time", "Contract"];
@@ -161,8 +161,8 @@ export default function ProfileManagementModal({
               <p className="font-semibold text-[1.15rem]">Edit Profile</p>
             </div>
             <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-8 w-full">
-                   <div className="space-y-1.5 col-span-2">
+              <div className="flex flex-col md:grid md:grid-cols-2 gap-y-4 gap-x-8 w-full">
+                <div className="space-y-1.5 md:col-span-2">
                   <h1 className="">Profile Title</h1>
                   <Controller
                     name="title"
@@ -204,7 +204,7 @@ export default function ProfileManagementModal({
                   />
                 </div>
 
-                <div className="space-y-1.5">
+                <div className="space-y-1.5 w-full">
                   <h1 className="">Job Type Preference</h1>
                   <Controller
                     name="jobTypePreference"
@@ -233,7 +233,10 @@ export default function ProfileManagementModal({
                 </div>
 
                 <div className="space-y-1.5 col-span-2">
-                  <h1 className="">Role of Interest <span className="text-2xs">(Avoid ambigious words)</span> </h1>
+                  <h1 className="">
+                    Role of Interest{" "}
+                    <span className="text-2xs">(Avoid ambigious words)</span>{" "}
+                  </h1>
                   <Controller
                     name="rolesOfInterest"
                     control={control}
@@ -246,7 +249,7 @@ export default function ProfileManagementModal({
                   />
                 </div>
 
-                <div className="space-y-1.5">
+                <div className="space-y-1.5 ">
                   <h1 className="">Remote Work Preference</h1>
                   <Controller
                     name="remoteWorkPreference"
@@ -379,7 +382,9 @@ export default function ProfileManagementModal({
                         className="data-[state=on]:bg-transparent data-[state=on]:*:[svg]:fill-primary data-[state=on]:*:[svg]:stroke-primary"
                       >
                         <BookmarkIcon />
-                        <span className="mt-0.5">Make default profile</span>
+                        <span className="mt-0.5 hidden md:flex">
+                          Make default profile
+                        </span>
                       </Toggle>
                     )}
                   />
