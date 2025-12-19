@@ -1,5 +1,6 @@
 // src/services/api/cover-letter.service.ts
 
+import { baseURL } from "@/lib/api/client";
 import { IUser } from "@/types";
 
 export interface CoverLetterRequest {
@@ -16,7 +17,7 @@ export interface StreamChunk {
   error?: string;
 }
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_AUTH_API_URL || 'http://localhost:3000';
+// const API_BASE_URL = process.env.NEXT_PUBLIC_AUTH_API_URL || 'http://localhost:3000';
 
 /**
  * Generates a cover letter with streaming response
@@ -29,7 +30,7 @@ export const generateCoverLetterStream = async (
   signal?: AbortSignal
 ): Promise<void> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/v1/generate-cover-letter`, {
+    const response = await fetch(`${baseURL}/v1/generate-cover-letter`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

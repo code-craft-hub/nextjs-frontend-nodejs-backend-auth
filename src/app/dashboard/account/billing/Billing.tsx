@@ -21,6 +21,7 @@ export const Billing = ({ reference }: any) => {
 
   const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
   const remainingDays = getDaysRemaining(user?.expiryTime ?? "");
+  const usedUpAllCredit = Number(user?.credit ?? 0) === 0;
   const REFERRAL = `${APP_URL}/register?referral=${
     user?.referralCode ?? "EXA0Q4YZ"
   }`;
@@ -47,33 +48,41 @@ export const Billing = ({ reference }: any) => {
         <section className="bg-gradient-to-b space-y-4 from-[#FF9A56] to-[#FF6B35] rounded-[12px] w-full p-4 sm:p-8">
           <div className="flex gap-4 justify-between w-full">
             <div className="text-white space-y-2">
-              <h1 className="font-semibold font-inter text-2xl">Free Trial</h1>
-              <p className="text-white/80">
+              <h1 className="font-semibold font-inter sm:text-2xl">
+                {usedUpAllCredit
+                  ? "You've used up your free credits"
+                  : "Free Trial"}
+              </h1>
+              <p className="text-white/80 ">
                 Explore all features with your trial period
               </p>
             </div>
-            {Number(remainingDays) > 0 && (
-              <div className="flex shrink-0 flex-col justify-center items-center gap-[4px] w-[97.67px] h-[81px] bg-[rgba(255,255,255,0.2)] rounded-[8px]">
-                <p className="font-inter text-center font-semibold text-[32px] leading-[32px] text-white">
-                  {remainingDays}
-                </p>
-                <p className="font-inter font-medium text-[14px] leading-[21px] text-center text-white">
-                  day{Number(remainingDays) > 1 && "s"} left
-                </p>
-              </div>
-            )}
+            {usedUpAllCredit
+              ? null
+              : Number(remainingDays) > 0 && (
+                  <div className="flex shrink-0 flex-col justify-center items-center gap-[4px] w-[97.67px] h-[81px] bg-[rgba(255,255,255,0.2)] rounded-[8px]">
+                    <p className="font-inter text-center font-semibold text-[32px] leading-[32px] text-white">
+                      {remainingDays}
+                    </p>
+                    <p className="font-inter font-medium text-[14px] leading-[21px] text-center text-white">
+                      day{Number(remainingDays) > 1 && "s"} left
+                    </p>
+                  </div>
+                )}
           </div>
           <div className="flex flex-wrap items-center  gap-4 relative">
             <div className="flex flex-col items-start gap-[4px]">
-              {user?.expiryTime && (
-                <p className="relative">
-                  <span className=" font-['Inter'] font-medium text-[14px] leading-[21px] text-white">
-                    Trial expires on{" "}
-                    {formatFirestoreDate(user?.expiryTime ?? "")}
-                  </span>
-                </p>
-              )}
-              <p className=" opacity-80 relative">
+              {usedUpAllCredit
+                ? null
+                : user?.expiryTime && (
+                    <p className="relative">
+                      <span className=" font-['Inter'] font-medium text-[14px] leading-[21px] text-white">
+                        Trial expires on{" "}
+                        {formatFirestoreDate(user?.expiryTime ?? "")}
+                      </span>
+                    </p>
+                  )}
+              <p className=" opacity-80 relative max-sm:text-2xs">
                 <span className="font-inter font-normal text-[12px] leading-[18px] text-white">
                   Upgrade now or refer friends to extend your access. In the
                   main time you have{" "}
@@ -102,7 +111,7 @@ export const Billing = ({ reference }: any) => {
               </p>
               <div className="flex flex-col sm:flex-row justify-between gap-4">
                 <div className="box-border flex flex-col justify-center p-2 px-4 w-full bg-[#F9FAFB] border border-[#D0D5DD] rounded-[8px]">
-                  <p className="font-semibold text-[16px] leading-[24px] text-[#101828] tracking-[0.8px]">
+                  <p className="font-semibold text-xs md:text-[16px] leading-[24px] text-[#101828] tracking-[0.8px]">
                     {REFERRAL}
                   </p>
                 </div>

@@ -112,7 +112,7 @@ const Preview = ({
       setOpenModal(true);
     } catch (error: any) {
       toast.error(
-        error?.response?.data || "Auto apply failed. Please try again.",
+        error?.response?.data?.message || "Auto apply failed. Please try again.",
         {
           action: {
             label: "Authenticate",

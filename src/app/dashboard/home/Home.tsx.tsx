@@ -55,8 +55,6 @@ export const HomeClient = memo(
       checkAuthorization();
     }, [notification, user?.credit]);
     
-    console.log(Number(user?.credit ?? 0) === 0)
-
     return (
       <>
         <TopGradient />

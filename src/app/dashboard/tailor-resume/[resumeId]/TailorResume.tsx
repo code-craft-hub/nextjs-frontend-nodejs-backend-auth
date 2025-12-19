@@ -12,7 +12,7 @@ import { resumeQueries } from "@/lib/queries/resume.queries";
 import { userQueries } from "@/lib/queries/user.queries";
 import { ResumeDownloadButton } from "./ResumeDownloadButton";
 import { TrashIcon } from "lucide-react";
-import { api } from "@/lib/api/client";
+import { api, baseURL } from "@/lib/api/client";
 import { sendGTMEvent } from "@next/third-parties/google";
 
 export const TailorResume = ({
@@ -49,10 +49,10 @@ export const TailorResume = ({
   const hasGeneratedRef = useRef(false);
   const router = useRouter();
 
-  const backendUrl = process.env.NEXT_PUBLIC_AUTH_API_URL;
+  // const backendUrl = process.env.NEXT_PUBLIC_AUTH_API_URL;
 
   const { streamData, streamStatus, startStream } = useResumeStream(
-    backendUrl + "/new-resume-generation",
+    baseURL + "/new-resume-generation",
     resumeId
   );
 

@@ -5,8 +5,9 @@ import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
 import { EditableResume } from "./EditableResume";
 import { COLLECTIONS } from "@/lib/utils/constants";
+import { baseURL } from "@/lib/api/client";
 
-const backendUrl = process.env.NEXT_PUBLIC_AUTH_API_URL;
+// const backendUrl = process.env.NEXT_PUBLIC_AUTH_API_URL;
 export const ResumeGenerator = ({
   jobDescription,
   resumeId,
@@ -16,7 +17,7 @@ export const ResumeGenerator = ({
 }) => {
 
   const { streamData, streamStatus, startStream } = useResumeStream(
-    backendUrl + "/new-resume-generation",
+    baseURL + "/new-resume-generation",
     resumeId
   );
   const { user, useCareerDoc } = useAuth();
