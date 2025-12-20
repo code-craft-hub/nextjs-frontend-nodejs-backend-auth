@@ -212,10 +212,8 @@ export const postedDate = (dateString?: string): string => {
 
 export const formatAppliedDate = (dateString?: string): string => {
   try {
-    const date = new Date(dateString ?? "");
+     const targetDate = normalizeToDate(dateString);
 
-    // Check if date is valid, use today's date if invalid
-    const validDate = isNaN(date.getTime()) ? new Date() : date;
 
     // Format: MMM D, YYYY HH:mm
     const options: Intl.DateTimeFormatOptions = {
@@ -224,7 +222,7 @@ export const formatAppliedDate = (dateString?: string): string => {
       year: "numeric",
     };
 
-    return new Intl.DateTimeFormat("en-US", options).format(validDate);
+    return new Intl.DateTimeFormat("en-US", options).format(targetDate!);
   } catch (error) {
     // Return today's date on any error
     const today = new Date();
