@@ -30,6 +30,7 @@ import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
+import { formatFirestoreDate } from "@/lib/utils/helpers";
 
 export const schema = z.object({
   id: z.number(),
@@ -86,7 +87,7 @@ const getColumns = (
     cell: ({ row }) => (
       <div className="">
         <Badge variant="outline" className={cn("border-0 px-1.5 font-inter")}>
-          {row.original?.generatedAt?.split(".")[0]}
+          {formatFirestoreDate(row.original?.generatedAt)}
         </Badge>
       </div>
     ),

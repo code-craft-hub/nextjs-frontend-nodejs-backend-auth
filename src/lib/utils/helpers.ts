@@ -214,8 +214,6 @@ export const formatAppliedDate = (dateString?: string): string => {
   try {
      const targetDate = normalizeToDate(dateString);
 
-
-    // Format: MMM D, YYYY HH:mm
     const options: Intl.DateTimeFormatOptions = {
       month: "short",
       day: "numeric",

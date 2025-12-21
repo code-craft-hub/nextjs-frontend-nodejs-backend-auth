@@ -30,6 +30,7 @@ import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
+import { formatFirestoreDate } from "@/lib/utils/helpers";
 
 export const schema = z.object({
   id: z.number(),
@@ -80,25 +81,29 @@ const getColumns = (
   },
   {
     accessorKey: "generatedAt",
-    header: "Application Date",
+    header: () => (
+      <div className=" w-full ">Application Date</div>
+    ),
     cell: ({ row }) => (
       <div className="">
         <Badge variant="outline" className={cn("border-0 px-1.5 font-inter")}>
-          {(row.original?.generatedAt)?.split(".")[0]}
+          {formatFirestoreDate(row.original?.generatedAt)}
         </Badge>
       </div>
     ),
   },
   {
     accessorKey: "type",
-    header: "Application Method",
+    header: () => (
+      <div className=" w-full ">Application Method</div>
+    ),
     cell: ({ row }) => (
-      <div className="flex gap-2 items-center justify-center">
+      <div className="flex gap-2 items-center justify-">
         <div>
           <Badge
             variant="outline"
             className={cn(
-              "text-muted-foreground px-1.5 rounded-2xl font-jakarta",
+              "text-muted-foreground px-1.5 rounded-2xl  font-jakarta",
               row.getValue("type") === "resume"
                 ? "bg-primary/10 border-primary/40 text-primary "
                 : row.getValue("type") === "cover-letter"
@@ -136,11 +141,7 @@ const getColumns = (
   },
 ];
 
-export function AIJobCustomizationDatatable({
-  data,
-}: {
-  data: any[];
-}) {
+export function AIJobCustomizationDatatable({ data }: { data: any[] }) {
   const router = useRouter();
 
   const [rowSelection, setRowSelection] = React.useState({});
