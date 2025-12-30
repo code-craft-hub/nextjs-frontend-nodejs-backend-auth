@@ -63,7 +63,7 @@ export const HomeClient = memo(
         <div className="container">
           <div className="w-full mt-4">
             {!notification && (
-              <Alert>
+              <Alert className="w-fit mx-auto">
                 <ShieldAlert />
                 <AlertTitle
                   onClick={() =>

@@ -11,6 +11,7 @@ import { useQuery } from "@tanstack/react-query";
 import { interviewQuestionQueries } from "@/lib/queries/interview.queries";
 import { userQueries } from "@/lib/queries/user.queries";
 import { sendGTMEvent } from "@next/third-parties/google";
+import { baseURL } from "@/lib/api/client";
 
 export const TailorInterviewQuestion = ({
   jobDescription,
@@ -86,7 +87,7 @@ export const TailorInterviewQuestion = ({
 
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_AUTH_API_URL}/v1/generate-interview-question`,
+        `${baseURL}/v1/generate-interview-question`,
         {
           method: "POST",
           headers: {
@@ -190,6 +191,8 @@ export const TailorInterviewQuestion = ({
   const generatedEmpty = isEmpty(qaData);
   const dataEmpty = isEmpty(data);
   const allEmpty = generatedEmpty && dataEmpty;
+
+  console.log("QA Data:", qaData, "Fetched Data:", data);
 
   return (
     <div className="min-h-screen h-full p-8">
