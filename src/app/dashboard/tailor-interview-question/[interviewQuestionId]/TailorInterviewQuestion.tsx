@@ -192,8 +192,6 @@ export const TailorInterviewQuestion = ({
   const dataEmpty = isEmpty(data);
   const allEmpty = generatedEmpty && dataEmpty;
 
-  console.log("QA Data:", qaData, "Fetched Data:", data);
-
   return (
     <div className="min-h-screen h-full p-8">
       <div className="max-w-5xl mx-auto">
