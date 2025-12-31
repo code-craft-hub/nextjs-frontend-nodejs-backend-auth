@@ -74,9 +74,25 @@ export const UserProfileForm: React.FC = () => {
     form.setValue("phoneNumber", user?.phoneNumber || "");
   }, [form, user, country, continent_code]);
 
-  const onSubmit = (value: z.infer<typeof profileSchema>) => {
+  const onSubmit = ({
+    firstName,
+    lastName,
+    state,
+    country,
+    countryCode,
+    phoneNumber,
+  }: z.infer<typeof profileSchema>) => {
+    const normalizedPhoneNumber = phoneNumber?.replace(/\s+/g, "");
     updateUser.mutate({
-      data: { ...value, displayName: `${value.firstName} ${value.lastName}` },
+      data: {
+        firstName,
+        lastName,
+        state,
+        country,
+        countryCode,
+        phoneNumber: normalizedPhoneNumber,
+        displayName: `${firstName} ${lastName}`,
+      },
     });
     toast.success("Profile updated successfully!");
   };
