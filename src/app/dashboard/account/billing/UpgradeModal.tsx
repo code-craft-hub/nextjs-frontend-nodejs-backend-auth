@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 // import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Check,Sparkles } from "lucide-react";
+import { Check, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { PaystackPaymentGateway } from "./Paystack";
@@ -205,14 +205,10 @@ export function UpgradeModal({
             <h2 className="text-2xl font-bold text-gray-900">
               Payment Details
             </h2>
-           
           </div>
 
           <Form {...form}>
-            <form
-              className="space-y-6"
-            >
-            
+            <form className="space-y-6">
               <div className="flex justify-between items-center py-4 border-t border-b border-gray-200">
                 <span className="text-gray-600">Selected Plan</span>
                 <span className="font-semibold text-gray-900 capitalize">

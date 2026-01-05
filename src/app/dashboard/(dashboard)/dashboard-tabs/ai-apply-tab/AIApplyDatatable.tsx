@@ -1,4 +1,3 @@
-import * as React from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -31,6 +30,7 @@ import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { formatFirestoreDate } from "@/lib/utils/helpers";
+import { useMemo, useState } from "react";
 
 export const schema = z.object({
   id: z.number(),
@@ -140,19 +140,19 @@ export function AIApplyDatatable({
   jobs: any;
 }) {
   const router = useRouter();
-  const [rowSelection, setRowSelection] = React.useState({});
+  const [rowSelection, setRowSelection] = useState({});
   const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    useState<VisibilityState>({});
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(
     []
   );
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [pagination, setPagination] = React.useState({
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [pagination, setPagination] = useState({
     pageIndex: 0,
     pageSize: 10,
   });
 
-  const columns = React.useMemo(() => getColumns(router), [router]); // Generate columns with router
+  const columns = useMemo(() => getColumns(router), [router]); // Generate columns with router
 
   const table = useReactTable({
     data,
@@ -179,7 +179,7 @@ export function AIApplyDatatable({
     getFacetedUniqueValues: getFacetedUniqueValues(),
   });
 
-  const [isLoadingMore, setIsLoadingMore] = React.useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   const totalRows = data.length;
   const currentRows = (pagination.pageIndex + 1) * pagination.pageSize;

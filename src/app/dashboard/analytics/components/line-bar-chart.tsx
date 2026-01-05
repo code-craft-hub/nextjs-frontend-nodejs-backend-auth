@@ -188,8 +188,9 @@ export const UsageTrendDashboard = (): JSX.Element => {
                   state.activeTooltipIndex !== null
                 ) {
                   handleMouseEnter(
-                    state.activePayload,
-                    state.activeTooltipIndex
+                    //@ts-ignore
+                    state.activePayload as any,
+                    state.activeTooltipIndex as any
                   );
                 }
               }}

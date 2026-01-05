@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useEffect, memo } from "react";
+import { useRef, useEffect, memo } from "react";
 import { Loader2 } from "lucide-react";
 import { useCoverLetterGenerator } from "@/hooks/useCoverLetterGenerator";
 import { useRouter } from "next/navigation";

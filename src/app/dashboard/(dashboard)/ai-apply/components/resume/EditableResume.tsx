@@ -515,7 +515,7 @@ export const EditableResume: React.FC<PreviewResumeProps> = ({
                   <SkillEditForm
                     initialData={displayData.hardSkill}
                     title="Technical Skills"
-                    placeholder="React, Python, AWS..."
+                    placeholder=" Python, AWS..."
                     onSave={(value) => {
                       createFieldHandler("hardSkill")(value);
                       onClose();

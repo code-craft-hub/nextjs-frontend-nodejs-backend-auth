@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AiApplyPreferences } from "./AiApplyPreferences";
@@ -11,15 +11,15 @@ import { sendGTMEvent } from "@next/third-parties/google";
 
 const Settings = ({ tab }: { tab: string }) => {
   const [currentTab, setCurrentTab] = useState(tab ?? "ai-applypreference");
-    const { data: user } = useQuery(userQueries.detail());
-  
-    useEffect(() => {
-      if (user?.firstName)
-        sendGTMEvent({
-          event: `Settings Page`,
-          value: `${user?.firstName} viewed Settings Page`,
-        });
-    }, [user?.firstName]);
+  const { data: user } = useQuery(userQueries.detail());
+
+  useEffect(() => {
+    if (user?.firstName)
+      sendGTMEvent({
+        event: `Settings Page`,
+        value: `${user?.firstName} viewed Settings Page`,
+      });
+  }, [user?.firstName]);
   const handleTabChange = (value: string) => {
     setCurrentTab(value);
   };

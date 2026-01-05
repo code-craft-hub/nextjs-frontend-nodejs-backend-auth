@@ -1,4 +1,3 @@
-import React from "react";
 import { OnboardingFormProps } from "@/types";
 import Progress from "./Progress";
 import { Button } from "@/components/ui/button";
@@ -8,6 +7,7 @@ import { motion } from "framer-motion";
 export const OnBoardingForm6 = ({ onNext, onPrev, children }: OnboardingFormProps) => {
   return (
     <motion.div
+    // @ts-ignore
       initial={{ opacity: 0, x: 100 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -100 }}

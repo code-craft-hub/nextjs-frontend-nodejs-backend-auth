@@ -1,4 +1,3 @@
-import React from "react";
 import { LandingPageClient } from "./LandingPageClient";
 import { createServerQueryClient } from "@/lib/query/prefetch";
 import { JobFilters } from "@/lib/types/jobs";

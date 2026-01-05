@@ -10,7 +10,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import React, { memo } from "react";
+import { memo } from "react";
 
 const MobileOverview = memo(
   ({

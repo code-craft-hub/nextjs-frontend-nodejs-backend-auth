@@ -16,7 +16,7 @@ import {
   MapPin,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
 
@@ -62,11 +62,10 @@ export const JobIdClient = ({
       },
     });
 
-    if(!job?.emailApply){
+    if (!job?.emailApply) {
       window.open(!!job.link ? job?.link : job?.applyUrl, "__blank");
       return;
     }
-
 
     if (user?.email && job?.emailApply) {
       const { isAuthorized } = await apiService.gmailOauthStatus();

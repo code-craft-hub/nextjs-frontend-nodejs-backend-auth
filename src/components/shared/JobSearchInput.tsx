@@ -10,9 +10,8 @@ import {
 } from "@/components/ui/form";
 import { z } from "zod";
 
-import React, { useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { SearchIcon, X } from "lucide-react";
-
 
 const JobSearchInput = ({ table, handleSearchSubmit }: any) => {
   const [showClearButton, setShowClearButton] = useState(false);

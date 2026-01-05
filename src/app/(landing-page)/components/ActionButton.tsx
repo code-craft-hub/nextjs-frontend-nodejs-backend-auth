@@ -1,9 +1,9 @@
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import React, { useState } from "react";
+import { memo, useState } from "react";
 import { ActionOption } from "../constants";
 
-export const ActionButton = React.memo(
+export const ActionButton = memo(
   ({ option }: { option: ActionOption }) => {
     const [hovered, setHovered] = useState<string | null>(null);
 

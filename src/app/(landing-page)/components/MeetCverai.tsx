@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import React from "react";
 
 export const MeetCverai = () => {
   const router = useRouter();
@@ -22,7 +21,7 @@ export const MeetCverai = () => {
                 onClick={() => {
                   router.push(`/dashboard/home`);
                 }}
-                className="max-sm:text-2xs break-words text-white px-8 py-3"
+                className="max-sm:text-2xs wrap-break-word text-white px-8 py-3"
               >
                 Start now - Your job hunt just got easier!
               </Button>

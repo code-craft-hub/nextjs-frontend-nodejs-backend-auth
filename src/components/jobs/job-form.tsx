@@ -1,8 +1,8 @@
 // components/jobs/job-form.tsx
-'use client';
+"use client";
 
-import type { Job, CreateJobData } from '@/lib/types/jobs';
-import { useState, useEffect } from 'react';
+import type { Job, CreateJobData } from "@/lib/types/jobs";
+import { useState, useEffect } from "react";
 
 interface JobFormProps {
   job: Job | null;
@@ -13,22 +13,22 @@ interface JobFormProps {
 
 export function JobForm({ job, onSubmit, onClose, isPending }: JobFormProps) {
   const [formData, setFormData] = useState<CreateJobData>({
-    title: '',
-    company: '',
-    location: '',
-    locationType: 'remote',
-    employmentType: 'full-time',
-    description: '',
+    title: "",
+    company: "",
+    location: "",
+    locationType: "remote",
+    employmentType: "full-time",
+    description: "",
     requirements: [],
     responsibilities: [],
     tags: [],
-    experienceLevel: 'mid',
-    status: 'draft',
+    experienceLevel: "mid",
+    status: "draft",
   });
 
-  const [requirementInput, setRequirementInput] = useState('');
-  const [responsibilityInput, setResponsibilityInput] = useState('');
-  const [tagInput, setTagInput] = useState('');
+  const [requirementInput, setRequirementInput] = useState("");
+  const [responsibilityInput, setResponsibilityInput] = useState("");
+  const [tagInput, setTagInput] = useState("");
 
   useEffect(() => {
     if (job) {
@@ -59,7 +59,7 @@ export function JobForm({ job, onSubmit, onClose, isPending }: JobFormProps) {
   };
 
   const addItem = (
-    type: 'requirements' | 'responsibilities' | 'tags',
+    type: "requirements" | "responsibilities" | "tags",
     value: string,
     setValue: (v: string) => void
   ) => {
@@ -68,11 +68,14 @@ export function JobForm({ job, onSubmit, onClose, isPending }: JobFormProps) {
         ...formData,
         [type]: [...(formData[type] || []), value.trim()],
       });
-      setValue('');
+      setValue("");
     }
   };
 
-  const removeItem = (type: 'requirements' | 'responsibilities' | 'tags', index: number) => {
+  const removeItem = (
+    type: "requirements" | "responsibilities" | "tags",
+    index: number
+  ) => {
     setFormData({
       ...formData,
       [type]: formData[type]?.filter((_, i) => i !== index),
@@ -84,14 +87,24 @@ export function JobForm({ job, onSubmit, onClose, isPending }: JobFormProps) {
       <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         <div className="sticky top-0 bg-white border-b px-6 py-4 flex items-center justify-between">
           <h2 className="text-2xl font-bold">
-            {job ? 'Edit Job' : 'Create New Job'}
+            {job ? "Edit Job" : "Create New Job"}
           </h2>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600"
           >
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         </div>
@@ -106,7 +119,9 @@ export function JobForm({ job, onSubmit, onClose, isPending }: JobFormProps) {
               <input
                 type="text"
                 value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, title: e.target.value })
+                }
                 required
                 className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
               />
@@ -118,7 +133,9 @@ export function JobForm({ job, onSubmit, onClose, isPending }: JobFormProps) {
               <input
                 type="text"
                 value={formData.company}
-                onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, company: e.target.value })
+                }
                 required
                 className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
               />
@@ -133,7 +150,9 @@ export function JobForm({ job, onSubmit, onClose, isPending }: JobFormProps) {
               <input
                 type="text"
                 value={formData.location}
-                onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, location: e.target.value })
+                }
                 required
                 placeholder="e.g., San Francisco, CA"
                 className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
@@ -145,7 +164,12 @@ export function JobForm({ job, onSubmit, onClose, isPending }: JobFormProps) {
               </label>
               <select
                 value={formData.locationType}
-                onChange={(e) => setFormData({ ...formData, locationType: e.target.value as any })}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    locationType: e.target.value as any,
+                  })
+                }
                 className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
               >
                 <option value="remote">Remote</option>
@@ -159,7 +183,12 @@ export function JobForm({ job, onSubmit, onClose, isPending }: JobFormProps) {
               </label>
               <select
                 value={formData.employmentType}
-                onChange={(e) => setFormData({ ...formData, employmentType: e.target.value as any })}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    employmentType: e.target.value as any,
+                  })
+                }
                 className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
               >
                 <option value="full-time">Full-time</option>
@@ -177,7 +206,12 @@ export function JobForm({ job, onSubmit, onClose, isPending }: JobFormProps) {
               </label>
               <select
                 value={formData.experienceLevel}
-                onChange={(e) => setFormData({ ...formData, experienceLevel: e.target.value as any })}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    experienceLevel: e.target.value as any,
+                  })
+                }
                 className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
               >
                 <option value="entry">Entry</option>
@@ -193,7 +227,9 @@ export function JobForm({ job, onSubmit, onClose, isPending }: JobFormProps) {
               </label>
               <select
                 value={formData.status}
-                onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
+                onChange={(e) =>
+                  setFormData({ ...formData, status: e.target.value as any })
+                }
                 className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
               >
                 <option value="draft">Draft</option>
@@ -211,7 +247,9 @@ export function JobForm({ job, onSubmit, onClose, isPending }: JobFormProps) {
             </label>
             <textarea
               value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, description: e.target.value })
+              }
               required
               rows={5}
               className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
@@ -229,9 +267,13 @@ export function JobForm({ job, onSubmit, onClose, isPending }: JobFormProps) {
                 value={requirementInput}
                 onChange={(e) => setRequirementInput(e.target.value)}
                 onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
+                  if (e.key === "Enter") {
                     e.preventDefault();
-                    addItem('requirements', requirementInput, setRequirementInput);
+                    addItem(
+                      "requirements",
+                      requirementInput,
+                      setRequirementInput
+                    );
                   }
                 }}
                 placeholder="Add a requirement and press Enter"
@@ -239,7 +281,9 @@ export function JobForm({ job, onSubmit, onClose, isPending }: JobFormProps) {
               />
               <button
                 type="button"
-                onClick={() => addItem('requirements', requirementInput, setRequirementInput)}
+                onClick={() =>
+                  addItem("requirements", requirementInput, setRequirementInput)
+                }
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
               >
                 Add
@@ -247,11 +291,14 @@ export function JobForm({ job, onSubmit, onClose, isPending }: JobFormProps) {
             </div>
             <div className="space-y-2">
               {formData.requirements?.map((req, index) => (
-                <div key={index} className="flex items-center gap-2 bg-gray-50 p-2 rounded">
+                <div
+                  key={index}
+                  className="flex items-center gap-2 bg-gray-50 p-2 rounded"
+                >
                   <span className="flex-1">{req}</span>
                   <button
                     type="button"
-                    onClick={() => removeItem('requirements', index)}
+                    onClick={() => removeItem("requirements", index)}
                     className="text-red-600 hover:text-red-800"
                   >
                     Remove
@@ -272,9 +319,13 @@ export function JobForm({ job, onSubmit, onClose, isPending }: JobFormProps) {
                 value={responsibilityInput}
                 onChange={(e) => setResponsibilityInput(e.target.value)}
                 onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
+                  if (e.key === "Enter") {
                     e.preventDefault();
-                    addItem('responsibilities', responsibilityInput, setResponsibilityInput);
+                    addItem(
+                      "responsibilities",
+                      responsibilityInput,
+                      setResponsibilityInput
+                    );
                   }
                 }}
                 placeholder="Add a responsibility and press Enter"
@@ -282,7 +333,13 @@ export function JobForm({ job, onSubmit, onClose, isPending }: JobFormProps) {
               />
               <button
                 type="button"
-                onClick={() => addItem('responsibilities', responsibilityInput, setResponsibilityInput)}
+                onClick={() =>
+                  addItem(
+                    "responsibilities",
+                    responsibilityInput,
+                    setResponsibilityInput
+                  )
+                }
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
               >
                 Add
@@ -290,11 +347,14 @@ export function JobForm({ job, onSubmit, onClose, isPending }: JobFormProps) {
             </div>
             <div className="space-y-2">
               {formData.responsibilities?.map((resp, index) => (
-                <div key={index} className="flex items-center gap-2 bg-gray-50 p-2 rounded">
+                <div
+                  key={index}
+                  className="flex items-center gap-2 bg-gray-50 p-2 rounded"
+                >
                   <span className="flex-1">{resp}</span>
                   <button
                     type="button"
-                    onClick={() => removeItem('responsibilities', index)}
+                    onClick={() => removeItem("responsibilities", index)}
                     className="text-red-600 hover:text-red-800"
                   >
                     Remove
@@ -315,17 +375,17 @@ export function JobForm({ job, onSubmit, onClose, isPending }: JobFormProps) {
                 value={tagInput}
                 onChange={(e) => setTagInput(e.target.value)}
                 onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
+                  if (e.key === "Enter") {
                     e.preventDefault();
-                    addItem('tags', tagInput, setTagInput);
+                    addItem("tags", tagInput, setTagInput);
                   }
                 }}
-                placeholder="Add tags (e.g., React, TypeScript)"
+                placeholder="Add tags (e.g.,  TypeScript)"
                 className="flex-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
               />
               <button
                 type="button"
-                onClick={() => addItem('tags', tagInput, setTagInput)}
+                onClick={() => addItem("tags", tagInput, setTagInput)}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
               >
                 Add
@@ -340,7 +400,7 @@ export function JobForm({ job, onSubmit, onClose, isPending }: JobFormProps) {
                   {tag}
                   <button
                     type="button"
-                    onClick={() => removeItem('tags', index)}
+                    onClick={() => removeItem("tags", index)}
                     className="text-blue-600 hover:text-blue-800"
                   >
                     ×
@@ -358,8 +418,10 @@ export function JobForm({ job, onSubmit, onClose, isPending }: JobFormProps) {
               </label>
               <input
                 type="text"
-                value={formData.department || ''}
-                onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+                value={formData.department || ""}
+                onChange={(e) =>
+                  setFormData({ ...formData, department: e.target.value })
+                }
                 className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -369,8 +431,10 @@ export function JobForm({ job, onSubmit, onClose, isPending }: JobFormProps) {
               </label>
               <input
                 type="url"
-                value={formData.applicationUrl || ''}
-                onChange={(e) => setFormData({ ...formData, applicationUrl: e.target.value })}
+                value={formData.applicationUrl || ""}
+                onChange={(e) =>
+                  setFormData({ ...formData, applicationUrl: e.target.value })
+                }
                 className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -390,7 +454,7 @@ export function JobForm({ job, onSubmit, onClose, isPending }: JobFormProps) {
               disabled={isPending}
               className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
             >
-              {isPending ? 'Saving...' : job ? 'Update Job' : 'Create Job'}
+              {isPending ? "Saving..." : job ? "Update Job" : "Create Job"}
             </button>
           </div>
         </form>

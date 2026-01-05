@@ -46,8 +46,7 @@ export const ResumePreview: React.FC<ResumePreviewProps> = ({
         trigger={
           <div className="space-y-4 hover:cursor-pointer hover:bg-gray-50 p-4 rounded-lg transition-colors">
             <h1 className="text-3xl font-bold text-gray-900">
-              {initialData.firstName}{" "}
-              {initialData.lastName}
+              {initialData.firstName} {initialData.lastName}
             </h1>
             {contactInfo && (
               <p className="text-lg text-gray-600 font-merriweather mt-2">
@@ -328,7 +327,7 @@ export const ResumePreview: React.FC<ResumePreviewProps> = ({
                   <SkillEditForm
                     initialData={data.hardSkill}
                     title="Technical Skills"
-                    placeholder="React, Python, AWS..."
+                    placeholder=" Python, AWS..."
                     onSave={(value) => {
                       createFieldHandler("hardSkill")(value);
                       onClose();

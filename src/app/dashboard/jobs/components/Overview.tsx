@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   ColumnFiltersState,
@@ -60,13 +60,13 @@ export default function Overview() {
   const router = useRouter();
   const [searchValue, setSearchValue] = useState("");
   const [isAutoFetching, setIsAutoFetching] = useState(false);
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(
     []
   );
   const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = React.useState({});
+    useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = useState({});
   const totalScoreRef = useRef<number>(0);
   const { data: user } = useQuery(userQueries.detail());
   // const noCredit = user?.credit === 0;
@@ -81,7 +81,7 @@ export default function Overview() {
   }, [user?.firstName]);
 
   useEffect(() => {
-      setUserCredit(Number(user?.credit ?? 0) === 0);
+    setUserCredit(Number(user?.credit ?? 0) === 0);
   }, [user?.credit]);
 
   const infiniteFilters = useMemo(

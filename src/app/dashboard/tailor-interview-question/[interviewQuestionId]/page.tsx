@@ -1,4 +1,3 @@
-import React from "react";
 import { TailorInterviewQuestion } from "./TailorInterviewQuestion";
 import { createServerQueryClient } from "@/lib/query/prefetch";
 import { interviewQuestionQueries } from "@/lib/queries/interview.queries";

@@ -1,4 +1,3 @@
-import React from "react";
 import Settings from "./Settings";
 import { requireOnboarding } from "@/lib/server-auth";
 import { createServerQueryClient } from "@/lib/query/prefetch";

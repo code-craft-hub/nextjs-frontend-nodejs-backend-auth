@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -113,7 +113,7 @@ const TailorCoverLetterDisplay = ({
   });
 
   // Reset form when dialog opens with latest data
-  React.useEffect(() => {
+  useEffect(() => {
     if (isDialogOpen && currentData) {
       form.reset({
         title: currentData.title || "",

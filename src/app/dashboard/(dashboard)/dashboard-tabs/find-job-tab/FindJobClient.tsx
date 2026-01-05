@@ -13,7 +13,7 @@ import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { JobType } from "@/types";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { jobsQueries } from "@/lib/queries/jobs.queries";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { JobFilters } from "@/lib/types/jobs";
 import { ReportCard } from "@/app/dashboard/jobs/components/ReportCard";

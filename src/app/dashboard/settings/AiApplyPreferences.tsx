@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import React, { JSX, useState } from "react";
+import { JSX, useState } from "react";
 import AuthorizeGoogle from "./(google-gmail-authorization)/AuthorizeGoogle";
 import { userQueries } from "@/lib/queries/user.queries";
 import { useQuery } from "@tanstack/react-query";
@@ -332,8 +332,9 @@ export const AiApplyPreferences: React.FC = () => {
                   <p className="text-2xs text-gray-400 mt-1 max-w-xl">
                     &ldquo;We are still in the process of verifying our Gmail
                     integration, so you will get a message saying &ldquo;Google
-                    hasn&apos;t verified this app&ldquo; Please click on &ldquo;Advance&ldquo; and
-                    continue to give access of sending emails to Cver AI&ldquo;
+                    hasn&apos;t verified this app&ldquo; Please click on
+                    &ldquo;Advance&ldquo; and continue to give access of sending
+                    emails to Cver AI&ldquo;
                   </p>
                 )}
               </div>

@@ -1,4 +1,3 @@
-import React from "react";
 import Preview from "./Preview";
 import { HydrationBoundary } from "@/components/hydration-boundary";
 import { dehydrate } from "@tanstack/react-query";

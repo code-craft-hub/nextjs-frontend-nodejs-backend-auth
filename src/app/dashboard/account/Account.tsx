@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { UserProfileForm } from "./user-profile-update";
 import { PasswordUpdateForm } from "./user-password-update";
 import { cn } from "@/lib/utils";

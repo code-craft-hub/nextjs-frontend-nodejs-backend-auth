@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import { useCallback, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { userQueries } from "@/lib/queries/user.queries";
 import AuthorizeGoogle from "./(google-gmail-authorization)/AuthorizeGoogle";

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import { ReactNode, useEffect, useMemo, useState } from "react";
 import {
   ColumnFiltersState,
   flexRender,
@@ -34,7 +34,7 @@ import { sendGTMEvent } from "@next/third-parties/google";
 export const AIRecommendations = ({
   children,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
 }) => {
   const { data: user } = useQuery(userQueries.detail());
   const userDataSource = getDataSource(user);
@@ -43,14 +43,14 @@ export const AIRecommendations = ({
   const [searchValue, _setSearchValue] = useState(() => ({
     title: userJobTitlePreference,
   }));
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(
     []
   );
   const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
+    useState<VisibilityState>({});
 
-  const [rowSelection, setRowSelection] = React.useState({});
+  const [rowSelection, setRowSelection] = useState({});
 
   useEffect(() => {
     if (user?.firstName)
@@ -82,24 +82,23 @@ export const AIRecommendations = ({
   const allJobs = useMemo(() => {
     const jobs = data?.pages.flatMap((page) => page.data) ?? [];
 
-    return jobs
-      .map((job) => {
-        const jobContent = job?.title + " " + job?.descriptionText;
+    return jobs.map((job) => {
+      const jobContent = job?.title + " " + job?.descriptionText;
 
-        const completeMatch = jobMatcher.calculateMatch(
-          userJobTitlePreference,
-          jobContent || ""
-        );
-        return {
-          ...job,
-          isBookmarked: bookmarkedIdSet?.has(job?.id),
-          matchPercentage: completeMatch?.score?.toString(),
-          matchDetails: completeMatch,
-        };
-      })
-      // .sort((a, b) => {
-      //   return parseInt(b?.createdAt) - parseInt(a?.createdAt);
-      // });
+      const completeMatch = jobMatcher.calculateMatch(
+        userJobTitlePreference,
+        jobContent || ""
+      );
+      return {
+        ...job,
+        isBookmarked: bookmarkedIdSet?.has(job?.id),
+        matchPercentage: completeMatch?.score?.toString(),
+        matchDetails: completeMatch,
+      };
+    });
+    // .sort((a, b) => {
+    //   return parseInt(b?.createdAt) - parseInt(a?.createdAt);
+    // });
   }, [data, user?.bookmarkedJobs?.length, user?.appliedJobs?.length]);
 
   const handleApply = async ({

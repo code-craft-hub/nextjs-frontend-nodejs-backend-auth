@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo } from "react";
+import { ReactNode, useEffect, useMemo, useState } from "react";
 import {
   ColumnFiltersState,
   flexRender,
@@ -35,27 +35,25 @@ import { JobType } from "@/types";
 import MobileOverview from "../components/MobileOverview";
 import { sendGTMEvent } from "@next/third-parties/google";
 
-export const SavedJobs = ({ children }: { children: React.ReactNode }) => {
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+export const SavedJobs = ({ children }: { children: ReactNode }) => {
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(
     []
   );
   const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
+    useState<VisibilityState>({});
 
-  const [rowSelection, setRowSelection] = React.useState({});
+  const [rowSelection, setRowSelection] = useState({});
 
   const { data: user } = useQuery(userQueries.detail());
 
-
-
-        useEffect(() => {
-        if (user?.firstName)
-          sendGTMEvent({
-            event: `Saved Jobs Page`,
-            value: `${user?.firstName} viewed Saved Jobs Page`,
-          });
-      }, [user?.firstName]);
+  useEffect(() => {
+    if (user?.firstName)
+      sendGTMEvent({
+        event: `Saved Jobs Page`,
+        value: `${user?.firstName} viewed Saved Jobs Page`,
+      });
+  }, [user?.firstName]);
   const userDataSource = getDataSource(user);
   const userJobTitlePreference =
     userDataSource?.key || userDataSource?.title || "";

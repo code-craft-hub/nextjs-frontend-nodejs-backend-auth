@@ -1,11 +1,17 @@
-
 "use client";
-import React, { useState, useCallback } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { Upload, FileText, FileCheck, Loader2, X, ImageIcon } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { useState, useCallback } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import {
+  Upload,
+  FileText,
+  FileCheck,
+  Loader2,
+  X,
+  ImageIcon,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -14,8 +20,8 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+} from "@/components/ui/form";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 // ============================================================================
 // TYPES & SCHEMAS
@@ -24,8 +30,8 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 const formSchema = z.object({
   extractedText: z
     .string()
-    .min(1, { message: 'Please upload a document to extract text.' })
-    .max(50000, { message: 'Extracted text exceeds maximum length.' }),
+    .min(1, { message: "Please upload a document to extract text." })
+    .max(50000, { message: "Extracted text exceeds maximum length." }),
   metadata: z
     .object({
       fileName: z.string(),
@@ -52,28 +58,28 @@ interface ExtractionResult {
 // API SERVICE
 // ============================================================================
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_AUTH_API_URL+"/extract" || 'http://localhost:3000/api';
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_AUTH_API_URL + "/extract" ||
+  "http://localhost:3000/api";
 
 const extractDocumentText = async (
   file: File,
-  language: string = 'eng'
+  language: string = "eng"
 ): Promise<ExtractionResult> => {
   const formData = new FormData();
-  formData.append('file', file);
-  formData.append('language', language);
-  formData.append('sanitize', 'true');
-
-
+  formData.append("file", file);
+  formData.append("language", language);
+  formData.append("sanitize", "true");
 
   const response = await fetch(API_BASE_URL, {
-    method: 'POST',
+    method: "POST",
     body: formData,
     credentials: "include",
   });
 
   if (!response.ok) {
     const error = await response.json();
-    throw new Error(error.error || 'Failed to extract text');
+    throw new Error(error.error || "Failed to extract text");
   }
 
   const result = await response.json();
@@ -166,8 +172,12 @@ const FileUploadZone: React.FC<FileUploadZoneProps> = ({
       onDrop={handleDrop}
       className={`
         border-2 border-dashed rounded-lg p-8 text-center transition-colors
-        ${isDragging ? 'border-blue-500 bg-blue-50' : 'border-slate-300'}
-        ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:border-blue-400'}
+        ${isDragging ? "border-blue-500 bg-blue-50" : "border-slate-300"}
+        ${
+          disabled
+            ? "opacity-50 cursor-not-allowed"
+            : "cursor-pointer hover:border-blue-400"
+        }
       `}
     >
       <input
@@ -180,7 +190,9 @@ const FileUploadZone: React.FC<FileUploadZoneProps> = ({
       />
       <label
         htmlFor="file-upload"
-        className={`flex flex-col items-center gap-3 ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+        className={`flex flex-col items-center gap-3 ${
+          disabled ? "cursor-not-allowed" : "cursor-pointer"
+        }`}
       >
         <div className="flex gap-2">
           <ImageIcon className="w-8 h-8 text-slate-400" />
@@ -212,7 +224,7 @@ export const AnyFormatToTextTalksToBackend = () => {
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      extractedText: '',
+      extractedText: "",
       metadata: undefined,
     },
   });
@@ -226,17 +238,18 @@ export const AnyFormatToTextTalksToBackend = () => {
       try {
         const result = await extractDocumentText(file);
 
-        form.setValue('extractedText', result.text);
-        form.setValue('metadata', {
+        form.setValue("extractedText", result.text);
+        form.setValue("metadata", {
           fileName: result.fileName,
           fileType: result.fileType,
           pageCount: result.pageCount,
           confidence: result.confidence,
           extractedAt: new Date(result.extractedAt),
         });
-        form.trigger('extractedText');
+        form.trigger("extractedText");
       } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
+        const errorMessage =
+          err instanceof Error ? err.message : "Unknown error occurred";
         setError(errorMessage);
       } finally {
         setIsProcessing(false);
@@ -251,15 +264,17 @@ export const AnyFormatToTextTalksToBackend = () => {
     form.reset();
   }, [form]);
 
-  const onSubmit = useCallback(() => {
-  }, []);
+  const onSubmit = useCallback(() => {}, []);
 
   return (
     <div className="max-w-3xl mx-auto p-6 space-y-6">
       <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight">Document Text Extractor</h1>
+        <h1 className="text-3xl font-bold tracking-tight">
+          Document Text Extractor
+        </h1>
         <p className="text-slate-600">
-          Upload an image, PDF, or Word document to extract and edit its text content.
+          Upload an image, PDF, or Word document to extract and edit its text
+          content.
         </p>
       </div>
 
@@ -308,37 +323,42 @@ export const AnyFormatToTextTalksToBackend = () => {
             )}
           />
 
-          {form.getValues('metadata') && (
+          {form.getValues("metadata") && (
             <div className="text-xs text-slate-500 space-y-1 p-3 bg-slate-50 rounded">
               <p>
-                <strong>File:</strong> {form.getValues('metadata')?.fileName}
+                <strong>File:</strong> {form.getValues("metadata")?.fileName}
               </p>
               <p>
-                <strong>Type:</strong> {form.getValues('metadata')?.fileType}
+                <strong>Type:</strong> {form.getValues("metadata")?.fileType}
               </p>
-              {form.getValues('metadata')?.pageCount && (
+              {form.getValues("metadata")?.pageCount && (
                 <p>
-                  <strong>Pages:</strong> {form.getValues('metadata')?.pageCount}
+                  <strong>Pages:</strong>{" "}
+                  {form.getValues("metadata")?.pageCount}
                 </p>
               )}
-              {form.getValues('metadata')?.confidence && (
+              {form.getValues("metadata")?.confidence && (
                 <p>
-                  <strong>OCR Confidence:</strong>{' '}
-                  {form.getValues('metadata')?.confidence?.toFixed(2)}%
+                  <strong>OCR Confidence:</strong>{" "}
+                  {form.getValues("metadata")?.confidence?.toFixed(2)}%
                 </p>
               )}
               <p>
-                <strong>Extracted:</strong>{' '}
-                {form.getValues('metadata')?.extractedAt.toLocaleString()}
+                <strong>Extracted:</strong>{" "}
+                {form.getValues("metadata")?.extractedAt.toLocaleString()}
               </p>
             </div>
           )}
 
-          <Button type="submit" disabled={isProcessing || !form.formState.isValid} className="w-full">
+          <Button
+            type="submit"
+            disabled={isProcessing || !form.formState.isValid}
+            className="w-full"
+          >
             Submit Extracted Text
           </Button>
         </form>
       </Form>
     </div>
   );
-}
+};
