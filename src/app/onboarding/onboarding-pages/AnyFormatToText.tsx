@@ -66,6 +66,54 @@ type FormSchema = z.infer<typeof formSchema>;
 
 class TextExtractionService {
   /**
+   * Extract text from PDF using pdf.js
+   * Handles both text-based and scanned PDFs
+   */
+  private static async extractFromPDF(file: File): Promise<string> {
+    if (typeof window === "undefined") {
+      return "";
+    }
+    try {
+      // Set worker path for PDF.js
+      pdfjsLib.GlobalWorkerOptions.workerSrc =
+        "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/5.4.149/pdf.worker.min.mjs";
+
+      const arrayBuffer = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+
+      const textParts: string[] = [];
+
+      // Extract text from each page
+      for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+        const page = await pdf.getPage(pageNum);
+        const textContent = await page.getTextContent();
+
+        const pageText = textContent.items
+          .map((item: any) => ("str" in item ? item.str : ""))
+          .filter(Boolean)
+          .join(" ");
+
+        if (pageText.trim()) {
+          textParts.push(`\n${pageText}\n`);
+        }
+      }
+
+      if (textParts.length === 0) {
+        throw new Error(
+          "No text found in PDF. This may be a scanned document requiring OCR, " +
+            "or the PDF may be empty."
+        );
+      }
+
+      return textParts.join("\n");
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown PDF error";
+      throw new Error(`Failed to extract text from PDF: ${errorMessage}`);
+    }
+  }
+
+  /**
    * Validates file type and size before processing
    */
   static validateFile(file: File): { valid: boolean; error?: string } {
@@ -146,51 +194,6 @@ class TextExtractionService {
       const errorMessage =
         error instanceof Error ? error.message : "Unknown OCR error";
       throw new Error(`Failed to extract text from image: ${errorMessage}`);
-    }
-  }
-
-  /**
-   * Extract text from PDF using pdf.js
-   * Handles both text-based and scanned PDFs
-   */
-  private static async extractFromPDF(file: File): Promise<string> {
-    try {
-      // Set worker path for PDF.js
-      pdfjsLib.GlobalWorkerOptions.workerSrc =
-        "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/5.4.149/pdf.worker.min.mjs";
-
-      const arrayBuffer = await file.arrayBuffer();
-      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-
-      const textParts: string[] = [];
-
-      // Extract text from each page
-      for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-        const page = await pdf.getPage(pageNum);
-        const textContent = await page.getTextContent();
-
-        const pageText = textContent.items
-          .map((item: any) => ("str" in item ? item.str : ""))
-          .filter(Boolean)
-          .join(" ");
-
-        if (pageText.trim()) {
-          textParts.push(`\n${pageText}\n`);
-        }
-      }
-
-      if (textParts.length === 0) {
-        throw new Error(
-          "No text found in PDF. This may be a scanned document requiring OCR, " +
-            "or the PDF may be empty."
-        );
-      }
-
-      return textParts.join("\n");
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Unknown PDF error";
-      throw new Error(`Failed to extract text from PDF: ${errorMessage}`);
     }
   }
 
@@ -544,7 +547,7 @@ export const DocumentTextExtractor = () => {
                   <textarea
                     {...field}
                     placeholder="Extracted text will appear here..."
-                    className="w-full min-h-[300px] p-3 border rounded-lg resize-y font-mono text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full min-h-75 p-3 border rounded-lg resize-y font-mono text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     disabled={isProcessing}
                   />
                 </FormControl>
