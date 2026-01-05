@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { jwtVerify } from "jose";
-import { IUser } from "./types";
-import { getJwtSecret } from "./lib/utils/helpers";
+import { IUser } from "./src/types";
+import { getJwtSecret } from "./src/lib/utils/helpers";
 
 async function verifySessionToken(
   token: string

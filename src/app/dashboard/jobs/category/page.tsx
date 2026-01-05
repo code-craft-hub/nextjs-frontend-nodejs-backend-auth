@@ -1,5 +1,4 @@
 import { Category } from "./CategoryClient";
-import { requireOnboarding } from "@/lib/server-auth";
 import { createServerQueryClient } from "@/lib/query/prefetch";
 import { userQueries } from "@/lib/queries/user.queries";
 import { jobsQueries } from "@/lib/queries/jobs.queries";
@@ -9,7 +8,6 @@ import { getDataSource } from "@/lib/utils/helpers";
 import { getCookiesToken } from "@/lib/auth.utils";
 
 const CategoryPage = async ({ searchParams }: any) => {
-  await requireOnboarding();
   const tab = (await searchParams)?.tab;
   const token = (await getCookiesToken()) ?? "";
 
