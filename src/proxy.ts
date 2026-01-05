@@ -32,7 +32,7 @@ const protectedPaths = ["/dashboard/home"];
 const verifyEmailPath = "/verify-email";
 const onboardingPath = "/onboarding";
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (
