@@ -3,8 +3,8 @@ import { useEffect, useState } from "react";
 import { UserProfileForm } from "./user-profile-update";
 import { PasswordUpdateForm } from "./user-password-update";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { apiService } from "@/hooks/use-auth";
+// import { Button } from "@/components/ui/button";
+// import { apiService } from "@/hooks/use-auth";
 import { Billing } from "./billing/Billing";
 import { CreditCard, Shield, User2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
@@ -34,7 +34,7 @@ export const AccountClient = ({ tab, reference }: any) => {
 
   return (
     <div className="space-y-4 sm:space-y-8">
-      <div className="flex justify-center items-center w-full bg-white shadow-2xl rounded-full p-1 px-1.5 max-w-screen-lg mx-auto font-roboto">
+      <div className="flex justify-center items-center w-full bg-white shadow-2xl rounded-full p-1 px-1.5 max-w-5xl mx-auto font-roboto">
         {tabs.map((tab) => (
           <div
             key={tab.id}
@@ -62,7 +62,7 @@ export const AccountClient = ({ tab, reference }: any) => {
         <PasswordUpdateForm />
       )}
 
-      <Button
+      {/* <Button
         onClick={async () => {
           await apiService.deleteUser();
         }}
@@ -70,7 +70,7 @@ export const AccountClient = ({ tab, reference }: any) => {
         className=""
       >
         Delete Account
-      </Button>
+      </Button> */}
     </div>
   );
 };
