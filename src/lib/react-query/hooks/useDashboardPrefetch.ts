@@ -25,6 +25,5 @@ export function useDashboardPrefetch({
       filters,
       autoApplyFilters,
     });
-    console.count("useDashboardPrefetch Rendered");
   }, [queryClient, filters, autoApplyFilters, enabled]);
 }

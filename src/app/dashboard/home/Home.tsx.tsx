@@ -47,7 +47,6 @@ export const HomeClient = memo(
       autoApplyFilters,
     });
 
-    console.count("Home Client Rendered");
     return (
       <>
         <TopGradient />

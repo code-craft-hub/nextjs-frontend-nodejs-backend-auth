@@ -1,6 +1,6 @@
 // import { createServerQueryClient } from "@/lib/query/prefetch";
 // import { userQueries } from "@/lib/queries/user.queries";
-// import Overview from "./components/Overview";
+import Overview from "./components/Overview";
 // import { jobsQueries } from "@/lib/queries/jobs.queries";
 // import { JobFilters } from "@/lib/types/jobs";
 // import { HydrationBoundary } from "@/components/hydration-boundary";
@@ -23,10 +23,7 @@ const JobListingsPage = async () => {
   // );
   return (
     <div className="p-4 sm:p-8">
-      JOb
-      {/* <HydrationBoundary state={dehydrate(queryClient)}>
         <Overview />
-      </HydrationBoundary> */}
     </div>
   );
 };
