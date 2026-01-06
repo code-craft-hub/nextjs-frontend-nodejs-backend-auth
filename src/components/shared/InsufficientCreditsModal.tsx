@@ -48,15 +48,9 @@ export default function InsufficientCreditsModal({
       ? true
       : new Date(formatFirestoreDate(currentUser?.expiryTime)) < new Date();
 
-  // console.log(
-  //   currentUser?.expiryTime,
-  //   currentUser?.isEligibleForReward,
-  //   isCreditExpired
-  // );
   useEffect(() => {
     getUserData();
     if (currentUser === null) return;
-    console.log(currentUser?.expiryTime, isCreditExpired);
     if (isCreditExpired) {
       console.warn(`${currentUser?.firstName} has insufficient credits.`);
       updateUser.mutate(

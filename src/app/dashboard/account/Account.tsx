@@ -13,6 +13,7 @@ import { formatFirestoreDate } from "@/lib/utils/helpers";
 import { Button } from "@/components/ui/button";
 import { apiService } from "@/hooks/use-auth";
 import InsufficientCreditsModal from "@/components/shared/InsufficientCreditsModal";
+import { CompletedPaymentModal } from "@/components/shared/CompletedPaymentModal";
 
 export const AccountClient = ({
   tab,
@@ -25,6 +26,11 @@ export const AccountClient = ({
 }) => {
   const [currentTab, setCurrentTab] = useState(!!tab ? tab : "account");
   const { data: user } = useQuery(userQueries.detail());
+  const [open, setOpen] = useState(false);
+  const handleDialogOpenChange = (isOpen: boolean) => {
+    setOpen(isOpen);
+  };
+
   const { start: startConfetti } = useFireworksConfetti();
   const isCreditExpired =
     user?.expiryTime === undefined
@@ -54,10 +60,10 @@ export const AccountClient = ({
   useEffect(() => {
     if (event === "subscription_success") {
       startConfetti();
+      handleDialogOpenChange(true);
     }
   }, []);
 
-  console.log("Accounts page");
   return (
     <div className="space-y-4 sm:space-y-8">
       <div className="flex justify-center items-center w-full bg-white shadow-2xl rounded-full p-1 px-1.5 max-w-5xl mx-auto font-roboto">
@@ -97,6 +103,10 @@ export const AccountClient = ({
           Delete Account
         </Button>
       )}
+      <CompletedPaymentModal
+        open={open}
+        onOpenChange={handleDialogOpenChange}
+      />
       <InsufficientCreditsModal hidden={true} />
     </div>
   );
