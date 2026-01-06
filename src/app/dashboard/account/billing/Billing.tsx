@@ -54,7 +54,7 @@ export const Billing = ({
         handleShowPlan={handleShowPlan}
       />
     ) : (
-      <div className="flex flex-col items-center gap-[30px] relative ">
+      <div className="flex flex-col items-center max-w-5xl mx-auto gap-[30px] relative ">
         <section className="bg-gradient-to-b space-y-4 from-[#FF9A56] to-[#FF6B35] rounded-[12px] w-full p-4 sm:p-8">
           <div className="flex gap-4 justify-between w-full">
             <div className="text-white space-y-2">

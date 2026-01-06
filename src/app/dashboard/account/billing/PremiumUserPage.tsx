@@ -71,7 +71,7 @@ export function PremiumUserPage() {
             </div>
 
             {/* Right Section - Days Counter */}
-            <div className="bg-white/20 rounded-xl px-6 py-4 text-center sm:min-w-[140px]">
+            <div className="bg-white/20 rounded-xl px-6 py-4 text-center sm:min-w-35">
               <div className="text-4xl font-bold">
                 {daysFromToday(user?.expiryTime)}
               </div>
@@ -167,7 +167,7 @@ export function PremiumUserPage() {
 
         {/* Cancellation Policy */}
         <div className="bg-[#FFFBEB] border border-[#FEE685] rounded-xl p-5 flex gap-4">
-          <div className="flex-shrink-0">
+          <div className="shrink-0">
             <div className="w-6 h-6 rounded-full bg-[#F59E0B] flex items-center justify-center">
               <svg
                 className="w-4 h-4 text-white"

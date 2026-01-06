@@ -86,6 +86,7 @@ const AuthorizeGoogle: React.FC<{
   useEffect(() => {
     const callCheckAuthOnce = async () => {
       const checkValue = await handleCheckAuthStatus();
+      console.log("Gmail Authorization Status:", checkValue);
       if (checkAuth) {
         checkAuth(checkValue);
       }

@@ -112,10 +112,10 @@ export const UserProfileForm: React.FC = () => {
                 </AvatarFallback>
               </Avatar>
               <div>
-                <h2 className="font-medium text-[17.32px] leading-[21px] text-black">
+                <h2 className="font-medium text-[17.32px] leading-5.25 text-black">
                   {user?.firstName} {user?.lastName}
                 </h2>
-                <p className="font-normal text-[13.85px] leading-[17px] text-black opacity-50">
+                <p className="font-normal text-[13.85px] leading-4.25 text-black opacity-50">
                   {user?.email}
                 </p>
               </div>

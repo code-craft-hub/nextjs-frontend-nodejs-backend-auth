@@ -8,18 +8,34 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { useUpdateUserMutation } from "@/lib/mutations/user.mutations";
 import { userQueries } from "@/lib/queries/user.queries";
 import { formatFirestoreDate } from "@/lib/utils/helpers";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function InsufficientCreditsModal() {
   const router = useRouter();
+  const updateUser = useUpdateUserMutation();
+
   const { data: user } = useQuery(userQueries.detail());
   const isCreditExpired =
     user?.expiryTime === undefined
       ? true
       : new Date(formatFirestoreDate(user?.expiryTime)) < new Date();
+
+  useEffect(() => {
+    if (isCreditExpired) {
+      console.warn(`${user?.firstName} has insufficient credits.`);
+      updateUser.mutate({
+        data: {
+          credit: 0,
+          isPro: false,
+        },
+      });
+    }
+  }, []);
 
   return (
     isCreditExpired && (
