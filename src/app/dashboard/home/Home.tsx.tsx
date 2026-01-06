@@ -14,9 +14,18 @@ import { useQuery } from "@tanstack/react-query";
 import { sendGTMEvent } from "@next/third-parties/google";
 import { getDataSource } from "@/lib/utils/helpers";
 import { useDashboardPrefetch } from "@/lib/react-query/hooks/useDashboardPrefetch";
+import InsufficientCreditsModal from "@/components/shared/InsufficientCreditsModal";
 
 export const HomeClient = memo(
-  ({ tab, jobDescription }: { tab: DashboardTab; jobDescription: string }) => {
+  ({
+    tab,
+    jobDescription,
+    isCreditExpired,
+  }: {
+    tab: DashboardTab;
+    jobDescription: string;
+    isCreditExpired: boolean;
+  }) => {
     const { data: user } = useQuery(userQueries.detail());
     const title = getDataSource(user)?.title;
     const rolesOfInterest = getDataSource(user)?.rolesOfInterest?.map(
@@ -47,10 +56,11 @@ export const HomeClient = memo(
       autoApplyFilters,
     });
 
+    console.log("Home : ", isCreditExpired)
     return (
       <>
         <TopGradient />
-
+        {isCreditExpired && <InsufficientCreditsModal />}
         <div className="container">
           <div className="w-full mt-4"></div>
           <Tabs

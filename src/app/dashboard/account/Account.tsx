@@ -11,7 +11,15 @@ import { useQuery } from "@tanstack/react-query";
 import { userQueries } from "@/lib/queries/user.queries";
 import { sendGTMEvent } from "@next/third-parties/google";
 
-export const AccountClient = ({ tab, reference }: any) => {
+export const AccountClient = ({
+  tab,
+  reference,
+  isCreditExpired,
+}: {
+  tab: string;
+  reference: string;
+  isCreditExpired: boolean;
+}) => {
   const [currentTab, setCurrentTab] = useState(!!tab ? tab : "account");
   const { data: user } = useQuery(userQueries.detail());
   const handleTabChange = (value: string) => {
@@ -57,7 +65,7 @@ export const AccountClient = ({ tab, reference }: any) => {
       {currentTab === "account" || currentTab === undefined ? (
         <UserProfileForm />
       ) : currentTab === "billing" ? (
-        <Billing reference={reference} />
+        <Billing reference={reference} isCreditExpired={isCreditExpired} />
       ) : (
         <PasswordUpdateForm />
       )}

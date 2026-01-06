@@ -6,6 +6,7 @@ import { api } from "@/lib/api/client";
 import { redirect } from "next/navigation";
 import { AccountClient } from "./Account";
 import { getCookiesToken } from "@/lib/auth.utils";
+import { formatFirestoreDate } from "@/lib/utils/helpers";
 
 const AccountPage = async ({ searchParams }: any) => {
   const tab = (await searchParams)?.tab;
@@ -50,10 +51,13 @@ const AccountPage = async ({ searchParams }: any) => {
     redirect(`/dashboard/account?tab=${tab || "billing"}`);
   }
 
+    const isCreditExpired =
+      new Date(formatFirestoreDate(user?.expiryTime)) < new Date();
+
   return (
     <div className="p-4 sm:p-8">
       <HydrationBoundary state={dehydrate(queryClient)}>
-        <AccountClient tab={tab} reference={reference} />
+        <AccountClient tab={tab} reference={reference} isCreditExpired={isCreditExpired} />
       </HydrationBoundary>
     </div>
   );
