@@ -41,7 +41,11 @@ import { jobMatcher } from "@/services/job-matcher";
 import { sendGTMEvent } from "@next/third-parties/google";
 // import InsufficientCreditsModal from "@/components/shared/InsufficientCreditsModal";
 import { userQueries } from "@/lib/queries/user.queries";
-import { OverviewColumn, OverviewSkeleton } from "./OverviewColumn";
+import {
+  OverviewColumn,
+  OverviewEmpty,
+  OverviewSkeleton,
+} from "./OverviewColumn";
 import MobileOverview from "./MobileOverview";
 
 export default function Overview() {
@@ -97,8 +101,15 @@ export default function Overview() {
     [appliedJobsIds]
   );
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useInfiniteQuery(jobsQueries?.infinite(infiniteFilters));
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isLoading,
+    isFetching,
+    isRefetching,
+    isFetchingNextPage,
+  } = useInfiniteQuery(jobsQueries?.infinite(infiniteFilters));
 
   const allJobs = useMemo(() => {
     const jobs = data?.pages.flatMap((page) => page.data) ?? [];
@@ -213,6 +224,12 @@ export default function Overview() {
     },
   });
 
+  const resetSearchToDefault = () => {
+    setSearchValue("");
+    table.getColumn("title")?.setFilterValue(undefined);
+    setIsAutoFetching(false);
+  };
+
   const onSubmit = async ({ username }: any) => {
     const trimmedSearch = username.trim();
     sendGTMEvent({
@@ -232,8 +249,12 @@ export default function Overview() {
     setIsAutoFetching(false);
   };
   const visibleRows = table.getRowModel().rows;
-  const hasNoResults = visibleRows.length === 0;
-  const isSearching = isAutoFetching || isFetchingNextPage;
+  // const isSearching = isAutoFetching || isFetchingNextPage;
+  const isSearching =
+    isLoading || isFetching || isRefetching || isFetchingNextPage;
+
+  const hasNoResults =
+    !isSearching && (data?.pages?.[0]?.data?.length ?? 0) === 0;
 
   return (
     <div className="lg:gap-6 lg:flex ">
@@ -312,17 +333,28 @@ export default function Overview() {
         <div className="hidden lg:grid grid-cols-1">
           <Table>
             <TableBody>
-              {visibleRows.length ? (
+              {isSearching ? (
+                <div className="grid gap-4">
+                  {Array.from({ length: 4 }).map((_, index) => (
+                    <OverviewSkeleton key={index} />
+                  ))}
+                </div>
+              ) : hasNoResults ? (
+                <div className="flex flex-col gap-1 text-muted-foreground">
+                  <OverviewEmpty
+                    searchValue={searchValue}
+                    resetSearchToDefault={resetSearchToDefault}
+                  />
+                </div>
+              ) : (
                 visibleRows.map((row) => (
                   <TableRow
-                    onClick={() => {
+                    key={row.id}
+                    onClick={() =>
                       router.push(
                         `/dashboard/jobs/${row.original.id}?referrer=jobs&title=${row.original.title}`
-                      );
-                    }}
-                    key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
-                    className="hover:bg-white border-b rounded-3xl! hover:border-primary hover:border-2 hover:rounded-2xl hover:cursor-pointer"
+                      )
+                    }
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id}>
@@ -334,35 +366,6 @@ export default function Overview() {
                     ))}
                   </TableRow>
                 ))
-              ) : (
-                <TableRow>
-                  <TableCell
-                    colSpan={columns.length}
-                    className="h-24 text-center"
-                  >
-                    {isSearching || isFetchingNextPage ? (
-                      <div className="flex items-center justify-center gap-2">
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        <span>Searching for matching jobs...</span>
-                      </div>
-                    ) : hasNoResults && !hasNextPage ? (
-                      isSearching ? (
-                        "Searching ... "
-                      ) : (
-                        <div className="grid gap-4">
-                          {Array.from({ length: 5 }).map((_, index) => (
-                            <OverviewSkeleton key={index} />
-                          ))}
-                        </div>
-                      )
-                    ) : (
-                      <span>No results.</span>
-                    )}
-                    {/*  <span>
-                       No results found. All data has been searched.
-                     </span> */}
-                  </TableCell>
-                </TableRow>
               )}
             </TableBody>
           </Table>

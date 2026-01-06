@@ -1,4 +1,3 @@
-
 "use client";
 import { Button } from "@/components/ui/button";
 
@@ -7,6 +6,7 @@ import {
   BookmarkIcon,
   Calendar,
   DollarSign,
+  FolderOpen,
   MapPin,
   Sparkles,
 } from "lucide-react";
@@ -16,7 +16,14 @@ import { Toggle } from "@/components/ui/toggle";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { PiOfficeChairFill } from "react-icons/pi";
 import { Skeleton } from "@/components/ui/skeleton";
-
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 export const OverviewColumn = ({
   updateJobs,
   handleApply,
@@ -157,8 +164,6 @@ export const OverviewColumn = ({
   },
 ];
 
-
-
 export function OverviewSkeleton() {
   return (
     <div className="flex items-center space-x-4">
@@ -168,5 +173,34 @@ export function OverviewSkeleton() {
         <Skeleton className="h-6 w-full bg-white" />
       </div>
     </div>
-  )
+  );
+}
+
+export function OverviewEmpty({
+  searchValue,
+  resetSearchToDefault,
+}: {
+  searchValue?: string;
+  resetSearchToDefault?: () => void;
+}) {
+  return (
+    <Empty>
+      <EmptyHeader>
+        <EmptyMedia variant="icon">
+          <FolderOpen />
+        </EmptyMedia>
+        <EmptyTitle> No jobs found for &apos;{searchValue}&apos;</EmptyTitle>
+        <EmptyDescription>
+          Try a different keyword or broaden your search.
+        </EmptyDescription>
+      </EmptyHeader>
+      <EmptyContent>
+        <div className="flex">
+          <Button onClick={resetSearchToDefault} variant="outline">
+            Reset Search
+          </Button>
+        </div>
+      </EmptyContent>
+    </Empty>
+  );
 }
