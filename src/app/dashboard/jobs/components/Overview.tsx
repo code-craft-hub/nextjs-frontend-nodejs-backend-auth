@@ -48,11 +48,7 @@ import {
 } from "./OverviewColumn";
 import MobileOverview from "./MobileOverview";
 
-export default function Overview({
-  isCreditExpired,
-}: {
-  isCreditExpired: boolean;
-}) {
+export default function Overview() {
   const router = useRouter();
   const [searchValue, setSearchValue] = useState("");
   const [isAutoFetching, setIsAutoFetching] = useState(false);
@@ -262,8 +258,6 @@ export default function Overview({
 
   return (
     <div className="lg:gap-6 lg:flex ">
-      {isCreditExpired && <InsufficientCreditsModal />}
-
       <div className="bg-white p-3 h-fit rounded-md hidden lg:flex lg:flex-col gap-1">
         {leftMenuItems.map((item) => (
           <div
@@ -402,6 +396,7 @@ export default function Overview({
           </div>
         )}
       </div>
+      <InsufficientCreditsModal />
     </div>
   );
 }

@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { useConfirm } from "@/hooks/use-confirm";
 import { toast } from "sonner";
 
-export function ProModal() {
+export function PremiumUserPage() {
   const [autoRenewal, setAutoRenewal] = useState(true);
   const { data: user } = useQuery(userQueries.detail());
 

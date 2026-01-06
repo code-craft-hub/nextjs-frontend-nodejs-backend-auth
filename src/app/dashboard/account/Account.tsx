@@ -10,18 +10,26 @@ import { CreditCard, Shield, User2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { userQueries } from "@/lib/queries/user.queries";
 import { sendGTMEvent } from "@next/third-parties/google";
+import { useFireworksConfetti } from "@/components/ui/confetti";
+import { formatFirestoreDate } from "@/lib/utils/helpers";
 
 export const AccountClient = ({
   tab,
+  event,
   reference,
-  isCreditExpired,
 }: {
   tab: string;
+  event: string;
   reference: string;
-  isCreditExpired: boolean;
 }) => {
   const [currentTab, setCurrentTab] = useState(!!tab ? tab : "account");
   const { data: user } = useQuery(userQueries.detail());
+  const { start: startConfetti } = useFireworksConfetti();
+  const isCreditExpired =
+    user?.expiryTime === undefined
+      ? true
+      : new Date(formatFirestoreDate(user?.expiryTime)) < new Date();
+
   const handleTabChange = (value: string) => {
     setCurrentTab(value);
   };
@@ -39,6 +47,13 @@ export const AccountClient = ({
     { id: "billing", value: "Billing & Subscription", icon: <CreditCard /> },
     { id: "security", value: "Security Settings", icon: <Shield /> },
   ];
+
+  useEffect(() => {
+    if (event === "subscription_success") {
+      startConfetti();
+      console.log(event);
+    }
+  }, []);
 
   return (
     <div className="space-y-4 sm:space-y-8">

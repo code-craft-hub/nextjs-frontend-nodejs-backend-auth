@@ -2,12 +2,11 @@ import { Button } from "@/components/ui/button";
 import { Copy, Info } from "lucide-react";
 import { UpgradeModal } from "./UpgradeModal";
 import { useEffect, useState } from "react";
-import { ProModal } from "./ProSubscription";
+import { PremiumUserPage } from "./PremiumUserPage";
 import { useQuery } from "@tanstack/react-query";
 import { userQueries } from "@/lib/queries/user.queries";
 import { formatFirestoreDate, getDaysRemaining } from "@/lib/utils/helpers";
 import { toast } from "sonner";
-import FireworksConfetti from "@/components/ui/confetti";
 
 export const Billing = ({
   reference,
@@ -20,6 +19,7 @@ export const Billing = ({
   const [completed, setCompleted] = useState(Boolean(user?.isPro) || false);
   const [showPlan, setShowPlan] = useState(false);
   const handleStateChange = (value: boolean) => {
+    console.log(value);
     setCompleted(value);
   };
   const handleShowPlan = (value: boolean) => {
@@ -42,7 +42,10 @@ export const Billing = ({
     setCompleted(Boolean(user?.isPro));
   }, [user?.isPro]);
 
-  return <FireworksConfetti autoStart duration={10000} />;
+  // useEffect(() => {
+  //   startConfetti();
+  // }, []);
+
   return !completed ? (
     showPlan ? (
       <UpgradeModal
@@ -82,8 +85,10 @@ export const Billing = ({
               {isCreditExpired ? null : (
                 <p className="relative">
                   <span className=" font-['Inter'] font-medium text-[14px] leading-[21px] text-white">
-                    Trial expires on{" "}
-                    {formatFirestoreDate(user?.expiryTime ?? "")}
+                    {isCreditExpired
+                      ? " Trial expires on" +
+                        formatFirestoreDate(user?.expiryTime ?? "")
+                      : "Upgrade to Pro or refer 5 people to continue enjoying all the features from Cver AI."}
                   </span>
                 </p>
               )}
@@ -197,6 +202,6 @@ export const Billing = ({
       </div>
     )
   ) : (
-    <ProModal />
+    <PremiumUserPage />
   );
 };

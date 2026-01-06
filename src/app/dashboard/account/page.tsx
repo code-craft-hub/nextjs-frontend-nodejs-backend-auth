@@ -6,10 +6,10 @@ import { api } from "@/lib/api/client";
 import { redirect } from "next/navigation";
 import { AccountClient } from "./Account";
 import { getCookiesToken } from "@/lib/auth.utils";
-import { formatFirestoreDate } from "@/lib/utils/helpers";
 
 const AccountPage = async ({ searchParams }: any) => {
   const tab = (await searchParams)?.tab;
+  const event = (await searchParams)?.event;
   const token = (await getCookiesToken()) ?? "";
 
   const reference = (await searchParams)?.reference;
@@ -48,16 +48,20 @@ const AccountPage = async ({ searchParams }: any) => {
 
   if (shouldCleanUrl) {
     // Redirect to clean URL with only the tab param
-    redirect(`/dashboard/account?tab=${tab || "billing"}`);
+    redirect(`/dashboard/account?tab=${tab || "billing"}&event=subscription_success`);
   }
 
-    const isCreditExpired =
-      new Date(formatFirestoreDate(user?.expiryTime)) < new Date();
+  
 
   return (
     <div className="p-4 sm:p-8">
       <HydrationBoundary state={dehydrate(queryClient)}>
-        <AccountClient tab={tab} reference={reference} isCreditExpired={isCreditExpired} />
+        <AccountClient
+          tab={tab}
+          event={event}
+          reference={reference}
+          
+        />
       </HydrationBoundary>
     </div>
   );

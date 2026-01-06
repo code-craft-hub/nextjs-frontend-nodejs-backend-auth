@@ -3,39 +3,39 @@
  * @module components/ui/confetti
  * @description Production-ready confetti component with comprehensive error handling,
  * accessibility support, and performance optimizations
- * 
+ *
  * @location src/components/ui/confetti/index.tsx
- * 
+ *
  * @example
  * import { FireworksConfetti, useFireworksConfetti } from '@/components/ui/confetti';
- * 
+ *
  * // Basic usage
  * <FireworksConfetti duration={15000} autoStart />
- * 
+ *
  * // Advanced usage with hook
  * const { start, stop, isActive } = useFireworksConfetti({ duration: 20000 });
- * 
+ *
  * @dependencies
  * - canvas-confetti: ^1.9.4
  * - React: ^18.0.0
- * 
+ *
  * @author Enterprise Development Team
  * @version 1.0.0
  * @created 2026-01-06
  */
 
-'use client';
+"use client";
 
-import React, { 
-  useState, 
-  useEffect, 
-  useCallback, 
-  useRef, 
+import {
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
   memo,
   type FC,
-  type ReactNode 
-} from 'react';
-import confetti from 'canvas-confetti';
+  type ReactNode,
+} from "react";
+import confetti from "canvas-confetti";
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -142,11 +142,11 @@ const ORIGIN_Y_OFFSET = 0.2;
 /**
  * Generates a random number within a specified range
  * Uses cryptographically secure random if available for better distribution
- * 
+ *
  * @param {number} min - Minimum value (inclusive)
  * @param {number} max - Maximum value (exclusive)
  * @returns {number} Random number in specified range
- * 
+ *
  * @example
  * randomInRange(0, 10); // Returns number between 0 and 10
  */
@@ -157,72 +157,81 @@ const randomInRange = (min: number, max: number): number => {
 /**
  * Detects if user prefers reduced motion
  * Checks both CSS media query and system preferences
- * 
+ *
  * @returns {boolean} True if reduced motion is preferred
- * 
+ *
  * @example
  * if (prefersReducedMotion()) {
  *   // Skip animations
  * }
  */
 const prefersReducedMotion = (): boolean => {
-  if (typeof window === 'undefined') return false;
-  
-  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (typeof window === "undefined") return false;
+
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 };
 
 /**
  * Validates configuration values
  * Ensures all config values are within acceptable ranges
- * 
+ *
  * @param {ConfettiConfig} config - Configuration to validate
  * @throws {Error} If configuration values are invalid
  */
 const validateConfig = (config: ConfettiConfig): void => {
   if (config.duration && config.duration < 0) {
-    throw new Error('Duration must be a positive number');
+    throw new Error("Duration must be a positive number");
   }
-  
+
   if (config.particleCount && config.particleCount < 0) {
-    throw new Error('Particle count must be a positive number');
+    throw new Error("Particle count must be a positive number");
   }
-  
+
   if (config.spread && (config.spread < 0 || config.spread > 360)) {
-    throw new Error('Spread must be between 0 and 360 degrees');
+    throw new Error("Spread must be between 0 and 360 degrees");
   }
 };
 
-// ============================================================================
-// CUSTOM HOOK
-// ============================================================================
+/**
+ *  Default config values
+ */
+const defaultConfig: ConfettiConfig = {
+  duration: DEFAULT_CONFIG.duration,
+  particleCount: DEFAULT_CONFIG.particleCount,
+  startVelocity: DEFAULT_CONFIG.startVelocity,
+  spread: DEFAULT_CONFIG.spread,
+  ticks: DEFAULT_CONFIG.ticks,
+  zIndex: DEFAULT_CONFIG.zIndex,
+  disableForReducedMotion: DEFAULT_CONFIG.disableForReducedMotion,
+};
 
 /**
  * Custom hook for managing fireworks confetti animation
  * Provides complete control over the animation lifecycle with cleanup
- * 
+ *
  * @param {ConfettiConfig} config - Animation configuration
  * @returns {UseFireworksConfettiReturn} Control functions and state
- * 
+ *
  * @example
  * const { start, stop, isActive, remainingTime } = useFireworksConfetti({
  *   duration: 20000,
  *   particleCount: 100,
  *   colors: ['#ff0000', '#00ff00', '#0000ff']
  * });
- * 
+ *
  * // Start animation
  * start();
- * 
+ *
  * // Stop animation
  * stop();
- * 
+ *
  * @throws {Error} If configuration is invalid
  */
 export const useFireworksConfetti = (
-  config: ConfettiConfig = {}
+  config: ConfettiConfig = defaultConfig
 ): UseFireworksConfettiReturn => {
   // Validate configuration
-  if (process.env.NODE_ENV === 'development') {
+  if (process.env.NODE_ENV === "development") {
     validateConfig(config);
   }
 
@@ -230,9 +239,10 @@ export const useFireworksConfetti = (
   const mergedConfig: Required<ConfettiConfig> = {
     ...DEFAULT_CONFIG,
     ...config,
-    colors: config.colors && config.colors.length > 0 
-      ? config.colors 
-      : DEFAULT_CONFIG.colors,
+    colors:
+      config.colors && config.colors.length > 0
+        ? config.colors
+        : DEFAULT_CONFIG.colors,
   };
 
   // State management
@@ -253,12 +263,12 @@ export const useFireworksConfetti = (
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
-    
+
     if (timeUpdateIntervalRef.current) {
       clearInterval(timeUpdateIntervalRef.current);
       timeUpdateIntervalRef.current = null;
     }
-    
+
     animationEndRef.current = null;
     setRemainingTime(null);
   }, []);
@@ -271,14 +281,14 @@ export const useFireworksConfetti = (
     // Respect reduced motion preference
     if (mergedConfig.disableForReducedMotion && prefersReducedMotion()) {
       console.info(
-        '[FireworksConfetti] Animation disabled due to reduced motion preference'
+        "[FireworksConfetti] Animation disabled due to reduced motion preference"
       );
       return;
     }
 
     // Prevent multiple simultaneous animations
     if (isActive) {
-      console.warn('[FireworksConfetti] Animation already in progress');
+      console.warn("[FireworksConfetti] Animation already in progress");
       return;
     }
 
@@ -372,7 +382,7 @@ export const useFireworksConfetti = (
 
 /**
  * FireworksConfetti Component
- * 
+ *
  * A production-ready React component that creates a fireworks confetti effect
  * with particles shooting from both sides of the screen. Features include:
  * - Automatic cleanup and memory management
@@ -381,19 +391,19 @@ export const useFireworksConfetti = (
  * - TypeScript support with full type safety
  * - Error handling and validation
  * - Optional default UI with controls
- * 
+ *
  * @component
  * @example
  * // Basic usage with default UI
  * <FireworksConfetti autoStart duration={10000} />
- * 
+ *
  * @example
  * // Custom implementation with hook
  * function CustomConfetti() {
  *   const { start, stop, isActive } = useFireworksConfetti();
  *   return <button onClick={start}>Launch!</button>;
  * }
- * 
+ *
  * @example
  * // With custom colors and callbacks
  * <FireworksConfetti
@@ -404,152 +414,83 @@ export const useFireworksConfetti = (
  *   onStop={() => console.log('Stopped!')}
  * />
  */
-export const FireworksConfetti: FC<FireworksConfettiProps> = memo(({
-  duration = DEFAULT_CONFIG.duration,
-  particleCount = DEFAULT_CONFIG.particleCount,
-  startVelocity = DEFAULT_CONFIG.startVelocity,
-  spread = DEFAULT_CONFIG.spread,
-  ticks = DEFAULT_CONFIG.ticks,
-  zIndex = DEFAULT_CONFIG.zIndex,
-  colors,
-  disableForReducedMotion = DEFAULT_CONFIG.disableForReducedMotion,
-  autoStart = false,
-  onStart,
-  onStop,
-  className,
-  children,
-  showControls = true,
-  labels = { start: '🚀 Launch Fireworks', stop: '⏹️ Stop' },
-}) => {
-  // Configuration for the hook
-  const config: ConfettiConfig = {
-    duration,
-    particleCount,
-    startVelocity,
-    spread,
-    ticks,
-    zIndex,
+export const FireworksConfetti: FC<FireworksConfettiProps> = memo(
+  ({
+    duration = DEFAULT_CONFIG.duration,
+    particleCount = DEFAULT_CONFIG.particleCount,
+    startVelocity = DEFAULT_CONFIG.startVelocity,
+    spread = DEFAULT_CONFIG.spread,
+    ticks = DEFAULT_CONFIG.ticks,
+    zIndex = DEFAULT_CONFIG.zIndex,
     colors,
-    disableForReducedMotion,
-  };
+    disableForReducedMotion = DEFAULT_CONFIG.disableForReducedMotion,
+    autoStart = false,
+    onStart,
+    onStop,
+    className,
+    children,
+    showControls = true,
+    labels = { start: "🚀 Launch Fireworks", stop: "⏹️ Stop" },
+  }) => {
+    // Configuration for the hook
+    const config: ConfettiConfig = {
+      duration,
+      particleCount,
+      startVelocity,
+      spread,
+      ticks,
+      zIndex,
+      colors,
+      disableForReducedMotion,
+    };
 
-  // Use the custom hook
-  const { start, stop, isActive, remainingTime } = useFireworksConfetti(config);
+    // Use the custom hook
+    const { start, stop, isActive, remainingTime } =
+      useFireworksConfetti(config);
 
-  // Handle lifecycle callbacks
-  useEffect(() => {
-    if (isActive && onStart) {
-      onStart();
-    } else if (!isActive && onStop && remainingTime === null) {
-      onStop();
+    // Handle lifecycle callbacks
+    useEffect(() => {
+      if (isActive && onStart) {
+        onStart();
+      } else if (!isActive && onStop && remainingTime === null) {
+        onStop();
+      }
+    }, [isActive, onStart, onStop, remainingTime]);
+
+    // Auto-start if enabled
+    useEffect(() => {
+      if (autoStart && !isActive) {
+        const timer = setTimeout(start, 100);
+        return () => clearTimeout(timer);
+      }
+    }, [autoStart]); // Only run on mount
+
+    // Format remaining time for display
+    const formatTime = (ms: number | null): string => {
+      if (ms === null) return "0.0s";
+      return `${(ms / 1000).toFixed(1)}s`;
+    };
+
+    // Render custom children if provided
+    if (children) {
+      return <div className={className}>{children}</div>;
     }
-  }, [isActive, onStart, onStop, remainingTime]);
 
-  // Auto-start if enabled
-  useEffect(() => {
-    if (autoStart && !isActive) {
-      const timer = setTimeout(start, 100);
-      return () => clearTimeout(timer);
+    // Default UI
+    if (!showControls) {
+      return null;
     }
-  }, [autoStart]); // Only run on mount
 
-  // Format remaining time for display
-  const formatTime = (ms: number | null): string => {
-    if (ms === null) return '0.0s';
-    return `${(ms / 1000).toFixed(1)}s`;
-  };
-
-  // Render custom children if provided
-  if (children) {
-    return <div className={className}>{children}</div>;
+    useEffect(() => {
+      if (autoStart && !isActive) {
+        start();
+      }
+    }, []);
   }
-
-  // Default UI
-  if (!showControls) {
-    return null;
-  }
-
-  return (
-    <div className={`flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-8 ${className || ''}`}>
-      <div className="text-center space-y-8 max-w-2xl">
-        {/* Header */}
-        <div className="space-y-4">
-          <h1 className="text-5xl font-bold text-white tracking-tight">
-            🎆 Fireworks Confetti 🎆
-          </h1>
-          <p className="text-xl text-purple-200">
-            Enterprise-grade confetti animation with dual-side fireworks effect
-          </p>
-        </div>
-
-        {/* Status Card */}
-        <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 shadow-2xl">
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-purple-200 font-medium">Status:</span>
-              <span className={`px-4 py-2 rounded-full font-semibold transition-all ${
-                isActive 
-                  ? 'bg-green-500 text-white animate-pulse' 
-                  : 'bg-gray-500 text-white'
-              }`}>
-                {isActive ? '🎉 Active' : '⏸️ Stopped'}
-              </span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-purple-200 font-medium">Duration:</span>
-              <span className="text-white font-semibold">{duration / 1000}s</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-purple-200 font-medium">Particles:</span>
-              <span className="text-white font-semibold">{particleCount} per burst</span>
-            </div>
-            {isActive && remainingTime !== null && (
-              <div className="flex items-center justify-between">
-                <span className="text-purple-200 font-medium">Remaining:</span>
-                <span className="text-green-400 font-semibold font-mono">
-                  {formatTime(remainingTime)}
-                </span>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Controls */}
-        <div className="flex gap-4 justify-center flex-wrap">
-          <button
-            onClick={start}
-            disabled={isActive}
-            aria-label="Start fireworks animation"
-            className={`px-8 py-4 rounded-xl font-bold text-lg transition-all duration-300 transform ${
-              isActive
-                ? 'bg-gray-600 text-gray-400 cursor-not-allowed opacity-50'
-                : 'bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600 hover:scale-105 hover:shadow-2xl active:scale-95'
-            }`}
-          >
-            {labels.start || '🚀 Launch Fireworks'}
-          </button>
-          <button
-            onClick={stop}
-            disabled={!isActive}
-            aria-label="Stop fireworks animation"
-            className={`px-8 py-4 rounded-xl font-bold text-lg transition-all duration-300 transform ${
-              !isActive
-                ? 'bg-gray-600 text-gray-400 cursor-not-allowed opacity-50'
-                : 'bg-gradient-to-r from-red-500 to-orange-500 text-white hover:from-red-600 hover:to-orange-600 hover:scale-105 hover:shadow-2xl active:scale-95'
-            }`}
-          >
-            {labels.stop || '⏹️ Stop'}
-          </button>
-        </div>
-
-      
-      </div>
-    </div>
-  );
-});
+);
 
 // Display name for React DevTools
-FireworksConfetti.displayName = 'FireworksConfetti';
+FireworksConfetti.displayName = "FireworksConfetti";
 
 // ============================================================================
 // EXPORTS
@@ -558,8 +499,3 @@ FireworksConfetti.displayName = 'FireworksConfetti';
 export default FireworksConfetti;
 
 // Named exports for tree-shaking
-export type {
-  ConfettiConfig,
-  FireworksConfettiProps,
-  UseFireworksConfettiReturn,
-};

@@ -17,15 +17,7 @@ import { useDashboardPrefetch } from "@/lib/react-query/hooks/useDashboardPrefet
 import InsufficientCreditsModal from "@/components/shared/InsufficientCreditsModal";
 
 export const HomeClient = memo(
-  ({
-    tab,
-    jobDescription,
-    isCreditExpired,
-  }: {
-    tab: DashboardTab;
-    jobDescription: string;
-    isCreditExpired: boolean;
-  }) => {
+  ({ tab, jobDescription }: { tab: DashboardTab; jobDescription: string }) => {
     const { data: user } = useQuery(userQueries.detail());
     const title = getDataSource(user)?.title;
     const rolesOfInterest = getDataSource(user)?.rolesOfInterest?.map(
@@ -56,11 +48,9 @@ export const HomeClient = memo(
       autoApplyFilters,
     });
 
-    console.log("Home : ", isCreditExpired)
     return (
       <>
         <TopGradient />
-        {isCreditExpired && <InsufficientCreditsModal />}
         <div className="container">
           <div className="w-full mt-4"></div>
           <Tabs
@@ -107,6 +97,7 @@ export const HomeClient = memo(
             </TabsContent>
           </Tabs>
         </div>
+        <InsufficientCreditsModal />
       </>
     );
   }
