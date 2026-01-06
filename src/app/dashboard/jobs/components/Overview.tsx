@@ -25,12 +25,8 @@ import { jobsQueries } from "@/lib/queries/jobs.queries";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { leftMenuItems } from "@/lib/utils/constants";
 import { v4 as uuidv4 } from "uuid";
-import {
-  ArrowRight,
-  SearchIcon,
-  Loader2,
-} from "lucide-react";
-import {  getDataSource } from "@/lib/utils/helpers";
+import { ArrowRight, SearchIcon, Loader2 } from "lucide-react";
+import { getDataSource } from "@/lib/utils/helpers";
 import { JobType } from "@/types";
 import { apiService } from "@/hooks/use-auth";
 import { toast } from "sonner";
@@ -43,9 +39,9 @@ import {
 import { ReportCard } from "./ReportCard";
 import { jobMatcher } from "@/services/job-matcher";
 import { sendGTMEvent } from "@next/third-parties/google";
-import InsufficientCreditsModal from "@/components/shared/InsufficientCreditsModal";
+// import InsufficientCreditsModal from "@/components/shared/InsufficientCreditsModal";
 import { userQueries } from "@/lib/queries/user.queries";
-import { OverviewColumn } from "./OverviewColumn";
+import { OverviewColumn, OverviewSkeleton } from "./OverviewColumn";
 import MobileOverview from "./MobileOverview";
 
 export default function Overview() {
@@ -53,16 +49,11 @@ export default function Overview() {
   const [searchValue, setSearchValue] = useState("");
   const [isAutoFetching, setIsAutoFetching] = useState(false);
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(
-    []
-  );
-  const [columnVisibility, setColumnVisibility] =
-    useState<VisibilityState>({});
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
   const totalScoreRef = useRef<number>(0);
   const { data: user } = useQuery(userQueries.detail());
-  // const noCredit = user?.credit === 0;
-  const [userCredit, setUserCredit] = useState(Number(user?.credit ?? 0) === 0);
 
   useEffect(() => {
     if (user?.firstName)
@@ -71,10 +62,6 @@ export default function Overview() {
         value: `${user?.firstName} viewed Job Page`,
       });
   }, [user?.firstName]);
-
-  useEffect(() => {
-    setUserCredit(Number(user?.credit ?? 0) === 0);
-  }, [user?.credit]);
 
   const infiniteFilters = useMemo(
     () => ({
@@ -250,7 +237,8 @@ export default function Overview() {
 
   return (
     <div className="lg:gap-6 lg:flex ">
-      {userCredit && <InsufficientCreditsModal />}
+      {/* {userCredit && <InsufficientCreditsModal />} */}
+
       <div className="bg-white p-3 h-fit rounded-md hidden lg:flex lg:flex-col gap-1">
         {leftMenuItems.map((item) => (
           <div
@@ -321,7 +309,6 @@ export default function Overview() {
             </p>
           </div>
         </div>
-
         <div className="hidden lg:grid grid-cols-1">
           <Table>
             <TableBody>
@@ -362,13 +349,18 @@ export default function Overview() {
                       isSearching ? (
                         "Searching ... "
                       ) : (
-                        <span>
-                          No results found. All data has been searched.
-                        </span>
+                        <div className="grid gap-4">
+                          {Array.from({ length: 5 }).map((_, index) => (
+                            <OverviewSkeleton key={index} />
+                          ))}
+                        </div>
                       )
                     ) : (
                       <span>No results.</span>
                     )}
+                    {/*  <span>
+                       No results found. All data has been searched.
+                     </span> */}
                   </TableCell>
                 </TableRow>
               )}

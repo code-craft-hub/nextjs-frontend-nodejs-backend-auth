@@ -26,7 +26,6 @@ import { useRouter } from "next/navigation";
 import { jobsQueries } from "@/lib/queries/jobs.queries";
 
 import { SearchBar } from "./JobSearchBar";
-import { getFindJobsColumns } from "../components/Overview";
 import { getDataSource } from "@/lib/utils/helpers";
 import { jobMatcher } from "@/services/job-matcher";
 import { toast } from "sonner";
@@ -34,6 +33,7 @@ import { apiService } from "@/hooks/use-auth";
 import { JobType } from "@/types";
 import MobileOverview from "../components/MobileOverview";
 import { sendGTMEvent } from "@next/third-parties/google";
+import { OverviewColumn } from "../components/OverviewColumn";
 
 export const SavedJobs = ({ children }: { children: ReactNode }) => {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -154,7 +154,7 @@ export const SavedJobs = ({ children }: { children: ReactNode }) => {
     );
   };
 
-  const columns = getFindJobsColumns({
+  const columns = OverviewColumn({
     router,
     updateJobs,
     handleApply,
@@ -206,7 +206,7 @@ export const SavedJobs = ({ children }: { children: ReactNode }) => {
                       }}
                       key={row.id}
                       data-state={row.getIsSelected() && "selected"}
-                      className="hover:bg-white border-b !rounded-3xl hover:border-primary hover:border-[2px] hover:rounded-2xl hover:cursor-pointer"
+                      className="hover:bg-white border-b rounded-3xl! hover:border-primary hover:border-2 hover:rounded-2xl hover:cursor-pointer"
                     >
                       {row.getVisibleCells().map((cell) => (
                         <TableCell key={cell.id}>

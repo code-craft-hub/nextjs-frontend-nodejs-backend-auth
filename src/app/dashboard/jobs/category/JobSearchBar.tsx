@@ -91,7 +91,7 @@ export const SearchBar = ({
           className="w-full grid grid-cols-1"
         >
           <Card className="w-full grid grid-cols-1 lg:grid lg:grid-cols-4 justify-between flex-row lg:items-center gap-2 px-4 py-4">
-            <div className="relative p-1 lg:border-r-[1px] lg:border-black/40 mr-1">
+            <div className="relative p-1 lg:border-r lg:border-black/40 mr-1">
               <FormField
                 control={form.control}
                 name="searchValue"
@@ -127,7 +127,7 @@ export const SearchBar = ({
                 alt=""
               />
             </div>
-            <div className="flex gap-1 items-center py-2 lg:border-r-[1px] lg:border-black/40 pr-2">
+            <div className="flex gap-1 items-center py-2 lg:border-r lg:border-black/40 pr-2">
               <DropdownMenu>
                 <DropdownMenuTrigger className="w-full text-start text-black/60 border-none focus:border-none focus:outline-none flex text-xs line-clamp-1 text-nowrap overflow-hidden truncate">
                   <img src="/map.svg" className="size-4 mr-1" alt="" />

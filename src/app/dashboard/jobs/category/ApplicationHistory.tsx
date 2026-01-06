@@ -136,7 +136,7 @@ export const ApplicationHistory = ({
                       }}
                       key={row.id}
                       data-state={row.getIsSelected() && "selected"}
-                      className="hover:bg-white border-b !rounded-3xl hover:border-primary hover:border-[2px] hover:rounded-2xl hover:cursor-pointer"
+                      className="hover:bg-white border-b rounded-3xl! hover:border-primary hover:border-2 hover:rounded-2xl hover:cursor-pointer"
                     >
                       {row.getVisibleCells().map((cell) => (
                         <TableCell key={cell.id}>

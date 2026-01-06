@@ -15,6 +15,7 @@ import { JobType } from "@/types";
 import { Toggle } from "@/components/ui/toggle";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { PiOfficeChairFill } from "react-icons/pi";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const OverviewColumn = ({
   updateJobs,
@@ -155,3 +156,17 @@ export const OverviewColumn = ({
     },
   },
 ];
+
+
+
+export function OverviewSkeleton() {
+  return (
+    <div className="flex items-center space-x-4">
+      <Skeleton className="size-16 rounded-sm bg-white" />
+      <div className="space-y-2 w-full">
+        <Skeleton className="h-6 w-full bg-white" />
+        <Skeleton className="h-6 w-full bg-white" />
+      </div>
+    </div>
+  )
+}

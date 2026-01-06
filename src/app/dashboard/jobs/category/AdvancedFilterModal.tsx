@@ -346,7 +346,7 @@ export default function AdvancedFilterModal() {
               Filter options <ChevronDown className="size-3" />{" "}
             </Button>
           </DialogTrigger>
-          <DialogContent className="!w-[90svw] p-0  !max-w-none h-fit overflow-auto bg-white ">
+          <DialogContent className="w-[90svw]! p-0  max-w-none! h-fit overflow-auto bg-white ">
             <DialogHeader>
               <DialogTitle className="sr-only">Edit profile</DialogTitle>
               <DialogDescription className="sr-only">
