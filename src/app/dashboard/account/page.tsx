@@ -1,4 +1,3 @@
-import { userQueries } from "@/lib/queries/user.queries";
 import { createServerQueryClient } from "@/lib/query/prefetch";
 import { dehydrate } from "@tanstack/react-query";
 import { HydrationBoundary } from "@/components/hydration-boundary";
@@ -25,21 +24,15 @@ const AccountPage = async ({ searchParams }: any) => {
           expiryTime?: string | Date;
         };
       }>(`/paystack/payments/verify/${reference}`, { token });
+      console.log("Payment verification data:", data); 
       initialData = data;
     } catch (error) {
       console.error("Error verifying payment:", error);
     }
   }
 
-  // Fetch user data AFTER payment verification
-  const user = await queryClient.fetchQuery({
-    ...userQueries.detail(token),
-    // Force a fresh fetch if there was a payment reference
-    // staleTime: reference ? 0 : undefined,
-  });
-
-  const isPro = user.isPro || initialData?.isPro;
-  const expiryTime = user.expiryTime || initialData?.expiryTime;
+  const isPro =  initialData?.isPro;
+  const expiryTime =  initialData?.expiryTime;
 
   const isExpired = expiryTime ? new Date(expiryTime) < new Date() : true;
 

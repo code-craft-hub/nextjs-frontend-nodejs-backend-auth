@@ -167,7 +167,7 @@ export function getDaysUntilProPlanExpiry(
 }
 
 export const generateIdempotencyKey = () => {
-  return `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  return `${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 };
 export const expireNextThreeDays = () => {
   const now = new Date();
@@ -178,7 +178,7 @@ export const expireNextThreeDays = () => {
     now.getHours(),
     now.getMinutes()
   );
-  return nextMinute.toISOString();
+  return nextMinute;
 };
 
 export const getJwtSecret = () => {

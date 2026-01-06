@@ -3,8 +3,6 @@ import { useEffect, useState } from "react";
 import { UserProfileForm } from "./user-profile-update";
 import { PasswordUpdateForm } from "./user-password-update";
 import { cn } from "@/lib/utils";
-// import { Button } from "@/components/ui/button";
-// import { apiService } from "@/hooks/use-auth";
 import { Billing } from "./billing/Billing";
 import { CreditCard, Shield, User2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
@@ -12,6 +10,8 @@ import { userQueries } from "@/lib/queries/user.queries";
 import { sendGTMEvent } from "@next/third-parties/google";
 import { useFireworksConfetti } from "@/components/ui/confetti";
 import { formatFirestoreDate } from "@/lib/utils/helpers";
+import { Button } from "@/components/ui/button";
+import { apiService } from "@/hooks/use-auth";
 
 export const AccountClient = ({
   tab,
@@ -34,6 +34,8 @@ export const AccountClient = ({
     setCurrentTab(value);
   };
 
+  const deleteAccount = process.env.NODE_ENV === "development" ? true : false;
+
   useEffect(() => {
     if (user?.firstName)
       sendGTMEvent({
@@ -51,7 +53,6 @@ export const AccountClient = ({
   useEffect(() => {
     if (event === "subscription_success") {
       startConfetti();
-      console.log(event);
     }
   }, []);
 
@@ -76,7 +77,6 @@ export const AccountClient = ({
           </div>
         ))}
       </div>
-
       {currentTab === "account" || currentTab === undefined ? (
         <UserProfileForm />
       ) : currentTab === "billing" ? (
@@ -84,16 +84,17 @@ export const AccountClient = ({
       ) : (
         <PasswordUpdateForm />
       )}
-
-      {/* <Button
-        onClick={async () => {
-          await apiService.deleteUser();
-        }}
-        variant={"destructive"}
-        className=""
-      >
-        Delete Account
-      </Button> */}
+      {deleteAccount && (
+        <Button
+          onClick={async () => {
+            await apiService.deleteUser();
+          }}
+          variant={"destructive"}
+          className=""
+        >
+          Delete Account
+        </Button>
+      )}
     </div>
   );
 };
