@@ -47,6 +47,7 @@ import {
   OverviewSkeleton,
 } from "./OverviewColumn";
 import MobileOverview from "./MobileOverview";
+import AuthorizeGoogle from "@/hooks/gmail/AuthorizeGoogle";
 
 export default function Overview() {
   const router = useRouter();
@@ -395,6 +396,7 @@ export default function Overview() {
           </div>
         )}
       </div>
+      <AuthorizeGoogle hidden={true} />
       <InsufficientCreditsModal />
     </div>
   );

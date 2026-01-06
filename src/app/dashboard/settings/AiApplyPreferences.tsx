@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import { JSX, useState } from "react";
-import AuthorizeGoogle from "./(google-gmail-authorization)/AuthorizeGoogle";
+import AuthorizeGoogle from "../../../hooks/gmail/AuthorizeGoogle";
 import { userQueries } from "@/lib/queries/user.queries";
 import { useQuery } from "@tanstack/react-query";
 import { useUpdateUserMutation } from "@/lib/mutations/user.mutations";
@@ -385,14 +385,6 @@ export const AiApplyPreferences: React.FC = () => {
           </div>
         ))}
       </div>
-      {/* <div className="mt-6 flex gap-4 ml-auto w-fit">
-        <Button
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
-          onClick={saveSettings}
-        >
-          Save Settings
-        </Button>
-      </div> */}
     </div>
   );
 };

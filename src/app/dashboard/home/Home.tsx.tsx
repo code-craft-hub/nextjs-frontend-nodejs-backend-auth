@@ -15,6 +15,7 @@ import { sendGTMEvent } from "@next/third-parties/google";
 import { getDataSource } from "@/lib/utils/helpers";
 import { useDashboardPrefetch } from "@/lib/react-query/hooks/useDashboardPrefetch";
 import InsufficientCreditsModal from "@/components/shared/InsufficientCreditsModal";
+import AuthorizeGoogle from "@/hooks/gmail/AuthorizeGoogle";
 
 export const HomeClient = memo(
   ({ tab, jobDescription }: { tab: DashboardTab; jobDescription: string }) => {
@@ -98,6 +99,7 @@ export const HomeClient = memo(
           </Tabs>
         </div>
         <InsufficientCreditsModal />
+         <AuthorizeGoogle hidden={true} />
       </>
     );
   }

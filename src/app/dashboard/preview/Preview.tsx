@@ -19,7 +19,8 @@ import { COLLECTIONS } from "@/lib/utils/constants";
 import { aiApplyQueries } from "@/lib/queries/ai-apply.queries";
 import { isEmpty } from "lodash";
 import { sendGTMEvent } from "@next/third-parties/google";
-// import { api } from "@/lib/api/client";
+import { useFireworksConfetti } from "@/components/ui/confetti";
+import AuthorizeGoogle from "@/hooks/gmail/AuthorizeGoogle";
 
 const Preview = ({
   coverLetterId,
@@ -39,6 +40,7 @@ const Preview = ({
   const [openModal, setOpenModal] = useState(false);
   const router = useRouter();
   const queryClient = useQueryClient();
+  const { start: startConfetti } = useFireworksConfetti();
 
   const { data: user } = useQuery(userQueries.detail());
 
@@ -108,11 +110,13 @@ const Preview = ({
         user?.aiApplyPreferences?.useMasterCV && defaultResume?.gcsPath
       );
       setActiveStep(4);
+      startConfetti();
       toast.success("Application Submitted Successfully!");
       setOpenModal(true);
     } catch (error: any) {
       toast.error(
-        error?.response?.data?.message || "Auto apply failed. Please try again.",
+        error?.response?.data?.message ||
+          "Auto apply failed. Please try again.",
         {
           action: {
             label: "Authenticate",
@@ -214,6 +218,7 @@ const Preview = ({
           Submit <Sparkles className="ml-2 h-4 w-4" />
         </Button>
       </div>
+      <AuthorizeGoogle hidden={true} />
     </div>
   );
 };
