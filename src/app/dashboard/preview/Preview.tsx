@@ -112,21 +112,23 @@ const Preview = ({
       setActiveStep(4);
       startConfetti();
       toast.success("Application Submitted Successfully!");
+      await Promise.all([
+        queryClient.invalidateQueries(resumeQueries.all()),
+        queryClient.invalidateQueries(coverLetterQueries.all()),
+        queryClient.invalidateQueries(aiApplyQueries.all()),
+        queryClient.invalidateQueries(userQueries.detail()),
+      ]);
       setOpenModal(true);
     } catch (error: any) {
-      toast.error(
-        error?.response?.data?.message ||
-          "Auto apply failed. Please try again.",
-        {
-          action: {
-            label: "Authenticate",
-            onClick: () => router.push("/dashboard/settings"),
-          },
-          classNames: {
-            actionButton: "!bg-blue-600 hover:!bg-blue-700 !text-white !h-8",
-          },
-        }
-      );
+      toast.error("Auto apply failed. Please try again.", {
+        action: {
+          label: "Authenticate",
+          onClick: () => router.push("/dashboard/settings"),
+        },
+        classNames: {
+          actionButton: "!bg-blue-600 hover:!bg-blue-700 !text-white !h-8",
+        },
+      });
     } finally {
       setIsSubmitting(false);
     }

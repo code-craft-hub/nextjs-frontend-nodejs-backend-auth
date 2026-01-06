@@ -149,7 +149,7 @@ export function AIJobCustomizationDatatable({ data }: { data: any[] }) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [pagination, setPagination] = useState({
     pageIndex: 0,
-    pageSize: 10,
+    pageSize: 5,
   });
 
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -188,7 +188,7 @@ export function AIJobCustomizationDatatable({ data }: { data: any[] }) {
     if (!canLoadMore) return;
     setIsLoadingMore(true);
 
-    table.setPageSize(pagination.pageSize + 10);
+    table.setPageSize(pagination.pageSize + 5);
     setIsLoadingMore(false);
   };
 
