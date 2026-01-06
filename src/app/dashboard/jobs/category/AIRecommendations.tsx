@@ -29,13 +29,9 @@ import { toast } from "sonner";
 import { JobType } from "@/types";
 import MobileOverview from "../components/MobileOverview";
 import { sendGTMEvent } from "@next/third-parties/google";
-import { OverviewColumn } from "../components/OverviewColumn";
+import { OverviewColumn, OverviewEmpty, OverviewSkeleton } from "../components/OverviewColumn";
 
-export const AIRecommendations = ({
-  children,
-}: {
-  children: ReactNode;
-}) => {
+export const AIRecommendations = ({ children }: { children: ReactNode }) => {
   const { data: user } = useQuery(userQueries.detail());
   const userDataSource = getDataSource(user);
   const userJobTitlePreference =
@@ -44,11 +40,8 @@ export const AIRecommendations = ({
     title: userJobTitlePreference,
   }));
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(
-    []
-  );
-  const [columnVisibility, setColumnVisibility] =
-    useState<VisibilityState>({});
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
 
   const [rowSelection, setRowSelection] = useState({});
 
@@ -68,12 +61,19 @@ export const AIRecommendations = ({
 
   const bookmarkedIds = (user?.bookmarkedJobs || []) as string[];
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useInfiniteQuery(
-      jobsQueries.infinite({
-        title: searchValue.title || userJobTitlePreference,
-      })
-    );
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isLoading,
+    isFetching,
+    isRefetching,
+    isFetchingNextPage,
+  } = useInfiniteQuery(
+    jobsQueries.infinite({
+      title: searchValue.title || userJobTitlePreference,
+    })
+  );
 
   const bookmarkedIdSet = useMemo(() => {
     return new Set(bookmarkedIds);
@@ -185,6 +185,13 @@ export const AIRecommendations = ({
     },
   });
 
+  const visibleRows = table.getRowModel().rows;
+  const isSearching =
+    isLoading || isFetching || isRefetching || isFetchingNextPage;
+  const hasNoResults =
+    !isSearching &&
+    ((data?.pages?.[0]?.data?.length ?? 0) === 0 || visibleRows.length === 0);
+
   return (
     <div className="font-inter grid grid-cols-1 w-full overflow-hidden gap-4 xl:gap-8">
       <div className="space-y-4 w-full">
@@ -198,8 +205,21 @@ export const AIRecommendations = ({
           <div className="overflow-hidden border-none hidden lg:grid grid-cols-1">
             <Table>
               <TableBody className="">
-                {table.getRowModel().rows?.length ? (
-                  table.getRowModel().rows.map((row) => (
+                {isSearching ? (
+                  <div className="grid gap-4">
+                    {Array.from({ length: 10 }).map((_, index) => (
+                      <OverviewSkeleton key={index} />
+                    ))}
+                  </div>
+                ) : hasNoResults ? (
+                  <div className="flex flex-col gap-1 text-muted-foreground">
+                    <OverviewEmpty
+                      searchValue={searchValue.title}
+                      // resetSearchToDefault={resetSearchToDefault}
+                    />
+                  </div>
+                ) : (
+                  visibleRows.map((row) => (
                     <TableRow
                       onClick={() => {
                         router.push(
@@ -220,15 +240,6 @@ export const AIRecommendations = ({
                       ))}
                     </TableRow>
                   ))
-                ) : (
-                  <TableRow>
-                    <TableCell
-                      colSpan={columns.length}
-                      className="h-24 text-center"
-                    >
-                      No saved jobs found.
-                    </TableCell>
-                  </TableRow>
                 )}
               </TableBody>
             </Table>

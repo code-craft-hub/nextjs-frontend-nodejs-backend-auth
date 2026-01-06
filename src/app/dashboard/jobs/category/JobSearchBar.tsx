@@ -18,7 +18,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Card } from "@/components/ui/card";
-import { useRef, useState } from "react";
+import { forwardRef, useImperativeHandle, useRef, useState } from "react";
 import { X } from "lucide-react";
 import {
   HoverCard,
@@ -30,13 +30,32 @@ const formSchema = z.object({
   searchValue: z.string(),
 });
 
-export const SearchBar = ({
-  allJobs,
-  table,
-}: {
-  allJobs?: any[];
-  table?: any;
-}) => {
+export interface SearchBarRef {
+  handleClear: () => void;
+}
+
+export const SearchBar = forwardRef<
+  SearchBarRef,
+  {
+    allJobs?: any[];
+    table?: any;
+    onSearchValueChange?: (value: string) => void;
+  }
+>(({ allJobs, table, onSearchValueChange}, ref) => {
+
+  const handleClear = () => {
+    form.reset();
+    table.getColumn("title")?.setFilterValue(undefined);
+    table.getColumn("employmentType")?.setFilterValue(undefined);
+    table.getColumn("location")?.setFilterValue(undefined);
+    setLocation("");  
+    setEmploymentType("");
+    setShowClearButton(false);
+  };
+
+  useImperativeHandle(ref, () => ({
+    handleClear,
+  }));
   const [showClearButton, setShowClearButton] = useState(false);
   const [location, setLocation] = useState(allJobs?.[0]?.location || "");
   const [employmentType, setEmploymentType] = useState(
@@ -62,14 +81,16 @@ export const SearchBar = ({
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     table.getColumn("title")?.setFilterValue(values.searchValue);
+    onSearchValueChange?.(values.searchValue);
   }
 
-  const handleClear = () => {
-    form.reset();
-    table.getColumn("title")?.setFilterValue(undefined);
-    table.getColumn("employmentType")?.setFilterValue(undefined);
-    table.getColumn("location")?.setFilterValue(undefined);
-  };
+  // const handleClear = () => {
+  //   form.reset();
+  //   table.getColumn("title")?.setFilterValue(undefined);
+  //   table.getColumn("employmentType")?.setFilterValue(undefined);
+  //   table.getColumn("location")?.setFilterValue(undefined);
+  // };
+
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement>,
     onChange: (...event: any[]) => void
@@ -234,4 +255,4 @@ export const SearchBar = ({
       </Form>
     </div>
   );
-};
+});

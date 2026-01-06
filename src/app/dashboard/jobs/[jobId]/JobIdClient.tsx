@@ -1,4 +1,5 @@
 "use client";
+import { Skeleton } from "@/components/ui/skeleton";
 import { apiService } from "@/hooks/use-auth";
 import { useUpdateJobApplicationHistoryMutation } from "@/lib/mutations/jobs.mutations";
 import { jobsQueries } from "@/lib/queries/jobs.queries";
@@ -27,7 +28,7 @@ export const JobIdClient = ({
   jobId: string;
   referrer: string;
 }) => {
-  const { data } = useQuery(jobsQueries.detail(jobId));
+  const { data, isLoading } = useQuery(jobsQueries.detail(jobId));
   const { data: user } = useQuery(userQueries.detail());
   const updateJobApplicationHistory = useUpdateJobApplicationHistoryMutation();
 
@@ -116,24 +117,28 @@ export const JobIdClient = ({
           {/* Company Header Card */}
           <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
             <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-              <div className="flex items-center">
-                {!!job?.companyLogo && (
-                  <div className="w-14 h-14 shrink-0 rounded-xl flex items-center justify-center mr-4">
-                    <img
-                      src={job?.companyLogo ?? ""}
-                      className="size-full text-white"
-                    />
+              {isLoading ? (
+                <JobTitleSkeleton />
+              ) : (
+                <div className="flex items-center">
+                  {!!job?.companyLogo && (
+                    <div className="w-14 h-14 shrink-0 rounded-xl flex items-center justify-center mr-4">
+                      <img
+                        src={job?.companyLogo ?? ""}
+                        className="size-full text-white"
+                      />
+                    </div>
+                  )}
+                  <div>
+                    <h2 className="text-xl font-semibold text-gray-900 capitalize">
+                      {job?.title}
+                    </h2>
+                    <p className="text-gray-500 text-sm capitalize">
+                      {job?.companyName}
+                    </p>
                   </div>
-                )}
-                <div>
-                  <h2 className="text-xl font-semibold text-gray-900 capitalize">
-                    {job?.title}
-                  </h2>
-                  <p className="text-gray-500 text-sm capitalize">
-                    {job?.companyName}
-                  </p>
                 </div>
-              </div>
+              )}
               <button
                 onClick={() => handleApplyClick()}
                 className="bg-blue-600 max-sm:text-2xs hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-medium max-sm:w-full"
@@ -154,17 +159,21 @@ export const JobIdClient = ({
                 <h3 className="text-xl font-semibold text-gray-900 mb-4">
                   Job Description
                 </h3>
-                <div className="text-gray-600 leading-relaxed space-y-3">
-                  {!!job?.descriptionHtml ? (
-                    <div
-                      dangerouslySetInnerHTML={{
-                        __html: job?.descriptionHtml ?? "",
-                      }}
-                    />
-                  ) : (
-                    <div>{job?.descriptionText}</div>
-                  )}
-                </div>
+                {isLoading ? (
+                  <JobDescriptionSkeleton />
+                ) : (
+                  <div className="text-gray-600 leading-relaxed space-y-3">
+                    {!!job?.descriptionHtml ? (
+                      <div
+                        dangerouslySetInnerHTML={{
+                          __html: job?.descriptionHtml ?? "",
+                        }}
+                      />
+                    ) : (
+                      <div>{job?.descriptionText}</div>
+                    )}
+                  </div>
+                )}
                 <div className="border-t pt-6 mt-6">
                   <p className="text-gray-700 mb-3">Share profile:</p>
                   <div className="flex flex-wrap gap-3">
@@ -335,3 +344,27 @@ export const JobIdClient = ({
     </div>
   );
 };
+
+export function JobDescriptionSkeleton() {
+  return (
+    <div className="grid grid-cols-1 gap-8 items-center ">
+      {Array.from({ length: 6 }).map((_, index) => (
+        <div className="space-y-2 w-full" key={index}>
+          <Skeleton className="h-10 w-full " />
+          <Skeleton className="h-10 w-full" />
+        </div>
+      ))}
+    </div>
+  );
+}
+export function JobTitleSkeleton() {
+  return (
+    <div className="flex gap-4">
+      <Skeleton className="h-16 w-16 " />
+      <div className="gap-2 grid">
+        <Skeleton className="h-6 w-32" />
+        <Skeleton className="h-6 w-32" />
+      </div>
+    </div>
+  );
+}

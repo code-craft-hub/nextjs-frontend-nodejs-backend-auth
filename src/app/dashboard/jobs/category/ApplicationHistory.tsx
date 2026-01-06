@@ -1,5 +1,5 @@
 "use client";
-import { ReactNode, useEffect, useMemo, useState } from "react";
+import { ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import {
   ColumnFiltersState,
   flexRender,
@@ -13,7 +13,7 @@ import {
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { jobsQueries } from "@/lib/queries/jobs.queries";
 import { useRouter } from "next/navigation";
-import { SearchBar } from "./JobSearchBar";
+import { SearchBar, SearchBarRef } from "./JobSearchBar";
 
 import { Button } from "@/components/ui/button";
 import { ColumnDef } from "@tanstack/react-table";
@@ -31,20 +31,14 @@ import { PiOfficeChairFill } from "react-icons/pi";
 import { usePrefetchJob } from "@/hooks/usePrefetchJob";
 import MobileOverview from "../components/MobileOverview";
 import { sendGTMEvent } from "@next/third-parties/google";
+import { OverviewEmpty, OverviewSkeleton } from "../components/OverviewColumn";
 
-export const ApplicationHistory = ({
-  children,
-}: {
-  children: ReactNode;
-}) => {
+export const ApplicationHistory = ({ children }: { children: ReactNode }) => {
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(
-    []
-  );
-  const [columnVisibility, setColumnVisibility] =
-    useState<VisibilityState>({});
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
-
+ const [searchValue, setSearchValue] = useState("");
   const { prefetchJob } = usePrefetchJob();
 
   const { data: user } = useQuery(userQueries.detail());
@@ -72,8 +66,15 @@ export const ApplicationHistory = ({
   const appliedJobsIds = (user?.appliedJobs?.map((job) => job.id) ||
     []) as string[];
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useInfiniteQuery(jobsQueries.appliedJobs(appliedJobsIds, "", 20));
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+    isFetching,
+    isRefetching,
+  } = useInfiniteQuery(jobsQueries.appliedJobs(appliedJobsIds, "", 20));
 
   const allJobs = useMemo(() => {
     const jobs = data?.pages.flatMap((page) => page.data) ?? [];
@@ -108,6 +109,20 @@ export const ApplicationHistory = ({
     },
   });
 
+ const searchBarRef = useRef<SearchBarRef>(null);
+
+  const resetSearchToDefault = () => {
+    searchBarRef.current?.handleClear();
+  };
+
+
+  const visibleRows = table.getRowModel().rows;
+  const isSearching =
+    isLoading || isFetching || isRefetching || isFetchingNextPage;
+  const hasNoResults =
+    !isSearching &&
+    ((data?.pages?.[0]?.data?.length ?? 0) === 0 || visibleRows.length === 0);
+
   return (
     <div className="font-inter grid grid-cols-1 w-full overflow-hidden gap-4 xl:gap-8">
       <div className="space-y-4 w-full">
@@ -115,7 +130,7 @@ export const ApplicationHistory = ({
           Application History
         </h1>
         {children}
-        <SearchBar allJobs={allJobs} table={table} />
+        <SearchBar ref={searchBarRef} allJobs={allJobs} table={table} onSearchValueChange={setSearchValue} />
 
         <div className="w-full bg-[#F1F2F4] p-2 px-4 rounded-sm sm:flex justify-between hidden font-roboto">
           <p className="text-[#474C54]">Job</p>
@@ -126,8 +141,21 @@ export const ApplicationHistory = ({
           <div className="overflow-hidden border-none hidden lg:grid grid-cols-1">
             <Table>
               <TableBody className="">
-                {table.getRowModel().rows?.length ? (
-                  table.getRowModel().rows.map((row) => (
+                {isSearching ? (
+                  <div className="grid gap-4">
+                    {Array.from({ length: 5 }).map((_, index) => (
+                      <OverviewSkeleton key={index} />
+                    ))}
+                  </div>
+                ) : hasNoResults ? (
+                  <div className="flex flex-col gap-1 text-muted-foreground">
+                    <OverviewEmpty
+                      searchValue={searchValue}
+                      resetSearchToDefault={resetSearchToDefault}
+                    />
+                  </div>
+                ) : (
+                  visibleRows.map((row) => (
                     <TableRow
                       onClick={() => {
                         router.push(
@@ -148,15 +176,6 @@ export const ApplicationHistory = ({
                       ))}
                     </TableRow>
                   ))
-                ) : (
-                  <TableRow>
-                    <TableCell
-                      colSpan={columns.length}
-                      className="h-24 text-center"
-                    >
-                      No results.
-                    </TableCell>
-                  </TableRow>
                 )}
               </TableBody>
             </Table>

@@ -249,10 +249,8 @@ export default function Overview() {
     setIsAutoFetching(false);
   };
   const visibleRows = table.getRowModel().rows;
-  // const isSearching = isAutoFetching || isFetchingNextPage;
   const isSearching =
     isLoading || isFetching || isRefetching || isFetchingNextPage;
-
   const hasNoResults =
     !isSearching && (data?.pages?.[0]?.data?.length ?? 0) === 0;
 
@@ -353,6 +351,7 @@ export default function Overview() {
                         `/dashboard/jobs/${row.original.id}?referrer=jobs&title=${row.original.title}`
                       )
                     }
+                    className="hover:bg-white border-b rounded-3xl! hover:border-primary hover:border-2 hover:rounded-2xl hover:cursor-pointer"
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id}>
