@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useEffect, useMemo, useState } from "react";
+import { ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import {
   ColumnFiltersState,
   flexRender,
@@ -25,7 +25,7 @@ import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { jobsQueries } from "@/lib/queries/jobs.queries";
 
-import { SearchBar } from "./JobSearchBar";
+import { SearchBar, SearchBarRef } from "./JobSearchBar";
 import { getDataSource } from "@/lib/utils/helpers";
 import { jobMatcher } from "@/services/job-matcher";
 import { toast } from "sonner";
@@ -33,15 +33,13 @@ import { apiService } from "@/hooks/use-auth";
 import { JobType } from "@/types";
 import MobileOverview from "../components/MobileOverview";
 import { sendGTMEvent } from "@next/third-parties/google";
-import { OverviewColumn } from "../components/OverviewColumn";
+import { OverviewColumn, OverviewEmpty, OverviewSkeleton } from "../components/OverviewColumn";
 
 export const SavedJobs = ({ children }: { children: ReactNode }) => {
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(
-    []
-  );
-  const [columnVisibility, setColumnVisibility] =
-    useState<VisibilityState>({});
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [searchValue, setSearchValue] = useState("");
 
   const [rowSelection, setRowSelection] = useState({});
 
@@ -65,8 +63,15 @@ export const SavedJobs = ({ children }: { children: ReactNode }) => {
 
   const bookmarkedIds = (user?.bookmarkedJobs || []) as string[];
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useInfiniteQuery(jobsQueries.bookmarked(bookmarkedIds, "", 20));
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+    isFetching,
+    isRefetching,
+  } = useInfiniteQuery(jobsQueries.bookmarked(bookmarkedIds, "", 20));
 
   const bookmarkedIdSet = useMemo(() => {
     return new Set(bookmarkedIds);
@@ -178,6 +183,19 @@ export const SavedJobs = ({ children }: { children: ReactNode }) => {
     },
   });
 
+  const searchBarRef = useRef<SearchBarRef>(null);
+
+  const resetSearchToDefault = () => {
+    searchBarRef.current?.handleClear();
+  };
+
+  const visibleRows = table.getRowModel().rows;
+  const isSearching =
+    isLoading || isFetching || isRefetching || isFetchingNextPage;
+  const hasNoResults =
+    !isSearching &&
+    ((data?.pages?.[0]?.data?.length ?? 0) === 0 || visibleRows.length === 0);
+
   return (
     <div className="font-inter grid grid-cols-1 w-full overflow-hidden gap-4 xl:gap-8">
       <div className="space-y-4 w-full">
@@ -185,7 +203,12 @@ export const SavedJobs = ({ children }: { children: ReactNode }) => {
           Saved Jobs
         </h1>
         {children}
-        <SearchBar table={table} allJobs={allJobs} />
+        <SearchBar
+          ref={searchBarRef}
+          allJobs={allJobs}
+          table={table}
+          onSearchValueChange={setSearchValue}
+        />
 
         <div className="w-full bg-[#F1F2F4] p-2 px-4 rounded-sm sm:flex justify-between hidden font-roboto">
           <p className="text-[#474C54]">Job</p>
@@ -196,8 +219,21 @@ export const SavedJobs = ({ children }: { children: ReactNode }) => {
           <div className="overflow-hidden border-none hidden lg:grid grid-cols-1">
             <Table>
               <TableBody className="">
-                {table.getRowModel().rows?.length ? (
-                  table.getRowModel().rows.map((row) => (
+                {isSearching ? (
+                  <div className="grid gap-4">
+                    {Array.from({ length: 5 }).map((_, index) => (
+                      <OverviewSkeleton key={index} />
+                    ))}
+                  </div>
+                ) : hasNoResults ? (
+                  <div className="flex flex-col gap-1 text-muted-foreground">
+                    <OverviewEmpty
+                      searchValue={searchValue}
+                      resetSearchToDefault={resetSearchToDefault}
+                    />
+                  </div>
+                ) : (
+                  visibleRows.map((row) => (
                     <TableRow
                       onClick={() => {
                         router.push(
@@ -218,15 +254,6 @@ export const SavedJobs = ({ children }: { children: ReactNode }) => {
                       ))}
                     </TableRow>
                   ))
-                ) : (
-                  <TableRow>
-                    <TableCell
-                      colSpan={columns.length}
-                      className="h-24 text-center"
-                    >
-                      No saved jobs found.
-                    </TableCell>
-                  </TableRow>
                 )}
               </TableBody>
             </Table>

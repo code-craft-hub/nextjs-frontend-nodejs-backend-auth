@@ -430,7 +430,6 @@ export const FireworksConfetti: FC<FireworksConfettiProps> = memo(
     className,
     children,
     showControls = true,
-    labels = { start: "🚀 Launch Fireworks", stop: "⏹️ Stop" },
   }) => {
     // Configuration for the hook
     const config: ConfettiConfig = {
@@ -445,7 +444,7 @@ export const FireworksConfetti: FC<FireworksConfettiProps> = memo(
     };
 
     // Use the custom hook
-    const { start, stop, isActive, remainingTime } =
+    const { start, isActive, remainingTime } =
       useFireworksConfetti(config);
 
     // Handle lifecycle callbacks
@@ -465,11 +464,7 @@ export const FireworksConfetti: FC<FireworksConfettiProps> = memo(
       }
     }, [autoStart]); // Only run on mount
 
-    // Format remaining time for display
-    const formatTime = (ms: number | null): string => {
-      if (ms === null) return "0.0s";
-      return `${(ms / 1000).toFixed(1)}s`;
-    };
+
 
     // Render custom children if provided
     if (children) {
