@@ -1,5 +1,4 @@
 import { StreamStatus } from '@/types'
-import React from 'react'
 
 const GenerationStatus = ({streamStatus}: {streamStatus: StreamStatus}) => {
   return (

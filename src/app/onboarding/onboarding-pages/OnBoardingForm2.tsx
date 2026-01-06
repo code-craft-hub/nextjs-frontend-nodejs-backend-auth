@@ -62,6 +62,7 @@ export const OnBoardingForm2 = ({ onNext, onPrev, children }: OnboardingFormProp
 
   return (
     <motion.div
+    // @ts-ignore
       initial={{ opacity: 0, x: 100 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -100 }}

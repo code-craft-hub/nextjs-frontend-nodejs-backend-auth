@@ -1,6 +1,5 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { CheckCircle, HelpCircle } from "lucide-react";
-import React from "react";
 
 const TailorInterviewQuestionEmptyState = ({index}:{index:number}) => {
   return (

@@ -1,7 +1,7 @@
 "use client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
-import { memo, useEffect, useState } from "react";
+import { memo, useEffect } from "react";
 import { AIApply } from "../(dashboard)/dashboard-tabs/ai-apply-tab/AIApply";
 import { FindJob } from "../(dashboard)/dashboard-tabs/find-job-tab/FindJob";
 import { DashboardTab } from "@/types";
@@ -12,28 +12,28 @@ import { JobFilters } from "@/lib/types/jobs";
 import { userQueries } from "@/lib/queries/user.queries";
 import { useQuery } from "@tanstack/react-query";
 import { sendGTMEvent } from "@next/third-parties/google";
-import { ShieldAlert } from "lucide-react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { useRouter } from "next/navigation";
-import { checkAuthStatus } from "../settings/(google-gmail-authorization)/gmail-authorization-service";
+import { getDataSource } from "@/lib/utils/helpers";
+import { useDashboardPrefetch } from "@/lib/react-query/hooks/useDashboardPrefetch";
 import InsufficientCreditsModal from "@/components/shared/InsufficientCreditsModal";
 
 export const HomeClient = memo(
-  ({
-    tab,
-    jobDescription,
-    filters,
-    autoApplyFilters,
-  }: {
-    tab: DashboardTab;
-    jobDescription: string;
-    filters: JobFilters;
-    autoApplyFilters: JobFilters;
-  }) => {
+  ({ tab, jobDescription }: { tab: DashboardTab; jobDescription: string }) => {
     const { data: user } = useQuery(userQueries.detail());
-    const [notification, setNotification] = useState(false);
-    const [userCredit, setUserCredit] = useState(Number(user?.credit ?? 0) === 0);
-    const noDataSource = user?.dataSource?.length === 0;
+    const title = getDataSource(user)?.title;
+    const rolesOfInterest = getDataSource(user)?.rolesOfInterest?.map(
+      (role: any) => role.value
+    );
+    const filters: JobFilters = {
+      page: 1,
+      limit: 20,
+      title: title || "",
+    };
+    const autoApplyFilters: JobFilters = {
+      page: 1,
+      limit: 20,
+      title: title || "",
+      skills: JSON.stringify(rolesOfInterest),
+    };
 
     useEffect(() => {
       if (user?.firstName)
@@ -42,63 +42,17 @@ export const HomeClient = memo(
           value: `${user?.firstName} viewed Dashboard Page`,
         });
     }, [user?.firstName]);
-    const router = useRouter();
 
-    useEffect(() => {
-      const checkAuthorization = async () => {
-        const authStatus = await checkAuthStatus();
-        if (authStatus?.success) {
-          setNotification(authStatus?.data?.isAuthorized);
-        }
-        setUserCredit(Number(user?.credit ?? 0) === 0);
-      };
-      checkAuthorization();
-    }, [notification, user?.credit]);
-    
+    useDashboardPrefetch({
+      filters,
+      autoApplyFilters,
+    });
+
     return (
       <>
         <TopGradient />
-        {userCredit && <InsufficientCreditsModal />}
-
         <div className="container">
-          <div className="w-full mt-4">
-            {!notification && (
-              <Alert className="w-fit mx-auto">
-                <ShieldAlert />
-                <AlertTitle
-                  onClick={() =>
-                    router.push("/dashboard/settings?tab=ai-applypreference")
-                  }
-                  className="hover:cursor-pointer hover:underline"
-                >
-                  Authorize your email account to use email Auto apply
-                </AlertTitle>
-
-                {noDataSource && (
-                  <AlertDescription
-                    onClick={() =>
-                      router.push("/dashboard/settings?tab=ai-applypreference")
-                    }
-                    className="hover:cursor-pointer hover:underline"
-                  >
-                    Please add at least one profile/resume, it&apos;ll be used
-                    for your job personalisation and applications.
-                  </AlertDescription>
-                )}
-                {userCredit && (
-                  <AlertDescription
-                    onClick={() =>
-                      router.push("/dashboard/account?tab=billing")
-                    }
-                    className="hover:cursor-pointer hover:underline"
-                  >
-                    Free plan expired, upgrade to Pro or refer 5 people to Cver
-                    AI
-                  </AlertDescription>
-                )}
-              </Alert>
-            )}
-          </div>
+          <div className="w-full mt-4"></div>
           <Tabs
             defaultValue={tab ?? "ai-apply"}
             className="gap-y-13 w-full p-4 sm:p-8"
@@ -143,9 +97,73 @@ export const HomeClient = memo(
             </TabsContent>
           </Tabs>
         </div>
+        <InsufficientCreditsModal />
       </>
     );
   }
 );
-
 HomeClient.displayName = "HomeClient";
+
+{
+  /* {userCredit && <InsufficientCreditsModal />} */
+}
+
+{
+  /* {!notification && (
+              <Alert className="w-fit mx-auto">
+                <ShieldAlert />
+                <AlertTitle
+                  onClick={() =>
+                    router.push("/dashboard/settings?tab=ai-applypreference")
+                  }
+                  className="hover:cursor-pointer hover:underline"
+                >
+                  Authorize your email account to use email Auto apply
+                </AlertTitle>
+
+                {noDataSource && (
+                  <AlertDescription
+                    onClick={() =>
+                      router.push("/dashboard/settings?tab=ai-applypreference")
+                    }
+                    className="hover:cursor-pointer hover:underline"
+                  >
+                    Please add at least one profile/resume, it&apos;ll be used
+                    for your job personalisation and applications.
+                  </AlertDescription>
+                )}
+                {userCredit && (
+                  <AlertDescription
+                    onClick={() =>
+                      router.push("/dashboard/account?tab=billing")
+                    }
+                    className="hover:cursor-pointer hover:underline"
+                  >
+                    Free plan expired, upgrade to Pro or refer 5 people to Cver
+                    AI
+                  </AlertDescription>
+                )}
+              </Alert>
+            )} */
+}
+// const [notification, setNotification] = useState(false);
+// const [userCredit, setUserCredit] = useState(
+//   Number(user?.credit ?? 0) === 0
+// );
+// const noDataSource = user?.dataSource?.length === 0;
+// const router = useRouter();
+
+// useEffect(() => {
+//   const checkAuthorization = async () => {
+//     const authStatus = await checkAuthStatus();
+//     if (authStatus?.success) {
+//       setNotification(authStatus?.data?.isAuthorized);
+//     }
+//     setUserCredit(Number(user?.credit ?? 0) === 0);
+//   };
+//   checkAuthorization();
+// }, [notification, user?.credit]);m "lucide-react";
+// import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+// import { useRouter } from "next/navigation";
+// import { checkAuthStatus } from "../settings/(google-gmail-authorization)/gmail-authorization-service";
+// import InsufficientCreditsModal

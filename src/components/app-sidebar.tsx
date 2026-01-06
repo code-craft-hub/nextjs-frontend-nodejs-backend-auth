@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import { BsExclamationCircle } from "react-icons/bs";
 import {
   Sidebar,

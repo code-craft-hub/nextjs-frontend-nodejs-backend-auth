@@ -18,7 +18,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Card } from "@/components/ui/card";
-import { useRef, useState } from "react";
+import { forwardRef, useImperativeHandle, useRef, useState } from "react";
 import { X } from "lucide-react";
 import {
   HoverCard,
@@ -30,13 +30,32 @@ const formSchema = z.object({
   searchValue: z.string(),
 });
 
-export const SearchBar = ({
-  allJobs,
-  table,
-}: {
-  allJobs?: any[];
-  table?: any;
-}) => {
+export interface SearchBarRef {
+  handleClear: () => void;
+}
+
+export const SearchBar = forwardRef<
+  SearchBarRef,
+  {
+    allJobs?: any[];
+    table?: any;
+    onSearchValueChange?: (value: string) => void;
+  }
+>(({ allJobs, table, onSearchValueChange}, ref) => {
+
+  const handleClear = () => {
+    form.reset();
+    table.getColumn("title")?.setFilterValue(undefined);
+    table.getColumn("employmentType")?.setFilterValue(undefined);
+    table.getColumn("location")?.setFilterValue(undefined);
+    setLocation("");  
+    setEmploymentType("");
+    setShowClearButton(false);
+  };
+
+  useImperativeHandle(ref, () => ({
+    handleClear,
+  }));
   const [showClearButton, setShowClearButton] = useState(false);
   const [location, setLocation] = useState(allJobs?.[0]?.location || "");
   const [employmentType, setEmploymentType] = useState(
@@ -62,14 +81,16 @@ export const SearchBar = ({
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     table.getColumn("title")?.setFilterValue(values.searchValue);
+    onSearchValueChange?.(values.searchValue);
   }
 
-  const handleClear = () => {
-    form.reset();
-    table.getColumn("title")?.setFilterValue(undefined);
-    table.getColumn("employmentType")?.setFilterValue(undefined);
-    table.getColumn("location")?.setFilterValue(undefined);
-  };
+  // const handleClear = () => {
+  //   form.reset();
+  //   table.getColumn("title")?.setFilterValue(undefined);
+  //   table.getColumn("employmentType")?.setFilterValue(undefined);
+  //   table.getColumn("location")?.setFilterValue(undefined);
+  // };
+
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement>,
     onChange: (...event: any[]) => void
@@ -91,7 +112,7 @@ export const SearchBar = ({
           className="w-full grid grid-cols-1"
         >
           <Card className="w-full grid grid-cols-1 lg:grid lg:grid-cols-4 justify-between flex-row lg:items-center gap-2 px-4 py-4">
-            <div className="relative p-1 lg:border-r-[1px] lg:border-black/40 mr-1">
+            <div className="relative p-1 lg:border-r lg:border-black/40 mr-1">
               <FormField
                 control={form.control}
                 name="searchValue"
@@ -127,7 +148,7 @@ export const SearchBar = ({
                 alt=""
               />
             </div>
-            <div className="flex gap-1 items-center py-2 lg:border-r-[1px] lg:border-black/40 pr-2">
+            <div className="flex gap-1 items-center py-2 lg:border-r lg:border-black/40 pr-2">
               <DropdownMenu>
                 <DropdownMenuTrigger className="w-full text-start text-black/60 border-none focus:border-none focus:outline-none flex text-xs line-clamp-1 text-nowrap overflow-hidden truncate">
                   <img src="/map.svg" className="size-4 mr-1" alt="" />
@@ -234,4 +255,4 @@ export const SearchBar = ({
       </Form>
     </div>
   );
-};
+});

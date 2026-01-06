@@ -1,4 +1,3 @@
-import * as React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -31,6 +30,7 @@ import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { formatFirestoreDate } from "@/lib/utils/helpers";
+import { useMemo, useState } from "react";
 
 export const schema = z.object({
   id: z.number(),
@@ -81,9 +81,7 @@ const getColumns = (
   },
   {
     accessorKey: "generatedAt",
-    header: () => (
-      <div className=" w-full ">Application Date</div>
-    ),
+    header: () => <div className=" w-full ">Application Date</div>,
     cell: ({ row }) => (
       <div className="">
         <Badge variant="outline" className={cn("border-0 px-1.5 font-inter")}>
@@ -94,9 +92,7 @@ const getColumns = (
   },
   {
     accessorKey: "type",
-    header: () => (
-      <div className=" w-full ">Application Method</div>
-    ),
+    header: () => <div className=" w-full ">Application Method</div>,
     cell: ({ row }) => (
       <div className="flex gap-2 items-center justify-">
         <div>
@@ -144,21 +140,21 @@ const getColumns = (
 export function AIJobCustomizationDatatable({ data }: { data: any[] }) {
   const router = useRouter();
 
-  const [rowSelection, setRowSelection] = React.useState({});
+  const [rowSelection, setRowSelection] = useState({});
   const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    useState<VisibilityState>({});
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(
     []
   );
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [pagination, setPagination] = React.useState({
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [pagination, setPagination] = useState({
     pageIndex: 0,
     pageSize: 10,
   });
 
-  const [isLoadingMore, setIsLoadingMore] = React.useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
-  const columns = React.useMemo(() => getColumns(router), [router]);
+  const columns = useMemo(() => getColumns(router), [router]);
 
   const table = useReactTable({
     data,

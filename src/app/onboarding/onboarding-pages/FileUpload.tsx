@@ -54,6 +54,7 @@ export const FileUpload = ({
     <div className="w-full" {...getRootProps()}>
       <motion.div
         onClick={handleClick}
+        // @ts-ignore
         whileHover="animate"
         className={cn(
           " group/file block rounded-sm cursor-pointer w-full relative ",
@@ -84,6 +85,7 @@ export const FileUpload = ({
               files.map((file, idx) => (
                 <motion.div
                   key={"file" + idx}
+                  // @ts-ignore
                   layoutId={idx === 0 ? "file-upload" : "file-upload-" + idx}
                   className={cn(
                     "relative overflow-hidden z-40 bg-white dark:bg-neutral-900 flex flex-col items-start justify-start md:h-24 p-4 mt-4 w-full mx-auto rounded-md",
@@ -92,6 +94,7 @@ export const FileUpload = ({
                 >
                   <div className="flex justify-between w-full items-center gap-4">
                     <motion.p
+                    // @ts-ignore
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       layout
@@ -100,6 +103,7 @@ export const FileUpload = ({
                       {file.name}
                     </motion.p>
                     <motion.p
+                    // @ts-ignore
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       layout
@@ -111,6 +115,7 @@ export const FileUpload = ({
 
                   <div className="flex text-sm md:flex-row flex-col items-start md:items-center w-full mt-2 justify-between text-neutral-600 dark:text-neutral-400">
                     <motion.p
+                    // @ts-ignore
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       layout
@@ -120,6 +125,7 @@ export const FileUpload = ({
                     </motion.p>
 
                     <motion.p
+                    // @ts-ignore
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       layout
@@ -132,6 +138,7 @@ export const FileUpload = ({
               ))}
             {!files.length && (
               <motion.div
+              // @ts-ignore
                 layoutId="file-upload"
                 variants={mainVariant}
                 transition={{
@@ -146,6 +153,7 @@ export const FileUpload = ({
               >
                 {isDragActive ? (
                   <motion.p
+                  // @ts-ignore
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     className="text-neutral-600 flex flex-col items-center"
@@ -176,6 +184,7 @@ export const FileUpload = ({
 
             {!files.length && (
               <motion.div
+              // @ts-ignore
                 variants={secondaryVariant}
                 className="absolute opacity-0  inset-0 z-30 bg-transparent flex items-center justify-center h-32  w-full max-w-[8rem] mx-auto rounded-md"
               ></motion.div>

@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import { useState, useCallback } from "react";
 
 /**
  * Enterprise-grade video player component with animated borders and play overlay
@@ -6,7 +6,9 @@ import React, { useState, useCallback } from "react";
  */
 export const VideoModal: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const [videoSrc, setVideoSrc] = useState<string>("https://www.youtube.com/embed/6Uss1_YleJk");
+  const [videoSrc, setVideoSrc] = useState<string>(
+    "https://www.youtube.com/embed/6Uss1_YleJk"
+  );
 
   /**
    * Handle play button click - loads and autoplays YouTube video

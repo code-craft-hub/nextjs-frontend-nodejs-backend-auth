@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   ColumnFiltersState,
@@ -25,24 +25,11 @@ import { jobsQueries } from "@/lib/queries/jobs.queries";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { leftMenuItems } from "@/lib/utils/constants";
 import { v4 as uuidv4 } from "uuid";
-import { ColumnDef } from "@tanstack/react-table";
-import {
-  BookmarkIcon,
-  Calendar,
-  DollarSign,
-  MapPin,
-  ArrowRight,
-  Sparkles,
-  SearchIcon,
-  Loader2,
-} from "lucide-react";
-import { formatAppliedDate, getDataSource } from "@/lib/utils/helpers";
+import { ArrowRight, SearchIcon, Loader2 } from "lucide-react";
+import { getDataSource } from "@/lib/utils/helpers";
 import { JobType } from "@/types";
-import { Toggle } from "@/components/ui/toggle";
 import { apiService } from "@/hooks/use-auth";
 import { toast } from "sonner";
-import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import { userQueries } from "@/lib/queries/user.queries";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { useForm } from "react-hook-form";
 import {
@@ -51,26 +38,26 @@ import {
 } from "@/lib/mutations/jobs.mutations";
 import { ReportCard } from "./ReportCard";
 import { jobMatcher } from "@/services/job-matcher";
-import { PiOfficeChairFill } from "react-icons/pi";
-import MobileOverview from "./MobileOverview";
 import { sendGTMEvent } from "@next/third-parties/google";
 import InsufficientCreditsModal from "@/components/shared/InsufficientCreditsModal";
+import { userQueries } from "@/lib/queries/user.queries";
+import {
+  OverviewColumn,
+  OverviewEmpty,
+  OverviewSkeleton,
+} from "./OverviewColumn";
+import MobileOverview from "./MobileOverview";
 
 export default function Overview() {
   const router = useRouter();
   const [searchValue, setSearchValue] = useState("");
   const [isAutoFetching, setIsAutoFetching] = useState(false);
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  );
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = React.useState({});
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = useState({});
   const totalScoreRef = useRef<number>(0);
   const { data: user } = useQuery(userQueries.detail());
-  // const noCredit = user?.credit === 0;
-  const [userCredit, setUserCredit] = useState(Number(user?.credit ?? 0) === 0);
 
   useEffect(() => {
     if (user?.firstName)
@@ -79,10 +66,6 @@ export default function Overview() {
         value: `${user?.firstName} viewed Job Page`,
       });
   }, [user?.firstName]);
-
-  useEffect(() => {
-      setUserCredit(Number(user?.credit ?? 0) === 0);
-  }, [user?.credit]);
 
   const infiniteFilters = useMemo(
     () => ({
@@ -118,8 +101,15 @@ export default function Overview() {
     [appliedJobsIds]
   );
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useInfiniteQuery(jobsQueries?.infinite(infiniteFilters));
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isLoading,
+    isFetching,
+    isRefetching,
+    isFetchingNextPage,
+  } = useInfiniteQuery(jobsQueries?.infinite(infiniteFilters));
 
   const allJobs = useMemo(() => {
     const jobs = data?.pages.flatMap((page) => page.data) ?? [];
@@ -211,7 +201,7 @@ export default function Overview() {
       `/dashboard/tailor-cover-letter/${uuidv4()}?${params}&aiApply=true`
     );
   };
-  const columns = getFindJobsColumns({
+  const columns = OverviewColumn({
     router,
     updateJobs,
     handleApply,
@@ -234,6 +224,12 @@ export default function Overview() {
     },
   });
 
+  const resetSearchToDefault = () => {
+    setSearchValue("");
+    table.getColumn("title")?.setFilterValue(undefined);
+    setIsAutoFetching(false);
+  };
+
   const onSubmit = async ({ username }: any) => {
     const trimmedSearch = username.trim();
     sendGTMEvent({
@@ -253,12 +249,13 @@ export default function Overview() {
     setIsAutoFetching(false);
   };
   const visibleRows = table.getRowModel().rows;
-  const hasNoResults = visibleRows.length === 0;
-  const isSearching = isAutoFetching || isFetchingNextPage;
+  const isSearching =
+    isLoading || isFetching || isRefetching || isFetchingNextPage;
+  const hasNoResults =
+    !isSearching && (data?.pages?.[0]?.data?.length ?? 0) === 0;
 
   return (
     <div className="lg:gap-6 lg:flex ">
-      {userCredit && <InsufficientCreditsModal />}
       <div className="bg-white p-3 h-fit rounded-md hidden lg:flex lg:flex-col gap-1">
         {leftMenuItems.map((item) => (
           <div
@@ -304,7 +301,7 @@ export default function Overview() {
                     <FormItem className=" w-full">
                       <FormControl>
                         <input
-                          className="border-none focus:border-none focus:outline-none w-full !bg-white focus:!bg-white h-14"
+                          className="border-none focus:border-none focus:outline-none w-full bg-white! focus:bg-white! h-14"
                           placeholder="Job title / Company name"
                           {...field}
                         />
@@ -329,21 +326,32 @@ export default function Overview() {
             </p>
           </div>
         </div>
-
         <div className="hidden lg:grid grid-cols-1">
           <Table>
             <TableBody>
-              {visibleRows.length ? (
+              {isSearching ? (
+                <div className="grid gap-4">
+                  {Array.from({ length: 4 }).map((_, index) => (
+                    <OverviewSkeleton key={index} />
+                  ))}
+                </div>
+              ) : hasNoResults ? (
+                <div className="flex flex-col gap-1 text-muted-foreground">
+                  <OverviewEmpty
+                    searchValue={searchValue}
+                    resetSearchToDefault={resetSearchToDefault}
+                  />
+                </div>
+              ) : (
                 visibleRows.map((row) => (
                   <TableRow
-                    onClick={() => {
+                    key={row.id}
+                    onClick={() =>
                       router.push(
                         `/dashboard/jobs/${row.original.id}?referrer=jobs&title=${row.original.title}`
-                      );
-                    }}
-                    key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
-                    className="hover:bg-white border-b !rounded-3xl hover:border-primary hover:border-[2px] hover:rounded-2xl hover:cursor-pointer"
+                      )
+                    }
+                    className="hover:bg-white border-b rounded-3xl! hover:border-primary hover:border-2 hover:rounded-2xl hover:cursor-pointer"
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id}>
@@ -355,30 +363,6 @@ export default function Overview() {
                     ))}
                   </TableRow>
                 ))
-              ) : (
-                <TableRow>
-                  <TableCell
-                    colSpan={columns.length}
-                    className="h-24 text-center"
-                  >
-                    {isSearching || isFetchingNextPage ? (
-                      <div className="flex items-center justify-center gap-2">
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        <span>Searching for matching jobs...</span>
-                      </div>
-                    ) : hasNoResults && !hasNextPage ? (
-                      isSearching ? (
-                        "Searching ... "
-                      ) : (
-                        <span>
-                          No results found. All data has been searched.
-                        </span>
-                      )
-                    ) : (
-                      <span>No results.</span>
-                    )}
-                  </TableCell>
-                </TableRow>
               )}
             </TableBody>
           </Table>
@@ -411,146 +395,7 @@ export default function Overview() {
           </div>
         )}
       </div>
+      <InsufficientCreditsModal />
     </div>
   );
 }
-
-export const getFindJobsColumns = ({
-  updateJobs,
-  handleApply,
-}: {
-  router: AppRouterInstance;
-  updateJobs?: any;
-  handleApply?: any;
-}): ColumnDef<JobType>[] => [
-  {
-    accessorKey: "companyText",
-    header: "Company",
-    cell: ({ row }) => (
-      <div className="shrink-0 flex items-center justify-center size-16">
-        <img
-          src={
-            !!row.original.companyLogo
-              ? row.original.companyLogo
-              : "/placeholder.jpg"
-          }
-          alt={row.original.companyText}
-          className="size-12"
-        />
-      </div>
-    ),
-  },
-  {
-    accessorKey: "title",
-    header: "Title",
-    cell: ({ row }) => {
-      const matchPercentage = Number(row.original.matchPercentage) || 0;
-      return (
-        <div className="capitalize ">
-          <div className="flex gap-4 items-center">
-            <div className="font-medium text-xs max-w-sm overflow-hidden">
-              {row.getValue("title")}
-            </div>
-            <div className="bg-blue-50 rounded text-blue-600 px-2 py-1">
-              <span className="text-2xs">
-                {!!row.original.jobType
-                  ? row.original.jobType
-                  : row.original.employmentType}
-              </span>
-            </div>
-            <div className="">
-              {matchPercentage > 40 && (
-                <Sparkles className="text-yellow-500 size-4" />
-              )}
-            </div>
-          </div>
-          <div className="flex gap-x-4 mt-1">
-            <p className="flex gap-1 text-gray-400 items-center">
-              <MapPin className="size-3" />
-              <span className="text-2xs">{row.original.location}</span>
-            </p>
-            <p className="flex gap-1 text-gray-400 items-center">
-              <PiOfficeChairFill className="size-3" />
-              <span className="text-2xs">{row.original.companyName}</span>
-            </p>
-            {!!row.original?.salary && (
-              <p className="flex gap-1 text-gray-400 items-center">
-                <DollarSign className="size-3" />
-                <span className="text-2xs">{row.original?.salary}</span>
-              </p>
-            )}
-            <p className="flex gap-1 text-gray-400 items-center">
-              <Calendar className="size-3" />
-              <span className="text-2xs">
-                {formatAppliedDate(
-                  row.original?.scrapedAt ||
-                    row.original?.postedAt ||
-                    row.original?.updatedAt
-                )}
-              </span>
-            </p>
-            {matchPercentage > 40 && (
-              <p className="text-2xs text-green-400">{matchPercentage}%</p>
-            )}
-          </div>
-        </div>
-      );
-    },
-  },
-  { accessorKey: "location", cell: () => <div></div> },
-  { accessorKey: "jobType", cell: () => <div></div> },
-  { accessorKey: "employmentType", cell: () => <div></div> },
-  {
-    accessorKey: "isBookmarked",
-    cell: ({ row }) => {
-      const isBookmarked = row.original.isBookmarked || false;
-
-      return (
-        <div
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            updateJobs.mutate({
-              id: String(row.original.id),
-              data: {
-                isBookmarked: !isBookmarked,
-              },
-            });
-          }}
-          className="flex justify-end"
-        >
-          <Toggle
-            pressed={isBookmarked || false}
-            aria-label="Toggle bookmark"
-            size="sm"
-            variant="outline"
-            className="data-[state=on]:bg-transparent data-[state=on]:*:[svg]:fill-black data-[state=on]:*:[svg]:stroke-black"
-          >
-            <BookmarkIcon />
-          </Toggle>
-        </div>
-      );
-    },
-  },
-  {
-    id: "actions",
-    enableHiding: false,
-    cell: ({ row }) => {
-      return (
-        <div className="flex justify-end">
-          <Button
-            disabled={row.original.isApplied}
-            className="w-full disabled:opacity-50 disabled:cursor-not-allowed disabled:text-gray-400"
-            onClick={(event) => handleApply({ event, row })}
-            variant={"button"}
-          >
-            {row.original?.emailApply ? "Auto Apply" : "Apply Now"}
-            {row.original?.emailApply && (
-              <Sparkles className="text-3 text-yellow" />
-            )}
-          </Button>
-        </div>
-      );
-    },
-  },
-];

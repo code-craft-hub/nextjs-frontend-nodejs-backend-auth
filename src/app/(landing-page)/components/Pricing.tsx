@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Check, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import  { useState } from "react";
 
 const Pricing = () => {
   const [selectedPlan, setSelectedPlan] = useState("pro");

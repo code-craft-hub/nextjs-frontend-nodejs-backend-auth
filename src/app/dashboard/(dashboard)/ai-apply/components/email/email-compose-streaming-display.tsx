@@ -1,5 +1,5 @@
-import { formatStreamContent } from '@/lib/utils/helpers';
-import React, { useEffect, useRef } from 'react';
+import { formatStreamContent } from "@/lib/utils/helpers";
+import { useEffect, useRef } from "react";
 
 interface StreamingDisplayProps {
   content: string;
@@ -14,7 +14,7 @@ interface StreamingDisplayProps {
 export const StreamingDisplay: React.FC<StreamingDisplayProps> = ({
   content,
   isStreaming,
-  isComplete
+  isComplete,
 }) => {
   const contentRef = useRef<HTMLDivElement>(null);
   const shouldAutoScroll = useRef(true);
@@ -83,11 +83,7 @@ export const StreamingDisplay: React.FC<StreamingDisplayProps> = ({
           )}
           {isComplete && (
             <div className="flex items-center gap-2 text-green-600">
-              <svg
-                className="w-4 h-4"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                 <path
                   fillRule="evenodd"
                   d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
@@ -110,7 +106,7 @@ export const StreamingDisplay: React.FC<StreamingDisplayProps> = ({
           <pre className="whitespace-pre-wrap font-sans text-slate-800 leading-relaxed">
             {formattedContent}
           </pre>
-          
+
           {/* Typing cursor during streaming */}
           {isStreaming && (
             <span className="inline-block w-0.5 h-5 bg-blue-600 animate-pulse ml-0.5"></span>

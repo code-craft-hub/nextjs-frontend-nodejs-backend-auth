@@ -15,7 +15,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import React, { memo } from "react";
+import  { memo } from "react";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
 

@@ -1,16 +1,13 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Switch } from "@/components/ui/switch";
 import { userQueries } from "@/lib/queries/user.queries";
 import { useQuery } from "@tanstack/react-query";
-import {
-  daysFromToday,
-  formatAppliedDate,
-} from "@/lib/utils/helpers";
+import { daysFromToday, formatAppliedDate } from "@/lib/utils/helpers";
 import { cn } from "@/lib/utils";
 import { useConfirm } from "@/hooks/use-confirm";
 import { toast } from "sonner";
 
-export function ProModal() {
+export function PremiumUserPage() {
   const [autoRenewal, setAutoRenewal] = useState(true);
   const { data: user } = useQuery(userQueries.detail());
 
@@ -149,9 +146,12 @@ export function ProModal() {
 
           {/* Action Buttons */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-6 sm:p-8 pt-0">
-            <button onClick={() => {
-              toast.success("Your account details is update to date.")
-            }} className="px-6 py-3 border-2 border-gray-300 rounded-lg text-[#344054] font-semibold hover:bg-gray-50 transition-colors">
+            <button
+              onClick={() => {
+                toast.success("Your account details is update to date.");
+              }}
+              className="px-6 py-3 border-2 border-gray-300 rounded-lg text-[#344054] font-semibold hover:bg-gray-50 transition-colors"
+            >
               Update Payment Method
             </button>
             <button
@@ -189,9 +189,9 @@ export function ProModal() {
               Cancellation Policy
             </h3>
             <p className="text-[#92400E] text-sm leading-relaxed">
-              If you cancel your subscription, you&apos;ll continue to have access
-              until the end of your current billing period (Nov 23, 2025). No
-              refunds are provided for partial months.
+              If you cancel your subscription, you&apos;ll continue to have
+              access until the end of your current billing period (Nov 23,
+              2025). No refunds are provided for partial months.
             </p>
           </div>
         </div>

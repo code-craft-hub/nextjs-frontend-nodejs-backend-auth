@@ -2,17 +2,24 @@ import { Button } from "@/components/ui/button";
 import { Copy, Info } from "lucide-react";
 import { UpgradeModal } from "./UpgradeModal";
 import { useEffect, useState } from "react";
-import { ProModal } from "./ProSubscription";
+import { PremiumUserPage } from "./PremiumUserPage";
 import { useQuery } from "@tanstack/react-query";
 import { userQueries } from "@/lib/queries/user.queries";
 import { formatFirestoreDate, getDaysRemaining } from "@/lib/utils/helpers";
 import { toast } from "sonner";
 
-export const Billing = ({ reference }: any) => {
+export const Billing = ({
+  reference,
+  isCreditExpired,
+}: {
+  reference: string;
+  isCreditExpired: boolean;
+}) => {
   const { data: user } = useQuery(userQueries.detail());
   const [completed, setCompleted] = useState(Boolean(user?.isPro) || false);
   const [showPlan, setShowPlan] = useState(false);
   const handleStateChange = (value: boolean) => {
+    console.log(value);
     setCompleted(value);
   };
   const handleShowPlan = (value: boolean) => {
@@ -21,7 +28,6 @@ export const Billing = ({ reference }: any) => {
 
   const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
   const remainingDays = getDaysRemaining(user?.expiryTime ?? "");
-  const usedUpAllCredit = Number(user?.credit ?? 0) === 0;
   const REFERRAL = `${APP_URL}/register?referral=${
     user?.referralCode ?? "EXA0Q4YZ"
   }`;
@@ -36,6 +42,10 @@ export const Billing = ({ reference }: any) => {
     setCompleted(Boolean(user?.isPro));
   }, [user?.isPro]);
 
+  // useEffect(() => {
+  //   startConfetti();
+  // }, []);
+
   return !completed ? (
     showPlan ? (
       <UpgradeModal
@@ -49,7 +59,7 @@ export const Billing = ({ reference }: any) => {
           <div className="flex gap-4 justify-between w-full">
             <div className="text-white space-y-2">
               <h1 className="font-semibold font-inter sm:text-2xl">
-                {usedUpAllCredit
+                {isCreditExpired
                   ? "You've used up your free credits"
                   : "Free Trial"}
               </h1>
@@ -57,7 +67,7 @@ export const Billing = ({ reference }: any) => {
                 Explore all features with your trial period
               </p>
             </div>
-            {usedUpAllCredit
+            {isCreditExpired
               ? null
               : Number(remainingDays) > 0 && (
                   <div className="flex shrink-0 flex-col justify-center items-center gap-[4px] w-[97.67px] h-[81px] bg-[rgba(255,255,255,0.2)] rounded-[8px]">
@@ -72,22 +82,22 @@ export const Billing = ({ reference }: any) => {
           </div>
           <div className="flex flex-wrap items-center  gap-4 relative">
             <div className="flex flex-col items-start gap-[4px]">
-              {usedUpAllCredit
-                ? null
-                : user?.expiryTime && (
-                    <p className="relative">
-                      <span className=" font-['Inter'] font-medium text-[14px] leading-[21px] text-white">
-                        Trial expires on{" "}
-                        {formatFirestoreDate(user?.expiryTime ?? "")}
-                      </span>
-                    </p>
-                  )}
+              {isCreditExpired ? null : (
+                <p className="relative">
+                  <span className=" font-['Inter'] font-medium text-[14px] leading-[21px] text-white">
+                    {isCreditExpired
+                      ? " Trial expires on" +
+                        formatFirestoreDate(user?.expiryTime ?? "")
+                      : "Upgrade to Pro or refer 5 people to continue enjoying all the features from Cver AI."}
+                  </span>
+                </p>
+              )}
               <p className=" opacity-80 relative max-sm:text-2xs">
                 <span className="font-inter font-normal text-[12px] leading-[18px] text-white">
                   Upgrade now or refer friends to extend your access. In the
                   main time you have{" "}
                   <span className="font-bold underline">
-                    {user?.credit ?? 0} credits
+                    {user?.credit ?? 0} credits {isCreditExpired && "(expired)"}
                   </span>
                 </span>
               </p>
@@ -192,6 +202,6 @@ export const Billing = ({ reference }: any) => {
       </div>
     )
   ) : (
-    <ProModal />
+    <PremiumUserPage />
   );
 };

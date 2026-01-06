@@ -87,7 +87,7 @@ const MenuItem = memo<{
       )}
       aria-current={isActive ? "page" : undefined}
     >
-      <div className="size-4 flex-shrink-0">
+      <div className="size-4 shrink-0">
         <Image
           src={item.icon}
           alt=""

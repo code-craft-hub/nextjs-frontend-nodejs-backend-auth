@@ -1,7 +1,7 @@
 "use client";
 
 import { customStyles } from "@/lib/utils/constants";
-import React, { KeyboardEventHandler, useState } from "react";
+import { KeyboardEventHandler, useState } from "react";
 import CreatableSelect from "react-select/creatable";
 
 const components = {
@@ -30,50 +30,50 @@ export const SelectCreatable = ({
   placeholder,
 }: SelectCreatableProps) => {
   const [inputValue, setInputValue] = useState("");
-const [lastKeyWasSpace, setLastKeyWasSpace] = useState(false);
+  const [lastKeyWasSpace, setLastKeyWasSpace] = useState(false);
 
-const handleKeyDown: KeyboardEventHandler = (event) => {
-  if (!inputValue) return;
-  
-  // Handle double space
-  if (event.key === " ") {
-    if (lastKeyWasSpace) {
-      // Second space detected
-      if (onChange) {
-        onChange([...value, createOption(inputValue)]);
+  const handleKeyDown: KeyboardEventHandler = (event) => {
+    if (!inputValue) return;
+
+    // Handle double space
+    if (event.key === " ") {
+      if (lastKeyWasSpace) {
+        // Second space detected
+        if (onChange) {
+          onChange([...value, createOption(inputValue)]);
+        }
+        setInputValue("");
+        setLastKeyWasSpace(false);
+        event.preventDefault();
+        return;
+      } else {
+        // First space
+        setLastKeyWasSpace(true);
+        return;
       }
-      setInputValue("");
-      setLastKeyWasSpace(false);
-      event.preventDefault();
-      return;
     } else {
-      // First space
-      setLastKeyWasSpace(true);
-      return;
+      // Reset if any other key is pressed
+      setLastKeyWasSpace(false);
     }
-  } else {
-    // Reset if any other key is pressed
-    setLastKeyWasSpace(false);
-  }
-  
-  switch (event.key) {
-    case "Enter":
-    case "Tab":
-      if (onChange) {
-        onChange([...value, createOption(inputValue)]);
-      }
-      setInputValue("");
-      event.preventDefault();
-      break;
-    case ",":
-      if (onChange) {
-        onChange([...value, createOption(inputValue)]);
-      }
-      setInputValue("");
-      event.preventDefault();
-      break;
-  }
-};
+
+    switch (event.key) {
+      case "Enter":
+      case "Tab":
+        if (onChange) {
+          onChange([...value, createOption(inputValue)]);
+        }
+        setInputValue("");
+        event.preventDefault();
+        break;
+      case ",":
+        if (onChange) {
+          onChange([...value, createOption(inputValue)]);
+        }
+        setInputValue("");
+        event.preventDefault();
+        break;
+    }
+  };
 
   return (
     <CreatableSelect

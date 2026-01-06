@@ -1,4 +1,3 @@
-import React from "react";
 import { createServerQueryClient } from "@/lib/query/prefetch";
 import { userQueries } from "@/lib/queries/user.queries";
 import { HydrationBoundary } from "@/components/hydration-boundary";

@@ -1,4 +1,3 @@
-import React from "react";
 import { TailorCoverLetter } from "./TailorCoverLetter";
 import { createServerQueryClient } from "@/lib/query/prefetch";
 import { coverLetterQueries } from "@/lib/queries/cover-letter.queries";

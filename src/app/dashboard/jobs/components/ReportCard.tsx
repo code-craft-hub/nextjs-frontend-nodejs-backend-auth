@@ -65,8 +65,8 @@ export const ReportCard = ({
               }}
             >
               <div className="">
-                <h1 className="font-bold mb-1">{item.count}</h1>
-                <p className="text-xs">{item.label}</p>
+                <h1 className="font-bold mb-1">{item.label}</h1>
+                {/* <p className="text-xs">{item.label}</p> */}
               </div>
               <div className="bg-white p-3 size-fit rounded-sm">
                 <img src={item.icon} alt={item.label} className="size-4" />
@@ -89,8 +89,8 @@ export const ReportCard = ({
             }}
           >
             <div className="">
-              <h1 className="font-bold font-inter mb-1">{item.count}</h1>
-              <p className="text-xs font-inter">{item.label}</p>
+              <h1 className="font-bold font-inter mb-1">{item.label}</h1>
+              {/* <p className="text-xs font-inter">{item.label}</p> */}
             </div>
             <div className="bg-white p-3 size-fit rounded-sm">
               <img src={item.icon} alt={item.label} className="size-4" />

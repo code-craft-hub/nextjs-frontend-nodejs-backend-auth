@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { jwtVerify } from "jose";
-import { IUser } from "./types";
-import { getJwtSecret } from "./lib/utils/helpers";
+import { IUser } from "./src/types";
+import { getJwtSecret } from "./src/lib/utils/helpers";
 
 async function verifySessionToken(
   token: string
@@ -32,7 +32,7 @@ const protectedPaths = ["/dashboard/home"];
 const verifyEmailPath = "/verify-email";
 const onboardingPath = "/onboarding";
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (

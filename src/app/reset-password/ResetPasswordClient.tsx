@@ -1,16 +1,23 @@
-'use client';
-import React, { useState } from "react";
+"use client";
+import { useState } from "react";
 import { PasswordResetVerifyEmail } from "./PasswordResetVerifyEmail";
 import { ResetPassword } from "./ResetPassword";
 
-const ResetPasswordClient = ({email}:{email: string}) => {
+const ResetPasswordClient = ({ email }: { email: string }) => {
   const [displayComponent, setDisplayComponent] = useState(true);
   const handleStateChange = (value: any) => {
-    setDisplayComponent(value)
-  }
+    setDisplayComponent(value);
+  };
   return (
     <div>
-      {displayComponent ? <PasswordResetVerifyEmail email={email} handleStateChange={handleStateChange} /> : <ResetPassword email={email}  />}
+      {displayComponent ? (
+        <PasswordResetVerifyEmail
+          email={email}
+          handleStateChange={handleStateChange}
+        />
+      ) : (
+        <ResetPassword email={email} />
+      )}
     </div>
   );
 };

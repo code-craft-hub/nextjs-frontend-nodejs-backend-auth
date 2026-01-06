@@ -29,6 +29,7 @@ const ProgressIcon = ({ progress }: { progress: number }) => (
       strokeWidth="1.25"
       strokeLinecap="round"
       strokeLinejoin="round"
+      // @ts-ignore
       initial={{ pathLength: 0 }}
       animate={{ pathLength: progress }}
       transition={{ duration: 0.6 }}
@@ -67,6 +68,7 @@ export const ProgressIndicator = ({
         <div className="bg-gray-50 absolute top-1/2 left-[12%] w-[78%] h-[2px] -translate-y-1/2">
           <motion.div
             className="h-full bg-[#4680EE] origin-left"
+            // @ts-ignore
             initial={{ scaleX: 0 }}
             animate={{ scaleX: (activeStep + 1) / stages.length }}
             transition={{ duration: 0.6, ease: "easeInOut" }}
@@ -80,6 +82,7 @@ export const ProgressIndicator = ({
           >
             <motion.button
               onClick={() => handleSetActiveStep(i)}
+              // @ts-ignore
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
             >

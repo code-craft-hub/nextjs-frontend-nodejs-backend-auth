@@ -10,7 +10,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import React, { memo } from "react";
+import { memo } from "react";
 
 const MobileOverview = memo(
   ({
@@ -50,7 +50,7 @@ const MobileOverview = memo(
                 <div className="flex-1">
                   <div className="flex items-start overflow-hidden justify-between mb-3">
                     <div className="flex items-center gap-3">
-                      <h2 className="text-sm font-semibold text-gray-900 capitalize break-words  ">
+                      <h2 className="text-sm font-semibold text-gray-900 capitalize wrap-break-word  ">
                         {job.title}
                       </h2>
                       <span className="px-3 hidden sm:flex py-1 bg-blue-50 text-blue-600 text-2xs text-nowrap sm:text-xs rounded-full">

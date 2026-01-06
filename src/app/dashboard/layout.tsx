@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/sidebar";
 import { UserMenu } from "@/components/UserMenu";
 import { DynamicBreadcrumb } from "./components/DynamicBreadcrumb";
-import { requireAuth } from "@/lib/server-auth";
+import { requireOnboarding } from "@/lib/server-auth";
 import { createServerQueryClient } from "@/lib/query/prefetch";
 import { userQueries } from "@/lib/queries/user.queries";
 import { HydrationBoundary } from "@/components/hydration-boundary";
@@ -21,7 +21,7 @@ interface DashboardLayoutProps {
 }
 
 const DashboardLayout = async ({ children }: DashboardLayoutProps) => {
-  await requireAuth();
+   await requireOnboarding();
   const token = (await getCookiesToken()) ?? "";
   const queryClient = createServerQueryClient();
   await queryClient.prefetchQuery(userQueries.detail(token));

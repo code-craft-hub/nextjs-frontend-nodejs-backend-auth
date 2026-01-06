@@ -20,16 +20,25 @@ export const jobsQueries = {
     return infiniteQueryOptions({
       queryKey: [...queryKeys.jobs.lists(), "infinite", baseFilters],
       queryFn: ({ pageParam }) => {
-        return jobsApi.getJobs({
-          ...baseFilters,
-          page: pageParam,
-          limit: baseFilters.limit || 20,
-        }, token);
+        return jobsApi.getJobs(
+          {
+            ...baseFilters,
+            page: pageParam,
+            limit: baseFilters.limit || 20,
+          },
+          token
+        );
       },
       getNextPageParam: (lastPage) => {
+
+        if (!lastPage?.data || lastPage.data.length === 0) {
+          return undefined;
+        }
+
         if (lastPage.page < lastPage.totalPages) {
           return lastPage.page + 1;
         }
+
         return undefined;
       },
       getPreviousPageParam: (firstPage) => {
@@ -53,16 +62,22 @@ export const jobsQueries = {
   },
 
   // Infinite scroll version for auto-apply jobs
-  autoApplyInfinite: (filters: Omit<JobFilters, "page"> = {}, token?: string) => {
+  autoApplyInfinite: (
+    filters: Omit<JobFilters, "page"> = {},
+    token?: string
+  ) => {
     const baseFilters = normalizeJobFilters(filters as JobFilters);
     return infiniteQueryOptions({
       queryKey: [...queryKeys.jobs.auto(baseFilters), "infinite"],
       queryFn: ({ pageParam }) => {
-        return jobsApi.autoApply({
-          ...baseFilters,
-          page: pageParam,
-          limit: baseFilters.limit || 20,
-        }, token);
+        return jobsApi.autoApply(
+          {
+            ...baseFilters,
+            page: pageParam,
+            limit: baseFilters.limit || 20,
+          },
+          token
+        );
       },
       getNextPageParam: (lastPage) => {
         if (lastPage.page < lastPage.totalPages) {

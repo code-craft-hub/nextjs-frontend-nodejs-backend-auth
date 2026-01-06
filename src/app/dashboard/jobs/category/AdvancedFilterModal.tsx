@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -339,27 +339,28 @@ export default function AdvancedFilterModal() {
 
   return (
     <div className="bg-red-500 w-full">
-
-    <Dialog>
-      <form>
-        <DialogTrigger asChild>
-          <Button variant="outline">Filter options <ChevronDown className="size-3" /> </Button>
-        </DialogTrigger>
-        <DialogContent className="!w-[90svw] p-0  !max-w-none h-fit overflow-auto bg-white ">
-          <DialogHeader>
-            <DialogTitle className="sr-only">Edit profile</DialogTitle>
-            <DialogDescription className="sr-only">
-              Make changes to your profile here. Click save when you&apos;re
-              done.
-            </DialogDescription>
-          </DialogHeader>
-          <AdvancedJobFilter
-            onFilterChange={handleFilterChange}
-            onApplyFilters={handleApplyFilters}
-          />
-        </DialogContent>
-      </form>
-    </Dialog>
+      <Dialog>
+        <form>
+          <DialogTrigger asChild>
+            <Button variant="outline">
+              Filter options <ChevronDown className="size-3" />{" "}
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="w-[90svw]! p-0  max-w-none! h-fit overflow-auto bg-white ">
+            <DialogHeader>
+              <DialogTitle className="sr-only">Edit profile</DialogTitle>
+              <DialogDescription className="sr-only">
+                Make changes to your profile here. Click save when you&apos;re
+                done.
+              </DialogDescription>
+            </DialogHeader>
+            <AdvancedJobFilter
+              onFilterChange={handleFilterChange}
+              onApplyFilters={handleApplyFilters}
+            />
+          </DialogContent>
+        </form>
+      </Dialog>
     </div>
   );
 }

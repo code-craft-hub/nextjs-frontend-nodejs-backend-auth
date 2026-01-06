@@ -1,6 +1,3 @@
-import React from 'react';
-
-// Main reusable component
 export function SegmentedProgress({ 
   percentage = 40, 
   size = 384, // default 96 * 4 (w-96)
