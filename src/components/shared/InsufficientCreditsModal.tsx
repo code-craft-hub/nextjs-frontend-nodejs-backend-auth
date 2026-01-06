@@ -11,32 +11,97 @@ import {
 import { useUpdateUserMutation } from "@/lib/mutations/user.mutations";
 import { userQueries } from "@/lib/queries/user.queries";
 import { formatFirestoreDate } from "@/lib/utils/helpers";
-import { useQuery } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useFireworksConfetti } from "../ui/confetti";
+import { toast } from "sonner";
+import { userApi } from "@/lib/api/user.api";
+import { IUser } from "@/types";
 
-export default function InsufficientCreditsModal() {
+export default function InsufficientCreditsModal({
+  hidden = false,
+}: {
+  hidden?: boolean;
+}) {
   const router = useRouter();
   const updateUser = useUpdateUserMutation();
+  const { start: startConfetti } = useFireworksConfetti();
+  const queryClient = useQueryClient();
+  const [currentUser, setCurrentUser] = useState<Partial<IUser> | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const { data: user } = useQuery(userQueries.detail());
-  const isCreditExpired =
-    user?.expiryTime === undefined
-      ? true
-      : new Date(formatFirestoreDate(user?.expiryTime)) < new Date();
-
-  useEffect(() => {
-    if (isCreditExpired) {
-      console.warn(`${user?.firstName} has insufficient credits.`);
-      updateUser.mutate({
-        data: {
-          credit: 0,
-          isPro: false,
-        },
-      });
+  const getUserData = async () => {
+    try {
+      setLoading(true);
+      const data = await userApi.getUser();
+      setCurrentUser(data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
     }
-  }, []);
+  };
 
+  const isCreditExpired =
+    currentUser?.expiryTime === undefined
+      ? true
+      : new Date(formatFirestoreDate(currentUser?.expiryTime)) < new Date();
+
+  // console.log(
+  //   currentUser?.expiryTime,
+  //   currentUser?.isEligibleForReward,
+  //   isCreditExpired
+  // );
+  useEffect(() => {
+    getUserData();
+    if (currentUser === null) return;
+    console.log(currentUser?.expiryTime, isCreditExpired);
+    if (isCreditExpired) {
+      console.warn(`${currentUser?.firstName} has insufficient credits.`);
+      updateUser.mutate(
+        {
+          data: {
+            credit: 0,
+            isPro: false,
+          },
+        },
+        {
+          onSuccess: () => {
+            queryClient.invalidateQueries({
+              queryKey: userQueries.detail().queryKey,
+            });
+          },
+        }
+      );
+    }
+    if (currentUser?.isEligibleForReward) {
+      startConfetti();
+      toast.success(
+        "🎉 You've earned 10 bonus credits for referring 5 users! valid for 7 days"
+      );
+      updateUser.mutate(
+        {
+          data: {
+            isEligibleForReward: false,
+          },
+        },
+        {
+          onSuccess: () => {
+            queryClient.invalidateQueries({
+              queryKey: userQueries.detail().queryKey,
+            });
+          },
+        }
+      );
+    }
+  }, [JSON.stringify(currentUser)]);
+
+  if (hidden) {
+    return null;
+  }
+
+  if (loading) return null;
   return (
     isCreditExpired && (
       <AlertDialog defaultOpen>

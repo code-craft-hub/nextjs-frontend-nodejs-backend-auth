@@ -12,6 +12,7 @@ import { useFireworksConfetti } from "@/components/ui/confetti";
 import { formatFirestoreDate } from "@/lib/utils/helpers";
 import { Button } from "@/components/ui/button";
 import { apiService } from "@/hooks/use-auth";
+import InsufficientCreditsModal from "@/components/shared/InsufficientCreditsModal";
 
 export const AccountClient = ({
   tab,
@@ -56,6 +57,7 @@ export const AccountClient = ({
     }
   }, []);
 
+  console.log("Accounts page");
   return (
     <div className="space-y-4 sm:space-y-8">
       <div className="flex justify-center items-center w-full bg-white shadow-2xl rounded-full p-1 px-1.5 max-w-5xl mx-auto font-roboto">
@@ -95,6 +97,7 @@ export const AccountClient = ({
           Delete Account
         </Button>
       )}
+      <InsufficientCreditsModal hidden={true} />
     </div>
   );
 };

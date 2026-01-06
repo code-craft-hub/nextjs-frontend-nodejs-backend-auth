@@ -78,6 +78,8 @@ export interface IUser {
   providerId?: string;
   emailVerified?: boolean;
   referralCount?: number;
+  isEligibleForReward?: boolean;
+  referredBy?: string;
   expiryTime?: string | Date;
   usersReferred?: [];
   dataSource?: any[];
