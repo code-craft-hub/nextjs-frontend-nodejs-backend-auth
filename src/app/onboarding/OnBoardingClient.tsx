@@ -30,8 +30,8 @@ export default function OnboardingClient() {
 
   const router = useRouter();
   const deleteAccount = async () => {
-    await api.delete("/delete");
-    // await api.post("/logout");
+    // await api.delete("/delete");
+    await api.post("/logout");
     router.push("/login");
   };
 
