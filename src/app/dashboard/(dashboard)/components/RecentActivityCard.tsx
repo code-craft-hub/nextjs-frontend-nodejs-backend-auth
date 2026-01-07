@@ -60,9 +60,9 @@ export const RecentActivityCard = memo(
         return;
       }
 
-      const { isAuthorized } = await apiService.gmailOauthStatus();
+      const { authorized } = await apiService.gmailOauthStatus();
 
-      if (!isAuthorized) {
+      if (!authorized) {
         toast.error(
           "✨ Go to the Settings page and enable authorization for Cver AI to send emails on your behalf. This option is located in the second card.",
           {

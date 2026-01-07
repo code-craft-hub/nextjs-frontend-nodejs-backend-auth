@@ -24,7 +24,6 @@ const AccountPage = async ({ searchParams }: any) => {
           expiryTime?: string | Date;
         };
       }>(`/paystack/payments/verify/${reference}`, { token });
-      console.log("Payment verification data:", data); 
       initialData = data;
     } catch (error) {
       console.error("Error verifying payment:", error);

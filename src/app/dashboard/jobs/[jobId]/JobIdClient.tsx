@@ -69,9 +69,9 @@ export const JobIdClient = ({
     }
 
     if (user?.email && job?.emailApply) {
-      const { isAuthorized } = await apiService.gmailOauthStatus();
+      const { authorized } = await apiService.gmailOauthStatus();
 
-      if (!isAuthorized) {
+      if (!authorized) {
         toast(
           "Please authorize Cver AI to send emails on your behalf from the settings page.  ",
           {

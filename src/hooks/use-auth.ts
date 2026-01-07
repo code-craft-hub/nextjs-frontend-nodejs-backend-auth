@@ -69,7 +69,7 @@ export const apiService = {
       );
     }
   },
-  gmailOauthStatus: async (): Promise<{ isAuthorized: boolean }> => {
+  gmailOauthStatus: async (): Promise<{ authorized: boolean }> => {
     try {
       const { data } = await axiosApiClient.get(
         `/google-gmail-oauth/auth-status/`

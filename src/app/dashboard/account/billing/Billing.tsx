@@ -19,7 +19,6 @@ export const Billing = ({
   const [completed, setCompleted] = useState(Boolean(user?.isPro) || false);
   const [showPlan, setShowPlan] = useState(false);
   const handleStateChange = (value: boolean) => {
-    console.log(value);
     setCompleted(value);
   };
   const handleShowPlan = (value: boolean) => {

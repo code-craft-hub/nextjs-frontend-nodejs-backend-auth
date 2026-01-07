@@ -7,7 +7,7 @@ interface User {
 interface AuthStatusResponse {
   success: boolean;
   data?: {
-    isAuthorized: boolean;
+    authorized: boolean;
   };
 }
 
@@ -64,7 +64,7 @@ export function useCreditAuthorization({
 
         if (!isMounted) return;
 
-        setIsAuthorized(Boolean(res?.success && res.data?.isAuthorized));
+        setIsAuthorized(Boolean(res?.success && res.data?.authorized));
       } catch (err) {
         if (!isMounted) return;
         setAuthError(err as Error);

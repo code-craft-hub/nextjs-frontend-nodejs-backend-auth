@@ -76,7 +76,7 @@ const AuthorizeGoogle: React.FC<{
   const handleCheckAuthStatus = useCallback(async () => {
     try {
       const { data } = await checkAuthStatus();
-      form.setValue("authorized", data.isAuthorized);
+      form.setValue("authorized", data?.authorized);
       return data;
     } catch (error) {
       console.error("Error checking auth status:", error);
@@ -86,6 +86,7 @@ const AuthorizeGoogle: React.FC<{
   useEffect(() => {
     const callCheckAuthOnce = async () => {
       const checkValue = await handleCheckAuthStatus();
+      console.log("Check Auth Value:", checkValue);
       if (checkAuth) {
         checkAuth(checkValue);
       }

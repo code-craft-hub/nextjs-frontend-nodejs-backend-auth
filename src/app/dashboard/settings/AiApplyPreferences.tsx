@@ -73,8 +73,9 @@ export const AiApplyPreferences: React.FC = () => {
 
   const [oauthState, setOauthState] = useState(false);
 
-  const checkAuth = async (value: { isAuthorized: boolean }): Promise<void> => {
-    setOauthState(value.isAuthorized);
+  const checkAuth = async (value: { authorized: boolean }): Promise<void> => {
+    setOauthState(value.authorized);
+    console.log("OAuth State Updated:", value);
   };
 
   const settings: Setting[] = [

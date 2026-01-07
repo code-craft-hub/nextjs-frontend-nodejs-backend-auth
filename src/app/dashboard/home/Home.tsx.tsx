@@ -159,7 +159,7 @@ HomeClient.displayName = "HomeClient";
 //   const checkAuthorization = async () => {
 //     const authStatus = await checkAuthStatus();
 //     if (authStatus?.success) {
-//       setNotification(authStatus?.data?.isAuthorized);
+//       setNotification(authStatus?.data?.authorized);
 //     }
 //     setUserCredit(Number(user?.credit ?? 0) === 0);
 //   };

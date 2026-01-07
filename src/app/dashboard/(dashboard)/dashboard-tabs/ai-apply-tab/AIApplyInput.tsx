@@ -101,9 +101,9 @@ export const AIApplyInput = memo(
           [];
 
         if (user?.email) {
-          const { isAuthorized } = await apiService.gmailOauthStatus();
+          const { authorized } = await apiService.gmailOauthStatus();
 
-          if (!isAuthorized) {
+          if (!authorized) {
             toast(
               "Please authorize Cver AI to send emails on your behalf from the settings page.  ",
               {
