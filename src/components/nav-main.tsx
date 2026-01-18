@@ -22,6 +22,7 @@ export function NavMain({
       title: string;
       url: string;
     }[];
+    external?: boolean;
   }[];
 }) {
   const pathname = usePathname();
@@ -53,8 +54,16 @@ export function NavMain({
                       if (isMobile) {
                         toggleSidebar();
                         setTimeout(() => {
+                          if (item?.external) {
+                            window.open(item.url, "_blank");
+                            return;
+                          }
                           router.push(item.url);
                         }, 500);
+                        return;
+                      }
+                      if (item?.external) {
+                        window.open(item.url, "_blank");
                         return;
                       }
                       router.push(item.url);
@@ -62,6 +71,7 @@ export function NavMain({
                   >
                     {item.icon && <item.icon />}
                     <span>{item.title}</span>
+                    {item.external && <div className="bg-green-500 size-1 animate-ping rounded-full" />}
                   </SidebarMenuButton>
                 </CollapsibleTrigger>
               </SidebarMenuItem>

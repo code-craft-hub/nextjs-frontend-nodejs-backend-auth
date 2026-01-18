@@ -21,7 +21,7 @@ interface DashboardLayoutProps {
 }
 
 const DashboardLayout = async ({ children }: DashboardLayoutProps) => {
-   await requireOnboarding();
+  await requireOnboarding();
   const token = (await getCookiesToken()) ?? "";
   const queryClient = createServerQueryClient();
   await queryClient.prefetchQuery(userQueries.detail(token));

@@ -31,7 +31,7 @@ export const HomeClient = memo(
     };
     const autoApplyFilters: JobFilters = {
       page: 1,
-      limit: 20,
+      limit: 30,
       title: title || "",
       skills: JSON.stringify(rolesOfInterest),
     };
@@ -105,67 +105,3 @@ export const HomeClient = memo(
   }
 );
 HomeClient.displayName = "HomeClient";
-
-{
-  /* {userCredit && <InsufficientCreditsModal />} */
-}
-
-{
-  /* {!notification && (
-              <Alert className="w-fit mx-auto">
-                <ShieldAlert />
-                <AlertTitle
-                  onClick={() =>
-                    router.push("/dashboard/settings?tab=ai-applypreference")
-                  }
-                  className="hover:cursor-pointer hover:underline"
-                >
-                  Authorize your email account to use email Auto apply
-                </AlertTitle>
-
-                {noDataSource && (
-                  <AlertDescription
-                    onClick={() =>
-                      router.push("/dashboard/settings?tab=ai-applypreference")
-                    }
-                    className="hover:cursor-pointer hover:underline"
-                  >
-                    Please add at least one profile/resume, it&apos;ll be used
-                    for your job personalisation and applications.
-                  </AlertDescription>
-                )}
-                {userCredit && (
-                  <AlertDescription
-                    onClick={() =>
-                      router.push("/dashboard/account?tab=billing")
-                    }
-                    className="hover:cursor-pointer hover:underline"
-                  >
-                    Free plan expired, upgrade to Pro or refer 5 people to Cver
-                    AI
-                  </AlertDescription>
-                )}
-              </Alert>
-            )} */
-}
-// const [notification, setNotification] = useState(false);
-// const [userCredit, setUserCredit] = useState(
-//   Number(user?.credit ?? 0) === 0
-// );
-// const noDataSource = user?.dataSource?.length === 0;
-// const router = useRouter();
-
-// useEffect(() => {
-//   const checkAuthorization = async () => {
-//     const authStatus = await checkAuthStatus();
-//     if (authStatus?.success) {
-//       setNotification(authStatus?.data?.authorized);
-//     }
-//     setUserCredit(Number(user?.credit ?? 0) === 0);
-//   };
-//   checkAuthorization();
-// }, [notification, user?.credit]);m "lucide-react";
-// import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-// import { useRouter } from "next/navigation";
-// import { checkAuthStatus } from "../settings/(google-gmail-authorization)/gmail-authorization-service";
-// import InsufficientCreditsModal

@@ -23,6 +23,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { userQueries } from "@/lib/queries/user.queries";
+import WhatsappIcon from "./icons/whatsapp";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { data: user } = useQuery(userQueries.detail());
@@ -66,6 +67,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         icon: UserIcon,
         url: "/dashboard/account",
       },
+      {
+        title: "Whatsapp Bot",
+        icon: WhatsappIcon,
+        url: `https://wa.me/+436767391022`,
+        external: true,
+      },
     ],
   };
 
@@ -95,6 +102,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent>
         <NavMain items={leftSidebarData.menus} />
       </SidebarContent>
+
       <SidebarFooter>
         {!isPro && (
           <div
@@ -115,7 +123,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </div>
         )}
       </SidebarFooter>
+    
       <SidebarRail />
     </Sidebar>
   );
 }
+
+
