@@ -75,6 +75,7 @@ export interface ProfileData {
 
 export interface IUser {
   uid?: string;
+  userId: string;
   providerId?: string;
   emailVerified?: boolean;
   referralCount?: number;

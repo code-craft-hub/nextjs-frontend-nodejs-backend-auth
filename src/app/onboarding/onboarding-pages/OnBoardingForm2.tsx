@@ -14,8 +14,13 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { userQueries } from "@/lib/queries/user.queries";
 import { useResumeUploadWithProgress } from "@/hooks/useResumeUploadWithProgress";
 import { queryKeys } from "@/lib/query/keys";
+import { CreateUserResume } from "./CreateUserResume";
 
-export const OnBoardingForm2 = ({ onNext, onPrev, children }: OnboardingFormProps) => {
+export const OnBoardingForm2 = ({
+  onNext,
+  onPrev,
+  children,
+}: OnboardingFormProps) => {
   const queryClient = useQueryClient();
 
   const { isUpdatingUserLoading } = useAuth();
@@ -52,7 +57,7 @@ export const OnBoardingForm2 = ({ onNext, onPrev, children }: OnboardingFormProp
         });
       }
     },
-    [uploadResume, clearError, user?.firstName, onNext]
+    [uploadResume, clearError, user?.firstName, onNext],
   );
 
   const isMobile = useIsMobile();
@@ -62,7 +67,7 @@ export const OnBoardingForm2 = ({ onNext, onPrev, children }: OnboardingFormProp
 
   return (
     <motion.div
-    // @ts-ignore
+      // @ts-ignore
       initial={{ opacity: 0, x: 100 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -100 }}
@@ -74,7 +79,7 @@ export const OnBoardingForm2 = ({ onNext, onPrev, children }: OnboardingFormProp
         <div
           className={cn(
             "flex justify-between mb-9 w-full max-w-screen-lg ",
-            isMobile && "fixed top-0 left-0 width-full px-4 pt-5"
+            isMobile && "fixed top-0 left-0 width-full px-4 pt-5",
           )}
         >
           <img src="/cverai-logo.png" className="w-28 h-8" alt="" />
@@ -83,7 +88,7 @@ export const OnBoardingForm2 = ({ onNext, onPrev, children }: OnboardingFormProp
         <div className="onboarding-card">
           <OnboardingTabs activeTab={"cv-handling"} />
           <div className="space-y-6">
-            <div>
+            <div className="">
               <h1 className="onboarding-h1">Do you have CV?</h1>
             </div>
           </div>
@@ -114,7 +119,7 @@ export const OnBoardingForm2 = ({ onNext, onPrev, children }: OnboardingFormProp
               </div>
             </div>
           )}
-
+          <CreateUserResume onNext={onNext} user={user} />
           <form className="space-y-6 w-full">
             {(error || uploadError) && (
               <div className="text-red-500 w-full p-3 bg-red-50 rounded-md">

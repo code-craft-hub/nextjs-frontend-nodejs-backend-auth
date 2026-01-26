@@ -23,6 +23,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { FloatingLabelInput } from "./FloatingInput";
 import { userQueries } from "@/lib/queries/user.queries";
 import { useQuery } from "@tanstack/react-query";
+import { axiosApiClient } from "@/lib/axios/auth-api";
 
 const formSchema = z.object({
   tailoringIssue: z.boolean().default(false).optional(),
@@ -34,10 +35,14 @@ const formSchema = z.object({
   others: z.string(),
 });
 
-export const OnBoardingForm4 = ({ onNext, onPrev, children }: OnboardingFormProps) => {
-  const { updateUser, isUpdatingUserLoading } = useAuth();
-    const {data: user} = useQuery(userQueries.detail());
-  
+export const OnBoardingForm4 = ({
+  onNext,
+  onPrev,
+  children,
+}: OnboardingFormProps) => {
+  const { isUpdatingUserLoading } = useAuth();
+  const { data: user } = useQuery(userQueries.detail());
+
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -53,7 +58,10 @@ export const OnBoardingForm4 = ({ onNext, onPrev, children }: OnboardingFormProp
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      await updateUser({ userNeed: values });
+      await axiosApiClient.put("/user/onboarding", {
+        stepNumber: 4,
+        userNeed: values,
+      });
       toast.success(`${user?.firstName} Your data has be saved!`);
       onNext();
     } catch (error) {
@@ -74,7 +82,7 @@ export const OnBoardingForm4 = ({ onNext, onPrev, children }: OnboardingFormProp
 
   return (
     <motion.div
-    // @ts-ignore
+      // @ts-ignore
       initial={{ opacity: 0, x: 100 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -100 }}
@@ -87,7 +95,7 @@ export const OnBoardingForm4 = ({ onNext, onPrev, children }: OnboardingFormProp
           className={cn(
             "flex justify-between mb-9 w-full max-w-screen-lg ",
             isMobile &&
-              "fixed top-0 left-0 width-full px-4 pt-5 backdrop-blur-2xl z-50 pb-4"
+              "fixed top-0 left-0 width-full px-4 pt-5 backdrop-blur-2xl z-50 pb-4",
           )}
         >
           <img src="/cverai-logo.png" className="w-28 h-8" alt="" />
@@ -129,7 +137,7 @@ export const OnBoardingForm4 = ({ onNext, onPrev, children }: OnboardingFormProp
                             field.value
                               ? "text-black"
                               : "text-muted-foreground font-normal",
-                            "h1"
+                            "h1",
                           )}
                           htmlFor="tailoringIssue"
                         >
@@ -157,7 +165,7 @@ export const OnBoardingForm4 = ({ onNext, onPrev, children }: OnboardingFormProp
                             field.value
                               ? "text-black"
                               : "text-muted-foreground font-normal",
-                            "h1"
+                            "h1",
                           )}
                           htmlFor="coverLetterIssue"
                         >
@@ -187,7 +195,7 @@ export const OnBoardingForm4 = ({ onNext, onPrev, children }: OnboardingFormProp
                             field.value
                               ? "text-black"
                               : "text-muted-foreground font-normal",
-                            "h1"
+                            "h1",
                           )}
                           htmlFor="aiJobIssue"
                         >
@@ -215,7 +223,7 @@ export const OnBoardingForm4 = ({ onNext, onPrev, children }: OnboardingFormProp
                             field.value
                               ? "text-black"
                               : "text-muted-foreground font-normal",
-                            "h1"
+                            "h1",
                           )}
                           htmlFor="jobTrackingIssue"
                         >
@@ -247,7 +255,7 @@ export const OnBoardingForm4 = ({ onNext, onPrev, children }: OnboardingFormProp
                             field.value
                               ? "text-black"
                               : "text-muted-foreground font-normal",
-                            "h1"
+                            "h1",
                           )}
                           htmlFor="findingJobIssue"
                         >
@@ -275,7 +283,7 @@ export const OnBoardingForm4 = ({ onNext, onPrev, children }: OnboardingFormProp
                             field.value
                               ? "text-black"
                               : "text-muted-foreground font-normal",
-                            "h1"
+                            "h1",
                           )}
                           htmlFor="aiPersonalizationIssue"
                         >
@@ -318,7 +326,9 @@ export const OnBoardingForm4 = ({ onNext, onPrev, children }: OnboardingFormProp
                   disabled={isUpdatingUserLoading}
                   className="onboarding-btn"
                 >
-                  {isUpdatingUserLoading ? "Saving..." : "Save and Continue"}{" "}
+                  {isUpdatingUserLoading
+                    ? "Saving..."
+                    : "Save and Continue"}{" "}
                 </Button>
               </div>
             </form>

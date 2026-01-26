@@ -25,6 +25,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { userQueries } from "@/lib/queries/user.queries";
 import { useQuery } from "@tanstack/react-query";
 import { expireNextThreeDays } from "@/lib/utils/helpers";
+import { axiosApiClient } from "@/lib/axios/auth-api";
 const formSchema = z.object({
   type: z
     .enum([
@@ -43,8 +44,12 @@ const formSchema = z.object({
   others: z.string().optional(),
 });
 
-export const OnBoardingForm5 = ({ onNext, onPrev , children}: OnboardingFormProps) => {
-  const { updateUser, isUpdatingUserLoading } = useAuth();
+export const OnBoardingForm5 = ({
+  onNext,
+  onPrev,
+  children,
+}: OnboardingFormProps) => {
+  const { isUpdatingUserLoading } = useAuth();
   const { data: user } = useQuery(userQueries.detail());
 
   const form = useForm({
@@ -56,7 +61,8 @@ export const OnBoardingForm5 = ({ onNext, onPrev , children}: OnboardingFormProp
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      await updateUser({
+      await axiosApiClient.put("/user/onboarding", {
+        stepNumber: 5,
         discovery: values,
         expiryTime: expireNextThreeDays,
         credit: 5,
@@ -78,7 +84,7 @@ export const OnBoardingForm5 = ({ onNext, onPrev , children}: OnboardingFormProp
 
   return (
     <motion.div
-    // @ts-ignore
+      // @ts-ignore
       initial={{ opacity: 0, x: 100 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -100 }}
@@ -91,7 +97,7 @@ export const OnBoardingForm5 = ({ onNext, onPrev , children}: OnboardingFormProp
           className={cn(
             "flex justify-between mb-9 w-full max-w-screen-lg ",
             isMobile &&
-              "fixed top-0 left-0 width-full px-4 pt-5 backdrop-blur-2xl z-50 pb-4"
+              "fixed top-0 left-0 width-full px-4 pt-5 backdrop-blur-2xl z-50 pb-4",
           )}
         >
           <img src="/cverai-logo.png" alt="" className="w-28 h-8" />
@@ -132,7 +138,7 @@ export const OnBoardingForm5 = ({ onNext, onPrev , children}: OnboardingFormProp
                               field.value
                                 ? "text-black"
                                 : "text-muted-foreground font-normal",
-                              "h1"
+                              "h1",
                             )}
                             htmlFor="linkedin"
                           >
@@ -151,7 +157,7 @@ export const OnBoardingForm5 = ({ onNext, onPrev , children}: OnboardingFormProp
                               field.value
                                 ? "text-black"
                                 : "text-muted-foreground font-normal",
-                              "h1"
+                              "h1",
                             )}
                             htmlFor="instagram"
                           >
@@ -167,7 +173,7 @@ export const OnBoardingForm5 = ({ onNext, onPrev , children}: OnboardingFormProp
                               field.value
                                 ? "text-black"
                                 : "text-muted-foreground font-normal",
-                              "h1"
+                              "h1",
                             )}
                             htmlFor="tiktok"
                           >
@@ -183,7 +189,7 @@ export const OnBoardingForm5 = ({ onNext, onPrev , children}: OnboardingFormProp
                               field.value
                                 ? "text-black"
                                 : "text-muted-foreground font-normal",
-                              "h1"
+                              "h1",
                             )}
                             htmlFor="friend"
                           >
@@ -199,7 +205,7 @@ export const OnBoardingForm5 = ({ onNext, onPrev , children}: OnboardingFormProp
                               field.value
                                 ? "text-black"
                                 : "text-muted-foreground font-normal",
-                              "h1"
+                              "h1",
                             )}
                             htmlFor="google"
                           >
@@ -215,7 +221,7 @@ export const OnBoardingForm5 = ({ onNext, onPrev , children}: OnboardingFormProp
                               field.value
                                 ? "text-black"
                                 : "text-muted-foreground font-normal",
-                              "h1"
+                              "h1",
                             )}
                             htmlFor="twitter"
                           >
@@ -231,7 +237,7 @@ export const OnBoardingForm5 = ({ onNext, onPrev , children}: OnboardingFormProp
                               field.value
                                 ? "text-black"
                                 : "text-muted-foreground font-normal",
-                              "h1"
+                              "h1",
                             )}
                             htmlFor="telegram"
                           >
@@ -247,7 +253,7 @@ export const OnBoardingForm5 = ({ onNext, onPrev , children}: OnboardingFormProp
                               field.value
                                 ? "text-black"
                                 : "text-muted-foreground font-normal",
-                              "h1"
+                              "h1",
                             )}
                             htmlFor="whatsapp"
                           >
@@ -293,7 +299,9 @@ export const OnBoardingForm5 = ({ onNext, onPrev , children}: OnboardingFormProp
                   disabled={isUpdatingUserLoading}
                   className="onboarding-btn"
                 >
-                  {isUpdatingUserLoading ? "Saving..." : "Save and Continue"}{" "}
+                  {isUpdatingUserLoading
+                    ? "Saving..."
+                    : "Save and Continue"}{" "}
                 </Button>
               </div>
             </form>

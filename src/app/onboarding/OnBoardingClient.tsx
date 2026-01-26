@@ -13,13 +13,16 @@ import { OnBoardingForm6 } from "./onboarding-pages/OnBoardingForm6";
 import { OnBoardingForm7 } from "./onboarding-pages/OnBoardingForm7";
 import { useRouter } from "next/navigation";
 import { api } from "@/lib/api/client";
+import { userQueries } from "@/lib/queries/user.queries";
+import { useQuery } from "@tanstack/react-query";
 
 export default function OnboardingClient() {
   const [currentStep, setCurrentStep] = useState(0);
+  const {data: user} = useQuery(userQueries.detail());
   const steps = [
     OnBoardingForm0,
-    OnBoardingForm1,
     OnBoardingForm2,
+    OnBoardingForm1,
     OnBoardingForm3,
     OnBoardingForm4,
     OnBoardingForm5,
@@ -30,8 +33,8 @@ export default function OnboardingClient() {
 
   const router = useRouter();
   const deleteAccount = async () => {
-    // await api.delete("/delete");
-    await api.post("/logout");
+    await api.delete("/delete");
+    // await api.post("/logout");
     router.push("/login");
   };
 
@@ -53,6 +56,8 @@ export default function OnboardingClient() {
 
   const CurrentStepComponent = steps[currentStep];
 
+  console.log(user?.userId)
+
   return (
     <div className="grid grid-cols-1 overflow-hidden">
       <AnimatePresence mode="wait">
@@ -63,6 +68,7 @@ export default function OnboardingClient() {
           fromDataSourceStep={fromDataSourceStep}
         >
           <div className="">
+           
             <Button className="" variant={"ghost"} onClick={deleteAccount}>
               <X />
             </Button>

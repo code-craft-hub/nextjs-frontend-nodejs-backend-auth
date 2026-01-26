@@ -25,6 +25,7 @@ import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { userQueries } from "@/lib/queries/user.queries";
 import { useQuery } from "@tanstack/react-query";
+import { axiosApiClient } from "@/lib/axios/auth-api";
 const formSchema = z.object({
   country: z.string({ message: "Please enter a valid country name." }),
   state: z.string({ message: "Please enter a valid state name." }),
@@ -33,8 +34,12 @@ const formSchema = z.object({
   }),
 });
 
-export const OnBoardingForm1 = ({ onNext, onPrev, children }: OnboardingFormProps) => {
-  const { updateUser, isUpdatingUserLoading } = useAuth();
+export const OnBoardingForm1 = ({
+  onNext,
+  onPrev,
+  children,
+}: OnboardingFormProps) => {
+  const { isUpdatingUserLoading } = useAuth();
   const { data: user } = useQuery(userQueries.detail());
 
   const { country, region, country_code } = useUserLocation();
@@ -54,7 +59,10 @@ export const OnBoardingForm1 = ({ onNext, onPrev, children }: OnboardingFormProp
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      await updateUser(values);
+      await axiosApiClient.put("/user/onboarding", {
+        stepNumber: 1,
+        ...values,
+      });
       toast.success(`${user?.firstName} Your data has be saved!`);
       onNext();
     } catch (error) {
@@ -77,7 +85,7 @@ export const OnBoardingForm1 = ({ onNext, onPrev, children }: OnboardingFormProp
 
   return (
     <motion.div
-    // @ts-ignore
+      // @ts-ignore
       initial={{ opacity: 0, x: 100 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -100 }}
@@ -90,7 +98,7 @@ export const OnBoardingForm1 = ({ onNext, onPrev, children }: OnboardingFormProp
           className={cn(
             "flex justify-between mb-9 w-full max-w-screen-lg ",
             isMobile &&
-              "fixed top-0 left-0 width-full px-4 pt-5 backdrop-blur-2xl z-50 pb-4"
+              "fixed top-0 left-0 width-full px-4 pt-5 backdrop-blur-2xl z-50 pb-4",
           )}
         >
           <img src="/cverai-logo.png" className="w-28 h-8" alt="" />
@@ -146,7 +154,7 @@ export const OnBoardingForm1 = ({ onNext, onPrev, children }: OnboardingFormProp
                       <div
                         className={cn(
                           "group relative flex items-center w-full rounded-[4px]  border border-input bg-background px-3 py-2 text-sm focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2",
-                          isMobile ? "h-8" : "h-10"
+                          isMobile ? "h-8" : "h-10",
                         )}
                       >
                         <label

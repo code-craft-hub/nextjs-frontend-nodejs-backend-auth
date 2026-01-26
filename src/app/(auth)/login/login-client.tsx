@@ -29,8 +29,7 @@ const LoginSchema = z.object({
     .min(8, { message: "Password must be at least 8 characters." }),
 });
 
-interface FloatingLabelInputProps
-  extends React.InputHTMLAttributes<HTMLInputElement> {
+interface FloatingLabelInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   id?: string;
   label: string;
   type?: string;
@@ -93,7 +92,7 @@ function FloatingLabelInput({
           className={`
             h-12  px-3 pr-${showPasswordToggle ? "12" : "3"}
             transition-colors duration-200 font-poppins
-            border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-[4px]
+            border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-lg
             ${className}
           `}
           onFocus={handleFocus}
@@ -124,10 +123,7 @@ export const LoginClient = () => {
     try {
       setIsLoginLoading(true);
       const credentials = jwtDecode(response.credential) as { email: string };
-     await axiosApiClient.post(
-        "/google-login-register",
-        credentials
-      );
+      await axiosApiClient.post("/google-login-register", credentials);
 
       router.push("/dashboard/home");
     } catch (error) {
@@ -158,7 +154,7 @@ export const LoginClient = () => {
     } catch (error: any) {
       console.error("Login error:", error);
       toast.error(
-        error?.response?.data?.message || "Login failed. Please try again."
+        error?.response?.data?.message || "Login failed. Please try again.",
       );
       return;
     } finally {

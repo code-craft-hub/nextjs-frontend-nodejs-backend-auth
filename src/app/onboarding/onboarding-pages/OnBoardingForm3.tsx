@@ -28,30 +28,44 @@ import { toast } from "sonner";
 import OnboardingTabs from "./OnBoardingTabs";
 import { useIsMobile } from "@/hooks/use-mobile";
 import Progress from "./Progress";
-import { SelectCreatable } from "@/components/shared/SelectCreatable";
+// import { SelectCreatable } from "@/components/shared/SelectCreatable";
 import { userQueries } from "@/lib/queries/user.queries";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
-import { FloatingLabelInput } from "./FloatingInput";
+// import { FloatingLabelInput } from "./FloatingInput";
 import { useUserLocation } from "@/hooks/get-user-location";
+import { axiosApiClient } from "@/lib/axios/auth-api";
 
-const formSchema = z.object({
-  partTime: z.boolean().default(false).optional(),
-  fullTime: z.boolean().default(false).optional(),
-  intership: z.boolean().default(false).optional(),
-  contract: z.boolean().default(false).optional(),
-  hybrid: z.boolean().default(false).optional(),
-  remote: z.boolean().default(false).optional(),
-  onsite: z.boolean().default(false).optional(),
-  // location: z.string().min(1, "Please select a preferred location"),
-  title: z.string().min(1, "Please select a job title"),
-  rolesOfInterest: z
-    .array(z.object({ label: z.string(), value: z.string() }))
-    .min(1, "Please add at least one role of interest"),
-});
+const formSchema = z
+  .object({
+    partTime: z.boolean().default(false).optional(),
+    fullTime: z.boolean().default(false).optional(),
+    intership: z.boolean().default(false).optional(),
+    contract: z.boolean().default(false).optional(),
+    hybrid: z.boolean().default(false).optional(),
+    remote: z.boolean().default(false).optional(),
+    onsite: z.boolean().default(false).optional(),
+  })
+  .refine(
+    (data) =>
+      data.partTime ||
+      data.fullTime ||
+      data.intership ||
+      data.contract ||
+      data.hybrid ||
+      data.remote ||
+      data.onsite,
+    {
+      message: "Please select at least one job preference",
+    }
+  );
 
-export const OnBoardingForm3 = ({ onNext, onPrev , children}: OnboardingFormProps) => {
-  const { updateUser, isUpdatingUserLoading } = useAuth();
+export const OnBoardingForm3 = ({
+  onNext,
+  onPrev,
+  children,
+}: OnboardingFormProps) => {
+  const { isUpdatingUserLoading } = useAuth();
   const { continent } = useUserLocation();
 
   const { data: user } = useQuery(userQueries.detail());
@@ -67,15 +81,15 @@ export const OnBoardingForm3 = ({ onNext, onPrev , children}: OnboardingFormProp
       remote: false,
       onsite: false,
       // location: "",
-      title: "",
-      rolesOfInterest: [],
+      // title: "",
+      // rolesOfInterest: [],
     },
   });
 
   useEffect(() => {
     if (user?.dataSource) {
       const data = user.dataSource[0];
-      form.setValue("rolesOfInterest", data?.rolesOfInterest || []);
+      // form.setValue("rolesOfInterest", data?.rolesOfInterest || []);
       // form.setValue("location", data?.location || continent || "");
       form.setValue("partTime", data?.partTime || false);
       form.setValue("fullTime", data?.fullTime || false);
@@ -84,19 +98,20 @@ export const OnBoardingForm3 = ({ onNext, onPrev , children}: OnboardingFormProp
       form.setValue("hybrid", data?.hybrid || false);
       form.setValue("remote", data?.remote || false);
       form.setValue("onsite", data?.onsite || false);
-      form.setValue("title", data?.title || "");
+      // form.setValue("title", data?.title || "");
     }
   }, [user, form, continent]);
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       const dataSource = [
         {
+          stepNumber: 3,
           ...user?.dataSource?.[0],
           ...values,
         },
       ];
 
-      await updateUser({
+      await axiosApiClient.put("/user/onboarding", {
         dataSource: dataSource,
         defaultDataSource: user?.dataSource?.[0]?.id,
       });
@@ -128,7 +143,7 @@ export const OnBoardingForm3 = ({ onNext, onPrev , children}: OnboardingFormProp
 
   return (
     <motion.div
-    // @ts-ignore
+      // @ts-ignore
       initial={{ opacity: 0, x: 100 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -100 }}
@@ -141,7 +156,7 @@ export const OnBoardingForm3 = ({ onNext, onPrev , children}: OnboardingFormProp
           className={cn(
             "flex justify-between mb-9 w-full max-w-screen-lg ",
             isMobile &&
-              "fixed top-0 left-0 width-full px-4 pt-5 backdrop-blur-2xl z-50 pb-4"
+              "fixed top-0 left-0 width-full px-4 pt-5 backdrop-blur-2xl z-50 pb-4",
           )}
         >
           <img src="/cverai-logo.png" alt="" className="w-24 h-8" />
@@ -394,7 +409,7 @@ export const OnBoardingForm3 = ({ onNext, onPrev , children}: OnboardingFormProp
                     </FormItem>
                   )}
                 /> */}
-                <FormField
+                {/* <FormField
                   control={form.control}
                   name="title"
                   render={({ field }) => (
@@ -415,15 +430,13 @@ export const OnBoardingForm3 = ({ onNext, onPrev , children}: OnboardingFormProp
                       <FormMessage />
                     </FormItem>
                   )}
-                />
-                <Controller
+                /> */}
+                {/* <Controller
                   name="rolesOfInterest"
                   control={form.control}
                   render={({ field, fieldState }) => (
                     <div className="space-y-2  rounded-md">
-                      {/* <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                        
-                      </label> */}
+                     
                       <p className="absolute z-10  text-muted-foreground bg-background px-2 -mt-2 ml-4 text-2xs">
                         Roles of Interest{" "}
                       </p>
@@ -439,7 +452,7 @@ export const OnBoardingForm3 = ({ onNext, onPrev , children}: OnboardingFormProp
                       )}
                     </div>
                   )}
-                />
+                /> */}
               </div>
 
               <div className="flex gap-4">
@@ -456,7 +469,9 @@ export const OnBoardingForm3 = ({ onNext, onPrev , children}: OnboardingFormProp
                   disabled={isUpdatingUserLoading}
                   className="onboarding-btn"
                 >
-                  {isUpdatingUserLoading ? "Saving..." : "Save and Continue"}{" "}
+                  {isUpdatingUserLoading
+                    ? "Saving..."
+                    : "Save and Continue"}{" "}
                 </Button>
               </div>
             </form>
