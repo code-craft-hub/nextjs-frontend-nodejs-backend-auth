@@ -10,7 +10,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { axiosApiClient } from "@/lib/axios/auth-api";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -54,6 +53,7 @@ export function CreateUserResume({
       toast.success(
         `${user?.firstName}, I'm generating your resume in the background, you'll find it on your dashboard soon!`,
       );
+      setChecked(false);
       onNext();
       await axiosApiClient.put("/user/onboarding", {
         stepNumber: 2,
@@ -87,7 +87,7 @@ export function CreateUserResume({
       </label>
 
       <Dialog open={checked} onOpenChange={setChecked}>
-        <DialogContent className="sm:max-w-106.25">
+        <DialogContent className="sm:max-w-106.25 max-h-[80svh] overflow-y-auto">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
               <DialogHeader>

@@ -50,7 +50,7 @@ export const ProfileManagement: React.FC = () => {
   // }, []);
 
   const progressPercentage = progress?.progress || 0;
-
+console.log("User Data Source:", user?.dataSource);
   return (
     <div className="font-inter">
       {/* Header */}

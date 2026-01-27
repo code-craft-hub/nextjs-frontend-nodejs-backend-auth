@@ -5,17 +5,19 @@ import { cn } from "@/lib/utils";
 import ProfileManagementModal from "./ProfileManagementModal";
 import { ProfileData } from "@/types";
 
-
-export const ProfileCard: React.FC<{ profile: ProfileData; dataSource: any }> = ({
-  profile,
-  dataSource,
-}) => {
+export const ProfileCard: React.FC<{
+  profile: ProfileData;
+  dataSource: any;
+}> = ({ profile, dataSource }) => {
   const deleteDataSource = useDeleteDataSourceWithGCS();
-  const isDefault = dataSource?.defaultDataSource === profile.id
+  const isDefault = dataSource?.defaultDataSource === profile.id;
   return (
-    <div className={cn("bg-white rounded-lg font-inter border border-gray-200  mb-4 relative",
-    //  isDefault && "shadow-xl shadow-blue-100"
-     )}>
+    <div
+      className={cn(
+        "bg-white rounded-lg font-inter border border-gray-200  mb-4 relative",
+        //  isDefault && "shadow-xl shadow-blue-100"
+      )}
+    >
       <div className="absolute top-4 right-2 flex">
         <Button
           onClick={() => {
@@ -31,7 +33,12 @@ export const ProfileCard: React.FC<{ profile: ProfileData; dataSource: any }> = 
       </div>
       <div className="p-6">
         <div className="flex items-center mb-4">
-          <h3 className={cn("text-md items-center gap-1 font-medium capitalize", isDefault && "ml-4")}>
+          <h3
+            className={cn(
+              "text-md items-center gap-1 font-medium capitalize",
+              isDefault && "ml-4",
+            )}
+          >
             {profile?.title ??
               profile?.key ??
               profile?.rolesOfInterest
@@ -43,7 +50,10 @@ export const ProfileCard: React.FC<{ profile: ProfileData; dataSource: any }> = 
             {isDefault && (
               <span>
                 <Sparkles
-                  className={cn("size-4 ml-2", "text-yellow-500 [svg]:fill absolute top-7 left-2")}
+                  className={cn(
+                    "size-4 ml-2",
+                    "text-yellow-500 [svg]:fill absolute top-7 left-2",
+                  )}
                 />
               </span>
             )}
