@@ -39,7 +39,7 @@ export const OnBoardingForm2 = ({
       clearError();
 
       const result = await uploadResume(file);
-
+      
       if (result.success) {
         queryClient.invalidateQueries({ queryKey: queryKeys.users.lists() });
         queryClient.invalidateQueries({ queryKey: queryKeys.users.all });

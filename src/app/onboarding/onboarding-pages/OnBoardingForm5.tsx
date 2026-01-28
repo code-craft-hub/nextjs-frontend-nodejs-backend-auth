@@ -61,14 +61,14 @@ export const OnBoardingForm5 = ({
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
+      onNext();
+      toast.success(`${user?.firstName} Your data has be saved!`);
       await axiosApiClient.put("/user/onboarding", {
         stepNumber: 5,
         discovery: values,
         expiryTime: expireNextThreeDays,
         credit: 5,
       });
-      toast.success(`${user?.firstName} Your data has be saved!`);
-      onNext();
     } catch (error) {
       console.error(error);
       toast.error(` please try again.`);
@@ -92,10 +92,10 @@ export const OnBoardingForm5 = ({
       className="min-h-screen items-center justify-center flex flex-col font-poppins"
     >
       <div className="absolute right-4 top-2 z-50">{children}</div>
-      <div className="onboarding-container !mt-4">
+      <div className="onboarding-container mt-4!">
         <div
           className={cn(
-            "flex justify-between mb-9 w-full max-w-screen-lg ",
+            "flex justify-between mb-9 w-full max-w-5xl ",
             isMobile &&
               "fixed top-0 left-0 width-full px-4 pt-5 backdrop-blur-2xl z-50 pb-4",
           )}

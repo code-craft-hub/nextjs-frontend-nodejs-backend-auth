@@ -1,7 +1,7 @@
 "use client";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -9,17 +9,9 @@ import {
   FormField,
   FormLabel,
   FormItem,
-  FormMessage,
 } from "@/components/ui/form";
 
 import { cn } from "@/lib/utils";
-// import {
-//   Select,
-//   SelectContent,
-//   SelectItem,
-//   SelectTrigger,
-//   SelectValue,
-// } from "@/components/ui/select";
 import { OnboardingFormProps } from "@/types";
 import { Checkbox } from "@/components/ui/checkbox";
 import { motion } from "framer-motion";
@@ -28,13 +20,12 @@ import { toast } from "sonner";
 import OnboardingTabs from "./OnBoardingTabs";
 import { useIsMobile } from "@/hooks/use-mobile";
 import Progress from "./Progress";
-// import { SelectCreatable } from "@/components/shared/SelectCreatable";
 import { userQueries } from "@/lib/queries/user.queries";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
-// import { FloatingLabelInput } from "./FloatingInput";
 import { useUserLocation } from "@/hooks/get-user-location";
-import { axiosApiClient } from "@/lib/axios/auth-api";
+// import { axiosApiClient } from "@/lib/axios/auth-api";
+import { useUpdateOnboarding } from "@/hooks/mutations";
 
 const formSchema = z
   .object({
@@ -57,7 +48,7 @@ const formSchema = z
       data.onsite,
     {
       message: "Please select at least one job preference",
-    }
+    },
   );
 
 export const OnBoardingForm3 = ({
@@ -80,17 +71,12 @@ export const OnBoardingForm3 = ({
       hybrid: false,
       remote: false,
       onsite: false,
-      // location: "",
-      // title: "",
-      // rolesOfInterest: [],
     },
   });
 
   useEffect(() => {
     if (user?.dataSource) {
       const data = user.dataSource[0];
-      // form.setValue("rolesOfInterest", data?.rolesOfInterest || []);
-      // form.setValue("location", data?.location || continent || "");
       form.setValue("partTime", data?.partTime || false);
       form.setValue("fullTime", data?.fullTime || false);
       form.setValue("intership", data?.intership || false);
@@ -98,25 +84,33 @@ export const OnBoardingForm3 = ({
       form.setValue("hybrid", data?.hybrid || false);
       form.setValue("remote", data?.remote || false);
       form.setValue("onsite", data?.onsite || false);
-      // form.setValue("title", data?.title || "");
     }
   }, [user, form, continent]);
+
+  const updateOnboarding = useUpdateOnboarding({
+    userFirstName: user?.firstName,
+    onSuccess: () => {
+      onNext();
+    },
+    onError: () => {
+      toast("Skip this process", {
+        action: {
+          label: "Skip",
+          onClick: () => onNext(),
+        },
+      });
+    },
+  });
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      const dataSource = [
-        {
-          stepNumber: 3,
-          ...user?.dataSource?.[0],
-          ...values,
-        },
-      ];
-
-      await axiosApiClient.put("/user/onboarding", {
-        dataSource: dataSource,
-        defaultDataSource: user?.dataSource?.[0]?.id,
-      });
-      toast.success(`${user?.firstName} Your data has be saved!`);
-      onNext();
+      const employmentPreferences = {
+        stepNumber: 3,
+        employmentPreferences: values,
+      };
+      updateOnboarding.mutate(employmentPreferences);
+      // toast.success(`${user?.firstName} Your data has be saved!`);
+      // await axiosApiClient.put("/user/onboarding", employmentPreferences);
     } catch (error) {
       toast.error(` please try again.`);
       toast("Skip this process", {
@@ -154,7 +148,7 @@ export const OnBoardingForm3 = ({
       <div className="onboarding-container">
         <div
           className={cn(
-            "flex justify-between mb-9 w-full max-w-screen-lg ",
+            "flex justify-between mb-9 w-full max-w-5xl ",
             isMobile &&
               "fixed top-0 left-0 width-full px-4 pt-5 backdrop-blur-2xl z-50 pb-4",
           )}
@@ -374,85 +368,6 @@ export const OnBoardingForm3 = ({
                     )}
                   />
                 </div>
-              </div>
-
-              <div className="mt-8 space-y-4">
-                {/* <FormField
-                  control={form.control}
-                  name="location"
-                  render={({ field }) => (
-                    <FormItem className="relative">
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <p className="absolute text-muted-foreground bg-background px-2 -mt-2 ml-4 text-2xs">
-                          Preferred location
-                        </p>
-                        <FormControl>
-                          <SelectTrigger className="w-full sm:!h-12 rounded-sm">
-                            <SelectValue
-                              placeholder="Select location"
-                              className="text-2xs"
-                            />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {locations.map((location) => (
-                            <SelectItem value={location} key={location}>
-                              {location}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                /> */}
-                {/* <FormField
-                  control={form.control}
-                  name="title"
-                  render={({ field }) => (
-                    <FormItem className="relative">
-                      <p className="absolute text-muted-foreground bg-background px-2 -mt-2 ml-4 text-2xs">
-                        Job Title
-                      </p>
-                      <FormControl>
-                        <FloatingLabelInput
-                          label="Job Title"
-                          isUpdatingUserLoading={isUpdatingUserLoading}
-                          {...field}
-                          placeholder="Software engineer, Backend developer"
-                          className="rounded-sm"
-                        />
-                      </FormControl>
-
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                /> */}
-                {/* <Controller
-                  name="rolesOfInterest"
-                  control={form.control}
-                  render={({ field, fieldState }) => (
-                    <div className="space-y-2  rounded-md">
-                     
-                      <p className="absolute z-10  text-muted-foreground bg-background px-2 -mt-2 ml-4 text-2xs">
-                        Roles of Interest{" "}
-                      </p>
-                      <SelectCreatable
-                        placeholder="This field will be used to recommend jobs to you. (E.g., Software Engineer)"
-                        value={field.value}
-                        onChange={field.onChange}
-                      />
-                      {fieldState.error && (
-                        <p className="text-sm font-medium text-destructive ">
-                          {fieldState.error.message}
-                        </p>
-                      )}
-                    </div>
-                  )}
-                /> */}
               </div>
 
               <div className="flex gap-4">

@@ -21,19 +21,16 @@ import { useSSE } from "@/hooks/resume/resume-sse";
 // Types
 type JobStatus = "waiting" | "active" | "completed" | "failed";
 
-
-
 export default function OnboardingClient() {
   const [currentStep, setCurrentStep] = useState(0);
   const { data: user } = useQuery(userQueries.detail());
 
-
   const steps = [
+    OnBoardingForm3,
+    OnBoardingForm4,
     OnBoardingForm0,
     OnBoardingForm1,
     OnBoardingForm2,
-    OnBoardingForm3,
-    OnBoardingForm4,
     OnBoardingForm5,
     OnBoardingForm6,
     OnBoardingForm7,
@@ -65,9 +62,8 @@ export default function OnboardingClient() {
 
   const CurrentStepComponent = steps[currentStep];
 
-  console.log(user?.userId);
-  const {  jobs } = useSSE();
-
+  console.log("User ID : ", user?.userId);
+  const { jobs } = useSSE();
 
   const getStatusColor = (status: JobStatus) => {
     switch (status) {

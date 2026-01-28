@@ -76,7 +76,7 @@ export function useSSE() {
 
         // Handle heartbeat
         if (type === SSEEventType.HEARTBEAT) {
-          console.log("💓 Heartbeat received:", data);
+          // console.log("💓 Heartbeat received:", data);
           resetHeartbeatTimeout();
           return;
         }

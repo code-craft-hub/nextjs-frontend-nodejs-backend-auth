@@ -58,12 +58,12 @@ export const OnBoardingForm4 = ({
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
+      onNext();
+      toast.success(`${user?.firstName} Your data has be saved!`);
       await axiosApiClient.put("/user/onboarding", {
         stepNumber: 4,
         userNeed: values,
       });
-      toast.success(`${user?.firstName} Your data has be saved!`);
-      onNext();
     } catch (error) {
       console.error(error);
       toast.error(` please try again.`);
@@ -93,7 +93,7 @@ export const OnBoardingForm4 = ({
       <div className="onboarding-container">
         <div
           className={cn(
-            "flex justify-between mb-9 w-full max-w-screen-lg ",
+            "flex justify-between mb-9 w-full max-w-5xl ",
             isMobile &&
               "fixed top-0 left-0 width-full px-4 pt-5 backdrop-blur-2xl z-50 pb-4",
           )}

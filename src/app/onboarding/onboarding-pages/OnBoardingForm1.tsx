@@ -59,12 +59,12 @@ export const OnBoardingForm1 = ({
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
+      onNext();
       await axiosApiClient.put("/user/onboarding", {
         stepNumber: 1,
         ...values,
       });
       toast.success(`${user?.firstName} Your data has be saved!`);
-      onNext();
     } catch (error) {
       console.error(error);
       toast.error(` please try again.`);
@@ -93,10 +93,10 @@ export const OnBoardingForm1 = ({
       className="min-h-screen items-center justify-center flex flex-col font-poppins"
     >
       <div className="absolute right-4 top-2 z-50">{children}</div>
-      <div className="onboarding-container !mt-4">
+      <div className="onboarding-container mt-4!">
         <div
           className={cn(
-            "flex justify-between mb-9 w-full max-w-screen-lg ",
+            "flex justify-between mb-9 w-full max-w-5xl ",
             isMobile &&
               "fixed top-0 left-0 width-full px-4 pt-5 backdrop-blur-2xl z-50 pb-4",
           )}
@@ -153,7 +153,7 @@ export const OnBoardingForm1 = ({
                     <FormControl>
                       <div
                         className={cn(
-                          "group relative flex items-center w-full rounded-[4px]  border border-input bg-background px-3 py-2 text-sm focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2",
+                          "group relative flex items-center w-full rounded-lg  border border-input bg-background px-3 py-2 text-sm focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2",
                           isMobile ? "h-8" : "h-10",
                         )}
                       >
@@ -169,7 +169,7 @@ export const OnBoardingForm1 = ({
                           international
                           defaultCountry={(country_code as any) ?? "US"}
                           placeholder="Enter phone number"
-                          className="!border-0 !outline-none !ring-0"
+                          className="border-0! outline-none! ring-0!"
                           numberInputProps={{
                             className:
                               "!border-0 !outline-none !ring-0 w-full max-sm:text-2xs !w-full md:!w-96 lg:!w-[43rem] h-9",
