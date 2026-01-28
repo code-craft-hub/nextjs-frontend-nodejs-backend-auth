@@ -78,7 +78,7 @@ export const OnBoardingForm2 = ({
       <div className="onboarding-container">
         <div
           className={cn(
-            "flex justify-between mb-9 w-full max-w-screen-lg ",
+            "flex justify-between mb-9 w-full max-w-5xl ",
             isMobile && "fixed top-0 left-0 width-full px-4 pt-5",
           )}
         >

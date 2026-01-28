@@ -1,8 +1,7 @@
 "use client";
 import { AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
-
+import { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import { OnBoardingForm0 } from "./onboarding-pages/OnBoardingForm0";
 import { OnBoardingForm1 } from "./onboarding-pages/OnBoardingForm1";
@@ -17,6 +16,7 @@ import { api } from "@/lib/api/client";
 import { userQueries } from "@/lib/queries/user.queries";
 import { useQuery } from "@tanstack/react-query";
 import { useSSE } from "@/hooks/resume/resume-sse";
+import { getOnboardingStatus } from "@/lib/api/user/onboarding.api";
 
 // Types
 type JobStatus = "waiting" | "active" | "completed" | "failed";
@@ -24,13 +24,13 @@ type JobStatus = "waiting" | "active" | "completed" | "failed";
 export default function OnboardingClient() {
   const [currentStep, setCurrentStep] = useState(0);
   const { data: user } = useQuery(userQueries.detail());
-
+  const [_status, setStatus] = useState({});
   const steps = [
-    OnBoardingForm3,
-    OnBoardingForm4,
     OnBoardingForm0,
     OnBoardingForm1,
     OnBoardingForm2,
+    OnBoardingForm3,
+    OnBoardingForm4,
     OnBoardingForm5,
     OnBoardingForm6,
     OnBoardingForm7,
@@ -83,8 +83,22 @@ export default function OnboardingClient() {
   const jobList = Array.from(jobs.values()).sort(
     (a, b) => b.createdAt - a.createdAt,
   );
+
+  useEffect(() => {
+    const fetchStatus = async () => {
+      const response = await getOnboardingStatus();
+      setStatus(response?.onboardingStep);
+      // if (response?.onboardingStep !== undefined) {
+      //   setCurrentStep(Number(response?.onboardingStep) + 1 || 0);
+      // }
+    };
+
+    fetchStatus();
+  }, [nextStep]);
+
   return (
     <div className="grid grid-cols-1 overflow-hidden">
+      {/* {JSON.stringify(status)} */}
       <AnimatePresence mode="wait">
         <CurrentStepComponent
           key={currentStep}

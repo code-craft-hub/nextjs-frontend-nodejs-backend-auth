@@ -45,9 +45,6 @@ export const OnBoardingForm1 = ({
 
   const updateOnboarding = useUpdateOnboarding({
     userFirstName: user?.firstName,
-    onSuccess: () => {
-      onNext();
-    },
     onError: () => {
       toast("Skip this process", {
         action: {

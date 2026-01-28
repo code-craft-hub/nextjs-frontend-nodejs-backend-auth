@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { axiosApiClient } from "@/lib/axios/auth-api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -24,6 +23,7 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
+import { useUpdateOnboarding } from "@/hooks/mutations";
 
 const formSchema = z.object({
   jobTitle: z.string().min(1, "Please select a preferred job title"),
@@ -46,30 +46,24 @@ export function CreateUserResume({
       jobDescription: "",
     },
   });
-
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    try {
-      console.log(values);
-      toast.success(
-        `${user?.firstName}, I'm generating your resume in the background, you'll find it on your dashboard soon!`,
-      );
-      setChecked(false);
-      onNext();
-      await axiosApiClient.put("/user/onboarding", {
-        stepNumber: 2,
-        ...values,
-      });
-    } catch (error) {
-      toast.error(` please try again.`);
+  const updateOnboarding = useUpdateOnboarding({
+    customMessage: `${user?.firstName}, your resume has been created successfully!`,
+    userFirstName: user?.firstName,
+    onError: () => {
       toast("Skip this process", {
         action: {
           label: "Skip",
-          onClick: () => {
-            onNext();
-          },
+          onClick: () => onNext(),
         },
       });
-    }
+    },
+  });
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    onNext();
+    updateOnboarding.mutate({
+      stepNumber: 2,
+      ...values,
+    });
   }
 
   return (

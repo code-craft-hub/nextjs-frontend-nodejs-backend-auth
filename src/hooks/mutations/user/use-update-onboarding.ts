@@ -17,6 +17,7 @@ export interface UseUpdateOnboardingOptions {
   showToast?: boolean;
   userFirstName?: string;
   optimisticUpdate?: boolean;
+  customMessage?: string;
 }
 
 export const useUpdateOnboarding = (
@@ -29,6 +30,7 @@ export const useUpdateOnboarding = (
     showToast = true,
     userFirstName,
     optimisticUpdate = true,
+    customMessage,
   } = options;
 
   return useMutation<
@@ -114,7 +116,7 @@ export const useUpdateOnboarding = (
     onSuccess: (data, variables, _context) => {
       if (showToast) {
         const name = userFirstName ? `${userFirstName}, ` : "";
-        toast.success(`${name}your data has been saved!`);
+        toast.success(customMessage ? customMessage : `${name}your data has been saved!`);
       }
 
       // Call custom success handler

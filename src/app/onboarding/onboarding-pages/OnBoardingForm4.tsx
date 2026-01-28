@@ -59,9 +59,6 @@ export const OnBoardingForm4 = ({
 
   const updateOnboarding = useUpdateOnboarding({
     userFirstName: user?.firstName,
-    onSuccess: () => {
-      onNext();
-    },
     onError: () => {
       toast("Skip this process", {
         action: {
@@ -143,7 +140,7 @@ export const OnBoardingForm4 = ({
                           )}
                           htmlFor="tailoringIssue"
                         >
-                          Writing/tailoring my CV
+                          Writing / tailoring my CV
                         </FormLabel>
                       </FormItem>
                     )}
@@ -229,7 +226,7 @@ export const OnBoardingForm4 = ({
                           )}
                           htmlFor="jobTrackingIssue"
                         >
-                          Job tracking/management
+                          Job tracking / management
                         </FormLabel>
                       </FormItem>
                     )}

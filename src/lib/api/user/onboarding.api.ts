@@ -39,7 +39,7 @@ export interface OnboardingUpdateResponse {
 export const updateOnboardingStep = async (
   payload: OnboardingUpdatePayload
 ): Promise<OnboardingUpdateResponse> => {
-  const response = await axiosApiClient.put<OnboardingUpdateResponse>(
+  const response = await axiosApiClient.patch<OnboardingUpdateResponse>(
     "/user/onboarding/step",
     payload
   );
