@@ -25,7 +25,7 @@ import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { userQueries } from "@/lib/queries/user.queries";
 import { useQuery } from "@tanstack/react-query";
-import { axiosApiClient } from "@/lib/axios/auth-api";
+import { useUpdateOnboarding } from "@/hooks/mutations";
 const formSchema = z.object({
   country: z.string({ message: "Please enter a valid country name." }),
   state: z.string({ message: "Please enter a valid state name." }),
@@ -41,8 +41,23 @@ export const OnBoardingForm1 = ({
 }: OnboardingFormProps) => {
   const { isUpdatingUserLoading } = useAuth();
   const { data: user } = useQuery(userQueries.detail());
-
   const { country, region, country_code } = useUserLocation();
+
+  const updateOnboarding = useUpdateOnboarding({
+    userFirstName: user?.firstName,
+    onSuccess: () => {
+      onNext();
+    },
+    onError: () => {
+      toast("Skip this process", {
+        action: {
+          label: "Skip",
+          onClick: () => onNext(),
+        },
+      });
+    },
+  });
+
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -58,25 +73,11 @@ export const OnBoardingForm1 = ({
   }, [country, region, form, user]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    try {
-      onNext();
-      await axiosApiClient.put("/user/onboarding", {
-        stepNumber: 1,
-        ...values,
-      });
-      toast.success(`${user?.firstName} Your data has be saved!`);
-    } catch (error) {
-      console.error(error);
-      toast.error(` please try again.`);
-      toast("Skip this process", {
-        action: {
-          label: "Skip",
-          onClick: () => {
-            onNext();
-          },
-        },
-      });
-    }
+    onNext();
+    updateOnboarding.mutate({
+      stepNumber: 1,
+      ...values,
+    });
   }
 
   const inputId = useId();

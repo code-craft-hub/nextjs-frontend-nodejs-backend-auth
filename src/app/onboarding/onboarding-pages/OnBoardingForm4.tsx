@@ -23,7 +23,8 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { FloatingLabelInput } from "./FloatingInput";
 import { userQueries } from "@/lib/queries/user.queries";
 import { useQuery } from "@tanstack/react-query";
-import { axiosApiClient } from "@/lib/axios/auth-api";
+// import { axiosApiClient } from "@/lib/axios/auth-api";
+import { useUpdateOnboarding } from "@/hooks/mutations";
 
 const formSchema = z.object({
   tailoringIssue: z.boolean().default(false).optional(),
@@ -56,26 +57,27 @@ export const OnBoardingForm4 = ({
     },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    try {
+  const updateOnboarding = useUpdateOnboarding({
+    userFirstName: user?.firstName,
+    onSuccess: () => {
       onNext();
-      toast.success(`${user?.firstName} Your data has be saved!`);
-      await axiosApiClient.put("/user/onboarding", {
-        stepNumber: 4,
-        userNeed: values,
-      });
-    } catch (error) {
-      console.error(error);
-      toast.error(` please try again.`);
+    },
+    onError: () => {
       toast("Skip this process", {
         action: {
           label: "Skip",
-          onClick: () => {
-            onNext();
-          },
+          onClick: () => onNext(),
         },
       });
-    }
+    },
+  });
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    onNext();
+    updateOnboarding.mutate({
+      stepNumber: 4,
+      userNeed: values,
+    });
   }
 
   const isMobile = useIsMobile();

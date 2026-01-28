@@ -25,7 +25,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { userQueries } from "@/lib/queries/user.queries";
 import { useQuery } from "@tanstack/react-query";
 import { expireNextThreeDays } from "@/lib/utils/helpers";
-import { axiosApiClient } from "@/lib/axios/auth-api";
+import { useUpdateOnboarding } from "@/hooks/mutations";
 const formSchema = z.object({
   type: z
     .enum([
@@ -52,6 +52,21 @@ export const OnBoardingForm5 = ({
   const { isUpdatingUserLoading } = useAuth();
   const { data: user } = useQuery(userQueries.detail());
 
+  const updateOnboarding = useUpdateOnboarding({
+    userFirstName: user?.firstName,
+    onSuccess: () => {
+      onNext();
+    },
+    onError: () => {
+      toast("Skip this process", {
+        action: {
+          label: "Skip",
+          onClick: () => onNext(),
+        },
+      });
+    },
+  });
+
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -60,25 +75,13 @@ export const OnBoardingForm5 = ({
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    try {
-      onNext();
-      toast.success(`${user?.firstName} Your data has be saved!`);
-      await axiosApiClient.put("/user/onboarding", {
-        stepNumber: 5,
-        discovery: values,
-        expiryTime: expireNextThreeDays,
-        credit: 5,
-      });
-    } catch (error) {
-      console.error(error);
-      toast.error(` please try again.`);
-      toast("Skip this process", {
-        action: {
-          label: "Skip",
-          onClick: () => onNext(),
-        },
-      });
-    }
+    onNext();
+    updateOnboarding.mutate({
+      stepNumber: 5,
+      discovery: values,
+      expiryTime: expireNextThreeDays,
+      credit: 5,
+    });
   }
   const isMobile = useIsMobile();
 

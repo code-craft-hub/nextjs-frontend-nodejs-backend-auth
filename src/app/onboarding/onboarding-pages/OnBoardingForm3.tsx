@@ -103,35 +103,12 @@ export const OnBoardingForm3 = ({
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    try {
-      const employmentPreferences = {
-        stepNumber: 3,
-        employmentPreferences: values,
-      };
-      updateOnboarding.mutate(employmentPreferences);
-      // toast.success(`${user?.firstName} Your data has be saved!`);
-      // await axiosApiClient.put("/user/onboarding", employmentPreferences);
-    } catch (error) {
-      toast.error(` please try again.`);
-      toast("Skip this process", {
-        action: {
-          label: "Skip",
-          onClick: () => {
-            onNext();
-          },
-        },
-      });
-    }
+    onNext();
+    updateOnboarding.mutate({
+      stepNumber: 3,
+      employmentPreferences: values,
+    });
   }
-
-  // const locations = [
-  //   "North America",
-  //   "South America",
-  //   "Europe",
-  //   "Asia",
-  //   "Africa",
-  //   "Oceania",
-  // ];
 
   const isMobile = useIsMobile();
 

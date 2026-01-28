@@ -40,7 +40,7 @@ export const updateOnboardingStep = async (
   payload: OnboardingUpdatePayload
 ): Promise<OnboardingUpdateResponse> => {
   const response = await axiosApiClient.put<OnboardingUpdateResponse>(
-    "/user/onboarding",
+    "/user/onboarding/step",
     payload
   );
   return response.data;
@@ -51,15 +51,7 @@ export const updateOnboardingStep = async (
  * @returns Promise with onboarding status
  */
 export const getOnboardingStatus = async () => {
-  const response = await axiosApiClient.get("/user/onboarding/status");
+  const response = await axiosApiClient.get("/user/onboarding");
   return response.data;
 };
 
-/**
- * Skip onboarding process
- * @returns Promise with skip confirmation
- */
-export const skipOnboarding = async () => {
-  const response = await axiosApiClient.post("/user/onboarding/skip");
-  return response.data;
-};
