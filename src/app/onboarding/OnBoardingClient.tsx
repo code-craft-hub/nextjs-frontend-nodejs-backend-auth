@@ -15,11 +15,11 @@ import { useRouter } from "next/navigation";
 import { api } from "@/lib/api/client";
 import { userQueries } from "@/lib/queries/user.queries";
 import { useQuery } from "@tanstack/react-query";
-import { useSSE } from "@/hooks/resume/resume-sse";
+// import { useSSE } from "@/hooks/resume/resume-sse";
 import { getOnboardingStatus } from "@/lib/api/user/onboarding.api";
 
 // Types
-type JobStatus = "waiting" | "active" | "completed" | "failed";
+// type JobStatus = "waiting" | "active" | "completed" | "failed";
 
 export default function OnboardingClient() {
   const [currentStep, setCurrentStep] = useState(0);
@@ -63,26 +63,26 @@ export default function OnboardingClient() {
   const CurrentStepComponent = steps[currentStep];
 
   console.log("User ID : ", user?.userId);
-  const { jobs } = useSSE();
+  // const { jobs } = useSSE();
 
-  const getStatusColor = (status: JobStatus) => {
-    switch (status) {
-      case "waiting":
-        return "#64748b";
-      case "active":
-        return "#3b82f6";
-      case "completed":
-        return "#4680EE";
-      case "failed":
-        return "#ef4444";
-      default:
-        return "#64748b";
-    }
-  };
+  // const getStatusColor = (status: JobStatus) => {
+  //   switch (status) {
+  //     case "waiting":
+  //       return "#64748b";
+  //     case "active":
+  //       return "#3b82f6";
+  //     case "completed":
+  //       return "#4680EE";
+  //     case "failed":
+  //       return "#ef4444";
+  //     default:
+  //       return "#64748b";
+  //   }
+  // };
 
-  const jobList = Array.from(jobs.values()).sort(
-    (a, b) => b.createdAt - a.createdAt,
-  );
+  // const jobList = Array.from(jobs.values()).sort(
+  //   (a, b) => b.createdAt - a.createdAt,
+  // );
 
   useEffect(() => {
     const fetchStatus = async () => {
@@ -113,10 +113,9 @@ export default function OnboardingClient() {
           </div>
         </CurrentStepComponent>
       </AnimatePresence>{" "}
-      <div className="">
+      {/* <div className="">
         {jobList.map((job) => (
           <div key={job.id}>
-            {/* Progress Bar */}
             {(job.status === "active" || job.status === "completed") && (
               <div className="mb-4">
                 <div className="flex justify-between text-sm text-gray-600 mb-2">
@@ -136,7 +135,7 @@ export default function OnboardingClient() {
             )}
           </div>
         ))}
-      </div>
+      </div> */}
     </div>
   );
 }
