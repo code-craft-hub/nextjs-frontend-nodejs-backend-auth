@@ -1,7 +1,7 @@
 "use client";
 import { AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
+import {  useState } from "react";
 import { X } from "lucide-react";
 import { OnBoardingForm0 } from "./onboarding-pages/OnBoardingForm0";
 import { OnBoardingForm1 } from "./onboarding-pages/OnBoardingForm1";
@@ -16,7 +16,7 @@ import { api } from "@/lib/api/client";
 import { userQueries } from "@/lib/queries/user.queries";
 import { useQuery } from "@tanstack/react-query";
 // import { useSSE } from "@/hooks/resume/resume-sse";
-import { getOnboardingStatus } from "@/lib/api/user/onboarding.api";
+// import { getOnboardingStatus } from "@/lib/api/user/onboarding.api";
 
 // Types
 // type JobStatus = "waiting" | "active" | "completed" | "failed";
@@ -24,7 +24,7 @@ import { getOnboardingStatus } from "@/lib/api/user/onboarding.api";
 export default function OnboardingClient() {
   const [currentStep, setCurrentStep] = useState(0);
   const { data: user } = useQuery(userQueries.detail());
-  const [_status, setStatus] = useState({});
+  // const [_status, setStatus] = useState({});
   const steps = [
     OnBoardingForm0,
     OnBoardingForm1,
@@ -84,17 +84,17 @@ export default function OnboardingClient() {
   //   (a, b) => b.createdAt - a.createdAt,
   // );
 
-  useEffect(() => {
-    const fetchStatus = async () => {
-      const response = await getOnboardingStatus();
-      setStatus(response?.onboardingStep);
-      // if (response?.onboardingStep !== undefined) {
-      //   setCurrentStep(Number(response?.onboardingStep) + 1 || 0);
-      // }
-    };
+  // useEffect(() => {
+  //   const fetchStatus = async () => {
+  //     const response = await getOnboardingStatus();
+  //     setStatus(response?.onboardingStep);
+  //     // if (response?.onboardingStep !== undefined) {
+  //     //   setCurrentStep(Number(response?.onboardingStep) + 1 || 0);
+  //     // }
+  //   };
 
-    fetchStatus();
-  }, [nextStep]);
+  //   fetchStatus();
+  // }, [nextStep]);
 
   return (
     <div className="grid grid-cols-1 overflow-hidden">

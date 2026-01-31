@@ -1,9 +1,8 @@
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { userQueries } from "@/lib/queries/user.queries";
 import AuthorizeGoogle from "../../../hooks/gmail/AuthorizeGoogle";
 import { toast } from "sonner";
-// import { onboardingApi } from "@/lib/api/onboarding.api";
 import { FileUploadZone } from "@/app/onboarding/onboarding-pages/AnyFormatToText";
 import { ProfileCard } from "./ProfileCard";
 import { useResumeUploadWithProgress } from "@/hooks/useResumeUploadWithProgress";
@@ -20,37 +19,34 @@ export const ProfileManagement: React.FC = () => {
     error: uploadError,
   } = useResumeUploadWithProgress();
 
-  const handleFileSelect = useCallback(
-    async (file: File) => {
-      toast.promise(uploadResume(file), {
-        loading: "Preparing your resume...",
-        success: () => {
-          queryClient.invalidateQueries({ queryKey: queryKeys.users.lists() });
-          queryClient.invalidateQueries({ queryKey: queryKeys.users.all });
-          return `${user?.firstName}, your resume is saved!`;
-        },
-        error: (error) => {
-          return "Failed to upload resume" + (error instanceof Error ? `: ${error.message}` : "");
-        },
-      });
-    },
-    [uploadResume, user?.firstName],
-  );
+  const handleFileSelect = async (file: File) => {
 
-  // const handleFileSelect = useCallback(async (file: File) => {
-  //   setLoading(true);
-  //   const formData = new FormData();
-  //   formData.append("file", file);
-  //   const result = await onboardingApi.createFirstProfile(formData);
-  //   if (result?.success) {
-  //     toast.success(`${data?.firstName}, your resume is saved!`);
-  //     await queryClient.invalidateQueries(userQueries.detail());
-  //   }
-  //   setLoading(false);
-  // }, []);
+    console.log("Selected file for upload:", file.name);
+    toast.promise(uploadResume(file), {
+      loading: "Preparing your resume...",
+      success: () => {
+        queryClient.invalidateQueries({ queryKey: queryKeys.users.lists() });
+        queryClient.invalidateQueries({ queryKey: queryKeys.users.all });
+        return `${user?.firstName}, your resume is saved!`;
+      },
+      error: (error) => {
+        return (
+          "Failed to upload resume" +
+          (error instanceof Error ? `: ${error.message}` : "")
+        );
+      },
+    });
+  };
+  //   ,useCallback(
+
+  //   [uploadResume, user?.firstName],
+  // );
 
   const progressPercentage = progress?.progress || 0;
-  console.log("User Data Source:", user?.dataSource?.flatMap((ds: any) => ds.id));
+  console.log(
+    "User Data Source:",
+    user?.dataSource?.flatMap((ds: any) => ds.id),
+  );
   return (
     <div className="font-inter">
       {/* Header */}

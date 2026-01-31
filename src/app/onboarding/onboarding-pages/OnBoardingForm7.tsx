@@ -174,7 +174,7 @@ export const OnBoardingForm7 = ({ onPrev, children }: OnboardingFormProps) => {
                   <Button
                     variant="outline"
                     className={cn(
-                      "bg-primary/10 hover:bg-primary/30 !h-12 text-blue-500 hover:text-blue-500",
+                      "bg-primary/10 hover:bg-primary/30 h-12! text-blue-500 hover:text-blue-500",
                       seletePlan?.toLowerCase() === plan.tier.toLowerCase() &&
                         "border-2 border-blue-500"
                     )}

@@ -19,7 +19,7 @@ export const OnBoardingForm6 = ({ onNext, onPrev, children }: OnboardingFormProp
       }}
     >
       <div className="absolute right-4 top-2 z-50">{children}</div>
-      <div className="flex flex-col items-start gap-9 w-full max-w-[1114px]">
+      <div className="flex flex-col items-start gap-9 w-full max-w-278.5">
         <div className="flex flex-row justify-between items-center w-full">
           <div className="flex col-span-2 items-center space-x-2">
             <img src="/cverai-logo.png" className="w-28 h-8" alt="" />

@@ -37,6 +37,7 @@ export const OnBoardingForm2 = ({
   const handleFileSelect = useCallback(
     async (file: File) => {
       clearError();
+      onNext();
 
       const result = await uploadResume(file);
       
@@ -44,7 +45,6 @@ export const OnBoardingForm2 = ({
         queryClient.invalidateQueries({ queryKey: queryKeys.users.lists() });
         queryClient.invalidateQueries({ queryKey: queryKeys.users.all });
         toast.success(`${user?.firstName}, your resume is saved!`);
-        onNext();
       } else {
         toast.error(result.error || "Failed to upload resume");
         toast("Skip this process", {

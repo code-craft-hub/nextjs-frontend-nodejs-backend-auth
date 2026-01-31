@@ -21,6 +21,8 @@ export const HomeClient = memo(
   ({ tab, jobDescription }: { tab: DashboardTab; jobDescription: string }) => {
     const { data: user } = useQuery(userQueries.detail());
     const title = getDataSource(user)?.title;
+
+    console.log("user data source in home", getDataSource(user));
     const rolesOfInterest = getDataSource(user)?.rolesOfInterest?.map(
       (role: any) => role.value,
     );

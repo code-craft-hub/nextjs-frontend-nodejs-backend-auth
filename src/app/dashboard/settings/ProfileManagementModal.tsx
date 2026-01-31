@@ -151,7 +151,7 @@ export default function ProfileManagementModal({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogTitle className="sr-only">Edit Profile</DialogTitle>
-      <DialogContent className="h-[90svh] overflow-y-auto md:!min-w-[45rem]">
+      <DialogContent className="h-[90svh] overflow-y-auto md:min-w-180!">
         <div className="font-inter flex items-center justify-center">
           <div className="w-full">
             <div className="relative flex flex-col mb-11 gap-y-4">

@@ -3,6 +3,7 @@ import { formatDistanceToNow, isValid } from "date-fns";
 import { ApiError, IUser, QAItem } from "@/types";
 import { jsonrepair } from "jsonrepair";
 import { MouseEvent } from "react";
+import { isEmpty } from "lodash";
 
 /**
  * Calculates the number of full days remaining until a future date.
@@ -22,22 +23,17 @@ export function getDaysRemaining(input: unknown): number {
     let targetDate: Date | null = null;
 
     // 1. Firestore Timestamp (admin / client SDK)
-    if (
-      typeof input === "object" &&
-      input !== null
-    ) {
+    if (typeof input === "object" && input !== null) {
       // Firestore Timestamp with toDate()
       if (typeof (input as any).toDate === "function") {
         targetDate = (input as any).toDate();
       }
       // Firestore Timestamp raw format
-      else if (
-        typeof (input as any).seconds === "number"
-      ) {
+      else if (typeof (input as any).seconds === "number") {
         const seconds = (input as any).seconds;
         const nanoseconds = (input as any).nanoseconds ?? 0;
         targetDate = new Date(
-          seconds * 1000 + Math.floor(nanoseconds / 1_000_000)
+          seconds * 1000 + Math.floor(nanoseconds / 1_000_000),
         );
       }
       // Native Date object
@@ -49,10 +45,7 @@ export function getDaysRemaining(input: unknown): number {
     // 2. Epoch timestamp (number)
     if (!targetDate && typeof input === "number") {
       // Heuristic: seconds vs milliseconds
-      targetDate =
-        input < 1e12
-          ? new Date(input * 1000)
-          : new Date(input);
+      targetDate = input < 1e12 ? new Date(input * 1000) : new Date(input);
     }
 
     // 3. ISO / RFC strings
@@ -81,7 +74,6 @@ export function getDaysRemaining(input: unknown): number {
   }
 }
 
-
 /**
  * Returns the number of days difference between today and the target date.
  * Positive = in the future, Negative = in the past
@@ -97,7 +89,6 @@ export function daysFromToday(value: any): number | null {
   return Math.round(diffDays); // round to nearest day
 }
 
-
 /**
  * Normalizes various timestamp shapes into a JS Date
  * - Firestore Timestamp (serialized)
@@ -112,7 +103,7 @@ export function normalizeToDate(
     | string
     | number
     | null
-    | undefined
+    | undefined,
 ): Date | null {
   if (!value) return null;
 
@@ -148,9 +139,8 @@ export function normalizeToDate(
   return null;
 }
 
-
 export function getDaysUntilProPlanExpiry(
-  expiryDate?: string | Date | null
+  expiryDate?: string | Date | null,
 ): number {
   if (!expiryDate) return 0;
 
@@ -176,7 +166,7 @@ export const expireNextThreeDays = () => {
     now.getMonth(),
     now.getDate() + 3,
     now.getHours(),
-    now.getMinutes()
+    now.getMinutes(),
   );
   return nextMinute;
 };
@@ -195,7 +185,7 @@ export const getJwtSecret = () => {
   if (secret.length < 32) {
     console.warn(
       `[WARNING] JWT_SECRET is only ${secret.length} characters. ` +
-        "Recommended minimum is 32 characters for security."
+        "Recommended minimum is 32 characters for security.",
     );
   }
 
@@ -212,7 +202,7 @@ export const postedDate = (dateString?: string): string => {
 
 export const formatAppliedDate = (dateString?: string): string => {
   try {
-     const targetDate = normalizeToDate(dateString);
+    const targetDate = normalizeToDate(dateString);
 
     const options: Intl.DateTimeFormatOptions = {
       month: "short",
@@ -234,15 +224,19 @@ export const formatAppliedDate = (dateString?: string): string => {
 };
 
 export const getDataSource = (user?: Partial<IUser>) => {
-  return Array.isArray(user?.dataSource)
+  let dataSource = Array.isArray(user?.dataSource)
     ? user?.dataSource?.find(
-        (profile) => profile.id === user?.defaultDataSource
+        (profile) => profile.id === user?.defaultDataSource,
       )
     : [];
+
+  if (isEmpty(dataSource)) dataSource = user?.dataSource?.[0];
+
+  return dataSource;
 };
 export const smoothlyScrollToView = (
   e: MouseEvent<HTMLAnchorElement>,
-  href: string
+  href: string,
 ) => {
   e.preventDefault();
   const element = document.querySelector(href);
@@ -259,7 +253,7 @@ export const smoothlyScrollToView = (
 };
 
 export const extractCompleteJsonObjects = (
-  text: string
+  text: string,
 ): {
   complete: QAItem[];
   remainder: string;
@@ -381,12 +375,12 @@ export function monthYear(input: Date | string) {
     validDate?.toLocaleDateString("en-US", {
       year: "numeric",
       month: "short",
-    })
+    }),
   );
 }
 
 export const formatFirestoreDate = (
-  value: any // can be Firestore timestamp, Date, string, or number
+  value: any, // can be Firestore timestamp, Date, string, or number
 ): string => {
   let date: Date;
 
@@ -399,7 +393,7 @@ export const formatFirestoreDate = (
 
   if (isFirestoreTimestamp) {
     date = new Date(
-      value._seconds * 1000 + Math.floor(value._nanoseconds / 1_000_000)
+      value._seconds * 1000 + Math.floor(value._nanoseconds / 1_000_000),
     );
   } else {
     // Fallback to regular date parsing
@@ -430,7 +424,6 @@ export const formatCurrencyUSA = (amount: number) => {
     minimumFractionDigits: 2,
   }).format(amount);
 };
-
 
 export const formatCurrencyNG = (amount: number) => {
   return new Intl.NumberFormat("en-NG", {
@@ -657,7 +650,7 @@ export const processProjects = (project: any) => {
 
 export const createCoverLetterOrderedParams = (
   docId: string,
-  jobDesc: string
+  jobDesc: string,
 ) => {
   const params = new URLSearchParams();
   params.set("coverLetterId", docId);
@@ -764,7 +757,7 @@ export const attemptJSONCompletion = (content: string): string => {
 export const parseJSONSafely = (
   rawContent: string,
   section: string,
-  isComplete: boolean = false
+  isComplete: boolean = false,
 ): { success: boolean; data: any[]; shouldUpdate: boolean } => {
   // Sanitize first
   const content = sanitizeJSONContent(rawContent);
@@ -810,7 +803,7 @@ export const parseJSONSafely = (
         `[${section}] JSON repair failed:`,
         repairError,
         "\nContent:",
-        content.substring(0, 200)
+        content.substring(0, 200),
       );
       return { success: false, data: [], shouldUpdate: false };
     }

@@ -12,6 +12,14 @@ import { MoreHorizontal, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { memo, useMemo } from "react";
 import { toast } from "sonner";
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 
 import {
   DropdownMenu,
@@ -25,18 +33,18 @@ import { userQueries } from "@/lib/queries/user.queries";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export const RecentActivityCard = memo(
-  ({ filters }: { filters: JobFilters }) => {
+  ({ filters, addMargin }: { filters: JobFilters; addMargin?: boolean }) => {
     const { data: jobs, isLoading } = useQuery(jobsQueries.autoApply(filters));
     const { data: user } = useQuery(userQueries.detail());
     const sortedJobs = useMemo(() => {
       if (!jobs?.data) return [];
 
       const recommendationsData = new Set(
-        user?.recommendationsData?.map((rec: any) => rec.jobId) || []
+        user?.recommendationsData?.map((rec: any) => rec.jobId) || [],
       );
 
       const appliedJobs = new Set(
-        user?.appliedJobs?.map((job: any) => job.id) || []
+        user?.appliedJobs?.map((job: any) => job.id) || [],
       );
 
       const job = jobs.data
@@ -74,7 +82,7 @@ export const RecentActivityCard = memo(
             classNames: {
               actionButton: "!bg-blue-600 hover:!bg-blue-700 !text-white !h-8",
             },
-          }
+          },
         );
 
         return;
@@ -84,12 +92,16 @@ export const RecentActivityCard = memo(
       params.set("jobDescription", JSON.stringify(job?.descriptionText || ""));
       params.set("recruiterEmail", encodeURIComponent(job?.emailApply));
       router.push(
-        `/dashboard/tailor-cover-letter/${uuidv4()}?${params}&aiApply=true`
+        `/dashboard/tailor-cover-letter/${uuidv4()}?${params}&aiApply=true`,
       );
     };
 
+    if (isEmpty(sortedJobs) && !isLoading) {
+      return <EmptyRecentActivity />;
+    }
+
     return (
-      <Card className="p-4 sm:p-7 gap-4">
+      <Card className={cn("p-4 sm:p-7 gap-4", addMargin && "mt-12")}>
         <h1 className="font-bold text-xl">Personalized Recommendation</h1>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-y-4 sm:gap-8">
           {isLoading
@@ -137,7 +149,7 @@ export const RecentActivityCard = memo(
                         <DropdownMenuItem
                           onClick={() => {
                             router.push(
-                              `/dashboard/jobs/${job.id}?referrer=dashboard&title=${job.title}`
+                              `/dashboard/jobs/${job.id}?referrer=dashboard&title=${job.title}`,
                             );
                           }}
                         >
@@ -160,7 +172,7 @@ export const RecentActivityCard = memo(
                         <Badge
                           className={cn(
                             "rounded-full font-epilogue font-semibold bg-cverai-teal/10 text-cverai-teal",
-                            " truncate overflow-hidden text-start "
+                            " truncate overflow-hidden text-start ",
                           )}
                         >
                           {!!job.jobType ? job.jobType : job?.employmentType}
@@ -169,7 +181,7 @@ export const RecentActivityCard = memo(
                         <Badge
                           className={cn(
                             "rounded-full font-epilogue text-wrap font-semibold text-cverai-blue border-cverai-blue bg-white",
-                            " truncate overflow-hidden text-start max-sm:max-w-44"
+                            " truncate overflow-hidden text-start max-sm:max-w-44",
                           )}
                         >
                           {job.location}
@@ -178,7 +190,7 @@ export const RecentActivityCard = memo(
                           <Badge
                             className={cn(
                               "rounded-full font-epilogue font-semibold text-cverai-orange border-cverai-orange bg-white",
-                              " truncate overflow-hidden text-start"
+                              " truncate overflow-hidden text-start",
                             )}
                           >
                             {job?.relevanceScore}% match
@@ -192,7 +204,7 @@ export const RecentActivityCard = memo(
         </div>
       </Card>
     );
-  }
+  },
 );
 
 RecentActivityCard.displayName = "RecentActivityCard";
@@ -202,5 +214,39 @@ const LoadingSkeleton = () => {
     <div className="flex flex-col space-y-3">
       <Skeleton className="h-34 w-full rounded-xl" />
     </div>
+  );
+};
+
+const EmptyRecentActivity = () => {
+  const router = useRouter();
+
+  const goToSettings = () => {
+    router.push("/dashboard/settings?tab=profile-management");
+  };
+
+  return (
+    <Empty className="border border-dashed">
+      <EmptyHeader>
+        <EmptyMedia variant="icon">
+          <img src="/empty.png" />
+        </EmptyMedia>
+        <EmptyTitle>Attention!!</EmptyTitle>
+        <EmptyDescription>
+          Please modify your Job title in the settings page to get more job
+          recommendations. Click the button below to go to settings.
+        </EmptyDescription>
+      </EmptyHeader>
+      <EmptyContent>
+        <Button
+          onClick={() => {
+            goToSettings();
+          }}
+          variant="outline"
+          size="sm"
+        >
+          Go to Settings
+        </Button>
+      </EmptyContent>
+    </Empty>
   );
 };

@@ -7,6 +7,7 @@ import { jobsQueries } from "@/lib/queries/jobs.queries";
 import { useQuery } from "@tanstack/react-query";
 import { JobFilters } from "@/lib/types/jobs";
 import { aiApplyQueries } from "@/lib/queries/ai-apply.queries";
+import { isEmpty } from "lodash";
 
 export const AIApply = memo(
   ({
@@ -20,7 +21,7 @@ export const AIApply = memo(
     const { data: jobs } = useQuery(jobsQueries.all(filters));
 
 
-
+    const emptyDataTable = isEmpty(aiApply?.data);
     return (
       <div className="flex flex-col font-poppins relative">
       
@@ -33,7 +34,7 @@ export const AIApply = memo(
         <div className="grid gap-y-16">
           <AIApplyInput jobDescription={jobDescription} />
           <AIApplyDatatable data={aiApply?.data ?? []} jobs={jobs} />
-          <RecentActivityCard filters={filters} />
+          <RecentActivityCard filters={filters} addMargin={emptyDataTable} />
         </div>
       </div>
     );
