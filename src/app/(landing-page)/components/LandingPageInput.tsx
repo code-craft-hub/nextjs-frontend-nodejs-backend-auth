@@ -13,6 +13,7 @@ import {
 import { useRouter } from "next/navigation";
 import { ArrowUp, Plus } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
+import JoinOurTelegramGroupAlert from "@/components/shared/JoinOurTelegramGroupAlert";
 
 const formSchema = z.object({
   jobDescription: z.string().optional(),
@@ -32,8 +33,8 @@ export const LandingPageInput = () => {
     // if (!jobDescription) return;
     router.push(
       `/dashboard/home?tab=ai-apply&jobDescription=${encodeURIComponent(
-        jobDescription!
-      )}`
+        jobDescription!,
+      )}`,
     );
   }
   return (
@@ -72,6 +73,8 @@ export const LandingPageInput = () => {
           />
         </form>
       </Form>
+
+      <JoinOurTelegramGroupAlert />
     </div>
   );
 };

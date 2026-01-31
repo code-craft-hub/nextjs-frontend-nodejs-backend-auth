@@ -1,4 +1,3 @@
-// components/ResumeDownloadButton.tsx
 import { useState } from "react";
 import axios from "axios";
 import { baseURL } from "@/lib/api/client";

@@ -22,19 +22,19 @@ export const ProfileManagement: React.FC = () => {
 
   const handleFileSelect = useCallback(
     async (file: File) => {
-      // clearError();
-
-      const result = await uploadResume(file);
-
-      if (result.success) {
-        queryClient.invalidateQueries({ queryKey: queryKeys.users.lists() });
-        queryClient.invalidateQueries({ queryKey: queryKeys.users.all });
-        toast.success(`${user?.firstName}, your resume is saved!`);
-      } else {
-        toast.error(result.error || "Failed to upload resume");
-      }
+      toast.promise(uploadResume(file), {
+        loading: "Preparing your resume...",
+        success: () => {
+          queryClient.invalidateQueries({ queryKey: queryKeys.users.lists() });
+          queryClient.invalidateQueries({ queryKey: queryKeys.users.all });
+          return `${user?.firstName}, your resume is saved!`;
+        },
+        error: (error) => {
+          return "Failed to upload resume" + (error instanceof Error ? `: ${error.message}` : "");
+        },
+      });
     },
-    [uploadResume, user?.firstName]
+    [uploadResume, user?.firstName],
   );
 
   // const handleFileSelect = useCallback(async (file: File) => {
@@ -50,7 +50,7 @@ export const ProfileManagement: React.FC = () => {
   // }, []);
 
   const progressPercentage = progress?.progress || 0;
-console.log("User Data Source:", user?.dataSource);
+  console.log("User Data Source:", user?.dataSource?.flatMap((ds: any) => ds.id));
   return (
     <div className="font-inter">
       {/* Header */}

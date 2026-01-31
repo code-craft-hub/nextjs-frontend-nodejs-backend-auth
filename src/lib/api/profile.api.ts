@@ -1,5 +1,8 @@
+import { axiosApiClient } from "../axios/auth-api";
 import { ProfileData, ProfileResponse } from "../types";
 import { api } from "./client";
+
+export const BACKEND_API_VERSION = "v1";
 
 // API functions
 export const profileApi = {
@@ -13,7 +16,7 @@ export const profileApi = {
   }): Promise<ProfileResponse> => {
     const data = await api.put<ProfileResponse>(
       `/users/create-update-data-source`,
-      payload.profileData
+      payload.profileData,
     );
     return data;
   },
@@ -25,7 +28,7 @@ export const profileApi = {
   }): Promise<ProfileResponse> => {
     const data = await api.patch<ProfileResponse>(
       `/users/set-default-data-source`,
-      { profileId }
+      { profileId },
     );
     return data;
   },
@@ -37,14 +40,14 @@ export const profileApi = {
       "/users/create-update-data-source",
       {
         ...payload.profileData,
-      }
+      },
     );
     return data;
   },
   deleteDataSource: async (): Promise<ProfileResponse> => {
     try {
       const data = await api.delete<ProfileResponse>(
-        "/users/delete-data-source"
+        "/users/delete-data-source",
       );
       return data;
     } catch (error) {
@@ -54,16 +57,11 @@ export const profileApi = {
   },
 
   // GCS
-  deleteDataSourceWithGCS: async ({
-    profileId,
-  }: {
-    profileId: string;
-  }): Promise<ProfileResponse> => {
+  deleteDataSourceWithGCS: async ({ profileId }: { profileId: string }) => {
     try {
-      const data = await api.delete<ProfileResponse>(
-        `/onboarding-user/${profileId}`
+      await axiosApiClient.delete<ProfileResponse>(
+        `/${BACKEND_API_VERSION}/resume/${profileId}/hard-delete`,
       );
-      return data;
     } catch (error) {
       console.error("Error deleting data source:", error);
       throw error;

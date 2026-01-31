@@ -17,6 +17,7 @@ import { userQueries } from "@/lib/queries/user.queries";
 export const UserMenu = () => {
   const { logout } = useAuth();
   const { data: user } = useQuery(userQueries.detail());
+  console.log("User Menu Rendered:", user?.userId);
   const router = useRouter();
 
   return (

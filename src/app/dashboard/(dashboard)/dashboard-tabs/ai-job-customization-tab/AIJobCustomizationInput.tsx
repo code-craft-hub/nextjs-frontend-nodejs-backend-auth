@@ -34,6 +34,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Separator } from "@/components/ui/separator";
 import { FileUploadForm } from "@/components/FileUploadForm";
 import { isEmpty } from "lodash";
+import JoinOurTelegramGroupAlert from "@/components/shared/JoinOurTelegramGroupAlert";
 
 const FORM_SCHEMA = z.object({
   jobDescription: z.string().min(2, {
@@ -72,7 +73,7 @@ export const AIJobCustomizationInput = memo(() => {
     router.push(
       `/dashboard/${docsInput}/${uuidv4()}?profile=${userProfile}&jobDescription=${
         jobDescription + extractedText
-      }&aiApply=false`
+      }&aiApply=false`,
     );
   };
 
@@ -112,12 +113,12 @@ export const AIJobCustomizationInput = memo(() => {
   };
 
   return (
-    <div className="!relative h-36">
+    <div className="relative! h-36">
       <div
         // className="relative shadow-blue-200 border-blue-500 rounded-2xl border-r shadow-xl h-38"
         className={cn(
           "relative shadow-blue-200 border-blue-500 rounded-2xl border-r shadow-xl  flex flex-col justify-between",
-          isSelectedFile ? "" : "h-38"
+          isSelectedFile ? "" : "h-38",
         )}
       >
         <FileUploadForm
@@ -138,7 +139,7 @@ export const AIJobCustomizationInput = memo(() => {
                       // className="w-full outline-none focus:outline-none text-xs focus:border-none p-2 resize-none pl-4 pt-2 border-none placeholder:font-medium focus-visible:border-none h-26"
                       className={cn(
                         "w-full outline-none focus:outline-none focus:border-none p-2 resize-none pl-4 pt-2 border-none placeholder:font-medium focus-visible:border-none  text-xs",
-                        isSelectedFile ? "" : "h-26"
+                        isSelectedFile ? "" : "h-26",
                       )}
                       {...field}
                     />
@@ -154,7 +155,7 @@ export const AIJobCustomizationInput = memo(() => {
                   open={isDropdownOpen}
                   onOpenChange={setIsDropdownOpen}
                 >
-                  <DropdownMenuTrigger className="data-[state=open]:!shadow-2xl rounded-full border-blue-500 p-1 hover:cursor-pointer z-20 border-2">
+                  <DropdownMenuTrigger className="data-[state=open]:shadow-2xl! rounded-full border-blue-500 p-1 hover:cursor-pointer z-20 border-2">
                     <Plus className="text-blue-400 size-4 font-bold" />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
@@ -175,7 +176,7 @@ export const AIJobCustomizationInput = memo(() => {
                           <label
                             htmlFor="file-upload"
                             className={cn(
-                              "gap-2 p-2 group hover:text-primary hover:cursor-pointer flex items-center text-xs"
+                              "gap-2 p-2 group hover:text-primary hover:cursor-pointer flex items-center text-xs",
                             )}
                           >
                             {Icon && (
@@ -189,36 +190,11 @@ export const AIJobCustomizationInput = memo(() => {
                             className={cn(index == 1 && "hidden", "m")}
                           />
                         </div>
-                      )
+                      ),
                     )}
                   </DropdownMenuContent>
                 </DropdownMenu>
-                {/* <DropdownMenu>
-                  <DropdownMenuTrigger className=" data-[state=open]:!shadow-2xl  rounded-full  border-blue-500 p-1 hover:cursor-pointer z-20 border-2">
-                    <Plus className="text-blue-400 size-4 font-bold" />
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="p-1 " align="start">
-                    <DropdownMenuGroup>
-                      {PROFILE_OPTIONS.map(({ label, value, icon: Icon }) => (
-                        <DropdownMenuItem
-                          onSelect={() => changeDataSource(value)}
-                          key={value}
-                          className={cn(
-                            "gap-2 group hover:text-primary hover:cursor-pointer mb-1",
-                            value === dataSource && "bg-gray-100 text-blue-500"
-                          )}
-                        >
-                          {Icon && (
-                            <Icon className="size-3 group-hover:text-primary" />
-                          )}
-                          <p className="group-hover:text-primary text-xs">
-                            {label}
-                          </p>
-                        </DropdownMenuItem>
-                      ))}
-                    </DropdownMenuGroup>
-                  </DropdownMenuContent>
-                </DropdownMenu> */}
+
                 <div className="hover:cursor-pointer z-20">
                   <SelectOptions
                     options={ACTION_OPTIONS}
@@ -259,6 +235,7 @@ export const AIJobCustomizationInput = memo(() => {
           </form>
         </Form>
       </div>
+      <JoinOurTelegramGroupAlert />
     </div>
   );
 });

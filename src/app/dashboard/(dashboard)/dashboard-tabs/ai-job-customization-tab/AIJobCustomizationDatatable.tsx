@@ -193,7 +193,7 @@ export function AIJobCustomizationDatatable({ data }: { data: any[] }) {
   };
 
   return (
-    <Card>
+    <Card className="mt-16">
       <div className="">
         <h1 className="font-bold text-xl px-6">Recent Activity</h1>
       </div>

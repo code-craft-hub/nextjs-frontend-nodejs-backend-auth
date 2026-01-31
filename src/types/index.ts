@@ -65,6 +65,7 @@ export interface ProfileData {
   remoteWorkPreference?: string;
   relocationWillingness?: string;
   location?: string;
+  gcsPath?: string;
   salaryExpectation?: string;
   availabilityToStart?: string;
   defaultDataSource?: string;

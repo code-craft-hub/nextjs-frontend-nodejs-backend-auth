@@ -32,6 +32,7 @@ import { apiService } from "@/hooks/use-auth";
 import { Separator } from "@/components/ui/separator";
 import { userQueries } from "@/lib/queries/user.queries";
 import { useQuery } from "@tanstack/react-query";
+import JoinOurTelegramGroupAlert from "@/components/shared/JoinOurTelegramGroupAlert";
 
 const FORM_SCHEMA = z.object({
   jobDescription: z.string().min(2, {
@@ -182,7 +183,7 @@ export const AIApplyInput = memo(
         </Form>
         <div className="flex justify-between p-2">
           <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
-            <DropdownMenuTrigger className="data-[state=open]:!shadow-2xl rounded-full border-blue-500 p-1 hover:cursor-pointer z-20 border-2">
+            <DropdownMenuTrigger className="data-[state=open]:shadow-2xl! rounded-full border-blue-500 p-1 hover:cursor-pointer z-20 border-2">
               <Plus className="text-blue-400 size-4 font-bold" />
             </DropdownMenuTrigger>
             <DropdownMenuContent
@@ -222,6 +223,8 @@ export const AIApplyInput = memo(
             <ArrowUp className="text-blue-400 size-4" />
           </button>
         </div>
+
+        <JoinOurTelegramGroupAlert />
       </div>
     );
   }

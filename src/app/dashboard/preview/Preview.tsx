@@ -21,6 +21,7 @@ import { isEmpty } from "lodash";
 import { sendGTMEvent } from "@next/third-parties/google";
 import { useFireworksConfetti } from "@/components/ui/confetti";
 import AuthorizeGoogle from "@/hooks/gmail/AuthorizeGoogle";
+import { GmailCompose } from "./GmailCompose";
 
 const Preview = ({
   coverLetterId,
@@ -46,11 +47,11 @@ const Preview = ({
 
   const { data: resumeData } = useQuery(resumeQueries.detail(resumeId));
   const { data: coverLetterData } = useQuery(
-    coverLetterQueries.detail(coverLetterId)
+    coverLetterQueries.detail(coverLetterId),
   );
 
   const defaultResume = user?.dataSource?.find(
-    (resume) => resume.id === user?.defaultDataSource
+    (resume) => resume.id === user?.defaultDataSource,
   );
 
   const handleOpenModal = (value: boolean) => {
@@ -59,7 +60,7 @@ const Preview = ({
 
   const handleCoverLetterDelete = async () => {
     await api.delete(
-      `/delete-document/${aiApplyId}?docType=${COLLECTIONS.AI_APPLY}&resumeId=${resumeId}&coverLetterId=${coverLetterId}`
+      `/delete-document/${aiApplyId}?docType=${COLLECTIONS.AI_APPLY}&resumeId=${resumeId}&coverLetterId=${coverLetterId}`,
     );
     toast.success("Cover letter deleted successfully");
     router.push("/dashboard/home");
@@ -81,14 +82,14 @@ const Preview = ({
             label: "Enable",
             onClick: () =>
               window.open(
-                `${frontendURL}/dashboard/settings?tab=ai-applypreference`
+                `${frontendURL}/dashboard/settings?tab=ai-applypreference`,
               ),
           },
           classNames: {
             // toast: "!bg-yellow-50 !border-yellow-200",
             actionButton: "!bg-blue-600 hover:!bg-blue-700 !text-white !h-8",
           },
-        }
+        },
       );
 
       return;
@@ -107,7 +108,7 @@ const Preview = ({
         recruiterEmail,
         jobDescription,
         user?.aiApplyPreferences.autoSendApplications,
-        user?.aiApplyPreferences?.useMasterCV && defaultResume?.gcsPath
+        user?.aiApplyPreferences?.useMasterCV && defaultResume?.gcsPath,
       );
       setActiveStep(4);
       startConfetti();
@@ -151,7 +152,7 @@ const Preview = ({
 
     // Word or any Office document
     return `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(
-      publicUrl
+      publicUrl,
     )}`;
   };
 
@@ -176,6 +177,11 @@ const Preview = ({
         </p>
 
         <div className="flex gap-2">
+          <GmailCompose
+            coverLetterData={coverLetterData!}
+            recruiterEmail={recruiterEmail}
+            resumeData={resumeData!}
+          />
           <Button
             className="text-2xs"
             variant={"destructive"}

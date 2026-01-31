@@ -78,8 +78,8 @@ export const useDeleteDataSourceWithGCS = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ profileId }: { profileId: string }) =>
-      profileApi.deleteDataSourceWithGCS({ profileId }),
+    mutationFn: (data: { profileId: string }) =>
+      profileApi.deleteDataSourceWithGCS(data),
     onSuccess: (_data, _variables) => {
       queryClient.invalidateQueries({
         queryKey: profileKeys.detail(),

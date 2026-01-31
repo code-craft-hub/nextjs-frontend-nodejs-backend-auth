@@ -44,7 +44,7 @@ export const LandingPageClient = ({
       >
         <Header user={user} />
         <div className="pt-32 mx-auto">
-          <h1 className="text-4xl text-center font-medium s:text-red-900 mb-12 !font-instrument">
+          <h1 className="text-4xl text-center font-medium s:text-red-900 mb-12 font-instrument!">
             AI Assist To Apply
           </h1>
         </div>
@@ -176,61 +176,7 @@ export const LandingPageClient = ({
         </div>
       </section>
 
-      {/* Pricing Section */}
-      {/* <section id="pricing" className="py-20">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-gray-900 text-center mb-4">
-            Pricing
-          </h2>
-          <p className="text-gray-600 text-center mb-12">
-            Choose a plan that suits your needs best!
-          </p>
-
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            {creditCard.map((plan) => (
-              <div
-                key={plan.tier}
-                className="bg-white rounded-3xl shadow-2xl shadow-blue-100 p-8 flex flex-col justify-between max-w-md max-md:mx-auto"
-              >
-                <div className="">
-                  <div className=" mb-8">
-                    <h3 className="text-2xl  text-gray-900 mb-2">
-                      {plan.tier} Tier
-                    </h3>
-                    <div className="flex items-baseline  mb-4">
-                      <p className="text-5xl  text-gray-900">
-                        {plan.price?.toLocaleString("en-NG", {
-                          style: "currency",
-                          currency: "NGN",
-                          minimumFractionDigits: 0,
-                        })}
-                        <span className="text-gray-400 text-[14px]">
-                          / month
-                        </span>
-                      </p>
-                    </div>
-                  </div>
-                  <ul className="space-y-4 px-8 mb-8 list-disc ">
-                    {plan.features.map((feature) => (
-                      <li key={feature} className=" items-center text-black ">
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <Button
-                  variant="outline"
-                  className="bg-primary/10 hover:bg-primary/30 !h-12 text-blue-500 hover:text-blue-500"
-                  onClick={() => router.push(`/dashboard/home`)}
-                >
-                  Choose this plan
-                </Button>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section> */}
+      
 
       <section id="pricing" className="py-20">
         <Pricing />
@@ -262,7 +208,7 @@ export const LandingPageClient = ({
                 key={testimonial.company}
                 className={`${
                   index % 2 === 0 && "sm:mt-16"
-                } bg-white rounded-2xl p-6 shadow-2xl shadow-blue-100 h-fit space-y-4 w-[300px]`}
+                } bg-white rounded-2xl p-6 shadow-2xl shadow-blue-100 h-fit space-y-4 w-75`}
               >
                 <div className="flex items-center mb-4">
                   <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-2xl mr-4">

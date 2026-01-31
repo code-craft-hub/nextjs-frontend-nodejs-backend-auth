@@ -87,7 +87,7 @@ export function AIApplyDatatable({
 
   return (
     table.getRowModel().rows?.length !== 0 && (
-      <Card>
+      <Card className="mt-12">
         <div className="">
           <h1 className="font-bold text-xl px-6 mb-6">Recent Activity</h1>
           <div className="overflow-hidden grid">

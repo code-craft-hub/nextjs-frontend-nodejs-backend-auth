@@ -41,7 +41,7 @@ const coverLetterSchema = z.object({
   recruiterEmail: z.email("Invalid email address").optional(),
 });
 
-type CoverLetterFormData = z.infer<typeof coverLetterSchema>;
+export type CoverLetterFormData = z.infer<typeof coverLetterSchema>;
 
 const TailorCoverLetterDisplay = ({
   data,
