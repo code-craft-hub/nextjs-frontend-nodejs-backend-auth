@@ -180,7 +180,6 @@ const Preview = ({
           <GmailCompose
             coverLetterData={coverLetterData!}
             recruiterEmail={recruiterEmail}
-            resumeData={resumeData!}
           />
           <Button
             className="text-2xs"

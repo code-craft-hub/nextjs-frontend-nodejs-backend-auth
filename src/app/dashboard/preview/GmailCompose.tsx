@@ -1,32 +1,24 @@
 "use client";
 import { useState } from "react";
-import axios from "axios";
-import { baseURL } from "@/lib/api/client";
 import { Button } from "@/components/ui/button";
-import { DownloadIcon, Loader } from "lucide-react";
-import { toast } from "sonner";
 
 export const GmailCompose = ({
   coverLetterData,
   recruiterEmail,
-  resumeData,
 }: {
   coverLetterData?: any;
   recruiterEmail: string;
-  resumeData?: any;
 }) => {
-  const [isDownloading, setIsDownloading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [to, setTo] = useState(recruiterEmail || "");
-  const [subject, setSubject] = useState(coverLetterData?.title || "");
-  const [body, setBody] = useState(() => {
+  const [to] = useState(recruiterEmail || "");
+  const [subject] = useState(coverLetterData?.title || "");
+  const [body] = useState(() => {
     let body = `${coverLetterData?.salutation || "Dear Hiring Manager,"}\n\n`;
     body += coverLetterData?.coverLetter || "";
     body += `\n\nSincerely,\n${coverLetterData?.firstName || ""} ${coverLetterData?.lastName || ""}`;
     body += `\n ${coverLetterData?.phoneNumber}`;
     return body;
   });
-  const [files, setFiles] = useState<File[]>([]);
+  const [files] = useState<File[]>([]);
 
   async function handleSend() {
     // await handleCopyPdfToClipboard();

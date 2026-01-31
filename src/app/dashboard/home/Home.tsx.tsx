@@ -22,11 +22,9 @@ export const HomeClient = memo(
     const { data: user } = useQuery(userQueries.detail());
     const title = getDataSource(user)?.title;
 
-    console.log("user data source in home", getDataSource(user));
     const rolesOfInterest = getDataSource(user)?.rolesOfInterest?.map(
       (role: any) => role.value,
     );
-    console.log(title, rolesOfInterest, user?.dataSource);
     const filters: JobFilters = {
       page: 1,
       limit: 20,

@@ -86,7 +86,6 @@ const AuthorizeGoogle: React.FC<{
   useEffect(() => {
     const callCheckAuthOnce = async () => {
       const checkValue = await handleCheckAuthStatus();
-      // console.log("Check Auth Value:", checkValue);
       if (checkAuth) {
         checkAuth(checkValue);
       }

@@ -13,18 +13,9 @@ import { OnBoardingForm6 } from "./onboarding-pages/OnBoardingForm6";
 import { OnBoardingForm7 } from "./onboarding-pages/OnBoardingForm7";
 import { useRouter } from "next/navigation";
 import { api } from "@/lib/api/client";
-import { userQueries } from "@/lib/queries/user.queries";
-import { useQuery } from "@tanstack/react-query";
-// import { useSSE } from "@/hooks/resume/resume-sse";
-// import { getOnboardingStatus } from "@/lib/api/user/onboarding.api";
-
-// Types
-// type JobStatus = "waiting" | "active" | "completed" | "failed";
 
 export default function OnboardingClient() {
   const [currentStep, setCurrentStep] = useState(0);
-  const { data: user } = useQuery(userQueries.detail());
-  // const [_status, setStatus] = useState({});
   const steps = [
     OnBoardingForm0,
     OnBoardingForm1,
@@ -39,8 +30,8 @@ export default function OnboardingClient() {
 
   const router = useRouter();
   const deleteAccount = async () => {
-    await api.delete("/delete");
-    // await api.post("/logout");
+    // await api.delete("/delete");
+    await api.post("/logout");
     router.push("/login");
   };
 
@@ -62,43 +53,9 @@ export default function OnboardingClient() {
 
   const CurrentStepComponent = steps[currentStep];
 
-  console.log("User ID : ", user?.userId);
-  // const { jobs } = useSSE();
-
-  // const getStatusColor = (status: JobStatus) => {
-  //   switch (status) {
-  //     case "waiting":
-  //       return "#64748b";
-  //     case "active":
-  //       return "#3b82f6";
-  //     case "completed":
-  //       return "#4680EE";
-  //     case "failed":
-  //       return "#ef4444";
-  //     default:
-  //       return "#64748b";
-  //   }
-  // };
-
-  // const jobList = Array.from(jobs.values()).sort(
-  //   (a, b) => b.createdAt - a.createdAt,
-  // );
-
-  // useEffect(() => {
-  //   const fetchStatus = async () => {
-  //     const response = await getOnboardingStatus();
-  //     setStatus(response?.onboardingStep);
-  //     // if (response?.onboardingStep !== undefined) {
-  //     //   setCurrentStep(Number(response?.onboardingStep) + 1 || 0);
-  //     // }
-  //   };
-
-  //   fetchStatus();
-  // }, [nextStep]);
 
   return (
     <div className="grid grid-cols-1 overflow-hidden">
-      {/* {JSON.stringify(status)} */}
       <AnimatePresence mode="wait">
         <CurrentStepComponent
           key={currentStep}
@@ -113,29 +70,6 @@ export default function OnboardingClient() {
           </div>
         </CurrentStepComponent>
       </AnimatePresence>{" "}
-      {/* <div className="">
-        {jobList.map((job) => (
-          <div key={job.id}>
-            {(job.status === "active" || job.status === "completed") && (
-              <div className="mb-4">
-                <div className="flex justify-between text-sm text-gray-600 mb-2">
-                  <span>Generating your resume</span>
-                  <span className="font-semibold">{job.progress}%</span>
-                </div>
-                <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
-                  <div
-                    className="h-full transition-all duration-300 rounded-full"
-                    style={{
-                      width: `${job.progress}%`,
-                      backgroundColor: getStatusColor(job.status),
-                    }}
-                  />
-                </div>
-              </div>
-            )}
-          </div>
-        ))}
-      </div> */}
     </div>
   );
 }

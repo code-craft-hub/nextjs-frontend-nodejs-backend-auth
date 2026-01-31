@@ -21,7 +21,6 @@ export const ProfileManagement: React.FC = () => {
 
   const handleFileSelect = async (file: File) => {
 
-    console.log("Selected file for upload:", file.name);
     toast.promise(uploadResume(file), {
       loading: "Preparing your resume...",
       success: () => {
@@ -37,16 +36,10 @@ export const ProfileManagement: React.FC = () => {
       },
     });
   };
-  //   ,useCallback(
-
-  //   [uploadResume, user?.firstName],
-  // );
+ 
 
   const progressPercentage = progress?.progress || 0;
-  console.log(
-    "User Data Source:",
-    user?.dataSource?.flatMap((ds: any) => ds.id),
-  );
+
   return (
     <div className="font-inter">
       {/* Header */}

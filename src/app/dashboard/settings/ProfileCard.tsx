@@ -9,7 +9,6 @@ export const ProfileCard: React.FC<{
   profile: ProfileData;
   dataSource: any;
 }> = ({ profile, dataSource }) => {
-  console.log(profile.id);
   const deleteDataSource = useDeleteDataSourceWithGCS();
   const isDefault = dataSource?.defaultDataSource === profile.id;
   return (
