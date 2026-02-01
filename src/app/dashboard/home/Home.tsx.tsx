@@ -16,26 +16,36 @@ import { getDataSource } from "@/lib/utils/helpers";
 import { useDashboardPrefetch } from "@/lib/react-query/hooks/useDashboardPrefetch";
 import InsufficientCreditsModal from "@/components/shared/InsufficientCreditsModal";
 import AuthorizeGoogle from "@/hooks/gmail/AuthorizeGoogle";
+import { isEmpty } from "lodash";
 
 export const HomeClient = memo(
   ({ tab, jobDescription }: { tab: DashboardTab; jobDescription: string }) => {
     const { data: user } = useQuery(userQueries.detail());
     const title = getDataSource(user)?.title;
 
-    const rolesOfInterest = getDataSource(user)?.rolesOfInterest?.map(
-      (role: any) => role.value,
+    const searchSkills = getDataSource(user)?.rolesOfInterest?.map(
+      (role: any) => role?.value,
     );
+    const skills = [
+      ...user?.dataSource?.[0].hardSkill,
+      ...user?.dataSource?.[0].softSkill,
+    ].map((skill) => skill?.value);
+
+    const rolesOfInterest = isEmpty(searchSkills) ? skills : searchSkills;
+
     const filters: JobFilters = {
       page: 1,
       limit: 20,
       title: title || "",
     };
+
     const autoApplyFilters: JobFilters = {
       page: 1,
       limit: 30,
       title: title || "",
       skills: JSON.stringify(rolesOfInterest),
     };
+
 
     useEffect(() => {
       if (user?.firstName)
