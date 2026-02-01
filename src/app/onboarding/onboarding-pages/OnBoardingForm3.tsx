@@ -16,7 +16,6 @@ import { OnboardingFormProps } from "@/types";
 import { Checkbox } from "@/components/ui/checkbox";
 import { motion } from "framer-motion";
 import { useAuth } from "@/hooks/use-auth";
-import { toast } from "sonner";
 import OnboardingTabs from "./OnBoardingTabs";
 import { useIsMobile } from "@/hooks/use-mobile";
 import Progress from "./Progress";
@@ -89,14 +88,6 @@ export const OnBoardingForm3 = ({
 
   const updateOnboarding = useUpdateOnboarding({
     userFirstName: user?.firstName,
-    onError: () => {
-      toast("Skip this process", {
-        action: {
-          label: "Skip",
-          onClick: () => onNext(),
-        },
-      });
-    },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {

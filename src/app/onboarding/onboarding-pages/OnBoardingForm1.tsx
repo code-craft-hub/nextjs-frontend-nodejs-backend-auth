@@ -17,7 +17,6 @@ import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
 import { useUserLocation } from "@/hooks/get-user-location";
 import { motion } from "framer-motion";
 import { useAuth } from "@/hooks/use-auth";
-import { toast } from "sonner";
 import { OnboardingFormProps } from "@/types";
 import Progress from "./Progress";
 import { FloatingLabelInput } from "./FloatingInput";
@@ -45,14 +44,14 @@ export const OnBoardingForm1 = ({
 
   const updateOnboarding = useUpdateOnboarding({
     userFirstName: user?.firstName,
-    onError: () => {
-      toast("Skip this process", {
-        action: {
-          label: "Skip",
-          onClick: () => onNext(),
-        },
-      });
-    },
+    // onError: () => {
+    //   toast("Skip this process", {
+    //     action: {
+    //       label: "Skip",
+    //       onClick: () => onNext(),
+    //     },
+    //   });
+    // },
   });
 
   const form = useForm({

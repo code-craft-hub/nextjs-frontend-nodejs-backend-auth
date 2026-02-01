@@ -45,17 +45,7 @@ export const OnBoardingForm2 = ({
         queryClient.invalidateQueries({ queryKey: queryKeys.users.lists() });
         queryClient.invalidateQueries({ queryKey: queryKeys.users.all });
         toast.success(`${user?.firstName}, your resume is saved!`);
-      } else {
-        toast.error(result.error || "Failed to upload resume");
-        toast("Skip this process", {
-          action: {
-            label: "Skip",
-            onClick: () => {
-              onNext();
-            },
-          },
-        });
-      }
+      } 
     },
     [uploadResume, clearError, user?.firstName, onNext],
   );

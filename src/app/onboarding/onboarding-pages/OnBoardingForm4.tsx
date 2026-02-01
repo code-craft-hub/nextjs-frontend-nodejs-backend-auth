@@ -16,14 +16,12 @@ import { cn } from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox";
 import { motion } from "framer-motion";
 import { useAuth } from "@/hooks/use-auth";
-import { toast } from "sonner";
 import OnboardingTabs from "./OnBoardingTabs";
 import Progress from "./Progress";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { FloatingLabelInput } from "./FloatingInput";
 import { userQueries } from "@/lib/queries/user.queries";
 import { useQuery } from "@tanstack/react-query";
-// import { axiosApiClient } from "@/lib/axios/auth-api";
 import { useUpdateOnboarding } from "@/hooks/mutations";
 
 const formSchema = z.object({
@@ -59,14 +57,6 @@ export const OnBoardingForm4 = ({
 
   const updateOnboarding = useUpdateOnboarding({
     userFirstName: user?.firstName,
-    onError: () => {
-      toast("Skip this process", {
-        action: {
-          label: "Skip",
-          onClick: () => onNext(),
-        },
-      });
-    },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {

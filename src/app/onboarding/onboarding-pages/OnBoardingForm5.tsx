@@ -17,7 +17,6 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { OnboardingFormProps } from "@/types";
 import { useAuth } from "@/hooks/use-auth";
-import { toast } from "sonner";
 import { FloatingLabelInput } from "./FloatingInput";
 import Progress from "./Progress";
 import { cn } from "@/lib/utils";
@@ -54,14 +53,6 @@ export const OnBoardingForm5 = ({
 
   const updateOnboarding = useUpdateOnboarding({
     userFirstName: user?.firstName,
-    onError: () => {
-      toast("Skip this process", {
-        action: {
-          label: "Skip",
-          onClick: () => onNext(),
-        },
-      });
-    },
   });
 
   const form = useForm({
