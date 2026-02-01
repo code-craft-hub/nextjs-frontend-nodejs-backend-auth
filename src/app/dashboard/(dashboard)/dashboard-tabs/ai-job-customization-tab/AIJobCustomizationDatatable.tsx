@@ -37,13 +37,13 @@ export const schema = z.object({
   title: z.string(),
   generatedAt: z.string(),
   applicationMethod: z.array(
-    z.object({ value: z.string(), title: z.string() })
+    z.object({ value: z.string(), title: z.string() }),
   ),
   type: z.string(),
 });
 
 const getColumns = (
-  router: ReturnType<typeof useRouter>
+  router: ReturnType<typeof useRouter>,
 ): ColumnDef<z.infer<typeof schema>>[] => [
   {
     id: "select",
@@ -103,8 +103,8 @@ const getColumns = (
               row.getValue("type") === "resume"
                 ? "bg-primary/10 border-primary/40 text-primary "
                 : row.getValue("type") === "cover-letter"
-                ? "bg-cverai-green/10 border-cverai-green/40 text-cverai-green"
-                : "bg-orange-500/10 border-orange-500/40 text-orange-500"
+                  ? "bg-cverai-green/10 border-cverai-green/40 text-cverai-green"
+                  : "bg-orange-500/10 border-orange-500/40 text-orange-500",
             )}
           >
             {row.getValue("type")}
@@ -126,7 +126,7 @@ const getColumns = (
             router.push(`/dashboard/tailor-cover-letter/${row.original.id}`);
           } else if (row.original.type === "interview-question") {
             router.push(
-              `/dashboard/tailor-interview-question/${row.original.id}`
+              `/dashboard/tailor-interview-question/${row.original.id}`,
             );
           }
         }}
@@ -137,15 +137,18 @@ const getColumns = (
   },
 ];
 
-export function AIJobCustomizationDatatable({ data }: { data: any[] }) {
+export function AIJobCustomizationDatatable({
+  data,
+  addMargin,
+}: {
+  data: any[];
+  addMargin?: boolean;
+}) {
   const router = useRouter();
 
   const [rowSelection, setRowSelection] = useState({});
-  const [columnVisibility, setColumnVisibility] =
-    useState<VisibilityState>({});
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(
-    []
-  );
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [pagination, setPagination] = useState({
     pageIndex: 0,
@@ -193,7 +196,7 @@ export function AIJobCustomizationDatatable({ data }: { data: any[] }) {
   };
 
   return (
-    <Card className="mt-16">
+    <Card>
       <div className="">
         <h1 className="font-bold text-xl px-6">Recent Activity</h1>
       </div>
@@ -213,7 +216,7 @@ export function AIJobCustomizationDatatable({ data }: { data: any[] }) {
                         ? null
                         : flexRender(
                             header.column.columnDef.header,
-                            header.getContext()
+                            header.getContext(),
                           )}
                     </TableHead>
                   );
@@ -229,7 +232,7 @@ export function AIJobCustomizationDatatable({ data }: { data: any[] }) {
                     <TableCell key={cell.id} className="px-6">
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext()
+                        cell.getContext(),
                       )}
                     </TableCell>
                   ))}

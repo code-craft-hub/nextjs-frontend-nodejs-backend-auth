@@ -44,7 +44,7 @@ export const AIApplyInput = memo(
   ({ jobDescription }: { jobDescription: string }) => {
     const { data: user } = useQuery(userQueries.detail());
     const [uploadedFiles, setUploadedFiles] = useState<UploadedFile | null>(
-      null
+      null,
     );
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [extractedText, setExtractedText] = useState<string>("");
@@ -95,7 +95,6 @@ export const AIApplyInput = memo(
 
     const onSubmit = useCallback(
       async ({ jobDescription }: z.infer<typeof FORM_SCHEMA>) => {
-       
         const foundEmails =
           jobDescription.match(emailRegex) ||
           extractedText.match(emailRegex) ||
@@ -118,7 +117,7 @@ export const AIApplyInput = memo(
                   actionButton:
                     "!bg-blue-600 hover:!bg-blue-700 !text-white !h-8",
                 },
-              }
+              },
             );
 
             return;
@@ -127,7 +126,7 @@ export const AIApplyInput = memo(
 
         if (foundEmails.length === 0) {
           toast.error(
-            "No destination email found in job description. Please include the destination email in the job description."
+            "No destination email found in job description. Please include the destination email in the job description.",
           );
           return;
         }
@@ -135,99 +134,107 @@ export const AIApplyInput = memo(
         const params = new URLSearchParams();
         params.set(
           "jobDescription",
-          JSON.stringify(jobDescription + extractedText)
+          JSON.stringify(jobDescription + extractedText),
         );
         params.set("recruiterEmail", JSON.stringify(foundEmails[0]));
         router.push(
-          `/dashboard/tailor-cover-letter/${uuidv4()}?${params}&aiApply=true`
+          `/dashboard/tailor-cover-letter/${uuidv4()}?${params}&aiApply=true`,
         );
       },
-      [router, extractedText]
+      [router, extractedText],
     );
 
     return (
-      <div
-        className={cn(
-          "relative shadow-blue-200 border-blue-500 rounded-2xl border-r shadow-xl  flex flex-col justify-between",
-          isSelectedFile ? "" : "h-38"
-        )}
-      >
-        <FileUploadForm
-          uploadedFiles={uploadedFiles}
-          setUploadedFiles={setUploadedFiles}
-          isProcessing={isProcessing}
-        />
+      <div>
+        <div
+          className={cn(
+            "relative shadow-blue-200 border-blue-500 rounded-2xl border-r shadow-xl  flex flex-col justify-between",
+            isSelectedFile ? "" : "h-38",
+          )}
+        >
+          <FileUploadForm
+            uploadedFiles={uploadedFiles}
+            setUploadedFiles={setUploadedFiles}
+            isProcessing={isProcessing}
+          />
 
-        <Form {...form}>
-          <form className="w-full h-full">
-            <FormField
-              control={form.control}
-              name="jobDescription"
-              render={({ field }) => (
-                <FormItem className="w-full">
-                  <FormControl>
-                    <textarea
-                      placeholder="Let's get started"
-                      className={cn(
-                        "w-full outline-none focus:outline-none focus:border-none p-2 resize-none pl-4 pt-2 border-none placeholder:font-medium focus-visible:border-none  text-xs",
-                        isSelectedFile ? "" : "h-26"
-                      )}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </form>
-        </Form>
-        <div className="flex justify-between p-2">
-          <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
-            <DropdownMenuTrigger className="data-[state=open]:shadow-2xl! rounded-full border-blue-500 p-1 hover:cursor-pointer z-20 border-2">
-              <Plus className="text-blue-400 size-4 font-bold" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              className="p-0 flex flex-col gap-"
-              align="start"
-            >
-              <input
-                id="file-upload"
-                type="file"
-                accept="image/*,.pdf,.doc,.docx,.txt"
-                onChange={handleFileUpload}
-                className="hidden "
+          <Form {...form}>
+            <form className="w-full h-full">
+              <FormField
+                control={form.control}
+                name="jobDescription"
+                render={({ field }) => (
+                  <FormItem className="w-full">
+                    <FormControl>
+                      <textarea
+                        placeholder="Let's get started"
+                        className={cn(
+                          "w-full outline-none focus:outline-none focus:border-none p-2 resize-none pl-4 pt-2 border-none placeholder:font-medium focus-visible:border-none  text-xs",
+                          isSelectedFile ? "" : "h-26",
+                        )}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
+            </form>
+          </Form>
+          <div className="flex justify-between p-2">
+            <DropdownMenu
+              open={isDropdownOpen}
+              onOpenChange={setIsDropdownOpen}
+            >
+              <DropdownMenuTrigger className="data-[state=open]:shadow-2xl! rounded-full border-blue-500 p-1 hover:cursor-pointer z-20 border-2">
+                <Plus className="text-blue-400 size-4 font-bold" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                className="p-0 flex flex-col gap-"
+                align="start"
+              >
+                <input
+                  id="file-upload"
+                  type="file"
+                  accept="image/*,.pdf,.doc,.docx,.txt"
+                  onChange={handleFileUpload}
+                  className="hidden "
+                />
 
-              {PROFILE_OPTIONS.slice(1).map(({ label, icon: Icon }, index) => (
-                <div key={label}>
-                  <label
-                    htmlFor="file-upload"
-                    className={cn(
-                      "gap-2 p-2 group hover:text-primary hover:cursor-pointer flex items-center text-xs"
-                    )}
-                  >
-                    {Icon && (
-                      <Icon className="size-4 group-hover:text-primary" />
-                    )}
-                    <span className="group-hover:text-primary">{label}</span>
-                  </label>
-                  <Separator className={cn(index == 1 && "hidden", "m")} />
-                </div>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <button
-            onClick={form.handleSubmit(onSubmit)}
-            className="rounded-full border-blue-500 border-2 p-1 hover:cursor-pointer z-50,"
-          >
-            <ArrowUp className="text-blue-400 size-4" />
-          </button>
+                {PROFILE_OPTIONS.slice(1).map(
+                  ({ label, icon: Icon }, index) => (
+                    <div key={label}>
+                      <label
+                        htmlFor="file-upload"
+                        className={cn(
+                          "gap-2 p-2 group hover:text-primary hover:cursor-pointer flex items-center text-xs",
+                        )}
+                      >
+                        {Icon && (
+                          <Icon className="size-4 group-hover:text-primary" />
+                        )}
+                        <span className="group-hover:text-primary">
+                          {label}
+                        </span>
+                      </label>
+                      <Separator className={cn(index == 1 && "hidden", "m")} />
+                    </div>
+                  ),
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <button
+              onClick={form.handleSubmit(onSubmit)}
+              className="rounded-full border-blue-500 border-2 p-1 hover:cursor-pointer z-50,"
+            >
+              <ArrowUp className="text-blue-400 size-4" />
+            </button>
+          </div>
         </div>
-
         <JoinOurTelegramGroupAlert />
       </div>
     );
-  }
+  },
 );
 
 AIApplyInput.displayName = "AIApplyInput";

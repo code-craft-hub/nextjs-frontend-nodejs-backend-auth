@@ -33,18 +33,21 @@ export const AIJobCustomization = memo(
       return shuffleArray(merged);
     }, [interviewQuestion?.data, coverLetter?.data, resumes?.data]);
 
+        const emptyDataTable = isEmpty(data);
+    
+
     return (
       <div className="flex flex-col font-poppins h-screen relative">
         <h1 className="font-instrument text-3xl text-center tracking-tighter mb-12">
           AI Job Document Customization
         </h1>
 
-        <div className="grid gap-y-16 pb-16">
+        <div className="grid gap-y-8 xl:gap-y-16 pb-16">
           <AIJobCustomizationInput />
           {isEmpty(data) ? null : (
-            <AIJobCustomizationDatatable data={data ?? []} />
+            <AIJobCustomizationDatatable data={data ?? []} addMargin={emptyDataTable} />
           )}
-          <RecentActivityCard filters={filters} />
+          <RecentActivityCard filters={filters} addMargin={emptyDataTable} />
         </div>
       </div>
     );

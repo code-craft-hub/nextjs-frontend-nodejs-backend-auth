@@ -13,11 +13,14 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/use-auth";
 import { useQuery } from "@tanstack/react-query";
 import { userQueries } from "@/lib/queries/user.queries";
+import { api } from "@/lib/api/client";
 
 export const UserMenu = () => {
   const { logout } = useAuth();
   const { data: user } = useQuery(userQueries.detail());
   const router = useRouter();
+
+  const isAdmin = (user as any)?.role === "admin";
 
   return (
     <div className="flex px-4">
@@ -43,6 +46,20 @@ export const UserMenu = () => {
             Log out
             <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
           </DropdownMenuItem>
+          {isAdmin && (
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={async () => {
+                  await api.delete("/delete");
+                  router.push(`/login`);
+                }}
+              >
+                Delete Account
+                <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+              </DropdownMenuItem>
+            </>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
     </div>

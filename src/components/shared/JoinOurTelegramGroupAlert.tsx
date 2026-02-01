@@ -3,7 +3,7 @@ import { Alert, AlertTitle } from "@/components/ui/alert";
 
 const JoinOurTelegramGroupAlert = () => {
   return (
-    <section className="mt-8 w-full">
+    <section className="w-full mt-8">
        <a
           href="https://web.telegram.org/k/#@Cver_AI"
           target="_blank"

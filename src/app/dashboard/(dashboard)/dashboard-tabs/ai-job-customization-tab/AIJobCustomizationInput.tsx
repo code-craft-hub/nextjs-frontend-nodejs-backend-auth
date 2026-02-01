@@ -113,128 +113,131 @@ export const AIJobCustomizationInput = memo(() => {
   };
 
   return (
-    <div className="relative! h-36">
-      <div
-        // className="relative shadow-blue-200 border-blue-500 rounded-2xl border-r shadow-xl h-38"
-        className={cn(
-          "relative shadow-blue-200 border-blue-500 rounded-2xl border-r shadow-xl  flex flex-col justify-between",
-          isSelectedFile ? "" : "h-38",
-        )}
-      >
-        <FileUploadForm
-          uploadedFiles={uploadedFiles}
-          setUploadedFiles={setUploadedFiles}
-          isProcessing={isProcessing}
-        />
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
-            <FormField
-              control={form.control}
-              name="jobDescription"
-              render={({ field }) => (
-                <FormItem className="w-full">
-                  <FormControl>
-                    <textarea
-                      placeholder="Let's get started"
-                      // className="w-full outline-none focus:outline-none text-xs focus:border-none p-2 resize-none pl-4 pt-2 border-none placeholder:font-medium focus-visible:border-none h-26"
-                      className={cn(
-                        "w-full outline-none focus:outline-none focus:border-none p-2 resize-none pl-4 pt-2 border-none placeholder:font-medium focus-visible:border-none  text-xs",
-                        isSelectedFile ? "" : "h-26",
-                      )}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+    <div>
+      <div className="relative! h-36">
+        <div
+          // className="relative shadow-blue-200 border-blue-500 rounded-2xl border-r shadow-xl h-38"
+          className={cn(
+            "relative shadow-blue-200 border-blue-500 rounded-2xl border-r shadow-xl  flex flex-col justify-between",
+            isSelectedFile ? "" : "h-38",
+          )}
+        >
+          <FileUploadForm
+            uploadedFiles={uploadedFiles}
+            setUploadedFiles={setUploadedFiles}
+            isProcessing={isProcessing}
+          />
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
+              <FormField
+                control={form.control}
+                name="jobDescription"
+                render={({ field }) => (
+                  <FormItem className="w-full">
+                    <FormControl>
+                      <textarea
+                        placeholder="Let's get started"
+                        // className="w-full outline-none focus:outline-none text-xs focus:border-none p-2 resize-none pl-4 pt-2 border-none placeholder:font-medium focus-visible:border-none h-26"
+                        className={cn(
+                          "w-full outline-none focus:outline-none focus:border-none p-2 resize-none pl-4 pt-2 border-none placeholder:font-medium focus-visible:border-none  text-xs",
+                          isSelectedFile ? "" : "h-26",
+                        )}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <div className="flex  justify-between bg-yellow py-2">
-              <div className="flex gap-2 px-3">
-                <DropdownMenu
-                  open={isDropdownOpen}
-                  onOpenChange={setIsDropdownOpen}
-                >
-                  <DropdownMenuTrigger className="data-[state=open]:shadow-2xl! rounded-full border-blue-500 p-1 hover:cursor-pointer z-20 border-2">
-                    <Plus className="text-blue-400 size-4 font-bold" />
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    className="p-0 flex flex-col gap-"
-                    align="start"
+              <div className="flex  justify-between bg-yellow py-2">
+                <div className="flex gap-2 px-3">
+                  <DropdownMenu
+                    open={isDropdownOpen}
+                    onOpenChange={setIsDropdownOpen}
                   >
-                    <input
-                      id="file-upload"
-                      type="file"
-                      accept="image/*,.pdf,.doc,.docx,.txt"
-                      onChange={handleFileUpload}
-                      className="hidden "
+                    <DropdownMenuTrigger className="data-[state=open]:shadow-2xl! rounded-full border-blue-500 p-1 hover:cursor-pointer z-20 border-2">
+                      <Plus className="text-blue-400 size-4 font-bold" />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      className="p-0 flex flex-col gap-"
+                      align="start"
+                    >
+                      <input
+                        id="file-upload"
+                        type="file"
+                        accept="image/*,.pdf,.doc,.docx,.txt"
+                        onChange={handleFileUpload}
+                        className="hidden "
+                      />
+
+                      {PROFILE_OPTIONS.slice(1).map(
+                        ({ label, value, icon: Icon }, index) => (
+                          <div key={value}>
+                            <label
+                              htmlFor="file-upload"
+                              className={cn(
+                                "gap-2 p-2 group hover:text-primary hover:cursor-pointer flex items-center text-xs",
+                              )}
+                            >
+                              {Icon && (
+                                <Icon className="size-4 group-hover:text-primary" />
+                              )}
+                              <span className="group-hover:text-primary">
+                                {label}
+                              </span>
+                            </label>
+                            <Separator
+                              className={cn(index == 1 && "hidden", "m")}
+                            />
+                          </div>
+                        ),
+                      )}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+
+                  <div className="hover:cursor-pointer z-20">
+                    <SelectOptions
+                      options={ACTION_OPTIONS}
+                      value={docsInput}
+                      onValueChange={(value) => setDocsInput(value)}
+                      placeholder="Tailor Resume"
+                      triggerClassName={
+                        " border-2 border-primary/70 rounded-xl text-primary hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 [&_svg]:!text-primary  text-2xs"
+                      }
+                      contentClassName="text-xs"
                     />
-
-                    {PROFILE_OPTIONS.slice(1).map(
-                      ({ label, value, icon: Icon }, index) => (
-                        <div key={value}>
-                          <label
-                            htmlFor="file-upload"
-                            className={cn(
-                              "gap-2 p-2 group hover:text-primary hover:cursor-pointer flex items-center text-xs",
-                            )}
-                          >
-                            {Icon && (
-                              <Icon className="size-4 group-hover:text-primary" />
-                            )}
-                            <span className="group-hover:text-primary">
-                              {label}
-                            </span>
-                          </label>
-                          <Separator
-                            className={cn(index == 1 && "hidden", "m")}
-                          />
-                        </div>
-                      ),
-                    )}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-
-                <div className="hover:cursor-pointer z-20">
-                  <SelectOptions
-                    options={ACTION_OPTIONS}
-                    value={docsInput}
-                    onValueChange={(value) => setDocsInput(value)}
-                    placeholder="Tailor Resume"
-                    triggerClassName={
-                      " border-2 border-primary/70 rounded-xl text-primary hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 [&_svg]:!text-primary  text-2xs"
-                    }
-                    contentClassName="text-xs"
-                  />
+                  </div>
+                </div>
+                <div className="flex gap-2 px-3">
+                  <div className="hover:cursor-pointer ">
+                    <SelectProfile
+                      options={profile ?? []}
+                      value={userProfile}
+                      onValueChange={(value) => {
+                        setUserProfile(value);
+                        toast.success(JSON.stringify(userProfile));
+                      }}
+                      placeholder="Tailor Resume"
+                      triggerClassName={
+                        " border-2 border-primary/70 rounded-xl text-primary hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 [&_svg]:!text-primary  text-2xs"
+                      }
+                      contentClassName="text-xs"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    className="rounded-full border-blue-500 border-2 p-1 hover:cursor-pointer "
+                  >
+                    <ArrowUp className="text-blue-400 size-4" />
+                  </button>
                 </div>
               </div>
-              <div className="flex gap-2 px-3">
-                <div className="hover:cursor-pointer ">
-                  <SelectProfile
-                    options={profile ?? []}
-                    value={userProfile}
-                    onValueChange={(value) => {
-                      setUserProfile(value);
-                      toast.success(JSON.stringify(userProfile));
-                    }}
-                    placeholder="Tailor Resume"
-                    triggerClassName={
-                      " border-2 border-primary/70 rounded-xl text-primary hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 [&_svg]:!text-primary  text-2xs"
-                    }
-                    contentClassName="text-xs"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="rounded-full border-blue-500 border-2 p-1 hover:cursor-pointer "
-                >
-                  <ArrowUp className="text-blue-400 size-4" />
-                </button>
-              </div>
-            </div>
-          </form>
-        </Form>
+            </form>
+          </Form>
+        </div>
       </div>
+
       <JoinOurTelegramGroupAlert />
     </div>
   );
