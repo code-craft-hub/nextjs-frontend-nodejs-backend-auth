@@ -2,6 +2,7 @@
 import { JobType } from "@/types";
 import { api } from "./client";
 import type { PaginatedResponse } from "@/lib/types";
+import { BACKEND_API_VERSION } from "./profile.api";
 
 export const jobsApi = {
   // Get all jobs with advanced filtering
@@ -12,6 +13,16 @@ export const jobsApi = {
     }),
   // Get all jobs with advanced filtering
   autoApply: (params?: any, token?: string) => {
+    return api.post<PaginatedResponse<JobType>>(
+      `/${BACKEND_API_VERSION}/recommendations`,
+      // "/job-recommendations/search/jobs",
+      {
+        ...params,
+        token,
+      }
+    );
+  },
+  autoApplyGet: (params?: any, token?: string) => {
     return api.get<PaginatedResponse<JobType>>(
       "/job-recommendations/search/jobs",
       {

@@ -43,7 +43,7 @@ export const HomeClient = memo(
       page: 1,
       limit: 30,
       title: title || "",
-      skills: JSON.stringify(rolesOfInterest),
+      skills: rolesOfInterest,
     };
 
 
