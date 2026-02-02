@@ -33,7 +33,7 @@ import { userQueries } from "@/lib/queries/user.queries";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export const RecentActivityCard = memo(
-  ({ filters, addMargin }: { filters: JobFilters; addMargin?: boolean }) => {
+  ({ filters }: { filters: JobFilters }) => {
     const { data: jobs, isLoading } = useQuery(jobsQueries.autoApply(filters));
     const { data: user } = useQuery(userQueries.detail());
     const sortedJobs = useMemo(() => {
@@ -101,7 +101,7 @@ export const RecentActivityCard = memo(
     }
 
     return (
-      <Card className={cn("p-4 sm:p-7 gap-4",)}>
+      <Card className={cn("p-4 sm:p-7 gap-4")}>
         <h1 className="font-bold text-xl">Personalized Recommendation</h1>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-y-4 sm:gap-8">
           {isLoading

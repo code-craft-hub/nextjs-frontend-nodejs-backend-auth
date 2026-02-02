@@ -142,7 +142,7 @@ export function CreateUserResume({
               </div>
               <DialogFooter>
                 <DialogClose asChild>
-                  <Button variant="outline">Cancel, Upload a CV</Button>
+                  <Button variant="outline">Cancel</Button>
                 </DialogClose>
                 <Button type="submit">Create Resume</Button>
               </DialogFooter>

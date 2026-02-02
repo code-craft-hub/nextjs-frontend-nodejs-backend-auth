@@ -1,7 +1,7 @@
 "use client";
 import { AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import {  useState } from "react";
+import { useState } from "react";
 import { X } from "lucide-react";
 import { OnBoardingForm0 } from "./onboarding-pages/OnBoardingForm0";
 import { OnBoardingForm1 } from "./onboarding-pages/OnBoardingForm1";
@@ -13,8 +13,13 @@ import { OnBoardingForm6 } from "./onboarding-pages/OnBoardingForm6";
 import { OnBoardingForm7 } from "./onboarding-pages/OnBoardingForm7";
 import { useRouter } from "next/navigation";
 import { api } from "@/lib/api/client";
+import { userQueries } from "@/lib/queries/user.queries";
+import { useQuery } from "@tanstack/react-query";
 
 export default function OnboardingClient() {
+  const { data: user } = useQuery(userQueries.detail());
+
+  console.log("Onboarding user data:", user?.userId);
   const [currentStep, setCurrentStep] = useState(0);
   const steps = [
     OnBoardingForm0,
@@ -52,7 +57,6 @@ export default function OnboardingClient() {
   };
 
   const CurrentStepComponent = steps[currentStep];
-
 
   return (
     <div className="grid grid-cols-1 overflow-hidden">

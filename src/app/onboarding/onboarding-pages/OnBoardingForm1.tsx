@@ -40,7 +40,7 @@ export const OnBoardingForm1 = ({
 }: OnboardingFormProps) => {
   const { isUpdatingUserLoading } = useAuth();
   const { data: user } = useQuery(userQueries.detail());
-  const { country, region, country_code } = useUserLocation();
+  const { country, region, country_code, postal, city } = useUserLocation();
 
   const updateOnboarding = useUpdateOnboarding({
     userFirstName: user?.firstName,
@@ -73,6 +73,10 @@ export const OnBoardingForm1 = ({
     updateOnboarding.mutate({
       stepNumber: 1,
       ...values,
+      postalCode: postal,
+      countryCode: country_code,
+      city: city,
+      address: `${city}, ${region}, ${country}`,
     });
   }
 
