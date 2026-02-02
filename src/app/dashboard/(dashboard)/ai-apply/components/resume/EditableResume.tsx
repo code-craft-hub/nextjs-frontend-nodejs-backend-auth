@@ -16,20 +16,34 @@ import { EducationEditForm } from "./form/EducationEditForm";
 import { ProjectEditForm } from "./form/ProjectEditForm";
 import { SkillEditForm } from "./form/SkillEditForm";
 import { CertificationEditForm } from "./form/CertificationEditForm";
-import { Edit } from "lucide-react";
+import { Edit, Loader2 } from "lucide-react";
 import { ContactEditForm } from "./form/ContactEditForm";
 import { useResumeData } from "@/hooks/use-resume-data";
 
 const SectionWrapper = memo(
-  ({ children, show }: { children: React.ReactNode; show?: boolean }) => {
+  ({
+    children,
+    show,
+    isLoading,
+  }: {
+    children: React.ReactNode;
+    show?: boolean;
+    isLoading?: boolean;
+  }) => {
     if (!show) return null;
     return (
       <div className="bg-white p-4 hover:cursor-pointer relative">
-        <Edit className="absolute top-3 right-3 size-3.5 text-gray-300" />
+        {isLoading ? (
+          <div className="absolute inset-0 bg-white/50 rounded flex items-center justify-center">
+            <Loader2 className="size-5 text-blue-500 animate-spin" />
+          </div>
+        ) : (
+          <Edit className="absolute top-3 right-3 size-3.5 text-gray-300" />
+        )}
         {children}
       </div>
     );
-  }
+  },
 );
 
 SectionWrapper.displayName = "SectionWrapper";
@@ -46,13 +60,16 @@ export const EditableResume: React.FC<PreviewResumeProps> = ({
   const { user } = useAuth();
   const contentRef = useRef<HTMLDivElement>(null);
 
-  const { resumeData, updateField } = useResumeData(data || {}, {
-    resumeId,
-    onSuccess: () => {},
-    onError: (error, field) => {
-      console.error(`✗ Failed to update ${field}:`, error);
+  const { resumeData, updateField, isFieldLoading } = useResumeData(
+    data || {},
+    {
+      resumeId,
+      onSuccess: () => {},
+      onError: (error, field) => {
+        console.error(`✗ Failed to update ${field}:`, error);
+      },
     },
-  });
+  );
 
   // Use resumeData as the single source of truth once streaming is complete
   const displayData = isStreaming ? data : resumeData;
@@ -66,7 +83,7 @@ export const EditableResume: React.FC<PreviewResumeProps> = ({
       address: (displayData as any)?.address ?? user?.address ?? "",
       portfolio: (displayData as any)?.portfolio ?? "",
     }),
-    [displayData.contact, user]
+    [displayData.contact, user],
   );
 
   const fullName = `${initialData.firstName} ${initialData.lastName}`.trim();
@@ -96,20 +113,23 @@ export const EditableResume: React.FC<PreviewResumeProps> = ({
       (value: T) => {
         updateField(field, value);
       },
-    [updateField]
+    [updateField],
   );
 
   return (
     <Card
       className={cn(
         "text-gray-800 font-merriweather relative rounded-sm",
-        hasProfile ? "p-4 sm:px-5 py-16 " : "hidden"
+        hasProfile ? "p-4 sm:px-5 py-16 " : "hidden",
       )}
     >
       {hasProfile && (
         <EditDialog
           trigger={
-            <SectionWrapper show={!!fullName || isStreaming}>
+            <SectionWrapper
+              show={!!fullName || isStreaming}
+              isLoading={isFieldLoading("contact")}
+            >
               <header className="text-center">
                 <h1 className="text-4xl font-bold font-merriweather">
                   {fullName ||
@@ -143,7 +163,10 @@ export const EditableResume: React.FC<PreviewResumeProps> = ({
       {hasProfile && (
         <EditDialog
           trigger={
-            <SectionWrapper show={hasProfile || isStreaming}>
+            <SectionWrapper
+              show={hasProfile || isStreaming}
+              isLoading={isFieldLoading("profile")}
+            >
               <section className="mb-4">
                 <h2 className="text-3xl font-bold border-b border-gray-300 pb-1 mb-2 font-merriweather">
                   Summary
@@ -181,7 +204,10 @@ export const EditableResume: React.FC<PreviewResumeProps> = ({
         <EditDialog
           className="w-full"
           trigger={
-            <SectionWrapper show={hasWorkExperience || isStreaming}>
+            <SectionWrapper
+              show={hasWorkExperience || isStreaming}
+              isLoading={isFieldLoading("workExperience")}
+            >
               <section className="mb-4 ">
                 <h2 className="text-3xl font-bold border-b border-gray-300 pb-1 mb-2 font-merriweather">
                   Work Experience
@@ -189,7 +215,7 @@ export const EditableResume: React.FC<PreviewResumeProps> = ({
                 {hasWorkExperience ? (
                   displayData.workExperience?.map((work, index) => {
                     const responsibilities = parseResponsibilities(
-                      work?.responsibilities
+                      work?.responsibilities,
                     );
 
                     return (
@@ -229,7 +255,7 @@ export const EditableResume: React.FC<PreviewResumeProps> = ({
                                 >
                                   {point}
                                 </li>
-                              )
+                              ),
                             )}
                           </ul>
                         )}
@@ -263,7 +289,10 @@ export const EditableResume: React.FC<PreviewResumeProps> = ({
       {hasEducation && (
         <EditDialog
           trigger={
-            <SectionWrapper show={hasEducation || isStreaming}>
+            <SectionWrapper
+              show={hasEducation || isStreaming}
+              isLoading={isFieldLoading("education")}
+            >
               <section className="mb-4">
                 <h2 className="text-3xl font-bold border-b border-gray-300 pb-1 mb-2 font-merriweather">
                   Education
@@ -328,7 +357,10 @@ export const EditableResume: React.FC<PreviewResumeProps> = ({
       {hasCertifications && (
         <EditDialog
           trigger={
-            <SectionWrapper show={hasCertifications || isStreaming}>
+            <SectionWrapper
+              show={hasCertifications || isStreaming}
+              isLoading={isFieldLoading("certification")}
+            >
               <section className="mb-4">
                 <h2 className="text-3xl font-bold border-b border-gray-300 pb-1 mb-2 font-merriweather">
                   Certifications
@@ -387,7 +419,10 @@ export const EditableResume: React.FC<PreviewResumeProps> = ({
       {hasProjects && (
         <EditDialog
           trigger={
-            <SectionWrapper show={hasProjects || isStreaming}>
+            <SectionWrapper
+              show={hasProjects || isStreaming}
+              isLoading={isFieldLoading("project")}
+            >
               <section className="mb-4">
                 <h2 className="text-2xl font-semibold border-b border-gray-300 pb-1 mb-2 font-merriweather">
                   Projects
@@ -447,7 +482,10 @@ export const EditableResume: React.FC<PreviewResumeProps> = ({
         </EditDialog>
       )}
       {(hasSoftSkills || hasHardSkills) && (
-        <SectionWrapper show={hasSkills || isStreaming}>
+        <SectionWrapper
+          show={hasSkills || isStreaming}
+          isLoading={isFieldLoading("softSkill") || isFieldLoading("hardSkill")}
+        >
           <section>
             <h2 className="text-3xl font-bold border-b border-gray-300 pb-1 mb-2 font-merriweather">
               Skills

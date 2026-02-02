@@ -7,7 +7,7 @@ const Policy = () => {
   return (
     <div>
       <Header url="/" />
-      <div className="flex flex-col p-4 md:p-8 gap-4 md:gap-8 items-center justify-center max-w-screen-md mx-auto text-start mt-16">
+      <div className="flex flex-col p-4 md:p-8 gap-4 md:gap-8 items-center justify-center max-w-3xl mx-auto text-start mt-16">
         <h1 className="font-bold text-2xl ">
           PRIVACY POLICY FOR CVER JOB APPLICATIONS LTD
         </h1>
@@ -279,6 +279,27 @@ const Policy = () => {
           free of charge. However, we may charge a reasonable fee if your
           request is clearly unfounded, repetitive or excessive. Alternatively,
           we may refuse to comply with your request in these circumstances.
+        </p>
+        <p className="text-start w-full">
+          <span className="font-bold text-xl">Use of Google User Data</span>{" "}
+          <br />
+          <p className="font-medium text-md mt-2">Our App (Cver AI) uses Google APIs to send emails on your behalf.</p>
+          <ul className="pl-4 mt-4">
+            <li>
+              ● <b>Data Sharing:</b> We do not share, transfer, or disclose
+              Google user data to third parties, except as necessary to provide
+              the service (e.g., passing data to Google's own APIs) or as
+              required by law.
+            </li>
+            <li>
+              ● <b>No Sale of Data: </b> Our use of information received from
+              Google APIs will adhere to the Google API Service User Data
+              Policy, including the Limited Use requirements.
+            </li>
+            <li>
+              ● <b>AI/ML Disclosure: </b> We do not use Google user data to train, retrain, or improve AI/Machine Learning models.
+            </li>
+          </ul>
         </p>
         <p className="text-start w-full">
           <span className="font-bold text-xl">What we may need from you</span>{" "}

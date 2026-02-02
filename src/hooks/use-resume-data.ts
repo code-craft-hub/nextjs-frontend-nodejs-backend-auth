@@ -5,12 +5,12 @@ import { ResumeField, UpdatePayload, UseResumeDataOptions } from "@/types";
 import { ResumeFormData } from "@/lib/schema-validations/resume.schema";
 import { createApiError } from "@/lib/utils/helpers";
 import { COLLECTIONS } from "@/lib/utils/constants";
-import {axiosApiClient} from "@/lib/axios/auth-api";
+import { axiosApiClient } from "@/lib/axios/auth-api";
 import { resumeQueries } from "@/lib/queries/resume.queries";
 
 const updateResumeField = async <T>(
   payload: UpdatePayload<T>,
-  baseUrl: string = process.env.NEXT_PUBLIC_AUTH_API_URL || ""
+  baseUrl: string = process.env.NEXT_PUBLIC_AUTH_API_URL || "",
 ): Promise<any> => {
   try {
     const updates =
@@ -24,7 +24,7 @@ const updateResumeField = async <T>(
         resumeId: payload.resumeId,
         updates,
         // { [payload.field]: payload.value },
-      }
+      },
     );
 
     return data;
@@ -49,13 +49,18 @@ const resumeQueryKeys = {
 
 export const useResumeData = (
   initialData: Partial<any>,
-  options: UseResumeDataOptions
+  options: UseResumeDataOptions,
 ) => {
   const { resumeId, apiUrl, onSuccess, onError } = options;
   const queryClient = useQueryClient();
 
   // Track pending updates to prevent premature syncing
   const pendingUpdatesRef = useRef<Set<ResumeField>>(new Set());
+
+  // Track which fields are currently loading
+  const [loadingFields, setLoadingFields] = useState<Set<ResumeField>>(
+    new Set(),
+  );
 
   // Local optimistic state
   const [resumeData, setResumeData] = useState<ResumeFormData>(() => ({
@@ -116,6 +121,7 @@ export const useResumeData = (
     onMutate: async (payload) => {
       // Mark this field as being updated
       pendingUpdatesRef.current.add(payload.field);
+      setLoadingFields((prev) => new Set(prev).add(payload.field));
 
       // Cancel outgoing refetches to prevent race conditions
       await queryClient.cancelQueries({
@@ -124,7 +130,7 @@ export const useResumeData = (
 
       // Snapshot previous value for rollback
       const previousData = queryClient.getQueryData(
-        resumeQueryKeys.doc(resumeId)
+        resumeQueryKeys.doc(resumeId),
       );
 
       // Optimistically update cache
@@ -138,16 +144,21 @@ export const useResumeData = (
     },
 
     onError: (error: Error, payload, context) => {
-      // Remove from pending updates
+      // Remove from pending updates and loading fields
       if (context?.field) {
         pendingUpdatesRef.current.delete(context.field);
+        setLoadingFields((prev) => {
+          const updated = new Set(prev);
+          updated.delete(context.field);
+          return updated;
+        });
       }
 
       // Rollback optimistic update on error
       if (context?.previousData) {
         queryClient.setQueryData(
           resumeQueryKeys.doc(resumeId),
-          context.previousData
+          context.previousData,
         );
         setResumeData(context.previousData as any);
       }
@@ -159,6 +170,11 @@ export const useResumeData = (
     onSuccess: (data, payload, context) => {
       if (context?.field) {
         pendingUpdatesRef.current.delete(context.field);
+        setLoadingFields((prev) => {
+          const updated = new Set(prev);
+          updated.delete(context.field);
+          return updated;
+        });
       }
 
       // Update local state with confirmed data if available
@@ -171,8 +187,14 @@ export const useResumeData = (
     },
 
     onSettled: (_data, _error, payload) => {
-      // Ensure field is removed from pending updates
+      // Ensure field is removed from pending updates and loading fields
       pendingUpdatesRef.current.delete(payload.field);
+      setLoadingFields((prev) => {
+        const updated = new Set(prev);
+        updated.delete(payload.field);
+        return updated;
+      });
+
       queryClient.invalidateQueries(resumeQueries.detail(resumeId));
 
       // Invalidate queries without refetching immediately
@@ -196,7 +218,7 @@ export const useResumeData = (
         resumeId,
       });
     },
-    [resumeId, mutation]
+    [resumeId, mutation],
   );
 
   // Batch update for multiple fields
@@ -213,7 +235,7 @@ export const useResumeData = (
         });
       });
     },
-    [resumeId, mutation]
+    [resumeId, mutation],
   );
 
   return {
@@ -221,6 +243,8 @@ export const useResumeData = (
     updateField,
     updateFields,
     isUpdating: mutation.isPending,
+    loadingFields,
+    isFieldLoading: (field: ResumeField) => loadingFields.has(field),
     error: mutation.error,
     isError: mutation.isError,
     reset: mutation.reset,
