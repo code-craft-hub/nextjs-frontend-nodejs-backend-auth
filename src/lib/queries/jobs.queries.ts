@@ -59,12 +59,10 @@ export const jobsQueries = {
       queryFn: () => jobsApi.autoApply(normalized, token),
       staleTime: 10 * 60 * 1000,
       refetchInterval: (query) => {
-        const data = query.state.data;
-        console.log("Polling for recommendations...", data, "state : ", query.state);
+        const recommendations = query.state.data?.data?.recommendations;
         // Poll every 5 seconds while recommendations are being built (no data)
         // Stop polling once data is available
-        if (!data?.data || data.data.length === 0) {
-
+        if (!recommendations || recommendations.length === 0) {
           return 5000;
         }
         return false;
@@ -72,7 +70,7 @@ export const jobsQueries = {
     });
   },
 
-  // Infinite scroll version for auto-apply jobs
+  // Infinite scroll version for auto-apply jobs (uses paginated endpoint)
   autoApplyInfinite: (
     filters: Omit<JobFilters, "page"> = {},
     token?: string
@@ -81,7 +79,7 @@ export const jobsQueries = {
     return infiniteQueryOptions({
       queryKey: [...queryKeys.jobs.auto(baseFilters), "infinite"],
       queryFn: ({ pageParam }) => {
-        return jobsApi.autoApply(
+        return jobsApi.autoApplyGet(
           {
             ...baseFilters,
             page: pageParam,

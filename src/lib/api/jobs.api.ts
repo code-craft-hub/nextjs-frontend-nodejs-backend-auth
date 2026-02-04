@@ -2,6 +2,7 @@
 import { JobType } from "@/types";
 import { api } from "./client";
 import type { PaginatedResponse } from "@/lib/types";
+import type { RecommendationsResponse } from "@/app/dashboard/(dashboard)/components/recent-activity/types";
 import { BACKEND_API_VERSION } from "./profile.api";
 
 export const jobsApi = {
@@ -13,9 +14,8 @@ export const jobsApi = {
     }),
   // Get all jobs with advanced filtering
   autoApply: (params?: any, token?: string) => {
-    return api.get<PaginatedResponse<JobType>>(
+    return api.get<{ data: RecommendationsResponse }>(
       `/${BACKEND_API_VERSION}/recommendations`,
-      // "/job-recommendations/search/jobs",
       {
         ...params,
         token,
