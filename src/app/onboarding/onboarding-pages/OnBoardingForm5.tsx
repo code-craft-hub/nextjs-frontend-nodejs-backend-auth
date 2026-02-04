@@ -23,7 +23,6 @@ import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { userQueries } from "@/lib/queries/user.queries";
 import { useQuery } from "@tanstack/react-query";
-import { expireNextThreeDays } from "@/lib/utils/helpers";
 import { useUpdateOnboarding } from "@/hooks/mutations";
 const formSchema = z.object({
   type: z
@@ -67,8 +66,6 @@ export const OnBoardingForm5 = ({
     updateOnboarding.mutate({
       stepNumber: 5,
       discovery: values,
-      expiryTime: expireNextThreeDays,
-      credit: 5,
     });
   }
   const isMobile = useIsMobile();

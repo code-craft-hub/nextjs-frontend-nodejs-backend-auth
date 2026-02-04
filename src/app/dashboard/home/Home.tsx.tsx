@@ -23,6 +23,8 @@ export const HomeClient = memo(
     const { data: user } = useQuery(userQueries.detail());
     const title = getDataSource(user)?.title;
 
+    console.log(user?.userId);
+
     const searchSkills = getDataSource(user)?.rolesOfInterest?.map(
       (role: any) => role?.value,
     );

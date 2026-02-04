@@ -2,16 +2,17 @@
 
 import { memo, useCallback } from "react";
 import { Sparkles } from "lucide-react";
-import { isEmpty } from "lodash";
 import { JobCardProps } from "./types";
 import { JobCardDropdown } from "./JobCardDropdown";
 import { JobBadges } from "./JobBadges";
 
 export const JobCard = memo(function JobCard({
-  job,
+  recommendation,
   onJobClick,
   onPreview,
 }: JobCardProps) {
+  const { job, matchScore } = recommendation;
+
   const handleAutoApply = useCallback(() => {
     onJobClick(job);
   }, [job, onJobClick]);
@@ -19,6 +20,11 @@ export const JobCard = memo(function JobCard({
   const handlePreview = useCallback(() => {
     onPreview(job);
   }, [job, onPreview]);
+
+  const salaryDisplay =
+    Array.isArray(job.salaryInfo) && job.salaryInfo.length > 0
+      ? job.salaryInfo.join(" - ")
+      : "";
 
   return (
     <div className="flex bg-slate-50 p-4 sm:p-6 rounded-xl gap-4 sm:gap-6 border border-[#cbd5e1] relative">
@@ -41,15 +47,12 @@ export const JobCard = memo(function JobCard({
             {job.companyName}
           </span>{" "}
           ·{" "}
-          <span className="font-inter text-gray-400">
-            {!isEmpty(job.salaryInfo) ? job?.salaryInfo : ""}
-          </span>
+          <span className="font-inter text-gray-400">{salaryDisplay}</span>
         </p>
         <JobBadges
-          jobType={job.jobType}
           employmentType={job.employmentType}
           location={job.location}
-          relevanceScore={job.relevanceScore}
+          matchScore={matchScore}
         />
       </div>
     </div>

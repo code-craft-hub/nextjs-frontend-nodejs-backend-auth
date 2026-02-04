@@ -8,21 +8,37 @@ import { creditCard } from "@/app/(landing-page)/constants";
 import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
-import { generateIdempotencyKey } from "@/lib/utils/helpers";
+import {
+  expireNextThreeDays,
+  generateIdempotencyKey,
+} from "@/lib/utils/helpers";
 import { baseURL } from "@/lib/api/client";
 import { useQuery } from "@tanstack/react-query";
 import { userQueries } from "@/lib/queries/user.queries";
 import { toast } from "sonner";
+import { useUpdateOnboarding } from "@/hooks/mutations";
 
 export const OnBoardingForm7 = ({ onPrev, children }: OnboardingFormProps) => {
   const [seletePlan, setSeletePlan] = useState("free");
   const { completeOnboarding, isOnboardingLoading } = useAuth();
   const { data: user } = useQuery(userQueries.detail());
 
+  const updateOnboarding = useUpdateOnboarding({
+    userFirstName: user?.firstName,
+  });
+
   const router = useRouter();
   const handleComplete = async (plan: string) => {
     try {
+      updateOnboarding.mutate({
+        stepNumber: 6,
+        plan: "trial",
+        expiryTime: expireNextThreeDays,
+        credit: 5,
+      });
+
       await completeOnboarding();
+
       if (plan === "free") {
         router.push("/dashboard/home");
         return;
@@ -43,7 +59,7 @@ export const OnBoardingForm7 = ({ onPrev, children }: OnboardingFormProps) => {
             body: JSON.stringify({
               email: user?.email,
               amount: parseFloat(
-                process.env.NEXT_PUBLIC_PAYSTACK_AMOUNT || "4999"
+                process.env.NEXT_PUBLIC_PAYSTACK_AMOUNT || "4999",
               ),
               currency: "NGN",
               metadata: {
@@ -67,7 +83,7 @@ export const OnBoardingForm7 = ({ onPrev, children }: OnboardingFormProps) => {
                 "bank_transfer",
               ],
             }),
-          }
+          },
         );
 
         if (!response.ok) {
@@ -109,7 +125,7 @@ export const OnBoardingForm7 = ({ onPrev, children }: OnboardingFormProps) => {
   };
   return (
     <motion.div
-    // @ts-ignore
+      // @ts-ignore
       initial={{ opacity: 0, x: 100 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -100 }}
@@ -176,7 +192,7 @@ export const OnBoardingForm7 = ({ onPrev, children }: OnboardingFormProps) => {
                     className={cn(
                       "bg-primary/10 hover:bg-primary/30 h-12! text-blue-500 hover:text-blue-500",
                       seletePlan?.toLowerCase() === plan.tier.toLowerCase() &&
-                        "border-2 border-blue-500"
+                        "border-2 border-blue-500",
                     )}
                     onClick={() => {
                       setSeletePlan(plan.tier.toLowerCase());

@@ -13,7 +13,7 @@ export const jobsApi = {
     }),
   // Get all jobs with advanced filtering
   autoApply: (params?: any, token?: string) => {
-    return api.post<PaginatedResponse<JobType>>(
+    return api.get<PaginatedResponse<JobType>>(
       `/${BACKEND_API_VERSION}/recommendations`,
       // "/job-recommendations/search/jobs",
       {

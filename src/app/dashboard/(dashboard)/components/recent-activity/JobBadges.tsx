@@ -9,7 +9,7 @@ export const JobBadges = memo(function JobBadges({
   jobType,
   employmentType,
   location,
-  relevanceScore,
+  matchScore,
 }: JobBadgesProps) {
   return (
     <div className="flex flex-wrap gap-2">
@@ -31,14 +31,14 @@ export const JobBadges = memo(function JobBadges({
         >
           {location}
         </Badge>
-        {relevanceScore && relevanceScore > 40 && (
+        {matchScore != null && matchScore > 40 && (
           <Badge
             className={cn(
               "rounded-full font-epilogue font-semibold text-cverai-orange border-cverai-orange bg-white",
               "truncate overflow-hidden text-start",
             )}
           >
-            {relevanceScore}% match
+            {Math.round(matchScore)}% match
           </Badge>
         )}
       </div>
