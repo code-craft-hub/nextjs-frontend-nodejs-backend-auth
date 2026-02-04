@@ -10,6 +10,7 @@ import { useJobActions } from "./hooks/useJobActions";
 import { JobCard } from "./JobCard";
 import { LoadingSkeleton } from "./LoadingSkeleton";
 import { EmptyRecentActivity } from "./EmptyRecentActivity";
+import { isEmpty } from "lodash";
 
 interface RecentActivityCardProps {
   filters: JobFilters;
@@ -23,6 +24,9 @@ export const RecentActivityCard = memo(function RecentActivityCard({
 
   const recommendations = jobs?.data?.recommendations ?? [];
 
+  const isBuildingRecommendations = isEmpty(recommendations) && !isLoading;
+
+  console.log("Recommendations:", recommendations);
   const renderContent = () => {
     if (isLoading) {
       return Array.from({ length: 6 }).map((_, index) => (
@@ -45,11 +49,13 @@ export const RecentActivityCard = memo(function RecentActivityCard({
   };
 
   return (
-    <Card className={cn("p-4 sm:p-7 gap-4")}>
-      <h1 className="font-bold text-xl">Personalized Recommendation</h1>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-y-4 sm:gap-8">
-        {renderContent()}
-      </div>
-    </Card>
+    !isBuildingRecommendations && (
+      <Card className={cn("p-4 sm:p-7 gap-4")}>
+        <h1 className="font-bold text-xl">Personalized Recommendation</h1>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-y-4 sm:gap-8">
+          {renderContent()}
+        </div>
+      </Card>
+    )
   );
 });

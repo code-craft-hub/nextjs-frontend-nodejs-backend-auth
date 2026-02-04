@@ -58,6 +58,17 @@ export const jobsQueries = {
       queryKey: queryKeys.jobs.auto(normalized),
       queryFn: () => jobsApi.autoApply(normalized, token),
       staleTime: 10 * 60 * 1000,
+      refetchInterval: (query) => {
+        const data = query.state.data;
+        console.log("Polling for recommendations...", data, "state : ", query.state);
+        // Poll every 5 seconds while recommendations are being built (no data)
+        // Stop polling once data is available
+        if (!data?.data || data.data.length === 0) {
+
+          return 5000;
+        }
+        return false;
+      },
     });
   },
 

@@ -52,8 +52,6 @@ export type JobType = {
   employmentType?: string;
 };
 
-export interfa
-
 export interface ProfileData {
   id: string;
   title: string;
