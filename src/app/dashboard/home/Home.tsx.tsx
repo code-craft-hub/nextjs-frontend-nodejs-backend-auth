@@ -27,9 +27,9 @@ export const HomeClient = memo(
       (role: any) => role?.value,
     );
     const skills = [
-      ...user?.dataSource?.[0].hardSkill,
-      ...user?.dataSource?.[0].softSkill,
-    ].map((skill) => skill?.value);
+      ...user?.dataSource?.[0]?.hardSkill || [],
+      ...user?.dataSource?.[0]?.softSkill || [],
+    ]?.map((skill) => skill?.value);
 
     const rolesOfInterest = isEmpty(searchSkills) ? skills : searchSkills;
 
