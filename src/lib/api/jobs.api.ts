@@ -13,13 +13,9 @@ export const jobsApi = {
       token,
     }),
   // Get all jobs with advanced filtering
-  autoApply: (params?: any, token?: string) => {
+  autoApply: () => {
     return api.get<{ data: RecommendationsResponse }>(
       `/${BACKEND_API_VERSION}/recommendations`,
-      {
-        ...params,
-        token,
-      }
     );
   },
   autoApplyGet: (params?: any, token?: string) => {
@@ -28,7 +24,7 @@ export const jobsApi = {
       {
         params,
         token,
-      }
+      },
     );
   },
 
@@ -37,7 +33,7 @@ export const jobsApi = {
     try {
       const data = await api.get<{ data: JobType }>(
         `/job-recommendations/${id}`,
-        { token }
+        { token },
       );
       return data;
     } catch (error) {
@@ -94,7 +90,7 @@ export const jobsApi = {
       { filters, format },
       {
         headers: { Accept: "application/octet-stream" },
-      }
+      },
     ),
 
   // Get unique values for filters (faceted search)
@@ -112,7 +108,7 @@ export const jobsApi = {
     page = 1,
     limit = 20,
     title?: string,
-    token?: string
+    token?: string,
   ) =>
     api.post<PaginatedResponse<JobType>>(
       "/job-recommendations/bookmarked",
@@ -122,7 +118,7 @@ export const jobsApi = {
         limit,
         title,
       },
-      { token }
+      { token },
     ),
   // Fetch applied jobs by IDs with pagination (client passes user's applied job IDs)
   // Body: { jobIds: string[], page?: number, limit?: number, title?: string }
@@ -131,7 +127,7 @@ export const jobsApi = {
     page = 1,
     limit = 20,
     title?: string,
-    token?: string
+    token?: string,
   ) =>
     api.post<PaginatedResponse<JobType>>(
       "/job-recommendations/applied-jobs",
@@ -141,6 +137,6 @@ export const jobsApi = {
         limit,
         title,
       },
-      { token }
+      { token },
     ),
 };

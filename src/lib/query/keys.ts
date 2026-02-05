@@ -90,6 +90,11 @@ export const queryKeys = {
       return [...queryKeys.jobs.lists(), cleanFilters] as const;
     },
 
+    autoApply: () => {
+      return [...queryKeys.jobs.autos(), "auto-apply"] as const;
+    },
+
+    
     auto: (filters: JobFilters) => {
       // Create a clean object without undefined values
       const cleanFilters: Record<string, any> = {};

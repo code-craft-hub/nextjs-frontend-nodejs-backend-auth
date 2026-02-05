@@ -6,7 +6,7 @@ export { LoadingSkeleton } from "./LoadingSkeleton";
 export { EmptyRecentActivity } from "./EmptyRecentActivity";
 export { useJobActions } from "./hooks/useJobActions";
 export type {
-  JobWithRecommendation,
+  JobRecommendation,
   JobCardProps,
   JobBadgesProps,
   JobCardDropdownProps,

@@ -19,7 +19,7 @@ interface RecentActivityCardProps {
 export const RecentActivityCard = memo(function RecentActivityCard({
   filters,
 }: RecentActivityCardProps) {
-  const { data: jobs, isLoading } = useQuery(jobsQueries.autoApply(filters));
+  const { data: jobs, isLoading } = useQuery(jobsQueries.autoApply());
   const { handleJobClick, handlePreview } = useJobActions();
 
   const recommendations = jobs?.data?.recommendations ?? [];

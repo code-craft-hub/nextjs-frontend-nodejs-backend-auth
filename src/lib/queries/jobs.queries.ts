@@ -52,11 +52,10 @@ export const jobsQueries = {
     });
   },
 
-  autoApply: (filters: JobFilters = {}, token?: string) => {
-    const normalized = normalizeJobFilters(filters);
+  autoApply: () => {
     return queryOptions({
-      queryKey: queryKeys.jobs.auto(normalized),
-      queryFn: () => jobsApi.autoApply(normalized, token),
+      queryKey: queryKeys.jobs.autoApply(),
+      queryFn: () => jobsApi.autoApply(),
       staleTime: 10 * 60 * 1000,
       refetchInterval: (query) => {
         const recommendations = query.state.data?.data?.recommendations;

@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { profileApi } from "../api/profile.api";
 import { userQueries } from "../queries/user.queries";
+import { jobsQueries } from "../queries/jobs.queries";
 
 // Query keys
 export const profileKeys = {
@@ -30,6 +31,12 @@ export const useUpdateDataSource = () => {
       queryClient.invalidateQueries({
         queryKey: userQueries.detail().queryKey,
       });
+      queryClient.invalidateQueries({
+        queryKey: jobsQueries.autoApply().queryKey,
+      });
+      queryClient.invalidateQueries({
+        queryKey: jobsQueries.autoApplyInfinite().queryKey,
+      });
       queryClient.setQueryData(profileKeys.detail(), data);
     },
     onError: (error: any) => {
@@ -37,6 +44,7 @@ export const useUpdateDataSource = () => {
     },
   });
 };
+
 export const useSetDefaultDataSource = () => {
   const queryClient = useQueryClient();
 
@@ -48,6 +56,12 @@ export const useSetDefaultDataSource = () => {
       });
       queryClient.invalidateQueries({
         queryKey: userQueries.detail().queryKey,
+      });
+      queryClient.invalidateQueries({
+        queryKey: jobsQueries.autoApply().queryKey,
+      });
+      queryClient.invalidateQueries({
+        queryKey: jobsQueries.autoApplyInfinite().queryKey,
       });
       queryClient.setQueryData(profileKeys.detail(), data);
     },
@@ -64,6 +78,12 @@ export const useDeleteDataSource = () => {
     onSuccess: (_data, _variables) => {
       queryClient.invalidateQueries({
         queryKey: profileKeys.detail(),
+      });
+      queryClient.invalidateQueries({
+        queryKey: jobsQueries.autoApply().queryKey,
+      });
+      queryClient.invalidateQueries({
+        queryKey: jobsQueries.autoApplyInfinite().queryKey,
       });
       queryClient.invalidateQueries({
         queryKey: userQueries.detail().queryKey,
@@ -85,6 +105,12 @@ export const useDeleteDataSourceWithGCS = () => {
         queryKey: profileKeys.detail(),
       });
       queryClient.invalidateQueries({
+        queryKey: jobsQueries.autoApply().queryKey,
+      });
+      queryClient.invalidateQueries({
+        queryKey: jobsQueries.autoApplyInfinite().queryKey,
+      });
+      queryClient.invalidateQueries({
         queryKey: userQueries.detail().queryKey,
       });
     },
@@ -104,7 +130,12 @@ export const useCreateDataSource = () => {
       queryClient.invalidateQueries({
         queryKey: profileKeys.detail(),
       });
-
+      queryClient.invalidateQueries({
+        queryKey: jobsQueries.autoApply().queryKey,
+      });
+      queryClient.invalidateQueries({
+        queryKey: jobsQueries.autoApplyInfinite().queryKey,
+      });
       queryClient.invalidateQueries({
         queryKey: userQueries.detail().queryKey,
       });
