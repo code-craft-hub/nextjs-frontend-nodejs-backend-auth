@@ -441,17 +441,22 @@ export function normalizeToString(input: any): string {
 
   // If input is already a string, try to parse it as JSON
   if (typeof input === "string") {
-    // Return as-is if it's already plain text (not JSON)
-    const trimmed = input.trim();
+    // Remove leading/trailing quotes and whitespace
+    const trimmed = input.trim().replace(/^["']+|["']+$/g, "");
     if (!trimmed.startsWith("{") && !trimmed.startsWith("[")) {
-      return input;
+      return trimmed;
     }
 
     try {
       const parsed = JSON.parse(input);
       return normalizeToString(parsed); // Recursively handle the parsed object
     } catch {
-      // If JSON parsing fails, return the original string
+      // If JSON parsing fails, check if it looks like incomplete JSON (streaming)
+      // Don't display raw JSON that looks like an object/array being built
+      if (isLikelyIncompleteJSON(trimmed)) {
+        return "";
+      }
+      // If it's not incomplete JSON, return the original string
       return input;
     }
   }

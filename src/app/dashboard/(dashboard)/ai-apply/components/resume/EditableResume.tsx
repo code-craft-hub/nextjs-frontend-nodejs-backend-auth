@@ -83,7 +83,7 @@ export const EditableResume: React.FC<PreviewResumeProps> = ({
       address: (displayData as any)?.address ?? user?.address ?? "",
       portfolio: (displayData as any)?.portfolio ?? "",
     }),
-    [displayData.contact, user],
+    [displayData, user],
   );
 
   const fullName = `${initialData.firstName} ${initialData.lastName}`.trim();

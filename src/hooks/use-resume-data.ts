@@ -10,7 +10,6 @@ import { resumeQueries } from "@/lib/queries/resume.queries";
 
 const updateResumeField = async <T>(
   payload: UpdatePayload<T>,
-  baseUrl: string = process.env.NEXT_PUBLIC_AUTH_API_URL || "",
 ): Promise<any> => {
   try {
     const updates =
@@ -19,7 +18,7 @@ const updateResumeField = async <T>(
         : { [payload.field]: payload.value };
 
     const { data } = await axiosApiClient.patch(
-      `${baseUrl}/career-doc/${COLLECTIONS.RESUME}/${payload.resumeId}`,
+      `/career-doc/${COLLECTIONS.RESUME}/${payload.resumeId}`,
       {
         resumeId: payload.resumeId,
         updates,
@@ -51,7 +50,7 @@ export const useResumeData = (
   initialData: Partial<any>,
   options: UseResumeDataOptions,
 ) => {
-  const { resumeId, apiUrl, onSuccess, onError } = options;
+  const { resumeId, onSuccess, onError } = options;
   const queryClient = useQueryClient();
 
   // Track pending updates to prevent premature syncing
@@ -115,7 +114,7 @@ export const useResumeData = (
     { previousData: any; field: ResumeField }
   >({
     mutationFn: async <T>(payload: UpdatePayload<T>) => {
-      return updateResumeField(payload, apiUrl);
+      return updateResumeField(payload);
     },
 
     onMutate: async (payload) => {

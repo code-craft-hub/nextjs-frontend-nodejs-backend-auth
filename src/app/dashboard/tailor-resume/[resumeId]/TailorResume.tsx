@@ -38,31 +38,16 @@ export const TailorResume = ({
       });
   }, [user?.firstName]);
 
-  // const defaultResume = user?.dataSource?.find(
-  //   (resume) => resume.id === user?.defaultDataSource
-  // );
-
-  // TODO: CHECK THE EXPIRY OF THE URL AND REFRESH IF NEEDED IN THE SERVER OR CLIENT
-
   const { data, status, isFetched } = useQuery(resumeQueries.detail(resumeId));
   const resultsEndRef = useRef<HTMLDivElement>(null);
   const hasGeneratedRef = useRef(false);
   const router = useRouter();
 
-  // const backendUrl = process.env.NEXT_PUBLIC_AUTH_API_URL;
 
   const { streamData, streamStatus, startStream } = useResumeStream(
     baseURL + "/new-resume-generation",
     resumeId
   );
-
-  useEffect(() => {
-    if (user?.firstName)
-      sendGTMEvent({
-        event: `Tailor Resume Page`,
-        value: `${user?.firstName} viewed Tailor Resume Page`,
-      });
-  }, [user?.firstName]);
 
   useEffect(() => {
     if (!streamStatus.isComplete) {
@@ -138,7 +123,7 @@ export const TailorResume = ({
       <EditableResume
         data={shouldUseDbData ? data! : streamData}
         resumeId={resumeId}
-        isStreaming={streamStatus.isComplete}
+        isStreaming={!streamStatus.isComplete}
       />
       <div ref={resultsEndRef} className="" />
     </div>
