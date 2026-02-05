@@ -102,7 +102,7 @@ export default function ProfileManagementModal({
           onError: (error) => {
             console.error("Failed to update profile:", error);
           },
-        }
+        },
       );
     } else {
       createDataSource.mutate(
@@ -116,9 +116,13 @@ export default function ProfileManagementModal({
           onError: (error) => {
             console.error("Failed to create profile:", error);
           },
-        }
+        },
       );
     }
+
+    setTimeout(() => {
+      window.location.href = "/dashboard/home";
+    }, 1500);
   };
 
   const handleUpdate = () => {
@@ -235,7 +239,9 @@ export default function ProfileManagementModal({
                 <div className="space-y-1.5 col-span-2">
                   <h1 className="">
                     Role of Interest{" "}
-                    <span className="text-2xs">(Avoid ambigious words)</span>{" "}
+                    <span className="text-2xs">
+                      (Avoid ambigious words)
+                    </span>{" "}
                   </h1>
                   <Controller
                     name="rolesOfInterest"
@@ -373,7 +379,7 @@ export default function ProfileManagementModal({
                           }
                           setOpen(false);
                           toast.success(
-                            `${profile?.title} is now your default profile!`
+                            `${profile?.title} is now your default profile!`,
                           );
                           setTimeout(() => {
                             router.refresh();

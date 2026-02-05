@@ -31,10 +31,12 @@ export const useUpdateDataSource = () => {
       queryClient.invalidateQueries({
         queryKey: userQueries.detail().queryKey,
       });
-      queryClient.invalidateQueries({
+      // Reset (not just invalidate) autoApply queries to clear cached data
+      // This restarts the polling logic since it checks for empty recommendations
+      queryClient.resetQueries({
         queryKey: jobsQueries.autoApply().queryKey,
       });
-      queryClient.invalidateQueries({
+      queryClient.resetQueries({
         queryKey: jobsQueries.autoApplyInfinite().queryKey,
       });
       queryClient.setQueryData(profileKeys.detail(), data);
