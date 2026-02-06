@@ -342,18 +342,23 @@ export const TailorResume = ({
   const handleStreamEvent = useCallback((event: StreamEvent) => {
     const { type, section, content } = event;
 
-    console.log("TYPE OF THE EVENT : ", type);
-    console.log("TYPE OF THE SECTION : ", section);
-    console.log("CONTENT OF THE SECTION : ", content);
-
-    if (!section) {
-      if (type === "generationComplete") {
-        setIsComplete(true);
-        setIsStreaming(false);
-        setProgress(100);
-      }
+    if (type === "generationComplete") {
+      setIsComplete(true);
+      setIsStreaming(false);
+      setProgress(100);
       return;
     }
+
+    console.log("THIS IS THE EVENT STREAM", event);
+    console.log("CURRENT SECTIONS STATE", sections);
+    console.log("WITH CONTENT", content);
+
+    // sectionContent without a section = overall streaming progress (single-call mode)
+    if (type === "sectionContent" && !section) {
+      return;
+    }
+
+    if (!section) return;
 
     setSections((prev) => {
       const updated = new Map(prev);
