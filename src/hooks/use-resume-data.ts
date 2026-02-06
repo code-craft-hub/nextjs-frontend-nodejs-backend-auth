@@ -2,7 +2,10 @@ import { useState, useCallback, useEffect, useRef } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 // import { authAPI } from "@/lib/axios/auth-api";
 import { ResumeField, UpdatePayload, UseResumeDataOptions } from "@/types";
-import { ResumeFormData } from "@/lib/schema-validations/resume.schema";
+import {
+  ContactFormData,
+  ResumeFormData,
+} from "@/lib/schema-validations/resume.schema";
 import { createApiError } from "@/lib/utils/helpers";
 import { COLLECTIONS } from "@/lib/utils/constants";
 import { axiosApiClient } from "@/lib/axios/auth-api";
@@ -62,7 +65,9 @@ export const useResumeData = (
   );
 
   // Local optimistic state
-  const [resumeData, setResumeData] = useState<ResumeFormData>(() => ({
+  const [resumeData, setResumeData] = useState<
+    ResumeFormData & ContactFormData
+  >(() => ({
     summary: "",
     personalDetails: {
       fullName: "",
@@ -159,7 +164,21 @@ export const useResumeData = (
           resumeQueryKeys.doc(resumeId),
           context.previousData,
         );
-        setResumeData(context.previousData as any);
+
+        // Handle contact field specially when rolling back
+        if (payload.field === "contact") {
+          setResumeData((prev) => ({
+            ...prev,
+            firstName: context.previousData.firstName ?? prev.firstName,
+            lastName: context.previousData.lastName ?? prev.lastName,
+            email: context.previousData.email ?? prev.email,
+            phoneNumber: context.previousData.phoneNumber ?? prev.phoneNumber,
+            address: context.previousData.address ?? prev.address,
+            portfolio: context.previousData.portfolio ?? prev.portfolio,
+          }));
+        } else {
+          setResumeData(context.previousData as any);
+        }
       }
 
       // Call error callback
@@ -178,7 +197,20 @@ export const useResumeData = (
 
       // Update local state with confirmed data if available
       if (data?.data) {
-        setResumeData((prev) => ({ ...prev, ...data.data }));
+        // Handle contact field specially - flatten contact object to root level
+        if (payload.field === "contact") {
+          setResumeData((prev) => ({
+            ...prev,
+            firstName: data.data.firstName ?? prev.firstName,
+            lastName: data.data.lastName ?? prev.lastName,
+            email: data.data.email ?? prev.email,
+            phoneNumber: data.data.phoneNumber ?? prev.phoneNumber,
+            address: data.data.address ?? prev.address,
+            portfolio: data.data.portfolio ?? prev.portfolio,
+          }));
+        } else {
+          setResumeData((prev) => ({ ...prev, ...data.data }));
+        }
       }
 
       // Call success callback

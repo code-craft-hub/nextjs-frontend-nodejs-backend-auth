@@ -40,7 +40,7 @@ export const EditDialog: React.FC<EditDialogProps> = ({
       >
         {trigger}
       </DialogTrigger>
-      <DialogContent className="!w-screen max-h-[90vh] overflow-y-auto max-sm:!p-2">
+      <DialogContent className="w-screen! max-h-[90vh] overflow-y-auto max-sm:p-2!">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           {description && <DialogDescription>{description}</DialogDescription>}
