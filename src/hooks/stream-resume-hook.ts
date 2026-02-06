@@ -15,7 +15,7 @@ import { jsonrepair } from "jsonrepair";
  */
 export const useResumeStream = (
   endpoint: string,
-  resumeId: string
+  resumeId: string,
 ): UseResumeStreamReturn => {
   const [streamData, setStreamData] = useState<StreamData>(() => ({
     profile: "",
@@ -149,7 +149,7 @@ export const useResumeStream = (
 
       return true;
     },
-    [sanitizeJSON]
+    [sanitizeJSON],
   );
 
   /**
@@ -157,7 +157,16 @@ export const useResumeStream = (
    */
   const handleEventData = useCallback(
     (eventData: any): void => {
-      // Handle simple content streaming: {"content": "chunk"}
+      // Handle new streaming format: {"type": "chunk", "content": "..."}
+      if (eventData.type === "chunk" && eventData.content !== undefined) {
+        accumulatedContentRef.current += eventData.content;
+
+        // Try to parse the accumulated content progressively
+        tryParseAndUpdateState(accumulatedContentRef.current, false);
+        return;
+      }
+
+      // Handle simple content streaming: {"content": "chunk"} (legacy)
       if (
         eventData.content !== undefined &&
         eventData.type === undefined &&
@@ -170,8 +179,8 @@ export const useResumeStream = (
         return;
       }
 
-      // Handle completion: {"done": true}
-      if (eventData.done === true) {
+      // Handle completion: {"done": true} or {"type": "generationComplete"}
+      if (eventData.done === true || eventData.type === "generationComplete") {
         // Final parse attempt
         tryParseAndUpdateState(accumulatedContentRef.current, true);
 
@@ -184,11 +193,11 @@ export const useResumeStream = (
       }
 
       // Handle error events
-      if (eventData.error) {
-        console.error("[Stream] Error:", eventData.error);
+      if (eventData.type === "error" || eventData.error) {
+        console.error("[Stream] Error:", eventData.error || eventData.message);
         setStreamStatus((prev) => ({
           ...prev,
-          error: eventData.error,
+          error: eventData.error || eventData.message || "Unknown error",
           isConnected: false,
         }));
         return;
@@ -301,7 +310,7 @@ export const useResumeStream = (
           }
       }
     },
-    [tryParseAndUpdateState]
+    [tryParseAndUpdateState],
   );
 
   /**
@@ -354,7 +363,7 @@ export const useResumeStream = (
         if (!response.ok) {
           const errorText = await response.text().catch(() => "Unknown error");
           throw new Error(
-            `HTTP ${response.status}: ${response.statusText || errorText}`
+            `HTTP ${response.status}: ${response.statusText || errorText}`,
           );
         }
 
@@ -409,7 +418,7 @@ export const useResumeStream = (
                   "[Stream] Failed to parse SSE event:",
                   parseError,
                   "\nData:",
-                  dataContent.substring(0, 200)
+                  dataContent.substring(0, 200),
                 );
               }
             }
@@ -429,7 +438,7 @@ export const useResumeStream = (
         accumulatedContentRef.current = "";
       }
     },
-    [endpoint, resumeId, handleEventData, tryParseAndUpdateState]
+    [endpoint, resumeId, handleEventData, tryParseAndUpdateState],
   );
 
   /**
