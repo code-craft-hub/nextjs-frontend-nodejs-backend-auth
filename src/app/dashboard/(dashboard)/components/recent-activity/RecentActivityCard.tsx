@@ -5,20 +5,13 @@ import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { jobsQueries } from "@/lib/queries/jobs.queries";
-import { JobFilters } from "@/lib/types/jobs";
 import { useJobActions } from "./hooks/useJobActions";
 import { JobCard } from "./JobCard";
 import { LoadingSkeleton } from "./LoadingSkeleton";
 import { EmptyRecentActivity } from "./EmptyRecentActivity";
 import { isEmpty } from "lodash";
 
-interface RecentActivityCardProps {
-  filters: JobFilters;
-}
-
-export const RecentActivityCard = memo(function RecentActivityCard({
-  filters,
-}: RecentActivityCardProps) {
+export const RecentActivityCard = memo(function RecentActivityCard() {
   const { data: jobs, isLoading } = useQuery(jobsQueries.autoApply());
   const { handleJobClick, handlePreview } = useJobActions();
 
@@ -26,7 +19,6 @@ export const RecentActivityCard = memo(function RecentActivityCard({
 
   const isBuildingRecommendations = isEmpty(recommendations) && !isLoading;
 
-  console.log("Recommendations:", recommendations);
   const renderContent = () => {
     if (isLoading) {
       return Array.from({ length: 6 }).map((_, index) => (

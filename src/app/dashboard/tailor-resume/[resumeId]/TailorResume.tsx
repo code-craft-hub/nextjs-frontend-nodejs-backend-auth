@@ -6,29 +6,8 @@ import { baseURL } from "@/lib/api/client";
 import { useEffect, useState, useCallback, useRef } from "react";
 
 // ============================================================================
-// ARCHITECTURE OVERVIEW
-// ============================================================================
-/*
- * This component implements a production-grade streaming architecture:
- *
- * 1. TYPE SAFETY: Comprehensive TypeScript types for all data structures
- * 2. STATE MANAGEMENT: Efficient React state updates with Map for O(1) lookups
- * 3. ERROR HANDLING: Graceful degradation with retry logic
- * 4. PERFORMANCE: Debounced updates and memoization
- * 5. UX: Progressive rendering with loading states
- * 6. MEMORY: Cleanup on unmount to prevent leaks
- * 7. ACCESSIBILITY: Semantic HTML and ARIA labels
- */
-
-// ============================================================================
 // TYPE DEFINITIONS
 // ============================================================================
-
-type StreamEventType =
-  | "sectionStarted"
-  | "sectionContent"
-  | "sectionCompleted"
-  | "generationComplete";
 
 type SectionType =
   | "profile"
@@ -39,17 +18,9 @@ type SectionType =
   | "softSkill"
   | "hardSkill";
 
-interface StreamEvent {
-  type: StreamEventType;
-  section?: SectionType;
-  content?: string;
-  fullContent?: string;
-}
-
 interface ResumeSection {
   type: SectionType;
-  status: "pending" | "streaming" | "completed" | "error";
-  rawContent: string;
+  status: "completed" | "error";
   parsedContent: any;
   error?: string;
 }
@@ -94,6 +65,7 @@ interface Skill {
 // CONSTANTS
 // ============================================================================
 
+/** Display order for rendering sections in the UI */
 const SECTION_ORDER: SectionType[] = [
   "profile",
   "workExperience",
@@ -102,6 +74,21 @@ const SECTION_ORDER: SectionType[] = [
   "hardSkill",
   "softSkill",
   "certification",
+];
+
+/**
+ * Order matching the AI's JSON output structure (RESUME_STRUCTURE).
+ * Used for incremental parsing — a section is confirmed complete when
+ * a later key in this order appears in the partial parse.
+ */
+const AI_OUTPUT_ORDER: SectionType[] = [
+  "profile",
+  "education",
+  "workExperience",
+  "certification",
+  "project",
+  "softSkill",
+  "hardSkill",
 ];
 
 const SECTION_TITLES: Record<SectionType, string> = {
@@ -119,27 +106,75 @@ const SECTION_TITLES: Record<SectionType, string> = {
 // ============================================================================
 
 /**
- * Safely parse JSON with error handling
- * Removes markdown code blocks and handles malformed JSON
+ * Attempts to parse a partial/incomplete JSON string by auto-closing
+ * any open structures (strings, arrays, objects).
+ * Returns null if parsing fails even after repair.
  */
-const safeParseJSON = (content: string): any => {
-  if (!content?.trim()) return null;
+const tryParsePartialJSON = (text: string): any | null => {
+  let cleaned = text.trim();
+  cleaned = cleaned.replace(/^```json\s*/gi, "").replace(/```\s*$/g, "");
+  cleaned = cleaned.trim();
+
+  if (!cleaned) return null;
+
+  // Try direct parse first
+  try {
+    return JSON.parse(cleaned);
+  } catch {
+    // fall through to auto-close
+  }
+
+  // Auto-close: track open structures (ignoring contents of strings)
+  let inString = false;
+  let escaped = false;
+  let openBraces = 0;
+  let openBrackets = 0;
+
+  for (let i = 0; i < cleaned.length; i++) {
+    const char = cleaned[i];
+
+    if (escaped) {
+      escaped = false;
+      continue;
+    }
+    if (char === "\\" && inString) {
+      escaped = true;
+      continue;
+    }
+    if (char === '"') {
+      inString = !inString;
+      continue;
+    }
+    if (inString) continue;
+
+    if (char === "{") openBraces++;
+    else if (char === "}") openBraces--;
+    else if (char === "[") openBrackets++;
+    else if (char === "]") openBrackets--;
+  }
+
+  let repaired = cleaned;
+
+  // Close any open string
+  if (inString) repaired += '"';
+
+  // Remove trailing comma (invalid before closing bracket/brace)
+  repaired = repaired.replace(/,\s*$/, "");
+
+  // Close open brackets then braces
+  for (let i = 0; i < openBrackets; i++) repaired += "]";
+  for (let i = 0; i < openBraces; i++) repaired += "}";
 
   try {
-    // Remove markdown formatting
-    const cleaned = content
-      .replace(/```json\s*/g, "")
-      .replace(/```\s*/g, "")
-      .trim();
-
-    if (!cleaned) return null;
-
-    return JSON.parse(cleaned);
-  } catch (error) {
-    console.warn("JSON parse error:", error);
+    return JSON.parse(repaired);
+  } catch {
     return null;
   }
 };
+
+// ============================================================================
+// SECTION COMPONENTS
+// ============================================================================
 
 const ProfileSection = ({ content }: { content: string }) => (
   <section className="space-y-2" aria-labelledby="profile-heading">
@@ -308,6 +343,10 @@ const SkillsSection = ({
   </section>
 );
 
+// ============================================================================
+// MAIN COMPONENT
+// ============================================================================
+
 export const TailorResume = ({
   jobDescription,
   resumeId,
@@ -335,89 +374,112 @@ export const TailorResume = ({
 
   // ========== Refs ==========
   const abortControllerRef = useRef<AbortController | null>(null);
+  const accumulatedRef = useRef("");
+  const emittedSectionsRef = useRef(new Set<SectionType>());
 
   /**
-   * Handle incoming stream events
+   * Try to extract completed sections from the accumulated AI response.
+   * A section is confirmed complete when a LATER section (in AI output order)
+   * already has its key present in the partial parse result.
    */
-  const handleStreamEvent = useCallback((event: StreamEvent) => {
-    const { type, section, content } = event;
+  const extractCompletedSections = useCallback(() => {
+    const partial = tryParsePartialJSON(accumulatedRef.current);
+    if (!partial || typeof partial !== "object") return;
 
-    if (type === "generationComplete") {
-      setIsComplete(true);
-      setIsStreaming(false);
-      setProgress(100);
-      return;
-    }
+    const newSections: Array<{ type: SectionType; data: any }> = [];
 
-    console.log("THIS IS THE EVENT STREAM", event);
-    console.log("CURRENT SECTIONS STATE", sections);
-    console.log("WITH CONTENT", content);
+    for (let i = 0; i < AI_OUTPUT_ORDER.length; i++) {
+      const sectionType = AI_OUTPUT_ORDER[i];
+      if (emittedSectionsRef.current.has(sectionType)) continue;
+      if (!(sectionType in partial)) continue;
 
-    // sectionContent without a section = overall streaming progress (single-call mode)
-    if (type === "sectionContent" && !section) {
-      return;
-    }
-
-    if (!section) return;
-
-    setSections((prev) => {
-      const updated = new Map(prev);
-      const existing = updated.get(section);
-
-      switch (type) {
-        case "sectionStarted":
-          updated.set(section, {
-            type: section,
-            status: "streaming",
-            rawContent: "",
-            parsedContent: null,
-          });
+      // Confirm this section is complete: a later key must exist
+      let confirmed = false;
+      for (let j = i + 1; j < AI_OUTPUT_ORDER.length; j++) {
+        if (AI_OUTPUT_ORDER[j] in partial) {
+          confirmed = true;
           break;
-
-        case "sectionContent":
-          if (existing) {
-            updated.set(section, {
-              ...existing,
-              rawContent: event.fullContent || existing.rawContent,
-            });
-          }
-          break;
-
-        case "sectionCompleted":
-          if (content) {
-            const parsed = safeParseJSON(content);
-            if (parsed) {
-              updated.set(section, {
-                type: section,
-                status: "completed",
-                rawContent: content,
-                parsedContent: parsed,
-              });
-
-              // Update progress
-              const completedCount = Array.from(updated.values()).filter(
-                (s) => s.status === "completed",
-              ).length;
-              setProgress((completedCount / SECTION_ORDER.length) * 100);
-            } else {
-              updated.set(section, {
-                type: section,
-                status: "error",
-                rawContent: content,
-                parsedContent: null,
-                error: "Failed to parse section data",
-              });
-            }
-          }
-          break;
+        }
       }
+      if (!confirmed) continue;
 
-      return updated;
-    });
+      emittedSectionsRef.current.add(sectionType);
+      newSections.push({ type: sectionType, data: partial[sectionType] });
+    }
+
+    if (newSections.length > 0) {
+      setSections((prev) => {
+        const updated = new Map(prev);
+        for (const { type, data } of newSections) {
+          updated.set(type, {
+            type,
+            status: "completed",
+            parsedContent: data,
+          });
+        }
+        return updated;
+      });
+      setProgress(
+        (emittedSectionsRef.current.size / SECTION_ORDER.length) * 100,
+      );
+    }
   }, []);
 
   /**
-   * Main streaming function with error handling
+   * Final parse: extract all remaining sections from the complete response.
+   */
+  const extractRemainingSections = useCallback(() => {
+    const fullData = tryParsePartialJSON(accumulatedRef.current);
+    if (!fullData || typeof fullData !== "object") return;
+
+    setSections((prev) => {
+      const updated = new Map(prev);
+      for (const sectionType of SECTION_ORDER) {
+        if (emittedSectionsRef.current.has(sectionType)) continue;
+        const data = fullData[sectionType];
+        if (data === undefined || data === null) continue;
+
+        emittedSectionsRef.current.add(sectionType);
+        updated.set(sectionType, {
+          type: sectionType,
+          status: "completed",
+          parsedContent: data,
+        });
+      }
+      return updated;
+    });
+    setProgress(100);
+  }, []);
+
+  /**
+   * Handle incoming SSE events from the server.
+   * Server sends raw AI chunks — client accumulates and parses incrementally.
+   */
+  const handleStreamEvent = useCallback(
+    (event: { type: string; content?: string; error?: string }) => {
+      if (event.type === "error") {
+        setError(event.error || "An unknown error occurred");
+        setIsStreaming(false);
+        return;
+      }
+
+      if (event.type === "generationComplete") {
+        extractRemainingSections();
+        setIsComplete(true);
+        setIsStreaming(false);
+        return;
+      }
+
+      if (event.type === "chunk" && event.content) {
+        accumulatedRef.current += event.content;
+        extractCompletedSections();
+      }
+    },
+    [extractCompletedSections, extractRemainingSections],
+  );
+
+  /**
+   * Main streaming function
    */
   const generateResume = useCallback(async () => {
     if (!user) return;
@@ -428,6 +490,8 @@ export const TailorResume = ({
     setSections(new Map());
     setIsComplete(false);
     setProgress(0);
+    accumulatedRef.current = "";
+    emittedSectionsRef.current = new Set();
 
     // Create abort controller
     abortControllerRef.current = new AbortController();
@@ -483,7 +547,7 @@ export const TailorResume = ({
               const eventData = JSON.parse(line.slice(6));
               handleStreamEvent(eventData);
             } catch (parseError) {
-              console.warn("Failed to parse event:", line, parseError);
+              console.warn("Failed to parse SSE event:", line, parseError);
             }
           }
         }
@@ -529,7 +593,6 @@ export const TailorResume = ({
       generateResume();
     }
 
-    // Cleanup on unmount
     return () => {
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
@@ -594,7 +657,7 @@ export const TailorResume = ({
         if (!Array.isArray(parsedContent) || parsedContent.length === 0) {
           return null;
         }
-        return null; // Implement certification renderer if needed
+        return null;
 
       default:
         return null;
@@ -606,7 +669,9 @@ export const TailorResume = ({
     <div className="max-w-4xl mx-auto p-6 space-y-8">
       {/* Header */}
       <header className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">AI-Tailored Resume</h1>
+        <h1 className="text-2xl font-bold text-gray-900">
+          AI-Tailored Resume
+        </h1>
 
         <div className="flex items-center gap-4">
           {isStreaming && (
@@ -708,7 +773,6 @@ export const TailorResume = ({
         {SECTION_ORDER.map((sectionType) => {
           const section = sections.get(sectionType);
 
-          // Don't render if section doesn't exist yet
           if (!section) return null;
 
           return (
@@ -716,20 +780,8 @@ export const TailorResume = ({
               key={sectionType}
               className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm transition-all hover:shadow-md"
             >
-              {/* Streaming state */}
-              {section.status === "streaming" && (
-                <div className="flex items-center gap-3">
-                  <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" />
-                  <span className="text-sm text-gray-600">
-                    Loading {SECTION_TITLES[sectionType]}...
-                  </span>
-                </div>
-              )}
-
-              {/* Completed state */}
               {section.status === "completed" && renderSection(section)}
 
-              {/* Error state */}
               {section.status === "error" && (
                 <div className="text-sm text-red-600">
                   <p className="font-medium">
