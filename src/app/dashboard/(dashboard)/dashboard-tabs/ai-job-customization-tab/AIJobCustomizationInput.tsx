@@ -216,7 +216,6 @@ export const AIJobCustomizationInput = memo(() => {
                       value={userProfile}
                       onValueChange={(value) => {
                         setUserProfile(value);
-                        toast.success(JSON.stringify(userProfile));
                       }}
                       placeholder="Tailor Resume"
                       triggerClassName={
