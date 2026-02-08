@@ -268,8 +268,6 @@ export const AiApplyPreferences: React.FC = () => {
     setSwitchStates(newState);
 
     try {
-      console.log("Saving settings with state:", newState(switchStates));
-      // return;
       await updateUser.mutateAsync({
         data: { aiApplyPreferences: newState(switchStates) },
       });

@@ -90,7 +90,6 @@ export const UserProfileForm: React.FC = () => {
   }: z.infer<typeof profileSchema>) => {
     const normalizedPhoneNumber = phoneNumber?.replace(/\s+/g, "");
 
-    // console.log(normalizedPhoneNumber); return;
     updateUser.mutate({
       data: {
         firstName,
