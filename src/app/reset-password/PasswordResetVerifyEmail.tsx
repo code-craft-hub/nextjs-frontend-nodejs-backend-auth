@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect } from "react";
-import {axiosApiClient} from "@/lib/axios/auth-api";
 import { useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -20,6 +19,7 @@ import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { X } from "lucide-react";
+import { api } from "@/lib/api/client";
 
 const formSchema = z.object({
   code: z.string().min(5, "Please enter the 5-digit verification code"),
@@ -63,7 +63,7 @@ export const PasswordResetVerifyEmail = ({
     setIsSending(true);
 
     try {
-      await axiosApiClient.post("/send-verification", { email });
+      await api.post("/send-verification", { email });
 
       toast.success(`${username}, verification code sent to your email!`);
       setCanResend(false);
@@ -97,7 +97,7 @@ export const PasswordResetVerifyEmail = ({
     setIsVerifying(true);
 
     try {
-      await axiosApiClient.post("/verify-email", { code, email });
+      await api.post("/verify-email", { code, email });
 
       toast.success(`${username}, your email has been verified successfully!`);
       setCompletedEmailVerification(true);
@@ -195,7 +195,7 @@ export const PasswordResetVerifyEmail = ({
               variant={"ghost"}
               className="absolute top-4 right-5"
               onClick={async () => {
-                await axiosApiClient.delete("/delete");
+                await api.delete("/delete");
                 router.push("/register");
               }}
             >

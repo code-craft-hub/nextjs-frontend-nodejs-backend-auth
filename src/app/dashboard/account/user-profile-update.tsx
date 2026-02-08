@@ -27,7 +27,6 @@ import { useUserLocation } from "@/hooks/get-user-location";
 import { useUpdateUserMutation } from "@/lib/mutations/user.mutations";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-
 export const e164PhoneNumberSchema = z
   .string()
   .trim()
@@ -35,7 +34,6 @@ export const e164PhoneNumberSchema = z
     message:
       "Invalid phone number. Must be in E.164 format (e.g. +14155552671)",
   });
-
 
 // Zod validation schema
 const profileSchema = z.object({
@@ -49,7 +47,6 @@ const profileSchema = z.object({
 });
 
 type ProfileFormData = z.infer<typeof profileSchema>;
-
 
 export const UserProfileForm: React.FC = () => {
   const { data: user } = useQuery(userQueries.detail());
@@ -101,6 +98,7 @@ export const UserProfileForm: React.FC = () => {
         displayName: `${firstName} ${lastName}`,
       },
     });
+    
     toast.success("Profile updated successfully!");
   };
 
@@ -240,36 +238,6 @@ export const UserProfileForm: React.FC = () => {
                   Phone number
                 </label>
                 <div className="flex flex-row items-start w-full">
-                  {/* <FormField
-                    control={form.control}
-                    name="countryCode"
-                    render={({ field }) => (
-                      <FormItem className="relative">
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger className="flex flex-row justify-between items-center px-3.5 py-2.5 h-11 gap-1 border-0 bg-transparent">
-                              <SelectValue className="text-xs leading-6 text-[#101828]" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {countryCodes.map((country) => (
-                              <SelectItem
-                                key={country.value}
-                                value={country.value}
-                              >
-                                {country.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage className="text-xs text-red-500 absolute" />
-                      </FormItem>
-                    )}
-                  /> */}
-
                   <FormField
                     control={form.control}
                     name="phoneNumber"
@@ -280,7 +248,7 @@ export const UserProfileForm: React.FC = () => {
                             type="tel"
                             placeholder="+234 837 387 2828"
                             {...field}
-                            className="flex-1 bg-transparent border-0 text-xs leading-6 text-[#667085] placeholder:text-[#667085] focus:outline-none focus:ring-0 shadow-none"
+                            className="flex-1 border p-4 h-11 text-xs leading-6  border-[#D0D5DD] rounded-lg bg-[#F9FAFB] text-[#667085] focus:outline-none focus:ring-0 shadow-none"
                           />
                         </FormControl>
                         <FormMessage className="text-xs text-red-500" />

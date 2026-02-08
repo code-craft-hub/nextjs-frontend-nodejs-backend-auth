@@ -1,6 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-// import { authAPI } from "@/lib/axios/auth-api";
 import { ResumeField, UpdatePayload, UseResumeDataOptions } from "@/types";
 import {
   ContactFormData,
@@ -8,8 +7,8 @@ import {
 } from "@/lib/schema-validations/resume.schema";
 import { createApiError } from "@/lib/utils/helpers";
 import { COLLECTIONS } from "@/lib/utils/constants";
-import { axiosApiClient } from "@/lib/axios/auth-api";
 import { resumeQueries } from "@/lib/queries/resume.queries";
+import { api } from "@/lib/api/client";
 
 const updateResumeField = async <T>(
   payload: UpdatePayload<T>,
@@ -20,7 +19,7 @@ const updateResumeField = async <T>(
         ? payload.value
         : { [payload.field]: payload.value };
 
-    const { data } = await axiosApiClient.patch(
+    return await api.patch(
       `/career-doc/${COLLECTIONS.RESUME}/${payload.resumeId}`,
       {
         resumeId: payload.resumeId,
@@ -28,8 +27,6 @@ const updateResumeField = async <T>(
         // { [payload.field]: payload.value },
       },
     );
-
-    return data;
   } catch (error) {
     if (error instanceof Error) {
       if (error.name === "AbortError") {

@@ -1,6 +1,5 @@
 "use client";
-
-import {axiosApiClient} from "@/lib/axios/auth-api";
+import { api } from "@/lib/api/client";
 import { userQueries } from "@/lib/queries/user.queries";
 import { RegisterUserSchema } from "@/lib/schema-validations";
 import { IUser, Login } from "@/types";
@@ -11,14 +10,14 @@ import { toast } from "sonner";
 export const apiService = {
   login: async (loginData: Login): Promise<Partial<IUser>> => {
     try {
-      const { data } = await axiosApiClient.post("/login", loginData);
+      const data = await api.post("/login", loginData);
 
-      return data.data;
+      return (data as any)?.data || (data as any);
     } catch (error: any) {
       console.error("ERROR IN LOGIN FUNCTION : ", error);
       toast.error(
         error?.response?.data?.error ||
-          "Login failed. Please check your credentials."
+          "Login failed. Please check your credentials.",
       );
 
       throw new Error(error.error || "Login failed");
@@ -27,10 +26,10 @@ export const apiService = {
 
   register: async (user: RegisterUserSchema): Promise<Partial<IUser>> => {
     try {
-      const { data } = await axiosApiClient.post("/register", user);
+      const data = await api.post("/register", user);
       toast.success("Registration successful! Please verify your email.");
 
-      return data.data;
+      return (data as any)?.data || (data as any);
     } catch (error: any) {
       console.error("ERROR IN REGISTER FUNCTION : ", error);
       toast.error(error?.response?.data?.message || "Registration failed");
@@ -40,8 +39,8 @@ export const apiService = {
 
   logout: async (): Promise<{ success: boolean }> => {
     try {
-      const { data } = await axiosApiClient.post("/logout");
-      return data.data;
+      const data = await api.post("/logout");
+      return (data as any)?.data || (data as any);
     } catch (error: any) {
       throw new Error(error.error || "Logout failed");
     }
@@ -49,10 +48,10 @@ export const apiService = {
 
   deleteUser: async (): Promise<{ success: boolean }> => {
     try {
-      const { data } = await axiosApiClient.delete("/delete");
+      const data = await api.delete("/delete");
       toast.success("User account deleted successfully");
       window.location.href = "/register";
-      return data.data;
+      return (data as any)?.data || (data as any);
     } catch (error: any) {
       throw new Error(error.error || "Deleting user account failed");
     }
@@ -60,25 +59,23 @@ export const apiService = {
 
   getUser: async (): Promise<IUser> => {
     try {
-      const { data } = await axiosApiClient.get("/users");
-      return data.data;
+      const data = await api.get("/users");
+      return (data as any)?.data || (data as any);
     } catch (error: any) {
       throw new Error(
         "Failed to fetch user data:",
-        error.error || "Fetch failed"
+        error.error || "Fetch failed",
       );
     }
   },
   gmailOauthStatus: async (): Promise<{ authorized: boolean }> => {
     try {
-      const { data } = await axiosApiClient.get(
-        `/google-gmail-oauth/auth-status/`
-      );
-      return data.data;
+      const data = await api.get(`/google-gmail-oauth/auth-status/`);
+      return (data as any)?.data || (data as any);
     } catch (error: any) {
       throw new Error(
         "Failed to fetch user data:",
-        error.error || "Fetch failed"
+        error.error || "Fetch failed",
       );
     }
   },
@@ -88,8 +85,8 @@ export const apiService = {
     message: string;
   }> => {
     try {
-      const { data } = await axiosApiClient.post("/send-verification");
-      return data.data;
+      const data = await api.post("/send-verification");
+      return (data as any)?.data || (data as any);
     } catch (error: any) {
       throw new Error(error.error || "Login failed");
     }
@@ -97,9 +94,9 @@ export const apiService = {
 
   verifyEmail: async (code: string): Promise<Partial<IUser>> => {
     try {
-      const { data } = await axiosApiClient.post("/verify-email", { code });
+      const data = await api.post("/verify-email", { code });
 
-      return data.data;
+      return (data as any)?.data || (data as any);
     } catch (error: any) {
       throw new Error(error.error || "Login failed");
     }
@@ -107,16 +104,16 @@ export const apiService = {
 
   completeOnboarding: async (): Promise<Partial<IUser>> => {
     try {
-      const { data } = await axiosApiClient.post("/complete-onboarding");
-      return data.data;
+      const data = await api.post("/complete-onboarding");
+      return (data as any)?.data || (data as any);
     } catch (error: any) {
       throw new Error(error.error || "Login failed");
     }
   },
   updateUser: async (input: any): Promise<Partial<IUser>> => {
     try {
-      const { data } = await axiosApiClient.put("/update", input);
-      return data.data;
+      const data = await api.put("/update", input);
+      return (data as any)?.data || (data as any);
     } catch (error: any) {
       throw new Error(error.error || "Updating user failed");
     }
@@ -124,17 +121,17 @@ export const apiService = {
 
   getCareerDoc: async <T>(
     documentId: string,
-    collection: string
+    collection: string,
   ): Promise<T> => {
     try {
-      const { data } = await axiosApiClient.get(
-        `/career-doc/${documentId}?collection=${collection}`
+      const data = await api.get(
+        `/career-doc/${documentId}?collection=${collection}`,
       );
-      return data.data;
+      return (data as any)?.data || (data as any);
     } catch (error: any) {
       throw new Error(
         "Failed to fetch user data:",
-        error.error || "Fetch failed"
+        error.error || "Fetch failed",
       );
     }
   },
@@ -142,61 +139,54 @@ export const apiService = {
   updateCareerDoc: async <T>(
     documentId: string,
     collection: string,
-    input: Partial<T>
+    input: Partial<T>,
   ) => {
     try {
-      const { data } = await axiosApiClient.patch(
-        `/career-doc/${collection}/${documentId}`,
-        {
-          updates: input,
-        }
-      );
-      return data.data;
+      const data = await api.patch(`/career-doc/${collection}/${documentId}`, {
+        updates: input,
+      });
+      return (data as any)?.data || (data as any);
     } catch (error: any) {
       throw new Error(
         "Failed to update document:",
-        error.error || "Update failed"
+        error.error || "Update failed",
       );
     }
   },
 
   getAllDoc: async <T>(collection: string): Promise<T> => {
     try {
-      const { data } = await axiosApiClient.get(
-        `/career-doc/?collection=${collection}`
-      );
-      return data.data;
+      const data = await api.get(`/career-doc/?collection=${collection}`);
+      return (data as any)?.data || (data as any);
     } catch (error: any) {
       throw new Error(
         "Failed to fetch all documents:",
-        error.error || "Fetch failed"
+        error.error || "Fetch failed",
       );
     }
   },
 
   getPaginatedDoc: async <T>(collection: string): Promise<T> => {
     try {
-      const { data } = await axiosApiClient.get(
-        `/career-doc/paginated/?collection=${collection}`
+      const data = await api.get(
+        `/career-doc/paginated/?collection=${collection}`,
       );
-      return data.data;
+      return (data as any)?.data || (data as any);
     } catch (error: any) {
       throw new Error(
         "Failed to fetch all documents:",
-        error.error || "Fetch failed"
+        error.error || "Fetch failed",
       );
     }
   },
 
   deleteCareerDoc: async (
     id: string,
-    collection: string
+    collection: string,
   ): Promise<Partial<IUser>> => {
     try {
-      const { data } = await axiosApiClient.delete(
-        `/career-doc/${id}/${collection}`
-      );
-      return data.data;
+      const data = await api.delete(`/career-doc/${id}/${collection}`);
+      return (data as any)?.data || (data as any);
     } catch (error: any) {
       throw new Error(error.error || "Deleting document failed");
     }
@@ -208,23 +198,20 @@ export const apiService = {
     recruiterEmail: string,
     jobDescription: string,
     autoSendApplications?: boolean,
-    gcsPath?: string
+    gcsPath?: string,
   ): Promise<Partial<IUser>> => {
     try {
-      const { data } = await axiosApiClient.post(
-        "/send-email-with-resume-and-coverletter",
-        {
-          user,
-          coverLetterId,
-          resumeId,
-          recruiterEmail,
-          jobDescription,
-          autoSendApplications,
-          gcsPath,
-        }
-      );
+      const data = await api.post("/send-email-with-resume-and-coverletter", {
+        user,
+        coverLetterId,
+        resumeId,
+        recruiterEmail,
+        jobDescription,
+        autoSendApplications,
+        gcsPath,
+      });
 
-      return data.data;
+      return (data as any)?.data || (data as any);
     } catch (error: any) {
       console.error("ERROR IN auto-apply: ", error);
 

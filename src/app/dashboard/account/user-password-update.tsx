@@ -15,11 +15,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { api } from "@/lib/api/client";
 
 // Zod validation schema with password requirements
 const passwordSchema = z
   .object({
-    email: z.string().email("Please enter a valid email address"),
+    email: z.email("Please enter a valid email address"),
     password: z
       .string()
       .min(8, "Password must be at least 8 characters")
@@ -27,7 +28,7 @@ const passwordSchema = z
       .regex(/\d/, "Password must contain at least one digit")
       .regex(
         /[^a-zA-Z0-9]/,
-        "Password must contain at least one special character"
+        "Password must contain at least one special character",
       ),
     confirmPassword: z.string(),
   })
@@ -65,8 +66,11 @@ export const PasswordUpdateForm: React.FC = () => {
   const watchedPassword = form.watch("password");
   const passwordValidation = usePasswordValidation(watchedPassword || "");
 
-  const onSubmit = () => {
+  const onSubmit = async () => {
+    const password = form.getValues("password");
+    const email = form.getValues("email");
     toast.success("Account info updated!");
+    await api.post("/update-user-password", { password, email });
   };
 
   const RequirementItem: React.FC<{ met: boolean; text: string }> = ({

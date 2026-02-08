@@ -25,7 +25,7 @@ import { cn } from "@/lib/utils";
 import { inputField } from "@/lib/utils/constants";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { axiosApiClient } from "@/lib/axios/auth-api";
+import { api } from "@/lib/api/client";
 
 export default function RegisterClient({ referral }: { referral?: string }) {
   const [loading, setLoading] = useState(false);
@@ -38,7 +38,7 @@ export default function RegisterClient({ referral }: { referral?: string }) {
       setLoading(true);
       const credentials = jwtDecode(response.credential) as { email: string };
 
-      await axiosApiClient.post("/google-login-register", {
+      await api.post("/google-login-register", {
         ...credentials,
         referralCode: form.getValues("referralCode"),
       });
@@ -67,17 +67,14 @@ export default function RegisterClient({ referral }: { referral?: string }) {
   const onSubmit = async (values: RegisterUserSchema) => {
     try {
       setLoading(true);
-      const response = await axiosApiClient.post("/register", values);
-
-      if (response?.data?.success) {
-        toast.success("Registration successful! Please check your email.");
-        router.push("/verify-email");
-      }
+      await api.post("/register", values);
+      toast.success("Registration successful! Please check your email.");
+      router.push("/verify-email");
     } catch (error: any) {
       console.error("Registration error:", error);
       toast.error(
         error?.response?.data?.message ||
-          "Registration failed. Please try again."
+          "Registration failed. Please try again.",
       );
       return;
     } finally {
@@ -131,7 +128,7 @@ export default function RegisterClient({ referral }: { referral?: string }) {
                             id={field.name}
                             placeholder=" "
                             {...field}
-                            className="h-12 !rounded-sm"
+                            className="h-12 rounded-sm!"
                           />
                         </div>
                       </FormControl>
@@ -156,7 +153,7 @@ export default function RegisterClient({ referral }: { referral?: string }) {
                             id={field.name}
                             placeholder=" "
                             {...field}
-                            className="h-12 !rounded-sm"
+                            className="h-12 rounded-sm!"
                           />
                         </div>
                       </FormControl>
@@ -182,7 +179,7 @@ export default function RegisterClient({ referral }: { referral?: string }) {
                           placeholder=" "
                           type="email"
                           {...field}
-                          className="h-12 !rounded-sm"
+                          className="h-12 rounded-sm!"
                         />
                       </div>
                     </FormControl>
@@ -219,7 +216,7 @@ export default function RegisterClient({ referral }: { referral?: string }) {
                           placeholder=" "
                           type={isVisible ? "text" : "password"}
                           {...field}
-                          className="h-12 !rounded-sm"
+                          className="h-12 rounded-sm!"
                         />
                         <button
                           className="absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-md text-muted-foreground/80 transition-[color,box-shadow] outline-none hover:text-foreground focus:z-10 focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
@@ -273,7 +270,7 @@ export default function RegisterClient({ referral }: { referral?: string }) {
                           placeholder=" "
                           type={confirmPasswordVisible ? "text" : "password"}
                           {...field}
-                          className="h-12 !rounded-sm"
+                          className="h-12 rounded-sm!"
                         />
                         <button
                           className="absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-md text-muted-foreground/80 transition-[color,box-shadow] outline-none hover:text-foreground focus:z-10 focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
@@ -316,7 +313,7 @@ export default function RegisterClient({ referral }: { referral?: string }) {
                           id={field.name}
                           placeholder=" "
                           {...field}
-                          className="h-12 !rounded-sm"
+                          className="h-12 rounded-sm!"
                         />
                       </div>
                     </FormControl>

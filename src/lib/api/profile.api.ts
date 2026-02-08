@@ -1,4 +1,3 @@
-import { axiosApiClient } from "../axios/auth-api";
 import { ProfileData, ProfileResponse } from "../types";
 import { api } from "./client";
 
@@ -59,7 +58,7 @@ export const profileApi = {
   // GCS
   deleteDataSourceWithGCS: async ({ profileId }: { profileId: string }) => {
     try {
-      await axiosApiClient.delete<ProfileResponse>(
+      await api.delete<ProfileResponse>(
         `/${BACKEND_API_VERSION}/resume/${profileId}/hard-delete`,
       );
     } catch (error) {

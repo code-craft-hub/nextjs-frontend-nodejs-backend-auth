@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect } from "react";
-import { axiosApiClient } from "@/lib/axios/auth-api";
 import { useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -22,6 +21,7 @@ import { toast } from "sonner";
 import { X } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { userQueries } from "@/lib/queries/user.queries";
+import { api } from "@/lib/api/client";
 
 const formSchema = z.object({
   code: z.string().min(5, "Please enter the 5-digit verification code"),
@@ -59,7 +59,7 @@ export const VerifyEmailClient = () => {
     setIsSending(true);
 
     try {
-      await axiosApiClient.post("/send-verification");
+      await api.post("/send-verification");
 
       toast.success(
         `${user?.firstName}, verification code sent to your email!`
@@ -94,7 +94,7 @@ export const VerifyEmailClient = () => {
     setIsVerifying(true);
 
     try {
-      await axiosApiClient.post("/verify-email", { code });
+      await api.post("/verify-email", { code });
 
       toast.success(
         `${user?.firstName}, your email has been verified successfully!`
@@ -193,7 +193,7 @@ export const VerifyEmailClient = () => {
               variant={"ghost"}
               className="absolute top-4 right-5"
               onClick={async () => {
-                await axiosApiClient.delete("/delete");
+                await api.delete("/delete");
                 router.push("/register");
               }}
             >

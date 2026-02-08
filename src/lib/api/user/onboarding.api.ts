@@ -1,5 +1,4 @@
-
-import { axiosApiClient } from "@/lib/axios/auth-api";
+import { api } from "../client";
 
 export interface OnboardingStep1Data {
   country: string;
@@ -37,13 +36,10 @@ export interface OnboardingUpdateResponse {
  * @returns Promise with updated user data
  */
 export const updateOnboardingStep = async (
-  payload: OnboardingUpdatePayload
-): Promise<OnboardingUpdateResponse> => {
-  const response = await axiosApiClient.patch<OnboardingUpdateResponse>(
-    "/user/onboarding/step",
-    payload
-  );
-  return response.data;
+  payload: OnboardingUpdatePayload,
+) => {
+  await api.patch<OnboardingUpdateResponse>("/user/onboarding/step", payload);
+  // return response.data;
 };
 
 /**
@@ -51,7 +47,5 @@ export const updateOnboardingStep = async (
  * @returns Promise with onboarding status
  */
 export const getOnboardingStatus = async () => {
-  const response = await axiosApiClient.get("/user/onboarding");
-  return response.data;
+  await api.get("/user/onboarding");
 };
-

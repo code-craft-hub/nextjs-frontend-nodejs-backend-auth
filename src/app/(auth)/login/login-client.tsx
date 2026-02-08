@@ -16,11 +16,9 @@ import { GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
 import { Input } from "@/components/ui/input";
 import { Eye, EyeOff } from "lucide-react";
-// import { useAuth } from "@/hooks/use-auth";
-// import { api } from "@/lib/api/client";
+import { api } from "@/lib/api/client";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { axiosApiClient } from "@/lib/axios/auth-api";
 
 const LoginSchema = z.object({
   email: z.email({ message: "Please enter a valid email address." }),
@@ -123,7 +121,7 @@ export const LoginClient = () => {
     try {
       setIsLoginLoading(true);
       const credentials = jwtDecode(response.credential) as { email: string };
-      await axiosApiClient.post("/google-login-register", credentials);
+      await api.post("/google-login-register", credentials);
 
       router.push("/dashboard/home");
     } catch (error) {
@@ -145,7 +143,7 @@ export const LoginClient = () => {
   const onSubmit = async (values: z.infer<typeof LoginSchema>) => {
     try {
       setIsLoginLoading(true);
-      await axiosApiClient.post("/login", {
+      await api.post("/login", {
         email: values.email,
         password: values.password,
       });

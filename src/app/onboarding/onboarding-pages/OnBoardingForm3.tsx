@@ -23,7 +23,6 @@ import { userQueries } from "@/lib/queries/user.queries";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useUserLocation } from "@/hooks/get-user-location";
-// import { axiosApiClient } from "@/lib/axios/auth-api";
 import { useUpdateOnboarding } from "@/hooks/mutations";
 
 const formSchema = z

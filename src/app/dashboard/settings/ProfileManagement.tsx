@@ -20,12 +20,14 @@ export const ProfileManagement: React.FC = () => {
   } = useResumeUploadWithProgress();
 
   const handleFileSelect = async (file: File) => {
-
     toast.promise(uploadResume(file), {
       loading: "Preparing your resume...",
       success: () => {
         queryClient.invalidateQueries({ queryKey: queryKeys.users.lists() });
         queryClient.invalidateQueries({ queryKey: queryKeys.users.all });
+        if (window !== undefined) {
+          window.location.href = "/dashboard/home";
+        }
         return `${user?.firstName}, your resume is saved!`;
       },
       error: (error) => {
@@ -36,7 +38,6 @@ export const ProfileManagement: React.FC = () => {
       },
     });
   };
- 
 
   // const progressPercentage = progress?.progress || 0;
 

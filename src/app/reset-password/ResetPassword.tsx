@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect } from "react";
-import {axiosApiClient} from "@/lib/axios/auth-api";
 import { useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -20,6 +19,7 @@ import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { EyeIcon, EyeOffIcon, X } from "lucide-react";
+import { api } from "@/lib/api/client";
 
 const formSchema = z.object({
   password: z.string().min(5, "Please enter your new password"),
@@ -65,7 +65,7 @@ export const ResetPassword = ({ email }: { email: string }) => {
     setIsVerifying(true);
 
     try {
-      await axiosApiClient.post("/update-user-password", { password, email });
+      await api.post("/update-user-password", { password, email });
 
       toast.success(
         `${
@@ -198,7 +198,7 @@ export const ResetPassword = ({ email }: { email: string }) => {
               variant={"ghost"}
               className="absolute top-4 right-5"
               onClick={async () => {
-                await axiosApiClient.delete("/delete");
+                await api.delete("/delete");
                 router.push("/register");
               }}
             >
