@@ -38,8 +38,8 @@ export interface OnboardingUpdateResponse {
 export const updateOnboardingStep = async (
   payload: OnboardingUpdatePayload,
 ) => {
-  await api.patch<OnboardingUpdateResponse>("/user/onboarding/step", payload);
-  // return response.data;
+  const response = await api.patch("/user/onboarding", payload) as any;
+  return response?.data; // return response.data;
 };
 
 /**

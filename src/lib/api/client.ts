@@ -16,9 +16,6 @@ export class APIError extends Error {
 
 export interface FetchOptions extends RequestInit {
   params?: Record<string, string | number | boolean>;
-}
-
-export interface FetchOptions extends RequestInit {
   token?: string;
 }
 
@@ -67,16 +64,13 @@ export async function apiClient<T>(
     credentials: isServerSide ? "omit" : "include", // Important distinction
   });
 
-  const data = await response.json();
+  const data = await response.json().catch(() => ({ error: "Request failed" }));
 
   if (!response.ok) {
-    const error = await response
-      .json()
-      .catch(() => ({ error: "Request failed" }));
-    if(response.status === 401 && window !== undefined) {
+    if(response.status === 401 && typeof window !== "undefined") {
       window.location.reload();
     }
-    throw new APIError(response.status, error.error || "Request failed", error);
+    throw new APIError(response.status, data.error || "Request failed", data);
   }
 
   return data;
