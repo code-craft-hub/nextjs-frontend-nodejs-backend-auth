@@ -14,8 +14,8 @@ export const ProfileManagement: React.FC = () => {
   const queryClient = useQueryClient();
   const {
     uploadResume,
-    progress,
-    isUploading,
+    // progress,
+    // isUploading,
     error: uploadError,
   } = useResumeUploadWithProgress();
 
@@ -38,7 +38,7 @@ export const ProfileManagement: React.FC = () => {
   };
  
 
-  const progressPercentage = progress?.progress || 0;
+  // const progressPercentage = progress?.progress || 0;
 
   return (
     <div className="font-inter">
@@ -77,7 +77,7 @@ export const ProfileManagement: React.FC = () => {
         </div>
       )}
       {/* Progress indicator */}
-      {isUploading && progress && (
+      {/* {isUploading && progress && (
         <div className="w-full space-y-3 mt-4">
           <div className="flex items-center justify-between text-sm">
             <span className="text-gray-700 font-medium">
@@ -92,7 +92,7 @@ export const ProfileManagement: React.FC = () => {
             />
           </div>
         </div>
-      )}
+      )} */}
       <div className="hidden">
         <AuthorizeGoogle />
       </div>
