@@ -14,14 +14,11 @@ import { shuffleArray } from "@/lib/utils/helpers";
 
 export const AIJobCustomization = memo(
   ({ filters }: { filters: JobFilters }) => {
-    const { data: resumes } = useQuery(
-      resumeQueries.all(filters)
+    const { data: resumes } = useQuery(resumeQueries.all(filters));
+    const { data: coverLetter } = useQuery(coverLetterQueries.all(filters));
+    const { data: interviewQuestion } = useQuery(
+      interviewQuestionQueries.all(filters),
     );
-    const { data: coverLetter } = useQuery(
-      coverLetterQueries.all(filters)
-    );
-    const { data: interviewQuestion } =
-      useQuery(interviewQuestionQueries.all(filters));
 
     const data = useMemo(() => {
       const merged = [
@@ -33,9 +30,6 @@ export const AIJobCustomization = memo(
       return shuffleArray(merged);
     }, [interviewQuestion?.data, coverLetter?.data, resumes?.data]);
 
-        const emptyDataTable = isEmpty(data);
-    
-
     return (
       <div className="flex flex-col font-poppins h-screen relative">
         <h1 className="font-instrument text-3xl text-center tracking-tighter mb-12">
@@ -45,13 +39,13 @@ export const AIJobCustomization = memo(
         <div className="grid gap-y-8 xl:gap-y-16 pb-16">
           <AIJobCustomizationInput />
           {isEmpty(data) ? null : (
-            <AIJobCustomizationDatatable data={data ?? []} addMargin={emptyDataTable} />
+            <AIJobCustomizationDatatable data={data ?? []} />
           )}
-          <RecentActivityCard filters={filters} addMargin={emptyDataTable} />
+          <RecentActivityCard />
         </div>
       </div>
     );
-  }
+  },
 );
 
 AIJobCustomization.displayName = "AIJobCustomization";

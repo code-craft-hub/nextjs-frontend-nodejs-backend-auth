@@ -14,10 +14,10 @@ type DashboardPrefetchParams = {
 
 export async function prefetchDashboardData(
   queryClient: QueryClient,
-  { filters, autoApplyFilters }: DashboardPrefetchParams
+  { filters }: DashboardPrefetchParams
 ) {
   await queryClient.prefetchQuery(jobsQueries.all(filters));
-  await queryClient.prefetchQuery(jobsQueries.autoApply(autoApplyFilters));
+  await queryClient.prefetchQuery(jobsQueries.autoApply());
   await queryClient.prefetchQuery(resumeQueries.all(filters));
   await queryClient.prefetchQuery(interviewQuestionQueries.all(filters));
   await queryClient.prefetchQuery(coverLetterQueries.all(filters));

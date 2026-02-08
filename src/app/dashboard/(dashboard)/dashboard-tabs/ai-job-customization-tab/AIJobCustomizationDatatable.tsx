@@ -139,10 +139,8 @@ const getColumns = (
 
 export function AIJobCustomizationDatatable({
   data,
-  addMargin,
 }: {
   data: any[];
-  addMargin?: boolean;
 }) {
   const router = useRouter();
 
