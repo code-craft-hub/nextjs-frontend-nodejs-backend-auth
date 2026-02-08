@@ -34,6 +34,7 @@ export const userApi = {
 
   // Update user
   updateUser: (data: UpdateUserData) => api.put<IUser>(`/update-user`, data),
+  
   updateAiPreference: (data: UpdateUserData) =>
     api.patch<IUser>(`/${BACKEND_API_VERSION}/ai-apply-settings`, data),
 

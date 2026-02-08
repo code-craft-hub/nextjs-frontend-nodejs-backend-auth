@@ -73,7 +73,7 @@ export async function apiClient<T>(
     const error = await response
       .json()
       .catch(() => ({ error: "Request failed" }));
-    if(response.status && window !== undefined) {
+    if(response.status === 401 && window !== undefined) {
       window.location.reload();
     }
     throw new APIError(response.status, error.error || "Request failed", error);
