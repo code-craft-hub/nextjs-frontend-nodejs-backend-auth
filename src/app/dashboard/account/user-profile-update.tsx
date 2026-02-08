@@ -13,44 +13,50 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+// import {
+//   Select,
+//   SelectContent,
+//   SelectItem,
+//   SelectTrigger,
+//   SelectValue,
+// } from "@/components/ui/select";
 import { toast } from "sonner";
 import { userQueries } from "@/lib/queries/user.queries";
 import { useQuery } from "@tanstack/react-query";
 import { useUserLocation } from "@/hooks/get-user-location";
 import { useUpdateUserMutation } from "@/lib/mutations/user.mutations";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+
+export const e164PhoneNumberSchema = z
+  .string()
+  .trim()
+  .regex(/^\+[1-9]\d{1,14}$/, {
+    message:
+      "Invalid phone number. Must be in E.164 format (e.g. +14155552671)",
+  });
+
 
 // Zod validation schema
 const profileSchema = z.object({
-  firstName: z.string().min(1, "First name is required"),
-  lastName: z.string().min(1, "Last name is required"),
-  country: z.string().min(1, "Country is required"),
-  state: z.string().min(1, "State is required"),
-  countryCode: z.string().min(1, "Country code is required"),
-  phoneNumber: z.string().min(1, "Phone number is required"),
-  email: z.string().email("Invalid email address"),
+  firstName: z.string().optional(),
+  lastName: z.string().optional(),
+  country: z.string().optional(),
+  state: z.string().optional(),
+  countryCode: z.string().optional(),
+  phoneNumber: e164PhoneNumberSchema,
+  email: z.email("Invalid email address").optional(),
 });
 
 type ProfileFormData = z.infer<typeof profileSchema>;
 
-const countryCodes = [
-  { value: "NG", label: "NG" },
-  { value: "US", label: "US" },
-  { value: "UK", label: "UK" },
-];
 
 export const UserProfileForm: React.FC = () => {
   const { data: user } = useQuery(userQueries.detail());
   const { continent_code, country } = useUserLocation();
   const updateUser = useUpdateUserMutation();
   const form = useForm<ProfileFormData>({
-    // resolver: zodResolver(profileSchema),
+    resolver: zodResolver(profileSchema),
     defaultValues: {
       firstName: "",
       lastName: "",
@@ -83,6 +89,8 @@ export const UserProfileForm: React.FC = () => {
     phoneNumber,
   }: z.infer<typeof profileSchema>) => {
     const normalizedPhoneNumber = phoneNumber?.replace(/\s+/g, "");
+
+    // console.log(normalizedPhoneNumber); return;
     updateUser.mutate({
       data: {
         firstName,
@@ -232,8 +240,8 @@ export const UserProfileForm: React.FC = () => {
                 <label className="text-sm font-medium text-[#344054] leading-5">
                   Phone number
                 </label>
-                <div className="flex flex-row items-start w-full h-11 bg-[#F9FAFB] border border-[#D0D5DD] rounded-lg">
-                  <FormField
+                <div className="flex flex-row items-start w-full">
+                  {/* <FormField
                     control={form.control}
                     name="countryCode"
                     render={({ field }) => (
@@ -261,7 +269,7 @@ export const UserProfileForm: React.FC = () => {
                         <FormMessage className="text-xs text-red-500 absolute" />
                       </FormItem>
                     )}
-                  />
+                  /> */}
 
                   <FormField
                     control={form.control}
@@ -271,9 +279,9 @@ export const UserProfileForm: React.FC = () => {
                         <FormControl>
                           <Input
                             type="tel"
-                            placeholder="+234 812 345 6789"
+                            placeholder="+234 837 387 2828"
                             {...field}
-                            className="flex-1 px-3.5 py-2.5 bg-transparent border-0 text-xs leading-6 text-[#667085] placeholder:text-[#667085] focus:outline-none focus:ring-0 shadow-none"
+                            className="flex-1 bg-transparent border-0 text-xs leading-6 text-[#667085] placeholder:text-[#667085] focus:outline-none focus:ring-0 shadow-none"
                           />
                         </FormControl>
                         <FormMessage className="text-xs text-red-500" />

@@ -3,7 +3,7 @@ import { JSX, useState } from "react";
 import AuthorizeGoogle from "../../../hooks/gmail/AuthorizeGoogle";
 import { userQueries } from "@/lib/queries/user.queries";
 import { useQuery } from "@tanstack/react-query";
-import { useUpdateUserMutation } from "@/lib/mutations/user.mutations";
+import { useUpdateAISettingsMutation } from "@/lib/mutations/user.mutations";
 interface SettingOption {
   label: string;
   description: string;
@@ -68,7 +68,7 @@ const Label: React.FC<LabelProps> = ({ htmlFor, className = "", children }) => (
 );
 
 export const AiApplyPreferences: React.FC = () => {
-  const updateUser = useUpdateUserMutation();
+  const updateUser = useUpdateAISettingsMutation();
   const { data: user } = useQuery(userQueries.detail());
 
   const [oauthState, setOauthState] = useState(false);
@@ -268,6 +268,8 @@ export const AiApplyPreferences: React.FC = () => {
     setSwitchStates(newState);
 
     try {
+      console.log("Saving settings with state:", newState(switchStates));
+      // return;
       await updateUser.mutateAsync({
         data: { aiApplyPreferences: newState(switchStates) },
       });
@@ -289,7 +291,7 @@ export const AiApplyPreferences: React.FC = () => {
           key={index}
           className={cn(
             "p-2 border border-blue-300 rounded-lg text-3xs transition-colors",
-            index % 2 != 0 ? "bg-blue-500 text-white" : "text-blue-500"
+            index % 2 != 0 ? "bg-blue-500 text-white" : "text-blue-500",
           )}
           onClick={() => handleButtonClick(action)}
           style={{
@@ -379,7 +381,7 @@ export const AiApplyPreferences: React.FC = () => {
                       ) : null}
                     </div>
                   </div>
-                )
+                ),
               )}
             </div>
           </div>

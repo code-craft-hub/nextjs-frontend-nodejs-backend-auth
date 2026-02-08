@@ -73,6 +73,12 @@ export async function apiClient<T>(
     const error = await response
       .json()
       .catch(() => ({ error: "Request failed" }));
+    console.log("Status Code:", response.status);
+    if(response.status && window !== undefined) {
+      console.log("Response Status Text:", response.statusText);
+      console.log("Error Response:", error);
+      window.location.reload();
+    }
     throw new APIError(response.status, error.error || "Request failed", error);
   }
 

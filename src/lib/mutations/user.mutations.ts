@@ -1,9 +1,6 @@
 // lib/mutations/user.mutations.ts
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-  userApi,
-  type CreateUserData,
-} from "@/lib/api/user.api";
+import { userApi, type CreateUserData } from "@/lib/api/user.api";
 import { queryKeys } from "@/lib/query/keys";
 import type { PaginatedResponse } from "@/lib/types";
 import { IUser } from "@/types";
@@ -38,7 +35,7 @@ export function useCreateUserMutation() {
             ],
             total: old.total + 1,
           };
-        }
+        },
       );
 
       return { previousUsers };
@@ -48,7 +45,7 @@ export function useCreateUserMutation() {
       if (context?.previousUsers) {
         queryClient.setQueriesData(
           { queryKey: queryKeys.users.lists() },
-          context.previousUsers
+          context.previousUsers,
         );
       }
     },
@@ -63,45 +60,18 @@ export function useUpdateUserMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ data }: {data: any }) =>
-      userApi.updateUser(data),
-    // onMutate: async ({ id, data }) => {
-    //   await queryClient.cancelQueries({ queryKey: queryKeys.users.detail() });
+    mutationFn: ({ data }: { data: any }) => userApi.updateUser(data),
+    onSettled: (_data, _error) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.users.detail() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.users.lists() });
+    },
+  });
+}
+export function useUpdateAISettingsMutation() {
+  const queryClient = useQueryClient();
 
-    //   const previousUser = queryClient.getQueryData(queryKeys.users.detail());
-
-    //   // Optimistically update detail
-    //   queryClient.setQueryData<IUser>(queryKeys.users.detail(), (old) => {
-    //     if (!old) return old;
-    //     return { ...old, ...data, updatedAt: new Date().toISOString() };
-    //   });
-
-    //   // Update in lists
-    //   queryClient.setQueriesData<PaginatedResponse<IUser>>(
-    //     { queryKey: queryKeys.users.lists() },
-    //     (old) => {
-    //       if (!old) return old;
-    //       return {
-    //         ...old,
-    //         data: old.data.map((user) =>
-    //           user.id === id
-    //             ? { ...user, ...data, updatedAt: new Date().toISOString() }
-    //             : user
-    //         ),
-    //       };
-    //     }
-    //   );
-
-    //   return { previousUser };
-    // },
-    // onError: (_err, _data, context) => {
-    //   if (context?.previousUser) {
-    //     queryClient.setQueryData(
-    //       queryKeys.users.detail(),
-    //       context.previousUser
-    //     );
-    //   }
-    // },
+  return useMutation({
+    mutationFn: ({ data }: { data: any }) => userApi.updateAiPreference(data),
     onSettled: (_data, _error) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.users.detail() });
       queryClient.invalidateQueries({ queryKey: queryKeys.users.lists() });
@@ -129,7 +99,7 @@ export function useDeleteUserMutation() {
             data: old.data.filter((user) => user.uid !== id),
             total: old.total - 1,
           };
-        }
+        },
       );
 
       return { previousUsers };
@@ -138,7 +108,7 @@ export function useDeleteUserMutation() {
       if (context?.previousUsers) {
         queryClient.setQueriesData(
           { queryKey: queryKeys.users.lists() },
-          context.previousUsers
+          context.previousUsers,
         );
       }
     },
