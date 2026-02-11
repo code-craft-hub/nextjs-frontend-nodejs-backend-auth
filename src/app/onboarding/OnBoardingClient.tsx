@@ -19,7 +19,7 @@ import { useQuery } from "@tanstack/react-query";
 export default function OnboardingClient() {
   const { data: user } = useQuery(userQueries.detail());
 
-  console.log("Onboarding user data:", user?.userId);
+  console.log("Onboarding user data:", user?.id);
   const [currentStep, setCurrentStep] = useState(0);
   const steps = [
     OnBoardingForm0,

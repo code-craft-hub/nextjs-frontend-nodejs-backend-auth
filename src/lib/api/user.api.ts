@@ -22,7 +22,8 @@ export const userApi = {
   // Get user by ID
   getUser: async (token?: string) => {
     const data = await api.get<{ data: Partial<IUser>; success: boolean }>(
-      `/users`,
+      `/${BACKEND_API_VERSION}/users`,
+      // `/users`,
       { token },
     );
     if (data?.success) return data.data;

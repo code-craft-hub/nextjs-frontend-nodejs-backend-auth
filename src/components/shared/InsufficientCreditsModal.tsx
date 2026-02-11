@@ -43,10 +43,12 @@ export default function InsufficientCreditsModal({
     }
   };
 
-  const isCreditExpired =
+  const CreditExpired =
     currentUser?.expiryTime === undefined
       ? true
       : new Date(formatFirestoreDate(currentUser?.expiryTime)) < new Date();
+
+      const isCreditExpired = currentUser?.accountTier === "free" && CreditExpired;
 
   useEffect(() => {
     getUserData();

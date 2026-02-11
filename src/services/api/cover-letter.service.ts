@@ -1,13 +1,14 @@
 // src/services/api/cover-letter.service.ts
 
 import { baseURL } from "@/lib/api/client";
+import { BACKEND_API_VERSION } from "@/lib/api/profile.api";
 import { IUser } from "@/types";
 
 export interface CoverLetterRequest {
   coverLetterId: string;
   user?: Partial<IUser>;
   jobDescription: string;
-  aiModel?: 'gemini' | 'gpt';
+  aiModel?: "gemini" | "gpt";
 }
 
 export interface StreamChunk {
@@ -27,18 +28,21 @@ export const generateCoverLetterStream = async (
   onChunk: (chunk: string) => void,
   onError: (error: string) => void,
   onComplete: (documentId: string) => void,
-  signal?: AbortSignal
+  signal?: AbortSignal,
 ): Promise<void> => {
   try {
-    const response = await fetch(`${baseURL}/v1/generate-cover-letter`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
+    const response = await fetch(
+      `${baseURL}/${BACKEND_API_VERSION}/cover-letters/generate`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(request),
+        signal,
+        credentials: "include",
       },
-      body: JSON.stringify(request),
-      signal,
-      credentials: "include",
-    });
+    );
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -46,7 +50,7 @@ export const generateCoverLetterStream = async (
 
     const reader = response.body?.getReader();
     if (!reader) {
-      throw new Error('No response body');
+      throw new Error("No response body");
     }
 
     const decoder = new TextDecoder();
@@ -56,10 +60,10 @@ export const generateCoverLetterStream = async (
       if (done) break;
 
       const chunk = decoder.decode(value);
-      const lines = chunk.split('\n');
+      const lines = chunk.split("\n");
 
       for (const line of lines) {
-        if (line.startsWith('data: ')) {
+        if (line.startsWith("data: ")) {
           try {
             const data: StreamChunk = JSON.parse(line.slice(6));
 
@@ -69,7 +73,7 @@ export const generateCoverLetterStream = async (
             }
 
             if (data.done) {
-              onComplete(data.documentId || '');
+              onComplete(data.documentId || "");
               return;
             }
 
@@ -77,16 +81,16 @@ export const generateCoverLetterStream = async (
               onChunk(data.content);
             }
           } catch (parseError) {
-            console.error('Failed to parse SSE data:', parseError);
+            console.error("Failed to parse SSE data:", parseError);
           }
         }
       }
     }
   } catch (error: any) {
-    if (error.name === 'AbortError') {
-      onError('Request cancelled');
+    if (error.name === "AbortError") {
+      onError("Request cancelled");
     } else {
-      onError(error.message || 'Failed to generate cover letter');
+      onError(error.message || "Failed to generate cover letter");
     }
   }
 };

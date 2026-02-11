@@ -16,5 +16,6 @@ export const userQueries = {
       queryKey: queryKeys.users.detail(),
       queryFn: () => userApi.getUser(token),
       staleTime: 10 * 60 * 1000,
+      // refetchInterval: 1000,
     }),
 };

@@ -32,7 +32,7 @@ export const OnBoardingForm7 = ({ onPrev, children }: OnboardingFormProps) => {
     try {
       updateOnboarding.mutate({
         stepNumber: 6,
-        plan: "trial",
+        plan: "basic",
         expiryTime: expireNextThreeDays,
         credit: 5,
       });

@@ -1,4 +1,4 @@
-import { TailorCoverLetter } from "./TailorCoverLetter";
+import  TailorCoverLetter  from "./TailorCoverLetter";
 import { createServerQueryClient } from "@/lib/query/prefetch";
 import { coverLetterQueries } from "@/lib/queries/cover-letter.queries";
 import { userQueries } from "@/lib/queries/user.queries";

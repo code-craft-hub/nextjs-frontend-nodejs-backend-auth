@@ -17,7 +17,6 @@ export interface Login {
   email: string;
   password?: string;
   provider?: string;
-
 }
 
 export type JobType = {
@@ -29,7 +28,7 @@ export type JobType = {
   companyText: string;
   location: string;
   salary: string;
-  relevanceScore: number,
+  relevanceScore: number;
   postedTime: string;
   matchPercentage: string;
   jobType: string;
@@ -134,6 +133,35 @@ export interface IUser {
   coverLetter?: string;
   workExperience?: ResumeFormData["workExperience"];
   education: ResumeFormData["education"];
+
+  // Postgres User fields
+  id: string;
+  // role: "user" | "admin" | "super_admin" | "moderator" | "support";
+  accountStatus:
+    | "active"
+    | "inactive"
+    | "suspended"
+    | "pending_verification"
+    | "locked";
+  accountTier: string;
+  locale: string | null;
+  timezone: string | null;
+  phoneVerified: boolean | null;
+  creditBalance: number | null;
+
+  isProUser: boolean | null;
+  subscriptionTier: string | null;
+  subscriptionStatus: string | null;
+  currentPeriodEnd: Date | null;
+  theme: string | null;
+  emailNotifications: boolean | null;
+  pushNotifications: boolean | null;
+  smsNotifications: boolean | null;
+  whatsappNotifications: boolean | null;
+  profileVisibility: string | null;
+  notificationFrequency: string | null;
+  maxRecommendationsPerDay: number | null;
+  onboardingStep: number | null;
 }
 
 export type Resume = ResumeFormData;
@@ -194,8 +222,7 @@ export interface ResumePreviewProps {
   user: Partial<IUser> | null;
 }
 
-export interface FloatingLabelInputProps
-  extends React.InputHTMLAttributes<HTMLInputElement> {
+export interface FloatingLabelInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   id?: string;
   label: string;
   type?: string;
@@ -274,8 +301,7 @@ export const intialData = {
   },
 };
 
-export interface FloatingLabelInputProps
-  extends React.InputHTMLAttributes<HTMLInputElement> {
+export interface FloatingLabelInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   id?: string;
   label: string;
   type?: string;
