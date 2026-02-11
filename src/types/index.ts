@@ -475,6 +475,7 @@ export interface CoverLetter {
   title: string;
   salutation?: string;
   coverLetter: string;
+  content: string;
   type: string;
   generatedAt: string;
   recruiterEmail: string;
