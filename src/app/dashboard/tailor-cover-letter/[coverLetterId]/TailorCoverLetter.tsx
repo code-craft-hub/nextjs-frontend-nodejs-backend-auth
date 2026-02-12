@@ -3,92 +3,92 @@
 import { useEffect, useRef } from "react";
 import { Loader2 } from "lucide-react";
 import { useCoverLetterStream } from "@/hooks/useCoverLetterGenerator";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { userQueries } from "@/lib/queries/user.queries";
 import { coverLetterQueries } from "@/lib/queries/cover-letter.queries";
-import { createCoverLetterOrderedParams } from "@/lib/utils/helpers";
-import { v4 as uuidv4 } from "uuid";
 import { ProgressIndicator } from "../../(dashboard)/ai-apply/progress-indicator";
+import {
+  buildCoverLetterUpdateUrl,
+  buildResumeStartUrl,
+  isPlaceholderId,
+} from "@/lib/utils/ai-apply-navigation";
 
-interface TailorCoverLetterProps {
-  jobDescription: string;
-  coverLetterId: string;
-  aiApply: boolean;
-  recruiterEmail: string;
-  documentId?: string;
-}
-
-export default function TailorCoverLetter({
-  jobDescription,
-  aiApply,
-  recruiterEmail,
-  documentId,
-}: TailorCoverLetterProps) {
-  console.log({ jobDescription, aiApply, recruiterEmail, documentId });
+export default function TailorCoverLetter() {
   const router = useRouter();
-  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const hasStartedRef = useRef(false);
   const contentRef = useRef<HTMLDivElement>(null);
 
   const { state, start, stop } = useCoverLetterStream();
   const { data: user } = useQuery(userQueries.detail());
 
+  // Extract IDs and parameters from URL search params
+  const coverLetterDocId = searchParams.get("coverLetterDocId");
+  const jobDescription = searchParams.get("jobDescription") || "";
+  const recruiterEmail = searchParams.get("recruiterEmail") || "";
+  const aiApply = searchParams.get("aiApply") === "true";
+  const isGeneratorStep = isPlaceholderId(coverLetterDocId);
+
   // Fetch existing cover letter if documentId is present (reload case)
   const { data: existingCoverLetter } = useQuery(
-    coverLetterQueries.detail(documentId ?? ""),
+    coverLetterQueries.detail(coverLetterDocId ?? ""),
   );
 
-  console.log({ existingCoverLetter });
+  const isGenerated = !!coverLetterDocId && !!existingCoverLetter;
 
-  const isGenerated = !!documentId && !!existingCoverLetter;
-
-  // Auto-start generation on first visit (no documentId means fresh generation)
+  // Auto-start generation on first visit (no coverLetterDocId means fresh generation)
   useEffect(() => {
-    if (!documentId && jobDescription && !hasStartedRef.current) {
+    if (isGeneratorStep && jobDescription && !hasStartedRef.current) {
       hasStartedRef.current = true;
       start({ jobDescription });
     }
-  }, [documentId, jobDescription, start]);
+  }, [isGeneratorStep, jobDescription, start]);
 
-  // After generation completes, append documentId to URL
+  // After generation completes, update URL with actual documentId
   useEffect(() => {
-    if (state.documentId && !state.isStreaming) {
-      const params = new URLSearchParams();
-      params.set("documentId", state.documentId);
-      if (jobDescription) params.set("jobDescription", jobDescription);
-      if (aiApply) params.set("aiApply", "true");
-      if (recruiterEmail) params.set("recruiterEmail", recruiterEmail);
-      router.replace(`${pathname}?${params.toString()}`);
+    if (state.documentId && !state.isStreaming && isGeneratorStep) {
+      const newUrl = buildCoverLetterUpdateUrl(
+        state.documentId,
+        jobDescription,
+        recruiterEmail,
+      );
+      router.replace(newUrl);
     }
   }, [
     state.documentId,
     state.isStreaming,
-    pathname,
+    isGeneratorStep,
     jobDescription,
-    aiApply,
     recruiterEmail,
     router,
   ]);
 
   // Handle aiApply navigation after generation completes
   useEffect(() => {
-    if (!aiApply || !state.documentId || state.isStreaming) return;
-
-    const orderedParams = createCoverLetterOrderedParams(
-      state.documentId,
-      jobDescription,
-    );
+    if (
+      !aiApply ||
+      !state.documentId ||
+      state.isStreaming ||
+      !isGeneratorStep
+    ) {
+      return;
+    }
 
     const timeout = setTimeout(() => {
       if (user?.aiApplyPreferences?.useMasterCV) {
+        // Use master CV directly (no resume generation needed)
         router.push(
-          `/dashboard/preview?baseResume=${user?.defaultDataSource}?aiApply=true&recruiterEmail=${recruiterEmail}&${orderedParams.toString()}`,
+          `/dashboard/preview?coverLetterDocId=${state.documentId}&baseResume=${user?.defaultDataSource}&aiApply=true&recruiterEmail=${recruiterEmail}&jobDescription=${encodeURIComponent(jobDescription)}`,
         );
       } else {
-        router.push(
-          `/dashboard/tailor-resume/${uuidv4()}?aiApply=true&recruiterEmail=${recruiterEmail}&${orderedParams.toString()}`,
+        // Navigate to tailor resume with the generated cover letter ID
+        const resumeUrl = buildResumeStartUrl(
+          state.documentId,
+          jobDescription,
+          recruiterEmail,
         );
+        router.push(resumeUrl);
       }
     }, 3000);
 
@@ -97,7 +97,9 @@ export default function TailorCoverLetter({
     aiApply,
     state.documentId,
     state.isStreaming,
-    user,
+    isGeneratorStep,
+    user?.aiApplyPreferences?.useMasterCV,
+    user?.defaultDataSource,
     jobDescription,
     recruiterEmail,
     router,

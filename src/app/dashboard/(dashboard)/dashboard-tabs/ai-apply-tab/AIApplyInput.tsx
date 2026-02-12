@@ -1,7 +1,6 @@
 "use client";
 
 import { ArrowUp, Plus } from "lucide-react";
-import { v4 as uuidv4 } from "uuid";
 
 import {
   DropdownMenu,
@@ -33,6 +32,7 @@ import { Separator } from "@/components/ui/separator";
 import { userQueries } from "@/lib/queries/user.queries";
 import { useQuery } from "@tanstack/react-query";
 import JoinOurTelegramGroupAlert from "@/components/shared/JoinOurTelegramGroupAlert";
+import { buildCoverLetterStartUrl } from "@/lib/utils/ai-apply-navigation";
 
 const FORM_SCHEMA = z.object({
   jobDescription: z.string().min(2, {
@@ -131,17 +131,19 @@ export const AIApplyInput = memo(
           return;
         }
 
-        const params = new URLSearchParams();
-        params.set(
-          "jobDescription",
-          JSON.stringify(jobDescription + extractedText),
+        // Use the combined job description + extracted text
+        const fullJobDescription = jobDescription + extractedText;
+        const recruiter = foundEmails[0] || "";
+
+        // Route to tailor cover letter with "pending" placeholder ID
+        // The backend will generate the actual documentId
+        const startUrl = buildCoverLetterStartUrl(
+          fullJobDescription,
+          recruiter,
         );
-        params.set("recruiterEmail", JSON.stringify(foundEmails[0]));
-        router.push(
-          `/dashboard/tailor-cover-letter/${uuidv4()}?${params}&aiApply=true`,
-        );
+        router.push(startUrl);
       },
-      [router, extractedText],
+      [router, extractedText, user?.email],
     );
 
     return (

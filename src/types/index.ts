@@ -449,6 +449,8 @@ export interface UseResumeStreamReturn {
   streamStatus: StreamStatus;
   startStream: (user: Partial<IUser>, jobDescription: string) => Promise<void>;
   stopStream: () => void;
+  documentId: string | null;
+  title: string;
 }
 
 export interface InterviewQuestion {

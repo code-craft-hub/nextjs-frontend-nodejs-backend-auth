@@ -6,9 +6,8 @@ import {
   ResumeFormData,
 } from "@/lib/schema-validations/resume.schema";
 import { createApiError } from "@/lib/utils/helpers";
-import { COLLECTIONS } from "@/lib/utils/constants";
 import { resumeQueries } from "@/lib/queries/resume.queries";
-import { api } from "@/lib/api/client";
+import { resumeApi } from "@/lib/api/resume.api";
 
 const updateResumeField = async <T>(
   payload: UpdatePayload<T>,
@@ -19,13 +18,9 @@ const updateResumeField = async <T>(
         ? payload.value
         : { [payload.field]: payload.value };
 
-    return await api.patch(
-      `/career-doc/${COLLECTIONS.RESUME}/${payload.resumeId}`,
-      {
-        resumeId: payload.resumeId,
-        updates,
-        // { [payload.field]: payload.value },
-      },
+    return await resumeApi.updateResume(
+        payload.resumeId,
+        updates as any,
     );
   } catch (error) {
     if (error instanceof Error) {

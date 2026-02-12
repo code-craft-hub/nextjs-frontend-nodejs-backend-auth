@@ -27,26 +27,24 @@ export const resumeApi = {
     api.get<PaginatedResponse<Resume>>(
       `/${BACKEND_API_VERSION}/resumes?` +
         new URLSearchParams(params as Record<string, string>).toString(),
-      { token }
+      { token },
     ),
 
   // Get resume by ID
   getResume: async (id: string, token?: string) => {
-    const { data } = await api.get<{ data: Resume }>(`/${BACKEND_API_VERSION}/resumes/${id}`, { token });
+    const { data } = await api.get<{ data: Resume }>(
+      `/${BACKEND_API_VERSION}/resumes/${id}`,
+      { token },
+    );
     return data;
   },
-
-  // Create resume
-  createResume: (data: CreateResumeData, token?: string) => api.post<Resume>("/${BACKEND_API_VERSION}/resumes", data, { token }),
 
   // Update resume
   updateResume: (id: string, data: UpdateResumeData, token?: string) =>
     api.patch<Resume>(`/${BACKEND_API_VERSION}/resumes/${id}`, data, { token }),
   // Delete resume
-  deleteResume: (id: string, token?: string) => api.delete<void>(`/${BACKEND_API_VERSION}/resumes/${id}`, { token }),
-
-  // Duplicate resume
-  duplicateResume: (id: string, token?: string) => api.post<Resume>(`/${BACKEND_API_VERSION}/resumes/${id}/duplicate`, undefined, { token }),
+  deleteResume: (id: string, token?: string) =>
+    api.delete<void>(`/${BACKEND_API_VERSION}/resumes/${id}`, { token }),
 
   // Export resume
   exportResume: (id: string, format: "pdf" | "docx") =>

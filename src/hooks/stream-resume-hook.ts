@@ -11,7 +11,7 @@ import { jsonrepair } from "jsonrepair";
 
 /**
  * Hook for streaming resume generation
- * Handles backend format: {"content": "chunk"} and {"done": true}
+ * Handles backend format: {"type": "chunk", "content": "..."}, {"type": "chunk", "title": "..."}, {"type": "generationComplete", "documentId": "...", "content": "..."}
  */
 export const useResumeStream = (
   endpoint: string,
@@ -33,6 +33,9 @@ export const useResumeStream = (
     error: null,
     completedSections: new Set<string>(),
   }));
+
+  const [documentId, setDocumentId] = useState<string | null>(null);
+  const [title, setTitle] = useState<string>("");
 
   const abortControllerRef = useRef<AbortController | null>(null);
   const accumulatedContentRef = useRef<string>("");
@@ -157,7 +160,13 @@ export const useResumeStream = (
    */
   const handleEventData = useCallback(
     (eventData: any): void => {
-      // Handle new streaming format: {"type": "chunk", "content": "..."}
+      // Handle title chunk: {"type": "chunk", "title": "..."}
+      if (eventData.type === "chunk" && eventData.title !== undefined) {
+        setTitle(eventData.title);
+        return;
+      }
+
+      // Handle streaming content chunks: {"type": "chunk", "content": "..."}
       if (eventData.type === "chunk" && eventData.content !== undefined) {
         accumulatedContentRef.current += eventData.content;
 
@@ -166,23 +175,39 @@ export const useResumeStream = (
         return;
       }
 
-      // Handle simple content streaming: {"content": "chunk"} (legacy)
-      if (
-        eventData.content !== undefined &&
-        eventData.type === undefined &&
-        eventData.section === undefined
-      ) {
-        accumulatedContentRef.current += eventData.content;
+      // Handle completion with full saved resume: {"type": "generationComplete", "documentId": "...", "content": "..."}
+      if (eventData.type === "generationComplete") {
+        if (eventData.documentId) {
+          setDocumentId(eventData.documentId);
+        }
 
-        // Try to parse the accumulated content progressively
-        tryParseAndUpdateState(accumulatedContentRef.current, false);
-        return;
-      }
+        // Parse the complete resume data from the generationComplete event
+        if (eventData.content) {
+          try {
+            const savedResume = JSON.parse(eventData.content);
 
-      // Handle completion: {"done": true} or {"type": "generationComplete"}
-      if (eventData.done === true || eventData.type === "generationComplete") {
-        // Final parse attempt
-        tryParseAndUpdateState(accumulatedContentRef.current, true);
+            // Map the saved resume format to StreamData format
+            setStreamData({
+              profile: savedResume.summary || "",
+              workExperience: savedResume.workExperience || [],
+              education: savedResume.education || [],
+              certification: savedResume.certification || [],
+              project: savedResume.project || [],
+              softSkill: savedResume.softSkill || [],
+              hardSkill: savedResume.hardSkill || [],
+              fullName: savedResume.fullName || "",
+              email: savedResume.email || "",
+              phoneNumber: savedResume.phoneNumber || "",
+              location: savedResume.location || "",
+              linkedIn: savedResume.linkedIn || "",
+              github: savedResume.github || "",
+              website: savedResume.website || "",
+              title: savedResume.title || "",
+            } as StreamData);
+          } catch (error) {
+            console.error("[Stream] Failed to parse generationComplete content:", error);
+          }
+        }
 
         setStreamStatus((prev) => ({
           ...prev,
@@ -192,7 +217,7 @@ export const useResumeStream = (
         return;
       }
 
-      // Handle error events
+      // Handle error events: {"type": "error", "error": "..."}
       if (eventData.type === "error" || eventData.error) {
         console.error("[Stream] Error:", eventData.error || eventData.message);
         setStreamStatus((prev) => ({
@@ -203,7 +228,7 @@ export const useResumeStream = (
         return;
       }
 
-      // Handle legacy section-based format for backward compatibility
+      // Legacy support for old event format (backward compatibility)
       const { type, section, content, fullContent, error } =
         eventData as StreamEvent;
 
@@ -266,23 +291,8 @@ export const useResumeStream = (
           }
           break;
 
-        case "generationComplete":
-          setStreamStatus((prev) => ({
-            ...prev,
-            isComplete: true,
-            isConnected: false,
-          }));
-          break;
-
         case "documentSaved":
-          setStreamData((prev) => ({
-            ...prev,
-            documentId: eventData.documentId,
-          }));
-          setStreamStatus((prev) => ({
-            ...prev,
-            savedDocumentToDatabase: true,
-          }));
+          setDocumentId(eventData.documentId || null);
           break;
 
         case "sectionError":
@@ -291,15 +301,6 @@ export const useResumeStream = (
           setStreamStatus((prev) => ({
             ...prev,
             error: error || eventData.error || "Unknown error",
-          }));
-          break;
-
-        case "error":
-          console.error("[Stream] Stream error:", error);
-          setStreamStatus((prev) => ({
-            ...prev,
-            error: error || "Unknown error",
-            isConnected: false,
           }));
           break;
 
@@ -465,5 +466,5 @@ export const useResumeStream = (
     };
   }, [stopStream]);
 
-  return { streamData, streamStatus, startStream, stopStream };
+  return { streamData, streamStatus, startStream, stopStream, documentId, title };
 };
