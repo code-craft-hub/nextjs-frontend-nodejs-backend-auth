@@ -45,19 +45,21 @@ export function ResumeLoadingSkeleton() {
   }, []);
 
   return (
-    <Empty className="bg-muted/30 h-full animate-pulse">
-      <EmptyHeader>
-        <EmptyMedia variant="icon">
-          <RefreshCcwIcon className="animate-spin" />
-        </EmptyMedia>
-        <EmptyTitle>Generating Your Resume</EmptyTitle>
-        <EmptyDescription className="max-w-xs text-pretty">
-          {LOADING_MESSAGES[messageIndex]}
-        </EmptyDescription>
-      </EmptyHeader>
-      <EmptyContent>
-        <div className="h-10 w-32 bg-muted rounded animate-pulse" />
-      </EmptyContent>
-    </Empty>
+    <div className="">
+      <Empty className="bg-muted/30 h-full animate-pulse">
+        <EmptyHeader>
+          <EmptyMedia variant="icon">
+            <RefreshCcwIcon className="animate-spin" />
+          </EmptyMedia>
+          <EmptyTitle>Cver AI is generating Your Resume</EmptyTitle>
+          <EmptyDescription className="max-w-xs text-pretty">
+            {LOADING_MESSAGES[messageIndex]}
+          </EmptyDescription>
+        </EmptyHeader>
+        <EmptyContent>
+          <div className="h-10 w-32 bg-muted rounded animate-pulse" />
+        </EmptyContent>
+      </Empty>
+    </div>
   );
 }

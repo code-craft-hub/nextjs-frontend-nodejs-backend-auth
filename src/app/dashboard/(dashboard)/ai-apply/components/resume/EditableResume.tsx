@@ -72,7 +72,7 @@ export const EditableResume: React.FC<PreviewResumeProps> = ({
   );
 
   // Use resumeData as the single source of truth once streaming is complete
-  const displayData = isStreaming ? data : resumeData;
+  const displayData = resumeData;
 
   const initialData = useMemo(
     () => ({

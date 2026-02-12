@@ -18,7 +18,6 @@ interface TailorCoverLetterDisplayProps {
   };
   displayContent: string;
   contentRef: React.RefObject<HTMLDivElement>;
-  stop: () => void;
 }
 
 export const TailorCoverLetterDisplayStreaming = ({
@@ -27,7 +26,6 @@ export const TailorCoverLetterDisplayStreaming = ({
   displayUser,
   displayContent,
   contentRef,
-  stop,
 }: TailorCoverLetterDisplayProps) => {
   return (
     <div className="grid grid-cols-1 gap-4 sm:gap-6">
@@ -75,18 +73,7 @@ export const TailorCoverLetterDisplayStreaming = ({
           <div className="text-red-500 p-4 shadow-xl w-full">
             Error: {state.error}
           </div>
-        )}
-
-        {state.isStreaming && (
-          <div className="p-4 w-full flex justify-center">
-            <button
-              onClick={stop}
-              className="text-sm text-red-500 hover:underline"
-            >
-              Stop generating
-            </button>
-          </div>
-        )}
+        )}      
       </div>
     </div>
   );

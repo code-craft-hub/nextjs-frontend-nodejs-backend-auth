@@ -19,7 +19,7 @@ export default function TailorCoverLetter() {
   const hasStartedRef = useRef(false);
   const contentRef = useRef<HTMLDivElement>(null);
 
-  const { state, start, stop } = useCoverLetterStream();
+  const { state, start } = useCoverLetterStream();
   const { data: user } = useQuery(userQueries.detail());
 
   // Extract IDs and parameters from URL search params
@@ -129,7 +129,6 @@ export default function TailorCoverLetter() {
       displayUser={displayUser}
       displayContent={displayContent}
       contentRef={contentRef as React.RefObject<HTMLDivElement>}
-      stop={stop}
     />
   );
 }

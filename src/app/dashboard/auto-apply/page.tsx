@@ -3,7 +3,6 @@
 import { useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useResumeStream } from "@/hooks/stream-resume-hook";
 import { useCoverLetterStream } from "@/hooks/useCoverLetterGenerator";
@@ -30,11 +29,12 @@ export default function AutoApplyPage() {
   const { data: user } = useQuery(userQueries.detail());
 
   // Initialize cover letter and resume streams
-  const { state: coverLetterState, start: startCoverLetter } =
-    useCoverLetterStream();
+  const {
+    state: coverLetterState,
+    start: startCoverLetter,
+  } = useCoverLetterStream();
 
   const {
-    streamData: resumeData,
     streamStatus: resumeStatus,
     startStream: startResume,
     documentId: resumeDocId,
@@ -100,23 +100,27 @@ export default function AutoApplyPage() {
     }
   }, [coverLetterState.content]);
 
-  const isCoverLetterComplete =
-    coverLetterState.documentId && !coverLetterState.isStreaming;
-  const isResumeComplete = resumeStatus.isComplete && resumeDocId;
-  const isBothComplete = isCoverLetterComplete && isResumeComplete;
+  const displayUser = {
+    firstName: user?.firstName || "",
+    lastName: user?.lastName || "",
+    phoneNumber: user?.phoneNumber || "",
+    title: coverLetterState.title || "",
+  };
+
+  const displayContent = coverLetterState.content;
+  const aiApply = true; // Auto-apply is always true on this page
 
   return (
-    <div>
+    <div className="flex flex-col gap-8 ">
       <TailorCoverLetterDisplayStreaming
         aiApply={aiApply}
         state={coverLetterState}
         displayUser={displayUser}
         displayContent={displayContent}
         contentRef={contentRef as React.RefObject<HTMLDivElement>}
-        stop={stop}
       />
 
-       <ResumeLoadingSkeleton />
+      <ResumeLoadingSkeleton />
     </div>
   );
 }

@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { apiService, useAuth } from "@/hooks/use-auth";
+import { apiService } from "@/hooks/use-auth";
 import { COLLECTIONS } from "@/lib/utils/constants";
 import { CoverLetter, IUser } from "@/types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -53,17 +53,11 @@ const TailorCoverLetterDisplay = ({
   recruiterEmail?: string;
 }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const { useCareerDoc } = useAuth();
   const queryClient = useQueryClient();
   const router = useRouter();
+  const currentData = data;
 
-  const { data: coverLetterData } = useCareerDoc<CoverLetter>(
-    data?.id || "",
-    COLLECTIONS.COVER_LETTER
-  );
-
-  // Use fresh data from query or fallback to props
-  const currentData = coverLetterData || data;
+  console.log({ currentData });
 
   // Mutation for updating cover letter
   const updateMutation = useMutation({
@@ -72,7 +66,7 @@ const TailorCoverLetterDisplay = ({
       return apiService.updateCareerDoc(
         currentData.id,
         COLLECTIONS.COVER_LETTER,
-        formData
+        formData,
       );
     },
     onSuccess: () => {
@@ -86,7 +80,7 @@ const TailorCoverLetterDisplay = ({
         ],
       });
       queryClient.invalidateQueries(
-        coverLetterQueries.detail(currentData?.id ?? "")
+        coverLetterQueries.detail(currentData?.id ?? ""),
       );
       queryClient.invalidateQueries({
         queryKey: [
@@ -162,13 +156,15 @@ const TailorCoverLetterDisplay = ({
     setIsDialogOpen(open);
   };
 
+  console.log({ currentData });
+
   return (
     <>
       <div className="grid grid-cols-1 gap-4 sm:gap-6">
         <div
           className={cn(
             "bg-slate-50 relative border-b w-full border-slate-200 shadow-md rounded-xl flex flex-col items-center justify-between",
-            { "opacity-50 pointer-events-none": updateMutation.isPending }
+            { "opacity-50 pointer-events-none": updateMutation.isPending },
           )}
         >
           <div
@@ -201,7 +197,7 @@ const TailorCoverLetterDisplay = ({
                 {currentData?.salutation || "Dear Hiring Manager,"}
               </p>
               <p className="text-sm">
-                {currentData?.coverLetter || "No content yet"}
+                {currentData?.coverLetter || currentData?.content}
               </p>
               {currentData?.coverLetter && (
                 <div className="mt-8">

@@ -16,7 +16,6 @@ import { Loader, Send, Sparkles, Trash } from "lucide-react";
 import { api } from "@/lib/api/client";
 import { COLLECTIONS } from "@/lib/utils/constants";
 import { aiApplyQueries } from "@/lib/queries/ai-apply.queries";
-import { isEmpty } from "lodash";
 import { sendGTMEvent } from "@next/third-parties/google";
 import { useFireworksConfetti } from "@/components/ui/confetti";
 import AuthorizeGoogle from "@/hooks/gmail/AuthorizeGoogle";
@@ -49,6 +48,8 @@ const Preview = ({
   const { data: coverLetterData } = useQuery(
     coverLetterQueries.detail(coverLetterId),
   );
+
+  console.log({ resumeData, coverLetterData, resumeId, coverLetterId });
 
   const defaultResume = user?.dataSource?.find(
     (resume) => resume.id === user?.defaultDataSource,
@@ -201,13 +202,11 @@ const Preview = ({
           </Button>
         </div>
       </div>
-      {isEmpty(coverLetterData) ? null : (
-        <TailorCoverLetterDisplay
-          user={user}
-          data={coverLetterData}
-          recruiterEmail={recruiterEmail}
-        />
-      )}
+      <TailorCoverLetterDisplay
+        user={user}
+        data={coverLetterData}
+        recruiterEmail={recruiterEmail}
+      />
       {user?.aiApplyPreferences?.useMasterCV ? (
         <div className="h-[80svh] overflow-hidden">
           <iframe
