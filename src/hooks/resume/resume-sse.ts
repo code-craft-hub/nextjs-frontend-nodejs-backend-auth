@@ -1,4 +1,4 @@
-import { baseURL } from "@/lib/api/client";
+import { BASEURL } from "@/lib/api/client";
 import { useState, useEffect, useRef, useCallback } from "react";
 
 export type JobStatus = "waiting" | "active" | "completed" | "failed";
@@ -27,7 +27,7 @@ export const SSEEventType = {
 
 export type SSEEventType = (typeof SSEEventType)[keyof typeof SSEEventType];
 
-export const SSE_URL = `${baseURL}/resume-jobs/stream`;
+export const SSE_URL = `${BASEURL}/resume-jobs/stream`;
 
 export function useSSE() {
   const [connected, setConnected] = useState(false);

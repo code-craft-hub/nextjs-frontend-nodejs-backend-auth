@@ -1,6 +1,6 @@
-import { baseURL } from '@/lib/api/client';
-import { BACKEND_API_VERSION } from '@/lib/api/profile.api';
-import { useState, useCallback, useRef } from 'react';
+import { BASEURL } from "@/lib/api/client";
+import { BACKEND_API_VERSION } from "@/lib/api/profile.api";
+import { useState, useCallback, useRef } from "react";
 
 export interface UploadProgress {
   step: string;
@@ -24,18 +24,21 @@ export const useResumeUploadWithProgress = () => {
 
     try {
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append("file", file);
 
       // Create the upload request
       // const response = await fetch(baseURL+'/onboarding-user/upload', {
-      const response = await fetch(baseURL+`/${BACKEND_API_VERSION}/resume/upload`, {
-        method: 'POST',
-        body: formData,
-        credentials: "include",
-      });
+      const response = await fetch(
+        BASEURL + `/${BACKEND_API_VERSION}/resume/upload`,
+        {
+          method: "POST",
+          body: formData,
+          credentials: "include",
+        },
+      );
 
       if (!response.ok) {
-        throw new Error('Upload failed');
+        throw new Error("Upload failed");
       }
 
       // Set up EventSource to listen for progress updates
@@ -43,19 +46,19 @@ export const useResumeUploadWithProgress = () => {
       const decoder = new TextDecoder();
 
       if (!reader) {
-        throw new Error('Stream not supported');
+        throw new Error("Stream not supported");
       }
 
       while (true) {
         const { done, value } = await reader.read();
-        
+
         if (done) break;
 
         const chunk = decoder.decode(value);
-        const lines = chunk.split('\n');
+        const lines = chunk.split("\n");
 
         for (const line of lines) {
-          if (line.startsWith('data: ')) {
+          if (line.startsWith("data: ")) {
             try {
               const data = JSON.parse(line.slice(6));
               setProgress(data);
@@ -68,12 +71,12 @@ export const useResumeUploadWithProgress = () => {
               }
 
               // If complete
-              if (data.step === 'complete' && data.data) {
+              if (data.step === "complete" && data.data) {
                 setIsUploading(false);
                 return { success: true, data: data.data };
               }
             } catch (e) {
-              console.error('Failed to parse SSE data:', e);
+              console.error("Failed to parse SSE data:", e);
             }
           }
         }
@@ -81,7 +84,7 @@ export const useResumeUploadWithProgress = () => {
 
       return { success: true };
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Upload failed';
+      const errorMessage = err instanceof Error ? err.message : "Upload failed";
       setError(errorMessage);
       setIsUploading(false);
       return { success: false, error: errorMessage };

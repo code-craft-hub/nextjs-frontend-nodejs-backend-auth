@@ -12,7 +12,7 @@ import { resumeQueries } from "@/lib/queries/resume.queries";
 import { userQueries } from "@/lib/queries/user.queries";
 import { ResumeDownloadButton } from "./ResumeDownloadButton";
 import { TrashIcon } from "lucide-react";
-import { api, baseURL } from "@/lib/api/client";
+import { api, BASEURL } from "@/lib/api/client";
 import { sendGTMEvent } from "@next/third-parties/google";
 
 export const TailorResume = ({
@@ -43,10 +43,9 @@ export const TailorResume = ({
   const hasGeneratedRef = useRef(false);
   const router = useRouter();
 
-
   const { streamData, streamStatus, startStream } = useResumeStream(
-    baseURL + "/new-resume-generation",
-    resumeId
+    BASEURL + "/new-resume-generation",
+    resumeId,
   );
 
   useEffect(() => {
@@ -76,7 +75,7 @@ export const TailorResume = ({
     }
     if (aiApply && streamStatus.isComplete) {
       router.push(
-        `/dashboard/preview?resumeId=${resumeId}&coverLetterId=${coverLetterId}&recruiterEmail=${recruiterEmail}&jobDescription=${jobDescription}`
+        `/dashboard/preview?resumeId=${resumeId}&coverLetterId=${coverLetterId}&recruiterEmail=${recruiterEmail}&jobDescription=${jobDescription}`,
       );
     }
   }, [
@@ -93,7 +92,7 @@ export const TailorResume = ({
 
   const handleCoverLetterDelete = async () => {
     await api.delete(
-      `/delete-document/${resumeId}?docType=${COLLECTIONS.RESUME}`
+      `/delete-document/${resumeId}?docType=${COLLECTIONS.RESUME}`,
     );
     toast.success("Resume deleted successfully");
     router.push("/dashboard/home");

@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { userQueries } from "@/lib/queries/user.queries";
-import { baseURL } from "@/lib/api/client";
+import { BASEURL } from "@/lib/api/client";
 import { generateIdempotencyKey } from "@/lib/utils/helpers";
 
 export const PaystackPaymentGateway = ({
@@ -25,7 +25,7 @@ export const PaystackPaymentGateway = ({
       const idempotencyKey = generateIdempotencyKey();
 
       // Updated endpoint to match new routing structure
-      const response = await fetch(`${baseURL}/paystack/payments/initialize`, {
+      const response = await fetch(`${BASEURL}/paystack/payments/initialize`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -88,8 +88,8 @@ export const PaystackPaymentGateway = ({
 
     try {
       const response = await fetch(
-        `${baseURL}/paystack/payments/verify/${reference}`,
-        { credentials: "include" }
+        `${BASEURL}/paystack/payments/verify/${reference}`,
+        { credentials: "include" },
       );
 
       if (!response.ok) {

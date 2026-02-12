@@ -1,6 +1,6 @@
 // lib/api/jobs.api.ts
 import { JobType } from "@/types";
-import { api, baseURL } from "./client";
+import { api, BASEURL } from "./client";
 import type { PaginatedResponse } from "@/lib/types";
 
 export const onboardingApi = {
@@ -23,7 +23,7 @@ export const onboardingApi = {
 
   // Create job
   createFirstProfile: async (data: any) => {
-    const response = await fetch(baseURL + "/onboarding-user/upload", {
+    const response = await fetch(BASEURL + "/onboarding-user/upload", {
       method: "POST",
       body: data,
       credentials: "include",
@@ -80,7 +80,7 @@ export const onboardingApi = {
       { filters, format },
       {
         headers: { Accept: "application/octet-stream" },
-      }
+      },
     ),
 
   // Get unique values for filters (faceted search)

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
-import { baseURL } from "@/lib/api/client";
+import { BASEURL } from "@/lib/api/client";
 import { IUser } from "@/types";
 import { Button } from "@/components/ui/button";
 import { DownloadIcon, Loader } from "lucide-react";
@@ -23,7 +23,7 @@ export const ResumeDownloadButton: React.FC<ResumeDownloadButtonProps> = ({
       setError(null);
 
       const response = await axios.post(
-        baseURL + "/download-generated-resume",
+        BASEURL + "/download-generated-resume",
         resumeData,
         {
           responseType: "blob", // Important: tells axios to expect binary data
@@ -31,7 +31,7 @@ export const ResumeDownloadButton: React.FC<ResumeDownloadButtonProps> = ({
             "Content-Type": "application/json",
           },
           withCredentials: true, // Include cookies for authentication if needed
-        }
+        },
       );
 
       // Create a blob from the PDF data
@@ -57,7 +57,7 @@ export const ResumeDownloadButton: React.FC<ResumeDownloadButtonProps> = ({
       setError(
         axios.isAxiosError(err) && err.response?.data?.error
           ? err.response.data.error
-          : "Failed to download resume. Please try again."
+          : "Failed to download resume. Please try again.",
       );
     } finally {
       setIsDownloading(false);
@@ -71,11 +71,7 @@ export const ResumeDownloadButton: React.FC<ResumeDownloadButtonProps> = ({
         disabled={isDownloading}
         variant={"outline"}
         className={`
-          ${
-            isDownloading
-              ? "bg-gray-400 cursor-not-allowed"
-              : ""
-          }
+          ${isDownloading ? "bg-gray-400 cursor-not-allowed" : ""}
           ${className}
         `}
       >

@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
 import { EditableResume } from "./EditableResume";
 import { COLLECTIONS } from "@/lib/utils/constants";
-import { baseURL } from "@/lib/api/client";
+import { BASEURL } from "@/lib/api/client";
 
 // const backendUrl = process.env.NEXT_PUBLIC_AUTH_API_URL;
 export const ResumeGenerator = ({
@@ -15,10 +15,9 @@ export const ResumeGenerator = ({
   jobDescription: string;
   resumeId: string;
 }) => {
-
   const { streamData, streamStatus, startStream } = useResumeStream(
-    baseURL + "/new-resume-generation",
-    resumeId
+    BASEURL + "/new-resume-generation",
+    resumeId,
   );
   const { user, useCareerDoc } = useAuth();
   const {
@@ -44,7 +43,6 @@ export const ResumeGenerator = ({
   //     clearTimeout(timeoutRef.current);
   //   }
   // };
-
 
   useEffect(() => {
     if (isFetched && status === "success") {

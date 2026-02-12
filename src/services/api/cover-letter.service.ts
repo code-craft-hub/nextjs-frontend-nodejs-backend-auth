@@ -1,6 +1,6 @@
 // src/services/api/cover-letter.service.ts
 
-import { baseURL } from "@/lib/api/client";
+import { BASEURL } from "@/lib/api/client";
 import { BACKEND_API_VERSION } from "@/lib/api/profile.api";
 import { IUser } from "@/types";
 
@@ -32,7 +32,7 @@ export const generateCoverLetterStream = async (
 ): Promise<void> => {
   try {
     const response = await fetch(
-      `${baseURL}/${BACKEND_API_VERSION}/cover-letters/generate`,
+      `${BASEURL}/${BACKEND_API_VERSION}/cover-letters/generate`,
       {
         method: "POST",
         headers: {

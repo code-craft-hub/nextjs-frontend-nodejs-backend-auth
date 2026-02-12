@@ -11,7 +11,7 @@ import { useQuery } from "@tanstack/react-query";
 import { interviewQuestionQueries } from "@/lib/queries/interview.queries";
 import { userQueries } from "@/lib/queries/user.queries";
 import { sendGTMEvent } from "@next/third-parties/google";
-import { baseURL } from "@/lib/api/client";
+import { BASEURL } from "@/lib/api/client";
 
 export const TailorInterviewQuestion = ({
   jobDescription,
@@ -26,7 +26,7 @@ export const TailorInterviewQuestion = ({
 
   const { data: user } = useQuery(userQueries.detail());
   const { data, status, isFetched } = useQuery(
-    interviewQuestionQueries.detail(interviewQuestionId)
+    interviewQuestionQueries.detail(interviewQuestionId),
   );
 
   useEffect(() => {
@@ -87,7 +87,7 @@ export const TailorInterviewQuestion = ({
 
     try {
       const response = await fetch(
-        `${baseURL}/v1/generate-interview-question`,
+        `${BASEURL}/v1/generate-interview-question`,
         {
           method: "POST",
           headers: {
@@ -99,7 +99,7 @@ export const TailorInterviewQuestion = ({
             user,
           }),
           credentials: "include",
-        }
+        },
       );
 
       if (!response.ok) {
@@ -181,7 +181,7 @@ export const TailorInterviewQuestion = ({
       toast.error(
         error instanceof Error
           ? error.message
-          : "Failed to generate questions. Please try again."
+          : "Failed to generate questions. Please try again.",
       );
     } finally {
       setIsGenerating(false);

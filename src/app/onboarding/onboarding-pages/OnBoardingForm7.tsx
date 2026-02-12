@@ -12,7 +12,7 @@ import {
   expireNextThreeDays,
   generateIdempotencyKey,
 } from "@/lib/utils/helpers";
-import { baseURL } from "@/lib/api/client";
+import { BASEURL } from "@/lib/api/client";
 import { useQuery } from "@tanstack/react-query";
 import { userQueries } from "@/lib/queries/user.queries";
 import { toast } from "sonner";
@@ -48,7 +48,7 @@ export const OnBoardingForm7 = ({ onPrev, children }: OnboardingFormProps) => {
         const idempotencyKey: string = generateIdempotencyKey();
 
         const response = await fetch(
-          `${baseURL}/paystack/payments/initialize`,
+          `${BASEURL}/paystack/payments/initialize`,
           {
             method: "POST",
             headers: {

@@ -1,13 +1,13 @@
 const isClientSide = typeof window !== "undefined";
 const isDevelopment = process.env.NODE_ENV === "development";
-export const baseURL =
+export const BASEURL =
   isClientSide && isDevelopment ? "/api" : process.env.NEXT_PUBLIC_AUTH_API_URL;
 
 export class APIError extends Error {
   constructor(
     public status: number,
     public statusText: string,
-    public data: any
+    public data: any,
   ) {
     super(`API Error: ${status} ${statusText}`);
     this.name = "APIError";
@@ -21,20 +21,22 @@ export interface FetchOptions extends RequestInit {
 
 export async function apiClient<T>(
   endpoint: string,
-  options: FetchOptions = {}
+  options: FetchOptions = {},
 ): Promise<T> {
   const { token, params, ...fetchOptions } = options;
 
- let url: URL;
+  let url: URL;
 
   // Handle absolute vs relative baseURL
-  if (baseURL?.startsWith("http")) {
-    url = new URL(`${baseURL}${endpoint}`);
+  if (BASEURL?.startsWith("http")) {
+    url = new URL(`${BASEURL}${endpoint}`);
   } else {
     // Relative URL: must use window.location.origin on client
     const origin =
-      typeof window !== "undefined" ? window.location.origin : "http://localhost";
-    url = new URL(`${baseURL}${endpoint}`, origin);
+      typeof window !== "undefined"
+        ? window.location.origin
+        : "http://localhost";
+    url = new URL(`${BASEURL}${endpoint}`, origin);
   }
 
   // Append params
@@ -45,7 +47,6 @@ export async function apiClient<T>(
       }
     });
   }
-  
 
   const headers: HeadersInit = {
     "Content-Type": "application/json",
@@ -67,7 +68,7 @@ export async function apiClient<T>(
   const data = await response.json().catch(() => ({ error: "Request failed" }));
 
   if (!response.ok) {
-    if(response.status === 401 && typeof window !== "undefined") {
+    if (response.status === 401 && typeof window !== "undefined") {
       window.location.reload();
     }
     throw new APIError(response.status, data.error || "Request failed", data);

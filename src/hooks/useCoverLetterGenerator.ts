@@ -1,10 +1,10 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
-import { baseURL } from "@/lib/api/client";
+import { BASEURL } from "@/lib/api/client";
 import { BACKEND_API_VERSION } from "@/lib/api/profile.api";
 
-const API_URL = `${baseURL}/${BACKEND_API_VERSION}/cover-letters/generate`;
+const API_URL = `${BASEURL}/${BACKEND_API_VERSION}/cover-letters/generate`;
 
 export interface StreamState {
   title: string;
@@ -93,7 +93,7 @@ export function useCoverLetterStream() {
                     ? prev.content + payload.content
                     : prev.content,
                   documentId: payload.done
-                    ? payload.documentId ?? prev.documentId
+                    ? (payload.documentId ?? prev.documentId)
                     : prev.documentId,
                   isStreaming: payload.done ? false : prev.isStreaming,
                 };
@@ -116,7 +116,7 @@ export function useCoverLetterStream() {
         }));
       }
     },
-    []
+    [],
   );
 
   const stop = useCallback(() => {
@@ -130,8 +130,6 @@ export function useCoverLetterStream() {
     stop,
   };
 }
-
-
 
 // // src/hooks/useCoverLetterGenerator.ts
 // import { useState, useRef, useCallback } from 'react';

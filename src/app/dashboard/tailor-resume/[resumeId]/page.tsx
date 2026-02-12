@@ -1,4 +1,4 @@
-import { TailorResume } from "./TailorResume";
+import TailorResume  from "./TailorResume";
 import { createServerQueryClient } from "@/lib/query/prefetch";
 import { resumeQueries } from "@/lib/queries/resume.queries";
 import { HydrationBoundary } from "@/components/hydration-boundary";
