@@ -32,7 +32,7 @@ import { Separator } from "@/components/ui/separator";
 import { userQueries } from "@/lib/queries/user.queries";
 import { useQuery } from "@tanstack/react-query";
 import JoinOurTelegramGroupAlert from "@/components/shared/JoinOurTelegramGroupAlert";
-import { buildCoverLetterStartUrl } from "@/lib/utils/ai-apply-navigation";
+import { buildAutoApplyStartUrl } from "@/lib/utils/ai-apply-navigation";
 
 const FORM_SCHEMA = z.object({
   jobDescription: z.string().min(2, {
@@ -137,7 +137,7 @@ export const AIApplyInput = memo(
 
         // Route to tailor cover letter with "pending" placeholder ID
         // The backend will generate the actual documentId
-        const startUrl = buildCoverLetterStartUrl(
+        const startUrl = buildAutoApplyStartUrl(
           fullJobDescription,
           recruiter,
         );

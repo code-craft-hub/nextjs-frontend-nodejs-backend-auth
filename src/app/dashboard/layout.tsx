@@ -25,7 +25,7 @@ const DashboardLayout = async ({ children }: DashboardLayoutProps) => {
   const token = (await getCookiesToken()) ?? "";
   const queryClient = createServerQueryClient();
   const user = await queryClient.fetchQuery(userQueries.detail(token));
-  // console.log("DashboardLayout user:", user);
+  console.log("DashboardLayout user:", user.id);
   // await queryClient.prefetchQuery(userQueries.detail(token));
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>

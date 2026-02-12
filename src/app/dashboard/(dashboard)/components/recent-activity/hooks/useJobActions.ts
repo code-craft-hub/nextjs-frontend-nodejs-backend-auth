@@ -1,9 +1,9 @@
 import { useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { v4 as uuidv4 } from "uuid";
 import { apiService } from "@/hooks/use-auth";
 import { JobType } from "@/types";
+import { buildAutoApplyStartUrl } from "@/lib/utils/ai-apply-navigation";
 
 export function useJobActions() {
   const router = useRouter();
@@ -34,12 +34,15 @@ export function useJobActions() {
         return;
       }
 
-      const params = new URLSearchParams();
-      params.set("jobDescription", JSON.stringify(job?.descriptionText || ""));
-      params.set("recruiterEmail", encodeURIComponent(job?.emailApply));
-      router.push(
-        `/dashboard/tailor-cover-letter/${uuidv4()}?${params}&aiApply=true`,
+      // const params = new URLSearchParams();
+      // params.set("jobDescription", JSON.stringify(job?.descriptionText || ""));
+      // params.set("recruiterEmail", encodeURIComponent(job?.emailApply));
+
+      const startUrl = buildAutoApplyStartUrl(
+        job.descriptionText || "",
+        job.emailApply || "",
       );
+      router.push(startUrl);
     },
     [router],
   );

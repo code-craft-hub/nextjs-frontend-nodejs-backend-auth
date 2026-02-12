@@ -103,7 +103,7 @@ const TailorCoverLetterDisplay = ({
     resolver: zodResolver(coverLetterSchema),
     defaultValues: {
       title: currentData?.title || "",
-      coverLetter: currentData?.coverLetter || "",
+      coverLetter: currentData?.coverLetter || currentData?.content || "",
       firstName: currentData?.firstName || user?.firstName || "",
       lastName: currentData?.lastName || user?.lastName || "",
       phoneNumber: currentData?.phoneNumber || user?.phoneNumber || "",
@@ -219,7 +219,7 @@ const TailorCoverLetterDisplay = ({
       </div>
 
       <Dialog open={isDialogOpen} onOpenChange={handleDialogOpenChange}>
-        <DialogContent className="md:!max-w-screen-md !w-full max-h-[90vh] overflow-y-auto ">
+        <DialogContent className="md:max-w-3xl! w-full! max-h-[90vh] overflow-y-auto ">
           <DialogHeader>
             <DialogTitle>Edit Cover Letter</DialogTitle>
           </DialogHeader>

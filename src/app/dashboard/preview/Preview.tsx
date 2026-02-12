@@ -3,7 +3,6 @@
 import { apiService } from "@/hooks/use-auth";
 import { EditableResume } from "../(dashboard)/ai-apply/components/resume/EditableResume";
 import { ProgressIndicator } from "../(dashboard)/ai-apply/progress-indicator";
-import TailorCoverLetterDisplay from "../tailor-cover-letter/[coverLetterId]/TailorCoverLetterDisplay";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
@@ -22,6 +21,7 @@ import { sendGTMEvent } from "@next/third-parties/google";
 import { useFireworksConfetti } from "@/components/ui/confetti";
 import AuthorizeGoogle from "@/hooks/gmail/AuthorizeGoogle";
 import { GmailCompose } from "./GmailCompose";
+import TailorCoverLetterDisplay from "../tailor-cover-letter/[coverLetterId]/TailorCoverLetterDisplay";
 
 const Preview = ({
   coverLetterId,

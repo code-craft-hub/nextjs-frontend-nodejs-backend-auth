@@ -15,18 +15,18 @@ const PreviewPage = async ({ searchParams }: any) => {
   const token = (await getCookiesToken()) ?? "";
   const queryClient = createServerQueryClient();
   await queryClient.prefetchQuery(userQueries.detail(token));
-  const { coverLetterId, resumeId, recruiterEmail, jobDescription, aiApplyId } =
+  const { coverLetterDocId, resumeDocId, recruiterEmail, jobDescription, aiApplyId } =
     await searchParams;
   // const baseResume = (await searchParams)?.baseResume;
   await prefetchWithPriority(queryClient, [
     {
-      queryKey: resumeQueries.detail(resumeId).queryKey,
-      queryFn: resumeQueries.detail(resumeId, token).queryFn,
+      queryKey: resumeQueries.detail(resumeDocId).queryKey,
+      queryFn: resumeQueries.detail(resumeDocId, token).queryFn,
       priority: "high",
     },
     {
-      queryKey: coverLetterQueries.detail(coverLetterId).queryKey,
-      queryFn: coverLetterQueries.detail(coverLetterId, token).queryFn,
+      queryKey: coverLetterQueries.detail(coverLetterDocId).queryKey,
+      queryFn: coverLetterQueries.detail(coverLetterDocId, token).queryFn,
       priority: "high",
     },
   ]);
@@ -35,8 +35,8 @@ const PreviewPage = async ({ searchParams }: any) => {
     <div className="p-4 sm:p-8 relative">
       <HydrationBoundary state={dehydrate(queryClient)}>
         <Preview
-          coverLetterId={coverLetterId}
-          resumeId={resumeId}
+          coverLetterId={coverLetterDocId}
+          resumeId={resumeDocId}
           recruiterEmail={recruiterEmail}
           jobDescription={jobDescription}
           aiApplyId={aiApplyId}

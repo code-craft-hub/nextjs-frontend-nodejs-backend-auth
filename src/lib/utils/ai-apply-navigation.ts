@@ -27,6 +27,19 @@ export function buildCoverLetterStartUrl(
 }
 
 /**
+ * Build URL for starting the cover letter generation
+ */
+export function buildAutoApplyStartUrl(
+  jobDescription: string,
+  recruiterEmail: string,
+): string {
+  const params = new URLSearchParams();
+  params.set("recruiterEmail", recruiterEmail);
+  params.set("jobDescription", jobDescription);
+  return `/dashboard/auto-apply?${params.toString()}`;
+}
+
+/**
  * Build URL for navigating to resume after cover letter is generated
  */
 export function buildResumeStartUrl(
