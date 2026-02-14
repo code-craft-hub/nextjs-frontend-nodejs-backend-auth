@@ -24,7 +24,7 @@ export const EmailCompose = memo<{
   const { user, useCareerDoc } = useAuth();
   const { data, isFetched, status } = useCareerDoc<{ coverLetter: string }>(
     coverLetterId,
-    COLLECTIONS.COVER_LETTER
+    COLLECTIONS.COVER_LETTER,
   );
   const router = useRouter();
 
@@ -43,16 +43,16 @@ export const EmailCompose = memo<{
               };
             },
             error: "Failed to generate cover letter",
-          }
+          },
         );
 
         if (aiApply) {
           const orderedParams = createCoverLetterOrderedParams(
             coverLetterId,
-            jobDescription
+            jobDescription,
           );
           router.push(
-            `/dashboard/resume/${uuidv4()}?${orderedParams.toString()}`
+            `/dashboard/resumes/${uuidv4()}?${orderedParams.toString()}`,
           );
         }
       }

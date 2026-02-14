@@ -42,6 +42,7 @@ export const OnBoardingForm1 = ({
   const { data: user } = useQuery(userQueries.detail());
   const { country, region, country_code, postal, city } = useUserLocation();
 
+  console.log("useUserLocation() : ", useUserLocation())
   const updateOnboarding = useUpdateOnboarding({
     userFirstName: user?.firstName,
     // onError: () => {

@@ -4,7 +4,7 @@ import { useResumeStream } from "@/hooks/stream-resume-hook";
 import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { COLLECTIONS } from "@/lib/utils/constants";
-import { EditableResume } from "../../(dashboard)/ai-apply/components/resume/EditableResume";
+// import { EditableResume } from "../../(dashboard)/ai-apply/components/resumes/EditableResume";
 import { ProgressIndicator } from "../../(dashboard)/ai-apply/progress-indicator";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,7 @@ import {
   buildPreviewUrl,
   isPlaceholderId,
 } from "@/lib/utils/ai-apply-navigation";
+import { EditableResume } from "../../(dashboard)/ai-apply/components/resume/EditableResume";
 
 const API_URL = `${BASEURL}/${BACKEND_API_VERSION}/resumes/generate`;
 
@@ -54,6 +55,8 @@ export const TailorResume = () => {
   const { data: existingResume, status: resumeStatus } = useQuery(
     resumeQueries.detail(resumeDocId ?? ""),
   );
+
+  console.log("resumeDocId : ", resumeDocId, existingResume, resumeStatus);
 
   const { streamData, streamStatus, startStream, documentId } = useResumeStream(
     API_URL,
@@ -156,9 +159,7 @@ export const TailorResume = () => {
     );
     toast.success("Resume deleted successfully");
     router.push("/dashboard/home");
-    await queryClient.invalidateQueries(
-      resumeQueries.detail(idToDelete),
-    );
+    await queryClient.invalidateQueries(resumeQueries.detail(idToDelete));
   };
 
   const displayResumeData = existingResume || streamData;

@@ -17,39 +17,29 @@ interface LocationData {
   latitude: string;
   postal: string;
   capital: string;
+  ipAddress: string;
+  continentCode: string;
+  countryName: string;
+  countryCode: string;
+  regionName: string;
+  regionCode: string;
+  cityName: string;
+  zipCode: string;
   flag: {
     img: string;
   };
 }
 
-const defaultLocation: LocationData = {
-  ip: "",
-  continent: "",
-  continent_code: "",
-  country: "",
-  country_code: "",
-  region: "",
-  region_code: "",
-  city: "",
-  calling_code: "",
-  currency: "",
-  currency_name: "",
-  longitude: "",
-  latitude: "",
-  postal: "",
-  capital: "",
-  flag: { img: "" },
-};
-
 export const useUserLocation = () => {
-  const [location, setLocation] = useState<LocationData>(defaultLocation);
+  const [location, setLocation] = useState<Partial<LocationData>>({});
 
   useEffect(() => {
     const fetchUserLocation = async () => {
-      console.log("getUserLocation : ", await getUserLocation());
-
       try {
-        const sources = [fetch("https://ipwho.is/").then((res) => res.json())];
+        const sources = [
+          fetch("https://ipwho.is/").then((res) => res.json()),
+          getUserLocation(),
+        ];
         const results = await Promise.allSettled(sources);
 
         const merged: Partial<LocationData> = {};
@@ -69,11 +59,7 @@ export const useUserLocation = () => {
             ? merged.flag
             : { img: "" };
 
-        setLocation({
-          ...defaultLocation,
-          ...merged,
-          flag,
-        });
+        setLocation({ ...merged, flag });
       } catch (err) {
         console.error("🌍 Failed to fetch user location:", err);
       }
@@ -83,21 +69,23 @@ export const useUserLocation = () => {
   }, []);
 
   return {
-    ip: location.ip,
-    continent: location.continent,
-    continent_code: location.continent_code,
-    country: location.country,
-    country_code: location.country_code,
-    region: location.region,
-    currency: location.currency,
-    currency_name: location.currency_name,
-    region_code: location.region_code,
-    latitude: location.latitude,
-    longitude: location.longitude,
-    city: location.city,
-    calling_code: location.calling_code,
-    postal: location.postal,
-    capital: location.capital,
-    flag: location.flag.img,
+    ip: location.ip || location.ipAddress || "",
+    continent: location.continent || "",
+    continent_code: location.continent_code || location.continentCode || "",
+    country: location.country || location.countryName || "",
+    country_code: location.country_code || location.countryCode || "",
+    countryName: location.country || "",
+    region: location.region || location.regionName || "",
+    currency: location.currency || "",
+    currency_name: location.currency_name || "",
+    region_code: location.region_code || location.regionCode || "",
+    latitude: location.latitude || "",
+    longitude: location.longitude || "",
+    city: location.city || location.cityName || "",
+    calling_code: location.calling_code || "",
+    postal: location.postal || "",
+    capital: location.capital || "",
+    flag: location.flag?.img || "",
+    zipCode: location.postal || location.zipCode || "",
   };
 };

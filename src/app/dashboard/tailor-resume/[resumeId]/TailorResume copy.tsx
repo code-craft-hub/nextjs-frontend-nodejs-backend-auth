@@ -3,7 +3,7 @@ import { useEffect, useRef } from "react";
 import { useResumeStream } from "@/hooks/stream-resume-hook";
 import { toast } from "sonner";
 import { COLLECTIONS } from "@/lib/utils/constants";
-import { EditableResume } from "../../(dashboard)/ai-apply/components/resume/EditableResume";
+import { EditableResume } from "../../(dashboard)/ai-apply/components/resumes/EditableResume";
 import { ProgressIndicator } from "../../(dashboard)/ai-apply/progress-indicator";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";

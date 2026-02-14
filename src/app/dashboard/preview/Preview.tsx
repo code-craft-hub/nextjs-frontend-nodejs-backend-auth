@@ -1,7 +1,7 @@
 "use client";
 
 import { apiService } from "@/hooks/use-auth";
-import { EditableResume } from "../(dashboard)/ai-apply/components/resume/EditableResume";
+import { EditableResume } from "../(dashboard)/ai-apply/components/resumes/EditableResume";
 import { ProgressIndicator } from "../(dashboard)/ai-apply/progress-indicator";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";

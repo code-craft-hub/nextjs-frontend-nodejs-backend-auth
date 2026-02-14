@@ -28,12 +28,7 @@ import { Loader2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { AIApplyColumn, schema } from "./AIApplyColumn";
 
-export function AIApplyDatatable({
-  data,
-}: {
-  data: z.infer<typeof schema>[];
-  jobs: any;
-}) {
+export function AIApplyDatatable({ data }: { data: z.infer<typeof schema>[] }) {
   const router = useRouter();
   const [rowSelection, setRowSelection] = useState({});
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -106,7 +101,7 @@ export function AIApplyDatatable({
                             ? null
                             : flexRender(
                                 header.column.columnDef.header,
-                                header.getContext()
+                                header.getContext(),
                               )}
                         </TableHead>
                       );
@@ -122,7 +117,7 @@ export function AIApplyDatatable({
                         <TableCell key={cell.id} className="px-6">
                           {flexRender(
                             cell.column.columnDef.cell,
-                            cell.getContext()
+                            cell.getContext(),
                           )}
                         </TableCell>
                       ))}

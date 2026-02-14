@@ -59,7 +59,7 @@ export const profileApi = {
   deleteDataSourceWithGCS: async ({ profileId }: { profileId: string }) => {
     try {
       await api.delete<ProfileResponse>(
-        `/${BACKEND_API_VERSION}/resume/${profileId}/hard-delete`,
+        `/${BACKEND_API_VERSION}/resumes/${profileId}/hard-delete`,
       );
     } catch (error) {
       console.error("Error deleting data source:", error);

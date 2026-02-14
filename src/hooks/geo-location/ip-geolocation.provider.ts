@@ -1,80 +1,22 @@
-
-type ProviderResult = {
-  provider: string;
-  data: Record<string, unknown>;
-  error?: string;
-};
-
-const PROVIDERS = [
-  {
-    name: "ipapi",
-    url: "https://ipapi.co/json/",
-  },
-  {
-    name: "ipwho",
-    url: "https://ipwho.is/",
-  },
-  {
-    name: "freeipapi",
-    url: "https://freeipapi.com/api/json",
-  },
-] as const;
-
-async function fetchProvider(
-  provider: (typeof PROVIDERS)[number],
-  timeoutMs = 5000,
-): Promise<ProviderResult> {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), timeoutMs);
-
+export async function getUserLocation(): Promise<IpLocation> {
   try {
-    const res = await fetch(provider.url, {
-      signal: controller.signal,
+    const response = await fetch("/api/geolocation", {
       headers: {
         accept: "application/json",
       },
     });
 
-    if (!res.ok) {
-      return {
-        provider: provider.name,
-        data: {},
-        error: `HTTP ${res.status}`,
-      };
+    if (!response.ok) {
+      console.error(`Failed to fetch geolocation: HTTP ${response.status}`);
+      return {};
     }
 
-    return {
-      provider: provider.name,
-      data: await res.json(),
-    };
+    const data = await response.json();
+    return data as IpLocation;
   } catch (err) {
-    return {
-      provider: provider.name,
-      data: {},
-      error: err instanceof Error ? err.message : "Unknown error",
-    };
-  } finally {
-    clearTimeout(timeout);
+    console.error("Failed to fetch geolocation:", err);
+    return {};
   }
-}
-
-export async function getUserLocation(): Promise<IpLocation> {
-  const results = await Promise.allSettled(
-    PROVIDERS.map((p) => fetchProvider(p)),
-  );
-
-  let merged: IpLocation = {};
-
-  for (const r of results) {
-    if (r.status === "fulfilled") {
-      merged = {
-        ...merged,
-        ...r.value.data,
-      };
-    }
-  }
-
-  return merged;
 }
 
 export function mapIpLocationToCountry(params: {
@@ -117,8 +59,6 @@ export function mapIpLocationToCountry(params: {
     // currencySymbol: "",
   };
 }
-
-
 
 export type FlagInfo = {
   img: string;
@@ -192,4 +132,4 @@ export type RawIpLocation = {
   isProxy?: boolean;
 };
 
-export type IpLocation = Partial<RawIpLocation> 
+export type IpLocation = Partial<RawIpLocation>;

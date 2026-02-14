@@ -40,6 +40,8 @@ export const schema = z.object({
     z.object({ value: z.string(), title: z.string() }),
   ),
   type: z.string(),
+  createdAt: z.string(),
+  contentType: z.string(),
 });
 
 const getColumns = (
@@ -85,7 +87,11 @@ const getColumns = (
     cell: ({ row }) => (
       <div className="">
         <Badge variant="outline" className={cn("border-0 px-1.5 font-inter")}>
-          {formatFirestoreDate(row.original?.generatedAt)}
+          {formatFirestoreDate(
+            !!row.original?.generatedAt
+              ? row.original?.generatedAt
+              : row.original?.createdAt,
+          )}
         </Badge>
       </div>
     ),
@@ -120,11 +126,11 @@ const getColumns = (
         variant={"ghost"}
         className="text-blue-500 font-jakarta"
         onClick={() => {
-          if (row.original.type === "resume") {
+          if (row.original.contentType === "resume") {
             router.push(`/dashboard/tailor-resume/${row.original.id}`);
-          } else if (row.original.type === "cover-letter") {
+          } else if (row.original.contentType === "cover-letter") {
             router.push(`/dashboard/tailor-cover-letter/${row.original.id}`);
-          } else if (row.original.type === "interview-question") {
+          } else if (row.original.contentType === "interview-question") {
             router.push(
               `/dashboard/tailor-interview-question/${row.original.id}`,
             );
@@ -137,11 +143,7 @@ const getColumns = (
   },
 ];
 
-export function AIJobCustomizationDatatable({
-  data,
-}: {
-  data: any[];
-}) {
+export function AIJobCustomizationDatatable({ data }: { data: any[] }) {
   const router = useRouter();
 
   const [rowSelection, setRowSelection] = useState({});

@@ -29,7 +29,7 @@ export const useResumeUploadWithProgress = () => {
       // Create the upload request
       // const response = await fetch(baseURL+'/onboarding-user/upload', {
       const response = await fetch(
-        BASEURL + `/${BACKEND_API_VERSION}/resume/upload`,
+        BASEURL + `/${BACKEND_API_VERSION}/resumes/upload`,
         {
           method: "POST",
           body: formData,

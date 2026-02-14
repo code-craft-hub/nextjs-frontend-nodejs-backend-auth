@@ -11,19 +11,21 @@ export interface EmailFormData {
 }
 
 export const downloadResumePdf = async (resume: any) => {
-  return await whatsappApiClient.post(`/resume/generatePDF`, resume, {responseType: "blob"});
+  return await whatsappApiClient.post(`/resumes/generatePDF`, resume, {
+    responseType: "blob",
+  });
 };
 
 export const requestAuthUrl = async (email: string) => {
   const { data } = await whatsappApiClient.get(
-    `/email/auth-url/${encodeURIComponent(email)}`
+    `/email/auth-url/${encodeURIComponent(email)}`,
   );
   return data;
 };
 
 export const sendAuthorizationCode = async (
   userEmail: string,
-  code: string
+  code: string,
 ) => {
   const { data } = await whatsappApiClient.post(`/email/auth-callback`, {
     userEmail,
