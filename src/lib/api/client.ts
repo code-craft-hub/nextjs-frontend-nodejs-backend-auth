@@ -1,7 +1,12 @@
 const isClientSide = typeof window !== "undefined";
 const isDevelopment = process.env.NODE_ENV === "development";
+
+export const BACKEND_API_VERSION = "v1";
+
 export const BASEURL =
-  isClientSide && isDevelopment ? "/api" : process.env.NEXT_PUBLIC_AUTH_API_URL;
+isClientSide && isDevelopment ? "/api" : process.env.NEXT_PUBLIC_AUTH_API_URL;
+
+export const API_URL = `${BASEURL}/${BACKEND_API_VERSION}`
 
 export class APIError extends Error {
   constructor(

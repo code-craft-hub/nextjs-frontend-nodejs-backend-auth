@@ -11,7 +11,7 @@ import { useQuery } from "@tanstack/react-query";
 import { interviewQuestionQueries } from "@/lib/queries/interview.queries";
 import { userQueries } from "@/lib/queries/user.queries";
 import { sendGTMEvent } from "@next/third-parties/google";
-import { BASEURL } from "@/lib/api/client";
+import { API_URL, BASEURL } from "@/lib/api/client";
 
 export const TailorInterviewQuestion = ({
   jobDescription,
@@ -86,21 +86,18 @@ export const TailorInterviewQuestion = ({
     setQaData([]);
 
     try {
-      const response = await fetch(
-        `${BASEURL}/v1/generate-interview-question`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            interviewQuestionId,
-            jobDescription,
-            user,
-          }),
-          credentials: "include",
+      const response = await fetch(`${API_URL}/interview-questions/generate`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify({
+          interviewQuestionId,
+          jobDescription,
+          user,
+        }),
+        credentials: "include",
+      });
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);

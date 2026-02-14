@@ -36,7 +36,7 @@ export const AIJobCustomization = memo(
           AI Job Document Customization
         </h1>
 
-        <div className="grid gap-y-8 xl:gap-y-16 pb-16">
+        <div className="grid gap-y-8 pb-16">
           <AIJobCustomizationInput />
           {isEmpty(data) ? null : (
             <AIJobCustomizationDatatable data={data ?? []} />

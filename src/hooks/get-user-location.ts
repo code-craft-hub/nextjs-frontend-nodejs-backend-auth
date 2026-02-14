@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { getUserLocation } from "./geo-location/ip-geolocation.provider";
 
 interface LocationData {
   ip: string;
@@ -45,25 +46,28 @@ export const useUserLocation = () => {
 
   useEffect(() => {
     const fetchUserLocation = async () => {
-      
+      console.log("getUserLocation : ", await getUserLocation());
+
       try {
-        const sources = [
-          fetch("https://ipwho.is/").then(res => res.json()),
-        ];
+        const sources = [fetch("https://ipwho.is/").then((res) => res.json())];
         const results = await Promise.allSettled(sources);
 
         const merged: Partial<LocationData> = {};
 
         for (const result of results) {
-          if (result.status === "fulfilled" && typeof result.value === "object") {
+          if (
+            result.status === "fulfilled" &&
+            typeof result.value === "object"
+          ) {
             Object.assign(merged, result.value);
           }
         }
 
         // Defensive fallback in case `flag` is not present or improperly formatted
-        const flag = merged.flag && typeof merged.flag === "object" && "img" in merged.flag
-          ? merged.flag
-          : { img: "" };
+        const flag =
+          merged.flag && typeof merged.flag === "object" && "img" in merged.flag
+            ? merged.flag
+            : { img: "" };
 
         setLocation({
           ...defaultLocation,

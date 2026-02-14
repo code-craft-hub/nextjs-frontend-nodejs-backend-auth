@@ -5,6 +5,8 @@ import type {
   PaginatedResponse,
   PaginationParams,
 } from "@/lib/types";
+import { BACKEND_API_VERSION } from "./profile.api";
+
 
 export interface CreateInterviewQuestionData {
   question: string;
@@ -30,7 +32,7 @@ export const interviewQuestionApi = {
   // Get all interview questions
   getInterviewQuestions: (params?: InterviewQuestionFilters, token?: string) =>
     api.get<PaginatedResponse<InterviewQuestion>>(
-      "/interview-question/paginated?" +
+      `/${BACKEND_API_VERSION}/interview-questions?` +
         new URLSearchParams(params as Record<string, string>).toString(),
       { token }
     ),
@@ -38,7 +40,7 @@ export const interviewQuestionApi = {
   // Get interview question by ID
   getInterviewQuestion: async (id: string, token?: string) => {
     const { data } = await api.get<{ data: InterviewQuestion }>(
-      `/interview-question/${id}`,
+      `/${BACKEND_API_VERSION}/interview-questions/${id}`,
       { token }
     );
     return data;
@@ -46,18 +48,18 @@ export const interviewQuestionApi = {
 
   // Create interview question
   createInterviewQuestion: (data: CreateInterviewQuestionData, token?: string) =>
-    api.post<InterviewQuestion>("/interview-question", data, { token }),
+    api.post<InterviewQuestion>(`/${BACKEND_API_VERSION}/interview-questions`, data, { token }),
 
   // Update interview question
   updateInterviewQuestion: (id: string, data: UpdateInterviewQuestionData, token?: string) =>
-    api.patch<InterviewQuestion>(`/interview-question/${id}`, data, { token }),
+    api.patch<InterviewQuestion>(`/${BACKEND_API_VERSION}/interview-questions/${id}`, data, { token }),
 
   // Delete interview question
   deleteInterviewQuestion: (id: string, token?: string) =>
-    api.delete<void>(`/interview-question/${id}`, { token }),
+    api.delete<void>(`/${BACKEND_API_VERSION}/interview-questions/${id}`, { token }),
   // Get random questions
   getRandomQuestions: (count: number, category?: string, token?: string) =>
-    api.get<InterviewQuestion[]>("/interview-question/random", {
+    api.get<InterviewQuestion[]>(`/${BACKEND_API_VERSION}/interview-questions/random`, {
       params: { count, ...(category && { category }) },
       token,
     }),
