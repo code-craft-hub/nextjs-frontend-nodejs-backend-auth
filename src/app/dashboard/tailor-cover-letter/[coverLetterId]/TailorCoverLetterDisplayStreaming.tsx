@@ -1,7 +1,6 @@
 "use client";
 
 import { Loader2 } from "lucide-react";
-import { ProgressIndicator } from "../../(dashboard)/ai-apply/progress-indicator";
 
 interface TailorCoverLetterDisplayProps {
   aiApply: boolean;
@@ -21,7 +20,6 @@ interface TailorCoverLetterDisplayProps {
 }
 
 export const TailorCoverLetterDisplayStreaming = ({
-  aiApply,
   state,
   displayUser,
   displayContent,
@@ -29,7 +27,7 @@ export const TailorCoverLetterDisplayStreaming = ({
 }: TailorCoverLetterDisplayProps) => {
   return (
     <div className="grid grid-cols-1 gap-4 sm:gap-6">
-      {aiApply && <ProgressIndicator activeStep={1} />}
+      {/* {aiApply && <ProgressIndicator activeStep={1} />} */}
       <div className="flex w-full gap-3 items-center p-4 bg-white justify-between">
         <p className="text-xl font-medium font-inter">Tailored Cover Letter</p>
       </div>
@@ -37,7 +35,7 @@ export const TailorCoverLetterDisplayStreaming = ({
       <div className="bg-slate-50 border-b border-slate-200 shadow-md rounded-xl flex flex-col items-center justify-between">
         <div
           ref={contentRef}
-          className="bg-white p-4 sm:p-8 h-125 overflow-y-auto w-full"
+          className="bg-white p-4 sm:p-8 overflow-y-auto w-full"
         >
           {state.isStreaming && !state.content ? (
             <div className="flex flex-col items-center justify-center h-full text-gray-400">

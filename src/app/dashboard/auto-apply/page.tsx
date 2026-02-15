@@ -111,7 +111,7 @@ export default function AutoApplyPage() {
   const aiApply = true; // Auto-apply is always true on this page
 
   return (
-    <div className="flex flex-col gap-8 ">
+    <div className="flex flex-col gap-8 p-4 sm:p-8">
       <TailorCoverLetterDisplayStreaming
         aiApply={aiApply}
         state={coverLetterState}
@@ -119,7 +119,6 @@ export default function AutoApplyPage() {
         displayContent={displayContent}
         contentRef={contentRef as React.RefObject<HTMLDivElement>}
       />
-
       <ResumeLoadingSkeleton />
     </div>
   );

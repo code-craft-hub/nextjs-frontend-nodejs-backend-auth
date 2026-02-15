@@ -60,14 +60,14 @@ export function buildResumeStartUrl(
  */
 export function buildCoverLetterUpdateUrl(
   coverLetterDocId: string,
-  jobDescription: string,
-  recruiterEmail: string,
+  // jobDescription: string,
+  // recruiterEmail: string,
 ): string {
   const params = new URLSearchParams();
   params.set("coverLetterDocId", coverLetterDocId);
-  params.set("jobDescription", jobDescription);
-  params.set("recruiterEmail", recruiterEmail);
-  params.set("aiApply", "true");
+  // params.set("jobDescription", jobDescription);
+  // params.set("recruiterEmail", recruiterEmail);
+  // params.set("aiApply", "true");
   return `/dashboard/tailor-cover-letter/${AI_APPLY_PLACEHOLDER_ID}?${params.toString()}`;
 }
 

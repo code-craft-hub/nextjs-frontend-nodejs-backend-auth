@@ -49,8 +49,8 @@ export default function TailorCoverLetter() {
     if (state.documentId && !state.isStreaming && isGeneratorStep) {
       const newUrl = buildCoverLetterUpdateUrl(
         state.documentId,
-        jobDescription,
-        recruiterEmail,
+        // jobDescription,
+        // recruiterEmail,
       );
       router.replace(newUrl);
     }

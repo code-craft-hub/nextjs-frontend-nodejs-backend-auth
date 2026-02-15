@@ -97,8 +97,8 @@ const getColumns = (
     ),
   },
   {
-    accessorKey: "type",
-    header: () => <div className=" w-full ">Application Method</div>,
+    accessorKey: "contentType",
+    header: () => <div className=" w-full ">Document Type</div>,
     cell: ({ row }) => (
       <div className="flex gap-2 items-center justify-">
         <div>
@@ -106,19 +106,20 @@ const getColumns = (
             variant="outline"
             className={cn(
               "text-muted-foreground px-1.5 rounded-2xl  font-jakarta",
-              row.getValue("type") === "resume"
+              row.getValue("contentType") === "resume"
                 ? "bg-primary/10 border-primary/40 text-primary "
-                : row.getValue("type") === "cover-letter"
+                : row.getValue("contentType") === "cover-letter"
                   ? "bg-cverai-green/10 border-cverai-green/40 text-cverai-green"
                   : "bg-orange-500/10 border-orange-500/40 text-orange-500",
             )}
           >
-            {row.getValue("type")}
+            {row.getValue("contentType")}
           </Badge>
         </div>
       </div>
     ),
   },
+ 
   {
     id: "actions",
     cell: ({ row }) => (

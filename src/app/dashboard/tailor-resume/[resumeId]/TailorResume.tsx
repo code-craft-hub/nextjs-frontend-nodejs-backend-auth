@@ -18,8 +18,6 @@ import { BACKEND_API_VERSION } from "@/lib/api/profile.api";
 import { ResumeLoadingSkeleton } from "../components/resume-loading-skeleton";
 import {
   buildResumeUpdateUrl,
-  buildPreviewUrl,
-  isPlaceholderId,
 } from "@/lib/utils/ai-apply-navigation";
 import { EditableResume } from "../../(dashboard)/ai-apply/components/resume/EditableResume";
 
@@ -65,7 +63,6 @@ export const TailorResume = () => {
   const recruiterEmail = searchParams.get("recruiterEmail") || "";
   const aiApply = searchParams.get("aiApply") === "true";
 
-  const isGeneratorStep = isPlaceholderId(resumeDocId);
 
   useEffect(() => {
     if (user?.firstName)
@@ -88,7 +85,7 @@ export const TailorResume = () => {
   );
 
   useEffect(() => {
-    if (!streamStatus.isComplete) {
+    if (!streamStatus.isComplete && !existingResume) {
       resultsEndRef.current?.scrollIntoView({
         behavior: "smooth",
         block: "end",
@@ -96,28 +93,48 @@ export const TailorResume = () => {
     }
   }, [streamData]);
 
-  // Start generation on first visit if no resumeDocId yet
+  // Start generation on first visit if no resumeDocId yet, OR if resumeDocId exists but data doesn't
   useEffect(() => {
-    if (isGeneratorStep && user && jobDescription && !hasGeneratedRef.current) {
+    const isRegenerationNeeded =
+      resumeDocId &&
+      (resumeStatus === "error" || (resumeStatus === "success" && !existingResume)); // No data exists
+
+    if (
+      (isRegenerationNeeded) &&
+      user &&
+      jobDescription &&
+      !hasGeneratedRef.current
+    ) {
       hasGeneratedRef.current = true;
+      const isRegenerating = isRegenerationNeeded;
       toast.promise(startStream(user, jobDescription), {
-        loading: "Generating your tailored resume...",
+        loading: isRegenerating
+          ? "Regenerating your tailored resume..."
+          : "Generating your tailored resume...",
         success: () => {
           return {
-            message: `Resume generation complete!`,
+            message: isRegenerating
+              ? `Resume regeneration complete!`
+              : `Resume generation complete!`,
           };
         },
-        error: "Error",
+        error: "Error generating resume",
       });
     }
-  }, [isGeneratorStep, user, jobDescription, startStream]);
+  }, [
+    resumeDocId,
+    resumeStatus,
+    existingResume,
+    user,
+    jobDescription,
+    startStream,
+  ]);
 
   // Update URL with actual resumeDocId after generation completes
   useEffect(() => {
     if (
       documentId &&
       !streamStatus.isComplete &&
-      isGeneratorStep &&
       coverLetterDocId
     ) {
       const newUrl = buildResumeUpdateUrl(
@@ -131,7 +148,6 @@ export const TailorResume = () => {
   }, [
     documentId,
     streamStatus.isComplete,
-    isGeneratorStep,
     coverLetterDocId,
     jobDescription,
     recruiterEmail,
@@ -143,21 +159,9 @@ export const TailorResume = () => {
     if (!aiApply || streamStatus.isComplete !== true || !documentId) {
       return;
     }
-
-    if (!isGeneratorStep) {
-      // Already have resumeDocId, navigate to preview
-      const previewUrl = buildPreviewUrl(
-        coverLetterDocId || "",
-        resumeDocId || documentId,
-        jobDescription,
-        recruiterEmail,
-      );
-      router.push(previewUrl);
-    }
   }, [
     aiApply,
     streamStatus.isComplete,
-    isGeneratorStep,
     documentId,
     coverLetterDocId,
     resumeDocId,
@@ -166,10 +170,11 @@ export const TailorResume = () => {
     router,
   ]);
 
-  const shouldUseDbData =
-    streamData.profile === "" && resumeStatus === "success";
+  
   const isLoading =
-    shouldUseDbData && !streamStatus.isComplete && resumeStatus !== "success";
+    resumeStatus === "pending" ||
+    resumeStatus === "error" ||
+    (resumeStatus === "success" && !existingResume && !streamStatus.isComplete);
 
   const handleResumeDelete = async () => {
     const idToDelete = resumeDocId || documentId;

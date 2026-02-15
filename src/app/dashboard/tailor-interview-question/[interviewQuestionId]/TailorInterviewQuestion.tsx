@@ -1,17 +1,19 @@
 "use client";
 import { HelpCircle, CheckCircle } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { jsonrepair } from "jsonrepair";
 import { toast } from "sonner";
 import { isEmpty } from "lodash";
 import { QAItem } from "@/types";
 import { extractCompleteJsonObjects } from "@/lib/utils/helpers";
 import TailorInterviewQuestionEmptyState from "./TailorInterviewQuestionEmptyState";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { interviewQuestionQueries } from "@/lib/queries/interview.queries";
 import { userQueries } from "@/lib/queries/user.queries";
 import { sendGTMEvent } from "@next/third-parties/google";
-import { API_URL, BASEURL } from "@/lib/api/client";
+import { API_URL } from "@/lib/api/client";
+import { useFireworksConfetti } from "@/components/ui/confetti";
 
 export const TailorInterviewQuestion = ({
   jobDescription,
@@ -20,14 +22,18 @@ export const TailorInterviewQuestion = ({
   jobDescription: string;
   interviewQuestionId: string;
 }) => {
+  const router = useRouter();
   const hasGeneratedRef = useRef(false);
-
-  const [qaData, setQaData] = useState<QAItem[]>([]);
+  const queryClient = useQueryClient();
 
   const { data: user } = useQuery(userQueries.detail());
   const { data, status, isFetched } = useQuery(
     interviewQuestionQueries.detail(interviewQuestionId),
   );
+  const [qaData, setQaData] = useState<QAItem[]>([]);
+  const [documentTitle, setDocumentTitle] = useState<string>(data?.title || "");
+
+  const { start: startConfetti } = useFireworksConfetti();
 
   useEffect(() => {
     if (user?.firstName)
@@ -36,6 +42,7 @@ export const TailorInterviewQuestion = ({
         value: `${user?.firstName} viewed Tailor Interview Question Page`,
       });
   }, [user?.firstName]);
+
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const resultsEndRef = useRef<HTMLDivElement>(null);
 
@@ -56,7 +63,9 @@ export const TailorInterviewQuestion = ({
 
         toast.promise(handleSubmit(), {
           loading: "I'm generating your tailored interview questions...",
-          success: () => {
+          success: async () => {
+            await handleStreamCompletion();
+
             return {
               message: `Hurray! Interview question generation complete!`,
               description: "Hopefully you nailed it!",
@@ -75,6 +84,15 @@ export const TailorInterviewQuestion = ({
         value: `${user?.firstName} viewed Tailor Interview Question Page`,
       });
   }, [user?.firstName]);
+
+  const handleStreamCompletion = async () => {
+    startConfetti();
+    await Promise.all([
+      queryClient.invalidateQueries(
+        interviewQuestionQueries.detail(interviewQuestionId),
+      ),
+    ]);
+  };
 
   const handleSubmit = async () => {
     if (!jobDescription.trim()) {
@@ -164,6 +182,15 @@ export const TailorInterviewQuestion = ({
                   // Keep only the incomplete part in buffer
                   buffer = remainder;
                 }
+              } else if (parsed.title) {
+                // Handle title from backend
+                setDocumentTitle(parsed.title);
+              } else if (parsed.done && parsed.documentId) {
+                // Handle completion with new document ID and update URL
+                router.push(
+                  `/dashboard/tailor-interview-question/${parsed.documentId}`,
+                );
+                setDocumentTitle(parsed.title);
               } else if (parsed.error) {
                 toast.error(parsed.error);
               }
@@ -189,13 +216,17 @@ export const TailorInterviewQuestion = ({
   const dataEmpty = isEmpty(data);
   const allEmpty = generatedEmpty && dataEmpty;
 
+  const content = data?.fullContent || data?.parsedContent || [];
   return (
     <div className="min-h-screen h-full p-8">
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-slate-800 mb-3">
+          <h1 className="text-3xl  text-slate-800 mb-3">
             Job Interview Questions & Answers
           </h1>
+          <p className="text-2xl font-bold text-slate-800 mb-3">
+            {documentTitle ? `Title: ${documentTitle}` : ""}
+          </p>
         </div>
         {!allEmpty ? (
           <div className="space-y-6">
@@ -209,7 +240,7 @@ export const TailorInterviewQuestion = ({
             )}
 
             {generatedEmpty &&
-              data?.fullContent?.map((item, index) => (
+              content?.map((item, index) => (
                 <div
                   key={index}
                   className="bg-white rounded-2xl shadow-lg overflow-hidden border border-slate-200 hover:shadow-xl transition-shadow duration-300"
@@ -217,7 +248,7 @@ export const TailorInterviewQuestion = ({
                   <div className="p-8">
                     {/* Question Section */}
                     <div className="flex gap-4 mb-6">
-                      <div className="flex-shrink-0">
+                      <div className="shrink-0">
                         <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
                           <HelpCircle className="w-6 h-6 text-blue-600" />
                         </div>
@@ -237,7 +268,7 @@ export const TailorInterviewQuestion = ({
 
                     {/* Answer Section */}
                     <div className="flex gap-4">
-                      <div className="flex-shrink-0">
+                      <div className="shrink-0">
                         <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center">
                           <CheckCircle className="w-6 h-6 text-emerald-600" />
                         </div>
@@ -263,7 +294,7 @@ export const TailorInterviewQuestion = ({
                   <div className="p-8">
                     {/* Question Section */}
                     <div className="flex gap-4 mb-6">
-                      <div className="flex-shrink-0">
+                      <div className="shrink-0">
                         <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
                           <HelpCircle className="w-6 h-6 text-blue-600" />
                         </div>
@@ -283,7 +314,7 @@ export const TailorInterviewQuestion = ({
 
                     {/* Answer Section */}
                     <div className="flex gap-4">
-                      <div className="flex-shrink-0">
+                      <div className="shrink-0">
                         <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center">
                           <CheckCircle className="w-6 h-6 text-emerald-600" />
                         </div>
