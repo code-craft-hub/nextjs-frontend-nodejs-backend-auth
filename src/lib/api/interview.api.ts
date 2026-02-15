@@ -57,6 +57,11 @@ export const interviewQuestionApi = {
   // Delete interview question
   deleteInterviewQuestion: (id: string, token?: string) =>
     api.delete<void>(`/${BACKEND_API_VERSION}/interview-questions/${id}`, { token }),
+
+  // Hard delete interview question
+  hardDeleteInterviewQuestion: (id: string, token?: string) =>
+    api.delete<void>(`/${BACKEND_API_VERSION}/interview-questions/${id}/hard-delete`, { token }),
+
   // Get random questions
   getRandomQuestions: (count: number, category?: string, token?: string) =>
     api.get<InterviewQuestion[]>(`/${BACKEND_API_VERSION}/interview-questions/random`, {

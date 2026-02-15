@@ -60,6 +60,9 @@ export const coverLetterApi = {
   // Delete cover letter
   deleteCoverLetter: (id: string, token?: string) => api.delete<void>(`/${BACKEND_API_VERSION}/cover-letters/${id}`, { token }),
 
+  // Hard delete cover letter
+  hardDeleteCoverLetter: (id: string, token?: string) => api.delete<void>(`/${BACKEND_API_VERSION}/cover-letters/${id}/hard-delete`, { token }),
+
   // Duplicate cover letter
   duplicateCoverLetter: (id: string, token?: string) =>
     api.post<CoverLetter>(`/${BACKEND_API_VERSION}/cover-letters/${id}/duplicate`, undefined, { token }),

@@ -73,6 +73,9 @@ export const resumeApi = {
   deleteResume: (id: string, token?: string) =>
     api.delete<void>(`${RESUME_BASE}/${id}`, { token }),
 
+  hardDeleteResume: (id: string, token?: string) =>
+    api.delete<void>(`${RESUME_BASE}/${id}/hard-delete`, { token }),
+
   // ─── Work Experience CRUD ─────────────────────────────────────
 
   createWorkExperience: (

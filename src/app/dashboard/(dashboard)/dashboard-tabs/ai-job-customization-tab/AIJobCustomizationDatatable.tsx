@@ -16,6 +16,7 @@ import {
   VisibilityState,
 } from "@tanstack/react-table";
 import { z } from "zod";
+import { useQueryClient } from "@tanstack/react-query";
 
 import {
   Table,
@@ -28,9 +29,22 @@ import {
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
-import { Loader2 } from "lucide-react";
+import { Loader2, Trash2 } from "lucide-react";
 import { formatFirestoreDate } from "@/lib/utils/helpers";
 import { useMemo, useState } from "react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { resumeApi } from "@/lib/api/resume.api";
+import { coverLetterApi } from "@/lib/api/cover-letter.api";
+import { interviewQuestionApi } from "@/lib/api/interview.api";
+import { queryKeys } from "@/lib/query/keys";
 
 export const schema = z.object({
   id: z.number(),
@@ -43,6 +57,12 @@ export const schema = z.object({
   createdAt: z.string(),
   contentType: z.string(),
 });
+
+const CONTENT_TYPE_ROUTES: Record<string, string> = {
+  resume: "/dashboard/tailor-resume",
+  "cover-letter": "/dashboard/tailor-cover-letter",
+  "interview-question": "/dashboard/tailor-interview-question",
+};
 
 const getColumns = (
   router: ReturnType<typeof useRouter>,
@@ -77,7 +97,7 @@ const getColumns = (
     accessorKey: "title",
     header: "Job Title",
     cell: ({ row }) => {
-      return <div className="font-inter">{row.original.title}</div>;
+      return <div className="font-inter max-w-xl">{row.original.title}</div>;
     },
     enableHiding: false,
   },
@@ -119,33 +139,37 @@ const getColumns = (
       </div>
     ),
   },
- 
+
   {
     id: "actions",
     cell: ({ row }) => (
-      <Button
-        variant={"ghost"}
-        className="text-blue-500 font-jakarta"
-        onClick={() => {
-          if (row.original.contentType === "resume") {
-            router.push(`/dashboard/tailor-resume/${row.original.id}`);
-          } else if (row.original.contentType === "cover-letter") {
-            router.push(`/dashboard/tailor-cover-letter/${row.original.id}`);
-          } else if (row.original.contentType === "interview-question") {
-            router.push(
-              `/dashboard/tailor-interview-question/${row.original.id}`,
-            );
-          }
-        }}
-      >
-        Show Details
-      </Button>
+      <>
+        <Button
+          variant={"ghost"}
+          className="text-blue-500 font-jakarta"
+          onClick={() => {
+            const basePath = CONTENT_TYPE_ROUTES[row.original.contentType];
+            if (basePath) {
+              router.push(`${basePath}/${row.original.id}`);
+            }
+          }}
+        >
+          Show Details
+        </Button>
+      </>
     ),
   },
 ];
 
-export function AIJobCustomizationDatatable({ data }: { data: any[] }) {
+export function AIJobCustomizationDatatable({
+  data,
+  onBulkDelete,
+}: {
+  data: any[];
+  onBulkDelete?: (ids: number[]) => Promise<void>;
+}) {
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const [rowSelection, setRowSelection] = useState({});
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -157,6 +181,8 @@ export function AIJobCustomizationDatatable({ data }: { data: any[] }) {
   });
 
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const columns = useMemo(() => getColumns(router), [router]);
 
@@ -196,10 +222,125 @@ export function AIJobCustomizationDatatable({ data }: { data: any[] }) {
     setIsLoadingMore(false);
   };
 
+  const getSelectedIds = (): Array<{ id: number; contentType: string }> => {
+    return Object.keys(rowSelection)
+      .map((index) => {
+        const item = data[parseInt(index)];
+        return item ? { id: item.id, contentType: item.contentType } : null;
+      })
+      .filter((item) => item !== null) as Array<{
+      id: number;
+      contentType: string;
+    }>;
+  };
+
+  const selectedCount = Object.keys(rowSelection).length;
+
+  const handleBulkDelete = async () => {
+    try {
+      setIsDeleting(true);
+      const selectedItems = getSelectedIds();
+
+      // Group items by content type
+      const resumeIds: number[] = [];
+      const coverLetterIds: number[] = [];
+      const interviewQuestionIds: number[] = [];
+
+      selectedItems.forEach((item) => {
+        switch (item.contentType) {
+          case "resume":
+            resumeIds.push(item.id);
+            break;
+          case "cover-letter":
+            coverLetterIds.push(item.id);
+            break;
+          case "interview-question":
+            interviewQuestionIds.push(item.id);
+            break;
+        }
+      });
+
+      // Delete from each API based on content type
+      const deletePromises: Promise<any>[] = [];
+
+      if (resumeIds.length > 0) {
+        deletePromises.push(
+          ...resumeIds.map((id) => resumeApi.hardDeleteResume(id.toString())),
+        );
+      }
+
+      if (coverLetterIds.length > 0) {
+        deletePromises.push(
+          ...coverLetterIds.map((id) =>
+            coverLetterApi.hardDeleteCoverLetter(id.toString()),
+          ),
+        );
+      }
+
+      if (interviewQuestionIds.length > 0) {
+        deletePromises.push(
+          ...interviewQuestionIds.map((id) =>
+            interviewQuestionApi.hardDeleteInterviewQuestion(id.toString()),
+          ),
+        );
+      }
+
+      // Wait for all deletions to complete
+      await Promise.all(deletePromises);
+
+      // Invalidate relevant queries to refresh the data
+      if (resumeIds.length > 0) {
+        await queryClient.invalidateQueries({
+          queryKey: queryKeys.resumes.lists(),
+        });
+      }
+
+      if (coverLetterIds.length > 0) {
+        await queryClient.invalidateQueries({
+          queryKey: queryKeys.coverLetters.lists(),
+        });
+      }
+
+      if (interviewQuestionIds.length > 0) {
+        await queryClient.invalidateQueries({
+          queryKey: queryKeys.interviewQuestions.lists(),
+        });
+      }
+
+      setRowSelection({});
+      setIsDeleteDialogOpen(false);
+
+      // Call parent onBulkDelete if provided (for cache invalidation, etc.)
+      if (onBulkDelete) {
+        await onBulkDelete(selectedItems.map((item) => item.id));
+      }
+    } catch (error) {
+      console.error("Failed to delete items:", error);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   return (
     <Card>
-      <div className="">
-        <h1 className="font-bold text-xl px-6">Recent Activity</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="font-bold text-xl px-6 py-4">Recent Activity</h1>
+        {selectedCount > 0 && (
+          <div className="flex items-center gap-2 px-6">
+            <span className="text-sm text-muted-foreground">
+              {selectedCount} selected
+            </span>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsDeleteDialogOpen(true)}
+              disabled={isDeleting}
+              className="text-red-500 hover:text-red-700 hover:bg-red-50"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
       </div>
       <div className="overflow-hidden grid">
         <Table>
@@ -272,6 +413,37 @@ export function AIJobCustomizationDatatable({ data }: { data: any[] }) {
           </Button>
         </div>
       ) : null}
+      <AlertDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Items</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete {selectedCount} selected item
+              {selectedCount !== 1 ? "s" : ""}? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="flex justify-end gap-2">
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleBulkDelete}
+              disabled={isDeleting}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {isDeleting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                "Delete"
+              )}
+            </AlertDialogAction>
+          </div>
+        </AlertDialogContent>
+      </AlertDialog>
     </Card>
   );
 }
