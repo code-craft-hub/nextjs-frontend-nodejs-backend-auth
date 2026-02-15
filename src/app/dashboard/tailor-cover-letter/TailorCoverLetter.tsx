@@ -12,12 +12,14 @@ import {
   isPlaceholderId,
 } from "@/lib/utils/ai-apply-navigation";
 import { TailorCoverLetterDisplayStreaming } from "./TailorCoverLetterDisplayStreaming";
+import { useFireworksConfetti } from "@/components/ui/confetti";
 
 export default function TailorCoverLetter() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const hasStartedRef = useRef(false);
   const contentRef = useRef<HTMLDivElement>(null);
+  const { start: startConfetti } = useFireworksConfetti();
 
   const { state, start } = useCoverLetterStream();
   const { data: user } = useQuery(userQueries.detail());
@@ -49,10 +51,10 @@ export default function TailorCoverLetter() {
     if (state.documentId && !state.isStreaming && isGeneratorStep) {
       const newUrl = buildCoverLetterUpdateUrl(
         state.documentId,
-        // jobDescription,
-        // recruiterEmail,
       );
       router.replace(newUrl);
+          startConfetti();
+
     }
   }, [
     state.documentId,

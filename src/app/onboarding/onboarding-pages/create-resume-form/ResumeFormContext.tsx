@@ -8,17 +8,20 @@ import {
   useState,
 } from "react";
 import type { ResumeAggregate } from "@/types/resume.types";
+import { useCreateResumeMutation } from "@/lib/mutations/resume.mutations";
 
 interface ResumeFormContextValue {
   resumeId: string | null;
   resumeData: ResumeAggregate | null;
   isEditMode: boolean;
   isLoading: boolean;
+  isCreating: boolean;
   setResumeData: (data: ResumeAggregate | null) => void;
   updateResumeField: <K extends keyof ResumeAggregate>(
     field: K,
     value: ResumeAggregate[K],
   ) => void;
+  createNewResume: (title: string) => Promise<string | null>;
 }
 
 const ResumeFormContext = createContext<ResumeFormContextValue | null>(null);
@@ -38,8 +41,11 @@ export function ResumeFormProvider({
     initialData,
   );
   const [isLoading] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
+  const [currentResumeId, setCurrentResumeId] = useState<string | null>(resumeId || null);
+  const createResumeMutation = useCreateResumeMutation();
 
-  const isEditMode = !!resumeId && !!resumeData;
+  const isEditMode = !!currentResumeId && !!resumeData;
 
   const updateResumeField = useCallback(
     <K extends keyof ResumeAggregate>(
@@ -54,16 +60,49 @@ export function ResumeFormProvider({
     [],
   );
 
+  const createNewResume = useCallback(
+    async (title: string): Promise<string | null> => {
+      return new Promise((resolve) => {
+        setIsCreating(true);
+        createResumeMutation.mutate(
+          { title },
+          {
+            onSuccess: (response: any) => {
+              const newResumeId = response?.data?.id;
+              if (newResumeId && response?.data) {
+                setResumeData(response.data);
+                setCurrentResumeId(newResumeId);
+                setIsCreating(false);
+                resolve(newResumeId);
+              } else {
+                setIsCreating(false);
+                resolve(null);
+              }
+            },
+            onError: (error) => {
+              console.error("Error creating resume:", error);
+              setIsCreating(false);
+              resolve(null);
+            },
+          },
+        );
+      });
+    },
+    [createResumeMutation],
+  );
+
   const value = useMemo(
     () => ({
-      resumeId: resumeId ?? resumeData?.id ?? null,
+      resumeId: currentResumeId,
       resumeData,
       isEditMode,
       isLoading,
+      isCreating,
       setResumeData,
       updateResumeField,
+      createNewResume,
     }),
-    [resumeId, resumeData, isEditMode, isLoading, updateResumeField],
+    [currentResumeId, resumeData, isEditMode, isLoading, isCreating, updateResumeField, createNewResume],
   );
 
   return (

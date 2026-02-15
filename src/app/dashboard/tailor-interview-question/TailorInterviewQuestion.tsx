@@ -20,28 +20,31 @@ export const TailorInterviewQuestion = ({
   interviewQuestionId,
 }: {
   jobDescription: string;
-  interviewQuestionId: string;
+  interviewQuestionId?: string;
 }) => {
   const router = useRouter();
   const hasGeneratedRef = useRef(false);
   const queryClient = useQueryClient();
+  const [interviewId, setInterviewId] = useState(interviewQuestionId);
 
   const { data: user } = useQuery(userQueries.detail());
   const { data, status, isFetched } = useQuery(
-    interviewQuestionQueries.detail(interviewQuestionId),
+    interviewQuestionQueries.detail(interviewId ?? ""),
   );
   const [qaData, setQaData] = useState<QAItem[]>([]);
   const [documentTitle, setDocumentTitle] = useState<string>(data?.title || "");
 
-  const { start: startConfetti } = useFireworksConfetti();
+  console.log(
+    "Fetched interview question data:",
+    data,
+    "Status:",
+    status,
+    "Is Fetched:",
+    isFetched,
+    interviewQuestionId,
+  );
 
-  useEffect(() => {
-    if (user?.firstName)
-      sendGTMEvent({
-        event: `Tailor Interview Question Page`,
-        value: `${user?.firstName} viewed Tailor Interview Question Page`,
-      });
-  }, [user?.firstName]);
+  const { start: startConfetti } = useFireworksConfetti();
 
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const resultsEndRef = useRef<HTMLDivElement>(null);
@@ -57,25 +60,23 @@ export const TailorInterviewQuestion = ({
   }, [qaData.length, isGenerating]);
 
   useEffect(() => {
-    if (isFetched && status === "success") {
-      if (jobDescription?.trim() && !hasGeneratedRef.current && !data) {
-        hasGeneratedRef.current = true;
+    if (jobDescription?.trim() && !interviewId && !data && !hasGeneratedRef.current) {
+      hasGeneratedRef.current = true;
 
-        toast.promise(handleSubmit(), {
-          loading: "I'm generating your tailored interview questions...",
-          success: async () => {
-            await handleStreamCompletion();
+      toast.promise(handleSubmit(), {
+        loading: "I'm generating your tailored interview questions...",
+        success: async () => {
+          await handleStreamCompletion();
 
-            return {
-              message: `Hurray! Interview question generation complete!`,
-              description: "Hopefully you nailed it!",
-            };
-          },
-          error: "Error",
-        });
-      }
+          return {
+            message: `Hurray! Interview question generation complete!`,
+            description: "Hopefully you nailed it!",
+          };
+        },
+        error: "Error",
+      });
     }
-  }, [user, jobDescription, data, status, isFetched]);
+  }, [user, jobDescription, interviewId, data, status, isFetched]);
 
   useEffect(() => {
     if (user?.firstName)
@@ -89,7 +90,7 @@ export const TailorInterviewQuestion = ({
     startConfetti();
     await Promise.all([
       queryClient.invalidateQueries(
-        interviewQuestionQueries.detail(interviewQuestionId),
+        interviewQuestionQueries.detail(interviewQuestionId ?? ""),
       ),
     ]);
   };
@@ -187,8 +188,9 @@ export const TailorInterviewQuestion = ({
                 setDocumentTitle(parsed.title);
               } else if (parsed.done && parsed.documentId) {
                 // Handle completion with new document ID and update URL
+                setInterviewId(parsed.documentId);
                 router.push(
-                  `/dashboard/tailor-interview-question/${parsed.documentId}`,
+                  `/dashboard/tailor-interview-question?interviewQuestionId=${parsed.documentId}`,
                 );
                 setDocumentTitle(parsed.title);
               } else if (parsed.error) {

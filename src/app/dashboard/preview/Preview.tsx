@@ -20,7 +20,7 @@ import { sendGTMEvent } from "@next/third-parties/google";
 import { useFireworksConfetti } from "@/components/ui/confetti";
 import AuthorizeGoogle from "@/hooks/gmail/AuthorizeGoogle";
 import { GmailCompose } from "./GmailCompose";
-import TailorCoverLetterDisplay from "../tailor-cover-letter/[coverLetterId]/TailorCoverLetterDisplay";
+import TailorCoverLetterDisplay from "../tailor-cover-letter/TailorCoverLetterDisplay";
 
 /**
  * Normalize API response data to match the expected UI schema

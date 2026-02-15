@@ -44,7 +44,13 @@ export default function ProfessionalSummaryForm({
   onBack,
   handleEditClick,
 }: ProfessionalSummaryFormProps) {
-  const { resumeId, resumeData, updateResumeField } = useResumeForm();
+  const {
+    resumeId,
+    resumeData,
+    updateResumeField,
+    createNewResume,
+    isCreating,
+  } = useResumeForm();
   const updateResume = useUpdateResumeMutation();
 
   const form = useForm<ProfessionalSummaryFormValues>({
@@ -58,13 +64,20 @@ export default function ProfessionalSummaryForm({
   const charCount = summaryValue?.length ?? 0;
 
   async function onSubmit({ summary }: ProfessionalSummaryFormValues) {
-    if (!resumeId) {
-      onNext?.();
-      return;
+    let activeResumeId = resumeId;
+
+    // If no resume exists, create one first
+    if (!activeResumeId) {
+      const newResumeId = await createNewResume("My Resume");
+      if (!newResumeId) {
+        console.error("Failed to create resume");
+        return;
+      }
+      activeResumeId = newResumeId;
     }
 
     updateResume.mutate(
-      { id: resumeId, data: { summary } },
+      { id: activeResumeId, data: { summary } },
       {
         onSuccess: () => {
           updateResumeField("summary", summary);
@@ -167,10 +180,12 @@ export default function ProfessionalSummaryForm({
             </Button>
             <Button
               type="submit"
-              disabled={updateResume.isPending}
+              disabled={updateResume.isPending || isCreating}
               className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 h-12 rounded-xl text-sm transition-colors"
             >
-              {updateResume.isPending ? "Saving..." : "Save & Continue"}
+              {updateResume.isPending || isCreating
+                ? "Saving..."
+                : "Save & Continue"}
             </Button>
           </div>
         </form>

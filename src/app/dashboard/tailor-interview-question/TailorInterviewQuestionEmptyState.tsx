@@ -10,7 +10,7 @@ const TailorInterviewQuestionEmptyState = ({index}:{index:number}) => {
         <div className="p-8">
           {/* Question Section */}
           <div className="flex gap-4 mb-6">
-            <div className="flex-shrink-0">
+            <div className="shrink-0">
               <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
                 <HelpCircle className="w-6 h-6 text-blue-600" />
               </div>
@@ -28,7 +28,7 @@ const TailorInterviewQuestionEmptyState = ({index}:{index:number}) => {
 
           {/* Answer Section */}
           <div className="flex gap-4">
-            <div className="flex-shrink-0">
+            <div className="shrink-0">
               <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center">
                 <CheckCircle className="w-6 h-6 text-emerald-600" />
               </div>

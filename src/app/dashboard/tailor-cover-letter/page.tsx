@@ -1,25 +1,19 @@
 import TailorCoverLetter from "./TailorCoverLetter";
 import { createServerQueryClient } from "@/lib/query/prefetch";
 import { coverLetterQueries } from "@/lib/queries/cover-letter.queries";
-import { userQueries } from "@/lib/queries/user.queries";
 import { getCookiesToken } from "@/lib/auth.utils";
 import { HydrationBoundary } from "@/components/hydration-boundary";
 import { dehydrate } from "@tanstack/react-query";
 
-const TailorCoverLetterPage = async ({ params }: any) => {
+const TailorCoverLetterPage = async ({ searchParams }: any) => {
   const token = (await getCookiesToken()) ?? "";
-  const { coverLetterId } = await params;
+  const { coverLetterId } = await searchParams;
 
   const queryClient = createServerQueryClient();
 
-  // Prefetch with coverLetterId if it's available and not a placeholder
-  if (coverLetterId && coverLetterId !== "pending") {
-    await queryClient.prefetchQuery(
-      coverLetterQueries.detail(coverLetterId, token),
-    );
-  }
-
-  await queryClient.prefetchQuery(userQueries.detail(token));
+  await queryClient.prefetchQuery(
+    coverLetterQueries.detail(coverLetterId, token),
+  );
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>

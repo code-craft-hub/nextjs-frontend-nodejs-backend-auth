@@ -20,6 +20,7 @@ import {
   useUpdateEducationMutation,
   useDeleteEducationMutation,
 } from "@/lib/mutations/resume.mutations";
+import { resumeApi } from "@/lib/api/resume.api";
 import { CloseEditButton } from "@/components/shared/CloseEditButton";
 
 // ─── Schema ────────────────────────────────────────────────────────
@@ -53,7 +54,13 @@ export default function EducationSection({
   onBack,
   handleEditClick,
 }: EducationSectionProps) {
-  const { resumeId, resumeData, updateResumeField } = useResumeForm();
+  const {
+    resumeId,
+    resumeData,
+    updateResumeField,
+    createNewResume,
+    isCreating,
+  } = useResumeForm();
   const createMutation = useCreateEducationMutation(resumeId || "");
   const updateMutation = useUpdateEducationMutation(resumeId || "");
   const deleteMutation = useDeleteEducationMutation(resumeId || "");
@@ -97,9 +104,16 @@ export default function EducationSection({
   });
 
   async function onSubmit(values: EducationFormValues) {
-    if (!resumeId) {
-      onNext?.();
-      return;
+    let activeResumeId = resumeId;
+
+    // If no resume exists, create one first
+    if (!activeResumeId) {
+      const newResumeId = await createNewResume("My Resume");
+      if (!newResumeId) {
+        console.error("Failed to create resume");
+        return;
+      }
+      activeResumeId = newResumeId;
     }
 
     const savePromises = values.educations.map((edu) => {
@@ -115,7 +129,8 @@ export default function EducationSection({
       if (edu.id) {
         return updateMutation.mutateAsync({ id: edu.id, data: payload });
       }
-      return createMutation.mutateAsync(payload);
+      // For new educations, use resumeApi directly to ensure we use the correct resumeId
+      return resumeApi.createEducation(activeResumeId, payload);
     });
 
     await Promise.all(savePromises);
@@ -149,7 +164,7 @@ export default function EducationSection({
 
   return (
     <div className="w-full relative bg-white rounded-2xl p-2 sm:p-6">
-       <CloseEditButton
+      <CloseEditButton
         onClick={() => handleEditClick(false)}
         ariaLabel="Close education form"
         className="top-2 right-2"

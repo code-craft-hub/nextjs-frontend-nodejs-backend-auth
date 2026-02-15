@@ -21,6 +21,7 @@ import {
   useUpdateWorkExperienceMutation,
   useDeleteWorkExperienceMutation,
 } from "@/lib/mutations/resume.mutations";
+import { resumeApi } from "@/lib/api/resume.api";
 import { CloseEditButton } from "@/components/shared/CloseEditButton";
 
 // ─── Schema ────────────────────────────────────────────────────────
@@ -371,7 +372,7 @@ export default function ExperienceForm({
   onBack,
   handleEditClick,
 }: ExperienceFormProps) {
-  const { resumeId, resumeData, updateResumeField } = useResumeForm();
+  const { resumeId, resumeData, updateResumeField, createNewResume, isCreating } = useResumeForm();
   const createMutation = useCreateWorkExperienceMutation(resumeId || "");
   const updateMutation = useUpdateWorkExperienceMutation(resumeId || "");
   const deleteMutation = useDeleteWorkExperienceMutation(resumeId || "");
@@ -421,9 +422,16 @@ export default function ExperienceForm({
   });
 
   async function onSubmit(values: ExperienceFormValues) {
-    if (!resumeId) {
-      onNext?.();
-      return;
+    let activeResumeId = resumeId;
+
+    // If no resume exists, create one first
+    if (!activeResumeId) {
+      const newResumeId = await createNewResume("My Resume");
+      if (!newResumeId) {
+        console.error("Failed to create resume");
+        return;
+      }
+      activeResumeId = newResumeId;
     }
 
     const savePromises = values.experiences.map((exp) => {
@@ -442,7 +450,8 @@ export default function ExperienceForm({
       if (exp.id) {
         return updateMutation.mutateAsync({ id: exp.id, data: payload });
       }
-      return createMutation.mutateAsync(payload);
+      // For new experiences, use resumeApi directly
+      return resumeApi.createWorkExperience(activeResumeId, payload);
     });
 
     await Promise.all(savePromises);
@@ -475,7 +484,8 @@ export default function ExperienceForm({
   const isSaving =
     createMutation.isPending ||
     updateMutation.isPending ||
-    deleteMutation.isPending;
+    deleteMutation.isPending ||
+    isCreating;
 
   return (
     <div className="w-full relative bg-white rounded-2xl p-2 sm:p-6 ">

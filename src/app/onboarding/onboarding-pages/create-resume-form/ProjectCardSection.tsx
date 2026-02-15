@@ -21,6 +21,7 @@ import {
   useUpdateProjectMutation,
   useDeleteProjectMutation,
 } from "@/lib/mutations/resume.mutations";
+import { resumeApi } from "@/lib/api/resume.api";
 import { PiOfficeChair } from "react-icons/pi";
 
 // ─── Schema ────────────────────────────────────────────────────────
@@ -170,7 +171,7 @@ export default function ProjectsForm({
   onBack,
   handleEditClick,
 }: ProjectsFormProps) {
-  const { resumeId, resumeData, updateResumeField } = useResumeForm();
+  const { resumeId, resumeData, updateResumeField, createNewResume, isCreating } = useResumeForm();
   const createMutation = useCreateProjectMutation(resumeId || "");
   const updateMutation = useUpdateProjectMutation(resumeId || "");
   const deleteMutation = useDeleteProjectMutation(resumeId || "");
@@ -199,9 +200,16 @@ export default function ProjectsForm({
   });
 
   async function onSubmit(values: ProjectsFormValues) {
-    if (!resumeId) {
-      onNext?.();
-      return;
+    let activeResumeId = resumeId;
+
+    // If no resume exists, create one first
+    if (!activeResumeId) {
+      const newResumeId = await createNewResume("My Resume");
+      if (!newResumeId) {
+        console.error("Failed to create resume");
+        return;
+      }
+      activeResumeId = newResumeId;
     }
 
     const savePromises = values.projects.map((proj) => {
@@ -220,7 +228,8 @@ export default function ProjectsForm({
       if (proj.id) {
         return updateMutation.mutateAsync({ id: proj.id, data: payload });
       }
-      return createMutation.mutateAsync(payload);
+      // For new projects, use resumeApi directly
+      return resumeApi.createProject(activeResumeId, payload);
     });
 
     await Promise.all(savePromises);
@@ -253,7 +262,8 @@ export default function ProjectsForm({
   const isSaving =
     createMutation.isPending ||
     updateMutation.isPending ||
-    deleteMutation.isPending;
+    deleteMutation.isPending ||
+    isCreating;
 
   return (
     <div className="w-full relative bg-white p-2 sm:p-6 rounded-2xl">

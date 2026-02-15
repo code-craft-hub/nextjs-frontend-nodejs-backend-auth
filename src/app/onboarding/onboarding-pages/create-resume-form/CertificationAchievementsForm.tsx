@@ -22,6 +22,7 @@ import {
   useUpdateCertificationMutation,
   useDeleteCertificationMutation,
 } from "@/lib/mutations/resume.mutations";
+import { resumeApi } from "@/lib/api/resume.api";
 
 // ─── Schema ────────────────────────────────────────────────────────
 
@@ -194,7 +195,7 @@ export default function CertificationAchievementsForm({
   onContinue,
   handleEditClick,
 }: CertificationAchievementsFormProps) {
-  const { resumeId, resumeData, updateResumeField } = useResumeForm();
+  const { resumeId, resumeData, updateResumeField, createNewResume, isCreating } = useResumeForm();
   const createMutation = useCreateCertificationMutation(resumeId || "");
   const updateMutation = useUpdateCertificationMutation(resumeId || "");
   const deleteMutation = useDeleteCertificationMutation(resumeId || "");
@@ -234,9 +235,16 @@ export default function CertificationAchievementsForm({
   });
 
   async function onSubmit(values: CertificationFormValues) {
-    if (!resumeId) {
-      onContinue?.();
-      return;
+    let activeResumeId = resumeId;
+
+    // If no resume exists, create one first
+    if (!activeResumeId) {
+      const newResumeId = await createNewResume("My Resume");
+      if (!newResumeId) {
+        console.error("Failed to create resume");
+        return;
+      }
+      activeResumeId = newResumeId;
     }
 
     const savePromises = values.certifications.map((cert) => {
@@ -252,7 +260,8 @@ export default function CertificationAchievementsForm({
       if (cert.id) {
         return updateMutation.mutateAsync({ id: cert.id, data: payload });
       }
-      return createMutation.mutateAsync(payload);
+      // For new certifications, use resumeApi directly
+      return resumeApi.createCertification(activeResumeId, payload);
     });
 
     await Promise.all(savePromises);
@@ -283,7 +292,8 @@ export default function CertificationAchievementsForm({
   const isSaving =
     createMutation.isPending ||
     updateMutation.isPending ||
-    deleteMutation.isPending;
+    deleteMutation.isPending ||
+    isCreating;
 
   return (
     <div className="w-full flex flex-col gap-6 relative">

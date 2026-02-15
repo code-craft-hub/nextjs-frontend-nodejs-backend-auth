@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Star, X, ArrowLeft } from "lucide-react";
 import { useResumeForm } from "./ResumeFormContext";
 import { useAddSkillsMutation } from "@/lib/mutations/resume.mutations";
+import { resumeApi } from "@/lib/api/resume.api";
 import { CloseEditButton } from "@/components/shared/CloseEditButton";
 
 // ─── Schema ────────────────────────────────────────────────────────
@@ -117,7 +118,7 @@ export default function SkillsForm({
   onBack,
   handleEditClick,
 }: SkillsFormProps) {
-  const { resumeId, resumeData, updateResumeField } = useResumeForm();
+  const { resumeId, resumeData, updateResumeField, createNewResume, isCreating } = useResumeForm();
   const addSkillsMutation = useAddSkillsMutation(resumeId || "");
 
   const form = useForm<SkillsFormValues>({
@@ -132,30 +133,40 @@ export default function SkillsForm({
   const softSkills = form.watch("softSkills");
 
   async function onSubmit(values: SkillsFormValues) {
-    if (!resumeId) {
-      onNext?.();
-      return;
+    let activeResumeId = resumeId;
+
+    // If no resume exists, create one first
+    if (!activeResumeId) {
+      const newResumeId = await createNewResume("My Resume");
+      if (!newResumeId) {
+        console.error("Failed to create resume");
+        return;
+      }
+      activeResumeId = newResumeId;
     }
 
-    addSkillsMutation.mutate(
-      {
-        hardSkill: values.hardSkills,
-        softSkill: values.softSkills,
-      },
-      {
-        onSuccess: () => {
-          updateResumeField(
-            "hardSkill",
-            values.hardSkills.map((s) => ({ label: s, value: s })),
-          );
-          updateResumeField(
-            "softSkill",
-            values.softSkills.map((s) => ({ label: s, value: s })),
-          );
-          onNext?.();
-        },
-      },
-    );
+    // If creating anew, call API directly; otherwise use mutation
+    const addSkillsPromise = resumeId
+      ? addSkillsMutation.mutateAsync({
+          hardSkill: values.hardSkills,
+          softSkill: values.softSkills,
+        })
+      : resumeApi.addSkills(activeResumeId, {
+          hardSkill: values.hardSkills,
+          softSkill: values.softSkills,
+        });
+
+    addSkillsPromise.then(() => {
+      updateResumeField(
+        "hardSkill",
+        values.hardSkills.map((s) => ({ label: s, value: s })),
+      );
+      updateResumeField(
+        "softSkill",
+        values.softSkills.map((s) => ({ label: s, value: s })),
+      );
+      onNext?.();
+    });
   }
 
   return (
@@ -263,10 +274,10 @@ export default function SkillsForm({
             </Button>
             <Button
               type="submit"
-              disabled={addSkillsMutation.isPending}
+              disabled={addSkillsMutation.isPending || isCreating}
               className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-8 h-12 rounded-xl text-sm transition-colors"
             >
-              {addSkillsMutation.isPending ? "Saving..." : "Save & Continue"}
+              {addSkillsMutation.isPending || isCreating ? "Saving..." : "Save & Continue"}
             </Button>
           </div>
         </form>

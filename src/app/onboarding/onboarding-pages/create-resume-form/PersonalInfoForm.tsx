@@ -44,7 +44,13 @@ export default function PersonalInfoForm({
   onNext,
   handleEditClick,
 }: PersonalInfoFormProps) {
-  const { resumeId, resumeData, updateResumeField } = useResumeForm();
+  const {
+    resumeId,
+    resumeData,
+    updateResumeField,
+    createNewResume,
+    isCreating,
+  } = useResumeForm();
   const updateResume = useUpdateResumeMutation();
 
   const form = useForm<PersonalInfoFormValues>({
@@ -61,13 +67,22 @@ export default function PersonalInfoForm({
   });
 
   async function onSubmit(values: PersonalInfoFormValues) {
-    if (!resumeId) {
-      onNext?.();
-      return;
+    let activeResumeId = resumeId;
+
+    // If no resume exists, create one first
+    if (!activeResumeId) {
+      const newResumeId = await createNewResume("My Resume");
+      if (!newResumeId) {
+        // Handle error - could show a toast
+        console.error("Failed to create resume");
+        return;
+      }
+      activeResumeId = newResumeId;
     }
 
+    // Update the resume with personal info
     updateResume.mutate(
-      { id: resumeId, data: values },
+      { id: activeResumeId, data: values },
       {
         onSuccess: () => {
           updateResumeField("fullName", values.fullName);
@@ -288,7 +303,7 @@ export default function PersonalInfoForm({
           <div className="pt-4 flex justify-end">
             <Button
               type="submit"
-              disabled={updateResume.isPending}
+              disabled={updateResume.isPending || isCreating}
               className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 h-12 rounded-xl text-sm transition-colors"
             >
               {updateResume.isPending ? "Saving..." : "Save & Continue"}

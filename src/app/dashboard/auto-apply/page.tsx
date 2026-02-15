@@ -10,7 +10,7 @@ import { userQueries } from "@/lib/queries/user.queries";
 import { BASEURL } from "@/lib/api/client";
 import { BACKEND_API_VERSION } from "@/lib/api/profile.api";
 import { buildPreviewUrl } from "@/lib/utils/ai-apply-navigation";
-import { TailorCoverLetterDisplayStreaming } from "../tailor-cover-letter/[coverLetterId]/TailorCoverLetterDisplayStreaming";
+import { TailorCoverLetterDisplayStreaming } from "../tailor-cover-letter/TailorCoverLetterDisplayStreaming";
 import { ResumeLoadingSkeleton } from "../tailor-resume/components/resume-loading-skeleton";
 
 const RESUME_API_URL = `${BASEURL}/${BACKEND_API_VERSION}/resumes/generate`;
@@ -29,16 +29,14 @@ export default function AutoApplyPage() {
   const { data: user } = useQuery(userQueries.detail());
 
   // Initialize cover letter and resume streams
-  const {
-    state: coverLetterState,
-    start: startCoverLetter,
-  } = useCoverLetterStream();
+  const { state: coverLetterState, start: startCoverLetter } =
+    useCoverLetterStream();
 
   const {
     streamStatus: resumeStatus,
     startStream: startResume,
     documentId: resumeDocId,
-  } = useResumeStream(RESUME_API_URL, "pending");
+  } = useResumeStream(RESUME_API_URL);
 
   // Start both generations in parallel on first render
   useEffect(() => {
