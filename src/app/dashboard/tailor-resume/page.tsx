@@ -6,7 +6,7 @@ import { dehydrate } from "@tanstack/react-query";
 import { getCookiesToken } from "@/lib/auth.utils";
 
 const TailorResumePage = async ({ searchParams }: any) => {
-  const { resumeId } = searchParams;
+  const { resumeId } = await searchParams;
   const token = (await getCookiesToken()) ?? "";
 
   const queryClient = createServerQueryClient();

@@ -14,15 +14,49 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Trash2, CalendarDays, Plus, ArrowLeft } from "lucide-react";
+import { Trash2, CalendarDays, Plus, ArrowLeft, BriefcaseBusiness } from "lucide-react";
 import { useResumeForm } from "./ResumeFormContext";
 import {
   useCreateWorkExperienceMutation,
   useUpdateWorkExperienceMutation,
   useDeleteWorkExperienceMutation,
 } from "@/lib/mutations/resume.mutations";
+import { CloseEditButton } from "@/components/shared/CloseEditButton";
 
 // ─── Schema ────────────────────────────────────────────────────────
+
+// Helper function to validate date format (MM/DD/YYYY or MM-DD-YYYY)
+function isValidDateFormat(dateStr: string): boolean {
+  if (!dateStr) return false;
+  const dateRegex = /^(\d{1,2})[-/](\d{1,2})[-/](\d{4})$/;
+  const match = dateStr.match(dateRegex);
+  if (!match) return false;
+
+  const month = parseInt(match[1], 10);
+  const day = parseInt(match[2], 10);
+  const year = parseInt(match[3], 10);
+
+  if (month < 1 || month > 12 || day < 1 || day > 31 || year < 1900) {
+    return false;
+  }
+
+  const date = new Date(year, month - 1, day);
+  return date.getMonth() === month - 1 && date.getDate() === day;
+}
+
+// Helper function to convert date string to ISO format
+function dateStringToISO(dateStr: string): string {
+  if (!dateStr) return "";
+  const dateRegex = /^(\d{1,2})[-/](\d{1,2})[-/](\d{4})$/;
+  const match = dateStr.match(dateRegex);
+  if (!match) return dateStr;
+
+  const month = match[1].padStart(2, "0");
+  const day = match[2].padStart(2, "0");
+  const year = match[3];
+
+  return `${year}-${month}-${day}`;
+}
 
 const experienceEntrySchema = z
   .object({
@@ -30,18 +64,38 @@ const experienceEntrySchema = z
     jobTitle: z.string().min(1, "Job title is required"),
     companyName: z.string().min(1, "Company name is required"),
     location: z.string().optional(),
-    startDate: z.string().min(1, "Start date is required"),
-    endDate: z.string().optional(),
+    startDate: z
+      .string()
+      .min(1, "Start date is required")
+      .refine(isValidDateFormat, "Please enter a valid date (MM/DD/YYYY)"),
+    endDate: z
+      .string()
+      .refine(
+        (val) => !val || isValidDateFormat(val),
+        "Please enter a valid date (MM/DD/YYYY)",
+      )
+      .optional(),
     isCurrent: z.boolean(),
     responsibilities: z
       .array(z.object({ text: z.string().min(1, "Cannot be empty") }))
       .min(1, "At least one responsibility is required"),
   })
   .refine(
-    (data) =>
-      data.isCurrent || (data.endDate && data.endDate.length > 0),
+    (data) => data.isCurrent || (data.endDate && data.endDate.length > 0),
     {
       message: "End date is required unless currently working here",
+      path: ["endDate"],
+    },
+  )
+  .refine(
+    (data) => {
+      if (!data.endDate || data.isCurrent) return true;
+      const startDate = new Date(dateStringToISO(data.startDate));
+      const endDate = new Date(dateStringToISO(data.endDate));
+      return endDate >= startDate;
+    },
+    {
+      message: "End date must be after or equal to start date",
       path: ["endDate"],
     },
   );
@@ -106,7 +160,7 @@ function ExperienceCard({
   } = useFieldArray({ control, name: `experiences.${index}.responsibilities` });
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 p-5 md:p-6 space-y-5">
+    <div className=" border rounded-2xl border-gray-200 p-2 sm:p-6 space-y-5">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-bold text-gray-900">
           Experience #{index + 1}
@@ -235,8 +289,7 @@ function ExperienceCard({
                 checked={field.value}
                 onCheckedChange={(checked) => {
                   field.onChange(checked);
-                  if (checked)
-                    setValue(`experiences.${index}.endDate`, "");
+                  if (checked) setValue(`experiences.${index}.endDate`, "");
                 }}
                 className="w-4 h-4 rounded border-gray-300 data-[state=checked]:bg-indigo-600 data-[state=checked]:border-indigo-600"
               />
@@ -310,9 +363,14 @@ function ExperienceCard({
 interface ExperienceFormProps {
   onNext?: () => void;
   onBack?: () => void;
+  handleEditClick: (isEditing: boolean) => void;
 }
 
-export default function ExperienceForm({ onNext, onBack }: ExperienceFormProps) {
+export default function ExperienceForm({
+  onNext,
+  onBack,
+  handleEditClick,
+}: ExperienceFormProps) {
   const { resumeId, resumeData, updateResumeField } = useResumeForm();
   const createMutation = useCreateWorkExperienceMutation(resumeId || "");
   const updateMutation = useUpdateWorkExperienceMutation(resumeId || "");
@@ -373,10 +431,12 @@ export default function ExperienceForm({ onNext, onBack }: ExperienceFormProps) 
         jobTitle: exp.jobTitle,
         companyName: exp.companyName,
         location: exp.location,
-        startDate: exp.startDate,
-        endDate: exp.isCurrent ? undefined : exp.endDate,
+        startDate: dateStringToISO(exp.startDate),
+        endDate: exp.isCurrent ? undefined : dateStringToISO(exp.endDate || ""),
         isCurrent: exp.isCurrent,
-        responsibilities: exp.responsibilities.map((r) => r.text).filter(Boolean),
+        responsibilities: exp.responsibilities
+          .map((r) => r.text)
+          .filter(Boolean),
       };
 
       if (exp.id) {
@@ -386,16 +446,21 @@ export default function ExperienceForm({ onNext, onBack }: ExperienceFormProps) 
     });
 
     await Promise.all(savePromises);
-    updateResumeField("workExperience", values.experiences.map((exp) => ({
-      id: exp.id,
-      jobTitle: exp.jobTitle,
-      companyName: exp.companyName,
-      location: exp.location,
-      startDate: exp.startDate,
-      endDate: exp.endDate,
-      isCurrent: exp.isCurrent,
-      responsibilities: exp.responsibilities.map((r) => r.text).filter(Boolean),
-    })));
+    updateResumeField(
+      "workExperience",
+      values.experiences.map((exp) => ({
+        id: exp.id,
+        jobTitle: exp.jobTitle,
+        companyName: exp.companyName,
+        location: exp.location,
+        startDate: dateStringToISO(exp.startDate),
+        endDate: exp.isCurrent ? "" : dateStringToISO(exp.endDate || ""),
+        isCurrent: exp.isCurrent,
+        responsibilities: exp.responsibilities
+          .map((r) => r.text)
+          .filter(Boolean),
+      })),
+    );
     onNext?.();
   }
 
@@ -413,7 +478,25 @@ export default function ExperienceForm({ onNext, onBack }: ExperienceFormProps) 
     deleteMutation.isPending;
 
   return (
-    <div className="w-full">
+    <div className="w-full relative bg-white rounded-2xl p-2 sm:p-6 ">
+      <CloseEditButton
+        onClick={() => handleEditClick(false)}
+        ariaLabel="Close work experience form"
+        className="top-2 right-2"
+      />
+      <div className="flex items-start gap-4 mb-7">
+        <span className="flex items-center justify-center size-12 rounded-full bg-gray-100 text-gray-500 shrink-0 mt-0.5">
+          <BriefcaseBusiness className="w-5 h-5" />
+        </span>
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 leading-tight">
+            Work Experience
+          </h1>
+          <p className="text-sm text-gray-400 mt-1 leading-relaxed">
+            List your relevant work experience in reverse chronological order.
+          </p>
+        </div>
+      </div>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           {fields.map((field, index) => (

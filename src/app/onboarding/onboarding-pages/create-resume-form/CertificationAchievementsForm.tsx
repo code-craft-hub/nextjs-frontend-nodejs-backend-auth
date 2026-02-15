@@ -16,6 +16,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Trash2, Plus, Award, ArrowLeft, ArrowRight } from "lucide-react";
 import { useResumeForm } from "./ResumeFormContext";
+import { CloseEditButton } from "@/components/shared/CloseEditButton";
 import {
   useCreateCertificationMutation,
   useUpdateCertificationMutation,
@@ -53,7 +54,7 @@ function CertificationCard({
   canRemove: boolean;
 }) {
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 p-5 md:p-6 space-y-5">
+    <div className="bg-white rounded-2xl border border-gray-200 p-2 sm:p-6 space-y-5">
       <div className="flex items-center gap-3">
         <h2 className="text-lg font-bold text-gray-900">
           Certification #{index + 1}
@@ -184,12 +185,14 @@ interface CertificationAchievementsFormProps {
   onBack?: () => void;
   onSaveDraft?: () => void;
   onContinue?: () => void;
+  handleEditClick: (isEditing: boolean) => void;
 }
 
 export default function CertificationAchievementsForm({
   onBack,
   onSaveDraft,
   onContinue,
+  handleEditClick,
 }: CertificationAchievementsFormProps) {
   const { resumeId, resumeData, updateResumeField } = useResumeForm();
   const createMutation = useCreateCertificationMutation(resumeId || "");
@@ -266,6 +269,7 @@ export default function CertificationAchievementsForm({
       })),
     );
     onContinue?.();
+    handleEditClick(false)
   }
 
   const handleRemoveCertification = (index: number) => {
@@ -282,7 +286,7 @@ export default function CertificationAchievementsForm({
     deleteMutation.isPending;
 
   return (
-    <div className="w-full flex flex-col gap-6">
+    <div className="w-full flex flex-col gap-6 relative">
       <div className="w-full bg-white rounded-2xl border border-gray-200 shadow-sm p-6 md:p-8">
         {/* Section header */}
         <div className="flex items-start gap-4 mb-7">
@@ -336,9 +340,13 @@ export default function CertificationAchievementsForm({
           </form>
         </Form>
       </div>
-
+      <CloseEditButton
+        onClick={() => handleEditClick(false)}
+        ariaLabel="Close certifications form"
+        className="top-2 right-2"
+      />
       {/* Bottom navigation */}
-      <div className="flex items-center justify-center gap-3">
+      <div className="grid grid-cols-3 items-center justify-center gap-4 sm:gap-6">
         <Button
           type="button"
           variant="outline"

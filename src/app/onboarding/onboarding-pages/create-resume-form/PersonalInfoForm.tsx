@@ -13,9 +13,10 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { User, MapPin, Linkedin, Globe, Mail, Phone, X } from "lucide-react";
+import { User, MapPin, Linkedin, Globe, Mail, Phone } from "lucide-react";
 import { useResumeForm } from "./ResumeFormContext";
 import { useUpdateResumeMutation } from "@/lib/mutations/resume.mutations";
+import { CloseEditButton } from "@/components/shared/CloseEditButton";
 
 // ─── Schema ────────────────────────────────────────────────────────
 
@@ -25,6 +26,7 @@ const personalInfoSchema = z.object({
   phoneNumber: z.string().optional(),
   location: z.string().min(1, "Location is required"),
   linkedIn: z.string().optional(),
+  github: z.string().optional(),
   website: z.string().optional(),
 });
 
@@ -53,6 +55,7 @@ export default function PersonalInfoForm({
       phoneNumber: resumeData?.phoneNumber || "",
       location: resumeData?.location || "",
       linkedIn: resumeData?.linkedIn || "",
+      github: resumeData?.github || "",
       website: resumeData?.website || "",
     },
   });
@@ -71,6 +74,7 @@ export default function PersonalInfoForm({
           updateResumeField("email", values.email);
           updateResumeField("phoneNumber", values.phoneNumber || "");
           updateResumeField("location", values.location);
+          updateResumeField("github", values.github || "");
           updateResumeField("linkedIn", values.linkedIn || "");
           updateResumeField("website", values.website || "");
           onNext?.();
@@ -80,10 +84,10 @@ export default function PersonalInfoForm({
   }
 
   return (
-    <div className="w-full bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8">
+    <div className="w-full bg-white rounded-2xl border border-gray-100 shadow-sm p-2 sm:p-6 relative">
       {/* Section header */}
       <div className="flex items-center gap-3 mb-8 relative">
-        <span className="flex items-center justify-center w-10 h-10 rounded-full bg-indigo-50 text-indigo-400">
+        <span className="flex items-center justify-center size-12 rounded-full bg-indigo-50 text-indigo-400">
           <User className="w-5 h-5" />
         </span>
         <div>
@@ -94,14 +98,11 @@ export default function PersonalInfoForm({
             Let&apos;s start with the basics. This helps employers contact you.
           </p>
         </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute -top-6 -right-6"
+        <CloseEditButton
           onClick={() => handleEditClick(false)}
-        >
-          <X />
-        </Button>
+          ariaLabel="Close personal information form"
+          className="-top-6 -right-6"
+        />
       </div>
 
       <Form {...form}>
@@ -234,28 +235,52 @@ export default function PersonalInfoForm({
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="website"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-sm font-medium text-gray-700">
-                      Portfolio/Website
-                    </FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <Globe className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300 pointer-events-none" />
-                        <Input
-                          placeholder="www.yourportfolio.com"
-                          className="h-12 rounded-xl border-gray-200 bg-white pl-10 placeholder:text-gray-300 text-gray-800 text-sm focus-visible:ring-blue-500 focus-visible:ring-1 focus-visible:border-blue-400"
-                          {...field}
-                        />
-                      </div>
-                    </FormControl>
-                    <FormMessage className="text-xs" />
-                  </FormItem>
-                )}
-              />
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="website"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium text-gray-700">
+                        Portfolio/Website
+                      </FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Globe className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300 pointer-events-none" />
+                          <Input
+                            placeholder="www.yourportfolio.com"
+                            className="h-12 rounded-xl border-gray-200 bg-white pl-10 placeholder:text-gray-300 text-gray-800 text-sm focus-visible:ring-blue-500 focus-visible:ring-1 focus-visible:border-blue-400"
+                            {...field}
+                          />
+                        </div>
+                      </FormControl>
+                      <FormMessage className="text-xs" />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="github"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium text-gray-700">
+                        GitHub Profile
+                      </FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Globe className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300 pointer-events-none" />
+                          <Input
+                            placeholder="www.github.com/yourprofile"
+                            className="h-12 rounded-xl border-gray-200 bg-white pl-10 placeholder:text-gray-300 text-gray-800 text-sm focus-visible:ring-blue-500 focus-visible:ring-1 focus-visible:border-blue-400"
+                            {...field}
+                          />
+                        </div>
+                      </FormControl>
+                      <FormMessage className="text-xs" />
+                    </FormItem>
+                  )}
+                />
+              </div>
             </div>
           </div>
 

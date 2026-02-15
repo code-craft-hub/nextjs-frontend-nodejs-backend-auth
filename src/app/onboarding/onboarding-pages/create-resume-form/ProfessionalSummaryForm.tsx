@@ -16,10 +16,11 @@ import { Button } from "@/components/ui/button";
 import { Lightbulb, BriefcaseBusiness, ArrowLeft } from "lucide-react";
 import { useResumeForm } from "./ResumeFormContext";
 import { useUpdateResumeMutation } from "@/lib/mutations/resume.mutations";
+import { CloseEditButton } from "@/components/shared/CloseEditButton";
 
 // ─── Schema ────────────────────────────────────────────────────────
 
-const MAX_CHARS = 500;
+const MAX_CHARS = 1024;
 
 const professionalSummarySchema = z.object({
   summary: z
@@ -35,11 +36,13 @@ type ProfessionalSummaryFormValues = z.infer<typeof professionalSummarySchema>;
 interface ProfessionalSummaryFormProps {
   onNext?: () => void;
   onBack?: () => void;
+  handleEditClick: (value: boolean) => void;
 }
 
 export default function ProfessionalSummaryForm({
   onNext,
   onBack,
+  handleEditClick,
 }: ProfessionalSummaryFormProps) {
   const { resumeId, resumeData, updateResumeField } = useResumeForm();
   const updateResume = useUpdateResumeMutation();
@@ -54,17 +57,17 @@ export default function ProfessionalSummaryForm({
   const summaryValue = form.watch("summary");
   const charCount = summaryValue?.length ?? 0;
 
-  async function onSubmit(values: ProfessionalSummaryFormValues) {
+  async function onSubmit({ summary }: ProfessionalSummaryFormValues) {
     if (!resumeId) {
       onNext?.();
       return;
     }
 
     updateResume.mutate(
-      { id: resumeId, data: { description: values.summary } },
+      { id: resumeId, data: { summary } },
       {
         onSuccess: () => {
-          updateResumeField("description", values.summary);
+          updateResumeField("summary", summary);
           onNext?.();
         },
       },
@@ -72,10 +75,15 @@ export default function ProfessionalSummaryForm({
   }
 
   return (
-    <div className="w-full bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8">
+    <div className="w-full bg-white rounded-2xl border border-gray-100 shadow-sm p-2 sm:p-6 relative">
       {/* ── Section header ──────────────────────────────────────────── */}
+      <CloseEditButton
+        onClick={() => handleEditClick(false)}
+        className="top-2 right-2"
+        ariaLabel="Close professional summary form"
+      />
       <div className="flex items-start gap-4 mb-7">
-        <span className="flex items-center justify-center w-11 h-11 rounded-full bg-purple-100 text-purple-500 shrink-0 mt-0.5">
+        <span className="flex items-center justify-center size-12 rounded-full bg-purple-100 text-purple-500 shrink-0 mt-0.5">
           <BriefcaseBusiness className="w-5 h-5" />
         </span>
         <div>

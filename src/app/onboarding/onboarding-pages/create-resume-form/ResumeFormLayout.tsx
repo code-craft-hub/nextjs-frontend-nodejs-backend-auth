@@ -30,46 +30,54 @@ const sections: Section[] = [
   { id: 5, label: "Skills", component: SkillsForm },
   {
     id: 6,
-    label: "Projects & Certifications",
-    component: ProjectsAndCertifications,
+    label: "Projects",
+    component: ProjectsForm,
+  },
+  {
+    id: 7,
+    label: "Certifications",
+    component: CertificationAchievementsForm,
   },
 ];
 
-function ProjectsAndCertifications({
-  onNext,
-  onBack,
-}: {
-  onNext?: () => void;
-  onBack?: () => void;
-}) {
-  const [showProjects, setShowProjects] = useState(true);
+// function ProjectsAndCertifications({
+//   onNext,
+//   onBack,
+//   handleEditClick,
+// }: {
+//   onNext?: () => void;
+//   onBack?: () => void;
+//   handleEditClick: (value: boolean) => void;
+// }) {
+//   const [showProjects, setShowProjects] = useState(true);
 
-  return (
-    <div>
-      {showProjects ? (
-        <div>
-          <ProjectsForm onBack={onBack} />
-          <div className="flex justify-center py-8">
-            <Button
-              onClick={() => setShowProjects(false)}
-              variant="default"
-              className="bg-indigo-600 hover:bg-indigo-700"
-            >
-              Continue to Certifications
-            </Button>
-          </div>
-        </div>
-      ) : (
-        <div>
-          <CertificationAchievementsForm
-            onBack={() => setShowProjects(true)}
-            onContinue={onNext}
-          />
-        </div>
-      )}
-    </div>
-  );
-}
+//   return (
+//     <div>
+//       {showProjects ? (
+//         <div>
+//           <ProjectsForm onBack={onBack} handleEditClick={handleEditClick} />
+//           <div className="flex justify-center py-8">
+//             <Button
+//               onClick={() => setShowProjects(false)}
+//               variant="default"
+//               className="bg-indigo-600 hover:bg-indigo-700"
+//             >
+//               Continue to Certifications
+//             </Button>
+//           </div>
+//         </div>
+//       ) : (
+//         <div>
+//           <CertificationAchievementsForm
+//             onBack={() => setShowProjects(true)}
+//             onContinue={onNext}
+//             handleEditClick={handleEditClick}
+//           />
+//         </div>
+//       )}
+//     </div>
+//   );
+// }
 
 export default function ResumeFormLayout({
   handleEditClick,

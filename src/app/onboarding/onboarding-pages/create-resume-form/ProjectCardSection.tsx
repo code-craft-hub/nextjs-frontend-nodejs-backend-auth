@@ -15,11 +15,13 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Trash2, Link2, Plus } from "lucide-react";
 import { useResumeForm } from "./ResumeFormContext";
+import { CloseEditButton } from "@/components/shared/CloseEditButton";
 import {
   useCreateProjectMutation,
   useUpdateProjectMutation,
   useDeleteProjectMutation,
 } from "@/lib/mutations/resume.mutations";
+import { PiOfficeChair } from "react-icons/pi";
 
 // ─── Schema ────────────────────────────────────────────────────────
 
@@ -51,7 +53,7 @@ function ProjectCard({
   canRemove: boolean;
 }) {
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 p-5 md:p-6 space-y-5">
+    <div className="bg-white rounded-2xl border border-gray-200 p-2 sm:p-6 space-y-5">
       <div className="flex items-center gap-3">
         <h2 className="text-lg font-bold text-gray-900">
           Project #{index + 1}
@@ -160,9 +162,14 @@ function ProjectCard({
 interface ProjectsFormProps {
   onNext?: () => void;
   onBack?: () => void;
+  handleEditClick: (isEditing: boolean) => void;
 }
 
-export default function ProjectsForm({ onNext, onBack }: ProjectsFormProps) {
+export default function ProjectsForm({
+  onNext,
+  onBack,
+  handleEditClick,
+}: ProjectsFormProps) {
   const { resumeId, resumeData, updateResumeField } = useResumeForm();
   const createMutation = useCreateProjectMutation(resumeId || "");
   const updateMutation = useUpdateProjectMutation(resumeId || "");
@@ -202,7 +209,10 @@ export default function ProjectsForm({ onNext, onBack }: ProjectsFormProps) {
         name: proj.name,
         description: proj.description,
         techStack: proj.techStack
-          ? proj.techStack.split(",").map((t) => t.trim()).filter(Boolean)
+          ? proj.techStack
+              .split(",")
+              .map((t) => t.trim())
+              .filter(Boolean)
           : [],
         url: proj.url,
       };
@@ -221,7 +231,10 @@ export default function ProjectsForm({ onNext, onBack }: ProjectsFormProps) {
         name: proj.name,
         description: proj.description,
         techStack: proj.techStack
-          ? proj.techStack.split(",").map((t) => t.trim()).filter(Boolean)
+          ? proj.techStack
+              .split(",")
+              .map((t) => t.trim())
+              .filter(Boolean)
           : [],
         url: proj.url,
       })),
@@ -243,8 +256,26 @@ export default function ProjectsForm({ onNext, onBack }: ProjectsFormProps) {
     deleteMutation.isPending;
 
   return (
-    <div className="w-full">
-      <div className="bg-gray-50 rounded-2xl border border-gray-200 p-4 md:p-5 space-y-4">
+    <div className="w-full relative bg-white p-2 sm:p-6 rounded-2xl">
+      <CloseEditButton
+        onClick={() => handleEditClick(false)}
+        ariaLabel="Close projects form"
+        className="top-2 right-3"
+      />
+      <div className="flex items-start gap-4 mb-4">
+        <span className="flex items-center justify-center size-12 rounded-full bg-purple-100 text-purple-500 shrink-0 mt-0.5">
+          <PiOfficeChair className="w-5 h-5" />
+        </span>
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 leading-tight">
+            Projects
+          </h1>
+          <p className="text-sm text-gray-400 mt-1 leading-relaxed">
+            Highlight key projects you've worked on. Include personal, academic,
+          </p>
+        </div>
+      </div>
+      <div className="bg-transparent py-4 md:py-5 space-y-4">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             {fields.map((field, index) => (

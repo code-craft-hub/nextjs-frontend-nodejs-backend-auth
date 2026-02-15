@@ -10,7 +10,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { resumeQueries } from "@/lib/queries/resume.queries";
 import { userQueries } from "@/lib/queries/user.queries";
 import { ResumeDownloadButton } from "./ResumeDownloadButton";
-import { Edit, TrashIcon } from "lucide-react";
+import { TrashIcon } from "lucide-react";
 import { api, BASEURL } from "@/lib/api/client";
 import { sendGTMEvent } from "@next/third-parties/google";
 import { BACKEND_API_VERSION } from "@/lib/api/profile.api";
@@ -173,15 +173,6 @@ export const TailorResume = () => {
           <div className="flex w-full gap-3 items-center  p-4  bg-white justify-between">
             <p className="text-xl font-medium font-inter">Tailored Resume</p>
             <div className="flex gap-2">
-              <Button
-                className=""
-                variant={"outline"}
-                onClick={() => {
-                  handleEditClick(true);
-                }}
-              >
-                <Edit className="w-5 h-5 " />
-              </Button>
               <Button
                 className=""
                 variant={"destructive"}

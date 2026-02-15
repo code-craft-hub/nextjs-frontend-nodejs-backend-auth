@@ -20,6 +20,7 @@ import {
   useUpdateEducationMutation,
   useDeleteEducationMutation,
 } from "@/lib/mutations/resume.mutations";
+import { CloseEditButton } from "@/components/shared/CloseEditButton";
 
 // ─── Schema ────────────────────────────────────────────────────────
 
@@ -44,11 +45,13 @@ type EducationFormValues = z.infer<typeof educationFormSchema>;
 interface EducationSectionProps {
   onNext?: () => void;
   onBack?: () => void;
+  handleEditClick: (isEditing: boolean) => void;
 }
 
 export default function EducationSection({
   onNext,
   onBack,
+  handleEditClick,
 }: EducationSectionProps) {
   const { resumeId, resumeData, updateResumeField } = useResumeForm();
   const createMutation = useCreateEducationMutation(resumeId || "");
@@ -145,10 +148,15 @@ export default function EducationSection({
     deleteMutation.isPending;
 
   return (
-    <div className="w-full">
+    <div className="w-full relative bg-white rounded-2xl p-2 sm:p-6">
+       <CloseEditButton
+        onClick={() => handleEditClick(false)}
+        ariaLabel="Close education form"
+        className="top-2 right-2"
+      />
       {/* Header */}
       <div className="flex items-start gap-4 mb-6">
-        <div className="flex-shrink-0 w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
+        <div className="shrink-0 w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
           <GraduationCap className="w-6 h-6 text-green-600" strokeWidth={2} />
         </div>
         <div>

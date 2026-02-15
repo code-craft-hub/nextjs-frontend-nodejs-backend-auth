@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Star, X, ArrowLeft } from "lucide-react";
 import { useResumeForm } from "./ResumeFormContext";
 import { useAddSkillsMutation } from "@/lib/mutations/resume.mutations";
+import { CloseEditButton } from "@/components/shared/CloseEditButton";
 
 // ─── Schema ────────────────────────────────────────────────────────
 
@@ -108,19 +109,22 @@ function SkillTagInput({
 interface SkillsFormProps {
   onNext?: () => void;
   onBack?: () => void;
+  handleEditClick: (isEditing: boolean) => void;
 }
 
-export default function SkillsForm({ onNext, onBack }: SkillsFormProps) {
+export default function SkillsForm({
+  onNext,
+  onBack,
+  handleEditClick,
+}: SkillsFormProps) {
   const { resumeId, resumeData, updateResumeField } = useResumeForm();
   const addSkillsMutation = useAddSkillsMutation(resumeId || "");
 
   const form = useForm<SkillsFormValues>({
     resolver: zodResolver(skillsSchema),
     defaultValues: {
-      hardSkills:
-        resumeData?.hardSkill?.map((s) => s.value || s.label) || [],
-      softSkills:
-        resumeData?.softSkill?.map((s) => s.value || s.label) || [],
+      hardSkills: resumeData?.hardSkill?.map((s) => s.value || s.label) || [],
+      softSkills: resumeData?.softSkill?.map((s) => s.value || s.label) || [],
     },
   });
 
@@ -155,10 +159,15 @@ export default function SkillsForm({ onNext, onBack }: SkillsFormProps) {
   }
 
   return (
-    <div className="w-full bg-white rounded-2xl border border-gray-200 shadow-sm p-6 md:p-8">
+    <div className="w-full bg-white rounded-2xl border border-gray-200 shadow-sm p-4 md:p-6 relative">
       {/* Section header */}
+      <CloseEditButton
+        onClick={() => handleEditClick(false)}
+        ariaLabel="Close skills form"
+        className="top-2 right-2"
+      />
       <div className="flex items-start gap-4 mb-7">
-        <span className="flex items-center justify-center w-11 h-11 rounded-full bg-orange-100 shrink-0 mt-0.5">
+        <span className="flex items-center justify-center size-12 rounded-full bg-orange-100 shrink-0 mt-0.5">
           <Star className="w-5 h-5 text-red-500 fill-red-500" />
         </span>
         <div>
@@ -234,8 +243,7 @@ export default function SkillsForm({ onNext, onBack }: SkillsFormProps) {
                   placeholder="Type a soft skill and press Enter (e.g., Leadership)"
                 />
                 <p className="text-xs text-gray-400 mt-1">
-                  Examples: Leadership, Communication, Problem Solving,
-                  Teamwork
+                  Examples: Leadership, Communication, Problem Solving, Teamwork
                 </p>
                 <FormMessage className="text-xs" />
               </FormItem>
