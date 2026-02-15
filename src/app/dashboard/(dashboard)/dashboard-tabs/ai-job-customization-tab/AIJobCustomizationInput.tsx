@@ -1,6 +1,5 @@
 "use client";
 import { ArrowUp, Plus } from "lucide-react";
-import { v4 as uuidv4 } from "uuid";
 
 import {
   DropdownMenu,
@@ -48,7 +47,7 @@ export const AIJobCustomizationInput = memo(() => {
   const [docsInput, setDocsInput] = useState<ActionValue>("tailor-resume");
   const [userProfile, setUserProfile] = useState<string>(() => {
     return profile?.[0]?.id || "";
-  }); 
+  });
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile | null>(null);
   const [extractedText, setExtractedText] = useState<string>("");
@@ -70,11 +69,16 @@ export const AIJobCustomizationInput = memo(() => {
       toast.error(`Please upgrade or refer more people to Cver AI`);
       return;
     }
+
     router.push(
-      `/dashboard/${docsInput}/${uuidv4()}?profile=${userProfile}&jobDescription=${
-        jobDescription + extractedText
-      }&aiApply=false`,
+      `/dashboard/${docsInput}?jobDescription=${jobDescription + extractedText}`,
     );
+    
+    // router.push(
+    //   `/dashboard/${docsInput}/${uuidv4()}?profile=${userProfile}&jobDescription=${
+    //     jobDescription + extractedText
+    //   }&aiApply=false`,
+    // );
   };
 
   const { processDocument, isProcessing } = useDocumentExtraction();

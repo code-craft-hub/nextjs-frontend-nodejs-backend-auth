@@ -15,7 +15,6 @@ import { jsonrepair } from "jsonrepair";
  */
 export const useResumeStream = (
   endpoint: string,
-  resumeId: string,
 ): UseResumeStreamReturn => {
   const [streamData, setStreamData] = useState<StreamData>(() => ({
     profile: "",
@@ -354,7 +353,6 @@ export const useResumeStream = (
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            resumeId,
             user,
             jobDescription,
           } as RequestPayload),
@@ -439,7 +437,7 @@ export const useResumeStream = (
         accumulatedContentRef.current = "";
       }
     },
-    [endpoint, resumeId, handleEventData, tryParseAndUpdateState],
+    [endpoint, handleEventData, tryParseAndUpdateState],
   );
 
   /**

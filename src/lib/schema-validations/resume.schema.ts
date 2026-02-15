@@ -67,8 +67,9 @@ export const skillSchema = z.object({
 });
 
 export const resumeSchema = z.object({
-  contact: contactSchema.optional(),
+  ...contactSchema.shape,
   profile: profileSchema.shape.profile,
+  description: profileSchema.shape.profile,
   education: z.array(educationSchema).optional().default([]),
   workExperience: z.array(workExperienceSchema).optional().default([]),
   certification: z.array(certificationSchema).optional().default([]),

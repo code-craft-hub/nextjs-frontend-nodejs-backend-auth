@@ -5,12 +5,13 @@ import ResumeFormLayout from "./ResumeFormLayout";
 interface CreateUserResumeProps {
   data?: ResumeAggregate | null;
   resumeId?: string | null;
+  handleEditClick: (value: boolean) => void;
 }
 
-const CreateUserResume = ({ data = null, resumeId = null }: CreateUserResumeProps) => {
+const CreateUserResume = ({ data = null, resumeId = null, handleEditClick }: CreateUserResumeProps) => {
   return (
     <ResumeFormProvider initialData={data} resumeId={resumeId}>
-      <ResumeFormLayout />
+      <ResumeFormLayout handleEditClick={handleEditClick} />
     </ResumeFormProvider>
   );
 };

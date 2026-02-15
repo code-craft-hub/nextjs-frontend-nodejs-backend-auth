@@ -74,19 +74,9 @@ export function buildCoverLetterUpdateUrl(
 /**
  * Build URL for updating resume with generated documentId
  */
-export function buildResumeUpdateUrl(
-  coverLetterDocId: string,
-  resumeDocId: string,
-  jobDescription: string,
-  recruiterEmail: string,
-): string {
-  const params = new URLSearchParams();
-  params.set("coverLetterDocId", coverLetterDocId);
-  params.set("resumeDocId", resumeDocId);
-  params.set("jobDescription", jobDescription);
-  params.set("recruiterEmail", recruiterEmail);
-  params.set("aiApply", "true");
-  return `/dashboard/tailor-resume/${AI_APPLY_PLACEHOLDER_ID}?${params.toString()}`;
+export function buildResumeUpdateUrl(resumeDocId: string): string {
+  return `/dashboard/tailor-resume?resumeId=${resumeDocId}`;
+  // return `/dashboard/tailor-resume/${resumeDocId}?${params.toString()}`;
 }
 
 /**

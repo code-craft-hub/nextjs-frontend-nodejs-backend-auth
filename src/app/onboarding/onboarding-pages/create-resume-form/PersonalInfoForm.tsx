@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { User, MapPin, Linkedin, Globe, Mail, Phone } from "lucide-react";
+import { User, MapPin, Linkedin, Globe, Mail, Phone, X } from "lucide-react";
 import { useResumeForm } from "./ResumeFormContext";
 import { useUpdateResumeMutation } from "@/lib/mutations/resume.mutations";
 
@@ -21,7 +21,7 @@ import { useUpdateResumeMutation } from "@/lib/mutations/resume.mutations";
 
 const personalInfoSchema = z.object({
   fullName: z.string().min(1, "Full name is required"),
-  email: z.string().email("Valid email is required"),
+  email: z.email("Valid email is required"),
   phoneNumber: z.string().optional(),
   location: z.string().min(1, "Location is required"),
   linkedIn: z.string().optional(),
@@ -35,9 +35,13 @@ type PersonalInfoFormValues = z.infer<typeof personalInfoSchema>;
 interface PersonalInfoFormProps {
   onNext?: () => void;
   onBack?: () => void;
+  handleEditClick: (value: boolean) => void;
 }
 
-export default function PersonalInfoForm({ onNext }: PersonalInfoFormProps) {
+export default function PersonalInfoForm({
+  onNext,
+  handleEditClick,
+}: PersonalInfoFormProps) {
   const { resumeId, resumeData, updateResumeField } = useResumeForm();
   const updateResume = useUpdateResumeMutation();
 
@@ -78,7 +82,7 @@ export default function PersonalInfoForm({ onNext }: PersonalInfoFormProps) {
   return (
     <div className="w-full bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8">
       {/* Section header */}
-      <div className="flex items-center gap-3 mb-8">
+      <div className="flex items-center gap-3 mb-8 relative">
         <span className="flex items-center justify-center w-10 h-10 rounded-full bg-indigo-50 text-indigo-400">
           <User className="w-5 h-5" />
         </span>
@@ -90,6 +94,14 @@ export default function PersonalInfoForm({ onNext }: PersonalInfoFormProps) {
             Let&apos;s start with the basics. This helps employers contact you.
           </p>
         </div>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="absolute -top-6 -right-6"
+          onClick={() => handleEditClick(false)}
+        >
+          <X />
+        </Button>
       </div>
 
       <Form {...form}>
@@ -181,9 +193,7 @@ export default function PersonalInfoForm({ onNext }: PersonalInfoFormProps) {
                       />
                     </div>
                   </FormControl>
-                  <p className="text-xs text-gray-400 mt-1">
-                    City and state are enough. No need for full address.
-                  </p>
+
                   <FormMessage className="text-xs" />
                 </FormItem>
               )}

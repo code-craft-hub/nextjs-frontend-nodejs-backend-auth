@@ -15,7 +15,11 @@ import CertificationAchievementsForm from "./CertificationAchievementsForm";
 type Section = {
   id: number;
   label: string;
-  component: React.ComponentType<{ onNext?: () => void; onBack?: () => void }>;
+  component: React.ComponentType<{
+    onNext?: () => void;
+    onBack?: () => void;
+    handleEditClick: (value: boolean) => void;
+  }>;
 };
 
 const sections: Section[] = [
@@ -67,7 +71,11 @@ function ProjectsAndCertifications({
   );
 }
 
-export default function ResumeFormLayout() {
+export default function ResumeFormLayout({
+  handleEditClick,
+}: {
+  handleEditClick: (value: boolean) => void;
+}) {
   const { isLoading } = useResumeForm();
   const [activeSection, setActiveSection] = useState(1);
 
@@ -96,7 +104,7 @@ export default function ResumeFormLayout() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
+      <div className="flex items-center justify-center min-h-100">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600" />
       </div>
     );
@@ -191,27 +199,14 @@ export default function ResumeFormLayout() {
         {/* ── Main Content ─────────────────────────────────────── */}
         <div className="flex-1 min-w-0">
           <div className="animate-fadeIn">
-            <ActiveComponent onNext={handleNext} onBack={handleBack} />
+            <ActiveComponent
+              onNext={handleNext}
+              onBack={handleBack}
+              handleEditClick={handleEditClick}
+            />
           </div>
         </div>
       </div>
-
-      {/* Animation styles */}
-      <style>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        .animate-fadeIn {
-          animation: fadeIn 0.3s ease-in-out;
-        }
-      `}</style>
     </div>
   );
 }

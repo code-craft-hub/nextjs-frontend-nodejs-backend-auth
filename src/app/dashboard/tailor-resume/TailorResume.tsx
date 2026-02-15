@@ -1,10 +1,9 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { useResumeStream } from "@/hooks/stream-resume-hook";
-import { useSearchParams, useParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { COLLECTIONS } from "@/lib/utils/constants";
-import { ProgressIndicator } from "../../(dashboard)/ai-apply/progress-indicator";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -15,10 +14,11 @@ import { Edit, TrashIcon } from "lucide-react";
 import { api, BASEURL } from "@/lib/api/client";
 import { sendGTMEvent } from "@next/third-parties/google";
 import { BACKEND_API_VERSION } from "@/lib/api/profile.api";
-import { ResumeLoadingSkeleton } from "../components/resume-loading-skeleton";
+import { ResumeLoadingSkeleton } from "./components/resume-loading-skeleton";
 import { buildResumeUpdateUrl } from "@/lib/utils/ai-apply-navigation";
-import { EditableResume } from "../../(dashboard)/ai-apply/components/resume/EditableResume";
 import CreateUserResume from "@/app/onboarding/onboarding-pages/create-resume-form/CreateUserResume";
+import { useFireworksConfetti } from "@/components/ui/confetti";
+import { ViewResume } from "./ViewResume";
 
 const API_URL = `${BASEURL}/${BACKEND_API_VERSION}/resumes/generate`;
 
@@ -46,22 +46,15 @@ const normalizeResumeData = (data: any) => {
 export const TailorResume = () => {
   const { data: user } = useQuery(userQueries.detail());
   const searchParams = useSearchParams();
-  const params = useParams();
   const queryClient = useQueryClient();
   const router = useRouter();
   const resultsEndRef = useRef<HTMLDivElement>(null);
   const hasGeneratedRef = useRef(false);
   const [editResume, setEditResume] = useState(false);
+  const [resumeId, setResumeId] = useState(searchParams.get("resumeId"));
+  const { start: startConfetti } = useFireworksConfetti();
 
-  // Extract IDs and parameters from URL search params and route params
-  const coverLetterDocId = searchParams.get("coverLetterDocId");
-  const resumeDocIdFromSearchParams = searchParams.get("resumeDocId");
-  const resumeDocIdFromRoute = (params.resumeId as string) || null;
-  // Use resumeDocId from route first (server-side prefetch), then from search params
-  const resumeDocId = resumeDocIdFromRoute || resumeDocIdFromSearchParams;
   const jobDescription = searchParams.get("jobDescription") || "";
-  const recruiterEmail = searchParams.get("recruiterEmail") || "";
-  const aiApply = searchParams.get("aiApply") === "true";
 
   useEffect(() => {
     if (user?.firstName)
@@ -71,17 +64,27 @@ export const TailorResume = () => {
       });
   }, [user?.firstName]);
 
-  // If resumeDocId exists, fetch the generated resume; otherwise use streaming data
+  // If resumeId exists, fetch the generated resume; otherwise use streaming data
   const { data: existingResume, status: resumeStatus } = useQuery(
-    resumeQueries.detail(resumeDocId ?? ""),
+    resumeQueries.detail(resumeId ?? ""),
   );
 
-  console.log("resumeDocId : ", resumeDocId, existingResume, resumeStatus);
-
-  const { streamData, streamStatus, startStream, documentId } = useResumeStream(
-    API_URL,
-    resumeDocId || "pending", // Use the resumeDocId if available, else "pending"
+  console.log(
+    "Existing resume data from query:",
+    existingResume,
+    "Status:",
+    resumeStatus,
   );
+
+  const { streamData, streamStatus, startStream, documentId } =
+    useResumeStream(API_URL);
+
+  // Update resumeId when documentId is generated
+  useEffect(() => {
+    if (documentId && !resumeId) {
+      setResumeId(documentId);
+    }
+  }, [documentId, resumeId]);
 
   useEffect(() => {
     if (!streamStatus.isComplete && !existingResume) {
@@ -92,21 +95,23 @@ export const TailorResume = () => {
     }
   }, [streamData]);
 
-  // Start generation on first visit if no resumeDocId yet, OR if resumeDocId exists but data doesn't
+  // Start generation on first visit if no resumeId yet, OR if resumeId exists but data doesn't
   useEffect(() => {
-    const isRegenerationNeeded =
-      resumeDocId &&
-      (resumeStatus === "error" ||
-        (resumeStatus === "success" && !existingResume)); // No data exists
-
-    if (
-      isRegenerationNeeded &&
+    // Determine if we need to generate/regenerate
+    const shouldGenerate =
       user &&
       jobDescription &&
-      !hasGeneratedRef.current
-    ) {
+      !hasGeneratedRef.current &&
+      // Start streaming if no resumeId yet (initial load with jobDescription)
+      (!resumeId ||
+        // Or regenerate if resumeId exists but fetch failed or no data
+        (resumeId &&
+          (resumeStatus === "error" ||
+            (resumeStatus === "success" && !existingResume))));
+
+    if (shouldGenerate) {
       hasGeneratedRef.current = true;
-      const isRegenerating = isRegenerationNeeded;
+      const isRegenerating = Boolean(resumeId);
       toast.promise(startStream(user, jobDescription), {
         loading: isRegenerating
           ? "Regenerating your tailored resume..."
@@ -121,58 +126,28 @@ export const TailorResume = () => {
         error: "Error generating resume",
       });
     }
-  }, [
-    resumeDocId,
-    resumeStatus,
-    existingResume,
-    user,
-    jobDescription,
-    startStream,
-  ]);
+  }, [resumeId, resumeStatus, existingResume, user, jobDescription]);
 
-  // Update URL with actual resumeDocId after generation completes
+  // Normalize the API data and use it as the source of truth
+  const normalizedExistingResume = existingResume
+    ? normalizeResumeData(existingResume)
+    : null;
+  const displayResumeData = normalizedExistingResume || streamData;
+
+  // Update URL with actual resumeId after generation completes
   useEffect(() => {
-    if (documentId && !streamStatus.isComplete && coverLetterDocId) {
-      const newUrl = buildResumeUpdateUrl(
-        coverLetterDocId,
-        documentId,
-        jobDescription,
-        recruiterEmail,
-      );
+    if (resumeId && streamStatus.isComplete) {
+      const newUrl = buildResumeUpdateUrl(resumeId);
       router.replace(newUrl);
+      startConfetti();
     }
-  }, [
-    documentId,
-    streamStatus.isComplete,
-    coverLetterDocId,
-    jobDescription,
-    recruiterEmail,
-    router,
-  ]);
-
-  // Navigate to preview after resume generation completes in aiApply flow
-  useEffect(() => {
-    if (!aiApply || streamStatus.isComplete !== true || !documentId) {
-      return;
-    }
-  }, [
-    aiApply,
-    streamStatus.isComplete,
-    documentId,
-    coverLetterDocId,
-    resumeDocId,
-    jobDescription,
-    recruiterEmail,
-    router,
-  ]);
+  }, [resumeId, streamStatus.isComplete, router]);
 
   const isLoading =
-    resumeStatus === "pending" ||
-    resumeStatus === "error" ||
-    (resumeStatus === "success" && !existingResume && !streamStatus.isComplete);
+    resumeStatus === "pending" || (!existingResume && !streamStatus.isComplete);
 
   const handleResumeDelete = async () => {
-    const idToDelete = resumeDocId || documentId;
+    const idToDelete = resumeId;
     if (!idToDelete) {
       toast.error("Cannot delete resume: No ID found");
       return;
@@ -186,16 +161,11 @@ export const TailorResume = () => {
     await queryClient.invalidateQueries(resumeQueries.detail(idToDelete));
   };
 
-  // Normalize the API data and use it as the source of truth
-  const normalizedExistingResume = existingResume
-    ? normalizeResumeData(existingResume)
-    : null;
-  const displayResumeData = normalizedExistingResume || streamData;
-
+  const handleEditClick = (value: boolean) => {
+    setEditResume(value);
+  };
   return (
     <div className="space-y-4 sm:space-y-8">
-      {aiApply && <ProgressIndicator activeStep={2} />}
-
       {isLoading ? (
         <ResumeLoadingSkeleton />
       ) : (
@@ -207,7 +177,7 @@ export const TailorResume = () => {
                 className=""
                 variant={"outline"}
                 onClick={() => {
-                  setEditResume(true);
+                  handleEditClick(true);
                 }}
               >
                 <Edit className="w-5 h-5 " />
@@ -226,15 +196,17 @@ export const TailorResume = () => {
           </div>
 
           {editResume ? (
-            <CreateUserResume />
+            <CreateUserResume
+              resumeId={resumeId}
+              data={displayResumeData}
+              handleEditClick={handleEditClick}
+            />
           ) : (
             <>
-              <EditableResume
+              <ViewResume
                 data={displayResumeData}
-                resumeId={resumeDocId || documentId || "pending"}
-                isStreaming={!streamStatus.isComplete}
+                handleEditClick={handleEditClick}
               />
-              <div ref={resultsEndRef} className="" />
             </>
           )}
         </>

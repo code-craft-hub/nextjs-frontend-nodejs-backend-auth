@@ -5,8 +5,8 @@ import { HydrationBoundary } from "@/components/hydration-boundary";
 import { dehydrate } from "@tanstack/react-query";
 import { getCookiesToken } from "@/lib/auth.utils";
 
-const TailorResumePage = async ({ params }: any) => {
-  const { resumeId } = await params;
+const TailorResumePage = async ({ searchParams }: any) => {
+  const { resumeId } = searchParams;
   const token = (await getCookiesToken()) ?? "";
 
   const queryClient = createServerQueryClient();
