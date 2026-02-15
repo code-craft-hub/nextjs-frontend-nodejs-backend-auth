@@ -434,6 +434,10 @@ export const formatCurrencyNG = (amount: number) => {
   }).format(amount);
 };
 
+export const coalesceString = (...values: Array<string | null | undefined>) =>
+  values.find(v => typeof v === "string" && v.trim() !== "") ?? "";
+
+
 export function normalizeToString(input: any): string {
   if (input == null) {
     return "";

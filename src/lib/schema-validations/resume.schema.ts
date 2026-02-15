@@ -18,9 +18,9 @@ export const educationSchema = z.object({
   degree: z.string().min(1, "Degree is required").optional(),
   fieldOfStudy: z.string().min(1, "Field of study is required").optional(),
   schoolName: z.string().min(1, "School name is required").optional(),
-  educationStart: z.string().min(1, "Start date is required").optional(),
-  educationEnd: z.string().min(1, "End date is required").optional(),
-  schoolLocation: z.string().min(1, "Location is required").optional(),
+  startDate: z.string().min(1, "Start date is required").optional(),
+  endDate: z.string().min(1, "End date is required").optional(),
+  location: z.string().min(1, "Location is required").optional(),
   academicAchievements: z
     .string()
     .min(1, "Academic achievements is required")
@@ -32,8 +32,9 @@ export const workExperienceSchema = z.object({
   jobTitle: z.string("Job title is required").optional(),
   companyName: z.string("Company name is required").optional(),
   location: z.string("Location is required").optional(),
-  jobStart: z.string("Start date is required").optional(),
-  jobEnd: z.string("End date is required").optional(),
+  startDate: z.string("Start date is required").optional(),
+  endDate: z.string("End date is required").optional(),
+  achievements: z.string().optional(),
   responsibilities: z
     .array(z.string().min(1))
     .min(1, "At least one responsibility required")

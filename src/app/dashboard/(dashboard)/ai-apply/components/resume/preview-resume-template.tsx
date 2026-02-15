@@ -1,9 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { useAuth } from "@/hooks/use-auth";
+import { userQueries } from "@/lib/queries/user.queries";
 import { cn } from "@/lib/utils";
 import { monthYear, normalizeToString } from "@/lib/utils/helpers";
 import { IUser } from "@/types";
+import { useQuery } from "@tanstack/react-query";
 import { memo } from "react";
 
 interface PreviewResumeProps {
@@ -71,7 +72,7 @@ export const PreviewResume = ({
   pause,
   cancelTimeout,
 }: PreviewResumeProps) => {
-  const { user } = useAuth();
+  const { data: user } = useQuery(userQueries.detail());
 
   // Compute all derived values at the top level (no conditional hooks)
   const firstName = data?.firstName || user?.firstName || "";
@@ -99,7 +100,7 @@ export const PreviewResume = ({
   const hasSkills = hasSoftSkills || hasHardSkills;
 
   return (
-    <Card className={cn("max-w-screen-lg p-4 sm:px-5 text-gray-800 font-merriweather py-16 relative", pause && "bg-gray-300")}>
+    <Card className={cn("max-w-5xl p-4 sm:px-5 text-gray-800 font-merriweather py-16 relative", pause && "bg-gray-300")}>
       <Button
         variant={"outline"}
         onClick={() => {
@@ -166,10 +167,10 @@ export const PreviewResume = ({
                       {work?.jobTitle || "Position"} -{" "}
                       {work?.companyName || "Company"}
                     </h3>
-                    {(work?.jobStart || work?.jobEnd) && (
+                    {(work?.startDate || work?.endDate) && (
                       <span className="text-sm text-gray-500 font-merriweather">
-                        {work?.jobStart ? monthYear(work.jobStart) : "Present"}{" "}
-                        - {work?.jobEnd ? monthYear(work.jobEnd) : "Present"}
+                        {work?.startDate ? monthYear(work.startDate) : "Present"}{" "}
+                        - {work?.endDate ? monthYear(work.endDate) : "Present"}
                       </span>
                     )}
                   </div>
@@ -211,26 +212,26 @@ export const PreviewResume = ({
           {hasEducation ? (
             data.education!.map((edu, index) => (
               <div
-                key={`edu-${index}-${edu?.schoolLocation || ""}`}
+                key={`edu-${index}-${edu?.location || ""}`}
                 className="mb-4"
               >
                 <div className="flex justify-between">
                   <p className="font-bold font-merriweather">
                     {edu?.fieldOfStudy || "Field of Study"}
                   </p>
-                  {(edu?.educationStart || edu?.educationEnd) && (
+                  {(edu?.startDate || edu?.endDate) && (
                     <span className="text-sm text-gray-500 font-merriweather">
-                      {edu?.educationStart ? monthYear(edu.educationStart) : ""}{" "}
+                      {edu?.startDate ? monthYear(edu.startDate) : ""}{" "}
                       -{" "}
-                      {edu?.educationEnd
-                        ? monthYear(edu.educationEnd)
+                      {edu?.endDate
+                        ? monthYear(edu.endDate)
                         : "Present"}
                     </span>
                   )}
                 </div>
                 <p className="text-sm text-gray-600 font-merriweather">
                   {edu?.degree || "Degree"} -{" "}
-                  {edu?.schoolLocation || "Location"}
+                  {edu?.location || "Location"}
                 </p>
                 {edu?.academicAchievements && (
                   <p className="text-sm text-gray-600 font-merriweather mt-1">

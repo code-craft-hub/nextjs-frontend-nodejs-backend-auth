@@ -1,14 +1,14 @@
 import { Card } from "@/components/ui/card";
-import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
 import {
+  coalesceString,
   isValidArray,
   monthYear,
   normalizeToString,
   parseResponsibilities,
 } from "@/lib/utils/helpers";
 import { PreviewResumeProps, ResumeField } from "@/types";
-import { memo, useCallback, useRef, useMemo } from "react";
+import { memo, useCallback, useRef } from "react";
 import { ProfileEditForm } from "./form/ProfileEditForm";
 import { EditDialog } from "./form/EditDialog";
 import { WorkExperienceEditForm } from "./form/WorkExperienceEditForm";
@@ -19,6 +19,8 @@ import { CertificationEditForm } from "./form/CertificationEditForm";
 import { Edit, Loader2 } from "lucide-react";
 import { ContactEditForm } from "./form/ContactEditForm";
 import { useResumeData } from "@/hooks/use-resume-data";
+import { useQuery } from "@tanstack/react-query";
+import { userQueries } from "@/lib/queries/user.queries";
 
 const SectionWrapper = memo(
   ({
@@ -57,7 +59,7 @@ export const EditableResume: React.FC<PreviewResumeProps> = ({
   resumeId,
   isStreaming,
 }) => {
-  const { user } = useAuth();
+  const { data: user } = useQuery(userQueries.detail());
   const contentRef = useRef<HTMLDivElement>(null);
 
   const { resumeData, updateField, isFieldLoading } = useResumeData(
@@ -71,29 +73,24 @@ export const EditableResume: React.FC<PreviewResumeProps> = ({
     },
   );
 
+  // console.log("resumeData in EditableResume : ", user);
+
   // Use resumeData as the single source of truth once streaming is complete
   const displayData = resumeData;
 
-  const initialData = useMemo(
-    () => ({
-      firstName: (displayData as any)?.firstName ?? user?.firstName ?? "",
-      lastName: (displayData as any)?.lastName ?? user?.lastName ?? "",
-      email: (displayData as any)?.email ?? user?.email ?? "",
-      phoneNumber: (displayData as any)?.phoneNumber ?? user?.phoneNumber ?? "",
-      address: (displayData as any)?.address ?? user?.address ?? "",
-      portfolio: (displayData as any)?.portfolio ?? "",
-    }),
-    [displayData, user],
+  const firstName = coalesceString(displayData?.firstName, user?.firstName);
+  const lastName = coalesceString(displayData?.lastName, user?.lastName);
+  const email = coalesceString(displayData?.email, user?.email);
+  const phoneNumber = coalesceString(
+    displayData?.phoneNumber,
+    user?.phoneNumber,
   );
+  const address = coalesceString(displayData?.address, user?.address);
+  const portfolio = coalesceString(displayData?.portfolio);
 
-  const fullName = `${initialData.firstName} ${initialData.lastName}`.trim();
+  const fullName = `${firstName} ${lastName}`.trim();
 
-  const contactInfo = [
-    initialData.email,
-    initialData.phoneNumber,
-    initialData.address,
-    initialData.portfolio,
-  ]
+  const contactInfo = [email, phoneNumber, address, portfolio]
     .filter(Boolean)
     .join(" | ");
 
@@ -114,6 +111,15 @@ export const EditableResume: React.FC<PreviewResumeProps> = ({
         updateField(field, value);
       },
     [updateField],
+  );
+
+  console.log(
+    "name : ",
+    fullName,
+    contactInfo,
+    profile,
+    displayData,
+    isStreaming,
   );
 
   return (
@@ -150,7 +156,14 @@ export const EditableResume: React.FC<PreviewResumeProps> = ({
         >
           {(onClose) => (
             <ContactEditForm
-              initialData={initialData}
+              initialData={{
+                firstName,
+                lastName,
+                email,
+                phoneNumber,
+                address,
+                portfolio,
+              }}
               onSave={(value) => {
                 createFieldHandler("contact")(value);
                 onClose();
@@ -217,6 +230,9 @@ export const EditableResume: React.FC<PreviewResumeProps> = ({
                     const responsibilities = parseResponsibilities(
                       work?.responsibilities,
                     );
+                    const achievements = parseResponsibilities(
+                      work?.achievements,
+                    );
 
                     return (
                       <div
@@ -225,17 +241,17 @@ export const EditableResume: React.FC<PreviewResumeProps> = ({
                       >
                         <div className="flex justify-between items-center">
                           <h3 className="font-bold font-merriweather">
-                            {work?.jobTitle || "Position"} -
-                            {work?.companyName || "Company"}
+                            {work?.jobTitle || ""} -
+                            {work?.companyName || ""}
                           </h3>
-                          {(work?.jobStart || work?.jobEnd) && (
+                          {(work?.startDate || work?.endDate) && (
                             <span className="text-sm text-gray-500 font-merriweather">
-                              {work?.jobStart
-                                ? monthYear(work.jobStart)
+                              {work?.startDate
+                                ? monthYear(work.startDate)
                                 : "Present"}
                               -
-                              {work?.jobEnd
-                                ? monthYear(work.jobEnd)
+                              {work?.endDate
+                                ? monthYear(work.endDate)
                                 : "Present"}
                             </span>
                           )}
@@ -259,6 +275,21 @@ export const EditableResume: React.FC<PreviewResumeProps> = ({
                             )}
                           </ul>
                         )}
+                        {achievements.length > 0 &&
+                          responsibilities.length === 0 && (
+                            <ul className="list-inside text-sm mt-2 space-y-1">
+                              {achievements.map(
+                                (point: string, idx: number) => (
+                                  <li
+                                    key={`ach-${index}-${idx}`}
+                                    className="list-disc font-merriweather ml-4"
+                                  >
+                                    {point}
+                                  </li>
+                                ),
+                              )}
+                            </ul>
+                          )}
                       </div>
                     );
                   })
@@ -300,28 +331,23 @@ export const EditableResume: React.FC<PreviewResumeProps> = ({
                 {hasEducation ? (
                   displayData.education?.map((edu, index) => (
                     <div
-                      key={`edu-${index}-${edu?.schoolLocation || ""}`}
+                      key={`edu-${index}-${edu?.location || ""}`}
                       className="mb-4"
                     >
                       <div className="flex justify-between">
                         <p className="font-bold font-merriweather">
-                          {edu?.fieldOfStudy || "Field of Study"}
+                          {edu?.fieldOfStudy || ""}
                         </p>
-                        {(edu?.educationStart || edu?.educationEnd) && (
+                        {(edu?.startDate || edu?.endDate) && (
                           <span className="text-sm text-gray-500 font-merriweather">
-                            {edu?.educationStart
-                              ? monthYear(edu.educationStart)
-                              : ""}{" "}
-                            -{" "}
-                            {edu?.educationEnd
-                              ? monthYear(edu.educationEnd)
-                              : "Present"}
+                            {edu?.startDate ? monthYear(edu.startDate) : ""} -{" "}
+                            {edu?.endDate ? monthYear(edu.endDate) : "Present"}
                           </span>
                         )}
                       </div>
                       <p className="text-sm text-gray-600 font-merriweather">
-                        {edu?.degree || "Degree"} -{" "}
-                        {edu?.schoolLocation || "Location"}
+                        {edu?.degree || ""} -{" "}
+                        {edu?.location || ""}
                       </p>
                       {edu?.academicAchievements && (
                         <p className="text-sm text-gray-600 font-merriweather mt-1">
@@ -374,7 +400,7 @@ export const EditableResume: React.FC<PreviewResumeProps> = ({
                       >
                         <div className="flex justify-between">
                           <p className="font-bold font-merriweather">
-                            {cert?.title || "Certification"}
+                            {cert?.title || ""}
                           </p>
                           {cert?.issueDate && (
                             <p className="text-sm text-gray-500 font-merriweather">
@@ -503,7 +529,7 @@ export const EditableResume: React.FC<PreviewResumeProps> = ({
                           key={`soft-${index}-${skill?.label || ""}`}
                           className="px-2 py-1 bg-gray-100 rounded font-merriweather"
                         >
-                          {skill?.label}
+                          {skill.label}
                         </span>
                       ))}
                     </div>
@@ -537,7 +563,7 @@ export const EditableResume: React.FC<PreviewResumeProps> = ({
                     <div className="flex flex-wrap gap-2 text-sm">
                       {displayData.hardSkill?.map((skill, index) => (
                         <span
-                          key={`hard-${index}-${skill?.label || ""}`}
+                          key={`hard-${index}-${skill || ""}`}
                           className="px-2 py-1 bg-gray-100 rounded font-merriweather"
                         >
                           {skill?.label}

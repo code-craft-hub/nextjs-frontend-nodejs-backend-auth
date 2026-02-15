@@ -18,10 +18,7 @@ const updateResumeField = async <T>(
         ? payload.value
         : { [payload.field]: payload.value };
 
-    return await resumeApi.updateResume(
-        payload.resumeId,
-        updates as any,
-    );
+    return await resumeApi.updateResume(payload.resumeId, updates as any);
   } catch (error) {
     if (error instanceof Error) {
       if (error.name === "AbortError") {
@@ -60,21 +57,19 @@ export const useResumeData = (
   const [resumeData, setResumeData] = useState<
     ResumeFormData & ContactFormData
   >(() => ({
-    summary: "",
-    personalDetails: {
-      fullName: "",
-      email: "",
-      phone: "",
-      address: "",
-      linkedIn: "",
-      github: "",
-      website: "",
-    },
-    workExperience: [],
+    // Contact fields (flattened at top level, matching API response)
+    firstName: "",
+    lastName: "",
+    email: "",
+    phoneNumber: "",
+    address: "",
+    portfolio: "",
+    // Resume fields
+    profile: "",
     education: [],
+    workExperience: [],
     certification: [],
     project: [],
-    skills: [],
     softSkill: [],
     hardSkill: [],
     ...initialData,

@@ -18,7 +18,8 @@ import {
   sendAuthorizationCode,
 } from "../../services/gmail/gmail-authorization-service";
 import { isValidEmail } from "@/validation";
-import { useAuth } from "@/hooks/use-auth";
+import { useQuery } from "@tanstack/react-query";
+import { userQueries } from "@/lib/queries/user.queries";
 
 const FormSchema = z.object({
   authorized: z.boolean().default(false).optional(),
@@ -31,7 +32,8 @@ const AuthorizeGoogle: React.FC<{
   const [_isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  const { user } = useAuth();
+  const { data: user } = useQuery(userQueries.detail());
+
   const userEmail = user?.email || "";
 
   useEffect(() => {

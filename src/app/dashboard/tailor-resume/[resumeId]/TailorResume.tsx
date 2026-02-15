@@ -1,10 +1,9 @@
 "use client";
 import { useEffect, useRef } from "react";
 import { useResumeStream } from "@/hooks/stream-resume-hook";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useParams } from "next/navigation";
 import { toast } from "sonner";
 import { COLLECTIONS } from "@/lib/utils/constants";
-// import { EditableResume } from "../../(dashboard)/ai-apply/components/resumes/EditableResume";
 import { ProgressIndicator } from "../../(dashboard)/ai-apply/progress-indicator";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -26,17 +25,42 @@ import { EditableResume } from "../../(dashboard)/ai-apply/components/resume/Edi
 
 const API_URL = `${BASEURL}/${BACKEND_API_VERSION}/resumes/generate`;
 
+/**
+ * Normalize API response data to match the expected UI schema
+ * Maps API fields (e.g., "summary") to schema fields (e.g., "profile")
+ */
+const normalizeResumeData = (data: any) => {
+  if (!data) return data;
+
+  return {
+    ...data,
+    // Map API's "summary" field to schema's "profile" field
+    profile: data.summary || data.profile || "",
+    // Ensure arrays exist
+    education: data.education || [],
+    workExperience: data.workExperience || [],
+    certification: data.certification || [],
+    project: data.project || [],
+    softSkill: data.softSkill || [],
+    hardSkill: data.hardSkill || [],
+  };
+};
+
 export const TailorResume = () => {
   const { data: user } = useQuery(userQueries.detail());
   const searchParams = useSearchParams();
+  const params = useParams();
   const queryClient = useQueryClient();
   const router = useRouter();
   const resultsEndRef = useRef<HTMLDivElement>(null);
   const hasGeneratedRef = useRef(false);
 
-  // Extract IDs and parameters from URL search params
+  // Extract IDs and parameters from URL search params and route params
   const coverLetterDocId = searchParams.get("coverLetterDocId");
-  const resumeDocId = searchParams.get("resumeDocId");
+  const resumeDocIdFromSearchParams = searchParams.get("resumeDocId");
+  const resumeDocIdFromRoute = (params.resumeId as string) || null;
+  // Use resumeDocId from route first (server-side prefetch), then from search params
+  const resumeDocId = resumeDocIdFromRoute || resumeDocIdFromSearchParams;
   const jobDescription = searchParams.get("jobDescription") || "";
   const recruiterEmail = searchParams.get("recruiterEmail") || "";
   const aiApply = searchParams.get("aiApply") === "true";
@@ -162,7 +186,11 @@ export const TailorResume = () => {
     await queryClient.invalidateQueries(resumeQueries.detail(idToDelete));
   };
 
-  const displayResumeData = existingResume || streamData;
+  // Normalize the API data and use it as the source of truth
+  const normalizedExistingResume = existingResume
+    ? normalizeResumeData(existingResume)
+    : null;
+  const displayResumeData = normalizedExistingResume || streamData;
 
   return (
     <div className="space-y-4 sm:space-y-8">

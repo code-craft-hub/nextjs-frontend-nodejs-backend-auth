@@ -1,7 +1,7 @@
 "use client";
 
 import { apiService } from "@/hooks/use-auth";
-import { EditableResume } from "../(dashboard)/ai-apply/components/resumes/EditableResume";
+import { EditableResume } from "../(dashboard)/ai-apply/components/resume/EditableResume";
 import { ProgressIndicator } from "../(dashboard)/ai-apply/progress-indicator";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -21,6 +21,27 @@ import { useFireworksConfetti } from "@/components/ui/confetti";
 import AuthorizeGoogle from "@/hooks/gmail/AuthorizeGoogle";
 import { GmailCompose } from "./GmailCompose";
 import TailorCoverLetterDisplay from "../tailor-cover-letter/[coverLetterId]/TailorCoverLetterDisplay";
+
+/**
+ * Normalize API response data to match the expected UI schema
+ * Maps API fields (e.g., "summary") to schema fields (e.g., "profile")
+ */
+const normalizeResumeData = (data: any) => {
+  if (!data) return data;
+
+  return {
+    ...data,
+    // Map API's "summary" field to schema's "profile" field
+    profile: data.summary || data.profile || "",
+    // Ensure arrays exist
+    education: data.education || [],
+    workExperience: data.workExperience || [],
+    certification: data.certification || [],
+    project: data.project || [],
+    softSkill: data.softSkill || [],
+    hardSkill: data.hardSkill || [],
+  };
+};
 
 const Preview = ({
   coverLetterId,
@@ -217,7 +238,10 @@ const Preview = ({
           />
         </div>
       ) : (
-        <EditableResume data={resumeData!} resumeId={resumeId} />
+        <EditableResume
+          data={normalizeResumeData(resumeData!)}
+          resumeId={resumeId}
+        />
       )}
       <div className="flex items-center justify-center max-sm:fixed w-full h-16 bottom-4 left-0 ">
         <Button disabled={isSubmitting} onClick={handleSubmit} className="w-64">

@@ -44,11 +44,11 @@ const FORM_SCHEMA = z.object({
 
 export const AIJobCustomizationInput = memo(() => {
   const { data: user } = useQuery(userQueries.detail());
-  const profile = user?.dataSource;
+  const profile = user?.dataSource; // TODO: Update this when we have a dedicated profile endpoint or field
   const [docsInput, setDocsInput] = useState<ActionValue>("tailor-resume");
   const [userProfile, setUserProfile] = useState<string>(() => {
     return profile?.[0]?.id || "";
-  });
+  }); 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile | null>(null);
   const [extractedText, setExtractedText] = useState<string>("");
