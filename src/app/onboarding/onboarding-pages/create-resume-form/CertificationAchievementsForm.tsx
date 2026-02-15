@@ -12,15 +12,25 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Trash2, Plus, Award, ArrowLeft, ArrowRight } from "lucide-react";
+import { useResumeForm } from "./ResumeFormContext";
+import {
+  useCreateCertificationMutation,
+  useUpdateCertificationMutation,
+  useDeleteCertificationMutation,
+} from "@/lib/mutations/resume.mutations";
 
-// ─── Schema ────────────────────────────────────────────────────────────────────
+// ─── Schema ────────────────────────────────────────────────────────
 
 const certificationEntrySchema = z.object({
+  id: z.string().optional(),
   title: z.string().optional(),
   issuer: z.string().optional(),
-  year: z.string().optional(),
+  issueDate: z.string().optional(),
+  description: z.string().optional(),
+  credentialUrl: z.string().optional(),
 });
 
 const certificationFormSchema = z.object({
@@ -29,7 +39,7 @@ const certificationFormSchema = z.object({
 
 type CertificationFormValues = z.infer<typeof certificationFormSchema>;
 
-// ─── Single Certification Card ────────────────────────────────────────────────
+// ─── Single Certification Card ─────────────────────────────────────
 
 function CertificationCard({
   index,
@@ -44,7 +54,6 @@ function CertificationCard({
 }) {
   return (
     <div className="bg-white rounded-2xl border border-gray-200 p-5 md:p-6 space-y-5">
-      {/* Card header */}
       <div className="flex items-center gap-3">
         <h2 className="text-lg font-bold text-gray-900">
           Certification #{index + 1}
@@ -61,7 +70,6 @@ function CertificationCard({
         )}
       </div>
 
-      {/* Title */}
       <FormField
         control={control}
         name={`certifications.${index}.title`}
@@ -73,7 +81,7 @@ function CertificationCard({
             <FormControl>
               <Input
                 placeholder="e.g., Google UX Design Professional Certificate"
-                className="h-12 rounded-xl border-gray-200 bg-white placeholder:text-gray-300 text-gray-800 text-sm text-center focus-visible:ring-indigo-400 focus-visible:ring-1 focus-visible:border-indigo-400"
+                className="h-12 rounded-xl border-gray-200 bg-white placeholder:text-gray-300 text-gray-800 text-sm focus-visible:ring-indigo-400 focus-visible:ring-1 focus-visible:border-indigo-400"
                 {...field}
               />
             </FormControl>
@@ -82,7 +90,6 @@ function CertificationCard({
         )}
       />
 
-      {/* Issuer + Year */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <FormField
           control={control}
@@ -95,7 +102,7 @@ function CertificationCard({
               <FormControl>
                 <Input
                   placeholder="e.g., Google / Coursera"
-                  className="h-12 rounded-xl border-gray-200 bg-white placeholder:text-gray-300 text-gray-800 text-sm text-center focus-visible:ring-indigo-400 focus-visible:ring-1 focus-visible:border-indigo-400"
+                  className="h-12 rounded-xl border-gray-200 bg-white placeholder:text-gray-300 text-gray-800 text-sm focus-visible:ring-indigo-400 focus-visible:ring-1 focus-visible:border-indigo-400"
                   {...field}
                 />
               </FormControl>
@@ -106,17 +113,16 @@ function CertificationCard({
 
         <FormField
           control={control}
-          name={`certifications.${index}.year`}
+          name={`certifications.${index}.issueDate`}
           render={({ field }) => (
             <FormItem>
               <FormLabel className="text-sm font-semibold text-gray-900">
-                Year
+                Issue Date
               </FormLabel>
               <FormControl>
                 <Input
-                  placeholder="2023"
-                  maxLength={4}
-                  className="h-12 rounded-xl border-gray-200 bg-white placeholder:text-gray-300 text-gray-800 text-sm text-center focus-visible:ring-indigo-400 focus-visible:ring-1 focus-visible:border-indigo-400"
+                  placeholder="e.g., 2023 or 01/2023"
+                  className="h-12 rounded-xl border-gray-200 bg-white placeholder:text-gray-300 text-gray-800 text-sm focus-visible:ring-indigo-400 focus-visible:ring-1 focus-visible:border-indigo-400"
                   {...field}
                 />
               </FormControl>
@@ -125,11 +131,54 @@ function CertificationCard({
           )}
         />
       </div>
+
+      <FormField
+        control={control}
+        name={`certifications.${index}.description`}
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="text-sm font-semibold text-gray-900">
+              Description{" "}
+              <span className="text-gray-400 font-normal">(Optional)</span>
+            </FormLabel>
+            <FormControl>
+              <Textarea
+                placeholder="Brief description of what the certification covers"
+                rows={3}
+                className="resize-none rounded-xl border-gray-200 bg-white placeholder:text-gray-300 text-gray-800 text-sm leading-relaxed focus-visible:ring-indigo-400 focus-visible:ring-1 focus-visible:border-indigo-400"
+                {...field}
+              />
+            </FormControl>
+            <FormMessage className="text-xs" />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={control}
+        name={`certifications.${index}.credentialUrl`}
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="text-sm font-semibold text-gray-900">
+              Credential URL{" "}
+              <span className="text-gray-400 font-normal">(Optional)</span>
+            </FormLabel>
+            <FormControl>
+              <Input
+                placeholder="https://credential.example.com/verify/..."
+                className="h-12 rounded-xl border-gray-200 bg-white placeholder:text-gray-300 text-gray-800 text-sm focus-visible:ring-indigo-400 focus-visible:ring-1 focus-visible:border-indigo-400"
+                {...field}
+              />
+            </FormControl>
+            <FormMessage className="text-xs" />
+          </FormItem>
+        )}
+      />
     </div>
   );
 }
 
-// ─── Main Component ───────────────────────────────────────────────────────────
+// ─── Main Component ────────────────────────────────────────────────
 
 interface CertificationAchievementsFormProps {
   onBack?: () => void;
@@ -142,10 +191,37 @@ export default function CertificationAchievementsForm({
   onSaveDraft,
   onContinue,
 }: CertificationAchievementsFormProps) {
+  const { resumeId, resumeData, updateResumeField } = useResumeForm();
+  const createMutation = useCreateCertificationMutation(resumeId || "");
+  const updateMutation = useUpdateCertificationMutation(resumeId || "");
+  const deleteMutation = useDeleteCertificationMutation(resumeId || "");
+
+  const existingCertifications = resumeData?.certification || [];
+
   const form = useForm<CertificationFormValues>({
     resolver: zodResolver(certificationFormSchema),
     defaultValues: {
-      certifications: [{ title: "", issuer: "", year: "" }],
+      certifications:
+        existingCertifications.length > 0
+          ? existingCertifications.map((cert) => ({
+              id: cert.id || undefined,
+              title: cert.title || cert.name || "",
+              issuer: cert.issuer || "",
+              issueDate: cert.issueDate
+                ? new Date(cert.issueDate).getFullYear().toString()
+                : "",
+              description: cert.description || "",
+              credentialUrl: cert.credentialUrl || "",
+            }))
+          : [
+              {
+                title: "",
+                issuer: "",
+                issueDate: "",
+                description: "",
+                credentialUrl: "",
+              },
+            ],
     },
   });
 
@@ -154,20 +230,61 @@ export default function CertificationAchievementsForm({
     name: "certifications",
   });
 
-  function onSubmit(values: CertificationFormValues) {
-    console.log(values);
+  async function onSubmit(values: CertificationFormValues) {
+    if (!resumeId) {
+      onContinue?.();
+      return;
+    }
+
+    const savePromises = values.certifications.map((cert) => {
+      const payload = {
+        title: cert.title,
+        name: cert.title,
+        issuer: cert.issuer,
+        issueDate: cert.issueDate,
+        description: cert.description,
+        credentialUrl: cert.credentialUrl,
+      };
+
+      if (cert.id) {
+        return updateMutation.mutateAsync({ id: cert.id, data: payload });
+      }
+      return createMutation.mutateAsync(payload);
+    });
+
+    await Promise.all(savePromises);
+    updateResumeField(
+      "certification",
+      values.certifications.map((cert) => ({
+        id: cert.id,
+        title: cert.title,
+        name: cert.title,
+        issuer: cert.issuer,
+        issueDate: cert.issueDate,
+        description: cert.description,
+        credentialUrl: cert.credentialUrl,
+      })),
+    );
     onContinue?.();
   }
 
-  const handleAddCertification = () => {
-    append({ title: "", issuer: "", year: "" });
+  const handleRemoveCertification = (index: number) => {
+    const cert = form.getValues(`certifications.${index}`);
+    if (cert.id && resumeId) {
+      deleteMutation.mutate(cert.id);
+    }
+    remove(index);
   };
+
+  const isSaving =
+    createMutation.isPending ||
+    updateMutation.isPending ||
+    deleteMutation.isPending;
 
   return (
     <div className="w-full flex flex-col gap-6">
-      {/* ── Main card ─────────────────────────────────────────────────────────── */}
       <div className="w-full bg-white rounded-2xl border border-gray-200 shadow-sm p-6 md:p-8">
-        {/* ── Section header ──────────────────────────────────────────────────── */}
+        {/* Section header */}
         <div className="flex items-start gap-4 mb-7">
           <span className="flex items-center justify-center w-11 h-11 rounded-full bg-yellow-100 shrink-0 mt-0.5">
             <Award className="w-5 h-5 text-yellow-500" />
@@ -188,24 +305,29 @@ export default function CertificationAchievementsForm({
           </div>
         </div>
 
-        {/* ── Form ────────────────────────────────────────────────────────────── */}
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            {/* Certification cards */}
             {fields.map((field, index) => (
               <CertificationCard
                 key={field.id}
                 index={index}
                 control={form.control}
-                remove={remove}
+                remove={handleRemoveCertification}
                 canRemove={fields.length > 1}
               />
             ))}
 
-            {/* Add Another Certification */}
             <button
               type="button"
-              onClick={handleAddCertification}
+              onClick={() =>
+                append({
+                  title: "",
+                  issuer: "",
+                  issueDate: "",
+                  description: "",
+                  credentialUrl: "",
+                })
+              }
               className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl border-2 border-dashed border-indigo-400 text-indigo-600 font-semibold text-sm hover:bg-indigo-50 transition-colors"
             >
               <Plus className="w-4 h-4" />
@@ -215,7 +337,7 @@ export default function CertificationAchievementsForm({
         </Form>
       </div>
 
-      {/* ── Bottom navigation ─────────────────────────────────────────────────── */}
+      {/* Bottom navigation */}
       <div className="flex items-center justify-center gap-3">
         <Button
           type="button"
@@ -238,11 +360,12 @@ export default function CertificationAchievementsForm({
 
         <Button
           type="submit"
+          disabled={isSaving}
           onClick={form.handleSubmit(onSubmit)}
           className="h-12 px-6 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm gap-2 transition-colors"
         >
-          Continue to Preview
-          <ArrowRight className="w-4 h-4" />
+          {isSaving ? "Saving..." : "Continue to Preview"}
+          {!isSaving && <ArrowRight className="w-4 h-4" />}
         </Button>
       </div>
     </div>

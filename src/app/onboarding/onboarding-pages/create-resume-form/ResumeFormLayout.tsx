@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Headphones } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useResumeForm } from "./ResumeFormContext";
 import PersonalInfoForm from "./PersonalInfoForm";
 import ProfessionalSummaryForm from "./ProfessionalSummaryForm";
 import ExperienceForm from "./WorkExperienceForm";
@@ -14,7 +15,7 @@ import CertificationAchievementsForm from "./CertificationAchievementsForm";
 type Section = {
   id: number;
   label: string;
-  component: React.ComponentType;
+  component: React.ComponentType<{ onNext?: () => void; onBack?: () => void }>;
 };
 
 const sections: Section[] = [
@@ -30,15 +31,20 @@ const sections: Section[] = [
   },
 ];
 
-// Component that combines Projects and Certifications
-function ProjectsAndCertifications() {
+function ProjectsAndCertifications({
+  onNext,
+  onBack,
+}: {
+  onNext?: () => void;
+  onBack?: () => void;
+}) {
   const [showProjects, setShowProjects] = useState(true);
 
   return (
     <div>
       {showProjects ? (
         <div>
-          <ProjectsForm />
+          <ProjectsForm onBack={onBack} />
           <div className="flex justify-center py-8">
             <Button
               onClick={() => setShowProjects(false)}
@@ -53,10 +59,7 @@ function ProjectsAndCertifications() {
         <div>
           <CertificationAchievementsForm
             onBack={() => setShowProjects(true)}
-            onContinue={() => {
-              // Handle continue to preview/next step
-              console.log("All forms completed!");
-            }}
+            onContinue={onNext}
           />
         </div>
       )}
@@ -64,7 +67,8 @@ function ProjectsAndCertifications() {
   );
 }
 
-export default function ResumeFormLayout(data: any /* TODO: CLAUSE PLEASE GET TYPE OF THE DATA FROM THE RESUMES AGGREGATE WHICH IS THE RESUMES AND ALL IT'S CHILDREN TABLES */) {
+export default function ResumeFormLayout() {
+  const { isLoading } = useResumeForm();
   const [activeSection, setActiveSection] = useState(1);
 
   const currentSection = sections.find((s) => s.id === activeSection);
@@ -75,9 +79,28 @@ export default function ResumeFormLayout(data: any /* TODO: CLAUSE PLEASE GET TY
 
   const handleSectionChange = (sectionId: number) => {
     setActiveSection(sectionId);
-    // Smooth scroll to top
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
+  const handleNext = () => {
+    if (activeSection < sections.length) {
+      handleSectionChange(activeSection + 1);
+    }
+  };
+
+  const handleBack = () => {
+    if (activeSection > 1) {
+      handleSectionChange(activeSection - 1);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600" />
+      </div>
+    );
+  }
 
   return (
     <div className=" flex items-start justify-center">
@@ -112,7 +135,7 @@ export default function ResumeFormLayout(data: any /* TODO: CLAUSE PLEASE GET TY
                             : "bg-gray-300 text-gray-600"
                       }`}
                     >
-                      {section.id < activeSection ? "✓" : section.id}
+                      {section.id < activeSection ? "\u2713" : section.id}
                     </span>
                     <span className="flex-1 text-left">{section.label}</span>
                   </button>
@@ -168,7 +191,7 @@ export default function ResumeFormLayout(data: any /* TODO: CLAUSE PLEASE GET TY
         {/* ── Main Content ─────────────────────────────────────── */}
         <div className="flex-1 min-w-0">
           <div className="animate-fadeIn">
-            <ActiveComponent />
+            <ActiveComponent onNext={handleNext} onBack={handleBack} />
           </div>
         </div>
       </div>

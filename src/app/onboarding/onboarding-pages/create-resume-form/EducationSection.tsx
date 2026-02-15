@@ -1,46 +1,148 @@
 "use client";
 
 import { useFieldArray, useForm } from "react-hook-form";
-import { Trash2, PlusCircle, GraduationCap } from "lucide-react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Trash2, PlusCircle, GraduationCap, ArrowLeft } from "lucide-react";
+import { useResumeForm } from "./ResumeFormContext";
+import {
+  useCreateEducationMutation,
+  useUpdateEducationMutation,
+  useDeleteEducationMutation,
+} from "@/lib/mutations/resume.mutations";
 
-type EducationEntry = {
-  degree: string;
-  institution: string;
-  startYear: string;
-  endYear: string;
-};
+// ─── Schema ────────────────────────────────────────────────────────
 
-type EducationFormValues = {
-  educations: EducationEntry[];
-};
+const educationEntrySchema = z.object({
+  id: z.string().optional(),
+  degree: z.string().min(1, "Degree is required"),
+  schoolName: z.string().min(1, "Institution is required"),
+  fieldOfStudy: z.string().optional(),
+  location: z.string().optional(),
+  startDate: z.string().optional(),
+  endDate: z.string().optional(),
+});
 
-export default function EducationSection() {
-  const {
-    register,
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<EducationFormValues>({
+const educationFormSchema = z.object({
+  educations: z.array(educationEntrySchema).min(1),
+});
+
+type EducationFormValues = z.infer<typeof educationFormSchema>;
+
+// ─── Component ────────────────────────────────────────────────────
+
+interface EducationSectionProps {
+  onNext?: () => void;
+  onBack?: () => void;
+}
+
+export default function EducationSection({
+  onNext,
+  onBack,
+}: EducationSectionProps) {
+  const { resumeId, resumeData, updateResumeField } = useResumeForm();
+  const createMutation = useCreateEducationMutation(resumeId || "");
+  const updateMutation = useUpdateEducationMutation(resumeId || "");
+  const deleteMutation = useDeleteEducationMutation(resumeId || "");
+
+  const existingEducations = resumeData?.education || [];
+
+  const form = useForm<EducationFormValues>({
+    resolver: zodResolver(educationFormSchema),
     defaultValues: {
-      educations: [
-        {
-          degree: "",
-          institution: "",
-          startYear: "2015",
-          endYear: "2019",
-        },
-      ],
+      educations:
+        existingEducations.length > 0
+          ? existingEducations.map((edu) => ({
+              id: edu.id || undefined,
+              degree: edu.degree || "",
+              schoolName: edu.schoolName || "",
+              fieldOfStudy: edu.fieldOfStudy || "",
+              location: edu.location || "",
+              startDate: edu.startDate
+                ? new Date(edu.startDate).getFullYear().toString()
+                : "",
+              endDate: edu.endDate
+                ? new Date(edu.endDate).getFullYear().toString()
+                : "",
+            }))
+          : [
+              {
+                degree: "",
+                schoolName: "",
+                fieldOfStudy: "",
+                location: "",
+                startDate: "",
+                endDate: "",
+              },
+            ],
     },
   });
 
   const { fields, append, remove } = useFieldArray({
-    control,
+    control: form.control,
     name: "educations",
   });
 
-  const onSubmit = (data: EducationFormValues) => {
-    console.log(data);
+  async function onSubmit(values: EducationFormValues) {
+    if (!resumeId) {
+      onNext?.();
+      return;
+    }
+
+    const savePromises = values.educations.map((edu) => {
+      const payload = {
+        degree: edu.degree,
+        schoolName: edu.schoolName,
+        fieldOfStudy: edu.fieldOfStudy,
+        location: edu.location,
+        startDate: edu.startDate,
+        endDate: edu.endDate,
+      };
+
+      if (edu.id) {
+        return updateMutation.mutateAsync({ id: edu.id, data: payload });
+      }
+      return createMutation.mutateAsync(payload);
+    });
+
+    await Promise.all(savePromises);
+    updateResumeField(
+      "education",
+      values.educations.map((edu) => ({
+        id: edu.id,
+        degree: edu.degree,
+        schoolName: edu.schoolName,
+        fieldOfStudy: edu.fieldOfStudy,
+        location: edu.location,
+        startDate: edu.startDate,
+        endDate: edu.endDate,
+      })),
+    );
+    onNext?.();
+  }
+
+  const handleRemoveEducation = (index: number) => {
+    const edu = form.getValues(`educations.${index}`);
+    if (edu.id && resumeId) {
+      deleteMutation.mutate(edu.id);
+    }
+    remove(index);
   };
+
+  const isSaving =
+    createMutation.isPending ||
+    updateMutation.isPending ||
+    deleteMutation.isPending;
 
   return (
     <div className="w-full">
@@ -59,182 +161,197 @@ export default function EducationSection() {
         </div>
       </div>
 
-      {/* Form */}
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        {fields.map((field, index) => (
-          <div
-            key={field.id}
-            className="relative bg-white border border-gray-200 rounded-2xl p-5 sm:p-6"
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          {fields.map((field, index) => (
+            <div
+              key={field.id}
+              className="relative bg-white border border-gray-200 rounded-2xl p-5 sm:p-6 space-y-4"
+            >
+              <div className="flex items-center justify-between">
+                <h3 className="text-base font-semibold text-gray-900">
+                  Education #{index + 1}
+                </h3>
+                {fields.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveEducation(index)}
+                    className="text-red-500 hover:text-red-600 transition-colors p-1 rounded-md hover:bg-red-50"
+                    aria-label={`Remove education ${index + 1}`}
+                  >
+                    <Trash2 className="w-5 h-5" />
+                  </button>
+                )}
+              </div>
+
+              {/* Degree + Field of Study */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name={`educations.${index}.degree`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium text-gray-800">
+                        Degree / Certification{" "}
+                        <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="e.g., Bachelor of Science"
+                          className="h-12 rounded-xl border-gray-200 bg-white placeholder:text-gray-300 text-gray-800 text-sm focus-visible:ring-indigo-400 focus-visible:ring-1 focus-visible:border-indigo-400"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className="text-xs" />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name={`educations.${index}.fieldOfStudy`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium text-gray-800">
+                        Field of Study
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="e.g., Computer Science"
+                          className="h-12 rounded-xl border-gray-200 bg-white placeholder:text-gray-300 text-gray-800 text-sm focus-visible:ring-indigo-400 focus-visible:ring-1 focus-visible:border-indigo-400"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className="text-xs" />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* Institution + Location */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name={`educations.${index}.schoolName`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium text-gray-800">
+                        Institution <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="e.g., Stanford University"
+                          className="h-12 rounded-xl border-gray-200 bg-white placeholder:text-gray-300 text-gray-800 text-sm focus-visible:ring-indigo-400 focus-visible:ring-1 focus-visible:border-indigo-400"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className="text-xs" />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name={`educations.${index}.location`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium text-gray-800">
+                        Location
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="e.g., Stanford, CA"
+                          className="h-12 rounded-xl border-gray-200 bg-white placeholder:text-gray-300 text-gray-800 text-sm focus-visible:ring-indigo-400 focus-visible:ring-1 focus-visible:border-indigo-400"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className="text-xs" />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* Start Year + End Year */}
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name={`educations.${index}.startDate`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium text-gray-800">
+                        Start Year
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="2015"
+                          className="h-12 rounded-xl border-gray-200 bg-white placeholder:text-gray-300 text-gray-800 text-sm focus-visible:ring-indigo-400 focus-visible:ring-1 focus-visible:border-indigo-400"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className="text-xs" />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name={`educations.${index}.endDate`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium text-gray-800">
+                        End Year
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="2019"
+                          className="h-12 rounded-xl border-gray-200 bg-white placeholder:text-gray-300 text-gray-800 text-sm focus-visible:ring-indigo-400 focus-visible:ring-1 focus-visible:border-indigo-400"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className="text-xs" />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+          ))}
+
+          <button
+            type="button"
+            onClick={() =>
+              append({
+                degree: "",
+                schoolName: "",
+                fieldOfStudy: "",
+                location: "",
+                startDate: "",
+                endDate: "",
+              })
+            }
+            className="w-full h-14 flex items-center justify-center gap-2 border-2 border-dashed border-indigo-400 rounded-2xl text-indigo-600 font-medium text-sm hover:bg-indigo-50 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-300"
           >
-            {/* Card Header */}
-            <div className="flex items-center justify-between mb-5">
-              <h3 className="text-base font-semibold text-gray-900">
-                Education #{index + 1}
-              </h3>
-              {fields.length > 1 && (
-                <button
-                  type="button"
-                  onClick={() => remove(index)}
-                  className="text-red-500 hover:text-red-600 transition-colors p-1 rounded-md hover:bg-red-50"
-                  aria-label={`Remove education ${index + 1}`}
-                >
-                  <Trash2 className="w-5 h-5" />
-                </button>
-              )}
-              {fields.length === 1 && (
-                <button
-                  type="button"
-                  onClick={() => remove(index)}
-                  className="text-red-500 hover:text-red-600 transition-colors p-1 rounded-md hover:bg-red-50"
-                  aria-label={`Remove education ${index + 1}`}
-                >
-                  <Trash2 className="w-5 h-5" />
-                </button>
-              )}
-            </div>
+            <PlusCircle className="w-5 h-5" />
+            Add Another Education
+          </button>
 
-            {/* Degree / Certification */}
-            <div className="mb-4">
-              <label
-                htmlFor={`degree-${index}`}
-                className="block text-sm font-medium text-gray-800 mb-1.5"
-              >
-                Degree / Certification <span className="text-red-500">*</span>
-              </label>
-              <input
-                id={`degree-${index}`}
-                type="text"
-                placeholder="e.g. ,Bachelor of Science in Computer Science"
-                {...register(`educations.${index}.degree`, {
-                  required: "Degree is required",
-                })}
-                className={`w-full h-12 px-4 text-sm text-gray-700 placeholder-gray-400 bg-white border rounded-xl outline-none transition-colors
-                  ${
-                    errors.educations?.[index]?.degree
-                      ? "border-red-400 focus:border-red-500 focus:ring-2 focus:ring-red-100"
-                      : "border-gray-200 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-50"
-                  }`}
-              />
-              {errors.educations?.[index]?.degree && (
-                <p className="mt-1 text-xs text-red-500">
-                  {errors.educations[index]?.degree?.message}
-                </p>
-              )}
-            </div>
-
-            {/* Institution */}
-            <div className="mb-5">
-              <label
-                htmlFor={`institution-${index}`}
-                className="block text-sm font-medium text-gray-800 mb-1.5"
-              >
-                Institution <span className="text-red-500">*</span>
-              </label>
-              <input
-                id={`institution-${index}`}
-                type="text"
-                placeholder="e.g., Stanford University"
-                {...register(`educations.${index}.institution`, {
-                  required: "Institution is required",
-                })}
-                className={`w-full h-12 px-4 text-sm text-gray-700 placeholder-gray-400 bg-white border rounded-xl outline-none transition-colors
-                  ${
-                    errors.educations?.[index]?.institution
-                      ? "border-red-400 focus:border-red-500 focus:ring-2 focus:ring-red-100"
-                      : "border-gray-200 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-50"
-                  }`}
-              />
-              {errors.educations?.[index]?.institution && (
-                <p className="mt-1 text-xs text-red-500">
-                  {errors.educations[index]?.institution?.message}
-                </p>
-              )}
-            </div>
-
-            {/* Start Year / End Year */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label
-                  htmlFor={`startYear-${index}`}
-                  className="block text-sm font-medium text-gray-800 mb-1.5"
-                >
-                  Start Year
-                </label>
-                <input
-                  id={`startYear-${index}`}
-                  type="text"
-                  placeholder="2015"
-                  {...register(`educations.${index}.startYear`, {
-                    pattern: {
-                      value: /^\d{4}$/,
-                      message: "Enter a valid year",
-                    },
-                  })}
-                  className={`w-full h-12 px-4 text-sm text-gray-700 placeholder-gray-400 bg-white border rounded-xl outline-none transition-colors
-                    ${
-                      errors.educations?.[index]?.startYear
-                        ? "border-red-400 focus:border-red-500 focus:ring-2 focus:ring-red-100"
-                        : "border-gray-200 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-50"
-                    }`}
-                />
-                {errors.educations?.[index]?.startYear && (
-                  <p className="mt-1 text-xs text-red-500">
-                    {errors.educations[index]?.startYear?.message}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label
-                  htmlFor={`endYear-${index}`}
-                  className="block text-sm font-medium text-gray-800 mb-1.5"
-                >
-                  End Year
-                </label>
-                <input
-                  id={`endYear-${index}`}
-                  type="text"
-                  placeholder="2019"
-                  {...register(`educations.${index}.endYear`, {
-                    pattern: {
-                      value: /^\d{4}$/,
-                      message: "Enter a valid year",
-                    },
-                  })}
-                  className={`w-full h-12 px-4 text-sm text-gray-700 placeholder-gray-400 bg-white border rounded-xl outline-none transition-colors
-                    ${
-                      errors.educations?.[index]?.endYear
-                        ? "border-red-400 focus:border-red-500 focus:ring-2 focus:ring-red-100"
-                        : "border-gray-200 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-50"
-                    }`}
-                />
-                {errors.educations?.[index]?.endYear && (
-                  <p className="mt-1 text-xs text-red-500">
-                    {errors.educations[index]?.endYear?.message}
-                  </p>
-                )}
-              </div>
-            </div>
+          {/* Navigation */}
+          <div className="pt-4 flex justify-between">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onBack}
+              className="h-12 px-6 rounded-xl border-gray-200 text-gray-700 font-semibold text-sm hover:bg-gray-50 gap-2"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back
+            </Button>
+            <Button
+              type="submit"
+              disabled={isSaving}
+              className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-8 h-12 rounded-xl text-sm transition-colors"
+            >
+              {isSaving ? "Saving..." : "Save & Continue"}
+            </Button>
           </div>
-        ))}
-
-        {/* Add Another Role Button */}
-        <button
-          type="button"
-          onClick={() =>
-            append({
-              degree: "",
-              institution: "",
-              startYear: "",
-              endYear: "",
-            })
-          }
-          className="w-full h-14 flex items-center justify-center gap-2 border-2 border-dashed border-indigo-400 rounded-2xl text-indigo-600 font-medium text-sm hover:bg-indigo-50 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-300"
-        >
-          <PlusCircle className="w-5 h-5" />
-          Add Another Role
-        </button>
-      </form>
+        </form>
+      </Form>
     </div>
   );
 }

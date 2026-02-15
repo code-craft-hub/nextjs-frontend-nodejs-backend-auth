@@ -14,14 +14,21 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Trash2, Link2, Plus } from "lucide-react";
+import { useResumeForm } from "./ResumeFormContext";
+import {
+  useCreateProjectMutation,
+  useUpdateProjectMutation,
+  useDeleteProjectMutation,
+} from "@/lib/mutations/resume.mutations";
 
-// ─── Schema ────────────────────────────────────────────────────────────────────
+// ─── Schema ────────────────────────────────────────────────────────
 
 const projectEntrySchema = z.object({
-  projectName: z.string().optional(),
+  id: z.string().optional(),
+  name: z.string().optional(),
   description: z.string().optional(),
-  toolsUsed: z.string().optional(),
-  projectLink: z.string().optional(),
+  techStack: z.string().optional(),
+  url: z.string().optional(),
 });
 
 const projectsFormSchema = z.object({
@@ -30,7 +37,7 @@ const projectsFormSchema = z.object({
 
 type ProjectsFormValues = z.infer<typeof projectsFormSchema>;
 
-// ─── Single Project Card ──────────────────────────────────────────────────────
+// ─── Single Project Card ───────────────────────────────────────────
 
 function ProjectCard({
   index,
@@ -45,7 +52,6 @@ function ProjectCard({
 }) {
   return (
     <div className="bg-white rounded-2xl border border-gray-200 p-5 md:p-6 space-y-5">
-      {/* Card header */}
       <div className="flex items-center gap-3">
         <h2 className="text-lg font-bold text-gray-900">
           Project #{index + 1}
@@ -62,10 +68,9 @@ function ProjectCard({
         )}
       </div>
 
-      {/* Project Name */}
       <FormField
         control={control}
-        name={`projects.${index}.projectName`}
+        name={`projects.${index}.name`}
         render={({ field }) => (
           <FormItem>
             <FormLabel className="text-sm font-semibold text-gray-900">
@@ -83,7 +88,6 @@ function ProjectCard({
         )}
       />
 
-      {/* Description */}
       <FormField
         control={control}
         name={`projects.${index}.description`}
@@ -105,18 +109,17 @@ function ProjectCard({
         )}
       />
 
-      {/* Tools Used */}
       <FormField
         control={control}
-        name={`projects.${index}.toolsUsed`}
+        name={`projects.${index}.techStack`}
         render={({ field }) => (
           <FormItem>
             <FormLabel className="text-sm font-semibold text-gray-900">
-              Tools Used
+              Tech Stack / Tools Used
             </FormLabel>
             <FormControl>
               <Input
-                placeholder="e.g., Figma, React, Node.js"
+                placeholder="e.g., React, Node.js, PostgreSQL (comma-separated)"
                 className="h-12 rounded-xl border-gray-200 bg-white placeholder:text-gray-300 text-gray-800 text-sm focus-visible:ring-indigo-400 focus-visible:ring-1 focus-visible:border-indigo-400"
                 {...field}
               />
@@ -126,10 +129,9 @@ function ProjectCard({
         )}
       />
 
-      {/* Project Link */}
       <FormField
         control={control}
-        name={`projects.${index}.projectLink`}
+        name={`projects.${index}.url`}
         render={({ field }) => (
           <FormItem>
             <FormLabel className="text-sm font-semibold text-gray-900">
@@ -153,20 +155,34 @@ function ProjectCard({
   );
 }
 
-// ─── Main Component ───────────────────────────────────────────────────────────
+// ─── Main Component ────────────────────────────────────────────────
 
-export default function ProjectsForm() {
+interface ProjectsFormProps {
+  onNext?: () => void;
+  onBack?: () => void;
+}
+
+export default function ProjectsForm({ onNext, onBack }: ProjectsFormProps) {
+  const { resumeId, resumeData, updateResumeField } = useResumeForm();
+  const createMutation = useCreateProjectMutation(resumeId || "");
+  const updateMutation = useUpdateProjectMutation(resumeId || "");
+  const deleteMutation = useDeleteProjectMutation(resumeId || "");
+
+  const existingProjects = resumeData?.project || [];
+
   const form = useForm<ProjectsFormValues>({
     resolver: zodResolver(projectsFormSchema),
     defaultValues: {
-      projects: [
-        {
-          projectName: "",
-          description: "",
-          toolsUsed: "",
-          projectLink: "",
-        },
-      ],
+      projects:
+        existingProjects.length > 0
+          ? existingProjects.map((proj) => ({
+              id: proj.id || undefined,
+              name: proj.name || "",
+              description: proj.description || "",
+              techStack: (proj.techStack as string[])?.join(", ") || "",
+              url: proj.url || "",
+            }))
+          : [{ name: "", description: "", techStack: "", url: "" }],
     },
   });
 
@@ -175,45 +191,107 @@ export default function ProjectsForm() {
     name: "projects",
   });
 
-  function onSubmit(values: ProjectsFormValues) {
-    console.log(values);
+  async function onSubmit(values: ProjectsFormValues) {
+    if (!resumeId) {
+      onNext?.();
+      return;
+    }
+
+    const savePromises = values.projects.map((proj) => {
+      const payload = {
+        name: proj.name,
+        description: proj.description,
+        techStack: proj.techStack
+          ? proj.techStack.split(",").map((t) => t.trim()).filter(Boolean)
+          : [],
+        url: proj.url,
+      };
+
+      if (proj.id) {
+        return updateMutation.mutateAsync({ id: proj.id, data: payload });
+      }
+      return createMutation.mutateAsync(payload);
+    });
+
+    await Promise.all(savePromises);
+    updateResumeField(
+      "project",
+      values.projects.map((proj) => ({
+        id: proj.id,
+        name: proj.name,
+        description: proj.description,
+        techStack: proj.techStack
+          ? proj.techStack.split(",").map((t) => t.trim()).filter(Boolean)
+          : [],
+        url: proj.url,
+      })),
+    );
+    onNext?.();
   }
 
-  const handleAddProject = () => {
-    append({
-      projectName: "",
-      description: "",
-      toolsUsed: "",
-      projectLink: "",
-    });
+  const handleRemoveProject = (index: number) => {
+    const proj = form.getValues(`projects.${index}`);
+    if (proj.id && resumeId) {
+      deleteMutation.mutate(proj.id);
+    }
+    remove(index);
   };
+
+  const isSaving =
+    createMutation.isPending ||
+    updateMutation.isPending ||
+    deleteMutation.isPending;
 
   return (
     <div className="w-full">
-      {/* Outer wrapper card — matches the light rounded container in screenshot */}
       <div className="bg-gray-50 rounded-2xl border border-gray-200 p-4 md:p-5 space-y-4">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            {/* Project cards */}
             {fields.map((field, index) => (
               <ProjectCard
                 key={field.id}
                 index={index}
                 control={form.control}
-                remove={remove}
+                remove={handleRemoveProject}
                 canRemove={fields.length > 1}
               />
             ))}
 
-            {/* Add Another Project button */}
             <button
               type="button"
-              onClick={handleAddProject}
+              onClick={() =>
+                append({
+                  name: "",
+                  description: "",
+                  techStack: "",
+                  url: "",
+                })
+              }
               className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl border-2 border-dashed border-indigo-400 text-indigo-600 font-semibold text-sm hover:bg-indigo-50 transition-colors"
             >
               <Plus className="w-4 h-4" />
               Add Another Project
             </button>
+
+            {/* Navigation - hidden when used inside ProjectsAndCertifications wrapper */}
+            {onBack && (
+              <div className="pt-4 flex justify-between">
+                <button
+                  type="button"
+                  onClick={onBack}
+                  className="h-12 px-6 rounded-xl border border-gray-200 text-gray-700 font-semibold text-sm hover:bg-gray-50"
+                >
+                  Back
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSaving}
+                  className="h-12 px-8 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm transition-colors disabled:opacity-50"
+                >
+                  {isSaving ? "Saving..." : "Save & Continue"}
+                </button>
+              </div>
+            )}
           </form>
         </Form>
       </div>

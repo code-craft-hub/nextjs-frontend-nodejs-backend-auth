@@ -12,29 +12,34 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Trash2, CalendarDays, Plus } from "lucide-react";
+import { Trash2, CalendarDays, Plus, ArrowLeft } from "lucide-react";
+import { useResumeForm } from "./ResumeFormContext";
+import {
+  useCreateWorkExperienceMutation,
+  useUpdateWorkExperienceMutation,
+  useDeleteWorkExperienceMutation,
+} from "@/lib/mutations/resume.mutations";
 
-// ─── Schema ────────────────────────────────────────────────────────────────────
-
-const bulletSchema = z.object({
-  text: z.string().min(1, "Bullet point cannot be empty"),
-});
+// ─── Schema ────────────────────────────────────────────────────────
 
 const experienceEntrySchema = z
   .object({
+    id: z.string().optional(),
     jobTitle: z.string().min(1, "Job title is required"),
     companyName: z.string().min(1, "Company name is required"),
+    location: z.string().optional(),
     startDate: z.string().min(1, "Start date is required"),
     endDate: z.string().optional(),
-    currentlyWorking: z.boolean(),
-    bullets: z
-      .array(bulletSchema)
-      .min(1, "At least one bullet point is required"),
+    isCurrent: z.boolean(),
+    responsibilities: z
+      .array(z.object({ text: z.string().min(1, "Cannot be empty") }))
+      .min(1, "At least one responsibility is required"),
   })
   .refine(
     (data) =>
-      data.currentlyWorking || (data.endDate && data.endDate.length > 0),
+      data.isCurrent || (data.endDate && data.endDate.length > 0),
     {
       message: "End date is required unless currently working here",
       path: ["endDate"],
@@ -47,7 +52,7 @@ const experienceFormSchema = z.object({
 
 type ExperienceFormValues = z.infer<typeof experienceFormSchema>;
 
-// ─── Date input with calendar icon ────────────────────────────────────────────
+// ─── Date input ────────────────────────────────────────────────────
 
 function DateInput({
   value,
@@ -75,7 +80,7 @@ function DateInput({
   );
 }
 
-// ─── Single Experience Card ───────────────────────────────────────────────────
+// ─── Single Experience Card ────────────────────────────────────────
 
 function ExperienceCard({
   index,
@@ -92,17 +97,16 @@ function ExperienceCard({
   watch: any;
   setValue: any;
 }) {
-  const currentlyWorking = watch(`experiences.${index}.currentlyWorking`);
+  const isCurrent = watch(`experiences.${index}.isCurrent`);
 
   const {
     fields: bulletFields,
     append: appendBullet,
     remove: removeBullet,
-  } = useFieldArray({ control, name: `experiences.${index}.bullets` });
+  } = useFieldArray({ control, name: `experiences.${index}.responsibilities` });
 
   return (
     <div className="bg-white rounded-2xl border border-gray-200 p-5 md:p-6 space-y-5">
-      {/* Card header */}
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-bold text-gray-900">
           Experience #{index + 1}
@@ -140,26 +144,47 @@ function ExperienceCard({
         )}
       />
 
-      {/* Company Name */}
-      <FormField
-        control={control}
-        name={`experiences.${index}.companyName`}
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel className="text-sm font-semibold text-gray-900">
-              Company Name <span className="text-red-500">*</span>
-            </FormLabel>
-            <FormControl>
-              <Input
-                placeholder="e.g., Tech Innovations inc"
-                className="h-12 rounded-xl border-gray-200 bg-white placeholder:text-gray-300 text-gray-800 text-sm focus-visible:ring-indigo-400 focus-visible:ring-1 focus-visible:border-indigo-400"
-                {...field}
-              />
-            </FormControl>
-            <FormMessage className="text-xs" />
-          </FormItem>
-        )}
-      />
+      {/* Company Name + Location */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <FormField
+          control={control}
+          name={`experiences.${index}.companyName`}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-sm font-semibold text-gray-900">
+                Company Name <span className="text-red-500">*</span>
+              </FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="e.g., Tech Innovations Inc"
+                  className="h-12 rounded-xl border-gray-200 bg-white placeholder:text-gray-300 text-gray-800 text-sm focus-visible:ring-indigo-400 focus-visible:ring-1 focus-visible:border-indigo-400"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage className="text-xs" />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={control}
+          name={`experiences.${index}.location`}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-sm font-semibold text-gray-900">
+                Location
+              </FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="e.g., San Francisco, CA"
+                  className="h-12 rounded-xl border-gray-200 bg-white placeholder:text-gray-300 text-gray-800 text-sm focus-visible:ring-indigo-400 focus-visible:ring-1 focus-visible:border-indigo-400"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage className="text-xs" />
+            </FormItem>
+          )}
+        />
+      </div>
 
       {/* Start Date + End Date */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -178,7 +203,6 @@ function ExperienceCard({
             </FormItem>
           )}
         />
-
         <FormField
           control={control}
           name={`experiences.${index}.endDate`}
@@ -191,7 +215,7 @@ function ExperienceCard({
                 <DateInput
                   value={field.value ?? ""}
                   onChange={field.onChange}
-                  disabled={currentlyWorking}
+                  disabled={isCurrent}
                 />
               </FormControl>
               <FormMessage className="text-xs" />
@@ -200,10 +224,10 @@ function ExperienceCard({
         />
       </div>
 
-      {/* Currently work here checkbox */}
+      {/* Currently work here */}
       <FormField
         control={control}
-        name={`experiences.${index}.currentlyWorking`}
+        name={`experiences.${index}.isCurrent`}
         render={({ field }) => (
           <FormItem className="flex items-center gap-2.5 space-y-0">
             <FormControl>
@@ -211,7 +235,8 @@ function ExperienceCard({
                 checked={field.value}
                 onCheckedChange={(checked) => {
                   field.onChange(checked);
-                  if (checked) setValue(`experiences.${index}.endDate`, "");
+                  if (checked)
+                    setValue(`experiences.${index}.endDate`, "");
                 }}
                 className="w-4 h-4 rounded border-gray-300 data-[state=checked]:bg-indigo-600 data-[state=checked]:border-indigo-600"
               />
@@ -223,10 +248,10 @@ function ExperienceCard({
         )}
       />
 
-      {/* Role Description / Bullets */}
+      {/* Responsibilities */}
       <div className="space-y-2">
         <FormLabel className="text-sm font-semibold text-gray-900">
-          Role Description <span className="text-red-500">*</span>
+          Responsibilities <span className="text-red-500">*</span>
         </FormLabel>
 
         <div className="space-y-2">
@@ -234,7 +259,7 @@ function ExperienceCard({
             <FormField
               key={bullet.id}
               control={control}
-              name={`experiences.${index}.bullets.${bIdx}.text`}
+              name={`experiences.${index}.responsibilities.${bIdx}.text`}
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
@@ -263,7 +288,6 @@ function ExperienceCard({
           ))}
         </div>
 
-        {/* Add bullet */}
         <button
           type="button"
           onClick={() => appendBullet({ text: "" })}
@@ -281,22 +305,55 @@ function ExperienceCard({
   );
 }
 
-// ─── Main Component ───────────────────────────────────────────────────────────
+// ─── Main Component ────────────────────────────────────────────────
 
-export default function ExperienceForm() {
+interface ExperienceFormProps {
+  onNext?: () => void;
+  onBack?: () => void;
+}
+
+export default function ExperienceForm({ onNext, onBack }: ExperienceFormProps) {
+  const { resumeId, resumeData, updateResumeField } = useResumeForm();
+  const createMutation = useCreateWorkExperienceMutation(resumeId || "");
+  const updateMutation = useUpdateWorkExperienceMutation(resumeId || "");
+  const deleteMutation = useDeleteWorkExperienceMutation(resumeId || "");
+
+  const existingExperiences = resumeData?.workExperience || [];
+
   const form = useForm<ExperienceFormValues>({
     resolver: zodResolver(experienceFormSchema),
     defaultValues: {
-      experiences: [
-        {
-          jobTitle: "",
-          companyName: "",
-          startDate: "",
-          endDate: "",
-          currentlyWorking: false,
-          bullets: [{ text: "" }],
-        },
-      ],
+      experiences:
+        existingExperiences.length > 0
+          ? existingExperiences.map((exp) => ({
+              id: exp.id || undefined,
+              jobTitle: exp.jobTitle || "",
+              companyName: exp.companyName || "",
+              location: exp.location || "",
+              startDate: exp.startDate
+                ? new Date(exp.startDate).toLocaleDateString("en-US")
+                : "",
+              endDate: exp.endDate
+                ? new Date(exp.endDate).toLocaleDateString("en-US")
+                : "",
+              isCurrent: exp.isCurrent || false,
+              responsibilities: (exp.responsibilities as string[])?.length
+                ? (exp.responsibilities as string[]).map((r) => ({
+                    text: r,
+                  }))
+                : [{ text: "" }],
+            }))
+          : [
+              {
+                jobTitle: "",
+                companyName: "",
+                location: "",
+                startDate: "",
+                endDate: "",
+                isCurrent: false,
+                responsibilities: [{ text: "" }],
+              },
+            ],
     },
   });
 
@@ -305,47 +362,110 @@ export default function ExperienceForm() {
     name: "experiences",
   });
 
-  function onSubmit(values: ExperienceFormValues) {
-    console.log(values);
+  async function onSubmit(values: ExperienceFormValues) {
+    if (!resumeId) {
+      onNext?.();
+      return;
+    }
+
+    const savePromises = values.experiences.map((exp) => {
+      const payload = {
+        jobTitle: exp.jobTitle,
+        companyName: exp.companyName,
+        location: exp.location,
+        startDate: exp.startDate,
+        endDate: exp.isCurrent ? undefined : exp.endDate,
+        isCurrent: exp.isCurrent,
+        responsibilities: exp.responsibilities.map((r) => r.text).filter(Boolean),
+      };
+
+      if (exp.id) {
+        return updateMutation.mutateAsync({ id: exp.id, data: payload });
+      }
+      return createMutation.mutateAsync(payload);
+    });
+
+    await Promise.all(savePromises);
+    updateResumeField("workExperience", values.experiences.map((exp) => ({
+      id: exp.id,
+      jobTitle: exp.jobTitle,
+      companyName: exp.companyName,
+      location: exp.location,
+      startDate: exp.startDate,
+      endDate: exp.endDate,
+      isCurrent: exp.isCurrent,
+      responsibilities: exp.responsibilities.map((r) => r.text).filter(Boolean),
+    })));
+    onNext?.();
   }
 
-  const handleAddRole = () => {
-    append({
-      jobTitle: "",
-      companyName: "",
-      startDate: "",
-      endDate: "",
-      currentlyWorking: false,
-      bullets: [{ text: "" }],
-    });
+  const handleRemoveExperience = (index: number) => {
+    const exp = form.getValues(`experiences.${index}`);
+    if (exp.id && resumeId) {
+      deleteMutation.mutate(exp.id);
+    }
+    remove(index);
   };
+
+  const isSaving =
+    createMutation.isPending ||
+    updateMutation.isPending ||
+    deleteMutation.isPending;
 
   return (
     <div className="w-full">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          {/* Experience cards */}
           {fields.map((field, index) => (
             <ExperienceCard
               key={field.id}
               index={index}
               control={form.control}
-              remove={remove}
+              remove={handleRemoveExperience}
               canRemove={fields.length > 1}
               watch={form.watch}
               setValue={form.setValue}
             />
           ))}
 
-          {/* Add Another Role button */}
           <button
             type="button"
-            onClick={handleAddRole}
+            onClick={() =>
+              append({
+                jobTitle: "",
+                companyName: "",
+                location: "",
+                startDate: "",
+                endDate: "",
+                isCurrent: false,
+                responsibilities: [{ text: "" }],
+              })
+            }
             className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl border-2 border-dashed border-indigo-400 text-indigo-600 font-semibold text-sm hover:bg-indigo-50 transition-colors"
           >
             <Plus className="w-4 h-4" />
             Add Another Role
           </button>
+
+          {/* Navigation */}
+          <div className="pt-4 flex justify-between">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onBack}
+              className="h-12 px-6 rounded-xl border-gray-200 text-gray-700 font-semibold text-sm hover:bg-gray-50 gap-2"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back
+            </Button>
+            <Button
+              type="submit"
+              disabled={isSaving}
+              className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-8 h-12 rounded-xl text-sm transition-colors"
+            >
+              {isSaving ? "Saving..." : "Save & Continue"}
+            </Button>
+          </div>
         </form>
       </Form>
     </div>

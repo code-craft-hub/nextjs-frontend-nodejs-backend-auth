@@ -12,9 +12,12 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
-import { Lightbulb, BriefcaseBusiness } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Lightbulb, BriefcaseBusiness, ArrowLeft } from "lucide-react";
+import { useResumeForm } from "./ResumeFormContext";
+import { useUpdateResumeMutation } from "@/lib/mutations/resume.mutations";
 
-// ─── Schema ────────────────────────────────────────────────────────────────────
+// ─── Schema ────────────────────────────────────────────────────────
 
 const MAX_CHARS = 500;
 
@@ -27,26 +30,50 @@ const professionalSummarySchema = z.object({
 
 type ProfessionalSummaryFormValues = z.infer<typeof professionalSummarySchema>;
 
-// ─── Component ────────────────────────────────────────────────────────────────
+// ─── Component ────────────────────────────────────────────────────
 
-export default function ProfessionalSummaryForm() {
+interface ProfessionalSummaryFormProps {
+  onNext?: () => void;
+  onBack?: () => void;
+}
+
+export default function ProfessionalSummaryForm({
+  onNext,
+  onBack,
+}: ProfessionalSummaryFormProps) {
+  const { resumeId, resumeData, updateResumeField } = useResumeForm();
+  const updateResume = useUpdateResumeMutation();
+
   const form = useForm<ProfessionalSummaryFormValues>({
     resolver: zodResolver(professionalSummarySchema),
     defaultValues: {
-      summary: "",
+      summary: resumeData?.description || resumeData?.summary || "",
     },
   });
 
   const summaryValue = form.watch("summary");
   const charCount = summaryValue?.length ?? 0;
 
-  function onSubmit(values: ProfessionalSummaryFormValues) {
-    console.log(values);
+  async function onSubmit(values: ProfessionalSummaryFormValues) {
+    if (!resumeId) {
+      onNext?.();
+      return;
+    }
+
+    updateResume.mutate(
+      { id: resumeId, data: { description: values.summary } },
+      {
+        onSuccess: () => {
+          updateResumeField("description", values.summary);
+          onNext?.();
+        },
+      },
+    );
   }
 
   return (
     <div className="w-full bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8">
-      {/* ── Section header ──────────────────────────────────────────────────── */}
+      {/* ── Section header ──────────────────────────────────────────── */}
       <div className="flex items-start gap-4 mb-7">
         <span className="flex items-center justify-center w-11 h-11 rounded-full bg-purple-100 text-purple-500 shrink-0 mt-0.5">
           <BriefcaseBusiness className="w-5 h-5" />
@@ -62,7 +89,7 @@ export default function ProfessionalSummaryForm() {
         </div>
       </div>
 
-      {/* ── Form ────────────────────────────────────────────────────────────── */}
+      {/* ── Form ──────────────────────────────────────────────────── */}
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
           <FormField
@@ -107,7 +134,7 @@ export default function ProfessionalSummaryForm() {
             )}
           />
 
-          {/* ── Pro Tip ─────────────────────────────────────────────────────── */}
+          {/* ── Pro Tip ─────────────────────────────────────────── */}
           <div className="rounded-xl bg-indigo-50 border border-indigo-100 p-4 mt-2">
             <div className="flex items-center gap-2 mb-1.5">
               <Lightbulb className="w-4 h-4 text-indigo-500 shrink-0" />
@@ -117,6 +144,26 @@ export default function ProfessionalSummaryForm() {
               Start with your years of experience, mention your specialty, and
               highlight 1-2 major achievements or skills that set you apart.
             </p>
+          </div>
+
+          {/* ── Navigation ─────────────────────────────────────── */}
+          <div className="pt-4 flex justify-between">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onBack}
+              className="h-12 px-6 rounded-xl border-gray-200 text-gray-700 font-semibold text-sm hover:bg-gray-50 gap-2"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back
+            </Button>
+            <Button
+              type="submit"
+              disabled={updateResume.isPending}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 h-12 rounded-xl text-sm transition-colors"
+            >
+              {updateResume.isPending ? "Saving..." : "Save & Continue"}
+            </Button>
           </div>
         </form>
       </Form>
