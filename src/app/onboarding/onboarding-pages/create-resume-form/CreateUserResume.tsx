@@ -1,19 +1,7 @@
-import React from 'react'
-import ExperienceForm from './WorkExperienceForm'
-import SkillsForm from './SkillsForm'
-import EducationSection from './EducationSection'
+import ResumeFormLayout from "./ResumeFormLayout";
 
 const CreateUserResume = () => {
-  return (
-    <div>
-      <ExperienceForm />
-      <SkillsForm />
-      <EducationSection />
-      <ProjectCardSection />
-      <CertificationAchievementsForm />
+  return <ResumeFormLayout />;
+};
 
-    </div>
-  )
-}
-
-export default CreateUserResume
+export default CreateUserResume;

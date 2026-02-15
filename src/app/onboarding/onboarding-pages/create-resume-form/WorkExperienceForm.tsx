@@ -28,11 +28,17 @@ const experienceEntrySchema = z
     startDate: z.string().min(1, "Start date is required"),
     endDate: z.string().optional(),
     currentlyWorking: z.boolean(),
-    bullets: z.array(bulletSchema).min(1, "At least one bullet point is required"),
+    bullets: z
+      .array(bulletSchema)
+      .min(1, "At least one bullet point is required"),
   })
   .refine(
-    (data) => data.currentlyWorking || (data.endDate && data.endDate.length > 0),
-    { message: "End date is required unless currently working here", path: ["endDate"] }
+    (data) =>
+      data.currentlyWorking || (data.endDate && data.endDate.length > 0),
+    {
+      message: "End date is required unless currently working here",
+      path: ["endDate"],
+    },
   );
 
 const experienceFormSchema = z.object({
@@ -315,35 +321,33 @@ export default function ExperienceForm() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-start justify-center p-4 md:p-8">
-      <div className="w-full max-w-2xl">
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            {/* Experience cards */}
-            {fields.map((field, index) => (
-              <ExperienceCard
-                key={field.id}
-                index={index}
-                control={form.control}
-                remove={remove}
-                canRemove={fields.length > 1}
-                watch={form.watch}
-                setValue={form.setValue}
-              />
-            ))}
+    <div className="w-full">
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          {/* Experience cards */}
+          {fields.map((field, index) => (
+            <ExperienceCard
+              key={field.id}
+              index={index}
+              control={form.control}
+              remove={remove}
+              canRemove={fields.length > 1}
+              watch={form.watch}
+              setValue={form.setValue}
+            />
+          ))}
 
-            {/* Add Another Role button */}
-            <button
-              type="button"
-              onClick={handleAddRole}
-              className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl border-2 border-dashed border-indigo-400 text-indigo-600 font-semibold text-sm hover:bg-indigo-50 transition-colors"
-            >
-              <Plus className="w-4 h-4" />
-              Add Another Role
-            </button>
-          </form>
-        </Form>
-      </div>
+          {/* Add Another Role button */}
+          <button
+            type="button"
+            onClick={handleAddRole}
+            className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl border-2 border-dashed border-indigo-400 text-indigo-600 font-semibold text-sm hover:bg-indigo-50 transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            Add Another Role
+          </button>
+        </form>
+      </Form>
     </div>
   );
 }

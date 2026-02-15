@@ -145,9 +145,7 @@ export default function CertificationAchievementsForm({
   const form = useForm<CertificationFormValues>({
     resolver: zodResolver(certificationFormSchema),
     defaultValues: {
-      certifications: [
-        { title: "", issuer: "", year: "" },
-      ],
+      certifications: [{ title: "", issuer: "", year: "" }],
     },
   });
 
@@ -166,10 +164,9 @@ export default function CertificationAchievementsForm({
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-start p-4 md:p-8 gap-6">
+    <div className="w-full flex flex-col gap-6">
       {/* ── Main card ─────────────────────────────────────────────────────────── */}
-      <div className="w-full max-w-2xl bg-white rounded-2xl border border-gray-200 shadow-sm p-6 md:p-8">
-
+      <div className="w-full bg-white rounded-2xl border border-gray-200 shadow-sm p-6 md:p-8">
         {/* ── Section header ──────────────────────────────────────────────────── */}
         <div className="flex items-start gap-4 mb-7">
           <span className="flex items-center justify-center w-11 h-11 rounded-full bg-yellow-100 shrink-0 mt-0.5">
@@ -219,7 +216,7 @@ export default function CertificationAchievementsForm({
       </div>
 
       {/* ── Bottom navigation ─────────────────────────────────────────────────── */}
-      <div className="w-full max-w-2xl flex items-center justify-center gap-3">
+      <div className="flex items-center justify-center gap-3">
         <Button
           type="button"
           variant="outline"

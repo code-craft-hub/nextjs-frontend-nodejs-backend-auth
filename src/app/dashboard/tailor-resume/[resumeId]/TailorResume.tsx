@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useResumeStream } from "@/hooks/stream-resume-hook";
 import { useSearchParams, useParams } from "next/navigation";
 import { toast } from "sonner";
@@ -11,15 +11,14 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { resumeQueries } from "@/lib/queries/resume.queries";
 import { userQueries } from "@/lib/queries/user.queries";
 import { ResumeDownloadButton } from "./ResumeDownloadButton";
-import { TrashIcon } from "lucide-react";
+import { Edit, TrashIcon } from "lucide-react";
 import { api, BASEURL } from "@/lib/api/client";
 import { sendGTMEvent } from "@next/third-parties/google";
 import { BACKEND_API_VERSION } from "@/lib/api/profile.api";
 import { ResumeLoadingSkeleton } from "../components/resume-loading-skeleton";
-import {
-  buildResumeUpdateUrl,
-} from "@/lib/utils/ai-apply-navigation";
+import { buildResumeUpdateUrl } from "@/lib/utils/ai-apply-navigation";
 import { EditableResume } from "../../(dashboard)/ai-apply/components/resume/EditableResume";
+import CreateUserResume from "@/app/onboarding/onboarding-pages/create-resume-form/CreateUserResume";
 
 const API_URL = `${BASEURL}/${BACKEND_API_VERSION}/resumes/generate`;
 
@@ -52,6 +51,7 @@ export const TailorResume = () => {
   const router = useRouter();
   const resultsEndRef = useRef<HTMLDivElement>(null);
   const hasGeneratedRef = useRef(false);
+  const [editResume, setEditResume] = useState(false);
 
   // Extract IDs and parameters from URL search params and route params
   const coverLetterDocId = searchParams.get("coverLetterDocId");
@@ -62,7 +62,6 @@ export const TailorResume = () => {
   const jobDescription = searchParams.get("jobDescription") || "";
   const recruiterEmail = searchParams.get("recruiterEmail") || "";
   const aiApply = searchParams.get("aiApply") === "true";
-
 
   useEffect(() => {
     if (user?.firstName)
@@ -97,10 +96,11 @@ export const TailorResume = () => {
   useEffect(() => {
     const isRegenerationNeeded =
       resumeDocId &&
-      (resumeStatus === "error" || (resumeStatus === "success" && !existingResume)); // No data exists
+      (resumeStatus === "error" ||
+        (resumeStatus === "success" && !existingResume)); // No data exists
 
     if (
-      (isRegenerationNeeded) &&
+      isRegenerationNeeded &&
       user &&
       jobDescription &&
       !hasGeneratedRef.current
@@ -132,11 +132,7 @@ export const TailorResume = () => {
 
   // Update URL with actual resumeDocId after generation completes
   useEffect(() => {
-    if (
-      documentId &&
-      !streamStatus.isComplete &&
-      coverLetterDocId
-    ) {
+    if (documentId && !streamStatus.isComplete && coverLetterDocId) {
       const newUrl = buildResumeUpdateUrl(
         coverLetterDocId,
         documentId,
@@ -170,7 +166,6 @@ export const TailorResume = () => {
     router,
   ]);
 
-  
   const isLoading =
     resumeStatus === "pending" ||
     resumeStatus === "error" ||
@@ -208,7 +203,15 @@ export const TailorResume = () => {
           <div className="flex w-full gap-3 items-center  p-4  bg-white justify-between">
             <p className="text-xl font-medium font-inter">Tailored Resume</p>
             <div className="flex gap-2">
-              <ResumeDownloadButton resumeData={displayResumeData} />
+              <Button
+                className=""
+                variant={"outline"}
+                onClick={() => {
+                  setEditResume(true);
+                }}
+              >
+                <Edit className="w-5 h-5 " />
+              </Button>
               <Button
                 className=""
                 variant={"destructive"}
@@ -218,15 +221,22 @@ export const TailorResume = () => {
               >
                 <TrashIcon className="w-5 h-5 " />
               </Button>
+              <ResumeDownloadButton resumeData={displayResumeData} />
             </div>
           </div>
 
-          <EditableResume
-            data={displayResumeData}
-            resumeId={resumeDocId || documentId || "pending"}
-            isStreaming={!streamStatus.isComplete}
-          />
-          <div ref={resultsEndRef} className="" />
+          {editResume ? (
+            <CreateUserResume />
+          ) : (
+            <>
+              <EditableResume
+                data={displayResumeData}
+                resumeId={resumeDocId || documentId || "pending"}
+                isStreaming={!streamStatus.isComplete}
+              />
+              <div ref={resultsEndRef} className="" />
+            </>
+          )}
         </>
       )}
     </div>

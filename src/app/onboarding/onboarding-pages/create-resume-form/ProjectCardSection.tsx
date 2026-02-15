@@ -189,35 +189,33 @@ export default function ProjectsForm() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-start justify-center p-4 md:p-8">
-      <div className="w-full max-w-2xl">
-        {/* Outer wrapper card — matches the light rounded container in screenshot */}
-        <div className="bg-gray-50 rounded-2xl border border-gray-200 p-4 md:p-5 space-y-4">
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              {/* Project cards */}
-              {fields.map((field, index) => (
-                <ProjectCard
-                  key={field.id}
-                  index={index}
-                  control={form.control}
-                  remove={remove}
-                  canRemove={fields.length > 1}
-                />
-              ))}
+    <div className="w-full">
+      {/* Outer wrapper card — matches the light rounded container in screenshot */}
+      <div className="bg-gray-50 rounded-2xl border border-gray-200 p-4 md:p-5 space-y-4">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            {/* Project cards */}
+            {fields.map((field, index) => (
+              <ProjectCard
+                key={field.id}
+                index={index}
+                control={form.control}
+                remove={remove}
+                canRemove={fields.length > 1}
+              />
+            ))}
 
-              {/* Add Another Project button */}
-              <button
-                type="button"
-                onClick={handleAddProject}
-                className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl border-2 border-dashed border-indigo-400 text-indigo-600 font-semibold text-sm hover:bg-indigo-50 transition-colors"
-              >
-                <Plus className="w-4 h-4" />
-                Add Another Project
-              </button>
-            </form>
-          </Form>
-        </div>
+            {/* Add Another Project button */}
+            <button
+              type="button"
+              onClick={handleAddProject}
+              className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl border-2 border-dashed border-indigo-400 text-indigo-600 font-semibold text-sm hover:bg-indigo-50 transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              Add Another Project
+            </button>
+          </form>
+        </Form>
       </div>
     </div>
   );

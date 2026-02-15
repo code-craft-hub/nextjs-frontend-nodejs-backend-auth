@@ -43,7 +43,7 @@ export default function EducationSection() {
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto px-4 sm:px-6 py-6">
+    <div className="w-full">
       {/* Header */}
       <div className="flex items-start gap-4 mb-6">
         <div className="flex-shrink-0 w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
@@ -99,8 +99,7 @@ export default function EducationSection() {
                 htmlFor={`degree-${index}`}
                 className="block text-sm font-medium text-gray-800 mb-1.5"
               >
-                Degree / Certification{" "}
-                <span className="text-red-500">*</span>
+                Degree / Certification <span className="text-red-500">*</span>
               </label>
               <input
                 id={`degree-${index}`}

@@ -74,93 +74,7 @@ export default function PersonalInfoForm() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-8 flex items-start justify-center">
-      <div className="w-full max-w-5xl flex flex-col md:flex-row gap-5">
-        {/* ── Sidebar ─────────────────────────────────────────────────────────── */}
-        <aside className="flex flex-col gap-4 w-full md:w-[260px] shrink-0">
-          {/* Form Sections card */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-            <p className="text-[11px] font-semibold uppercase tracking-widest text-gray-400 mb-4">
-              Form Sections
-            </p>
-
-            <nav className="flex flex-col gap-1">
-              {sections.map((s) => {
-                const isActive = s.id === ACTIVE_SECTION;
-                return (
-                  <button
-                    key={s.id}
-                    type="button"
-                    className={cn(
-                      "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors w-full text-left",
-                      isActive
-                        ? "bg-blue-600 text-white"
-                        : "text-gray-600 hover:bg-gray-50"
-                    )}
-                  >
-                    <span
-                      className={cn(
-                        "flex items-center justify-center w-6 h-6 rounded-full text-xs font-semibold shrink-0",
-                        isActive
-                          ? "bg-white/20 text-white"
-                          : "bg-gray-100 text-gray-500"
-                      )}
-                    >
-                      {s.id}
-                    </span>
-                    {s.label}
-                  </button>
-                );
-              })}
-            </nav>
-
-            {/* Progress */}
-            <div className="mt-5 pt-4 border-t border-gray-100">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-medium text-gray-500">
-                  Progress
-                </span>
-                <span className="text-xs font-semibold text-blue-600">
-                  {PROGRESS}%
-                </span>
-              </div>
-              <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-blue-600 rounded-full transition-all duration-300"
-                  style={{ width: `${PROGRESS}%` }}
-                />
-              </div>
-              <p className="text-xs text-gray-400 mt-2">
-                {COMPLETED} of {TOTAL} sections completed
-              </p>
-            </div>
-          </div>
-
-          {/* Need Help card */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="flex items-center justify-center w-8 h-8 bg-gray-100 rounded-full">
-                <Headphones className="w-4 h-4 text-gray-500" />
-              </span>
-              <span className="font-semibold text-gray-900 text-sm">
-                Need Help?
-              </span>
-            </div>
-            <p className="text-xs text-gray-500 leading-relaxed mb-4">
-              Our support team is here to assist you with any questions.
-            </p>
-            <Button
-              variant="outline"
-              className="w-full text-sm font-medium border-gray-200 text-gray-700 hover:bg-gray-50 rounded-xl"
-              type="button"
-            >
-              Contact Support
-            </Button>
-          </div>
-        </aside>
-
-        {/* ── Main form card ───────────────────────────────────────────────────── */}
-        <div className="flex-1 bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8">
+    <div className="w-full bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8">
           {/* Section header */}
           <div className="flex items-center gap-3 mb-8">
             <span className="flex items-center justify-center w-10 h-10 rounded-full bg-indigo-50 text-indigo-400">
@@ -369,8 +283,6 @@ export default function PersonalInfoForm() {
               </div>
             </form>
           </Form>
-        </div>
-      </div>
     </div>
   );
 }
