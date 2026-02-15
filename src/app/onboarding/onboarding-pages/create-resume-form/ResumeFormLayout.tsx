@@ -64,7 +64,7 @@ function ProjectsAndCertifications() {
   );
 }
 
-export default function ResumeFormLayout() {
+export default function ResumeFormLayout(data: any /* TODO: CLAUSE PLEASE GET TYPE OF THE DATA FROM THE RESUMES AGGREGATE WHICH IS THE RESUMES AND ALL IT'S CHILDREN TABLES */) {
   const [activeSection, setActiveSection] = useState(1);
 
   const currentSection = sections.find((s) => s.id === activeSection);
@@ -80,12 +80,12 @@ export default function ResumeFormLayout() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-8 flex items-start justify-center">
+    <div className=" flex items-start justify-center">
       <div className="w-full max-w-6xl flex flex-col md:flex-row gap-6">
         {/* ── Sidebar ──────────────────────────────────────────── */}
-        <aside className="flex flex-col gap-4 w-full md:w-[280px] shrink-0">
+        <aside className="flex flex-col gap-4 sm:gap-8 w-full md:w-70 shrink-0">
           {/* Form Sections Card */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 sticky top-8">
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 ">
             <p className="text-[11px] font-semibold uppercase tracking-widest text-gray-400 mb-4">
               Form Sections
             </p>
