@@ -21,9 +21,17 @@ interface Setting {
   options: SettingOption[];
 }
 
-interface SwitchStates {
-  [key: string]: boolean;
-}
+type AiApplyPreferences =
+  | "autoApplyEnabled"
+  | "autoSendApplications"
+  | "enableWhatsAppApplications"
+  | "saveAsDrafts"
+  | "generateTailoredCv"
+  | "useMasterCv";
+
+type SwitchStates = {
+  [key in AiApplyPreferences]: boolean;
+};
 
 interface SwitchProps {
   id: string;
@@ -71,6 +79,8 @@ export const AiApplyPreferences: React.FC = () => {
   const updateUser = useUpdateAISettingsMutation();
   const { data: user } = useQuery(userQueries.detail());
 
+  console.log("User AI Apply Preferences:", user);
+
   const [oauthState, setOauthState] = useState(false);
 
   const checkAuth = async (value: { authorized: boolean }): Promise<void> => {
@@ -86,7 +96,7 @@ export const AiApplyPreferences: React.FC = () => {
           label: "Enable Auto Apply",
           description: "Allow AI to automatically apply to matching jobs",
           type: "toggle",
-          key: "enableAutoApply",
+          key: "autoApplyEnabled",
         },
       ],
     },
@@ -113,13 +123,13 @@ export const AiApplyPreferences: React.FC = () => {
           label: "Use Master CV",
           description: "Use your original uploaded CV for all applications",
           type: "toggle",
-          key: "useMasterCV",
+          key: "useMasterCv",
         },
         {
           label: "Generate Tailored CV",
           description: "Let Cver customize your CV for each job applications",
           type: "toggle",
-          key: "generateTailoredCV",
+          key: "generateTailoredCv",
         },
       ],
     },
@@ -140,44 +150,7 @@ export const AiApplyPreferences: React.FC = () => {
         },
       ],
     },
-    // {
-    //   section: "Form Filing Method",
-    //   options: [
-    //     {
-    //       label: "Review Before Submit",
-    //       description:
-    //         "AI fills forms but waits for your approval before submitting",
-    //       type: "toggle",
-    //       key: "reviewBeforeSubmit",
-    //     },
-    //     {
-    //       label: "Auto Submit",
-    //       description:
-    //         "AI automatically submits applications after filing forms",
-    //       type: "toggle",
-    //       key: "autoSubmit",
-    //     },
-    //   ],
-    // },
-    // {
-    //   section: "Handling Unknown Questions",
-    //   options: [
-    //     {
-    //       label: "Intelligent Answers",
-    //       description:
-    //         "AI provides smart answers for questions outside its knowledge base",
-    //       type: "toggle",
-    //       key: "intelligentAnswers",
-    //     },
-    //     {
-    //       label: "Pause for Input",
-    //       description:
-    //         "AI pauses and requests your input for unknown questions",
-    //       type: "toggle",
-    //       key: "pauseForInput",
-    //     },
-    //   ],
-    // },
+
     {
       section: "WhatsApp Integration",
       img: "/message.svg",
@@ -198,34 +171,23 @@ export const AiApplyPreferences: React.FC = () => {
         },
       ],
     },
-    // {
-    //   child: true,
-    //   options: [
-    //     {
-    //       label: "Enable WhatsApp Applications",
-    //       description: "Allow applications via WhatsApp",
-    //       type: "toggle",
-    //       key: "enableWhatsAppApplications",
-    //     },
-    //   ],
-    // },
   ];
 
   // Initialize state for all toggle switches
   const [switchStates, setSwitchStates] = useState<SwitchStates>(() => {
-    const initialState: SwitchStates = {};
-    Object.entries(user?.aiApplyPreferences ?? {}).forEach(([key, value]) => {
+    const initialState: SwitchStates = {
+      autoApplyEnabled: false,
+      autoSendApplications: false,
+      enableWhatsAppApplications: false,
+      saveAsDrafts: false,
+      generateTailoredCv: false,
+      useMasterCv: false,
+    };
+    Object.entries(user ?? {}).forEach(([key, value]) => {
       if (key && typeof value === "boolean") {
-        initialState[key] = value;
+        initialState[key as keyof SwitchStates] = value;
       }
     });
-    // settings.forEach((setting: Setting) => {
-    //   setting.options?.forEach((option: SettingOption) => {
-    //     if (option.type === "toggle" && option.key) {
-    //       initialState[option.key] = false; // Default to false, you can set custom defaults
-    //     }
-    //   });
-    // });
 
     return initialState;
   });
@@ -245,21 +207,21 @@ export const AiApplyPreferences: React.FC = () => {
         updated.autoSendApplications = !checked;
       }
 
-      if (key === "pauseForInput") {
-        updated.intelligentAnswers = !checked;
-      } else if (key === "intelligentAnswers") {
-        updated.pauseForInput = !checked;
-      }
+      // if (key === "pauseForInput") {
+      //   updated.intelligentAnswers = !checked;
+      // } else if (key === "intelligentAnswers") {
+      //   updated.pauseForInput = !checked;
+      // }
 
-      if (key === "autoSubmit") {
-        updated.reviewBeforeSubmit = !checked;
-      } else if (key === "reviewBeforeSubmit") {
-        updated.autoSubmit = !checked;
-      }
-      if (key === "generateTailoredCV") {
-        updated.useMasterCV = !checked;
-      } else if (key === "useMasterCV") {
-        updated.generateTailoredCV = !checked;
+      // if (key === "autoSubmit") {
+      //   updated.reviewBeforeSubmit = !checked;
+      // } else if (key === "reviewBeforeSubmit") {
+      //   updated.autoSubmit = !checked;
+      // }
+      if (key === "generateTailoredCv") {
+        updated.useMasterCv = !checked;
+      } else if (key === "useMasterCv") {
+        updated.generateTailoredCv = !checked;
       }
 
       return updated;
@@ -269,7 +231,7 @@ export const AiApplyPreferences: React.FC = () => {
 
     try {
       await updateUser.mutateAsync({
-        data: { aiApplyPreferences: newState(switchStates) },
+        data: newState(switchStates),
       });
     } catch (error) {
       console.error("Error saving settings:", error);
@@ -307,7 +269,7 @@ export const AiApplyPreferences: React.FC = () => {
   );
 
   // Get switch state safely
-  const getSwitchState = (key: string): boolean => {
+  const getSwitchState = (key: AiApplyPreferences): boolean => {
     return switchStates[key] || false;
   };
 
@@ -363,7 +325,9 @@ export const AiApplyPreferences: React.FC = () => {
                       {option.type === "toggle" && option.key ? (
                         <Switch
                           id={option.key}
-                          checked={getSwitchState(option.key)}
+                          checked={getSwitchState(
+                            option.key as AiApplyPreferences,
+                          )}
                           onCheckedChange={(checked: boolean) =>
                             handleSwitchChange(option.key!, checked)
                           }
