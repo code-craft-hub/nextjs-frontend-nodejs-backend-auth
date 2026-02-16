@@ -1,4 +1,10 @@
-import type { ResumeAggregate, WorkExperienceEntry, EducationEntry, ProjectEntry, CertificationEntry } from "@/types/resume.types";
+import type {
+  ResumeAggregate,
+  WorkExperienceEntry,
+  EducationEntry,
+  ProjectEntry,
+  CertificationEntry,
+} from "@/types/resume.types";
 import { api } from "./client";
 import type { PaginatedResponse, PaginationParams } from "@/lib/types";
 import { BACKEND_API_VERSION } from "./profile.api";
@@ -49,6 +55,11 @@ export const resumeApi = {
 
   createResume: (data: CreateResumeData, token?: string) =>
     api.post<ApiResponse<ResumeAggregate>>(RESUME_BASE, data, { token }),
+
+  createNewResume: (data: CreateResumeData, token?: string) =>
+    api.post<ApiResponse<ResumeAggregate>>(RESUME_BASE + "/new", data, {
+      token,
+    }),
 
   getResumes: (params?: ResumeFilters, token?: string) =>
     api.get<PaginatedResponse<ResumeAggregate>>(

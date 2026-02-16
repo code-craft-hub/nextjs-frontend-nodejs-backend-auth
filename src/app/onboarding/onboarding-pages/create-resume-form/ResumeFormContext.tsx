@@ -8,7 +8,7 @@ import {
   useState,
 } from "react";
 import type { ResumeAggregate } from "@/types/resume.types";
-import { useCreateResumeMutation } from "@/lib/mutations/resume.mutations";
+import { useCreateNewResumeMutation } from "@/lib/mutations/resume.mutations";
 
 interface ResumeFormContextValue {
   resumeId: string | null;
@@ -43,7 +43,7 @@ export function ResumeFormProvider({
   const [isLoading] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [currentResumeId, setCurrentResumeId] = useState<string | null>(resumeId || null);
-  const createResumeMutation = useCreateResumeMutation();
+  const createResumeMutation = useCreateNewResumeMutation();
 
   const isEditMode = !!currentResumeId && !!resumeData;
 

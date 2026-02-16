@@ -187,6 +187,7 @@ interface CertificationAchievementsFormProps {
   onSaveDraft?: () => void;
   onContinue?: () => void;
   handleEditClick: (isEditing: boolean) => void;
+  onboardingResumeUploadCompleted?: () => void;
 }
 
 export default function CertificationAchievementsForm({
@@ -194,11 +195,23 @@ export default function CertificationAchievementsForm({
   onSaveDraft,
   onContinue,
   handleEditClick,
+  onboardingResumeUploadCompleted,
 }: CertificationAchievementsFormProps) {
-  const { resumeId, resumeData, updateResumeField, createNewResume, isCreating } = useResumeForm();
+  const {
+    resumeId,
+    resumeData,
+    updateResumeField,
+    createNewResume,
+    isCreating,
+  } = useResumeForm();
   const createMutation = useCreateCertificationMutation(resumeId || "");
   const updateMutation = useUpdateCertificationMutation(resumeId || "");
   const deleteMutation = useDeleteCertificationMutation(resumeId || "");
+
+  const completedResumeBuild = async () => {
+    form.handleSubmit(onSubmit)();
+    onboardingResumeUploadCompleted?.();
+  };
 
   const existingCertifications = resumeData?.certification || [];
 
@@ -278,7 +291,7 @@ export default function CertificationAchievementsForm({
       })),
     );
     onContinue?.();
-    handleEditClick(false)
+    handleEditClick(false);
   }
 
   const handleRemoveCertification = (index: number) => {
@@ -379,7 +392,7 @@ export default function CertificationAchievementsForm({
         <Button
           type="submit"
           disabled={isSaving}
-          onClick={form.handleSubmit(onSubmit)}
+          onClick={() => completedResumeBuild}
           className="h-12 px-6 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm gap-2 transition-colors"
         >
           {isSaving ? "Saving..." : "Continue to Preview"}

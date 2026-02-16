@@ -13,7 +13,15 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { User, MapPin, Linkedin, Globe, Mail, Phone } from "lucide-react";
+import {
+  User,
+  MapPin,
+  Linkedin,
+  Globe,
+  Mail,
+  Phone,
+  Briefcase,
+} from "lucide-react";
 import { useResumeForm } from "./ResumeFormContext";
 import { useUpdateResumeMutation } from "@/lib/mutations/resume.mutations";
 import { CloseEditButton } from "@/components/shared/CloseEditButton";
@@ -26,6 +34,7 @@ const personalInfoSchema = z.object({
   phoneNumber: z.string().optional(),
   location: z.string().min(1, "Location is required"),
   linkedIn: z.string().optional(),
+  resumeTitle: z.string({ message: "Please provide the resume title." }),
   github: z.string().optional(),
   website: z.string().optional(),
 });
@@ -61,6 +70,7 @@ export default function PersonalInfoForm({
       phoneNumber: resumeData?.phoneNumber || "",
       location: resumeData?.location || "",
       linkedIn: resumeData?.linkedIn || "",
+      resumeTitle: resumeData?.linkedIn || "",
       github: resumeData?.github || "",
       website: resumeData?.website || "",
     },
@@ -71,7 +81,7 @@ export default function PersonalInfoForm({
 
     // If no resume exists, create one first
     if (!activeResumeId) {
-      const newResumeId = await createNewResume("My Resume");
+      const newResumeId = await createNewResume(values.resumeTitle);
       if (!newResumeId) {
         // Handle error - could show a toast
         console.error("Failed to create resume");
@@ -219,37 +229,55 @@ export default function PersonalInfoForm({
           {/* Divider */}
           <div className="pt-1" />
 
-          {/* Online Presence */}
           <div>
-            <p className="text-sm font-semibold text-gray-900 mb-4">
-              Online Presence{" "}
-              <span className="text-gray-400 font-normal">(Optional)</span>
-            </p>
-
             <div className="space-y-4">
-              <FormField
-                control={form.control}
-                name="linkedIn"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-sm font-medium text-gray-700">
-                      LinkedIn Profile
-                    </FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <Linkedin className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300 pointer-events-none" />
-                        <Input
-                          placeholder="linkedin.com/in/yourprofile"
-                          className="h-12 rounded-xl border-gray-200 bg-white pl-10 placeholder:text-gray-300 text-gray-800 text-sm focus-visible:ring-blue-500 focus-visible:ring-1 focus-visible:border-blue-400"
-                          {...field}
-                        />
-                      </div>
-                    </FormControl>
-                    <FormMessage className="text-xs" />
-                  </FormItem>
-                )}
-              />
-
+              {" "}
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="linkedIn"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium text-gray-700">
+                        LinkedIn Profile
+                      </FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Linkedin className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300 pointer-events-none" />
+                          <Input
+                            placeholder="linkedin.com/in/yourprofile"
+                            className="h-12 rounded-xl border-gray-200 bg-white pl-10 placeholder:text-gray-300 text-gray-800 text-sm focus-visible:ring-blue-500 focus-visible:ring-1 focus-visible:border-blue-400"
+                            {...field}
+                          />
+                        </div>
+                      </FormControl>
+                      <FormMessage className="text-xs" />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="resumeTitle"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium text-gray-700">
+                        Resume Title
+                      </FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Briefcase className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300 pointer-events-none" />
+                          <Input
+                            placeholder="software engineer"
+                            className="h-12 rounded-xl border-gray-200 bg-white pl-10 placeholder:text-gray-300 text-gray-800 text-sm focus-visible:ring-blue-500 focus-visible:ring-1 focus-visible:border-blue-400"
+                            {...field}
+                          />
+                        </div>
+                      </FormControl>
+                      <FormMessage className="text-xs" />
+                    </FormItem>
+                  )}
+                />
+              </div>
               <div className="grid grid-cols-2 gap-4">
                 <FormField
                   control={form.control}

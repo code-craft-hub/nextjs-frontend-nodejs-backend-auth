@@ -19,6 +19,7 @@ type Section = {
     onNext?: () => void;
     onBack?: () => void;
     handleEditClick: (value: boolean) => void;
+    onboardingResumeUploadCompleted?: () => void;
   }>;
 };
 
@@ -40,49 +41,12 @@ const sections: Section[] = [
   },
 ];
 
-// function ProjectsAndCertifications({
-//   onNext,
-//   onBack,
-//   handleEditClick,
-// }: {
-//   onNext?: () => void;
-//   onBack?: () => void;
-//   handleEditClick: (value: boolean) => void;
-// }) {
-//   const [showProjects, setShowProjects] = useState(true);
-
-//   return (
-//     <div>
-//       {showProjects ? (
-//         <div>
-//           <ProjectsForm onBack={onBack} handleEditClick={handleEditClick} />
-//           <div className="flex justify-center py-8">
-//             <Button
-//               onClick={() => setShowProjects(false)}
-//               variant="default"
-//               className="bg-indigo-600 hover:bg-indigo-700"
-//             >
-//               Continue to Certifications
-//             </Button>
-//           </div>
-//         </div>
-//       ) : (
-//         <div>
-//           <CertificationAchievementsForm
-//             onBack={() => setShowProjects(true)}
-//             onContinue={onNext}
-//             handleEditClick={handleEditClick}
-//           />
-//         </div>
-//       )}
-//     </div>
-//   );
-// }
-
 export default function ResumeFormLayout({
   handleEditClick,
+  onNext: onboardingResumeUploadCompleted,
 }: {
   handleEditClick: (value: boolean) => void;
+  onNext?: () => void;
 }) {
   const { isLoading } = useResumeForm();
   const [activeSection, setActiveSection] = useState(1);
@@ -211,6 +175,7 @@ export default function ResumeFormLayout({
               onNext={handleNext}
               onBack={handleBack}
               handleEditClick={handleEditClick}
+              onboardingResumeUploadCompleted={onboardingResumeUploadCompleted}
             />
           </div>
         </div>

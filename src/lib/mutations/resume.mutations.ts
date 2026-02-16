@@ -165,6 +165,20 @@ export function useDeleteResumeMutation() {
   });
 }
 
+// ─── New Resume Mutation ────────────────────────────────────
+
+export function useCreateNewResumeMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: CreateResumeData) => resumeApi.createNewResume(data),
+    onSettled: () => {
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.resumes.lists(),
+      });
+    },
+  });
+}
 // ─── Work Experience Mutations ────────────────────────────────────
 
 export function useCreateWorkExperienceMutation(resumeId: string) {
@@ -185,8 +199,13 @@ export function useUpdateWorkExperienceMutation(resumeId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<WorkExperienceEntry> }) =>
-      resumeApi.updateWorkExperience(resumeId, id, data),
+    mutationFn: ({
+      id,
+      data,
+    }: {
+      id: string;
+      data: Partial<WorkExperienceEntry>;
+    }) => resumeApi.updateWorkExperience(resumeId, id, data),
     onSettled: () => {
       queryClient.invalidateQueries({
         queryKey: queryKeys.resumes.detail(resumeId),
@@ -199,8 +218,7 @@ export function useDeleteWorkExperienceMutation(resumeId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: string) =>
-      resumeApi.deleteWorkExperience(resumeId, id),
+    mutationFn: (id: string) => resumeApi.deleteWorkExperience(resumeId, id),
     onSettled: () => {
       queryClient.invalidateQueries({
         queryKey: queryKeys.resumes.detail(resumeId),
@@ -209,7 +227,7 @@ export function useDeleteWorkExperienceMutation(resumeId: string) {
   });
 }
 
-// ─── Education Mutations ──────────────────────────────────────────
+// ─── Education Mutations ────────────────────────────────────────── ---500
 
 export function useCreateEducationMutation(resumeId: string) {
   const queryClient = useQueryClient();
@@ -334,8 +352,7 @@ export function useDeleteCertificationMutation(resumeId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: string) =>
-      resumeApi.deleteCertification(resumeId, id),
+    mutationFn: (id: string) => resumeApi.deleteCertification(resumeId, id),
     onSettled: () => {
       queryClient.invalidateQueries({
         queryKey: queryKeys.resumes.detail(resumeId),

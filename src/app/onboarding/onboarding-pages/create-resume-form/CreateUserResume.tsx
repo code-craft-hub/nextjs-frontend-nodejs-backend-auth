@@ -6,12 +6,13 @@ interface CreateUserResumeProps {
   data?: ResumeAggregate | null;
   resumeId?: string | null;
   handleEditClick: (value: boolean) => void;
+  onNext?: () => void;
 }
 
-const CreateUserResume = ({ data = null, resumeId = null, handleEditClick }: CreateUserResumeProps) => {
+const CreateUserResume = ({ data = null, resumeId = null, handleEditClick, onNext }: CreateUserResumeProps) => {
   return (
     <ResumeFormProvider initialData={data} resumeId={resumeId}>
-      <ResumeFormLayout handleEditClick={handleEditClick} />
+      <ResumeFormLayout handleEditClick={handleEditClick} onNext={onNext} />
     </ResumeFormProvider>
   );
 };

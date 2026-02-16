@@ -112,22 +112,43 @@ type ExperienceFormValues = z.infer<typeof experienceFormSchema>;
 function DateInput({
   value,
   onChange,
-  placeholder = "mm-dd-yyyy",
   disabled,
 }: {
   value: string;
   onChange: (v: string) => void;
-  placeholder?: string;
   disabled?: boolean;
 }) {
+  // Convert MM/DD/YYYY to YYYY-MM-DD for date input
+  const convertToDateInputFormat = (dateStr: string): string => {
+    if (!dateStr) return "";
+    const dateRegex = /^(\d{1,2})[-/](\d{1,2})[-/](\d{4})$/;
+    const match = dateStr.match(dateRegex);
+    if (!match) return dateStr;
+    const month = match[1].padStart(2, "0");
+    const day = match[2].padStart(2, "0");
+    const year = match[3];
+    return `${year}-${month}-${day}`;
+  };
+
+  // Convert YYYY-MM-DD to MM/DD/YYYY for form submission
+  const convertFromDateInputFormat = (dateStr: string): string => {
+    if (!dateStr) return "";
+    const dateRegex = /^(\d{4})-(\d{2})-(\d{2})$/;
+    const match = dateStr.match(dateRegex);
+    if (!match) return dateStr;
+    const month = parseInt(match[2], 10);
+    const day = parseInt(match[3], 10);
+    const year = match[1];
+    return `${month}/${day}/${year}`;
+  };
+
   return (
     <div className="relative">
       <CalendarDays className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
       <Input
-        type="text"
-        placeholder={placeholder}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
+        type="date"
+        value={convertToDateInputFormat(value)}
+        onChange={(e) => onChange(convertFromDateInputFormat(e.target.value))}
         disabled={disabled}
         className="h-12 rounded-xl border-gray-200 bg-white pl-10 placeholder:text-gray-300 text-gray-800 text-sm focus-visible:ring-indigo-400 focus-visible:ring-1 focus-visible:border-indigo-400 disabled:opacity-40 disabled:cursor-not-allowed"
       />
