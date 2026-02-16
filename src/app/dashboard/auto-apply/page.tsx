@@ -6,6 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useResumeStream } from "@/hooks/stream-resume-hook";
 import { useCoverLetterStream } from "@/hooks/useCoverLetterGenerator";
+import { useCreateAutoApplyMutation } from "@/lib/mutations/auto-apply.mutations";
 import { userQueries } from "@/lib/queries/user.queries";
 import { BASEURL } from "@/lib/api/client";
 import { BACKEND_API_VERSION } from "@/lib/api/profile.api";
@@ -19,7 +20,10 @@ export default function AutoApplyPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const hasStartedRef = useRef(false);
+  const hasSavedRef = useRef(false);
   const contentRef = useRef<HTMLDivElement>(null);
+
+  const createAutoApply = useCreateAutoApplyMutation();
 
   // Extract parameters from URL
   const jobDescription = searchParams.get("jobDescription") || "";
@@ -67,19 +71,32 @@ export default function AutoApplyPage() {
       coverLetterState.documentId && !coverLetterState.isStreaming;
     const isResumeComplete = resumeStatus.isComplete && resumeDocId;
 
-    if (isCoverLetterComplete && isResumeComplete) {
-      // Small delay to ensure all state is settled
-      const timeout = setTimeout(() => {
-        const previewUrl = buildPreviewUrl(
-          coverLetterState.documentId,
-          resumeDocId,
-          jobDescription,
-          recruiterEmail,
-        );
-        router.push(previewUrl);
-      }, 1000);
+    if (isCoverLetterComplete && isResumeComplete && !hasSavedRef.current) {
+      hasSavedRef.current = true;
 
-      return () => clearTimeout(timeout);
+      createAutoApply.mutate(
+        {
+          id: crypto.randomUUID(),
+          resumeId: resumeDocId,
+          coverLetterId: coverLetterState.documentId,
+          title: coverLetterState.title || "Auto Apply",
+          type: "email",
+          recruiterEmail: recruiterEmail || null,
+          jobDescription: jobDescription || null,
+          status: "draft",
+          source: "auto_apply",
+        },
+        {
+          onSettled: () => {
+            const previewUrl = buildPreviewUrl(
+              coverLetterState.documentId,
+              resumeDocId,
+              recruiterEmail,
+            );
+            router.push(previewUrl);
+          },
+        },
+      );
     }
   }, [
     coverLetterState.documentId,

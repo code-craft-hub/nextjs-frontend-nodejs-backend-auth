@@ -4,18 +4,13 @@ import { AIApplyInput } from "./AIApplyInput";
 import { RecentActivityCard } from "../../components/RecentActivityCard";
 import { AIApplyDatatable } from "./AIApplyDatatable";
 import { useQuery } from "@tanstack/react-query";
-import { JobFilters } from "@/lib/types/jobs";
-import { aiApplyQueries } from "@/lib/queries/ai-apply.queries";
+import { autoApplyQueries } from "@/lib/queries/auto-apply.queries";
 
 export const AIApply = memo(
-  ({
-    jobDescription,
-    filters,
-  }: {
-    jobDescription: string;
-    filters: JobFilters;
-  }) => {
-    const { data: aiApply } = useQuery(aiApplyQueries.all(filters));
+  ({ jobDescription }: { jobDescription: string }) => {
+    const { data: aiApply } = useQuery(autoApplyQueries.all());
+
+    console.log("AI Apply Data:", aiApply);
 
     return (
       <div className="flex flex-col font-poppins relative">

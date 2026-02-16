@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 
 import { Checkbox } from "@/components/ui/checkbox";
 import { Skeleton } from "@/components/ui/skeleton";
+import { AutoApplyRecord } from "@/lib/api/auto-apply.api";
 
 import { cn } from "@/lib/utils";
 
@@ -12,11 +13,12 @@ import { useRouter } from "next/dist/client/components/navigation";
 import z from "zod";
 
 export const schema = z.object({
-  id: z.number(),
+  id: z.string(),
   title: z.string(),
   generatedAt: z.string(),
   type: z.string(),
   action: z.string(),
+  status: z.string(),
   recruiterEmail: z.string(),
   jobDescription: z.string(),
   coverLetterId: z.string(),
@@ -25,7 +27,7 @@ export const schema = z.object({
 
 export const AIApplyColumn = (
   router: ReturnType<typeof useRouter>
-): ColumnDef<z.infer<typeof schema>>[] => [
+): ColumnDef<AutoApplyRecord>[] => [
   {
     id: "select",
     header: ({ table }) => (
@@ -56,7 +58,7 @@ export const AIApplyColumn = (
     accessorKey: "title",
     header: "Job Title",
     cell: ({ row }) => {
-      return <div className="font-inter">{row.original.title}</div>;
+      return <div className="font-inter max-w-3xs overflow-hidden truncate">{row.original.title}</div>;
     },
     enableHiding: false,
   },
@@ -93,6 +95,27 @@ export const AIApplyColumn = (
     ),
   },
   {
+    accessorKey: "status",
+    header: "Status",
+    cell: ({ row }) => (
+      <div className="">
+        <div>
+          <Badge
+            variant="outline"
+            className={cn(
+              "text-muted-foreground px-1.5 rounded-2xl font-jakarta capitalize",
+              row.original.status === "sent"
+                ? "bg-cverai-green/10 border-cverai-green/40 text-cverai-green"
+                : "bg-primary/10 border-primary/40 text-primary"
+            )}
+          >
+            {row.original.status}
+          </Badge>
+        </div>
+      </div>
+    ),
+  },
+  {
     id: "actions",
     cell: ({ row }) => {
       return (
@@ -101,7 +124,7 @@ export const AIApplyColumn = (
           className="text-blue-500 font-jakarta"
           onClick={() => {
             router.push(
-              `/dashboard/preview?aiApplyId=${row.original.id}&resumeId=${row.original.resumeId}&coverLetterId=${row.original.coverLetterId}&recruiterEmail=${row.original.recruiterEmail}&jobDescription=${row.original.jobDescription}`
+              `/dashboard/preview?aiApplyId=${row.original.id}&resumeId=${row.original.resumeId}&coverLetterId=${row.original.coverLetterId}&recruiterEmail=${row.original.recruiterEmail}`
             );
           }}
         >

@@ -29,8 +29,8 @@ export const HomeClient = memo(
       (role: any) => role?.value,
     );
     const skills = [
-      ...user?.dataSource?.[0]?.hardSkill || [],
-      ...user?.dataSource?.[0]?.softSkill || [],
+      ...(user?.dataSource?.[0]?.hardSkill || []),
+      ...(user?.dataSource?.[0]?.softSkill || []),
     ]?.map((skill) => skill?.value);
 
     const rolesOfInterest = isEmpty(searchSkills) ? skills : searchSkills;
@@ -48,7 +48,6 @@ export const HomeClient = memo(
       skills: rolesOfInterest,
     };
 
-
     useEffect(() => {
       if (user?.firstName)
         sendGTMEvent({
@@ -62,9 +61,6 @@ export const HomeClient = memo(
       autoApplyFilters,
     });
 
-    // return(
-    //   <CertificationAchievementsForm />
-    // )
     return (
       <>
         <TopGradient />
@@ -99,12 +95,8 @@ export const HomeClient = memo(
                 </TabsTrigger>
               ))}
             </TabsList>
-
             <TabsContent value="ai-apply">
-              <AIApply
-                jobDescription={jobDescription}
-                filters={autoApplyFilters}
-              />
+              <AIApply jobDescription={jobDescription} />
             </TabsContent>
             <TabsContent value="tailor-cv">
               <AIJobCustomization filters={autoApplyFilters} />

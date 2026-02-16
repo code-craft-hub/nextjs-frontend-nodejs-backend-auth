@@ -181,7 +181,7 @@
   }
   
   .container {
-    @apply max-w-screen-xl mx-auto sm:px-4;
+    @apply max-w-screen-2xl mx-auto sm:px-4;
   }
 
 }

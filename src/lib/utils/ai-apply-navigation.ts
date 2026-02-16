@@ -78,13 +78,11 @@ export function buildResumeUpdateUrl(resumeDocId: string): string {
 export function buildPreviewUrl(
   coverLetterDocId: string,
   resumeDocId: string,
-  jobDescription: string,
   recruiterEmail: string,
 ): string {
   const params = new URLSearchParams();
   params.set("coverLetterDocId", coverLetterDocId);
   params.set("resumeDocId", resumeDocId);
-  params.set("jobDescription", jobDescription);
   params.set("recruiterEmail", recruiterEmail);
   return `/dashboard/preview?${params.toString()}`;
 }

@@ -15,9 +15,15 @@ const PreviewPage = async ({ searchParams }: any) => {
   const token = (await getCookiesToken()) ?? "";
   const queryClient = createServerQueryClient();
   await queryClient.prefetchQuery(userQueries.detail(token));
-  const { coverLetterDocId, resumeDocId, recruiterEmail, jobDescription, aiApplyId } =
-    await searchParams;
-  // const baseResume = (await searchParams)?.baseResume;
+  const {
+    coverLetterDocId,
+    resumeDocId,
+    recruiterEmail,
+    jobDescription,
+    aiApplyId,
+  } = await searchParams;
+
+  
   await prefetchWithPriority(queryClient, [
     {
       queryKey: resumeQueries.detail(resumeDocId).queryKey,
