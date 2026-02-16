@@ -23,6 +23,7 @@ import {
   useDeleteCertificationMutation,
 } from "@/lib/mutations/resume.mutations";
 import { resumeApi } from "@/lib/api/resume.api";
+import { useTriggerJobRecommendationsMutation } from "@/lib/mutations/recommendations.mutations";
 
 // ─── Schema ────────────────────────────────────────────────────────
 
@@ -207,9 +208,16 @@ export default function CertificationAchievementsForm({
   const createMutation = useCreateCertificationMutation(resumeId || "");
   const updateMutation = useUpdateCertificationMutation(resumeId || "");
   const deleteMutation = useDeleteCertificationMutation(resumeId || "");
+  const triggerRecommendationsMutation = useTriggerJobRecommendationsMutation();
 
   const completedResumeBuild = async () => {
-    form.handleSubmit(onSubmit)();
+    // Submit the form and wait for it to complete
+    await form.handleSubmit(onSubmit)();
+
+    // Trigger job recommendations
+    await triggerRecommendationsMutation.mutateAsync();
+
+    // Notify that resume building is completed
     onboardingResumeUploadCompleted?.();
   };
 
@@ -306,7 +314,8 @@ export default function CertificationAchievementsForm({
     createMutation.isPending ||
     updateMutation.isPending ||
     deleteMutation.isPending ||
-    isCreating;
+    isCreating ||
+    triggerRecommendationsMutation.isPending;
 
   return (
     <div className="w-full flex flex-col gap-6 relative">

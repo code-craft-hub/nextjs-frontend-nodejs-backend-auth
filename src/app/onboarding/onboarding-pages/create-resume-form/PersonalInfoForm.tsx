@@ -11,6 +11,12 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,10 +27,13 @@ import {
   Mail,
   Phone,
   Briefcase,
+  Sparkles,
 } from "lucide-react";
 import { useResumeForm } from "./ResumeFormContext";
 import { useUpdateResumeMutation } from "@/lib/mutations/resume.mutations";
 import { CloseEditButton } from "@/components/shared/CloseEditButton";
+import { toast } from "sonner";
+import { resumeApi } from "@/lib/api/resume.api";
 
 // ─── Schema ────────────────────────────────────────────────────────
 
@@ -47,11 +56,13 @@ interface PersonalInfoFormProps {
   onNext?: () => void;
   onBack?: () => void;
   handleEditClick: (value: boolean) => void;
+  onboardingResumeUploadCompleted?: () => void;
 }
 
 export default function PersonalInfoForm({
   onNext,
   handleEditClick,
+  onboardingResumeUploadCompleted,
 }: PersonalInfoFormProps) {
   const {
     resumeId,
@@ -108,6 +119,19 @@ export default function PersonalInfoForm({
     );
   }
 
+  const handleResumeAutoGeneration = async () => {
+    // Validate only the resumeTitle field
+    const resumeTitle = form.getValues("resumeTitle");
+
+    if (resumeTitle?.trim() === "") {
+      return toast.error("Please provide a value for the resume title.");
+    }
+
+    console.log("Resume Title for auto-generation:", resumeTitle);
+    toast.success(`Auto-generating your resume title: ${resumeTitle}`);
+    onboardingResumeUploadCompleted?.();
+    await resumeApi.autoNewResume(resumeTitle);
+  };
   return (
     <div className="w-full bg-white rounded-2xl border border-gray-100 shadow-sm p-2 sm:p-6 relative">
       {/* Section header */}
@@ -261,7 +285,21 @@ export default function PersonalInfoForm({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-sm font-medium text-gray-700">
-                        Resume Title
+                        Resume Title{" "}
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger
+                              className="inline-flex cursor-help animate-pulse"
+                              onClick={() => handleResumeAutoGeneration()}
+                              type="button"
+                            >
+                              <Sparkles className="size-4 text-yellow-500 hover:text-gray-500" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              Click to Auto-generate your resume title
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
                       </FormLabel>
                       <FormControl>
                         <div className="relative">

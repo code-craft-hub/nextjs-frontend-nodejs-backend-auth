@@ -61,6 +61,15 @@ export const resumeApi = {
       token,
     }),
 
+  autoNewResume: (title: string, token?: string) =>
+    api.post<ApiResponse<ResumeAggregate>>(
+      RESUME_BASE + "/generate",
+      { title },
+      {
+        token,
+      },
+    ),
+
   getResumes: (params?: ResumeFilters, token?: string) =>
     api.get<PaginatedResponse<ResumeAggregate>>(
       `${RESUME_BASE}?` +

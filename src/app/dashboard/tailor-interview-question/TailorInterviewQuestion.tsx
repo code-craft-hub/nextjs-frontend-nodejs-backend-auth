@@ -105,7 +105,7 @@ export const TailorInterviewQuestion = ({
     setQaData([]);
 
     try {
-      const response = await fetch(`${API_URL}/interview-questions/generate`, {
+      const response = await fetch(`${API_URL}/interview-questions/stream`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

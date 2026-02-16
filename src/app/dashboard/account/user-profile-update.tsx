@@ -13,19 +13,12 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 import { Input } from "@/components/ui/input";
-// import {
-//   Select,
-//   SelectContent,
-//   SelectItem,
-//   SelectTrigger,
-//   SelectValue,
-// } from "@/components/ui/select";
 import { toast } from "sonner";
 import { userQueries } from "@/lib/queries/user.queries";
 import { useQuery } from "@tanstack/react-query";
-import { useUserLocation } from "@/hooks/get-user-location";
 import { useUpdateUserMutation } from "@/lib/mutations/user.mutations";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { getUserLocation } from "@/hooks/geo-location/ip-geolocation.provider";
 
 export const e164PhoneNumberSchema = z
   .string()
@@ -50,7 +43,7 @@ type ProfileFormData = z.infer<typeof profileSchema>;
 
 export const UserProfileForm: React.FC = () => {
   const { data: user } = useQuery(userQueries.detail());
-  const { continent_code, country } = useUserLocation();
+  const { continent_code, country } = getUserLocation();
   const updateUser = useUpdateUserMutation();
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
@@ -98,7 +91,7 @@ export const UserProfileForm: React.FC = () => {
         displayName: `${firstName} ${lastName}`,
       },
     });
-    
+
     toast.success("Profile updated successfully!");
   };
 

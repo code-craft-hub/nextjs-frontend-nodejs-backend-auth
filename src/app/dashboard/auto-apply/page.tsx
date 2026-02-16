@@ -13,7 +13,7 @@ import { buildPreviewUrl } from "@/lib/utils/ai-apply-navigation";
 import { TailorCoverLetterDisplayStreaming } from "../tailor-cover-letter/TailorCoverLetterDisplayStreaming";
 import { ResumeLoadingSkeleton } from "../tailor-resume/components/resume-loading-skeleton";
 
-const RESUME_API_URL = `${BASEURL}/${BACKEND_API_VERSION}/resumes/generate`;
+const RESUME_API_URL = `${BASEURL}/${BACKEND_API_VERSION}/resumes/stream`;
 
 export default function AutoApplyPage() {
   const router = useRouter();

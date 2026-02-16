@@ -51,7 +51,7 @@ export const coverLetterApi = {
 
 
   generateCoverLetter: (data: CreateCoverLetterData, token?: string) =>
-    api.post<CoverLetter>(`/${BACKEND_API_VERSION}/cover-letters/generate`, data, { token }),
+    api.post<CoverLetter>(`/${BACKEND_API_VERSION}/cover-letters/stream`, data, { token }),
 
   // Update cover letter
   updateCoverLetter: (id: string, data: UpdateCoverLetterData, token?: string) =>

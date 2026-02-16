@@ -20,7 +20,7 @@ import CreateUserResume from "@/app/onboarding/onboarding-pages/create-resume-fo
 import { useFireworksConfetti } from "@/components/ui/confetti";
 import { ViewResume } from "./ViewResume";
 
-const API_URL = `${BASEURL}/${BACKEND_API_VERSION}/resumes/generate`;
+const API_URL = `${BASEURL}/${BACKEND_API_VERSION}/resumes/stream`;
 
 /**
  * Normalize API response data to match the expected UI schema

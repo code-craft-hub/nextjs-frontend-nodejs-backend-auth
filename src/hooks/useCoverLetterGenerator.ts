@@ -4,7 +4,7 @@ import { useCallback, useRef, useState } from "react";
 import { BASEURL } from "@/lib/api/client";
 import { BACKEND_API_VERSION } from "@/lib/api/profile.api";
 
-const API_URL = `${BASEURL}/${BACKEND_API_VERSION}/cover-letters/generate`;
+const API_URL = `${BASEURL}/${BACKEND_API_VERSION}/cover-letters/stream`;
 
 export interface StreamState {
   title: string;

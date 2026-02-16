@@ -32,7 +32,7 @@ export const generateCoverLetterStream = async (
 ): Promise<void> => {
   try {
     const response = await fetch(
-      `${BASEURL}/${BACKEND_API_VERSION}/cover-letters/generate`,
+      `${BASEURL}/${BACKEND_API_VERSION}/cover-letters/stream`,
       {
         method: "POST",
         headers: {
