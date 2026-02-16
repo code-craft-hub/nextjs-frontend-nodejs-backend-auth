@@ -17,6 +17,12 @@ export interface CreateCoverLetterData {
 export interface UpdateCoverLetterData {
   title?: string;
   content?: string;
+  coverLetter?: string;
+  firstName?: string;
+  lastName?: string;
+  salutation?: string;
+  phoneNumber?: string;
+  recruiterEmail?: string;
   jobTitle?: string;
   company?: string;
 }

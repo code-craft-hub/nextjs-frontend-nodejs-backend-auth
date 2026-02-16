@@ -34,6 +34,7 @@ import { useUpdateResumeMutation } from "@/lib/mutations/resume.mutations";
 import { CloseEditButton } from "@/components/shared/CloseEditButton";
 import { toast } from "sonner";
 import { resumeApi } from "@/lib/api/resume.api";
+import { useSearchParams } from "next/navigation";
 
 // ─── Schema ────────────────────────────────────────────────────────
 
@@ -119,7 +120,10 @@ export default function PersonalInfoForm({
     );
   }
 
+  const resumeIdInUrl = useSearchParams().get("resumeId");
+
   const handleResumeAutoGeneration = async () => {
+    if (resumeIdInUrl) return;
     // Validate only the title field
     const title = form.getValues("title");
 

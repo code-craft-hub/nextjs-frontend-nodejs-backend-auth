@@ -1,12 +1,29 @@
 import { useEffect, useState } from "react";
 
+// Module-level cache so all components share the same fetched data
+let cachedLocation: IpLocation | null = null;
+let locationPromise: Promise<IpLocation> | null = null;
+
+console.log("Module loaded: ip-geolocation.provider", {cachedLocation, locationPromise});
+
+console.count("Module loaded: ip-geolocation.provider");
+
 export function useUserLocation() {
-  const [location, setLocation] = useState<IpLocation>({});
+  const [location, setLocation] = useState<IpLocation>(cachedLocation ?? {});
 
+  console.count("useUserLocation called");
+
+  console.log("useUserLocation: current location state", location);
+  console.log("useUserLocation: cachedLocation", cachedLocation);
+  console.log("useUserLocation: locationPromise", locationPromise);
   useEffect(() => {
-    getUserLocation().then((data) => {
+    if (cachedLocation) {
+      setLocation(cachedLocation);
+      return;
+    }
 
-      console.log("Location fetched : ", data);
+    getUserLocation().then((data) => {
+      cachedLocation = data;
       setLocation(data);
     });
   }, []);
@@ -15,24 +32,33 @@ export function useUserLocation() {
 }
 
 export async function getUserLocation(): Promise<IpLocation> {
-  try {
-    const response = await fetch("/api/geolocation", {
-      headers: {
-        accept: "application/json",
-      },
-    });
+  if (cachedLocation) return cachedLocation;
+  if (locationPromise) return locationPromise;
 
-    if (!response.ok) {
-      console.error(`Failed to fetch geolocation: HTTP ${response.status}`);
+  locationPromise = (async () => {
+    try {
+      const response = await fetch("/api/geolocation", {
+        headers: {
+          accept: "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        console.error(`Failed to fetch geolocation: HTTP ${response.status}`);
+        return {};
+      }
+
+      const data = await response.json();
+      cachedLocation = data as IpLocation;
+      return cachedLocation;
+    } catch (err) {
+      console.error("Failed to fetch geolocation:", err);
+      locationPromise = null;
       return {};
     }
+  })();
 
-    const data = await response.json();
-    return data as IpLocation;
-  } catch (err) {
-    console.error("Failed to fetch geolocation:", err);
-    return {};
-  }
+  return locationPromise;
 }
 
 export type FlagInfo = {

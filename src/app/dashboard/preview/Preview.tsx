@@ -70,7 +70,6 @@ const Preview = ({
     coverLetterQueries.detail(coverLetterId),
   );
 
-  console.log({ resumeData, coverLetterData, resumeId, coverLetterId });
 
   const defaultResume = user?.dataSource?.find(
     (resume) => resume.id === user?.defaultDataSource,

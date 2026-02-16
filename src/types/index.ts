@@ -475,7 +475,6 @@ export interface CoverLetter {
   portfolio: string;
   title: string;
   salutation?: string;
-  coverLetter: string;
   content: string;
   type: string;
   generatedAt: string;

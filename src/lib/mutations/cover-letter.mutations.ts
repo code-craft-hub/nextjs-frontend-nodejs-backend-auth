@@ -1,4 +1,3 @@
-// lib/mutations/cover-letter.mutations.ts
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { coverLetterApi, type CreateCoverLetterData, type UpdateCoverLetterData } from '@/lib/api/cover-letter.api';
 import { queryKeys } from '@/lib/query/keys';

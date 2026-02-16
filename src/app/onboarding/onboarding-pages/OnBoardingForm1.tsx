@@ -40,15 +40,13 @@ export const OnBoardingForm1 = ({
 }: OnboardingFormProps) => {
   const { isUpdatingUserLoading } = useAuth();
   const { data: user } = useQuery(userQueries.detail());
-  const { country, region, country_code, postal, city } = useUserLocation();
-
-  console.log("user location data", {
-    country,
-    region,
-    country_code,
-    postal,
-    city,
-  });
+  const {
+    countryName: country,
+    regionName: region,
+    countryCode,
+    zipCode: postal,
+    cityName: city,
+  } = useUserLocation();
 
   const updateOnboarding = useUpdateOnboarding({
     userFirstName: user?.firstName,
@@ -82,7 +80,7 @@ export const OnBoardingForm1 = ({
       stepNumber: 1,
       ...values,
       postalCode: postal,
-      countryCode: country_code,
+      countryCode: countryCode,
       city: city,
       address: `${city}, ${region}, ${country}`,
     });
@@ -176,7 +174,7 @@ export const OnBoardingForm1 = ({
                           {...field}
                           id={inputId}
                           international
-                          defaultCountry={(country_code as any) ?? "US"}
+                          defaultCountry={(countryCode as any) ?? "US"}
                           placeholder="Enter phone number"
                           className="border-0! outline-none! ring-0!"
                           numberInputProps={{

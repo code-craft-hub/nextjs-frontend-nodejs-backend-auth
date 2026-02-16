@@ -73,7 +73,6 @@ export const EditableResume: React.FC<PreviewResumeProps> = ({
     },
   );
 
-  // console.log("resumeData in EditableResume : ", user);
 
   // Use resumeData as the single source of truth once streaming is complete
   const displayData = resumeData;
@@ -111,15 +110,6 @@ export const EditableResume: React.FC<PreviewResumeProps> = ({
         updateField(field, value);
       },
     [updateField],
-  );
-
-  console.log(
-    "name : ",
-    fullName,
-    contactInfo,
-    profile,
-    displayData,
-    isStreaming,
   );
 
   return (

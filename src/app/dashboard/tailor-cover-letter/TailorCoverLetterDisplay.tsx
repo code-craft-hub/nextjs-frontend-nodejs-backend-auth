@@ -19,19 +19,16 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { apiService } from "@/hooks/use-auth";
-import { COLLECTIONS } from "@/lib/utils/constants";
 import { CoverLetter, IUser } from "@/types";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { EditIcon, Loader } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { coverLetterQueries } from "@/lib/queries/cover-letter.queries";
 import { cn } from "@/lib/utils";
+import { useUpdateCoverLetterMutation } from "@/lib/mutations/cover-letter.mutations";
 
 // Validation schema
 const coverLetterSchema = z.object({
   title: z.string().min(1, "Title is required"),
-  coverLetter: z
+  content: z
     .string()
     .min(10, "Cover letter must be at least 10 characters"),
   firstName: z.string().min(1, "First name is required"),
@@ -43,6 +40,18 @@ const coverLetterSchema = z.object({
 
 export type CoverLetterFormData = z.infer<typeof coverLetterSchema>;
 
+function mapFormToUpdateData(formData: CoverLetterFormData) {
+  return {
+    title: formData.title,
+    content: formData.content,
+    firstName: formData.firstName,
+    lastName: formData.lastName,
+    salutation: formData.salutation,
+    phoneNumber: formData.phoneNumber,
+    recruiterEmail: formData.recruiterEmail,
+  };
+}
+
 const TailorCoverLetterDisplay = ({
   data,
   user,
@@ -53,51 +62,17 @@ const TailorCoverLetterDisplay = ({
   recruiterEmail?: string;
 }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const queryClient = useQueryClient();
   const router = useRouter();
   const currentData = data;
+  const updateMutation = useUpdateCoverLetterMutation();
 
-  console.log({ currentData });
-
-  // Mutation for updating cover letter
-  const updateMutation = useMutation({
-    mutationFn: async (formData: CoverLetterFormData) => {
-      if (!currentData?.id) throw new Error("No document ID");
-      return apiService.updateCareerDoc(
-        currentData.id,
-        COLLECTIONS.COVER_LETTER,
-        formData,
-      );
-    },
-    onSuccess: () => {
-      // Invalidate and refetch
-      queryClient.invalidateQueries({
-        queryKey: [
-          "auth",
-          "careerDoc",
-          COLLECTIONS.COVER_LETTER,
-          currentData?.id,
-        ],
-      });
-      queryClient.invalidateQueries(
-        coverLetterQueries.detail(currentData?.id ?? ""),
-      );
-      queryClient.invalidateQueries({
-        queryKey: [
-          "auth",
-          "careerDoc",
-          COLLECTIONS.COVER_LETTER,
-          currentData?.id,
-        ],
-      });
-    },
-  });
+  console.log("TailorCoverLetterDisplay data : ", data, recruiterEmail);
 
   const form = useForm<CoverLetterFormData>({
     resolver: zodResolver(coverLetterSchema),
     defaultValues: {
       title: currentData?.title || "",
-      coverLetter: currentData?.coverLetter || currentData?.content || "",
+      content:  currentData?.content || "",
       firstName: currentData?.firstName || user?.firstName || "",
       lastName: currentData?.lastName || user?.lastName || "",
       phoneNumber: currentData?.phoneNumber || user?.phoneNumber || "",
@@ -111,7 +86,7 @@ const TailorCoverLetterDisplay = ({
     if (isDialogOpen && currentData) {
       form.reset({
         title: currentData.title || "",
-        coverLetter: currentData.coverLetter || "",
+        content: currentData.content || "",
         firstName: currentData.firstName || user?.firstName || "",
         lastName: currentData.lastName || user?.lastName || "",
         phoneNumber: currentData.phoneNumber || user?.phoneNumber || "",
@@ -133,30 +108,28 @@ const TailorCoverLetterDisplay = ({
       if (fieldName === "recruiterEmail" && currentValue) {
         const url = new URL(window.location.href);
         url.searchParams.set("recruiterEmail", currentValue);
-        // window.history.replaceState({}, "", url.toString());
-
         router.replace(url.toString());
       }
 
-      if (currentValue !== originalValue) {
-        updateMutation.mutate(formValues);
-        // toast.success(
-        //   `${capitalize(fieldName)} field has be updated and saved!`
-        // );
+      if (currentValue !== originalValue && currentData?.id) {
+        updateMutation.mutate({
+          id: currentData.id,
+          data: mapFormToUpdateData(formValues),
+        });
       }
     }
   };
 
   const handleDialogOpenChange = (open: boolean) => {
-    if (!open && form.formState.isDirty) {
-      // Save changes when closing if there are unsaved changes
+    if (!open && form.formState.isDirty && currentData?.id) {
       const formValues = form.getValues();
-      updateMutation.mutate(formValues);
+      updateMutation.mutate({
+        id: currentData.id,
+        data: mapFormToUpdateData(formValues),
+      });
     }
     setIsDialogOpen(open);
   };
-
-  console.log({ currentData });
 
   return (
     <>
@@ -197,9 +170,9 @@ const TailorCoverLetterDisplay = ({
                 {currentData?.salutation || "Dear Hiring Manager,"}
               </p>
               <p className="text-sm">
-                {currentData?.coverLetter || currentData?.content}
+                {currentData?.content}
               </p>
-              {currentData?.coverLetter && (
+              {currentData?.content && (
                 <div className="mt-8">
                   <p>Sincerely</p>
                   <p>
@@ -283,7 +256,7 @@ const TailorCoverLetterDisplay = ({
 
               <FormField
                 control={form.control}
-                name="coverLetter"
+                name="content"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Cover Letter Content</FormLabel>
@@ -294,7 +267,7 @@ const TailorCoverLetterDisplay = ({
                         placeholder="Write your cover letter here..."
                         rows={12}
                         className="resize-y"
-                        onBlur={() => handleFieldBlur("coverLetter")}
+                        onBlur={() => handleFieldBlur("content")}
                       />
                     </FormControl>
                     <FormMessage />
