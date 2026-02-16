@@ -64,6 +64,12 @@ const CONTENT_TYPE_ROUTES: Record<string, string> = {
   "interview-question": "/dashboard/tailor-interview-question",
 };
 
+const CONTENT_TYPE_ID: Record<string, string> = {
+  resume: "resumeId",
+  "cover-letter": "coverLetterId",
+  "interview-question": "interviewQuestionId",
+};
+
 const getColumns = (
   router: ReturnType<typeof useRouter>,
 ): ColumnDef<z.infer<typeof schema>>[] => [
@@ -149,8 +155,9 @@ const getColumns = (
           className="text-blue-500 font-jakarta"
           onClick={() => {
             const basePath = CONTENT_TYPE_ROUTES[row.original.contentType];
-            if (basePath) {
-              router.push(`${basePath}/${row.original.id}`);
+            const idKey = CONTENT_TYPE_ID[row.original.contentType];
+            if (basePath && idKey) {
+              router.push(`${basePath}?${idKey}=${row.original.id}`);
             }
           }}
         >

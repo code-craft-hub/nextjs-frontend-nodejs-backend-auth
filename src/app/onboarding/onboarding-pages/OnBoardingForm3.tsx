@@ -22,8 +22,8 @@ import Progress from "./Progress";
 import { userQueries } from "@/lib/queries/user.queries";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
-import { useUserLocation } from "@/hooks/get-user-location";
 import { useUpdateOnboarding } from "@/hooks/mutations";
+import { useUserLocation } from "@/hooks/geo-location/ip-geolocation.provider";
 
 const formSchema = z
   .object({

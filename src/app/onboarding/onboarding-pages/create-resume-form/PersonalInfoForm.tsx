@@ -43,7 +43,7 @@ const personalInfoSchema = z.object({
   phoneNumber: z.string().optional(),
   location: z.string().min(1, "Location is required"),
   linkedIn: z.string().optional(),
-  resumeTitle: z.string({ message: "Please provide the resume title." }),
+  title: z.string({ message: "Please provide the resume title." }),
   github: z.string().optional(),
   website: z.string().optional(),
 });
@@ -81,7 +81,7 @@ export default function PersonalInfoForm({
       phoneNumber: resumeData?.phoneNumber || "",
       location: resumeData?.location || "",
       linkedIn: resumeData?.linkedIn || "",
-      resumeTitle: resumeData?.linkedIn || "",
+      title: resumeData?.title || "",
       github: resumeData?.github || "",
       website: resumeData?.website || "",
     },
@@ -92,7 +92,7 @@ export default function PersonalInfoForm({
 
     // If no resume exists, create one first
     if (!activeResumeId) {
-      const newResumeId = await createNewResume(values.resumeTitle);
+      const newResumeId = await createNewResume(values.title);
       if (!newResumeId) {
         // Handle error - could show a toast
         console.error("Failed to create resume");
@@ -120,17 +120,17 @@ export default function PersonalInfoForm({
   }
 
   const handleResumeAutoGeneration = async () => {
-    // Validate only the resumeTitle field
-    const resumeTitle = form.getValues("resumeTitle");
+    // Validate only the title field
+    const title = form.getValues("title");
 
-    if (resumeTitle?.trim() === "") {
+    if (title?.trim() === "") {
       return toast.error("Please provide a value for the resume title.");
     }
 
-    console.log("Resume Title for auto-generation:", resumeTitle);
-    toast.success(`Auto-generating your resume title: ${resumeTitle}`);
+    console.log("Resume Title for auto-generation:", title);
+    toast.success(`Auto-generating your resume title: ${title}`);
     onboardingResumeUploadCompleted?.();
-    await resumeApi.autoNewResume(resumeTitle);
+    await resumeApi.autoNewResume(title);
   };
   return (
     <div className="w-full bg-white rounded-2xl border border-gray-100 shadow-sm p-2 sm:p-6 relative">
@@ -281,7 +281,7 @@ export default function PersonalInfoForm({
                 />
                 <FormField
                   control={form.control}
-                  name="resumeTitle"
+                  name="title"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-sm font-medium text-gray-700">

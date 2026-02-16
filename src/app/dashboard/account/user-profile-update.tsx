@@ -18,7 +18,7 @@ import { userQueries } from "@/lib/queries/user.queries";
 import { useQuery } from "@tanstack/react-query";
 import { useUpdateUserMutation } from "@/lib/mutations/user.mutations";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { getUserLocation } from "@/hooks/geo-location/ip-geolocation.provider";
+import { useUserLocation } from "@/hooks/geo-location/ip-geolocation.provider";
 
 export const e164PhoneNumberSchema = z
   .string()
@@ -43,7 +43,7 @@ type ProfileFormData = z.infer<typeof profileSchema>;
 
 export const UserProfileForm: React.FC = () => {
   const { data: user } = useQuery(userQueries.detail());
-  const { continent_code, country } = getUserLocation();
+  const location = useUserLocation();
   const updateUser = useUpdateUserMutation();
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
@@ -60,15 +60,20 @@ export const UserProfileForm: React.FC = () => {
 
   useEffect(() => {
     const countryName =
-      typeof user?.country == "object" ? (user?.country as any)?.name : country;
+      typeof user?.country == "object"
+        ? (user?.country as any)?.name
+        : location.country;
     form.setValue("firstName", user?.firstName || "");
     form.setValue("lastName", user?.lastName || "");
     form.setValue("email", user?.email || "");
     form.setValue("country", countryName || "");
     form.setValue("state", user?.state || "");
-    form.setValue("countryCode", user?.countryCode || continent_code || "");
+    form.setValue(
+      "countryCode",
+      user?.countryCode || location.continent_code || ""
+    );
     form.setValue("phoneNumber", user?.phoneNumber || "");
-  }, [form, user, country, continent_code]);
+  }, [form, user, location]);
 
   const onSubmit = ({
     firstName,

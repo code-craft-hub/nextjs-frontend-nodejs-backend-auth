@@ -22,9 +22,9 @@ export default function OnboardingClient() {
   console.log("Onboarding user data:", user?.id);
   const [currentStep, setCurrentStep] = useState(0);
   const steps = [
-    OnBoardingForm2,
     OnBoardingForm0,
     OnBoardingForm1,
+    OnBoardingForm2,
     OnBoardingForm3,
     OnBoardingForm4,
     OnBoardingForm5,

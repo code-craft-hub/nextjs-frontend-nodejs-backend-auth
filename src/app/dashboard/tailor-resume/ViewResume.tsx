@@ -3,6 +3,7 @@ import {
   coalesceString,
   isValidArray,
   monthYear,
+  normalize,
   normalizeToString,
   parseResponsibilities,
 } from "@/lib/utils/helpers";
@@ -36,7 +37,12 @@ export const ViewResume: React.FC<ViewResumeProps> = ({
 
   const fullName = `${firstName} ${lastName}`.trim();
 
-  const contactInfo = [email, phoneNumber, address, portfolio]
+  const contactInfo = [
+    normalize(email),
+    normalize(phoneNumber),
+    normalize(address),
+    normalize(portfolio),
+  ]
     .filter(Boolean)
     .join(" | ");
 

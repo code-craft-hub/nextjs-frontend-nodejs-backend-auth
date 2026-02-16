@@ -1,3 +1,19 @@
+import { useEffect, useState } from "react";
+
+export function useUserLocation() {
+  const [location, setLocation] = useState<IpLocation>({});
+
+  useEffect(() => {
+    getUserLocation().then((data) => {
+
+      console.log("Location fetched : ", data);
+      setLocation(data);
+    });
+  }, []);
+
+  return location;
+}
+
 export async function getUserLocation(): Promise<IpLocation> {
   try {
     const response = await fetch("/api/geolocation", {
@@ -17,47 +33,6 @@ export async function getUserLocation(): Promise<IpLocation> {
     console.error("Failed to fetch geolocation:", err);
     return {};
   }
-}
-
-export function mapIpLocationToCountry(params: {
-  userId: string;
-  location: IpLocation;
-}) {
-  const { userId, location } = params;
-
-  if (!location.country || !location.country_code) {
-    throw new Error("Invalid IP location: country data missing");
-  }
-
-  return {
-    userId,
-
-    // REQUIRED
-    name: location.country,
-    code:
-      location.country_code.length === 3
-        ? location.country_code
-        : (location.countryCode ?? ""),
-    code2: location.country_code,
-
-    // OPTIONAL / NORMALIZED
-    capital: location.capital,
-    region: location.region,
-    latitude: location.latitude,
-    longitude: location.longitude,
-
-    phoneCode: location.calling_code,
-    currency: location.currencies?.[0],
-    flagEmoji: location.flag?.emoji,
-    flagUrl: location.flag?.img,
-
-    isActive: true,
-
-    // nativeName: "",
-    // subregion: "",
-    currencyName: location?.currencies?.[0],
-    // currencySymbol: "",
-  };
 }
 
 export type FlagInfo = {

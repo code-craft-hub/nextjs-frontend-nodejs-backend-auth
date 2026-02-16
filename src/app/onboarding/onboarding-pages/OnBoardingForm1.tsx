@@ -14,7 +14,6 @@ import {
 } from "@/components/ui/form";
 import "react-phone-number-input/style.css";
 import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
-import { useUserLocation } from "@/hooks/get-user-location";
 import { motion } from "framer-motion";
 import { useAuth } from "@/hooks/use-auth";
 import { OnboardingFormProps } from "@/types";
@@ -25,6 +24,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { userQueries } from "@/lib/queries/user.queries";
 import { useQuery } from "@tanstack/react-query";
 import { useUpdateOnboarding } from "@/hooks/mutations";
+import { useUserLocation } from "@/hooks/geo-location/ip-geolocation.provider";
 const formSchema = z.object({
   country: z.string({ message: "Please enter a valid country name." }),
   state: z.string({ message: "Please enter a valid state name." }),
@@ -42,7 +42,14 @@ export const OnBoardingForm1 = ({
   const { data: user } = useQuery(userQueries.detail());
   const { country, region, country_code, postal, city } = useUserLocation();
 
-  console.log("useUserLocation() : ", useUserLocation())
+  console.log("user location data", {
+    country,
+    region,
+    country_code,
+    postal,
+    city,
+  });
+
   const updateOnboarding = useUpdateOnboarding({
     userFirstName: user?.firstName,
     // onError: () => {
@@ -65,8 +72,8 @@ export const OnBoardingForm1 = ({
   });
 
   useEffect(() => {
-    form.setValue("country", country);
-    form.setValue("state", user?.state || region);
+    form.setValue("country", country ?? "");
+    form.setValue("state", user?.state ?? region ?? "");
   }, [country, region, form, user]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
