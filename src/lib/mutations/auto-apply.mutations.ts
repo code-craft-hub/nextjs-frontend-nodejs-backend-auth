@@ -4,7 +4,11 @@ import {
   type CreateAutoApplyData,
   type UpdateAutoApplyData,
 } from "@/lib/api/auto-apply.api";
-import { autoApplyKeys } from "@/lib/query/auto-apply.keys";
+import {
+  invalidateAutoApplyLists,
+  invalidateAutoApplyDetail,
+  invalidateAutoApplyCount,
+} from "@/lib/query/query-invalidation";
 
 export function useCreateAutoApplyMutation() {
   const queryClient = useQueryClient();
@@ -12,12 +16,8 @@ export function useCreateAutoApplyMutation() {
   return useMutation({
     mutationFn: (data: CreateAutoApplyData) => autoApplyApi.create(data),
     onSettled: () => {
-      queryClient.invalidateQueries({
-        queryKey: autoApplyKeys.lists(),
-      });
-      queryClient.invalidateQueries({
-        queryKey: autoApplyKeys.count(),
-      });
+      invalidateAutoApplyLists(queryClient);
+      invalidateAutoApplyCount(queryClient);
     },
   });
 }
@@ -29,12 +29,8 @@ export function useUpdateAutoApplyMutation() {
     mutationFn: ({ id, data }: { id: string; data: UpdateAutoApplyData }) =>
       autoApplyApi.update(id, data),
     onSettled: (_data, _error, { id }) => {
-      queryClient.invalidateQueries({
-        queryKey: autoApplyKeys.detail(id),
-      });
-      queryClient.invalidateQueries({
-        queryKey: autoApplyKeys.lists(),
-      });
+      invalidateAutoApplyDetail(queryClient, id);
+      invalidateAutoApplyLists(queryClient);
     },
   });
 }
@@ -45,12 +41,8 @@ export function useDeleteAutoApplyMutation() {
   return useMutation({
     mutationFn: (id: string) => autoApplyApi.delete(id),
     onSettled: () => {
-      queryClient.invalidateQueries({
-        queryKey: autoApplyKeys.lists(),
-      });
-      queryClient.invalidateQueries({
-        queryKey: autoApplyKeys.count(),
-      });
+      invalidateAutoApplyLists(queryClient);
+      invalidateAutoApplyCount(queryClient);
     },
   });
 }

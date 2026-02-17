@@ -11,6 +11,7 @@ import { userQueries } from "@/lib/queries/user.queries";
 import { BASEURL } from "@/lib/api/client";
 import { BACKEND_API_VERSION } from "@/lib/api/profile.api";
 import { buildPreviewUrl } from "@/lib/utils/ai-apply-navigation";
+import { invalidateDocumentGenerationQueries } from "@/lib/query/query-invalidation";
 import { TailorCoverLetterDisplayStreaming } from "../tailor-cover-letter/TailorCoverLetterDisplayStreaming";
 import { ResumeLoadingSkeleton } from "../tailor-resume/components/resume-loading-skeleton";
 
@@ -94,6 +95,7 @@ export default function AutoApplyPage() {
               recruiterEmail,
             );
             router.push(previewUrl);
+            invalidateDocumentGenerationQueries();
           },
         },
       );

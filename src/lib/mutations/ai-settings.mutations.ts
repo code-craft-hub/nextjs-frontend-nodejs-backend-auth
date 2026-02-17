@@ -4,7 +4,7 @@ import {
   type CreateAISettingsData,
   type UpdateAISettingsData,
 } from "@/lib/api/ai-settings.api";
-import { aiSettingsKeys } from "@/lib/query/ai-settings.keys";
+import { invalidateAISettingsQueries } from "@/lib/query/query-invalidation";
 
 export function useCreateOrUpdateAISettingsMutation() {
   const queryClient = useQueryClient();
@@ -13,9 +13,7 @@ export function useCreateOrUpdateAISettingsMutation() {
     mutationFn: (data: CreateAISettingsData) =>
       aiSettingsApi.createOrUpdateSettings(data),
     onSettled: () => {
-      queryClient.invalidateQueries({
-        queryKey: aiSettingsKeys.detail(),
-      });
+      invalidateAISettingsQueries(queryClient);
     },
   });
 }
@@ -27,9 +25,7 @@ export function useUpdateAISettingsMutation() {
     mutationFn: (data: UpdateAISettingsData) =>
       aiSettingsApi.updateSettings(data),
     onSettled: () => {
-      queryClient.invalidateQueries({
-        queryKey: aiSettingsKeys.detail(),
-      });
+      invalidateAISettingsQueries(queryClient);
     },
   });
 }
@@ -41,9 +37,7 @@ export function useToggleAutoApplyMutation() {
     mutationFn: (enabled: boolean) =>
       aiSettingsApi.toggleAutoApply(enabled),
     onSettled: () => {
-      queryClient.invalidateQueries({
-        queryKey: aiSettingsKeys.detail(),
-      });
+      invalidateAISettingsQueries(queryClient);
     },
   });
 }
@@ -54,9 +48,7 @@ export function useDeleteAISettingsMutation() {
   return useMutation({
     mutationFn: () => aiSettingsApi.deleteSettings(),
     onSettled: () => {
-      queryClient.invalidateQueries({
-        queryKey: aiSettingsKeys.detail(),
-      });
+      invalidateAISettingsQueries(queryClient);
     },
   });
 }

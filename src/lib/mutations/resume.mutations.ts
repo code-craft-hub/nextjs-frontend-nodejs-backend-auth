@@ -5,6 +5,11 @@ import {
   type UpdateResumeData,
 } from "@/lib/api/resume.api";
 import { queryKeys } from "@/lib/query/keys";
+import {
+  invalidateResumeDetail,
+  invalidateResumeLists,
+  invalidateResumeQueries,
+} from "@/lib/query/query-invalidation";
 import type { PaginatedResponse } from "@/lib/types";
 import type {
   WorkExperienceEntry,
@@ -61,7 +66,7 @@ export function useCreateResumeMutation() {
       }
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.resumes.lists() });
+      invalidateResumeLists(queryClient);
     },
   });
 }
@@ -115,10 +120,8 @@ export function useUpdateResumeMutation() {
       }
     },
     onSettled: (_data, _error, { id }) => {
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.resumes.detail(id),
-      });
-      queryClient.invalidateQueries({ queryKey: queryKeys.resumes.lists() });
+      invalidateResumeDetail(queryClient, id);
+      invalidateResumeLists(queryClient);
     },
   });
 }
@@ -160,7 +163,7 @@ export function useDeleteResumeMutation() {
       }
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.resumes.lists() });
+      invalidateResumeLists(queryClient);
     },
   });
 }
@@ -173,9 +176,7 @@ export function useCreateNewResumeMutation() {
   return useMutation({
     mutationFn: (data: CreateResumeData) => resumeApi.createNewResume(data),
     onSettled: () => {
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.resumes.lists(),
-      });
+      invalidateResumeLists(queryClient);
     },
   });
 }
@@ -188,9 +189,7 @@ export function useCreateWorkExperienceMutation(resumeId: string) {
     mutationFn: (data: Partial<WorkExperienceEntry>) =>
       resumeApi.createWorkExperience(resumeId, data),
     onSettled: () => {
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.resumes.detail(resumeId),
-      });
+      invalidateResumeDetail(queryClient, resumeId);
     },
   });
 }
@@ -207,9 +206,7 @@ export function useUpdateWorkExperienceMutation(resumeId: string) {
       data: Partial<WorkExperienceEntry>;
     }) => resumeApi.updateWorkExperience(resumeId, id, data),
     onSettled: () => {
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.resumes.detail(resumeId),
-      });
+      invalidateResumeDetail(queryClient, resumeId);
     },
   });
 }
@@ -220,9 +217,7 @@ export function useDeleteWorkExperienceMutation(resumeId: string) {
   return useMutation({
     mutationFn: (id: string) => resumeApi.deleteWorkExperience(resumeId, id),
     onSettled: () => {
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.resumes.detail(resumeId),
-      });
+      invalidateResumeDetail(queryClient, resumeId);
     },
   });
 }
@@ -236,9 +231,7 @@ export function useCreateEducationMutation(resumeId: string) {
     mutationFn: (data: Partial<EducationEntry>) =>
       resumeApi.createEducation(resumeId, data),
     onSettled: () => {
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.resumes.detail(resumeId),
-      });
+      invalidateResumeDetail(queryClient, resumeId);
     },
   });
 }
@@ -250,9 +243,7 @@ export function useUpdateEducationMutation(resumeId: string) {
     mutationFn: ({ id, data }: { id: string; data: Partial<EducationEntry> }) =>
       resumeApi.updateEducation(resumeId, id, data),
     onSettled: () => {
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.resumes.detail(resumeId),
-      });
+      invalidateResumeDetail(queryClient, resumeId);
     },
   });
 }
@@ -263,9 +254,7 @@ export function useDeleteEducationMutation(resumeId: string) {
   return useMutation({
     mutationFn: (id: string) => resumeApi.deleteEducation(resumeId, id),
     onSettled: () => {
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.resumes.detail(resumeId),
-      });
+      invalidateResumeDetail(queryClient, resumeId);
     },
   });
 }
@@ -279,9 +268,7 @@ export function useCreateProjectMutation(resumeId: string) {
     mutationFn: (data: Partial<ProjectEntry>) =>
       resumeApi.createProject(resumeId, data),
     onSettled: () => {
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.resumes.detail(resumeId),
-      });
+      invalidateResumeDetail(queryClient, resumeId);
     },
   });
 }
@@ -293,9 +280,7 @@ export function useUpdateProjectMutation(resumeId: string) {
     mutationFn: ({ id, data }: { id: string; data: Partial<ProjectEntry> }) =>
       resumeApi.updateProject(resumeId, id, data),
     onSettled: () => {
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.resumes.detail(resumeId),
-      });
+      invalidateResumeDetail(queryClient, resumeId);
     },
   });
 }
@@ -306,9 +291,7 @@ export function useDeleteProjectMutation(resumeId: string) {
   return useMutation({
     mutationFn: (id: string) => resumeApi.deleteProject(resumeId, id),
     onSettled: () => {
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.resumes.detail(resumeId),
-      });
+      invalidateResumeDetail(queryClient, resumeId);
     },
   });
 }
@@ -322,9 +305,7 @@ export function useCreateCertificationMutation(resumeId: string) {
     mutationFn: (data: Partial<CertificationEntry>) =>
       resumeApi.createCertification(resumeId, data),
     onSettled: () => {
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.resumes.detail(resumeId),
-      });
+      invalidateResumeDetail(queryClient, resumeId);
     },
   });
 }
@@ -341,9 +322,7 @@ export function useUpdateCertificationMutation(resumeId: string) {
       data: Partial<CertificationEntry>;
     }) => resumeApi.updateCertification(resumeId, id, data),
     onSettled: () => {
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.resumes.detail(resumeId),
-      });
+      invalidateResumeDetail(queryClient, resumeId);
     },
   });
 }
@@ -354,9 +333,7 @@ export function useDeleteCertificationMutation(resumeId: string) {
   return useMutation({
     mutationFn: (id: string) => resumeApi.deleteCertification(resumeId, id),
     onSettled: () => {
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.resumes.detail(resumeId),
-      });
+      invalidateResumeDetail(queryClient, resumeId);
     },
   });
 }
@@ -370,9 +347,7 @@ export function useAddSkillsMutation(resumeId: string) {
     mutationFn: (data: { hardSkill?: string[]; softSkill?: string[] }) =>
       resumeApi.addSkills(resumeId, data),
     onSettled: () => {
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.resumes.detail(resumeId),
-      });
+      invalidateResumeDetail(queryClient, resumeId);
     },
   });
 }

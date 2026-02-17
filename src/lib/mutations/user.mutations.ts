@@ -1,9 +1,9 @@
-// lib/mutations/user.mutations.ts
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { userApi, type CreateUserData } from "@/lib/api/user.api";
 import { queryKeys } from "@/lib/query/keys";
 import type { PaginatedResponse } from "@/lib/types";
 import { IUser } from "@/types";
+import { invalidateUserDetail, invalidateUserLists } from "../queries/user.queries";
 
 export function useCreateUserMutation() {
   const queryClient = useQueryClient();
@@ -51,19 +51,17 @@ export function useCreateUserMutation() {
     },
     onSettled: () => {
       // Always refetch after mutation
-      queryClient.invalidateQueries({ queryKey: queryKeys.users.lists() });
+      invalidateUserLists();
     },
   });
 }
 
 export function useUpdateUserMutation() {
-  const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: ({ data }: { data: any }) => userApi.updateUser(data),
     onSettled: (_data, _error) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.users.detail() });
-      queryClient.invalidateQueries({ queryKey: queryKeys.users.lists() });
+      invalidateUserDetail();
+      invalidateUserLists();
     },
   });
 }
@@ -101,7 +99,7 @@ export function useDeleteUserMutation() {
       }
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.users.lists() });
+      invalidateUserLists();
     },
   });
 }
