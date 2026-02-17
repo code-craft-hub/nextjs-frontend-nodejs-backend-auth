@@ -4,18 +4,9 @@ import { useEffect, useState } from "react";
 let cachedLocation: IpLocation | null = null;
 let locationPromise: Promise<IpLocation> | null = null;
 
-console.log("Module loaded: ip-geolocation.provider", {cachedLocation, locationPromise});
-
-console.count("Module loaded: ip-geolocation.provider");
-
 export function useUserLocation() {
   const [location, setLocation] = useState<IpLocation>(cachedLocation ?? {});
 
-  console.count("useUserLocation called");
-
-  console.log("useUserLocation: current location state", location);
-  console.log("useUserLocation: cachedLocation", cachedLocation);
-  console.log("useUserLocation: locationPromise", locationPromise);
   useEffect(() => {
     if (cachedLocation) {
       setLocation(cachedLocation);

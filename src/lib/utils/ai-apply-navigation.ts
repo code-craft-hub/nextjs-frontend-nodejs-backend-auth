@@ -81,8 +81,8 @@ export function buildPreviewUrl(
   recruiterEmail: string,
 ): string {
   const params = new URLSearchParams();
-  params.set("coverLetterDocId", coverLetterDocId);
-  params.set("resumeDocId", resumeDocId);
+  params.set("coverLetterId", coverLetterDocId);
+  params.set("resumeId", resumeDocId);
   params.set("recruiterEmail", recruiterEmail);
   return `/dashboard/preview?${params.toString()}`;
 }

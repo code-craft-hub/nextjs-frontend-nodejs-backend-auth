@@ -67,18 +67,6 @@ export function useUpdateUserMutation() {
     },
   });
 }
-export function useUpdateAISettingsMutation() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: ({ data }: { data: any }) => userApi.updateAiPreference(data),
-    onSettled: (_data, _error) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.users.detail() });
-      queryClient.invalidateQueries({ queryKey: queryKeys.users.lists() });
-    },
-  });
-}
-
 export function useDeleteUserMutation() {
   const queryClient = useQueryClient();
 

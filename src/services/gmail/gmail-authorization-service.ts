@@ -1,43 +1,43 @@
-import { api } from "@/lib/api/client";
+import {
+  gmailApi,
+  EmailFormData,
+  EmailPayload,
+} from "@/lib/api/gmail.api";
 import { fileToBase64 } from "@/lib/utils/helpers";
 
-export interface EmailFormData {
-  userEmail: string;
-  recruiterEmail: string;
-  subject: string;
-  content: string;
-  sendImmediately: boolean;
-  attachment?: File;
-}
+export type { EmailFormData };
 
-export const checkAuthStatus = async () => {
-  const data = await api.get<any>(
-    `/google-gmail-oauth/auth-status/`
-  );
-
-  return data;
+export const checkAuthStatus = async (token?: string) => {
+  return gmailApi.checkAuthStatus(token);
 };
 
-export const requestAuthUrl = async () => {
-  const data = await api.get<any>(
-    `/google-gmail-oauth/auth-url/`
-  );
-  return data;
+export const requestAuthUrl = async (token?: string) => {
+  return gmailApi.getAuthUrl(token);
 };
 
 export const sendAuthorizationCode = async (
-  userEmail: string,
-  code: string
+  code: string,
+  token?: string
 ) => {
-  const data = await api.post<any>(`/google-gmail-oauth/auth-callback`, {
-    userEmail,
-    code,
-  });
-  return data;
+  return gmailApi.handleAuthCallback(code, token);
 };
 
-export const sendEmail = async (formData: EmailFormData) => {
-  const payload: any = { ...formData };
+export const getAccount = async (token?: string) => {
+  return gmailApi.getAccount(token);
+};
+
+export const revokeAccess = async (token?: string) => {
+  return gmailApi.revokeAccess(token);
+};
+
+export const sendEmail = async (formData: EmailFormData, token?: string) => {
+  const payload: EmailPayload = {
+    userEmail: formData.userEmail,
+    recruiterEmail: formData.recruiterEmail,
+    subject: formData.subject,
+    content: formData.content,
+    sendImmediately: formData.sendImmediately,
+  };
 
   if (formData.attachment) {
     payload.attachment = {
@@ -47,6 +47,5 @@ export const sendEmail = async (formData: EmailFormData) => {
     };
   }
 
-  const data = await api.post<any>(`/google-gmail-oauth/send`, payload);
-  return data;
+  return gmailApi.sendEmail(payload, token);
 };

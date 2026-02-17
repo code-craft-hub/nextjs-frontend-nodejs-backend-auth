@@ -59,7 +59,7 @@ export default function ResumeFormLayout({
 
   const handleSectionChange = (sectionId: number) => {
     setActiveSection(sectionId);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    // window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleNext = () => {

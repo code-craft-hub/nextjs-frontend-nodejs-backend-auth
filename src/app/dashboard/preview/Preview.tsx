@@ -1,7 +1,6 @@
 "use client";
 
 import { apiService } from "@/hooks/use-auth";
-import { EditableResume } from "../(dashboard)/ai-apply/components/resume/EditableResume";
 import { ProgressIndicator } from "../(dashboard)/ai-apply/progress-indicator";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -21,18 +20,20 @@ import { useFireworksConfetti } from "@/components/ui/confetti";
 import AuthorizeGoogle from "@/hooks/gmail/AuthorizeGoogle";
 import { GmailCompose } from "./GmailCompose";
 import TailorCoverLetterDisplay from "../tailor-cover-letter/TailorCoverLetterDisplay";
+import { ViewResume } from "../tailor-resume/ViewResume";
+import CreateUserResume from "@/app/onboarding/onboarding-pages/create-resume-form/CreateUserResume";
 
 /**
  * Normalize API response data to match the expected UI schema
  * Maps API fields (e.g., "summary") to schema fields (e.g., "profile")
  */
-const normalizeResumeData = (data: any) => {
+const normalizeResumeData = (data: any): any => {
   if (!data) return data;
 
   return {
     ...data,
     // Map API's "summary" field to schema's "profile" field
-    profile: data.summary || data.profile || "",
+    profile: data.summary || "",
     // Ensure arrays exist
     education: data.education || [],
     workExperience: data.workExperience || [],
@@ -59,6 +60,8 @@ const Preview = ({
   const [activeStep, setActiveStep] = useState(3);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [openModal, setOpenModal] = useState(false);
+    const [editResume, setEditResume] = useState(false);
+
   const router = useRouter();
   const queryClient = useQueryClient();
   const { start: startConfetti } = useFireworksConfetti();
@@ -70,7 +73,9 @@ const Preview = ({
     coverLetterQueries.detail(coverLetterId),
   );
 
-  console.log(resumeData, coverLetterData);
+  const displayResumeData = normalizeResumeData(resumeData);
+
+  console.log(displayResumeData, coverLetterData);
 
   const defaultResume = user?.dataSource?.find(
     (resume) => resume.id === user?.defaultDataSource,
@@ -188,6 +193,11 @@ const Preview = ({
         value: `${user?.firstName} viewed Preview Page`,
       });
   }, [user?.firstName]);
+
+  const handleEditClick = (value: boolean) => {
+    setEditResume(value);
+  };
+
   return openModal ? (
     <CongratulationModal handleOpenModal={handleOpenModal} />
   ) : (
@@ -237,11 +247,19 @@ const Preview = ({
             title="Resume PDF"
           />
         </div>
-      ) : (
-        <EditableResume
-          data={normalizeResumeData(resumeData!)}
+      ) : editResume ? (
+        <CreateUserResume
           resumeId={resumeId}
+          data={displayResumeData}
+          handleEditClick={handleEditClick}
         />
+      ) : (
+        <>
+          <ViewResume
+            data={displayResumeData}
+            handleEditClick={handleEditClick}
+          />
+        </>
       )}
       <div className="flex items-center justify-center max-sm:fixed w-full h-16 bottom-4 left-0 ">
         <Button disabled={isSubmitting} onClick={handleSubmit} className="w-64">

@@ -2,8 +2,9 @@ import { cn } from "@/lib/utils";
 import { JSX, useState } from "react";
 import AuthorizeGoogle from "../../../hooks/gmail/AuthorizeGoogle";
 import { userQueries } from "@/lib/queries/user.queries";
+import { aiSettingsQueries } from "@/lib/queries/ai-settings.queries";
 import { useQuery } from "@tanstack/react-query";
-import { useUpdateAISettingsMutation } from "@/lib/mutations/user.mutations";
+import { useUpdateAISettingsMutation } from "@/lib/mutations/ai-settings.mutations";
 interface SettingOption {
   label: string;
   description: string;
@@ -76,10 +77,11 @@ const Label: React.FC<LabelProps> = ({ htmlFor, className = "", children }) => (
 );
 
 export const AiApplyPreferences: React.FC = () => {
-  const updateUser = useUpdateAISettingsMutation();
+  const updateSettings = useUpdateAISettingsMutation();
   const { data: user } = useQuery(userQueries.detail());
+  const { data } = useQuery(aiSettingsQueries.detail());
+  const settings = data?.data;
 
-  console.log("User AI Apply Preferences:", user);
 
   const [oauthState, setOauthState] = useState(false);
 
@@ -87,7 +89,7 @@ export const AiApplyPreferences: React.FC = () => {
     setOauthState(value.authorized);
   };
 
-  const settings: Setting[] = [
+  const settingsConfig: Setting[] = [
     {
       section: "Auto Apply Configuration",
       subTitle: "Configure how Cver AI applies to jobs on your behalf.",
@@ -183,7 +185,7 @@ export const AiApplyPreferences: React.FC = () => {
       generateTailoredCv: false,
       useMasterCv: false,
     };
-    Object.entries(user ?? {}).forEach(([key, value]) => {
+    Object.entries(settings ?? {}).forEach(([key, value]) => {
       if (key && typeof value === "boolean") {
         initialState[key as keyof SwitchStates] = value;
       }
@@ -230,9 +232,7 @@ export const AiApplyPreferences: React.FC = () => {
     setSwitchStates(newState);
 
     try {
-      await updateUser.mutateAsync({
-        data: newState(switchStates),
-      });
+      await updateSettings.mutateAsync(newState(switchStates));
     } catch (error) {
       console.error("Error saving settings:", error);
     }
@@ -276,7 +276,7 @@ export const AiApplyPreferences: React.FC = () => {
   return (
     <div className="">
       <div className="space-y-6 font-inter">
-        {settings.map((setting: Setting, settingIndex: number) => (
+        {settingsConfig.map((setting: Setting, settingIndex: number) => (
           <div
             key={setting.section || `child-${settingIndex}`}
             className="bg-white rounded-xl p-4 sm:p-6 shadow-sm border"

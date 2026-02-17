@@ -49,12 +49,9 @@ export default function TailorCoverLetter() {
   // After generation completes, update URL with actual documentId
   useEffect(() => {
     if (state.documentId && !state.isStreaming && isGeneratorStep) {
-      const newUrl = buildCoverLetterUpdateUrl(
-        state.documentId,
-      );
+      const newUrl = buildCoverLetterUpdateUrl(state.documentId);
       router.replace(newUrl);
-          startConfetti();
-
+      startConfetti();
     }
   }, [
     state.documentId,
@@ -114,7 +111,7 @@ export default function TailorCoverLetter() {
   }, [state.content]);
 
   const displayContent = isGenerated
-    ? existingCoverLetter?.content || existingCoverLetter?.coverLetter
+    ? existingCoverLetter?.content
     : state.content;
 
   const displayUser = {

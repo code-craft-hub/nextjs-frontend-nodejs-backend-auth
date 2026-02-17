@@ -49,15 +49,22 @@ export const useResumeUploadWithProgress = () => {
         throw new Error("Stream not supported");
       }
 
+      let buffer = "";
+
       while (true) {
         const { done, value } = await reader.read();
 
         if (done) break;
 
-        const chunk = decoder.decode(value);
-        const lines = chunk.split("\n");
+        buffer += decoder.decode(value, { stream: true });
 
-        for (const line of lines) {
+        // SSE events are separated by double newlines
+        const events = buffer.split("\n\n");
+        // Keep the last part as it may be incomplete
+        buffer = events.pop() || "";
+
+        for (const event of events) {
+          const line = event.trim();
           if (line.startsWith("data: ")) {
             try {
               const data = JSON.parse(line.slice(6));
@@ -71,7 +78,7 @@ export const useResumeUploadWithProgress = () => {
               }
 
               // If complete
-              if (data.step === "complete" && data.data) {
+              if (data.step === "complete") {
                 setIsUploading(false);
                 return { success: true, data: data.data };
               }
@@ -82,6 +89,7 @@ export const useResumeUploadWithProgress = () => {
         }
       }
 
+      setIsUploading(false);
       return { success: true };
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Upload failed";
