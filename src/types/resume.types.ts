@@ -88,8 +88,8 @@ export interface ResumeAggregate {
   github?: string;
   website?: string;
   summary?: string;
-  description?: string;
   fileName?: string;
+  gcsPath?: string;
   originalName?: string;
   isDefault: boolean;
   rawResumeText?: string;

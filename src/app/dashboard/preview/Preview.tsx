@@ -1,6 +1,5 @@
 "use client";
 
-import { apiService } from "@/hooks/use-auth";
 import { ProgressIndicator } from "../(dashboard)/ai-apply/progress-indicator";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -22,6 +21,7 @@ import { GmailCompose } from "./GmailCompose";
 import TailorCoverLetterDisplay from "../tailor-cover-letter/TailorCoverLetterDisplay";
 import { ViewResume } from "../tailor-resume/ViewResume";
 import CreateUserResume from "@/app/onboarding/onboarding-pages/create-resume-form/CreateUserResume";
+import { aiSettingsQueries } from "@/lib/queries/ai-settings.queries";
 
 /**
  * Normalize API response data to match the expected UI schema
@@ -50,12 +50,14 @@ const Preview = ({
   recruiterEmail,
   jobDescription,
   autoApplyId,
+  masterCvId,
 }: {
   coverLetterId: string;
   resumeId: string;
   jobDescription: string;
   recruiterEmail: string;
   autoApplyId: string;
+  masterCvId?: string;
 }) => {
   const [activeStep, setActiveStep] = useState(3);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -67,8 +69,14 @@ const Preview = ({
   const { start: startConfetti } = useFireworksConfetti();
 
   const { data: user } = useQuery(userQueries.detail());
+  const { data: settings } = useQuery(aiSettingsQueries.detail());
 
+  const isMasterCv = !!masterCvId;
   const { data: resumeData } = useQuery(resumeQueries.detail(resumeId));
+  const { data: masterCvData } = useQuery({
+    ...resumeQueries.detail(masterCvId ?? ""),
+    enabled: isMasterCv,
+  });
   const { data: coverLetterData } = useQuery(
     coverLetterQueries.detail(coverLetterId),
   );
@@ -98,7 +106,8 @@ const Preview = ({
 
     try {
       setIsSubmitting(true);
-      await apiService.sendApplication(
+      // Clause please handle this API call and the associated logic for submitting the application, I'll provide the backend api endpoint in the chat context.
+      await mutate.sendApplication(
         autoApplyId,
         coverLetterId,
         resumeId,
@@ -152,7 +161,7 @@ const Preview = ({
   };
 
   // Usage
-  const viewerSrc = buildViewerSrc(defaultResume?.gcsPath);
+  const viewerSrc = buildViewerSrc(masterCvData?.gcsPath ?? resumeData?.gcsPath ?? "");
 
   useEffect(() => {
     if (user?.firstName)
@@ -206,11 +215,11 @@ const Preview = ({
         data={coverLetterData}
         recruiterEmail={recruiterEmail}
       />
-      {user?.aiApplyPreferences?.useMasterCV ? (
+      {settings?.useMasterCv || isMasterCv ? (
         <div className="h-[80svh] overflow-hidden">
           <iframe
             src={viewerSrc}
-            // src={`${defaultResume?.url}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`}
+            // src={`${masterCvData?.url ?? resumeData?.url}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`}
             className="w-full h-[85svh] overflow-hidden border-0"
             title="Resume PDF"
           />

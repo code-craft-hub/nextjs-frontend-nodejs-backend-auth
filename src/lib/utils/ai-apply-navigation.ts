@@ -76,14 +76,20 @@ export function buildResumeUpdateUrl(resumeDocId: string): string {
  * Build URL for preview page after all documents are generated
  */
 export function buildPreviewUrl(
+  autoApplyId: string,
   coverLetterDocId: string,
   resumeDocId: string,
   recruiterEmail: string,
+  options?: { masterCvId?: string },
 ): string {
   const params = new URLSearchParams();
-  params.set("coverLetterId", coverLetterDocId);
-  params.set("resumeId", resumeDocId);
-  params.set("recruiterEmail", recruiterEmail);
+  params.set("auto-apply-id", autoApplyId);
+  params.set("cover-letter-id", coverLetterDocId);
+  params.set("resume-id", resumeDocId);
+  params.set("recruiter-email", recruiterEmail);
+  if (options?.masterCvId) {
+    params.set("master-cv-id", options.masterCvId);
+  }
   return `/dashboard/preview?${params.toString()}`;
 }
 

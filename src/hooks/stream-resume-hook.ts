@@ -8,14 +8,13 @@ import {
   UseResumeStreamReturn,
 } from "@/types";
 import { jsonrepair } from "jsonrepair";
+import { RESUME_BASE } from "@/lib/api/resume.api";
 
 /**
  * Hook for streaming resume generation
  * Handles backend format: {"type": "chunk", "content": "..."}, {"type": "chunk", "title": "..."}, {"type": "generationComplete", "documentId": "...", "content": "..."}
  */
-export const useResumeStream = (
-  endpoint: string,
-): UseResumeStreamReturn => {
+export const useResumeStream = (): UseResumeStreamReturn => {
   const [streamData, setStreamData] = useState<StreamData>(() => ({
     profile: "",
     workExperience: [],
@@ -204,7 +203,10 @@ export const useResumeStream = (
               title: savedResume.title || "",
             } as StreamData);
           } catch (error) {
-            console.error("[Stream] Failed to parse generationComplete content:", error);
+            console.error(
+              "[Stream] Failed to parse generationComplete content:",
+              error,
+            );
           }
         }
 
@@ -347,7 +349,7 @@ export const useResumeStream = (
         accumulatedContentRef.current = "";
 
         // Initiate SSE connection
-        const response = await fetch(endpoint, {
+        const response = await fetch(RESUME_BASE + "/stream", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -437,7 +439,7 @@ export const useResumeStream = (
         accumulatedContentRef.current = "";
       }
     },
-    [endpoint, handleEventData, tryParseAndUpdateState],
+    [handleEventData, tryParseAndUpdateState],
   );
 
   /**
@@ -464,5 +466,12 @@ export const useResumeStream = (
     };
   }, [stopStream]);
 
-  return { streamData, streamStatus, startStream, stopStream, documentId, title };
+  return {
+    streamData,
+    streamStatus,
+    startStream,
+    stopStream,
+    documentId,
+    title,
+  };
 };

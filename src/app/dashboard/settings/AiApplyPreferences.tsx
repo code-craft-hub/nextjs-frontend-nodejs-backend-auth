@@ -79,8 +79,7 @@ const Label: React.FC<LabelProps> = ({ htmlFor, className = "", children }) => (
 export const AiApplyPreferences: React.FC = () => {
   const updateSettings = useUpdateAISettingsMutation();
   const { data: user } = useQuery(userQueries.detail());
-  const { data } = useQuery(aiSettingsQueries.detail());
-  const settings = data?.data;
+  const { data: settings } = useQuery(aiSettingsQueries.detail());
 
 
   const [oauthState, setOauthState] = useState(false);

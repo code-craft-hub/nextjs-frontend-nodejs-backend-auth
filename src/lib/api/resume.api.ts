@@ -48,7 +48,7 @@ interface ApiResponse<T> {
 
 // ─── API Client ───────────────────────────────────────────────────
 
-const RESUME_BASE = `/${BACKEND_API_VERSION}/resumes`;
+export const RESUME_BASE = `/${BACKEND_API_VERSION}/resumes`;
 
 export const resumeApi = {
   // ─── Resume CRUD ──────────────────────────────────────────────

@@ -78,10 +78,14 @@ export const aiSettingsApi = {
    * @route GET /api/v1/ai-apply-settings
    * @desc Get AI apply settings for the authenticated user
    */
-  getSettings: (token?: string) =>
-    api.get<ApiResponse<AIApplySettings>>(`${AI_SETTINGS_BASE}`, {
-      token,
-    }),
+  getSettings: async (token?: string) => {
+    const response = await api.get<ApiResponse<AIApplySettings>>(
+      `${AI_SETTINGS_BASE}`,
+      { token }
+    );
+    if (response?.success) return response.data;
+    throw new Error("Failed to fetch AI settings");
+  },
 
   /**
    * @route POST /api/v1/ai-apply-settings
