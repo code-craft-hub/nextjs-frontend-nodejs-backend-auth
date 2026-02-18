@@ -7,8 +7,15 @@ export interface CreateUserData {
   role?: string;
 }
 
-export interface UpdateUserData<T = never> {
-  data?: Partial<T>;
+export interface UpdateUserData {
+  firstName?: string;
+  lastName?: string;
+  displayName?: string;
+  photoUrl?: string;
+  phoneNumber?: string;
+  countryCode?: string;
+  country?: string;
+  state?: string;
 }
 
 export type { IUser };

@@ -1,13 +1,12 @@
 import type { IUser } from "@/types";
-import { api } from "@/lib/api/client";
+import { api, BACKEND_API_VERSION } from "@/lib/api/client";
 import type { PaginatedResponse, PaginationParams } from "@/lib/types";
-import { BACKEND_API_VERSION } from "@/lib/api/profile.api";
 import type { CreateUserData, UpdateUserData } from "./user.api.types";
 
 export const userApi = {
   // Get all users (with pagination)
   getUsers: (_params?: PaginationParams) =>
-    api.get<PaginatedResponse<IUser>>("/users"),
+    api.get<PaginatedResponse<IUser>>(`/${BACKEND_API_VERSION}/users`),
 
   // Get user by ID
   getUser: async (token?: string) => {
@@ -20,15 +19,21 @@ export const userApi = {
   },
 
   // Create user
-  createUser: (data: CreateUserData) => api.post<IUser>("/users", data),
+  createUser: (data: CreateUserData) =>
+    api.post<IUser>(`/${BACKEND_API_VERSION}/users`, data),
 
   // Update user
-  updateUser: (data: UpdateUserData) => api.put<IUser>(`/update-user`, data),
+  updateUser: (data: UpdateUserData) =>
+    api.put<{ success: boolean; data: { userId: string } }>(
+      `/${BACKEND_API_VERSION}/users`,
+      data,
+    ),
 
   // Delete user
-  deleteUser: (id: string) => api.delete<void>(`/users/${id}`),
+  deleteUser: (id: string) =>
+    api.delete<void>(`/${BACKEND_API_VERSION}/users/${id}`),
 
   // Batch operations
   deleteUsers: (ids: string[]) =>
-    api.post<void>("/users/batch/delete", { ids }),
+    api.post<void>(`/${BACKEND_API_VERSION}/users/batch/delete`, { ids }),
 };
