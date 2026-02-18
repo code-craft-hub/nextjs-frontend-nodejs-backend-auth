@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { useResumeStream } from "@/hooks/stream-resume-hook";
 import { useCoverLetterStream } from "@/hooks/useCoverLetterGenerator";
 import { useCreateAutoApplyMutation } from "@/lib/mutations/auto-apply.mutations";
-import { userQueries } from "@/lib/queries/user.queries";
+import { userQueries } from "@module/user";
 import { BASEURL } from "@/lib/api/client";
 import { BACKEND_API_VERSION } from "@/lib/api/profile.api";
 import { buildPreviewUrl } from "@/lib/utils/ai-apply-navigation";

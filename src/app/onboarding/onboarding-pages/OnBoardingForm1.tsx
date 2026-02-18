@@ -21,7 +21,7 @@ import Progress from "./Progress";
 import { FloatingLabelInput } from "./FloatingInput";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { userQueries } from "@/lib/queries/user.queries";
+import { userQueries } from "@module/user";
 import { useQuery } from "@tanstack/react-query";
 import { useUpdateOnboarding } from "@/hooks/mutations";
 import { useUserLocation } from "@/hooks/geo-location/ip-geolocation.provider";

@@ -19,7 +19,7 @@ import { useAuth } from "@/hooks/use-auth";
 import OnboardingTabs from "./OnBoardingTabs";
 import { useIsMobile } from "@/hooks/use-mobile";
 import Progress from "./Progress";
-import { userQueries } from "@/lib/queries/user.queries";
+import { userQueries } from "@module/user";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useUpdateOnboarding } from "@/hooks/mutations";

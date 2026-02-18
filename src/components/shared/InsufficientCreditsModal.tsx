@@ -8,15 +8,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { useUpdateUserMutation } from "@/lib/mutations/user.mutations";
-import { userQueries } from "@/lib/queries/user.queries";
+import { useUpdateUserMutation } from "@module/user";
+import { userQueries } from "@module/user";
 import { formatFirestoreDate } from "@/lib/utils/helpers";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useFireworksConfetti } from "../ui/confetti";
 import { toast } from "sonner";
-import { userApi } from "@/lib/api/user.api";
+import { userApi } from "@module/user";
 import { IUser } from "@/types";
 
 export default function InsufficientCreditsModal({

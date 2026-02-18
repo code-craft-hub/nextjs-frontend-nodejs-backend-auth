@@ -2,7 +2,7 @@
 import { cn } from "@/lib/utils";
 import React from "react";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { userQueries } from "@/lib/queries/user.queries";
+import { userQueries } from "@module/user";
 import { useQuery } from "@tanstack/react-query";
 
 interface StatItem {

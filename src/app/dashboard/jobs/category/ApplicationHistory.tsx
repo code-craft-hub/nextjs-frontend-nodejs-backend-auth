@@ -21,7 +21,7 @@ import { DollarSign, MapPin, Sparkles } from "lucide-react";
 import { formatAppliedDate } from "@/lib/utils/helpers";
 import { JobType } from "@/types";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import { userQueries } from "@/lib/queries/user.queries";
+import { userQueries } from "@module/user";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import {
   useUpdateJobApplicationHistoryMutation,

@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { Billing } from "./billing/Billing";
 import { CreditCard, Shield, User2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { userQueries } from "@/lib/queries/user.queries";
+import { userQueries } from "@module/user";
 import { sendGTMEvent } from "@next/third-parties/google";
 import { useFireworksConfetti } from "@/components/ui/confetti";
 import { formatFirestoreDate } from "@/lib/utils/helpers";

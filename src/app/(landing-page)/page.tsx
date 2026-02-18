@@ -5,7 +5,7 @@ import { jobsQueries } from "@/lib/queries/jobs.queries";
 import { prefetchWithPriority } from "@/lib/query/parallel-prefetch";
 import { HydrationBoundary } from "@/components/hydration-boundary";
 import { dehydrate } from "@tanstack/react-query";
-import { userQueries } from "@/lib/queries/user.queries";
+import { userQueries } from "@module/user";
 import { getDataSource } from "@/lib/utils/helpers";
 import { getCookiesToken, getSessionFromCookies } from "@/lib/auth.utils";
 

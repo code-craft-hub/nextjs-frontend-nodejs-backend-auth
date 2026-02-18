@@ -14,9 +14,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { userQueries } from "@/lib/queries/user.queries";
+import { userQueries } from "@module/user";
 import { useQuery } from "@tanstack/react-query";
-import { useUpdateUserMutation } from "@/lib/mutations/user.mutations";
+import { useUpdateUserMutation } from "@module/user";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useUserLocation } from "@/hooks/geo-location/ip-geolocation.provider";
 

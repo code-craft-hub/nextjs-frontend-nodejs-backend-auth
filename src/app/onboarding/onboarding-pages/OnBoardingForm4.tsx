@@ -20,7 +20,7 @@ import OnboardingTabs from "./OnBoardingTabs";
 import Progress from "./Progress";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { FloatingLabelInput } from "./FloatingInput";
-import { userQueries } from "@/lib/queries/user.queries";
+import { userQueries } from "@module/user";
 import { useQuery } from "@tanstack/react-query";
 import { useUpdateOnboarding } from "@/hooks/mutations";
 

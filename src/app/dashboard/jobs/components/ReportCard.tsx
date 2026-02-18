@@ -1,5 +1,5 @@
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { userQueries } from "@/lib/queries/user.queries";
+import { userQueries } from "@module/user";
 import { cn } from "@/lib/utils";
 import { randomNumber } from "@/lib/utils/helpers";
 import { useQuery } from "@tanstack/react-query";

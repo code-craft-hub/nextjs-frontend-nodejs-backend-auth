@@ -1,1 +1,1 @@
-export { useUserQuery } from './user/use-user-query';
+export { useUserQuery } from "@module/user";

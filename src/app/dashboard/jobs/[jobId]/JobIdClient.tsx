@@ -3,7 +3,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { apiService } from "@/hooks/use-auth";
 import { useUpdateJobApplicationHistoryMutation } from "@/lib/mutations/jobs.mutations";
 import { jobsQueries } from "@/lib/queries/jobs.queries";
-import { userQueries } from "@/lib/queries/user.queries";
+import { userQueries } from "@module/user";
 import { postedDate } from "@/lib/utils/helpers";
 import { useQuery } from "@tanstack/react-query";
 import {

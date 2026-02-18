@@ -14,7 +14,7 @@ import {
 } from "@/lib/utils/helpers";
 import { BASEURL } from "@/lib/api/client";
 import { useQuery } from "@tanstack/react-query";
-import { userQueries } from "@/lib/queries/user.queries";
+import { userQueries } from "@module/user";
 import { toast } from "sonner";
 import { useUpdateOnboarding } from "@/hooks/mutations";
 

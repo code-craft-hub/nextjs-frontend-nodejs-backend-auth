@@ -19,7 +19,7 @@ import {
 } from "../../services/gmail/gmail-authorization-service";
 import { isValidEmail } from "@/validation";
 import { useQuery } from "@tanstack/react-query";
-import { userQueries } from "@/lib/queries/user.queries";
+import { userQueries } from "@module/user";
 
 const FormSchema = z.object({
   authorized: z.boolean().default(false).optional(),
@@ -107,7 +107,7 @@ const AuthorizeGoogle: React.FC<{
       if (!success) return toast.error(`Failed to get auth URL`);
 
       // ✅ Start Google OAuth
-      window.location.href = data.authUrl;
+      window.location.href = data?.data?.authUrl;
     } catch (err: any) {
       // toast.error(`Error: ${err.message}`);
       console.error("Authorization error:", err);

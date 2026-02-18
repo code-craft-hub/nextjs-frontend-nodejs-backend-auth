@@ -29,7 +29,7 @@ import { useDocumentExtraction } from "@/app/onboarding/onboarding-pages/AnyForm
 import { isEmpty } from "lodash";
 import { apiService } from "@/hooks/use-auth";
 import { Separator } from "@/components/ui/separator";
-import { userQueries } from "@/lib/queries/user.queries";
+import { userQueries } from "@module/user";
 import { useQuery } from "@tanstack/react-query";
 import JoinOurTelegramGroupAlert from "@/components/shared/JoinOurTelegramGroupAlert";
 import { buildAutoApplyStartUrl } from "@/lib/utils/ai-apply-navigation";

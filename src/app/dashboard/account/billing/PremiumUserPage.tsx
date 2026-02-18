@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Switch } from "@/components/ui/switch";
-import { userQueries } from "@/lib/queries/user.queries";
+import { userQueries } from "@module/user";
 import { useQuery } from "@tanstack/react-query";
 import { daysFromToday, formatAppliedDate } from "@/lib/utils/helpers";
 import { cn } from "@/lib/utils";

@@ -2,7 +2,7 @@ import { requireEmailVerification } from "@/lib/server-auth";
 import { redirect } from "next/navigation";
 import OnboardingClient from "./OnBoardingClient";
 import { createServerQueryClient } from "@/lib/query/prefetch";
-import { userQueries } from "@/lib/queries/user.queries";
+import { userQueries } from "@module/user";
 import { HydrationBoundary } from "@/components/hydration-boundary";
 import { dehydrate } from "@tanstack/react-query";
 import { getCookiesToken } from "@/lib/auth.utils";

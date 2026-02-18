@@ -2,7 +2,7 @@ import Preview from "./Preview";
 import { HydrationBoundary } from "@/components/hydration-boundary";
 import { dehydrate } from "@tanstack/react-query";
 import { createServerQueryClient } from "@/lib/query/prefetch";
-import { userQueries } from "@/lib/queries/user.queries";
+import { userQueries } from "@module/user";
 import { prefetchWithPriority } from "@/lib/query/parallel-prefetch";
 import { resumeQueries } from "@/lib/queries/resume.queries";
 import { coverLetterQueries } from "@/lib/queries/cover-letter.queries";
@@ -16,14 +16,13 @@ const PreviewPage = async ({ searchParams }: any) => {
   const queryClient = createServerQueryClient();
   await queryClient.prefetchQuery(userQueries.detail(token));
   const {
-    coverLetterId,
-    resumeId,
-    recruiterEmail,
-    jobDescription,
-    aiApplyId,
+    "cover-letter-id": coverLetterId,
+    "resume-id": resumeId,
+    "recruiter-email": recruiterEmail,
+    "job-description": jobDescription,
+    "auto-apply-id": autoApplyId,
   } = await searchParams;
 
-  
   await prefetchWithPriority(queryClient, [
     {
       queryKey: resumeQueries.detail(resumeId).queryKey,
@@ -45,7 +44,7 @@ const PreviewPage = async ({ searchParams }: any) => {
           resumeId={resumeId}
           recruiterEmail={recruiterEmail}
           jobDescription={jobDescription}
-          aiApplyId={aiApplyId}
+          autoApplyId={autoApplyId}
         />
       </HydrationBoundary>
     </div>

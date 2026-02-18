@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { userQueries } from "@/lib/queries/user.queries";
+import { userQueries } from "@module/user";
 import { cn } from "@/lib/utils";
 import { monthYear, normalizeToString } from "@/lib/utils/helpers";
 import { IUser } from "@/types";

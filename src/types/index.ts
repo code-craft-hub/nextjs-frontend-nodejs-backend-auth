@@ -83,11 +83,7 @@ export interface IUser {
   referredBy?: string;
   expiryTime?: string | Date;
   usersReferred?: [];
-  dataSource?: any[];
-  bookmarkedJobs: string[];
-  rolesOfInterest?: { label: string; value: string }[];
   role?: any[];
-  isAnonymous?: boolean;
   referralCode?: string;
   displayName?: string;
   countryCode?: string;
@@ -96,7 +92,6 @@ export interface IUser {
   lastName?: string;
   cvJobTitle?: string;
   isPro?: boolean;
-  proPlanExpiryDate?: string | Date;
   customClaims?: Record<string, any> | undefined;
   provider?: string;
   password?: string;
@@ -108,9 +103,6 @@ export interface IUser {
     totalCoverLetters: number;
     totalInterviewQuestions: number;
   };
-  aiApplyPreferences?: any;
-  baseResume?: string;
-  key?: string;
   address?: string;
   country?: string;
   state?: string;
@@ -125,15 +117,6 @@ export interface IUser {
   photoURL?: string;
   createdAt?: string | Date;
   updatedAt?: string | Date;
-  softSkill?: ResumeFormData["softSkill"];
-  hardSkill?: ResumeFormData["hardSkill"];
-  project?: ResumeFormData["project"];
-  socials?: any[];
-  certification?: ResumeFormData["certification"];
-  coverLetter?: string;
-  workExperience?: ResumeFormData["workExperience"];
-  education: ResumeFormData["education"];
-
   // Postgres User fields
   id: string;
   // role: "user" | "admin" | "super_admin" | "moderator" | "support";

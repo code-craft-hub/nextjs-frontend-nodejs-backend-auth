@@ -1,5 +1,5 @@
 import { createServerQueryClient } from "@/lib/query/prefetch";
-import { userQueries } from "@/lib/queries/user.queries";
+import { userQueries } from "@module/user";
 import { HydrationBoundary } from "@/components/hydration-boundary";
 import { dehydrate } from "@tanstack/react-query";
 import AnalyticsClient from "./AnalyticsClient";

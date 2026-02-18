@@ -13,7 +13,7 @@ import {
   VisibilityState,
 } from "@tanstack/react-table";
 import { v4 as uuidv4 } from "uuid";
-import { userQueries } from "@/lib/queries/user.queries";
+import { userQueries } from "@module/user";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import {
   useUpdateJobApplicationHistoryMutation,

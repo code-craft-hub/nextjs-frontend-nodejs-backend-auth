@@ -26,7 +26,7 @@ export const schema = z.object({
 });
 
 export const AIApplyColumn = (
-  router: ReturnType<typeof useRouter>
+  router: ReturnType<typeof useRouter>,
 ): ColumnDef<AutoApplyRecord>[] => [
   {
     id: "select",
@@ -58,7 +58,11 @@ export const AIApplyColumn = (
     accessorKey: "title",
     header: "Job Title",
     cell: ({ row }) => {
-      return <div className="font-inter max-w-3xs overflow-hidden truncate">{row.original.title}</div>;
+      return (
+        <div className="font-inter max-w-3xs overflow-hidden truncate">
+          {row.original.title}
+        </div>
+      );
     },
     enableHiding: false,
   },
@@ -85,7 +89,7 @@ export const AIApplyColumn = (
               "text-muted-foreground px-1.5 rounded-2xl font-jakarta capitalize",
               row.original.type !== "email"
                 ? "bg-primary/10 border-primary/40 text-primary"
-                : "bg-cverai-green/10 border-cverai-green/40 text-cverai-green"
+                : "bg-cverai-green/10 border-cverai-green/40 text-cverai-green",
             )}
           >
             {row.original.type}
@@ -106,7 +110,7 @@ export const AIApplyColumn = (
               "text-muted-foreground px-1.5 rounded-2xl font-jakarta capitalize",
               row.original.status === "sent"
                 ? "bg-cverai-green/10 border-cverai-green/40 text-cverai-green"
-                : "bg-primary/10 border-primary/40 text-primary"
+                : "bg-primary/10 border-primary/40 text-primary",
             )}
           >
             {row.original.status}
@@ -123,9 +127,18 @@ export const AIApplyColumn = (
           variant={"ghost"}
           className="text-blue-500 font-jakarta"
           onClick={() => {
-            router.push(
-              `/dashboard/preview?aiApplyId=${row.original.id}&resumeId=${row.original.resumeId}&coverLetterId=${row.original.coverLetterId}&recruiterEmail=${row.original.recruiterEmail}`
-            );
+            const params = new URLSearchParams();
+            params.set("auto-apply-id", row.original.id);
+            if (row.original.resumeId)
+              params.set("resume-id", row.original.resumeId);
+            if (row.original.coverLetterId)
+              params.set("cover-letter-id", row.original.coverLetterId);
+            if (row.original.recruiterEmail)
+              params.set("recruiter-email", row.original.recruiterEmail);
+
+            const url = `/dashboard/preview?${params.toString()}`;
+
+            router.push(url);
           }}
         >
           Show Details

@@ -1,9 +1,10 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { userApi, type CreateUserData } from "@/lib/api/user.api";
+import { userApi } from "../api/user.api";
+import type { CreateUserData } from "../api/user.api.types";
 import { queryKeys } from "@/lib/query/keys";
 import type { PaginatedResponse } from "@/lib/types";
-import { IUser } from "@/types";
-import { invalidateUserDetail, invalidateUserLists } from "../queries/user.queries";
+import type { IUser } from "@/types";
+import { invalidateUserLists } from "../queries/user.queryOptions";
 
 export function useCreateUserMutation() {
   const queryClient = useQueryClient();
@@ -51,55 +52,7 @@ export function useCreateUserMutation() {
     },
     onSettled: () => {
       // Always refetch after mutation
-      invalidateUserLists();
-    },
-  });
-}
-
-export function useUpdateUserMutation() {
-  return useMutation({
-    mutationFn: ({ data }: { data: any }) => userApi.updateUser(data),
-    onSettled: (_data, _error) => {
-      invalidateUserDetail();
-      invalidateUserLists();
-    },
-  });
-}
-export function useDeleteUserMutation() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (id: string) => userApi.deleteUser(id),
-    onMutate: async (id) => {
-      await queryClient.cancelQueries({ queryKey: queryKeys.users.lists() });
-
-      const previousUsers = queryClient.getQueryData(queryKeys.users.lists());
-
-      // Optimistically remove from lists
-      queryClient.setQueriesData<PaginatedResponse<IUser>>(
-        { queryKey: queryKeys.users.lists() },
-        (old) => {
-          if (!old) return old;
-          return {
-            ...old,
-            data: old.data.filter((user) => user.uid !== id),
-            total: old.total - 1,
-          };
-        },
-      );
-
-      return { previousUsers };
-    },
-    onError: (_err, _id, context) => {
-      if (context?.previousUsers) {
-        queryClient.setQueriesData(
-          { queryKey: queryKeys.users.lists() },
-          context.previousUsers,
-        );
-      }
-    },
-    onSettled: () => {
-      invalidateUserLists();
+      invalidateUserLists(queryClient);
     },
   });
 }

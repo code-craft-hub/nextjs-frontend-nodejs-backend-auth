@@ -18,7 +18,7 @@ import { Button } from "@/components/ui/button";
 import { JobFilters } from "@/lib/types/jobs";
 import { ReportCard } from "@/app/dashboard/jobs/components/ReportCard";
 import JobSearchInput from "@/components/shared/JobSearchInput";
-import { userQueries } from "@/lib/queries/user.queries";
+import { userQueries } from "@module/user";
 import { getDataSource } from "@/lib/utils/helpers";
 import { jobMatcher } from "@/services/job-matcher";
 import { useRouter } from "next/navigation";

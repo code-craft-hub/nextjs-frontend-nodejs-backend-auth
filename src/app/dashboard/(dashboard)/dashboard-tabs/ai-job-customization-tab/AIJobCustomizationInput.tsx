@@ -28,7 +28,7 @@ import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { useDocumentExtraction } from "@/app/onboarding/onboarding-pages/AnyFormatToText";
 import { UploadedFile } from "@/types";
-import { userQueries } from "@/lib/queries/user.queries";
+import { userQueries } from "@module/user";
 import { useQuery } from "@tanstack/react-query";
 import { Separator } from "@/components/ui/separator";
 import { FileUploadForm } from "@/components/FileUploadForm";

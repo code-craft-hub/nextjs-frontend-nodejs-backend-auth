@@ -1,5 +1,5 @@
-import { api } from "../client";
-import { BACKEND_API_VERSION } from "../profile.api";
+import { api } from "@/lib/api/client";
+import { BACKEND_API_VERSION } from "@/lib/api/profile.api";
 
 export interface OnboardingStep1Data {
   country: string;
@@ -8,7 +8,6 @@ export interface OnboardingStep1Data {
 }
 
 export interface OnboardingStep2Data {
-  // Define your step 2 fields
   occupation?: string;
   companyName?: string;
 }
@@ -40,8 +39,7 @@ export const updateOnboardingStep = async (
   payload: OnboardingUpdatePayload,
 ) => {
   const response = await api.patch(`/${BACKEND_API_VERSION}/users/onboarding/step`, payload) as any;
-  // const response = await api.patch("/user/onboarding/step", payload) as any;
-  return response?.data; // return response.data;
+  return response?.data;
 };
 
 /**

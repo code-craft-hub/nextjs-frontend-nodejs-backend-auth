@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AiApplyPreferences } from "./AiApplyPreferences";
 import { Sparkles, User } from "lucide-react";
 import { ProfileManagement } from "./ProfileManagement";
-import { userQueries } from "@/lib/queries/user.queries";
+import { userQueries } from "@module/user";
 import { useQuery } from "@tanstack/react-query";
 import { sendGTMEvent } from "@next/third-parties/google";
 

@@ -40,7 +40,7 @@ import { ReportCard } from "./ReportCard";
 import { jobMatcher } from "@/services/job-matcher";
 import { sendGTMEvent } from "@next/third-parties/google";
 import InsufficientCreditsModal from "@/components/shared/InsufficientCreditsModal";
-import { userQueries } from "@/lib/queries/user.queries";
+import { userQueries } from "@module/user";
 import {
   OverviewColumn,
   OverviewEmpty,

@@ -1,6 +1,6 @@
 "use client";
 import { api } from "@/lib/api/client";
-import { userQueries } from "@/lib/queries/user.queries";
+import { userQueries } from "@module/user";
 import { RegisterUserSchema } from "@/lib/schema-validations";
 import { IUser, Login } from "@/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";

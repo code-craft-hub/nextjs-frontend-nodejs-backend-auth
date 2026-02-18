@@ -12,7 +12,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/use-auth";
 import { useQuery } from "@tanstack/react-query";
-import { userQueries } from "@/lib/queries/user.queries";
+import { userQueries } from "@module/user";
 import { api } from "@/lib/api/client";
 
 export const UserMenu = () => {

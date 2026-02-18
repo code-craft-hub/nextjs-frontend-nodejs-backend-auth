@@ -4,7 +4,7 @@ import { UpgradeModal } from "./UpgradeModal";
 import { useEffect, useState } from "react";
 import { PremiumUserPage } from "./PremiumUserPage";
 import { useQuery } from "@tanstack/react-query";
-import { userQueries } from "@/lib/queries/user.queries";
+import { userQueries } from "@module/user";
 import { formatFirestoreDate, getDaysRemaining } from "@/lib/utils/helpers";
 import { toast } from "sonner";
 

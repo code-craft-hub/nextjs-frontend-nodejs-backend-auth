@@ -10,7 +10,7 @@ import { extractCompleteJsonObjects } from "@/lib/utils/helpers";
 import TailorInterviewQuestionEmptyState from "./TailorInterviewQuestionEmptyState";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { interviewQuestionQueries } from "@/lib/queries/interview.queries";
-import { userQueries } from "@/lib/queries/user.queries";
+import { userQueries } from "@module/user";
 import { sendGTMEvent } from "@next/third-parties/google";
 import { API_URL } from "@/lib/api/client";
 import { useFireworksConfetti } from "@/components/ui/confetti";

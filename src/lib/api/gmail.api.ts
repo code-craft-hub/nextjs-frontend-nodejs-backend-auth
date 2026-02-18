@@ -28,7 +28,7 @@ export interface EmailPayload {
 }
 
 export interface AuthUrlResponse {
-  authUrl: string;
+  data: { success: boolean; authUrl: string };
 }
 
 export interface AuthCallbackData {

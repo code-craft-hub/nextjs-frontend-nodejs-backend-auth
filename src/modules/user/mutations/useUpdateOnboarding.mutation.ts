@@ -1,12 +1,12 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { userQueries } from "@/lib/queries/user.queries";
-import { onboardingQueries } from "@/lib/queries/user/onboarding.queries";
+import { userQueries } from "../queries/user.queryOptions";
+import { onboardingQueries } from "../queries/onboarding.queryKeys";
 import {
   updateOnboardingStep,
-  OnboardingUpdatePayload,
-  OnboardingUpdateResponse,
-} from "@/lib/api/user/onboarding.api";
+  type OnboardingUpdatePayload,
+  type OnboardingUpdateResponse,
+} from "../api/onboarding.api";
 
 export interface UseUpdateOnboardingOptions {
   onSuccess?: (
@@ -96,34 +96,28 @@ export const useUpdateOnboarding = (
         );
       }
 
-      // Log error for debugging
       console.error("[useUpdateOnboarding] Mutation failed:", {
         error,
         variables,
         timestamp: new Date().toISOString(),
       });
 
-      // Show error toast
       if (showToast) {
         toast.error("Failed to save your data. Please try again.");
       }
 
-      // Call custom error handler
       onError?.(error, variables);
     },
 
-    // Handle mutation success
     onSuccess: (data, variables, _context) => {
       if (showToast) {
         const name = userFirstName ? `${userFirstName}, ` : "";
         toast.success(customMessage ? customMessage : `${name}your data has been saved!`);
       }
 
-      // Call custom success handler
       onSuccess?.(data, variables);
     },
 
-    // Always run after mutation (success or error)
     onSettled: (_data, _error, _variables, _context) => {
       queryClient.invalidateQueries({
         queryKey: userQueries.all().queryKey,
@@ -134,7 +128,6 @@ export const useUpdateOnboarding = (
         queryKey: onboardingQueries.all,
       });
 
-      // Also invalidate broader user queries to catch any related updates
       queryClient.invalidateQueries({
         queryKey: ["user"],
         exact: false,
@@ -142,7 +135,6 @@ export const useUpdateOnboarding = (
     },
 
     retry: (failureCount, error) => {
-      // Don't retry on validation errors (4xx except 429)
       if (error instanceof Error) {
         const axiosError = error as any;
         if (
@@ -153,7 +145,6 @@ export const useUpdateOnboarding = (
           return false;
         }
       }
-      // Retry network errors up to 2 times
       return failureCount < 2;
     },
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),

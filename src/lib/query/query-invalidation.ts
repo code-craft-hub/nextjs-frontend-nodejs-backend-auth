@@ -2,7 +2,7 @@ import { QueryClient, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "./keys";
 import { aiSettingsKeys } from "./ai-settings.keys";
 import { autoApplyKeys } from "./auto-apply.keys";
-import { invalidateUserQueries } from "../queries/user.queries";
+import { invalidateUserQueries } from "@module/user";
 
 /**
  * Centralized query invalidation utilities
@@ -260,7 +260,7 @@ export const invalidateAllAIQueries = (queryClient: QueryClient) => {
  */
 export const invalidateAllUserQueries = (queryClient: QueryClient) => {
   return Promise.all([
-    invalidateUserQueries(),
+    invalidateUserQueries(queryClient),
     invalidateAllAIQueries(queryClient),
   ]);
 };

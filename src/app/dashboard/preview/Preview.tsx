@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { userQueries } from "@/lib/queries/user.queries";
+import { userQueries } from "@module/user";
 import { resumeQueries } from "@/lib/queries/resume.queries";
 import { coverLetterQueries } from "@/lib/queries/cover-letter.queries";
 import { CongratulationModal } from "@/components/shared/CongratulationModal";
@@ -49,13 +49,13 @@ const Preview = ({
   resumeId,
   recruiterEmail,
   jobDescription,
-  aiApplyId,
+  autoApplyId,
 }: {
   coverLetterId: string;
   resumeId: string;
   jobDescription: string;
   recruiterEmail: string;
-  aiApplyId: string;
+  autoApplyId: string;
 }) => {
   const [activeStep, setActiveStep] = useState(3);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -75,11 +75,6 @@ const Preview = ({
 
   const displayResumeData = normalizeResumeData(resumeData);
 
-  console.log(displayResumeData, coverLetterData);
-
-  const defaultResume = user?.dataSource?.find(
-    (resume) => resume.id === user?.defaultDataSource,
-  );
 
   const handleOpenModal = (value: boolean) => {
     setOpenModal(value);
@@ -87,7 +82,7 @@ const Preview = ({
 
   const handleCoverLetterDelete = async () => {
     await api.delete(
-      `/delete-document/${aiApplyId}?docType=${COLLECTIONS.AI_APPLY}&resumeId=${resumeId}&coverLetterId=${coverLetterId}`,
+      `/delete-document/${autoApplyId}?docType=${COLLECTIONS.AI_APPLY}&resumeId=${resumeId}&coverLetterId=${coverLetterId}`,
     );
     toast.success("Cover letter deleted successfully");
     router.push("/dashboard/home");
@@ -100,42 +95,15 @@ const Preview = ({
   };
 
   const handleSubmit = async () => {
-    const frontendURL = process.env.NEXT_PUBLIC_APP_URL;
-    if (!user?.aiApplyPreferences) {
-      toast.error(
-        "Visit the Settings to configure your AI Apply Preferences. Enable Auto Apply in the third card section to get started.",
-        {
-          action: {
-            label: "Enable",
-            onClick: () =>
-              window.open(
-                `${frontendURL}/dashboard/settings?tab=ai-applypreference`,
-              ),
-          },
-          classNames: {
-            // toast: "!bg-yellow-50 !border-yellow-200",
-            actionButton: "!bg-blue-600 hover:!bg-blue-700 !text-white !h-8",
-          },
-        },
-      );
 
-      return;
-    }
-
-    if (!user || !coverLetterData) {
-      toast.error("Missing required data");
-      return;
-    }
     try {
       setIsSubmitting(true);
       await apiService.sendApplication(
-        user,
+        autoApplyId,
         coverLetterId,
         resumeId,
         recruiterEmail,
         jobDescription,
-        user?.aiApplyPreferences.autoSendApplications,
-        user?.aiApplyPreferences?.useMasterCV && defaultResume?.gcsPath,
       );
       setActiveStep(4);
       startConfetti();

@@ -10,7 +10,7 @@ import {
 import { PreviewResumeProps } from "@/types";
 import { useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { userQueries } from "@/lib/queries/user.queries";
+import { userQueries } from "@module/user";
 
 const StreamingSkeleton = ({ className = "" }: { className?: string }) => (
   <div className={`animate-pulse bg-gray-200 rounded ${className}`} />

@@ -22,7 +22,7 @@ import SettingIcon from "./icons/settingIcon";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { userQueries } from "@/lib/queries/user.queries";
+import { userQueries } from "@module/user";
 import WhatsappIcon from "./icons/whatsapp";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {

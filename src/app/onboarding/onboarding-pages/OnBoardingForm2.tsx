@@ -11,7 +11,7 @@ import { FileUploadZone, useDocumentExtraction } from "./AnyFormatToText";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { userQueries } from "@/lib/queries/user.queries";
+import { userQueries } from "@module/user";
 import { useResumeUploadWithProgress } from "@/hooks/useResumeUploadWithProgress";
 import { queryKeys } from "@/lib/query/keys";
 import { Checkbox } from "@/components/ui/checkbox";
