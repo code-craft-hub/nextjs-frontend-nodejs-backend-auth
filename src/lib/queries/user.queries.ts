@@ -1,9 +1,7 @@
-import { QueryClient, queryOptions, useQuery } from "@tanstack/react-query";
+import { queryOptions, useQueryClient } from "@tanstack/react-query";
 import { userApi } from "@/lib/api/user.api";
 import { queryKeys } from "@/lib/query/keys";
 import type { PaginationParams } from "@/lib/types";
-
-const queryClient = new QueryClient();
 
 export const userQueryKeys = {
   users: {
@@ -35,35 +33,37 @@ export const userQueries = {
     }),
 };
 
-const { data: user } = useQuery(userQueries.detail());
 
 // ─── User Queries ───────────────────────────────────────────
 
 export const invalidateUserLists = () => {
+  const qc = useQueryClient();
   return Promise.all([
-    queryClient.invalidateQueries({
+    qc.invalidateQueries({
       queryKey: queryKeys.users.details(),
     }),
-    queryClient.invalidateQueries({
+    qc.invalidateQueries({
       queryKey: queryKeys.users.lists(),
     }),
   ]);
 };
 export const invalidateUserQueries = () => {
+  const qc = useQueryClient();
+
   return Promise.all([
-    queryClient.invalidateQueries({
+    qc.invalidateQueries({
       queryKey: queryKeys.users.details(),
     }),
-    queryClient.invalidateQueries({
+    qc.invalidateQueries({
       queryKey: queryKeys.users.lists(),
     }),
   ]);
 };
 
 export const invalidateUserDetail = () => {
-  return queryClient.invalidateQueries({
+  const qc = useQueryClient();
+  return qc.invalidateQueries({
     queryKey: queryKeys.users.details(),
   });
 };
 
-export { user };
