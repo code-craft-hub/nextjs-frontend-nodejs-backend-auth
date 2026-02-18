@@ -6,18 +6,16 @@ import { toast } from "sonner";
 import { FileUploadZone } from "@/app/onboarding/onboarding-pages/AnyFormatToText";
 import { ProfileCard } from "./ProfileCard";
 import { useResumeUploadWithProgress } from "@/hooks/useResumeUploadWithProgress";
+import { resumeQueries } from "@/lib/queries/resume.queries";
 import { queryKeys } from "@/lib/query/keys";
 
 export const ProfileManagement: React.FC = () => {
   const { data: user } = useQuery(userQueries.detail());
   const [loading, _setLoading] = useState(false);
   const queryClient = useQueryClient();
-  const {
-    uploadResume,
-    // progress,
-    // isUploading,
-    error: uploadError,
-  } = useResumeUploadWithProgress();
+
+  const { data: uploadedResumes } = useQuery(resumeQueries.uploaded());
+  const { uploadResume, error: uploadError } = useResumeUploadWithProgress();
 
   const handleFileSelect = async (file: File) => {
     toast.promise(uploadResume(file), {
@@ -39,8 +37,7 @@ export const ProfileManagement: React.FC = () => {
     });
   };
 
-  // const progressPercentage = progress?.progress || 0;
-
+  console.log("Uploaded Resumes:", uploadedResumes);
   return (
     <div className="font-inter">
       {/* Header */}
@@ -53,13 +50,13 @@ export const ProfileManagement: React.FC = () => {
         </p>
         <div className="mt-2">
           <h2 className="font-medium text-gray-900">
-            Active Profiles ({user?.dataSource?.length ?? 0})
+            {/* Active Profiles ({uploadedResumes?.length ?? 0}) */}
           </h2>
         </div>
       </div>
       <div className="space-y-4 mb-8">
-        {user?.dataSource?.map((profile) => (
-          <ProfileCard key={profile.id} profile={profile} dataSource={user} />
+        {uploadedResumes?.map((profile) => (
+          <ProfileCard key={profile.id} resume={profile} />
         ))}
       </div>
       <FileUploadZone
@@ -77,23 +74,7 @@ export const ProfileManagement: React.FC = () => {
             : "Failed to process document. Please try again."}
         </div>
       )}
-      {/* Progress indicator */}
-      {/* {isUploading && progress && (
-        <div className="w-full space-y-3 mt-4">
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-gray-700 font-medium">
-              {progress.message}
-            </span>
-            <span className="text-gray-500">{progressPercentage}%</span>
-          </div>
-          <div className="w-full bg-gray-200 rounded-full h-2.5">
-            <div
-              className="bg-blue-600 h-2.5 rounded-full transition-all duration-300 ease-out"
-              style={{ width: `${progressPercentage}%` }}
-            />
-          </div>
-        </div>
-      )} */}
+
       <div className="hidden">
         <AuthorizeGoogle />
       </div>

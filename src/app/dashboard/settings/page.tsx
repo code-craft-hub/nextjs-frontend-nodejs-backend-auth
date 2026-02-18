@@ -4,6 +4,7 @@ import { createServerQueryClient } from "@/lib/query/prefetch";
 import { aiSettingsQueries } from "@/lib/queries/ai-settings.queries";
 import { HydrationBoundary } from "@/components/hydration-boundary";
 import { dehydrate } from "@tanstack/react-query";
+import { resumeQueries } from "@/lib/queries/resume.queries";
 
 const SettingsPage = async ({
   searchParams,
@@ -15,7 +16,8 @@ const SettingsPage = async ({
   const token = (await getCookiesToken()) ?? "";
   const queryClient = createServerQueryClient();
   await queryClient.prefetchQuery(aiSettingsQueries.detail(token));
-  
+  await queryClient.prefetchQuery(resumeQueries.uploaded({}, token));
+
   return (
     <div className="p-4 sm:p-8">
       <HydrationBoundary state={dehydrate(queryClient)}>

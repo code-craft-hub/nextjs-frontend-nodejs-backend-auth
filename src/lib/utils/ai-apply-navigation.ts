@@ -32,10 +32,12 @@ export function buildCoverLetterStartUrl(
 export function buildAutoApplyStartUrl(
   jobDescription: string,
   recruiterEmail: string,
+  jobId?: string,
 ): string {
   const params = new URLSearchParams();
-  params.set("recruiterEmail", recruiterEmail);
-  params.set("jobDescription", jobDescription);
+  if (jobId) params.set("job-id", jobId);
+  params.set("recruiter-email", recruiterEmail);
+  params.set("job-description", jobDescription);
   return `/dashboard/auto-apply?${params.toString()}`;
 }
 
@@ -76,17 +78,17 @@ export function buildResumeUpdateUrl(resumeDocId: string): string {
  * Build URL for preview page after all documents are generated
  */
 export function buildPreviewUrl(
-  autoApplyId: string,
-  coverLetterDocId: string,
-  resumeDocId: string,
-  recruiterEmail: string,
+  autoApplyId?: string,
+  coverLetterDocId?: string,
+  resumeDocId?: string,
+  recruiterEmail?: string,
   options?: { masterCvId?: string },
 ): string {
   const params = new URLSearchParams();
-  params.set("auto-apply-id", autoApplyId);
-  params.set("cover-letter-id", coverLetterDocId);
-  params.set("resume-id", resumeDocId);
-  params.set("recruiter-email", recruiterEmail);
+  if (autoApplyId) params.set("auto-apply-id", autoApplyId);
+  if (coverLetterDocId) params.set("cover-letter-id", coverLetterDocId);
+  if (resumeDocId) params.set("resume-id", resumeDocId);
+  if (recruiterEmail) params.set("recruiter-email", recruiterEmail);
   if (options?.masterCvId) {
     params.set("master-cv-id", options.masterCvId);
   }

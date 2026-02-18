@@ -223,6 +223,7 @@ export const formatAppliedDate = (dateString?: string): string => {
   }
 };
 
+//  TODO: DELETE
 export const getDataSource = (user?: Partial<IUser>) => {
   let dataSource = Array.isArray(user?.dataSource)
     ? user?.dataSource?.find(

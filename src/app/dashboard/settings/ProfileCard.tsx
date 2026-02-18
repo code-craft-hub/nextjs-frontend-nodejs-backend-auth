@@ -3,14 +3,13 @@ import { Button } from "@/components/ui/button";
 import { ChevronRight, Sparkles, Trash } from "lucide-react";
 import { cn } from "@/lib/utils";
 import ProfileManagementModal from "./ProfileManagementModal";
-import { ProfileData } from "@/types";
+import { ResumeAggregate } from "@/types/resume.types";
+import { formatAppliedDate } from "@/lib/utils/helpers";
 
 export const ProfileCard: React.FC<{
-  profile: ProfileData;
-  dataSource: any;
-}> = ({ profile, dataSource }) => {
+  resume: ResumeAggregate;
+}> = ({ resume }) => {
   const deleteDataSource = useDeleteDataSourceWithGCS();
-  const isDefault = dataSource?.defaultDataSource === profile.id;
   return (
     <div
       className={cn(
@@ -22,7 +21,7 @@ export const ProfileCard: React.FC<{
         <Button
           onClick={() => {
             deleteDataSource.mutate({
-              profileId: profile.id,
+              profileId: resume.id,
             });
           }}
           variant={"ghost"}
@@ -36,18 +35,11 @@ export const ProfileCard: React.FC<{
           <h3
             className={cn(
               "text-md items-center gap-1 font-medium capitalize",
-              isDefault && "ml-4",
+              resume.isDefault && "ml-4",
             )}
           >
-            {profile?.title ??
-              profile?.key ??
-              profile?.rolesOfInterest
-                ?.slice(0, 2)
-                ?.map((role) => role.label)
-                .join(", ") ??
-              profile?.originalName ??
-              "Untitled Profile"}
-            {isDefault && (
+            {resume?.title || "Untitled Profile"}
+            {resume.isDefault && (
               <span>
                 <Sparkles
                   className={cn(
@@ -61,15 +53,14 @@ export const ProfileCard: React.FC<{
         </div>
 
         <p className="text-gray-600 text-sm leading-relaxed mb-2 line-clamp-3">
-          {profile?.description ||
-            profile?.data ||
-            profile?.profile ||
-            "No description available."}
+          {resume?.summary || "No description available."}
         </p>
-        <p className="text-gray-400 text-sm">{profile.date}</p>
+        <p className="text-gray-400 text-sm">
+          {formatAppliedDate(resume.createdAt)}
+        </p>
       </div>
       <div className="border-t p-4">
-        <ProfileManagementModal profile={profile} dataSource={dataSource}>
+        <ProfileManagementModal resume={resume}>
           <button className="flex items-center justify-between w-full text-blue-600 text-sm font-medium hover:text-blue-700 transition-colors">
             <span>Edit Profile</span>
             <ChevronRight className="w-4 h-4" />

@@ -28,9 +28,7 @@ import { useUpdateCoverLetterMutation } from "@/lib/mutations/cover-letter.mutat
 // Validation schema
 const coverLetterSchema = z.object({
   title: z.string().min(1, "Title is required"),
-  content: z
-    .string()
-    .min(10, "Cover letter must be at least 10 characters"),
+  content: z.string().min(10, "Cover letter must be at least 10 characters"),
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
   salutation: z.string().min(1, "Salutation is required"),
@@ -66,13 +64,11 @@ const TailorCoverLetterDisplay = ({
   const currentData = data;
   const updateMutation = useUpdateCoverLetterMutation();
 
-  console.log("TailorCoverLetterDisplay data : ", data, recruiterEmail);
-
   const form = useForm<CoverLetterFormData>({
     resolver: zodResolver(coverLetterSchema),
     defaultValues: {
       title: currentData?.title || "",
-      content:  currentData?.content || "",
+      content: currentData?.content || "",
       firstName: currentData?.firstName || user?.firstName || "",
       lastName: currentData?.lastName || user?.lastName || "",
       phoneNumber: currentData?.phoneNumber || user?.phoneNumber || "",
@@ -169,9 +165,7 @@ const TailorCoverLetterDisplay = ({
               <p className="text-sm font-bold font-inter">
                 {currentData?.salutation || "Dear Hiring Manager,"}
               </p>
-              <p className="text-sm">
-                {currentData?.content}
-              </p>
+              <p className="text-sm">{currentData?.content}</p>
               {currentData?.content && (
                 <div className="mt-8">
                   <p>Sincerely</p>

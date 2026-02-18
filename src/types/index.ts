@@ -421,14 +421,14 @@ export interface StreamEvent {
 }
 
 export interface RequestPayload {
-  user: Partial<IUser>;
+  jobId?: string;
   jobDescription: string;
 }
 
 export interface UseResumeStreamReturn {
   streamData: StreamData;
   streamStatus: StreamStatus;
-  startStream: (user: Partial<IUser>, jobDescription: string) => Promise<void>;
+  startStream: (jobDescription: string, jobId?: string) => Promise<void>;
   stopStream: () => void;
   documentId: string | null;
   title: string;

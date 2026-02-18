@@ -11,6 +11,13 @@ export const resumeQueries = {
       staleTime: 5 * 60 * 1000,
     }),
 
+  uploaded: (params: ResumeFilters = {}, token?: string) =>
+    queryOptions({
+      queryKey: queryKeys.resumes.uploaded(params),
+      queryFn: () => resumeApi.listUploaded(params, token),
+      staleTime: 5 * 60 * 1000,
+    }),
+
   detail: (id: string, token?: string) =>
     queryOptions({
       queryKey: queryKeys.resumes.detail(id),

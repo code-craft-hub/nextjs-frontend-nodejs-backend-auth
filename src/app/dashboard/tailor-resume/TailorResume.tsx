@@ -3,7 +3,6 @@ import { useEffect, useRef, useState } from "react";
 import { useResumeStream } from "@/hooks/stream-resume-hook";
 import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-import { COLLECTIONS } from "@/lib/utils/constants";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -11,16 +10,13 @@ import { resumeQueries } from "@/lib/queries/resume.queries";
 import { userQueries } from "@module/user";
 import { ResumeDownloadButton } from "./ResumeDownloadButton";
 import { TrashIcon } from "lucide-react";
-import { api, BASEURL } from "@/lib/api/client";
 import { sendGTMEvent } from "@next/third-parties/google";
-import { BACKEND_API_VERSION } from "@/lib/api/profile.api";
 import { ResumeLoadingSkeleton } from "./components/resume-loading-skeleton";
 import { buildResumeUpdateUrl } from "@/lib/utils/ai-apply-navigation";
 import CreateUserResume from "@/app/onboarding/onboarding-pages/create-resume-form/CreateUserResume";
 import { useFireworksConfetti } from "@/components/ui/confetti";
 import { ViewResume } from "./ViewResume";
-
-const API_URL = `${BASEURL}/${BACKEND_API_VERSION}/resumes/stream`;
+import { useDeleteResumeMutation } from "@/lib/mutations/resume.mutations";
 
 /**
  * Normalize API response data to match the expected UI schema
@@ -53,6 +49,7 @@ export const TailorResume = () => {
   const [editResume, setEditResume] = useState(false);
   const [resumeId, setResumeId] = useState(searchParams.get("resumeId"));
   const { start: startConfetti } = useFireworksConfetti();
+  const deleteResume = useDeleteResumeMutation();
 
   const jobDescription = searchParams.get("jobDescription") || "";
 
@@ -77,7 +74,7 @@ export const TailorResume = () => {
   );
 
   const { streamData, streamStatus, startStream, documentId } =
-    useResumeStream(API_URL);
+    useResumeStream();
 
   // Update resumeId when documentId is generated
   useEffect(() => {
@@ -112,7 +109,7 @@ export const TailorResume = () => {
     if (shouldGenerate) {
       hasGeneratedRef.current = true;
       const isRegenerating = Boolean(resumeId);
-      toast.promise(startStream(user, jobDescription), {
+      toast.promise(startStream(jobDescription), {
         loading: isRegenerating
           ? "Regenerating your tailored resume..."
           : "Generating your tailored resume...",
@@ -153,9 +150,7 @@ export const TailorResume = () => {
       return;
     }
 
-    await api.delete(
-      `/delete-document/${idToDelete}?docType=${COLLECTIONS.RESUME}`,
-    );
+    deleteResume.mutate(idToDelete);
     toast.success("Resume deleted successfully");
     router.push("/dashboard/home");
     await queryClient.invalidateQueries(resumeQueries.detail(idToDelete));

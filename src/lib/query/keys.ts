@@ -48,6 +48,8 @@ export const queryKeys = {
     lists: () => [...queryKeys.resumes.all, "list"] as const,
     list: (filters: Record<string, any>) =>
       [...queryKeys.resumes.lists(), filters] as const,
+    uploaded: (filters: Record<string, any>) =>
+      [...queryKeys.resumes.all, "uploaded", filters] as const,
     details: () => [...queryKeys.resumes.all, "detail"] as const,
     detail: (id: string) => [...queryKeys.resumes.details(), id] as const,
   },

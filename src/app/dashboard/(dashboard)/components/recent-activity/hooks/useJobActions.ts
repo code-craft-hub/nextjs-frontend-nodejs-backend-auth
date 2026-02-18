@@ -39,6 +39,7 @@ export function useJobActions() {
       // params.set("recruiterEmail", encodeURIComponent(job?.emailApply));
 
       const startUrl = buildAutoApplyStartUrl(
+        job.id,
         job.descriptionText || "",
         job.emailApply || "",
       );

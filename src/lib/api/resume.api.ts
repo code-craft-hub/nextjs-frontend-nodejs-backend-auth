@@ -77,6 +77,17 @@ export const resumeApi = {
       { token },
     ),
 
+  listUploaded: async (params?: ResumeFilters, token?: string) => {
+    const data = await api.get<ApiResponse<ResumeAggregate[]>>(
+      `${RESUME_BASE}/uploaded?` +
+        new URLSearchParams(params as Record<string, string>).toString(),
+      { token },
+    );
+
+    if (data?.success) return data.data;
+    throw new Error("Failed to fetch user data");
+  },
+
   getResume: async (id: string, token?: string) => {
     const response = await api.get<ApiResponse<ResumeAggregate>>(
       `${RESUME_BASE}/${id}`,

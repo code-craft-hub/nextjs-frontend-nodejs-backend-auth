@@ -1,6 +1,5 @@
 import { useRef, useState, useCallback, useEffect } from "react";
 import {
-  IUser,
   RequestPayload,
   StreamData,
   StreamEvent,
@@ -319,7 +318,7 @@ export const useResumeStream = (): UseResumeStreamReturn => {
    * Start streaming with proper lifecycle management
    */
   const startStream = useCallback(
-    async (user: Partial<IUser>, jobDescription: string): Promise<void> => {
+    async (jobDescription: string, jobId?: string): Promise<void> => {
       try {
         // Cleanup existing connections
         if (abortControllerRef.current) {
@@ -355,8 +354,8 @@ export const useResumeStream = (): UseResumeStreamReturn => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            user,
             jobDescription,
+            jobId,
           } as RequestPayload),
           credentials: "include",
         });

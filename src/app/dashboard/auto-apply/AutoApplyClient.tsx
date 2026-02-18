@@ -14,7 +14,6 @@ import { TailorCoverLetterDisplayStreaming } from "../tailor-cover-letter/Tailor
 import { ResumeLoadingSkeleton } from "../tailor-resume/components/resume-loading-skeleton";
 import { aiSettingsQueries } from "@/lib/queries/ai-settings.queries";
 
-
 export default function AutoApplyClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -25,8 +24,9 @@ export default function AutoApplyClient() {
   const createAutoApply = useCreateAutoApplyMutation();
 
   // Extract parameters from URL
-  const jobDescription = searchParams.get("jobDescription") || "";
-  const recruiterEmail = searchParams.get("recruiterEmail") || "";
+  const jobDescription = searchParams.get("job-description") || "";
+  const recruiterEmail = searchParams.get("recruiter-email") || "";
+  const jobId = searchParams.get("job-id") || undefined;
 
   // Get user data and settings (prefetched on server)
   const { data: user } = useQuery(userQueries.detail());
@@ -49,9 +49,14 @@ export default function AutoApplyClient() {
     if (jobDescription && user && !hasStartedRef.current) {
       hasStartedRef.current = true;
 
+      console.log("[AutoApply] Starting generation with params:", {
+        jobId,
+        useMasterCv,
+      });
+
       if (useMasterCv) {
         // Only generate cover letter when using master CV
-        toast.promise(startCoverLetter({ jobDescription }), {
+        toast.promise(startCoverLetter({ jobDescription, jobId }), {
           loading: "Generating cover letter...",
           success: "Cover letter generated!",
           error: "Failed to generate cover letter",
@@ -59,12 +64,12 @@ export default function AutoApplyClient() {
       } else {
         // Generate both cover letter and resume in parallel
         Promise.all([
-          toast.promise(startCoverLetter({ jobDescription }), {
+          toast.promise(startCoverLetter({ jobDescription, jobId }), {
             loading: "Generating cover letter...",
             success: "Cover letter generated!",
             error: "Failed to generate cover letter",
           }),
-          toast.promise(startResume(user, jobDescription), {
+          toast.promise(startResume(jobDescription, jobId), {
             loading: "Generating resume...",
             success: "Resume generated!",
             error: "Failed to generate resume",
@@ -104,8 +109,7 @@ export default function AutoApplyClient() {
         },
         {
           onSettled: (data) => {
-            console.log("[AutoApply] Auto apply record created:", data);
-            const autoApplyId = data?.id;
+            const autoApplyId = data?.data?.id;
             const previewUrl = buildPreviewUrl(
               autoApplyId,
               coverLetterState.documentId,

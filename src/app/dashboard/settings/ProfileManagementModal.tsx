@@ -30,6 +30,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { ProfileData } from "@/types";
 import { v4 as uuidv4 } from "uuid";
+import { ResumeAggregate } from "@/types/resume.types";
 
 const jobLevel = ["Entry Level", "Mid Level", "Senior Level"];
 const jobTypes = ["Full Time", "Part Time", "Contract"];
@@ -37,14 +38,12 @@ const availability = ["Yes", "No"];
 
 interface ProfileManagementModalProps {
   children: React.ReactNode;
-  profile?: ProfileData;
-  dataSource?: any;
+  resume?: ResumeAggregate;
 }
 
 export default function ProfileManagementModal({
   children,
-  profile,
-  dataSource,
+  resume,
 }: ProfileManagementModalProps) {
   const [open, setOpen] = useState(false);
 
@@ -57,40 +56,39 @@ export default function ProfileManagementModal({
       title: "",
       jobLevelPreference: jobLevel[0],
       jobTypePreference: jobTypes[0],
-      rolesOfInterest: profile?.rolesOfInterest ?? ([] as Option[]),
+      rolesOfInterest: resume?.softSkill ?? ([] as Option[]),
       remoteWorkPreference: availability[0],
       relocationWillingness: "",
       location: "",
       salaryExpectation: "",
       availabilityToStart: "",
       description: "",
-      defaultDataSource: false,
+      isDefault: false,
     },
   });
 
   useEffect(() => {
-    if (profile) {
+    if (resume) {
       reset({
-        title: profile.title || "",
-        jobLevelPreference: profile.jobLevelPreference || jobLevel[0],
-        jobTypePreference: profile.jobTypePreference || jobTypes[0],
-        rolesOfInterest: profile.rolesOfInterest || [],
-        remoteWorkPreference: profile.remoteWorkPreference || availability[0],
-        relocationWillingness: profile.relocationWillingness || "",
-        location: profile.location || "",
-        salaryExpectation: profile.salaryExpectation || "",
-        availabilityToStart: profile.availabilityToStart || "",
-        description:
-          profile.description || profile.data || profile.profile || "",
-        defaultDataSource: dataSource?.defaultDataSource === profile.id,
+        title: resume.title || "",
+        jobLevelPreference: resume?.jobLevelPreference || jobLevel[0],
+        jobTypePreference: resume?.jobTypePreference || jobTypes[0],
+        rolesOfInterest: resume?.softSkill || [],
+        remoteWorkPreference: resume?.remoteWorkPreference || availability[0],
+        relocationWillingness: resume?.relocationWillingness || "",
+        location: resume?.location || "",
+        salaryExpectation: resume?.salaryExpectation || "",
+        availabilityToStart: resume?.availabilityToStart || "",
+        description: resume?.summary || "",
+        isDefault: resume?.isDefault || false,
       });
     }
-  }, [profile, reset]);
+  }, [resume, reset]);
 
   const onSubmit = (data: any) => {
-    const userProfile = { ...profile, ...data };
+    const userProfile = { ...resume, ...data };
 
-    if (profile) {
+    if (resume) {
       updateDataSource.mutate(
         {
           profileData: userProfile,
@@ -131,18 +129,18 @@ export default function ProfileManagementModal({
 
   const handleCancel = () => {
     setOpen(false);
-    if (profile) {
+    if (resume) {
       reset({
-        title: profile.title || "",
-        jobLevelPreference: profile.jobLevelPreference || jobLevel[0],
-        jobTypePreference: profile.jobTypePreference || jobTypes[0],
-        rolesOfInterest: profile.rolesOfInterest || [],
-        remoteWorkPreference: profile.remoteWorkPreference || availability[0],
-        relocationWillingness: profile.relocationWillingness || "",
-        location: profile.location || "",
-        salaryExpectation: profile.salaryExpectation || "",
-        availabilityToStart: profile.availabilityToStart || "",
-        defaultDataSource: profile.activeDataSource === "" && true,
+        title: resume.title || "",
+        jobLevelPreference: resume.jobLevelPreference || jobLevel[0],
+        jobTypePreference: resume.jobTypePreference || jobTypes[0],
+        rolesOfInterest: resume.rolesOfInterest || [],
+        remoteWorkPreference: resume.remoteWorkPreference || availability[0],
+        relocationWillingness: resume.relocationWillingness || "",
+        location: resume.location || "",
+        salaryExpectation: resume.salaryExpectation || "",
+        availabilityToStart: resume.availabilityToStart || "",
+        isDefault: resume.activeDataSource === "" && true,
       });
     }
   };
@@ -372,14 +370,14 @@ export default function ProfileManagementModal({
                         pressed={field.value}
                         onPressedChange={(pressed) => {
                           field.onChange(pressed);
-                          if (pressed && profile) {
+                          if (pressed && resume) {
                             setDefaultDataSource.mutate({
-                              profileId: profile.id,
+                              profileId: resume.id,
                             });
                           }
                           setOpen(false);
                           toast.success(
-                            `${profile?.title} is now your default profile!`,
+                            `${resume?.title} is now your default profile!`,
                           );
                           setTimeout(() => {
                             router.refresh();
@@ -411,7 +409,7 @@ export default function ProfileManagementModal({
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       Updating...
                     </>
-                  ) : profile ? (
+                  ) : resume ? (
                     "Update Profile"
                   ) : (
                     "Create Profile"

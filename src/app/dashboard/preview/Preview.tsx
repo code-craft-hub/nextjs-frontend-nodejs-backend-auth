@@ -5,44 +5,34 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { userQueries } from "@module/user";
 import { resumeQueries } from "@/lib/queries/resume.queries";
 import { coverLetterQueries } from "@/lib/queries/cover-letter.queries";
 import { CongratulationModal } from "@/components/shared/CongratulationModal";
 import { Loader, Send, Sparkles, Trash } from "lucide-react";
-import { api } from "@/lib/api/client";
-import { COLLECTIONS } from "@/lib/utils/constants";
-import { aiApplyQueries } from "@/lib/queries/ai-apply.queries";
 import { sendGTMEvent } from "@next/third-parties/google";
 import { useFireworksConfetti } from "@/components/ui/confetti";
 import AuthorizeGoogle from "@/hooks/gmail/AuthorizeGoogle";
-import { GmailCompose } from "./GmailCompose";
 import TailorCoverLetterDisplay from "../tailor-cover-letter/TailorCoverLetterDisplay";
 import { ViewResume } from "../tailor-resume/ViewResume";
 import CreateUserResume from "@/app/onboarding/onboarding-pages/create-resume-form/CreateUserResume";
 import { aiSettingsQueries } from "@/lib/queries/ai-settings.queries";
+import { normalizeResumeData } from "@/lib/utils/resume-normalizer";
+import {
+  useSendEmailApplicationMutation,
+  useDeleteEmailApplicationMutation,
+  GmailCompose,
+} from "@/modules/email-application";
 
-/**
- * Normalize API response data to match the expected UI schema
- * Maps API fields (e.g., "summary") to schema fields (e.g., "profile")
- */
-const normalizeResumeData = (data: any): any => {
-  if (!data) return data;
-
-  return {
-    ...data,
-    // Map API's "summary" field to schema's "profile" field
-    profile: data.summary || "",
-    // Ensure arrays exist
-    education: data.education || [],
-    workExperience: data.workExperience || [],
-    certification: data.certification || [],
-    project: data.project || [],
-    softSkill: data.softSkill || [],
-    hardSkill: data.hardSkill || [],
-  };
-};
+interface PreviewProps {
+  coverLetterId: string;
+  resumeId: string;
+  recruiterEmail: string;
+  jobDescription: string;
+  autoApplyId: string;
+  masterCvId?: string;
+}
 
 const Preview = ({
   coverLetterId,
@@ -51,21 +41,12 @@ const Preview = ({
   jobDescription,
   autoApplyId,
   masterCvId,
-}: {
-  coverLetterId: string;
-  resumeId: string;
-  jobDescription: string;
-  recruiterEmail: string;
-  autoApplyId: string;
-  masterCvId?: string;
-}) => {
+}: PreviewProps) => {
   const [activeStep, setActiveStep] = useState(3);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [openModal, setOpenModal] = useState(false);
-    const [editResume, setEditResume] = useState(false);
+  const [editResume, setEditResume] = useState(false);
 
   const router = useRouter();
-  const queryClient = useQueryClient();
   const { start: startConfetti } = useFireworksConfetti();
 
   const { data: user } = useQuery(userQueries.detail());
@@ -81,48 +62,44 @@ const Preview = ({
     coverLetterQueries.detail(coverLetterId),
   );
 
-  const displayResumeData = normalizeResumeData(resumeData);
+  // Initialize mutations
+  const sendApplicationMutation = useSendEmailApplicationMutation();
+  const deleteApplicationMutation = useDeleteEmailApplicationMutation();
 
+  const displayResumeData = normalizeResumeData(resumeData);
 
   const handleOpenModal = (value: boolean) => {
     setOpenModal(value);
   };
 
   const handleCoverLetterDelete = async () => {
-    await api.delete(
-      `/delete-document/${autoApplyId}?docType=${COLLECTIONS.AI_APPLY}&resumeId=${resumeId}&coverLetterId=${coverLetterId}`,
-    );
-    toast.success("Cover letter deleted successfully");
-    router.push("/dashboard/home");
-    await Promise.all([
-      queryClient.invalidateQueries(resumeQueries.all()),
-      queryClient.invalidateQueries(coverLetterQueries.all()),
-      queryClient.invalidateQueries(aiApplyQueries.all()),
-      queryClient.invalidateQueries(userQueries.detail()),
-    ]);
+    try {
+      await deleteApplicationMutation.mutateAsync({
+        autoApplyId,
+        resumeId,
+        coverLetterId,
+      });
+      toast.success("Cover letter deleted successfully");
+      router.push("/dashboard/home");
+    } catch (error: any) {
+      toast.error(
+        error.message || "Failed to delete cover letter. Please try again.",
+      );
+    }
   };
 
   const handleSubmit = async () => {
-
     try {
-      setIsSubmitting(true);
-      // Clause please handle this API call and the associated logic for submitting the application, I'll provide the backend api endpoint in the chat context.
-      await mutate.sendApplication(
+      await sendApplicationMutation.mutateAsync({
         autoApplyId,
         coverLetterId,
         resumeId,
         recruiterEmail,
         jobDescription,
-      );
+      });
       setActiveStep(4);
       startConfetti();
       toast.success("Application Submitted Successfully!");
-      await Promise.all([
-        queryClient.invalidateQueries(resumeQueries.all()),
-        queryClient.invalidateQueries(coverLetterQueries.all()),
-        queryClient.invalidateQueries(aiApplyQueries.all()),
-        queryClient.invalidateQueries(userQueries.detail()),
-      ]);
       setOpenModal(true);
     } catch (error: any) {
       toast.error("Auto apply failed. Please try again.", {
@@ -134,8 +111,6 @@ const Preview = ({
           actionButton: "!bg-blue-600 hover:!bg-blue-700 !text-white !h-8",
         },
       });
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -161,7 +136,9 @@ const Preview = ({
   };
 
   // Usage
-  const viewerSrc = buildViewerSrc(masterCvData?.gcsPath ?? resumeData?.gcsPath ?? "");
+  const viewerSrc = buildViewerSrc(
+    masterCvData?.gcsPath ?? resumeData?.gcsPath ?? "",
+  );
 
   useEffect(() => {
     if (user?.firstName)
@@ -174,6 +151,9 @@ const Preview = ({
   const handleEditClick = (value: boolean) => {
     setEditResume(value);
   };
+
+  const isSubmitting =
+    sendApplicationMutation.isPending || deleteApplicationMutation.isPending;
 
   return openModal ? (
     <CongratulationModal handleOpenModal={handleOpenModal} />
@@ -192,17 +172,15 @@ const Preview = ({
           />
           <Button
             className="text-2xs"
-            variant={"destructive"}
+            variant="destructive"
             disabled={isSubmitting}
-            onClick={() => {
-              handleCoverLetterDelete();
-            }}
+            onClick={handleCoverLetterDelete}
           >
             <Trash className="size-4" />
           </Button>
           <Button
             disabled={isSubmitting}
-            variant={"outline"}
+            variant="outline"
             className="text-xs"
             onClick={handleSubmit}
           >
@@ -219,7 +197,6 @@ const Preview = ({
         <div className="h-[80svh] overflow-hidden">
           <iframe
             src={viewerSrc}
-            // src={`${masterCvData?.url ?? resumeData?.url}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`}
             className="w-full h-[85svh] overflow-hidden border-0"
             title="Resume PDF"
           />
