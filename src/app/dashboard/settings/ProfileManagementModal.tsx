@@ -18,23 +18,21 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { BookmarkIcon, Loader2 } from "lucide-react";
-import {
-  useCreateDataSource,
-  useSetDefaultDataSource,
-  useUpdateDataSource,
-} from "@/lib/mutations/profile.mutations";
-import { Option, SelectCreatable } from "@/components/shared/SelectCreatable";
-import { Textarea } from "@/components/ui/textarea";
 import { Toggle } from "@/components/ui/toggle";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
-import { ProfileData } from "@/types";
-import { v4 as uuidv4 } from "uuid";
 import { ResumeAggregate } from "@/types/resume.types";
+import { useUpdateResumeMutation } from "@/lib/mutations/resume.mutations";
 
-const jobLevel = ["Entry Level", "Mid Level", "Senior Level"];
+const jobLevels = ["Entry Level", "Mid Level", "Senior Level"];
 const jobTypes = ["Full Time", "Part Time", "Contract"];
 const availability = ["Yes", "No"];
+
+function getOptionsWithValue(options: string[], value: string | undefined) {
+  if (value && !options.includes(value)) {
+    return [value, ...options];
+  }
+  return options;
+}
 
 interface ProfileManagementModalProps {
   children: React.ReactNode;
@@ -47,20 +45,17 @@ export default function ProfileManagementModal({
 }: ProfileManagementModalProps) {
   const [open, setOpen] = useState(false);
 
-  const updateDataSource = useUpdateDataSource();
-  const setDefaultDataSource = useSetDefaultDataSource();
-  const createDataSource = useCreateDataSource();
+  const updateResume = useUpdateResumeMutation();
 
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
       title: "",
-      jobLevelPreference: jobLevel[0],
-      jobTypePreference: jobTypes[0],
-      rolesOfInterest: resume?.softSkill ?? ([] as Option[]),
-      remoteWorkPreference: availability[0],
-      relocationWillingness: "",
+      jobLevel: jobLevels[0],
+      jobType: jobTypes[0],
+      remotePreference: true,
+      relocationWillingness: true,
       location: "",
-      salaryExpectation: "",
+      salary: "",
       availabilityToStart: "",
       description: "",
       isDefault: false,
@@ -71,56 +66,33 @@ export default function ProfileManagementModal({
     if (resume) {
       reset({
         title: resume.title || "",
-        jobLevelPreference: resume?.jobLevelPreference || jobLevel[0],
-        jobTypePreference: resume?.jobTypePreference || jobTypes[0],
-        rolesOfInterest: resume?.softSkill || [],
-        remoteWorkPreference: resume?.remoteWorkPreference || availability[0],
-        relocationWillingness: resume?.relocationWillingness || "",
-        location: resume?.location || "",
-        salaryExpectation: resume?.salaryExpectation || "",
-        availabilityToStart: resume?.availabilityToStart || "",
-        description: resume?.summary || "",
-        isDefault: resume?.isDefault || false,
+        jobLevel: resume.jobLevel || jobLevels[0],
+        jobType: resume.jobType || jobTypes[0],
+        remotePreference: resume.remotePreference,
+        relocationWillingness: resume.relocationWillingness || false,
+        location: resume.location || "",
+        salary: resume.salary || "",
+        availabilityToStart: resume.availabilityToStart || "",
+        description: resume.summary || "",
+        isDefault: resume.isDefault || false,
       });
     }
   }, [resume, reset]);
 
-  const onSubmit = (data: any) => {
-    const userProfile = { ...resume, ...data };
-
-    if (resume) {
-      updateDataSource.mutate(
-        {
-          profileData: userProfile,
+  const onSubmit = (data: Record<string, unknown>) => {
+    console.log("Form data to submit:", data);
+    updateResume.mutate(
+      { id: resume!.id, data },
+      {
+        onSuccess: () => {
+          setOpen(false);
+          toast.success("Resume updated successfully!");
         },
-        {
-          onSuccess: () => {
-            setOpen(false);
-          },
-          onError: (error) => {
-            console.error("Failed to update profile:", error);
-          },
+        onError: (error: Error) => {
+          console.error("Failed to save profile:", error);
         },
-      );
-    } else {
-      createDataSource.mutate(
-        {
-          profileData: { ...userProfile, id: uuidv4() },
-        },
-        {
-          onSuccess: () => {
-            setOpen(false);
-          },
-          onError: (error) => {
-            console.error("Failed to create profile:", error);
-          },
-        },
-      );
-    }
-
-    setTimeout(() => {
-      window.location.href = "/dashboard/home";
-    }, 1500);
+      },
+    );
   };
 
   const handleUpdate = () => {
@@ -132,22 +104,21 @@ export default function ProfileManagementModal({
     if (resume) {
       reset({
         title: resume.title || "",
-        jobLevelPreference: resume.jobLevelPreference || jobLevel[0],
-        jobTypePreference: resume.jobTypePreference || jobTypes[0],
-        rolesOfInterest: resume.rolesOfInterest || [],
-        remoteWorkPreference: resume.remoteWorkPreference || availability[0],
-        relocationWillingness: resume.relocationWillingness || "",
+        jobLevel: resume.jobLevel || jobLevels[0],
+        jobType: resume.jobType || jobTypes[0],
+        remotePreference: resume.remotePreference || false,
+        relocationWillingness: resume.relocationWillingness || false,
         location: resume.location || "",
-        salaryExpectation: resume.salaryExpectation || "",
+        salary: resume.salary || "",
         availabilityToStart: resume.availabilityToStart || "",
-        isDefault: resume.activeDataSource === "" && true,
+        description: resume.summary || "",
+        isDefault: resume.isDefault || false,
       });
     }
   };
 
-  const isSubmitting = updateDataSource.isPending || createDataSource.isPending;
+  const isSubmitting = updateResume.isPending;
 
-  const router = useRouter();
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -181,7 +152,7 @@ export default function ProfileManagementModal({
                 <div className="space-y-1.5">
                   <h1 className="font-medium">Job Level Preference</h1>
                   <Controller
-                    name="jobLevelPreference"
+                    name="jobLevel"
                     control={control}
                     render={({ field }) => (
                       <Select
@@ -194,7 +165,7 @@ export default function ProfileManagementModal({
                         <SelectContent>
                           <SelectGroup>
                             <SelectLabel>Select Job</SelectLabel>
-                            {jobLevel.map((job) => (
+                            {getOptionsWithValue(jobLevels, field.value).map((job) => (
                               <SelectItem value={job} key={job}>
                                 {job}
                               </SelectItem>
@@ -209,7 +180,7 @@ export default function ProfileManagementModal({
                 <div className="space-y-1.5 w-full">
                   <h1 className="">Job Type Preference</h1>
                   <Controller
-                    name="jobTypePreference"
+                    name="jobType"
                     control={control}
                     render={({ field }) => (
                       <Select
@@ -222,7 +193,7 @@ export default function ProfileManagementModal({
                         <SelectContent>
                           <SelectGroup>
                             <SelectLabel>Select Job Type</SelectLabel>
-                            {jobTypes.map((job) => (
+                            {getOptionsWithValue(jobTypes, field.value).map((job) => (
                               <SelectItem value={job} key={job}>
                                 {job}
                               </SelectItem>
@@ -234,7 +205,7 @@ export default function ProfileManagementModal({
                   />
                 </div>
 
-                <div className="space-y-1.5 col-span-2">
+                {/* <div className="space-y-1.5 col-span-2">
                   <h1 className="">
                     Role of Interest{" "}
                     <span className="text-2xs">
@@ -251,17 +222,19 @@ export default function ProfileManagementModal({
                       />
                     )}
                   />
-                </div>
+                </div> */}
 
                 <div className="space-y-1.5 ">
                   <h1 className="">Remote Work Preference</h1>
                   <Controller
-                    name="remoteWorkPreference"
+                    name="remotePreference"
                     control={control}
                     render={({ field }) => (
                       <Select
-                        onValueChange={field.onChange}
-                        value={field.value}
+                        onValueChange={(value) =>
+                          field.onChange(value === "Yes")
+                        }
+                        value={field.value ? "Yes" : "No"}
                       >
                         <SelectTrigger className="w-full">
                           <SelectValue placeholder="Remote Work Preference" />
@@ -288,8 +261,10 @@ export default function ProfileManagementModal({
                     control={control}
                     render={({ field }) => (
                       <Select
-                        onValueChange={field.onChange}
-                        value={field.value}
+                        onValueChange={(value) =>
+                          field.onChange(value === "Yes")
+                        }
+                        value={field.value ? "Yes" : "No"}
                       >
                         <SelectTrigger className="w-full">
                           <SelectValue placeholder="Yes" />
@@ -325,7 +300,7 @@ export default function ProfileManagementModal({
                     Salary Expectation (Input figure in local currency)
                   </h1>
                   <Controller
-                    name="salaryExpectation"
+                    name="salary"
                     control={control}
                     render={({ field }) => (
                       <Input placeholder="$125,000 - $150,000" {...field} />
@@ -343,7 +318,7 @@ export default function ProfileManagementModal({
                     )}
                   />
                 </div>
-                <div className="space-y-1.5 col-span-2">
+                {/* <div className="space-y-1.5 col-span-2">
                   <h1 className="">Description</h1>
                   <Controller
                     name="description"
@@ -356,10 +331,10 @@ export default function ProfileManagementModal({
                       ></Textarea>
                     )}
                   />
-                </div>
+                </div> */}
                 <div className="absolute top-20 right-6">
                   <Controller
-                    name="defaultDataSource"
+                    name="isDefault"
                     control={control}
                     render={({ field }) => (
                       <Toggle
@@ -370,18 +345,6 @@ export default function ProfileManagementModal({
                         pressed={field.value}
                         onPressedChange={(pressed) => {
                           field.onChange(pressed);
-                          if (pressed && resume) {
-                            setDefaultDataSource.mutate({
-                              profileId: resume.id,
-                            });
-                          }
-                          setOpen(false);
-                          toast.success(
-                            `${resume?.title} is now your default profile!`,
-                          );
-                          setTimeout(() => {
-                            router.refresh();
-                          }, 300);
                         }}
                         className="data-[state=on]:bg-transparent data-[state=on]:*:[svg]:fill-primary data-[state=on]:*:[svg]:stroke-primary"
                       >

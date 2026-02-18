@@ -92,6 +92,12 @@ export interface ResumeAggregate {
   gcsPath?: string;
   originalName?: string;
   isDefault: boolean;
+  jobLevel: string ;
+  jobType: string ;
+  remotePreference: boolean ;
+  relocationWillingness: boolean ;
+  salary: string ;
+  availabilityToStart: string ;
   rawResumeText?: string;
   createdAt?: string;
   updatedAt?: string;

@@ -34,6 +34,12 @@ export interface UpdateResumeData {
   website?: string;
   summary?: string;
   description?: string;
+  jobLevelPreference?: string;
+  jobTypePreference?: string;
+  remoteWorkPreference?: string;
+  relocationWillingness?: string;
+  salaryExpectation?: string;
+  availabilityToStart?: string;
 }
 
 export interface ResumeFilters extends PaginationParams {

@@ -8,7 +8,6 @@ import { queryKeys } from "@/lib/query/keys";
 import {
   invalidateResumeDetail,
   invalidateResumeLists,
-  invalidateResumeQueries,
 } from "@/lib/query/query-invalidation";
 import type { PaginatedResponse } from "@/lib/types";
 import type {
@@ -17,6 +16,7 @@ import type {
   ProjectEntry,
   CertificationEntry,
 } from "@/types/resume.types";
+import { resumeQueries } from "../queries/resume.queries";
 
 // ─── Resume Mutations ─────────────────────────────────────────────
 
@@ -130,7 +130,7 @@ export function useDeleteResumeMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: string) => resumeApi.deleteResume(id),
+    mutationFn: (id: string) => resumeApi.hardDeleteResume(id),
     onMutate: async (id) => {
       await queryClient.cancelQueries({
         queryKey: queryKeys.resumes.lists(),
@@ -164,6 +164,11 @@ export function useDeleteResumeMutation() {
     },
     onSettled: () => {
       invalidateResumeLists(queryClient);
+      queryClient.invalidateQueries({ queryKey: queryKeys.users.lists() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.users.all });
+      queryClient.invalidateQueries({
+        queryKey: resumeQueries.uploaded().queryKey,
+      });
     },
   });
 }

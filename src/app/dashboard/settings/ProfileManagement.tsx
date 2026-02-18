@@ -23,6 +23,7 @@ export const ProfileManagement: React.FC = () => {
       success: () => {
         queryClient.invalidateQueries({ queryKey: queryKeys.users.lists() });
         queryClient.invalidateQueries({ queryKey: queryKeys.users.all });
+        queryClient.invalidateQueries({ queryKey: resumeQueries.uploaded().queryKey });
         if (window !== undefined) {
           window.location.href = "/dashboard/home";
         }

@@ -1,15 +1,15 @@
-import { useDeleteDataSourceWithGCS } from "@/lib/mutations/profile.mutations";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, Sparkles, Trash } from "lucide-react";
 import { cn } from "@/lib/utils";
 import ProfileManagementModal from "./ProfileManagementModal";
 import { ResumeAggregate } from "@/types/resume.types";
 import { formatAppliedDate } from "@/lib/utils/helpers";
+import { useDeleteResumeMutation } from "@/lib/mutations/resume.mutations";
 
 export const ProfileCard: React.FC<{
   resume: ResumeAggregate;
 }> = ({ resume }) => {
-  const deleteDataSource = useDeleteDataSourceWithGCS();
+  const deleteDataSource = useDeleteResumeMutation();
   return (
     <div
       className={cn(
@@ -20,9 +20,7 @@ export const ProfileCard: React.FC<{
       <div className="absolute top-4 right-2 flex">
         <Button
           onClick={() => {
-            deleteDataSource.mutate({
-              profileId: resume.id,
-            });
+            deleteDataSource.mutate(resume.id);
           }}
           variant={"ghost"}
           className=""
@@ -30,43 +28,45 @@ export const ProfileCard: React.FC<{
           <Trash className="w-4 h-4 text-red-600" />
         </Button>
       </div>
-      <div className="p-6">
-        <div className="flex items-center mb-4">
-          <h3
-            className={cn(
-              "text-md items-center gap-1 font-medium capitalize",
-              resume.isDefault && "ml-4",
-            )}
-          >
-            {resume?.title || "Untitled Profile"}
-            {resume.isDefault && (
-              <span>
-                <Sparkles
-                  className={cn(
-                    "size-4 ml-2",
-                    "text-yellow-500 [svg]:fill absolute top-7 left-2",
-                  )}
-                />
-              </span>
-            )}
-          </h3>
-        </div>
+      <ProfileManagementModal resume={resume}>
+        <div>
+          <div className="p-6">
+            <div className="flex items-center mb-4">
+              <h3
+                className={cn(
+                  "text-md items-center gap-1 font-medium capitalize",
+                  resume.isDefault && "ml-4",
+                )}
+              >
+                {resume?.title || "Untitled Profile"}
+                {resume.isDefault && (
+                  <span>
+                    <Sparkles
+                      className={cn(
+                        "size-4 ml-2",
+                        "text-yellow-500 [svg]:fill absolute top-7 left-2",
+                      )}
+                    />
+                  </span>
+                )}
+              </h3>
+            </div>
 
-        <p className="text-gray-600 text-sm leading-relaxed mb-2 line-clamp-3">
-          {resume?.summary || "No description available."}
-        </p>
-        <p className="text-gray-400 text-sm">
-          {formatAppliedDate(resume.createdAt)}
-        </p>
-      </div>
-      <div className="border-t p-4">
-        <ProfileManagementModal resume={resume}>
-          <button className="flex items-center justify-between w-full text-blue-600 text-sm font-medium hover:text-blue-700 transition-colors">
-            <span>Edit Profile</span>
-            <ChevronRight className="w-4 h-4" />
-          </button>
-        </ProfileManagementModal>
-      </div>
+            <p className="text-gray-600 text-sm leading-relaxed mb-2 line-clamp-3">
+              {resume?.summary || "No description available."}
+            </p>
+            <p className="text-gray-400 text-sm">
+              {formatAppliedDate(resume.createdAt)}
+            </p>
+          </div>
+          <div className="border-t p-4">
+            <button className="flex items-center justify-between w-full text-blue-600 text-sm font-medium hover:text-blue-700 transition-colors">
+              <span>Edit Profile</span>
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </ProfileManagementModal>
     </div>
   );
 };
