@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 interface User {
-  credit?: number | string | null;
+  creditBalance?: number | string | null;
 }
 
 interface AuthStatusResponse {
@@ -44,7 +44,7 @@ export function useCreditAuthorization({
   const hasValidCredit = useMemo(() => {
     if (!user) return false;
 
-    const credit = Number(user.credit);
+    const credit = Number(user.creditBalance);
     return Number.isFinite(credit) && credit > 0;
   }, [user]);
 

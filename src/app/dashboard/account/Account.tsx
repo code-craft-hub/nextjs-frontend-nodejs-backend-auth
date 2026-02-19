@@ -9,11 +9,14 @@ import { useQuery } from "@tanstack/react-query";
 import { userQueries } from "@module/user";
 import { sendGTMEvent } from "@next/third-parties/google";
 import { useFireworksConfetti } from "@/components/ui/confetti";
-import { formatFirestoreDate } from "@/lib/utils/helpers";
 import { Button } from "@/components/ui/button";
 import { apiService } from "@/hooks/use-auth";
-import InsufficientCreditsModal from "@/components/shared/InsufficientCreditsModal";
 import { CompletedPaymentModal } from "@/components/shared/CompletedPaymentModal";
+
+// InsufficientCreditsModal is intentionally NOT rendered on the account/billing page.
+// The billing page is where users go TO resolve an expired plan, so blocking them
+// with a modal here would prevent them from upgrading. It should only appear on
+// feature pages (resume builder, auto-apply, etc.) where the action requires credits.
 
 export const AccountClient = ({
   tab,
@@ -24,67 +27,67 @@ export const AccountClient = ({
   event: string;
   reference: string;
 }) => {
-  const [currentTab, setCurrentTab] = useState(!!tab ? tab : "account");
+  const [currentTab, setCurrentTab] = useState(tab || "account");
   const { data: user } = useQuery(userQueries.detail());
   const [open, setOpen] = useState(false);
-  const handleDialogOpenChange = (isOpen: boolean) => {
-    setOpen(isOpen);
-  };
 
   const { start: startConfetti } = useFireworksConfetti();
+
+  // A user is on a "free trial" / expired plan when:
+  // - They are not a pro user, OR
+  // - Their subscription period has ended.
+  // Source of truth: server-provided `currentPeriodEnd` from userSubscriptions table.
   const isCreditExpired =
-    user?.expiryTime === undefined
-      ? true
-      : new Date(formatFirestoreDate(user?.expiryTime)) < new Date();
+    !user?.isProUser ||
+    user?.currentPeriodEnd === null ||
+    new Date(user?.currentPeriodEnd ?? "") < new Date();
 
-  const handleTabChange = (value: string) => {
-    setCurrentTab(value);
-  };
-
-  const deleteAccount = process.env.NODE_ENV === "development" ? true : false;
+  const isDevMode = process.env.NODE_ENV === "development";
 
   useEffect(() => {
-    if (user?.firstName)
+    if (user?.firstName) {
       sendGTMEvent({
-        event: `Accounts Page`,
-        value: `${user?.firstName} viewed Accounts Page`,
+        event: "Accounts Page",
+        value: `${user.firstName} viewed Accounts Page`,
       });
+    }
   }, [user?.firstName]);
-
-  const tabs = [
-    { id: "account", value: "Account Settings", icon: <User2 /> },
-    { id: "billing", value: "Billing & Subscription", icon: <CreditCard /> },
-    { id: "security", value: "Security Settings", icon: <Shield /> },
-  ];
 
   useEffect(() => {
     if (event === "subscription_success") {
       startConfetti();
-      handleDialogOpenChange(true);
+      setOpen(true);
     }
-  }, []);
+  }, [event]);
+
+  const tabs = [
+    { id: "account", label: "Account Settings", icon: <User2 /> },
+    { id: "billing", label: "Billing & Subscription", icon: <CreditCard /> },
+    { id: "security", label: "Security Settings", icon: <Shield /> },
+  ];
 
   return (
     <div className="space-y-4 sm:space-y-8">
       <div className="flex justify-center items-center w-full bg-white shadow-2xl rounded-full p-1 px-1.5 max-w-5xl mx-auto font-roboto">
-        {tabs.map((tab) => (
+        {tabs.map((t) => (
           <div
-            key={tab.id}
+            key={t.id}
             className={cn(
               "flex items-center justify-center gap-2 px-3 py-2 rounded-[15px] text-center w-full",
-              tab.id === currentTab ? "bg-background" : "hover:cursor-pointer"
+              t.id === currentTab ? "bg-background" : "hover:cursor-pointer",
             )}
-            onClick={() => handleTabChange(tab.id)}
+            onClick={() => setCurrentTab(t.id)}
           >
             <span className="text-[14px] font-medium text-[#0C111D] hidden md:flex">
-              {tab.value}
+              {t.label}
             </span>
             <span className="text-[14px] font-medium text-[#0C111D] md:hidden">
-              {tab.icon}
+              {t.icon}
             </span>
           </div>
         ))}
       </div>
+
       {currentTab === "account" || currentTab === undefined ? (
         <UserProfileForm />
       ) : currentTab === "billing" ? (
@@ -92,22 +95,17 @@ export const AccountClient = ({
       ) : (
         <PasswordUpdateForm />
       )}
-      {deleteAccount && (
+
+      {isDevMode && (
         <Button
-          onClick={async () => {
-            await apiService.deleteUser();
-          }}
-          variant={"destructive"}
-          className=""
+          onClick={() => apiService.deleteUser()}
+          variant="destructive"
         >
           Delete Account
         </Button>
       )}
-      <CompletedPaymentModal
-        open={open}
-        onOpenChange={handleDialogOpenChange}
-      />
-      <InsufficientCreditsModal hidden={true} />
+
+      <CompletedPaymentModal open={open} onOpenChange={setOpen} />
     </div>
   );
 };

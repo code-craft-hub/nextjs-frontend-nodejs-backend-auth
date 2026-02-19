@@ -28,7 +28,7 @@ import WhatsappIcon from "./icons/whatsapp";
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { data: user } = useQuery(userQueries.detail());
   const { open } = useSidebar();
-  const isPro = user?.isPro;
+  const isPro = user?.isProUser;
 
   const leftSidebarData = {
     user: {

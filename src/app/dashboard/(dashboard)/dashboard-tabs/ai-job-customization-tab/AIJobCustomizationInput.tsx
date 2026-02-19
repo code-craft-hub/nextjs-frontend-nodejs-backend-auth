@@ -43,17 +43,14 @@ const FORM_SCHEMA = z.object({
 
 export const AIJobCustomizationInput = memo(() => {
   const { data: user } = useQuery(userQueries.detail());
-  const profile = user?.dataSource; // TODO: Update this when we have a dedicated profile endpoint or field
   const [docsInput, setDocsInput] = useState<ActionValue>("tailor-resume");
-  const [userProfile, setUserProfile] = useState<string>(() => {
-    return profile?.[0]?.id || "";
-  });
+  const [userProfile, setUserProfile] = useState<string[]>([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile | null>(null);
   const [extractedText, setExtractedText] = useState<string>("");
 
   const router = useRouter();
-  const noCredit = user?.credit === 0;
+  const noCredit = (user?.creditBalance ?? 0) === 0;
 
   const isSelectedFile = !isEmpty(uploadedFiles);
 
@@ -216,7 +213,8 @@ export const AIJobCustomizationInput = memo(() => {
                 <div className="flex gap-2 px-3">
                   <div className="hover:cursor-pointer ">
                     <SelectProfile
-                      options={profile ?? []}
+                    // @ts-ignore
+                      options={profile ?? []} // TODO: fix this any type
                       value={userProfile}
                       onValueChange={(value) => {
                         setUserProfile(value);

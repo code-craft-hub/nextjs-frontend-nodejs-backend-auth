@@ -61,7 +61,7 @@ export function PremiumUserPage() {
                 <div className="pt-4 space-y-0.5">
                   <p className="font-semibold">
                     Next billing date:{" "}
-                    {formatAppliedDate(user?.expiryTime as any)}
+                    {formatAppliedDate(user?.currentPeriodEnd as any)}
                   </p>
                   <p className="text-white/70 text-sm">
                     Your subscription will automatically renew
@@ -73,7 +73,7 @@ export function PremiumUserPage() {
             {/* Right Section - Days Counter */}
             <div className="bg-white/20 rounded-xl px-6 py-4 text-center sm:min-w-35">
               <div className="text-4xl font-bold">
-                {daysFromToday(user?.expiryTime)}
+                {daysFromToday(user?.currentPeriodEnd)}
               </div>
               <div className="text-sm text-white/80 mt-1">
                 days until renewal

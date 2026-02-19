@@ -1,50 +1,74 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { userQueries } from "@module/user";
-import { BASEURL } from "@/lib/api/client";
+import { api, BACKEND_API_VERSION } from "@/lib/api/client";
 import { generateIdempotencyKey } from "@/lib/utils/helpers";
+import { toast } from "sonner";
+
+interface InitializePaymentResponse {
+  status: string;
+  data: {
+    data: {
+      authorization_url: string;
+      reference: string;
+    };
+  };
+}
+
+interface VerifyPaymentResponse {
+  status: string;
+  data: {
+    isProUser: boolean;
+    currentPeriodEnd?: string | null;
+    status: string;
+  };
+}
 
 export const PaystackPaymentGateway = ({
   active,
   trxReference,
   handleStateChange,
-}: any) => {
+}: {
+  active: boolean;
+  trxReference?: string;
+  handleStateChange: (isPro: boolean) => void;
+}) => {
   const { data: user } = useQuery(userQueries.detail());
+  const queryClient = useQueryClient();
 
   const [loading, setLoading] = useState(false);
-  const [reference, setReference] = useState(trxReference ?? "");
-
-  // Update to match new backend URL structure
+  // Use a ref to track if verification has already run for this reference
+  const hasVerified = useRef(false);
 
   const initializePayment = async () => {
-    setLoading(true);
+    if (!user?.email) {
+      toast.error("Unable to retrieve your account details. Please refresh and try again.");
+      return;
+    }
 
+    setLoading(true);
     try {
       const idempotencyKey = generateIdempotencyKey();
 
-      // Updated endpoint to match new routing structure
-      const response = await fetch(`${BASEURL}/paystack/payments/initialize`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Idempotency-Key": idempotencyKey,
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          email: user?.email,
+      const result = await api.post<InitializePaymentResponse>(
+        `/${BACKEND_API_VERSION}/paystack/payments/initialize`,
+        {
+          // Email is also validated server-side from the auth token.
+          // This is purely for pre-filling the Paystack checkout form.
+          email: user.email,
           amount: parseFloat(process.env.NEXT_PUBLIC_PAYSTACK_AMOUNT || "4999"),
           currency: "NGN",
           metadata: {
-            first_name: user?.firstName,
-            last_name: user?.lastName,
-            phone: user?.phoneNumber,
+            first_name: user.firstName,
+            last_name: user.lastName,
+            phone: user.phoneNumber,
             custom_fields: [
               {
                 display_name: "Customer Name",
                 variable_name: "customer_name",
-                value: `${user?.firstName} ${user?.lastName}`,
+                value: `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim(),
               },
             ],
           },
@@ -56,74 +80,57 @@ export const PaystackPaymentGateway = ({
             "mobile_money",
             "bank_transfer",
           ],
-        }),
-      });
+        },
+        {
+          headers: { "Idempotency-Key": idempotencyKey },
+        }
+      );
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Payment initialization failed");
+      const authorizationUrl = result?.data?.data?.authorization_url;
+      if (!authorizationUrl) {
+        throw new Error("Invalid response from payment server");
       }
 
-      const result = await response.json();
-
-      if (result.status === "success" && result.data?.data) {
-        const paymentData = result.data.data;
-        setReference(paymentData.reference);
-        // window.open(paymentData.authorization_url);
-        window.location.href = paymentData.authorization_url;
-      } else {
-        throw new Error(result.message || "Payment initialization failed");
-      }
+      window.location.href = authorizationUrl;
     } catch (err: any) {
-      console.error("Payment error:", err);
+      toast.error(err?.data?.error || "Payment initialization failed. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
-  const verifyPayment = async () => {
-    if (!reference) {
-      return;
-    }
-
+  const verifyPayment = async (reference: string) => {
     try {
-      const response = await fetch(
-        `${BASEURL}/paystack/payments/verify/${reference}`,
-        { credentials: "include" },
+      const result = await api.get<VerifyPaymentResponse>(
+        `/${BACKEND_API_VERSION}/paystack/payments/verify/${reference}`,
       );
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Verification failed");
-      }
-
-      const result = await response.json();
-
-      // Handle new response structure
-      if (result.status === "success" && result.data?.data) {
+      if (result?.data?.isProUser) {
         handleStateChange(true);
+        // Refresh user data to reflect new pro status
+        queryClient.invalidateQueries({ queryKey: userQueries.detail().queryKey });
       }
     } catch (err: any) {
-      console.error("Verification error:", err);
+      // Verification failed — the webhook will still process the payment.
+      // Don't surface an error here; the UI will update on next data refresh.
     }
   };
 
   useEffect(() => {
-    verifyPayment();
-  }, []);
+    // Only verify once per reference, and only if we have a valid one.
+    if (!trxReference || hasVerified.current) return;
+    hasVerified.current = true;
+    verifyPayment(trxReference);
+  }, [trxReference]);
 
   return (
-    <>
-      <Button
-        onClick={() => {
-          initializePayment();
-        }}
-        type="button"
-        disabled={!active || loading}
-        className="w-full bg-blue-600 hover:bg-blue-700"
-      >
-        Complete Upgrade
-      </Button>
-    </>
+    <Button
+      onClick={initializePayment}
+      type="button"
+      disabled={!active || loading}
+      className="w-full bg-blue-600 hover:bg-blue-700"
+    >
+      {loading ? "Processing..." : "Complete Upgrade"}
+    </Button>
   );
 };

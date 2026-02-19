@@ -74,68 +74,58 @@ export interface ProfileData {
 }
 
 export interface IUser {
-  uid?: string;
+  // ─── Identity ──────────────────────────────────────────────
+  id: string;
   userId: string;
-  providerId?: string;
+  email?: string;
   emailVerified?: boolean;
-  referralCount?: number;
-  isEligibleForReward?: boolean;
-  referredBy?: string;
-  expiryTime?: string | Date;
-  usersReferred?: [];
-  role?: any[];
-  referralCode?: string;
   displayName?: string;
-  countryCode?: string;
-  defaultDataSource?: string;
+  photoURL?: string;
+  providerId?: string;
+  provider?: string;
+
+  // ─── Profile ───────────────────────────────────────────────
   firstName?: string;
   lastName?: string;
-  cvJobTitle?: string;
-  isPro?: boolean;
-  customClaims?: Record<string, any> | undefined;
-  provider?: string;
-  password?: string;
-  recommendationsData?: any[];
-  appliedJobs?: { id: string; appliedDate: string }[];
-  analytics?: {
-    totalApplications: number;
-    totalResumes: number;
-    totalCoverLetters: number;
-    totalInterviewQuestions: number;
-  };
+  phoneNumber?: string;
+  phoneVerified: boolean | null;
   address?: string;
   country?: string;
+  countryCode?: string;
   state?: string;
-  phoneNumber?: string;
-  website?: string;
-  portfolio?: string;
-  email?: string;
-  profile: string;
-  credit?: number;
-  onboardingComplete?: boolean;
-  maxCredit?: number;
-  photoURL?: string;
-  createdAt?: string | Date;
-  updatedAt?: string | Date;
-  // Postgres User fields
-  id: string;
-  // role: "user" | "admin" | "super_admin" | "moderator" | "support";
+  locale: string | null;
+  timezone: string | null;
+
+  // ─── Account status ────────────────────────────────────────
   accountStatus:
     | "active"
     | "inactive"
     | "suspended"
     | "pending_verification"
     | "locked";
+  /** "basic" | "pro" — controls feature gating */
   accountTier: string;
-  locale: string | null;
-  timezone: string | null;
-  phoneVerified: boolean | null;
-  creditBalance: number | null;
+  role?: any[];
 
+  // ─── Subscription (from userSubscriptions table) ───────────
+  /** Whether the user currently has an active Pro subscription */
   isProUser: boolean | null;
   subscriptionTier: string | null;
   subscriptionStatus: string | null;
+  /** The date the current subscription period ends (next billing date) */
   currentPeriodEnd: Date | null;
+
+  // ─── Credits (from userCredits table) ──────────────────────
+  creditBalance: number | null;
+
+  // ─── Referrals (from userReferrals table) ──────────────────
+  referralCode?: string;
+  referralCount?: number;
+  usersReferred?: string[];
+  referredBy?: string;
+  isEligibleForReward?: boolean;
+
+  // ─── Preferences (from userPreferences table) ──────────────
   theme: string | null;
   emailNotifications: boolean | null;
   pushNotifications: boolean | null;
@@ -144,7 +134,27 @@ export interface IUser {
   profileVisibility: string | null;
   notificationFrequency: string | null;
   maxRecommendationsPerDay: number | null;
+
+  // ─── Onboarding ────────────────────────────────────────────
+  onboardingComplete?: boolean;
   onboardingStep: number | null;
+
+  // ─── Misc ──────────────────────────────────────────────────
+  defaultDataSource?: string;
+  cvJobTitle?: string;
+  website?: string;
+  portfolio?: string;
+  profile: string;
+  recommendationsData?: any[];
+  appliedJobs?: { id: string; appliedDate: string }[];
+  analytics?: {
+    totalApplications: number;
+    totalResumes: number;
+    totalCoverLetters: number;
+    totalInterviewQuestions: number;
+  };
+  createdAt?: string | Date;
+  updatedAt?: string | Date;
 }
 
 export type Resume = ResumeFormData;

@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { PremiumUserPage } from "./PremiumUserPage";
 import { useQuery } from "@tanstack/react-query";
 import { userQueries } from "@module/user";
-import { formatFirestoreDate, getDaysRemaining } from "@/lib/utils/helpers";
+import { getDaysRemaining } from "@/lib/utils/helpers";
 import { toast } from "sonner";
 
 export const Billing = ({
@@ -16,7 +16,7 @@ export const Billing = ({
   isCreditExpired: boolean;
 }) => {
   const { data: user } = useQuery(userQueries.detail());
-  const [completed, setCompleted] = useState(Boolean(user?.isPro) || false);
+  const [completed, setCompleted] = useState(Boolean(user?.isProUser) || false);
   const [showPlan, setShowPlan] = useState(false);
   const handleStateChange = (value: boolean) => {
     setCompleted(value);
@@ -26,7 +26,7 @@ export const Billing = ({
   };
 
   const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-  const remainingDays = getDaysRemaining(user?.expiryTime ?? "");
+  const remainingDays = getDaysRemaining(user?.currentPeriodEnd ?? null);
   const REFERRAL = `${APP_URL}/register?referral=${
     user?.referralCode ?? "EXA0Q4YZ"
   }`;
@@ -38,8 +38,8 @@ export const Billing = ({
   };
 
   useEffect(() => {
-    setCompleted(Boolean(user?.isPro));
-  }, [user?.isPro]);
+    setCompleted(Boolean(user?.isProUser));
+  }, [user?.isProUser]);
 
   // useEffect(() => {
   //   startConfetti();
@@ -85,8 +85,7 @@ export const Billing = ({
                 <p className="relative">
                   <span className=" font-['Inter'] font-medium text-[14px] leading-[21px] text-white">
                     {isCreditExpired
-                      ? " Trial expires on" +
-                        formatFirestoreDate(user?.expiryTime ?? "")
+                      ? "Your trial has expired"
                       : "Upgrade to Pro or refer 5 people to continue enjoying all the features from Cver AI."}
                   </span>
                 </p>
@@ -96,7 +95,7 @@ export const Billing = ({
                   Upgrade now or refer friends to extend your access. In the
                   main time you have{" "}
                   <span className="font-bold underline">
-                    {user?.credit ?? 0} credits {isCreditExpired && "(expired)"}
+                    {user?.creditBalance ?? 0} credits {isCreditExpired && "(expired)"}
                   </span>
                 </span>
               </p>

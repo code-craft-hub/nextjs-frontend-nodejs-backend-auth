@@ -1,59 +1,60 @@
 import { createServerQueryClient } from "@/lib/query/prefetch";
 import { dehydrate } from "@tanstack/react-query";
 import { HydrationBoundary } from "@/components/hydration-boundary";
-import { api } from "@/lib/api/client";
+import { api, BACKEND_API_VERSION } from "@/lib/api/client";
 import { redirect } from "next/navigation";
 import { AccountClient } from "./Account";
 import { getCookiesToken } from "@/lib/auth.utils";
 
+interface VerifyPaymentData {
+  status: string;
+  isProUser: boolean;
+  currentPeriodEnd?: string | Date | null;
+}
+
 const AccountPage = async ({ searchParams }: any) => {
-  const tab = (await searchParams)?.tab;
-  const event = (await searchParams)?.event;
+  const resolvedParams = await searchParams;
+  const tab = resolvedParams?.tab as string | undefined;
+  const event = resolvedParams?.event as string | undefined;
+  const reference = resolvedParams?.reference as string | undefined;
+
   const token = (await getCookiesToken()) ?? "";
-
-  const reference = (await searchParams)?.reference;
-
   const queryClient = createServerQueryClient();
-  let initialData;
+
+  let paymentData: VerifyPaymentData | undefined;
+
   if (reference) {
     try {
-      const { data } = await api.get<{
-        data: {
-          status: string;
-          isPro: boolean;
-          expiryTime?: string | Date;
-        };
-      }>(`/paystack/payments/verify/${reference}`, { token });
-      initialData = data;
-    } catch (error) {
-      console.error("Error verifying payment:", error);
+      // NOTE: This is the server-side verify call.
+      // The webhook is the authoritative payment processor; this is for immediate UI feedback.
+      const { data } = await api.get<{ data: VerifyPaymentData }>(
+        `/${BACKEND_API_VERSION}/paystack/payments/verify/${reference}`,
+        { token },
+      );
+      paymentData = data;
+    } catch {
+      // Verification failed — non-fatal. The webhook will still process the payment.
+      // The user can refresh the billing page once the webhook completes.
     }
   }
 
-  const isPro =  initialData?.isPro;
-  const expiryTime =  initialData?.expiryTime;
+  const isProUser = paymentData?.isProUser;
+  const currentPeriodEnd = paymentData?.currentPeriodEnd;
+  const isExpired = currentPeriodEnd ? new Date(currentPeriodEnd) < new Date() : true;
 
-  const isExpired = expiryTime ? new Date(expiryTime) < new Date() : true;
-
-  // Check if we need to clean the URL (remove search params except 'tab')
-  const shouldCleanUrl = !isExpired && isPro && reference;
-
-  if (shouldCleanUrl) {
-    // Redirect to clean URL with only the tab param
-    redirect(`/dashboard/account?tab=${tab || "billing"}&event=subscription_success`);
+  // After a successful payment, redirect to a clean URL to:
+  // 1. Prevent re-verification on browser refresh
+  // 2. Show the confetti/success modal via the `event` param
+  if (isProUser && !isExpired && reference) {
+    redirect(
+      `/dashboard/account?tab=${tab ?? "billing"}&event=subscription_success`,
+    );
   }
-
-  
 
   return (
     <div className="p-4 sm:p-8">
       <HydrationBoundary state={dehydrate(queryClient)}>
-        <AccountClient
-          tab={tab}
-          event={event}
-          reference={reference}
-          
-        />
+        <AccountClient tab={tab ?? ""} event={event ?? ""} reference={reference ?? ""} />
       </HydrationBoundary>
     </div>
   );

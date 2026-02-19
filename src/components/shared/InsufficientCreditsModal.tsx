@@ -1,3 +1,16 @@
+/**
+ * InsufficientCreditsModal
+ *
+ * Shows a blocking modal when a free-tier user's trial has expired.
+ *
+ * Design decisions:
+ * - Uses the existing React Query cache (userQueries.detail()) — no separate API call.
+ * - Is purely presentational: it NEVER mutates the user's plan or credit balance.
+ *   Enforcement of credits/plan expiry is the backend's responsibility on every action.
+ * - The reward toast for `isEligibleForReward` is kept for UX only; the actual credit
+ *   grant happens server-side on the 5th referral — the frontend never writes this value.
+ */
+"use client";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -8,143 +21,94 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { useUpdateUserMutation } from "@module/user";
 import { userQueries } from "@module/user";
-import { formatFirestoreDate } from "@/lib/utils/helpers";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useFireworksConfetti } from "../ui/confetti";
 import { toast } from "sonner";
-import { userApi } from "@module/user";
-import { IUser } from "@/types";
+import { useQuery } from "@tanstack/react-query";
 
-export default function InsufficientCreditsModal({
-  hidden = false,
-}: {
-  hidden?: boolean;
-}) {
+export default function InsufficientCreditsModal() {
   const router = useRouter();
-  const updateUser = useUpdateUserMutation();
-  const { start: startConfetti } = useFireworksConfetti();
   const queryClient = useQueryClient();
-  const [currentUser, setCurrentUser] = useState<Partial<IUser> | null>(null);
-  const [loading, setLoading] = useState(false);
+  const { start: startConfetti } = useFireworksConfetti();
 
-  const getUserData = async () => {
-    try {
-      setLoading(true);
-      const data = await userApi.getUser();
-      setCurrentUser(data);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Re-use the cached user data — no duplicate API call.
+  const { data: user, isLoading } = useQuery(userQueries.detail());
 
-  const CreditExpired =
-    currentUser?.expiryTime === undefined
-      ? true
-      : new Date(formatFirestoreDate(currentUser?.expiryTime)) < new Date();
+  // A user is considered "expired" when they are not a pro subscriber,
+  // or when their subscription period has ended.
+  // Source of truth: server-provided `isProUser` + `currentPeriodEnd`.
+  const periodEnd = user?.currentPeriodEnd;
+  const isCreditExpired =
+    !user?.isProUser || !periodEnd || new Date(periodEnd) < new Date();
 
-      const isCreditExpired = currentUser?.accountTier === "free" && CreditExpired;
-
+  // Show confetti/toast when the backend has granted the referral reward.
+  // The mutation that resets `isEligibleForReward` is intentionally NOT here —
+  // it belongs to a dedicated server action or webhook handler.
   useEffect(() => {
-    getUserData();
-    if (currentUser === null) return;
-    if (isCreditExpired) {
-      console.warn(`${currentUser?.firstName} has insufficient credits.`);
-      updateUser.mutate(
-        {
-          data: {
-            credit: 0,
-            isPro: false,
-          },
-        },
-        {
-          onSuccess: () => {
-            queryClient.invalidateQueries({
-              queryKey: userQueries.detail().queryKey,
-            });
-          },
-        }
-      );
-    }
-    if (currentUser?.isEligibleForReward) {
-      startConfetti();
-      toast.success(
-        "🎉 You've earned 10 bonus credits for referring 5 users! valid for 7 days"
-      );
-      updateUser.mutate(
-        {
-          data: {
-            isEligibleForReward: false,
-          },
-        },
-        {
-          onSuccess: () => {
-            queryClient.invalidateQueries({
-              queryKey: userQueries.detail().queryKey,
-            });
-          },
-        }
-      );
-    }
-  }, [JSON.stringify(currentUser)]);
+    if (!user?.isEligibleForReward) return;
 
-  if (hidden) {
-    return null;
-  }
+    startConfetti();
+    toast.success(
+      "🎉 You've earned 10 bonus credits for referring 5 users! Valid for 7 days.",
+    );
 
-  if (loading) return null;
+    // Refresh so the UI reflects server-granted credits.
+    queryClient.invalidateQueries({ queryKey: userQueries.detail().queryKey });
+  }, [user?.isEligibleForReward]);
+
+  // Don't render while loading to avoid a flash of the modal.
+  if (isLoading || !isCreditExpired) return null;
+
+  const handleUpgrade = () => router.push("/dashboard/account?tab=billing");
+
   return (
-    isCreditExpired && (
-      <AlertDialog defaultOpen>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <div className="flex-between">
-              {/* <p className="p-16-semibold text-dark-400">Insufficient Credits</p> */}
-              <AlertDialogCancel
-                className="bg-transparent border-0"
-                onClick={() => router.push("/dashboard/account?tab=billing")}
-              >
-                <img
-                  src="/assets/icons/close.svg"
-                  alt="credit coins"
-                  width={24}
-                  height={24}
-                  className="cursor-pointer"
-                />
-              </AlertDialogCancel>
-            </div>
-
-            <img
-              src="/assets/images/stacked-coins.png"
-              alt="credit coins"
-              width={462}
-              height={122}
-            />
-
-            <AlertDialogTitle className="p-24-bold text-dark-600">
-              Oops.... Looks like you&#39;ve run out of free credits!
-            </AlertDialogTitle>
-
-            <AlertDialogDescription className="p-16-regular py-3">
-              No worries, though - you can keep enjoying our services by
-              upgrading or refer Cver AI to someone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogAction
-              className="button w-full bg-blue-400  bg-cover"
-              onClick={() => router.push("/dashboard/account?tab=billing")}
+    <AlertDialog defaultOpen>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <div className="flex-between">
+            <AlertDialogCancel
+              className="bg-transparent border-0"
+              onClick={handleUpgrade}
             >
-              Upgrade or Refer a friend.
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    )
+              <img
+                src="/assets/icons/close.svg"
+                alt="Close"
+                width={24}
+                height={24}
+                className="cursor-pointer"
+              />
+            </AlertDialogCancel>
+          </div>
+
+          <img
+            src="/assets/images/stacked-coins.png"
+            alt="Stacked coins"
+            width={462}
+            height={122}
+          />
+
+          <AlertDialogTitle className="p-24-bold text-dark-600">
+            Oops... Looks like you&apos;ve run out of free credits!
+          </AlertDialogTitle>
+
+          <AlertDialogDescription className="p-16-regular py-3">
+            No worries — you can keep enjoying our services by upgrading to Pro
+            or referring Cver AI to a friend.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+
+        <AlertDialogFooter>
+          <AlertDialogAction
+            className="button w-full bg-blue-400 bg-cover"
+            onClick={handleUpgrade}
+          >
+            Upgrade or Refer a Friend
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }
