@@ -1,15 +1,3 @@
-/**
- * InsufficientCreditsModal
- *
- * Shows a blocking modal when a free-tier user's trial has expired.
- *
- * Design decisions:
- * - Uses the existing React Query cache (userQueries.detail()) — no separate API call.
- * - Is purely presentational: it NEVER mutates the user's plan or credit balance.
- *   Enforcement of credits/plan expiry is the backend's responsibility on every action.
- * - The reward toast for `isEligibleForReward` is kept for UX only; the actual credit
- *   grant happens server-side on the 5th referral — the frontend never writes this value.
- */
 "use client";
 import {
   AlertDialog,
@@ -28,6 +16,7 @@ import { useEffect } from "react";
 import { useFireworksConfetti } from "../ui/confetti";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
+import { isSubscriptionActive } from "@/lib/utils/helpers";
 
 export default function InsufficientCreditsModal() {
   const router = useRouter();
@@ -37,16 +26,10 @@ export default function InsufficientCreditsModal() {
   // Re-use the cached user data — no duplicate API call.
   const { data: user, isLoading } = useQuery(userQueries.detail());
 
-  // A user is considered "expired" when they are not a pro subscriber,
-  // or when their subscription period has ended.
-  // Source of truth: server-provided `isProUser` + `currentPeriodEnd`.
-  const periodEnd = user?.currentPeriodEnd;
-  const isCreditExpired =
-    !user?.isProUser || !periodEnd || new Date(periodEnd) < new Date();
+  const hasActiveSubscription = isSubscriptionActive(user?.currentPeriodEnd);
 
-  // Show confetti/toast when the backend has granted the referral reward.
-  // The mutation that resets `isEligibleForReward` is intentionally NOT here —
-  // it belongs to a dedicated server action or webhook handler.
+  console.log(" DATA ====: ", hasActiveSubscription);
+
   useEffect(() => {
     if (!user?.isEligibleForReward) return;
 
@@ -57,10 +40,10 @@ export default function InsufficientCreditsModal() {
 
     // Refresh so the UI reflects server-granted credits.
     queryClient.invalidateQueries({ queryKey: userQueries.detail().queryKey });
-  }, [user?.isEligibleForReward]);
+  }, [user?.isEligibleForReward, startConfetti, queryClient]);
 
   // Don't render while loading to avoid a flash of the modal.
-  if (isLoading || !isCreditExpired) return null;
+  if (isLoading || hasActiveSubscription) return null;
 
   const handleUpgrade = () => router.push("/dashboard/account?tab=billing");
 

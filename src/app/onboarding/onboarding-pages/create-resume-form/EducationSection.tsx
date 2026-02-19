@@ -20,7 +20,6 @@ import {
   useUpdateEducationMutation,
   useDeleteEducationMutation,
 } from "@/lib/mutations/resume.mutations";
-import { resumeApi } from "@/lib/api/resume.api";
 import { CloseEditButton } from "@/components/shared/CloseEditButton";
 
 // ─── Schema ────────────────────────────────────────────────────────
@@ -61,7 +60,7 @@ export default function EducationSection({
     createNewResume,
     isCreating,
   } = useResumeForm();
-  const createMutation = useCreateEducationMutation(resumeId || "");
+  const createMutation = useCreateEducationMutation();
   const updateMutation = useUpdateEducationMutation(resumeId || "");
   const deleteMutation = useDeleteEducationMutation(resumeId || "");
 
@@ -129,8 +128,7 @@ export default function EducationSection({
       if (edu.id) {
         return updateMutation.mutateAsync({ id: edu.id, data: payload });
       }
-      // For new educations, use resumeApi directly to ensure we use the correct resumeId
-      return resumeApi.createEducation(activeResumeId, payload);
+      return createMutation.mutateAsync({ resumeId: activeResumeId, data: payload });
     });
 
     await Promise.all(savePromises);
@@ -160,7 +158,8 @@ export default function EducationSection({
   const isSaving =
     createMutation.isPending ||
     updateMutation.isPending ||
-    deleteMutation.isPending;
+    deleteMutation.isPending ||
+    isCreating;
 
   return (
     <div className="w-full relative bg-white rounded-2xl p-2 sm:p-6">

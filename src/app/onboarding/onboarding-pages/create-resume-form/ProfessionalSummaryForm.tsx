@@ -56,7 +56,7 @@ export default function ProfessionalSummaryForm({
   const form = useForm<ProfessionalSummaryFormValues>({
     resolver: zodResolver(professionalSummarySchema),
     defaultValues: {
-      summary: resumeData?.description || resumeData?.summary || "",
+      summary: resumeData?.summary || "",
     },
   });
 

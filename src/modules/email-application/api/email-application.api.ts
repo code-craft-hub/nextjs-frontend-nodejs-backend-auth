@@ -1,10 +1,10 @@
-import { api } from "@/lib/api/client";
+import { api, BACKEND_API_VERSION } from "@/lib/api/client";
 import type {
   SendEmailApplicationPayload,
   SendEmailApplicationResponse,
 } from "./email-application.api.types";
 
-const EMAIL_APPLICATION_BASE = "/v1/email-applications";
+const EMAIL_APPLICATION_BASE = `/${BACKEND_API_VERSION}/email-applications`;
 
 /**
  * Email Application API Client

@@ -94,7 +94,7 @@ const Preview = ({
         autoApplyId,
         coverLetterId,
         resumeId,
-        recruiterEmail,
+        recruiterEmail: coverLetterData?.recruiterEmail || recruiterEmail || "",
         jobDescription,
       });
       setActiveStep(4);
@@ -168,7 +168,9 @@ const Preview = ({
         <div className="flex gap-2">
           <GmailCompose
             coverLetterData={coverLetterData!}
-            recruiterEmail={recruiterEmail}
+            recruiterEmail={
+              coverLetterData?.recruiterEmail || recruiterEmail || ""
+            }
           />
           <Button
             className="text-2xs"
@@ -191,9 +193,9 @@ const Preview = ({
       <TailorCoverLetterDisplay
         user={user}
         data={coverLetterData}
-        recruiterEmail={recruiterEmail}
+        recruiterEmail={coverLetterData?.recruiterEmail || recruiterEmail || ""}
       />
-      {settings?.useMasterCv || isMasterCv ? (
+      {settings?.useMasterCv && viewerSrc ? (
         <div className="h-[80svh] overflow-hidden">
           <iframe
             src={viewerSrc}

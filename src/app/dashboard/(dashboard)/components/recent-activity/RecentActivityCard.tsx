@@ -30,9 +30,9 @@ export const RecentActivityCard = memo(function RecentActivityCard() {
       return <EmptyRecentActivity />;
     }
 
-    return recommendations.map((recommendation) => (
+    return recommendations.map((recommendation, index) => (
       <JobCard
-        key={recommendation.id}
+        key={recommendation.id ?? index}
         recommendation={recommendation}
         onJobClick={handleJobClick}
         onPreview={handlePreview}

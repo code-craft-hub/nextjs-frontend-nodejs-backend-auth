@@ -21,7 +21,6 @@ import {
   useUpdateProjectMutation,
   useDeleteProjectMutation,
 } from "@/lib/mutations/resume.mutations";
-import { resumeApi } from "@/lib/api/resume.api";
 import { PiOfficeChair } from "react-icons/pi";
 
 // ─── Schema ────────────────────────────────────────────────────────
@@ -172,7 +171,7 @@ export default function ProjectsForm({
   handleEditClick,
 }: ProjectsFormProps) {
   const { resumeId, resumeData, updateResumeField, createNewResume, isCreating } = useResumeForm();
-  const createMutation = useCreateProjectMutation(resumeId || "");
+  const createMutation = useCreateProjectMutation();
   const updateMutation = useUpdateProjectMutation(resumeId || "");
   const deleteMutation = useDeleteProjectMutation(resumeId || "");
 
@@ -228,8 +227,7 @@ export default function ProjectsForm({
       if (proj.id) {
         return updateMutation.mutateAsync({ id: proj.id, data: payload });
       }
-      // For new projects, use resumeApi directly
-      return resumeApi.createProject(activeResumeId, payload);
+      return createMutation.mutateAsync({ resumeId: activeResumeId, data: payload });
     });
 
     await Promise.all(savePromises);

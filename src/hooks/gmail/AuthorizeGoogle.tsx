@@ -42,7 +42,6 @@ const AuthorizeGoogle: React.FC<{
     const handleOAuthCallback = async () => {
       const code = searchParams.get("code");
       const error = searchParams.get("error");
-      const state = searchParams.get("state");
 
       if (!code && !error) return;
 
@@ -52,10 +51,7 @@ const AuthorizeGoogle: React.FC<{
         if (error) throw new Error(`Authorization failed: ${error}`);
         if (!code) throw new Error("No authorization code received");
 
-        const resolvedEmail = state || userEmail;
-        if (!resolvedEmail) throw new Error("User email not found");
-
-        const result = await sendAuthorizationCode(resolvedEmail, code);
+        const result = await sendAuthorizationCode(code);
         if (result.success) {
           toast.success("Gmail authorization successful!");
           form.setValue("authorized", true);
@@ -108,7 +104,9 @@ const AuthorizeGoogle: React.FC<{
       if (!success) return toast.error(`Failed to get auth URL`);
 
       // ✅ Start Google OAuth
-      window.location.href = data?.data?.authUrl;
+      const authUrl = (data as any)?.authUrl ?? data?.data?.authUrl;
+      if (!authUrl) return toast.error(`Failed to get auth URL`);
+      window.location.href = authUrl;
     } catch (err: any) {
       // toast.error(`Error: ${err.message}`);
       console.error("Authorization error:", err);
@@ -154,3 +152,4 @@ const AuthorizeGoogle: React.FC<{
 };
 
 export default AuthorizeGoogle;
+

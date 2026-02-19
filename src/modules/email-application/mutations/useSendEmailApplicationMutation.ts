@@ -3,7 +3,6 @@ import { emailApplicationApi } from "../api/email-application.api";
 import type { SendEmailApplicationPayload } from "../api/email-application.api.types";
 import {
   invalidateEmailApplicationQueries,
-  invalidateEmailApplicationLists,
 } from "../queries/email-application.invalidation";
 import {
   invalidateResumeQueries,

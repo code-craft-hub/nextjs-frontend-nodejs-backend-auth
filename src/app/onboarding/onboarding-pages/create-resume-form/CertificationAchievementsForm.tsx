@@ -22,7 +22,6 @@ import {
   useUpdateCertificationMutation,
   useDeleteCertificationMutation,
 } from "@/lib/mutations/resume.mutations";
-import { resumeApi } from "@/lib/api/resume.api";
 import { useTriggerJobRecommendationsMutation } from "@/lib/mutations/recommendations.mutations";
 
 // ─── Schema ────────────────────────────────────────────────────────
@@ -205,7 +204,7 @@ export default function CertificationAchievementsForm({
     createNewResume,
     isCreating,
   } = useResumeForm();
-  const createMutation = useCreateCertificationMutation(resumeId || "");
+  const createMutation = useCreateCertificationMutation();
   const updateMutation = useUpdateCertificationMutation(resumeId || "");
   const deleteMutation = useDeleteCertificationMutation(resumeId || "");
   const triggerRecommendationsMutation = useTriggerJobRecommendationsMutation();
@@ -281,8 +280,7 @@ export default function CertificationAchievementsForm({
       if (cert.id) {
         return updateMutation.mutateAsync({ id: cert.id, data: payload });
       }
-      // For new certifications, use resumeApi directly
-      return resumeApi.createCertification(activeResumeId, payload);
+      return createMutation.mutateAsync({ resumeId: activeResumeId, data: payload });
     });
 
     await Promise.all(savePromises);
@@ -399,9 +397,9 @@ export default function CertificationAchievementsForm({
         </Button>
 
         <Button
-          type="submit"
+          type="button"
           disabled={isSaving}
-          onClick={() => completedResumeBuild}
+          onClick={completedResumeBuild}
           className="h-12 px-6 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm gap-2 transition-colors"
         >
           {isSaving ? "Saving..." : "Continue to Preview"}

@@ -16,7 +16,6 @@ import { Button } from "@/components/ui/button";
 import { Star, X, ArrowLeft } from "lucide-react";
 import { useResumeForm } from "./ResumeFormContext";
 import { useAddSkillsMutation } from "@/lib/mutations/resume.mutations";
-import { resumeApi } from "@/lib/api/resume.api";
 import { CloseEditButton } from "@/components/shared/CloseEditButton";
 
 // ─── Schema ────────────────────────────────────────────────────────
@@ -119,7 +118,7 @@ export default function SkillsForm({
   handleEditClick,
 }: SkillsFormProps) {
   const { resumeId, resumeData, updateResumeField, createNewResume, isCreating } = useResumeForm();
-  const addSkillsMutation = useAddSkillsMutation(resumeId || "");
+  const addSkillsMutation = useAddSkillsMutation();
 
   const form = useForm<SkillsFormValues>({
     resolver: zodResolver(skillsSchema),
@@ -145,28 +144,23 @@ export default function SkillsForm({
       activeResumeId = newResumeId;
     }
 
-    // If creating anew, call API directly; otherwise use mutation
-    const addSkillsPromise = resumeId
-      ? addSkillsMutation.mutateAsync({
-          hardSkill: values.hardSkills,
-          softSkill: values.softSkills,
-        })
-      : resumeApi.addSkills(activeResumeId, {
-          hardSkill: values.hardSkills,
-          softSkill: values.softSkills,
-        });
-
-    addSkillsPromise.then(() => {
-      updateResumeField(
-        "hardSkill",
-        values.hardSkills.map((s) => ({ label: s, value: s })),
-      );
-      updateResumeField(
-        "softSkill",
-        values.softSkills.map((s) => ({ label: s, value: s })),
-      );
-      onNext?.();
+    await addSkillsMutation.mutateAsync({
+      resumeId: activeResumeId,
+      data: {
+        hardSkill: values.hardSkills,
+        softSkill: values.softSkills,
+      },
     });
+
+    updateResumeField(
+      "hardSkill",
+      values.hardSkills.map((s) => ({ label: s, value: s })),
+    );
+    updateResumeField(
+      "softSkill",
+      values.softSkills.map((s) => ({ label: s, value: s })),
+    );
+    onNext?.();
   }
 
   return (

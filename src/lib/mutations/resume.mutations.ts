@@ -187,13 +187,18 @@ export function useCreateNewResumeMutation() {
 }
 // ─── Work Experience Mutations ────────────────────────────────────
 
-export function useCreateWorkExperienceMutation(resumeId: string) {
+export function useCreateWorkExperienceMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: Partial<WorkExperienceEntry>) =>
-      resumeApi.createWorkExperience(resumeId, data),
-    onSettled: () => {
+    mutationFn: ({
+      resumeId,
+      data,
+    }: {
+      resumeId: string;
+      data: Partial<WorkExperienceEntry>;
+    }) => resumeApi.createWorkExperience(resumeId, data),
+    onSettled: (_data, _error, { resumeId }) => {
       invalidateResumeDetail(queryClient, resumeId);
     },
   });
@@ -229,13 +234,18 @@ export function useDeleteWorkExperienceMutation(resumeId: string) {
 
 // ─── Education Mutations ────────────────────────────────────────── ---500
 
-export function useCreateEducationMutation(resumeId: string) {
+export function useCreateEducationMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: Partial<EducationEntry>) =>
-      resumeApi.createEducation(resumeId, data),
-    onSettled: () => {
+    mutationFn: ({
+      resumeId,
+      data,
+    }: {
+      resumeId: string;
+      data: Partial<EducationEntry>;
+    }) => resumeApi.createEducation(resumeId, data),
+    onSettled: (_data, _error, { resumeId }) => {
       invalidateResumeDetail(queryClient, resumeId);
     },
   });
@@ -266,13 +276,18 @@ export function useDeleteEducationMutation(resumeId: string) {
 
 // ─── Project Mutations ────────────────────────────────────────────
 
-export function useCreateProjectMutation(resumeId: string) {
+export function useCreateProjectMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: Partial<ProjectEntry>) =>
-      resumeApi.createProject(resumeId, data),
-    onSettled: () => {
+    mutationFn: ({
+      resumeId,
+      data,
+    }: {
+      resumeId: string;
+      data: Partial<ProjectEntry>;
+    }) => resumeApi.createProject(resumeId, data),
+    onSettled: (_data, _error, { resumeId }) => {
       invalidateResumeDetail(queryClient, resumeId);
     },
   });
@@ -303,13 +318,18 @@ export function useDeleteProjectMutation(resumeId: string) {
 
 // ─── Certification Mutations ──────────────────────────────────────
 
-export function useCreateCertificationMutation(resumeId: string) {
+export function useCreateCertificationMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: Partial<CertificationEntry>) =>
-      resumeApi.createCertification(resumeId, data),
-    onSettled: () => {
+    mutationFn: ({
+      resumeId,
+      data,
+    }: {
+      resumeId: string;
+      data: Partial<CertificationEntry>;
+    }) => resumeApi.createCertification(resumeId, data),
+    onSettled: (_data, _error, { resumeId }) => {
       invalidateResumeDetail(queryClient, resumeId);
     },
   });
@@ -345,13 +365,18 @@ export function useDeleteCertificationMutation(resumeId: string) {
 
 // ─── Skills Mutation ──────────────────────────────────────────────
 
-export function useAddSkillsMutation(resumeId: string) {
+export function useAddSkillsMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: { hardSkill?: string[]; softSkill?: string[] }) =>
-      resumeApi.addSkills(resumeId, data),
-    onSettled: () => {
+    mutationFn: ({
+      resumeId,
+      data,
+    }: {
+      resumeId: string;
+      data: { hardSkill?: string[]; softSkill?: string[] };
+    }) => resumeApi.addSkills(resumeId, data),
+    onSettled: (_result, _error, { resumeId }) => {
       invalidateResumeDetail(queryClient, resumeId);
     },
   });

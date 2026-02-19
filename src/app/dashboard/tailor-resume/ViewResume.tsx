@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card";
 import {
   coalesceString,
+  formatAppliedDate,
   isValidArray,
   monthYear,
   normalize,
@@ -212,7 +213,7 @@ export const ViewResume: React.FC<ViewResumeProps> = ({
                     </p>
                     {cert?.issueDate && (
                       <p className="text-sm text-gray-500 font-merriweather">
-                        {cert.issueDate}
+                        {formatAppliedDate(cert.issueDate)}
                       </p>
                     )}
                   </div>

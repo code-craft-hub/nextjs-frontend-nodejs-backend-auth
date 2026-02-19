@@ -21,7 +21,6 @@ import {
   useUpdateWorkExperienceMutation,
   useDeleteWorkExperienceMutation,
 } from "@/lib/mutations/resume.mutations";
-import { resumeApi } from "@/lib/api/resume.api";
 import { CloseEditButton } from "@/components/shared/CloseEditButton";
 
 // ─── Schema ────────────────────────────────────────────────────────
@@ -394,7 +393,7 @@ export default function ExperienceForm({
   handleEditClick,
 }: ExperienceFormProps) {
   const { resumeId, resumeData, updateResumeField, createNewResume, isCreating } = useResumeForm();
-  const createMutation = useCreateWorkExperienceMutation(resumeId || "");
+  const createMutation = useCreateWorkExperienceMutation();
   const updateMutation = useUpdateWorkExperienceMutation(resumeId || "");
   const deleteMutation = useDeleteWorkExperienceMutation(resumeId || "");
 
@@ -471,8 +470,7 @@ export default function ExperienceForm({
       if (exp.id) {
         return updateMutation.mutateAsync({ id: exp.id, data: payload });
       }
-      // For new experiences, use resumeApi directly
-      return resumeApi.createWorkExperience(activeResumeId, payload);
+      return createMutation.mutateAsync({ resumeId: activeResumeId, data: payload });
     });
 
     await Promise.all(savePromises);

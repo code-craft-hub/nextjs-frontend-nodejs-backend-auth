@@ -139,6 +139,31 @@ export function normalizeToDate(
   return null;
 }
 
+/**
+ * Type guard that validates a value is a non-empty string
+ * representing a real, parseable date.
+ *
+ * Guards against: null, undefined, "", "Invalid Date", NaN dates,
+ * and non-date strings like "hello".
+ */
+export function isValidDate(value: unknown): value is string {
+  if (!value || typeof value !== "string") return false;
+
+  const date = new Date(value);
+
+  // `new Date("hello")` → Invalid Date → isNaN returns true
+  return !isNaN(date.getTime());
+}
+
+/**
+ * Returns true only if the date string is valid AND in the past.
+ * Colocating the logic prevents misuse of a bare `new Date(periodEnd)`
+ * elsewhere in the codebase.
+ */
+export function isSubscriptionActive(dateString: unknown): boolean {
+  return isValidDate(dateString) && new Date(dateString) > new Date();
+}
+
 export function getDaysUntilProPlanExpiry(
   expiryDate?: string | Date | null,
 ): number {
@@ -436,7 +461,7 @@ export const formatCurrencyNG = (amount: number) => {
 };
 
 export const coalesceString = (...values: Array<string | null | undefined>) =>
-  values.find(v => typeof v === "string" && v.trim() !== "") ?? "";
+  values.find((v) => typeof v === "string" && v.trim() !== "") ?? "";
 
 export const normalize = (value?: string) => {
   if (!value) return undefined;
