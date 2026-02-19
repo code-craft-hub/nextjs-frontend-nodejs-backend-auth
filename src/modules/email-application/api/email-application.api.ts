@@ -1,10 +1,7 @@
 import { api } from "@/lib/api/client";
-import { COLLECTIONS } from "@/lib/utils/constants";
 import type {
   SendEmailApplicationPayload,
   SendEmailApplicationResponse,
-  DeleteEmailApplicationPayload,
-  DeleteEmailApplicationResponse,
 } from "./email-application.api.types";
 
 const EMAIL_APPLICATION_BASE = "/v1/email-applications";
@@ -20,15 +17,5 @@ export const emailApplicationApi = {
   sendApplication: (payload: SendEmailApplicationPayload) =>
     api.post<SendEmailApplicationResponse>(EMAIL_APPLICATION_BASE, payload),
 
-  /**
-   * Delete an email application record
-   */
-  deleteApplication: (
-    autoApplyId: string,
-    resumeId: string,
-    coverLetterId: string,
-  ) =>
-    api.delete<DeleteEmailApplicationResponse>(
-      `/delete-document/${autoApplyId}?docType=${COLLECTIONS.AI_APPLY}&resumeId=${resumeId}&coverLetterId=${coverLetterId}`,
-    ),
+
 };

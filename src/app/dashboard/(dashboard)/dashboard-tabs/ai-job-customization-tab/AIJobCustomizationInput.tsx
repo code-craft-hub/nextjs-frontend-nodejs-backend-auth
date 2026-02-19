@@ -23,7 +23,7 @@ import {
   ActionValue,
   PROFILE_OPTIONS,
 } from "../../components/constants";
-import { SelectOptions, SelectProfile } from "../../components/SelectOptions";
+import { SelectOptions } from "../../components/SelectOptions";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { useDocumentExtraction } from "@/app/onboarding/onboarding-pages/AnyFormatToText";
@@ -44,7 +44,7 @@ const FORM_SCHEMA = z.object({
 export const AIJobCustomizationInput = memo(() => {
   const { data: user } = useQuery(userQueries.detail());
   const [docsInput, setDocsInput] = useState<ActionValue>("tailor-resume");
-  const [userProfile, setUserProfile] = useState<string[]>([]);
+  // const [userProfile, setUserProfile] = useState<string[]>([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile | null>(null);
   const [extractedText, setExtractedText] = useState<string>("");
@@ -211,9 +211,8 @@ export const AIJobCustomizationInput = memo(() => {
                   </div>
                 </div>
                 <div className="flex gap-2 px-3">
-                  <div className="hover:cursor-pointer ">
+                  {/* <div className="hover:cursor-pointer ">
                     <SelectProfile
-                    // @ts-ignore
                       options={profile ?? []} // TODO: fix this any type
                       value={userProfile}
                       onValueChange={(value) => {
@@ -225,7 +224,7 @@ export const AIJobCustomizationInput = memo(() => {
                       }
                       contentClassName="text-xs"
                     />
-                  </div>
+                  </div> */}
                   <button
                     type="submit"
                     className="rounded-full border-blue-500 border-2 p-1 hover:cursor-pointer "

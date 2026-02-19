@@ -33,15 +33,11 @@ export function useJobActions() {
         );
         return;
       }
-
-      // const params = new URLSearchParams();
-      // params.set("jobDescription", JSON.stringify(job?.descriptionText || ""));
-      // params.set("recruiterEmail", encodeURIComponent(job?.emailApply));
-
+      
       const startUrl = buildAutoApplyStartUrl(
-        job.id,
         job.descriptionText || "",
         job.emailApply || "",
+        job.id,
       );
       router.push(startUrl);
     },

@@ -38,7 +38,6 @@ export const ProfileManagement: React.FC = () => {
     });
   };
 
-  console.log("Uploaded Resumes:", uploadedResumes);
   return (
     <div className="font-inter">
       {/* Header */}

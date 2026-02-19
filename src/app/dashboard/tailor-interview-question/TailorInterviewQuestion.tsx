@@ -113,7 +113,6 @@ export const TailorInterviewQuestion = ({
         body: JSON.stringify({
           interviewQuestionId,
           jobDescription,
-          user,
         }),
         credentials: "include",
       });

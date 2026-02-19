@@ -1,5 +1,4 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { emailApplicationApi } from "../api/email-application.api";
 import {
   invalidateEmailApplicationQueries,
   invalidateEmailApplicationLists,
@@ -9,6 +8,9 @@ import {
   invalidateCoverLetterQueries,
   invalidateAIApplyQueries,
 } from "@/lib/query/query-invalidation";
+import { autoApplyApi } from "@/lib/api/auto-apply.api";
+import { resumeApi } from "@/lib/api/resume.api";
+import { coverLetterApi } from "@/lib/api/cover-letter.api";
 
 /**
  * Hook for deleting an email application
@@ -26,20 +28,21 @@ export function useDeleteEmailApplicationMutation() {
       autoApplyId: string;
       resumeId: string;
       coverLetterId: string;
-    }) =>
-      emailApplicationApi.deleteApplication(
-        autoApplyId,
-        resumeId,
-        coverLetterId,
-      ),
+    }) => {
+      return Promise.all([
+        autoApplyApi.delete(autoApplyId),
+        resumeApi.hardDeleteResume(resumeId),
+        coverLetterApi.hardDeleteCoverLetter(coverLetterId),
+      ]);
+    },
 
     onSettled: () => {
-      // Invalidate related cached queries after deletion
       return Promise.all([
         invalidateEmailApplicationQueries(queryClient),
         invalidateResumeQueries(queryClient),
         invalidateCoverLetterQueries(queryClient),
         invalidateAIApplyQueries(queryClient),
+        invalidateEmailApplicationLists(queryClient),
       ]);
     },
   });

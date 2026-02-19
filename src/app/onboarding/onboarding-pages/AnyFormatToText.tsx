@@ -16,7 +16,6 @@ import {
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import mammoth from "mammoth";
 import Tesseract from "tesseract.js";
-import * as pdfjsLib from "pdfjs-dist";
 import { cn } from "@/lib/utils";
 
 // ============================================================================
@@ -73,10 +72,12 @@ class TextExtractionService {
     if (typeof window === "undefined") {
       return "";
     }
+
+    const pdfjsLib = await import("pdfjs-dist");
+
     try {
-      // Set worker path for PDF.js
-      pdfjsLib.GlobalWorkerOptions.workerSrc =
-        "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/5.4.149/pdf.worker.min.mjs";
+      // Use the CDN worker that matches the exact installed pdfjs-dist version.
+      pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
 
       const arrayBuffer = await file.arrayBuffer();
       const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
@@ -101,7 +102,7 @@ class TextExtractionService {
       if (textParts.length === 0) {
         throw new Error(
           "No text found in PDF. This may be a scanned document requiring OCR, " +
-            "or the PDF may be empty."
+            "or the PDF may be empty.",
         );
       }
 
@@ -180,12 +181,12 @@ class TextExtractionService {
               console.info(`OCR Progress: ${Math.round(m.progress * 100)}%`);
             }
           },
-        }
+        },
       );
 
       if (!data.text || data.text.trim().length === 0) {
         throw new Error(
-          "No text detected in image. The image may be blank or text quality is too low."
+          "No text detected in image. The image may be blank or text quality is too low.",
         );
       }
 
@@ -212,7 +213,7 @@ class TextExtractionService {
           if (!result.value || result.value.trim().length === 0) {
             resolve(
               `[WORD DOCUMENT: ${file.name}]\n\n` +
-                `No text content found in document or document is empty.`
+                `No text content found in document or document is empty.`,
             );
           } else {
             resolve(result.value);
@@ -268,7 +269,7 @@ export const useDocumentExtraction = () => {
         setIsProcessing(false);
       }
     },
-    []
+    [],
   );
 
   const clearError = useCallback(() => {
@@ -332,7 +333,7 @@ export const FileUploadZone: React.FC<FileUploadZoneProps> = ({
         onFileSelect(files[0]);
       }
     },
-    [disabled, onFileSelect]
+    [disabled, onFileSelect],
   );
 
   const handleFileInput = useCallback(
@@ -342,7 +343,7 @@ export const FileUploadZone: React.FC<FileUploadZoneProps> = ({
         onFileSelect(files[0]);
       }
     },
-    [onFileSelect]
+    [onFileSelect],
   );
 
   if (currentFile) {
@@ -350,7 +351,7 @@ export const FileUploadZone: React.FC<FileUploadZoneProps> = ({
       <div
         className={cn(
           "flex items-center justify-between p-4 border rounded-lg bg-slate-50 w-full h-24",
-          disabled && "border-blue-500 animate-pulse border-2"
+          disabled && "border-blue-500 animate-pulse border-2",
         )}
       >
         <div className="flex items-center gap-3">
@@ -390,7 +391,7 @@ export const FileUploadZone: React.FC<FileUploadZoneProps> = ({
             : "cursor-pointer hover:border-blue-400"
         }
       `,
-        profile ? "p-4" : "p-8"
+        profile ? "p-4" : "p-8",
       )}
     >
       <input
@@ -490,7 +491,7 @@ export const DocumentTextExtractor = () => {
         // form.trigger("extractedText"); USE THIS IF YOU WANT TO TRIGGER VALIDATION IMMEDIATELY OR USE THE {SHOULDVALIDATE: TRUE} OPTION IN SETVALUE ABOVE
       }
     },
-    [processDocument, clearError, form]
+    [processDocument, clearError, form],
   );
 
   const handleClearFile = useCallback(() => {

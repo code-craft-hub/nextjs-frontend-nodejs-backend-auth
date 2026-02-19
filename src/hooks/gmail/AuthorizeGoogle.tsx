@@ -11,7 +11,7 @@ import {
   FormItem,
 } from "@/components/ui/form";
 import { Switch } from "@/components/ui/switch";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import {
   checkAuthStatus,
   requestAuthUrl,
@@ -31,6 +31,8 @@ const AuthorizeGoogle: React.FC<{
 }> = ({ checkAuth, hidden = false }) => {
   const [_isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
 
   const { data: user } = useQuery(userQueries.detail());
 
@@ -38,10 +40,9 @@ const AuthorizeGoogle: React.FC<{
 
   useEffect(() => {
     const handleOAuthCallback = async () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const code = urlParams.get("code");
-      const error = urlParams.get("error");
-      const state = urlParams.get("state");
+      const code = searchParams.get("code");
+      const error = searchParams.get("error");
+      const state = searchParams.get("state");
 
       if (!code && !error) return;
 
@@ -64,15 +65,14 @@ const AuthorizeGoogle: React.FC<{
         }
       } catch (err: any) {
         console.error("OAuth callback error:", err);
-        // toast.error(err.message || "Unknown error");
-        router.push(location.pathname);
+        router.push(pathname);
       } finally {
         setIsLoading(false);
       }
     };
 
     handleOAuthCallback();
-  }, [location.search, userEmail, router, location.pathname]);
+  }, [searchParams, userEmail, router, pathname]);
 
   // ✅ Check Gmail Auth on Hover
   const handleCheckAuthStatus = useCallback(async () => {
@@ -88,6 +88,7 @@ const AuthorizeGoogle: React.FC<{
   useEffect(() => {
     const callCheckAuthOnce = async () => {
       const checkValue = await handleCheckAuthStatus();
+      console.log("Initial Gmail auth status:", checkValue);
       if (checkAuth) {
         checkAuth(checkValue);
       }

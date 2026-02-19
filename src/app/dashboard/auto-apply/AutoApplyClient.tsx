@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useResumeStream } from "@/hooks/stream-resume-hook";
 import { useCoverLetterStream } from "@/hooks/useCoverLetterGenerator";
@@ -21,6 +21,7 @@ export default function AutoApplyClient() {
   const hasSavedRef = useRef(false);
   const contentRef = useRef<HTMLDivElement>(null);
 
+  const queryClient = useQueryClient();
   const createAutoApply = useCreateAutoApplyMutation();
 
   // Extract parameters from URL
@@ -56,19 +57,25 @@ export default function AutoApplyClient() {
 
       if (useMasterCv) {
         // Only generate cover letter when using master CV
-        toast.promise(startCoverLetter({ jobDescription, jobId }), {
-          loading: "Generating cover letter...",
-          success: "Cover letter generated!",
-          error: "Failed to generate cover letter",
-        });
-      } else {
-        // Generate both cover letter and resume in parallel
-        Promise.all([
-          toast.promise(startCoverLetter({ jobDescription, jobId }), {
+        toast.promise(
+          startCoverLetter({ jobDescription, jobId, recruiterEmail }),
+          {
             loading: "Generating cover letter...",
             success: "Cover letter generated!",
             error: "Failed to generate cover letter",
-          }),
+          },
+        );
+      } else {
+        // Generate both cover letter and resume in parallel
+        Promise.all([
+          toast.promise(
+            startCoverLetter({ jobDescription, jobId, recruiterEmail }),
+            {
+              loading: "Generating cover letter...",
+              success: "Cover letter generated!",
+              error: "Failed to generate cover letter",
+            },
+          ),
           toast.promise(startResume(jobDescription, jobId), {
             loading: "Generating resume...",
             success: "Resume generated!",
@@ -118,7 +125,7 @@ export default function AutoApplyClient() {
               useMasterCv ? { masterCvId: settings!.masterCvId! } : undefined,
             );
             router.push(previewUrl);
-            invalidateDocumentGenerationQueries();
+            invalidateDocumentGenerationQueries(queryClient);
           },
         },
       );

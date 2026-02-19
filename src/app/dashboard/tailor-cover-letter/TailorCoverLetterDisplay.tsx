@@ -21,7 +21,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { CoverLetter, IUser } from "@/types";
 import { EditIcon, Loader } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useUpdateCoverLetterMutation } from "@/lib/mutations/cover-letter.mutations";
 
@@ -60,7 +59,6 @@ const TailorCoverLetterDisplay = ({
   recruiterEmail?: string;
 }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const router = useRouter();
   const currentData = data;
   const updateMutation = useUpdateCoverLetterMutation();
 
@@ -72,7 +70,7 @@ const TailorCoverLetterDisplay = ({
       firstName: currentData?.firstName || user?.firstName || "",
       lastName: currentData?.lastName || user?.lastName || "",
       phoneNumber: currentData?.phoneNumber || user?.phoneNumber || "",
-      recruiterEmail: recruiterEmail || "",
+      recruiterEmail: currentData?.recruiterEmail || recruiterEmail || "",
       salutation: currentData?.salutation || "",
     },
   });
@@ -86,7 +84,7 @@ const TailorCoverLetterDisplay = ({
         firstName: currentData.firstName || user?.firstName || "",
         lastName: currentData.lastName || user?.lastName || "",
         phoneNumber: currentData.phoneNumber || user?.phoneNumber || "",
-        recruiterEmail: recruiterEmail || "",
+        recruiterEmail: currentData?.recruiterEmail || recruiterEmail || "",
         salutation: currentData.salutation || "Dear Hiring Manager,",
       });
     }
@@ -101,18 +99,18 @@ const TailorCoverLetterDisplay = ({
       const currentValue = formValues[fieldName];
       const originalValue = currentData?.[fieldName] || "";
 
-      if (fieldName === "recruiterEmail" && currentValue) {
-        const url = new URL(window.location.href);
-        url.searchParams.set("recruiterEmail", currentValue);
-        router.replace(url.toString());
-      }
-
       if (currentValue !== originalValue && currentData?.id) {
-        updateMutation.mutate({
+        await updateMutation.mutateAsync({
           id: currentData.id,
           data: mapFormToUpdateData(formValues),
         });
       }
+
+      // if (fieldName === "recruiterEmail" && currentValue) {
+      //   const url = new URL(window.location.href);
+      //   url.searchParams.set("recruiterEmail", currentValue);
+      //   router.replace(url.toString());
+      // }
     }
   };
 
@@ -154,12 +152,12 @@ const TailorCoverLetterDisplay = ({
               <div className="mb-4">
                 <p className="text-sm text-gray-500 font-medium font-inter">
                   To:{" "}
-                  {recruiterEmail ||
-                    currentData?.recruiterEmail ||
-                    "Not specified"}
+                  {currentData?.recruiterEmail ||
+                    recruiterEmail ||
+                    ""}
                 </p>
                 <p className="text-md font-inter">
-                  Subject: {currentData?.title || "Untitled"}
+                  Subject: {currentData?.title || ""}
                 </p>
               </div>
               <p className="text-sm font-bold font-inter">

@@ -20,10 +20,6 @@ export const AIJobCustomization = memo(
       interviewQuestionQueries.all(filters),
     );
 
-    console.log("resumes : ", resumes);
-    console.log("coverLetter : ", coverLetter);
-    console.log("interviewQuestion : ", interviewQuestion);
-
     const data = useMemo(() => {
       const merged = [
         ...(interviewQuestion?.data ?? []),

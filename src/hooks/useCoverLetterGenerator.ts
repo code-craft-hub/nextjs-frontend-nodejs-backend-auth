@@ -27,8 +27,8 @@ export function useCoverLetterStream() {
   const abortRef = useRef<AbortController | null>(null);
 
   const start = useCallback(
-    async (params: { jobDescription: string; jobId?: string }) => {
-      const { jobDescription, jobId } = params;
+    async (params: { jobDescription: string; jobId?: string, recruiterEmail?: string }) => {
+      const { jobDescription, jobId, recruiterEmail } = params;
 
       // reset + mark streaming
       setState({ ...INITIAL_STATE, isStreaming: true });
@@ -44,7 +44,7 @@ export function useCoverLetterStream() {
           },
           credentials: "include",
           signal: abortRef.current.signal,
-          body: JSON.stringify({ jobDescription, jobId }),
+          body: JSON.stringify({ jobDescription, jobId, recruiterEmail }),
         });
 
         if (!response.ok || !response.body) {

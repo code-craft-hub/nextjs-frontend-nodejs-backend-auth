@@ -1,4 +1,4 @@
-import { QueryClient, useQueryClient } from "@tanstack/react-query";
+import { QueryClient } from "@tanstack/react-query";
 import { queryKeys } from "./keys";
 import { aiSettingsKeys } from "./ai-settings.keys";
 import { autoApplyKeys } from "./auto-apply.keys";
@@ -234,11 +234,10 @@ export const invalidateBlogQueries = (queryClient: QueryClient) => {
  * Invalidate multiple related queries at once
  * Useful for operations that affect multiple entities
  */
-export const invalidateDocumentGenerationQueries = () => {
-  const qc = useQueryClient();
+export const invalidateDocumentGenerationQueries = (queryClient: QueryClient) => {
   return Promise.all([
-    invalidateResumeQueries(qc),
-    invalidateCoverLetterQueries(qc),
+    invalidateResumeQueries(queryClient),
+    invalidateCoverLetterQueries(queryClient),
   ]);
 };
 

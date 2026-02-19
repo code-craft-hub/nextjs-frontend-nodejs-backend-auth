@@ -8,7 +8,6 @@ import { userQueries } from "@module/user";
 import { coverLetterQueries } from "@/lib/queries/cover-letter.queries";
 import {
   buildCoverLetterUpdateUrl,
-  buildResumeStartUrl,
   isPlaceholderId,
 } from "@/lib/utils/ai-apply-navigation";
 import { TailorCoverLetterDisplayStreaming } from "./TailorCoverLetterDisplayStreaming";
@@ -57,47 +56,6 @@ export default function TailorCoverLetter() {
     state.documentId,
     state.isStreaming,
     isGeneratorStep,
-    jobDescription,
-    recruiterEmail,
-    router,
-  ]);
-
-  // Handle aiApply navigation after generation completes
-  useEffect(() => {
-    if (
-      !aiApply ||
-      !state.documentId ||
-      state.isStreaming ||
-      !isGeneratorStep
-    ) {
-      return;
-    }
-
-    const timeout = setTimeout(() => {
-      if (user?.aiApplyPreferences?.useMasterCV) {
-        // Use master CV directly (no resume generation needed)
-        router.push(
-          `/dashboard/preview?coverLetterDocId=${state.documentId}&baseResume=${user?.defaultDataSource}&aiApply=true&recruiterEmail=${recruiterEmail}&jobDescription=${encodeURIComponent(jobDescription)}`,
-        );
-      } else {
-        // Navigate to tailor resume with the generated cover letter ID
-        const resumeUrl = buildResumeStartUrl(
-          state.documentId,
-          jobDescription,
-          recruiterEmail,
-        );
-        router.push(resumeUrl);
-      }
-    }, 3000);
-
-    return () => clearTimeout(timeout);
-  }, [
-    aiApply,
-    state.documentId,
-    state.isStreaming,
-    isGeneratorStep,
-    user?.aiApplyPreferences?.useMasterCV,
-    user?.defaultDataSource,
     jobDescription,
     recruiterEmail,
     router,

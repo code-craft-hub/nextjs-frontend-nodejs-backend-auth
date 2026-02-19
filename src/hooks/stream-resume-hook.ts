@@ -8,6 +8,9 @@ import {
 } from "@/types";
 import { jsonrepair } from "jsonrepair";
 import { RESUME_BASE } from "@/lib/api/resume.api";
+import { BASEURL } from "@/lib/api/client";
+
+const streamResumeUrl = `${BASEURL}${RESUME_BASE}/stream`;
 
 /**
  * Hook for streaming resume generation
@@ -348,20 +351,27 @@ export const useResumeStream = (): UseResumeStreamReturn => {
         accumulatedContentRef.current = "";
 
         // Initiate SSE connection
-        const response = await fetch(RESUME_BASE + "/stream", {
+        const requestPayload: RequestPayload = { jobDescription, jobId };
+        console.log("[Stream] POST", streamResumeUrl, requestPayload);
+
+        const response = await fetch(streamResumeUrl, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            jobDescription,
-            jobId,
-          } as RequestPayload),
+          body: JSON.stringify(requestPayload),
           credentials: "include",
         });
 
+        console.log(
+          "[Stream] Response status:",
+          response.status,
+          response.statusText,
+        );
+
         if (!response.ok) {
           const errorText = await response.text().catch(() => "Unknown error");
+          console.error("[Stream] Server error body:", errorText);
           throw new Error(
             `HTTP ${response.status}: ${response.statusText || errorText}`,
           );

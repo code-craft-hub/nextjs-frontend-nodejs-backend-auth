@@ -17,6 +17,7 @@ export const JobCardDropdown = memo(function JobCardDropdown({
   onPreview,
 }: JobCardDropdownProps) {
   return (
+    <div onClick={(e) => e.stopPropagation()}>
     <DropdownMenu>
       <DropdownMenuTrigger asChild className="absolute top-4 right-4">
         <Button variant="ghost">
@@ -35,5 +36,6 @@ export const JobCardDropdown = memo(function JobCardDropdown({
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
+    </div>
   );
 });
