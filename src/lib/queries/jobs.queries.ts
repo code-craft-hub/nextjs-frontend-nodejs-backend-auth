@@ -4,13 +4,14 @@ import { jobsApi } from "@/lib/api/jobs.api";
 import { queryKeys } from "@/lib/query/keys";
 import type { JobFilters } from "@/lib/types/jobs";
 import { normalizeJobFilters } from "../query/normalize-filters";
+import recommendationsApi from "../api/recommendations.api";
 
 export const jobsQueries = {
   all: (filters: JobFilters = {}, token?: string) => {
     const normalized = normalizeJobFilters(filters);
     return queryOptions({
       queryKey: queryKeys.jobs.list(normalized),
-      queryFn: () => jobsApi.getJobs(normalized, token),
+      queryFn: () => recommendationsApi.getRecommendations(normalized, token),
       staleTime: 10 * 60 * 1000,
     });
   },

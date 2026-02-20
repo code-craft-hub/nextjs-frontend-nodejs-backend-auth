@@ -28,7 +28,6 @@ import { v4 as uuidv4 } from "uuid";
 import { ArrowRight, SearchIcon, Loader2 } from "lucide-react";
 import { getDataSource } from "@/lib/utils/helpers";
 import { JobType } from "@/types";
-import { apiService } from "@/hooks/use-auth";
 import { toast } from "sonner";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { useForm } from "react-hook-form";
@@ -48,6 +47,7 @@ import {
 } from "./OverviewColumn";
 import MobileOverview from "./MobileOverview";
 import AuthorizeGoogle from "@/hooks/gmail/AuthorizeGoogle";
+import { gmailApi } from "@/lib/api/gmail.api";
 
 export default function Overview() {
   const router = useRouter();
@@ -166,8 +166,9 @@ export default function Overview() {
       return;
     }
 
-    const { authorized } = await apiService.gmailOauthStatus();
-
+    const { data } = await gmailApi.checkAuthStatus()
+    const authorized = data?.authorized;
+    
     if (!authorized) {
       toast.error(
         "✨ Go to the Settings page and enable authorization for Cver AI to send emails on your behalf. This option is located in the second card.",

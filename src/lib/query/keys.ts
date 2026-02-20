@@ -135,4 +135,39 @@ export const queryKeys = {
     location: (location: string, params?: Record<string, any>) =>
       [...queryKeys.jobPosts.all, "location", location, params] as const,
   },
+  jobApplications: {
+    all: ["job-applications"] as const,
+    lists: () => [...queryKeys.jobApplications.all, "list"] as const,
+    list: (filters: Record<string, any>) =>
+      [...queryKeys.jobApplications.lists(), filters] as const,
+    details: () => [...queryKeys.jobApplications.all, "detail"] as const,
+    detail: (id: string) =>
+      [...queryKeys.jobApplications.details(), id] as const,
+    user: (userId: string) =>
+      [...queryKeys.jobApplications.all, "user", userId] as const,
+    check: (userId: string, jobId: string) =>
+      [...queryKeys.jobApplications.all, "check", userId, jobId] as const,
+    status: (status: string, params?: Record<string, any>) =>
+      [...queryKeys.jobApplications.all, "status", status, params] as const,
+    job: (jobId: string) =>
+      [...queryKeys.jobApplications.all, "job", jobId] as const,
+    adminList: (params?: Record<string, any>) =>
+      [...queryKeys.jobApplications.all, "admin", "list", params] as const,
+  },
+  recommendations: {
+    all: ["recommendations"] as const,
+    lists: () => [...queryKeys.recommendations.all, "list"] as const,
+    user: () => [...queryKeys.recommendations.all, "user"] as const,
+    trigger: () => [...queryKeys.recommendations.all, "trigger"] as const,
+    generate: (params: Record<string, any>) =>
+      [...queryKeys.recommendations.all, "generate", params] as const,
+    quickSearch: (q: string) =>
+      [...queryKeys.recommendations.all, "quick-search", q] as const,
+    similar: (jobId: string) =>
+      [...queryKeys.recommendations.all, "similar", jobId] as const,
+    byTitle: (title: string) =>
+      [...queryKeys.recommendations.all, "by-title", title] as const,
+    bySkills: (skills: string) =>
+      [...queryKeys.recommendations.all, "by-skills", skills] as const,
+  },
 } as const;

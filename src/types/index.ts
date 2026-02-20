@@ -13,11 +13,6 @@ export type UploadedFile = {
 };
 export type DashboardTab = "ai-apply" | "find-jobs" | "tailor-cv";
 
-export interface Login {
-  email: string;
-  password?: string;
-  provider?: string;
-}
 
 export type JobType = {
   id: string;
@@ -50,6 +45,51 @@ export type JobType = {
   sponsorCategory: string;
   employmentType?: string;
 };
+
+export interface JobApplication {
+  id: string;
+  userId: string;
+  jobId: string;
+  status: string;
+  appliedAt?: string | Date;
+  statusUpdatedAt?: string | Date | null;
+  updatedAt?: string | Date | null;
+  deletedAt?: string | Date | null;
+  resumeId?: string | null;
+  coverLetter?: string | null;
+  metadata?: Record<string, any> | null;
+}
+
+export interface JobPost {
+  id: string;
+  title: string;
+  link?: string | null;
+  companyName?: string | null;
+  companyLogo?: string | null;
+  companyIcon?: string | null;
+  companyText?: string | null;
+  location?: string | null;
+  salaryInfo?: {
+    min?: number;
+    max?: number;
+    currency?: string;
+    period?: string;
+  } | null;
+  postedAt?: string | Date | null;
+  descriptionHtml?: string | null;
+  descriptionText?: string | null;
+  applyUrl?: string | null;
+  jobFunction?: string | null;
+  employmentType?: string | null;
+  expireAt?: string | Date | null;
+  emailApply?: string | null;
+  source?: string | null;
+  payload?: Record<string, any> | null;
+  isProcessed?: boolean;
+  qualityScore?: number | null;
+  createdAt?: string | Date | null;
+  updatedAt?: string | Date | null;
+}
 
 export interface ProfileData {
   id: string;
@@ -145,7 +185,7 @@ export interface IUser {
   website?: string;
   portfolio?: string;
   profile: string;
-  recommendationsData?: any[]
+  recommendationsData?: any[];
   createdAt?: string | Date;
   updatedAt?: string | Date;
 }
@@ -240,50 +280,6 @@ export interface ResumeSection {
   error?: string;
 }
 
-export const intialData = {
-  profile: {
-    type: "profile",
-    content: "",
-    isComplete: false,
-    isStreaming: false,
-  },
-  education: {
-    type: "education",
-    content: "",
-    isComplete: false,
-    isStreaming: false,
-  },
-  workExperience: {
-    type: "workExperience",
-    content: "",
-    isComplete: false,
-    isStreaming: false,
-  },
-  certification: {
-    type: "certification",
-    content: "",
-    isComplete: false,
-    isStreaming: false,
-  },
-  project: {
-    type: "project",
-    content: "",
-    isComplete: false,
-    isStreaming: false,
-  },
-  hardSkill: {
-    type: "hardSkill",
-    content: "",
-    isComplete: false,
-    isStreaming: false,
-  },
-  softSkill: {
-    type: "softSkill",
-    content: "",
-    isComplete: false,
-    isStreaming: false,
-  },
-};
 
 export interface FloatingLabelInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   id?: string;
@@ -293,94 +289,6 @@ export interface FloatingLabelInputProps extends React.InputHTMLAttributes<HTMLI
   showPasswordToggle?: boolean;
 }
 
-export type ApprovedT = {
-  duration: string;
-  message: string;
-  paidAt: string;
-  plan: string;
-  redirecturl: string;
-  reference: string;
-  price: number;
-  status: string;
-  transaction: string;
-  trxref: string;
-};
-
-export type cancelledT = {
-  message: string;
-  paidAt: string;
-  plan: string;
-  price: number;
-  status: string;
-};
-
-export interface ApiResponse<T> {
-  data: T;
-  meta: {
-    pagination?: {
-      page: number;
-      pageSize: number;
-      pageCount: number;
-      total: number;
-    };
-  };
-}
-
-export interface Media {
-  id: number;
-  name: string;
-  url: string;
-  alternativeText?: string | null;
-  caption?: string | null;
-}
-
-export interface Author {
-  name: string;
-  avatar?: string | null;
-}
-
-export interface Article {
-  id: string;
-  title: string;
-  author_comment: string;
-  summary: string;
-  subtitle: string;
-  author?: Author | null;
-  cover?: string | null;
-  big_thumbnail?: string | null;
-  category?: string | null;
-  createdAt?: Date;
-  author_avatar: string;
-  author_name: string;
-  blog_cover: string;
-  createdBy?: string;
-  description_html: string;
-  description_json: string;
-  description_text: string;
-  related: [];
-  status: string;
-  uid: string;
-}
-
-export interface ArticleData {
-  data: Article;
-  id: string;
-}
-
-export interface ArticleResponse {
-  documents: ArticleData[];
-}
-
-export interface ArticleState {
-  cover: string;
-  big_thumbnail: string;
-  updatedAt: string;
-  title: string;
-  description: string;
-  avatar: string;
-  author: string;
-  blog_content: string;
-}
 
 // Represents API Error structure
 export interface ApiError {
@@ -392,17 +300,6 @@ export interface ApiError {
   };
 }
 
-export interface UserProfile {
-  uid: string;
-  email: string | null;
-  displayName: string | null;
-  photoURL: string | null;
-  role: "admin" | "user";
-  createdAt: string;
-  lastLoginAt: string;
-  isEmailVerified: boolean;
-  customClaims?: Record<string, any>;
-}
 
 export type StreamData = ResumeFormData;
 

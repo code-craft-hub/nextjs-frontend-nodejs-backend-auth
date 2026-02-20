@@ -237,6 +237,53 @@ export const invalidateJobPostDetail = (
   });
 };
 
+// ─── Job Applications Queries ─────────────────────────────────
+
+export const invalidateJobApplicationsQueries = (queryClient: QueryClient) => {
+  return Promise.all([
+    queryClient.invalidateQueries({
+      queryKey: queryKeys.jobApplications.lists(),
+    }),
+    queryClient.invalidateQueries({
+      queryKey: queryKeys.jobApplications.details(),
+    }),
+  ]);
+};
+
+export const invalidateJobApplicationLists = (queryClient: QueryClient) => {
+  return queryClient.invalidateQueries({
+    queryKey: queryKeys.jobApplications.lists(),
+  });
+};
+
+export const invalidateJobApplicationDetail = (
+  queryClient: QueryClient,
+  applicationId: string,
+) => {
+  return queryClient.invalidateQueries({
+    queryKey: queryKeys.jobApplications.detail(applicationId),
+  });
+};
+
+// ─── Recommendations Queries ─────────────────────────────────
+
+export const invalidateRecommendationsQueries = (queryClient: QueryClient) => {
+  return Promise.all([
+    queryClient.invalidateQueries({
+      queryKey: queryKeys.recommendations.user(),
+    }),
+    queryClient.invalidateQueries({
+      queryKey: queryKeys.recommendations.lists(),
+    }),
+  ]);
+};
+
+export const invalidateUserRecommendations = (queryClient: QueryClient) => {
+  return queryClient.invalidateQueries({
+    queryKey: queryKeys.recommendations.user(),
+  });
+};
+
 // ─── Blog Queries ───────────────────────────────────────────
 
 export const invalidateBlogQueries = (queryClient: QueryClient) => {

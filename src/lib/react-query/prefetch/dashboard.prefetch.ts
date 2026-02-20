@@ -1,4 +1,4 @@
-import { aiApplyQueries } from "@/lib/queries/ai-apply.queries";
+import { autoApplyQueries } from "@/lib/queries/auto-apply.queries";
 import { coverLetterQueries } from "@/lib/queries/cover-letter.queries";
 import { interviewQuestionQueries } from "@/lib/queries/interview.queries";
 import { jobsQueries } from "@/lib/queries/jobs.queries";
@@ -21,7 +21,7 @@ export async function prefetchDashboardData(
   await queryClient.prefetchQuery(resumeQueries.all(filters));
   await queryClient.prefetchQuery(interviewQuestionQueries.all(filters));
   await queryClient.prefetchQuery(coverLetterQueries.all(filters));
-  await queryClient.prefetchQuery(aiApplyQueries.all(filters));
+  await queryClient.prefetchQuery(autoApplyQueries.all());
 
   // Infinite query separately (important)
   await queryClient.prefetchInfiniteQuery(
