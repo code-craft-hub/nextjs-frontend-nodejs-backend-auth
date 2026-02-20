@@ -96,7 +96,6 @@ export const queryKeys = {
       return [...queryKeys.jobs.autos(), "auto-apply"] as const;
     },
 
-    
     auto: (filters: JobFilters) => {
       // Create a clean object without undefined values
       const cleanFilters: Record<string, any> = {};
@@ -118,5 +117,22 @@ export const queryKeys = {
       [...queryKeys.jobs.all, "search", query] as const,
     similar: (id: string) => [...queryKeys.jobs.all, "similar", id] as const,
     filters: () => [...queryKeys.jobs.all, "filters"] as const,
+  },
+  jobPosts: {
+    all: ["job-posts"] as const,
+    lists: () => [...queryKeys.jobPosts.all, "list"] as const,
+    list: (filters: Record<string, any>) =>
+      [...queryKeys.jobPosts.lists(), filters] as const,
+    details: () => [...queryKeys.jobPosts.all, "detail"] as const,
+    detail: (id: string) => [...queryKeys.jobPosts.details(), id] as const,
+    stats: () => [...queryKeys.jobPosts.all, "stats"] as const,
+    search: (q: string) => [...queryKeys.jobPosts.all, "search", q] as const,
+    fts: (q: string) => [...queryKeys.jobPosts.all, "fts", q] as const,
+    active: () => [...queryKeys.jobPosts.all, "active"] as const,
+    unprocessed: () => [...queryKeys.jobPosts.all, "unprocessed"] as const,
+    company: (companyName: string, params?: Record<string, any>) =>
+      [...queryKeys.jobPosts.all, "company", companyName, params] as const,
+    location: (location: string, params?: Record<string, any>) =>
+      [...queryKeys.jobPosts.all, "location", location, params] as const,
   },
 } as const;

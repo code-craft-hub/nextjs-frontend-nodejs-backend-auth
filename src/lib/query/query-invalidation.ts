@@ -212,6 +212,31 @@ export const invalidateJobsLists = (queryClient: QueryClient) => {
   });
 };
 
+// ─── Job Posts (server-side job-posts) Queries ──────────────
+
+export const invalidateJobPostsQueries = (queryClient: QueryClient) => {
+  return Promise.all([
+    queryClient.invalidateQueries({ queryKey: queryKeys.jobPosts.lists() }),
+    queryClient.invalidateQueries({ queryKey: queryKeys.jobPosts.details() }),
+    queryClient.invalidateQueries({ queryKey: queryKeys.jobPosts.stats() }),
+  ]);
+};
+
+export const invalidateJobPostLists = (queryClient: QueryClient) => {
+  return queryClient.invalidateQueries({
+    queryKey: queryKeys.jobPosts.lists(),
+  });
+};
+
+export const invalidateJobPostDetail = (
+  queryClient: QueryClient,
+  jobPostId: string,
+) => {
+  return queryClient.invalidateQueries({
+    queryKey: queryKeys.jobPosts.detail(jobPostId),
+  });
+};
+
 // ─── Blog Queries ───────────────────────────────────────────
 
 export const invalidateBlogQueries = (queryClient: QueryClient) => {
@@ -234,7 +259,9 @@ export const invalidateBlogQueries = (queryClient: QueryClient) => {
  * Invalidate multiple related queries at once
  * Useful for operations that affect multiple entities
  */
-export const invalidateDocumentGenerationQueries = (queryClient: QueryClient) => {
+export const invalidateDocumentGenerationQueries = (
+  queryClient: QueryClient,
+) => {
   return Promise.all([
     invalidateResumeQueries(queryClient),
     invalidateCoverLetterQueries(queryClient),
