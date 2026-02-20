@@ -5,7 +5,7 @@ import type {
   ProjectEntry,
   CertificationEntry,
 } from "@/types/resume.types";
-import { api, API_URL } from "./client";
+import { api, BACKEND_API_VERSION } from "./client";
 import type { PaginatedResponse, PaginationParams } from "@/lib/types";
 
 // ─── Types ────────────────────────────────────────────────────────
@@ -53,7 +53,7 @@ interface ApiResponse<T> {
 
 // ─── API Client ───────────────────────────────────────────────────
 
-export const RESUME_BASE = `${API_URL}/resumes`;
+export const RESUME_BASE = `${BACKEND_API_VERSION}/resumes`;
 
 export const resumeApi = {
   // ─── Resume CRUD ──────────────────────────────────────────────

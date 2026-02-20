@@ -1,4 +1,4 @@
-import { api, API_URL } from "./client";
+import { api, BACKEND_API_VERSION } from "./client";
 
 // ─── Types ────────────────────────────────────────────────────────
 
@@ -70,7 +70,7 @@ interface ApiResponse<T> {
 
 // ─── API Client ───────────────────────────────────────────────────
 
-const AI_SETTINGS_BASE = `${API_URL}/ai-apply-settings`;
+const AI_SETTINGS_BASE = `${BACKEND_API_VERSION}/ai-apply-settings`;
 
 export const aiSettingsApi = {
   /**

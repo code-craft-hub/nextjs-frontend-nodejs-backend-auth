@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { api, API_URL } from "@/lib/api/client";
+import { api, BACKEND_API_VERSION } from "@/lib/api/client";
 
 interface BookmarkRecord {
   id: string;
@@ -35,7 +35,7 @@ export function useBookmarkedJobIds(): Set<string> {
   const { data: rawData } = useQuery({
     queryKey: BOOKMARK_IDS_QUERY_KEY,
     queryFn: () =>
-      api.get<GetBookmarksResponse>(`${API_URL}/users/bookmarks`, {
+      api.get<GetBookmarksResponse>(`${BACKEND_API_VERSION}/users/bookmarks`, {
         params: { limit: 500 },
       }),
     staleTime: 5 * 60 * 1000,

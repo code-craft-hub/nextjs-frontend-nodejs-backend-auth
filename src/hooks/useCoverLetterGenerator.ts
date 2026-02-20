@@ -1,9 +1,9 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
-import { API_URL } from "@/lib/api/client";
+import { BACKEND_API_VERSION } from "@/lib/api/client";
 
-const APP_API_URL = `${API_URL}/cover-letters/stream`;
+const APP_API_URL = `${BACKEND_API_VERSION}/cover-letters/stream`;
 
 export interface StreamState {
   title: string;

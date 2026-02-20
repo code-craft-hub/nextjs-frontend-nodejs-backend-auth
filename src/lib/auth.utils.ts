@@ -21,7 +21,7 @@ export async function createSessionToken(userSession: IUser): Promise<string> {
 // Verify session token
 export async function verifySessionToken(
   token: string
-): Promise<Partial<IUser> | null> {
+): Promise<Partial<IUser & {customClaims: Record<string, any>}> | null> {
   try {
     const secret = new TextEncoder().encode(process.env.JWT_SECRET);
 
@@ -30,7 +30,6 @@ export async function verifySessionToken(
     });
 
     return {
-      uid: payload.uid as string,
       email: payload.email as string,
       emailVerified: payload.emailVerified as boolean,
       onboardingComplete: payload.onboardingComplete as boolean,

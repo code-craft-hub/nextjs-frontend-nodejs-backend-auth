@@ -12,7 +12,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { interviewQuestionQueries } from "@/lib/queries/interview.queries";
 import { userQueries } from "@module/user";
 import { sendGTMEvent } from "@next/third-parties/google";
-import { API_URL } from "@/lib/api/client";
+import { BACKEND_API_VERSION } from "@/lib/api/client";
 import { useFireworksConfetti } from "@/components/ui/confetti";
 
 export const TailorInterviewQuestion = ({
@@ -105,7 +105,7 @@ export const TailorInterviewQuestion = ({
     setQaData([]);
 
     try {
-      const response = await fetch(`${API_URL}/interview-questions/stream`, {
+      const response = await fetch(`${BACKEND_API_VERSION}/interview-questions/stream`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

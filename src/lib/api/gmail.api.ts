@@ -1,4 +1,4 @@
-import { api, API_URL } from "./client";
+import { api, BACKEND_API_VERSION } from "./client";
 
 // ─── Types ────────────────────────────────────────────────────────
 
@@ -58,7 +58,7 @@ interface ApiResponse<T> {
 
 // ─── API Client ───────────────────────────────────────────────────
 
-const GMAIL_AUTH_BASE = `${API_URL}/auth/gmail`;
+const GMAIL_AUTH_BASE = `${BACKEND_API_VERSION}/auth/gmail`;
 
 export const gmailApi = {
   getAuthUrl: (token?: string) =>
@@ -90,7 +90,7 @@ export const gmailApi = {
 
   sendEmail: (payload: EmailPayload, token?: string) =>
     api.post<ApiResponse<SendEmailResponse>>(
-      `${API_URL}/gmail/send`,
+      `${BACKEND_API_VERSION}/gmail/send`,
       payload,
       { token },
     ),
