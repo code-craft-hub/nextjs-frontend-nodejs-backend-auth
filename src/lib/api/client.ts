@@ -4,9 +4,9 @@ const isDevelopment = process.env.NODE_ENV === "development";
 export const BACKEND_API_VERSION = "v1";
 
 export const BASEURL =
-isClientSide && isDevelopment ? "/api" : process.env.NEXT_PUBLIC_AUTH_API_URL;
+  isClientSide && isDevelopment ? "/api" : process.env.NEXT_PUBLIC_AUTH_API_URL;
 
-export const API_URL = `${BASEURL}/${BACKEND_API_VERSION}`
+export const API_URL = `${BASEURL}/${BACKEND_API_VERSION}`;
 
 export class APIError extends Error {
   constructor(
@@ -24,19 +24,69 @@ export interface FetchOptions extends RequestInit {
   token?: string;
 }
 
+// ─── Token Refresh State ─────────────────────────────────────────────────────
+// Serialises concurrent 401 responses so only one refresh call is made.
+// All in-flight requests wait for the same refresh promise.
+let isRefreshing = false;
+let refreshPromise: Promise<boolean> | null = null;
+
+/**
+ * Attempt to rotate the access token using the httpOnly refresh_token cookie.
+ * Returns true if a new access_token cookie was issued, false otherwise.
+ *
+ * The refresh_token cookie path is "/api/v1/auth" — the browser will send it
+ * automatically when we POST to that exact path.
+ */
+async function refreshAccessToken(): Promise<boolean> {
+  // Serialise concurrent refresh attempts into a single request.
+  if (isRefreshing && refreshPromise) return refreshPromise;
+
+  isRefreshing = true;
+  refreshPromise = (async () => {
+    try {
+      const origin =
+        typeof window !== "undefined"
+          ? window.location.origin
+          : "http://localhost";
+
+      const url = BASEURL?.startsWith("http")
+        ? `${BASEURL}/${BACKEND_API_VERSION}/auth/refresh`
+        : new URL(
+            `${BASEURL}/${BACKEND_API_VERSION}/auth/refresh`,
+            origin,
+          ).toString();
+
+      const response = await fetch(url, {
+        method: "POST",
+        credentials: "include",
+      });
+
+      return response.ok;
+    } catch {
+      return false;
+    } finally {
+      isRefreshing = false;
+      refreshPromise = null;
+    }
+  })();
+
+  return refreshPromise;
+}
+
+// ─── Core Fetch Wrapper ───────────────────────────────────────────────────────
+
 export async function apiClient<T>(
   endpoint: string,
   options: FetchOptions = {},
+  _isRetry = false,
 ): Promise<T> {
   const { token, params, ...fetchOptions } = options;
 
   let url: URL;
 
-  // Handle absolute vs relative baseURL
   if (BASEURL?.startsWith("http")) {
     url = new URL(`${BASEURL}${endpoint}`);
   } else {
-    // Relative URL: must use window.location.origin on client
     const origin =
       typeof window !== "undefined"
         ? window.location.origin
@@ -44,7 +94,6 @@ export async function apiClient<T>(
     url = new URL(`${BASEURL}${endpoint}`, origin);
   }
 
-  // Append params
   if (params) {
     Object.entries(params).forEach(([key, value]) => {
       if (value !== undefined && value !== null) {
@@ -59,7 +108,7 @@ export async function apiClient<T>(
   };
 
   if (token) {
-    (headers as any)["Authorization"] = `Bearer ${token}`;
+    (headers as Record<string, string>)["Authorization"] = `Bearer ${token}`;
   }
 
   const isServerSide = typeof window === "undefined";
@@ -67,20 +116,40 @@ export async function apiClient<T>(
   const response = await fetch(url.toString(), {
     ...fetchOptions,
     headers,
-    credentials: isServerSide ? "omit" : "include", // Important distinction
+    credentials: isServerSide ? "omit" : "include",
   });
 
   const data = await response.json().catch(() => ({ error: "Request failed" }));
 
   if (!response.ok) {
-    if (response.status === 401 && typeof window !== "undefined") {
-      window.location.reload();
+    // ── 401 recovery: attempt token rotation, then retry once ──────────────
+    // Skip retry for the refresh endpoint itself to prevent loops.
+    const isRefreshEndpoint = endpoint.includes("/auth/refresh");
+
+    if (
+      response.status === 401 &&
+      typeof window !== "undefined" &&
+      !_isRetry &&
+      !isRefreshEndpoint
+    ) {
+      const refreshed = await refreshAccessToken();
+
+      if (refreshed) {
+        // Retry the original request with the new access_token cookie in place.
+        return apiClient<T>(endpoint, options, true);
+      }
+
+      // Refresh failed — session is fully expired; send user to login.
+      window.location.href = "/login";
     }
+
     throw new APIError(response.status, data.error || "Request failed", data);
   }
 
   return data;
 }
+
+// ─── Convenience Methods ──────────────────────────────────────────────────────
 
 export const api = {
   get: <T>(endpoint: string, options?: FetchOptions) =>

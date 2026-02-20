@@ -23,8 +23,12 @@ import { useQuery } from "@tanstack/react-query";
 import { userQueries } from "@module/user";
 import { api } from "@/lib/api/client";
 
+// Server validates exactly 6 numeric digits (auth.validator.ts → otpSchema).
 const formSchema = z.object({
-  code: z.string().min(5, "Please enter the 5-digit verification code"),
+  code: z
+    .string()
+    .length(6, "Please enter the 6-digit verification code")
+    .regex(/^\d{6}$/, "Verification code must contain digits only"),
 });
 
 export const VerifyEmailClient = () => {
@@ -59,24 +63,21 @@ export const VerifyEmailClient = () => {
     setIsSending(true);
 
     try {
-      await api.post("/send-verification");
+      await api.post("/v1/auth/resend-verification");
 
       toast.success(
         `${user?.firstName}, verification code sent to your email!`
       );
       setCanResend(false);
-      setTimeLeft(60); // 1 minute cooldown
+      setTimeLeft(60); // 1-minute cooldown matches the server-side rate limiter
     } catch (error: any) {
       console.error(error);
-      if (error.response.status === 401) {
+      // APIError (from client.ts) exposes `.status` directly, not `.response.status`.
+      if (error?.status === 401) {
         router.replace("/login");
         return;
       }
-      toast.error(
-        typeof error.message === "string"
-          ? error.message
-          : JSON.stringify(error.message)
-      );
+      toast.error(error?.data?.error ?? error?.message ?? "Failed to send code");
     } finally {
       setIsSending(false);
       setIsVerifying(false);
@@ -94,23 +95,20 @@ export const VerifyEmailClient = () => {
     setIsVerifying(true);
 
     try {
-      await api.post("/verify-email", { code });
+      // Server expects the field name `otp`, not `code`.
+      await api.post("/v1/auth/verify-email", { otp: code });
+
+      // The access token still carries emailVerified: false from registration.
+      // Rotate it immediately so the middleware sees the updated claim and
+      // allows navigation to /onboarding without redirecting back here.
+      await api.post("/v1/auth/refresh");
 
       toast.success(
         `${user?.firstName}, your email has been verified successfully!`
       );
       setCompletedEmailVerification(true);
     } catch (error: any) {
-      toast.error(
-        error?.response?.data
-          ? error?.response?.data?.error
-          : JSON.stringify(error.response?.data) || "Verification failed"
-      );
-      // toast.error(
-      //   typeof error.message === "string"
-      //     ? error.message
-      //     : error.response.data || JSON.stringify(error.message)
-      // );
+      toast.error(error?.data?.error ?? error?.message ?? "Verification failed");
     } finally {
       setIsVerifying(false);
     }
@@ -193,7 +191,7 @@ export const VerifyEmailClient = () => {
               variant={"ghost"}
               className="absolute top-4 right-5"
               onClick={async () => {
-                await api.delete("/delete");
+                await api.delete("/v1/users");
                 router.push("/register");
               }}
             >

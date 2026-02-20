@@ -21,8 +21,12 @@ import { toast } from "sonner";
 import { X } from "lucide-react";
 import { api } from "@/lib/api/client";
 
+// Server validates exactly 6 numeric digits (auth.validator.ts → otpSchema).
 const formSchema = z.object({
-  code: z.string().min(5, "Please enter the 5-digit verification code"),
+  code: z
+    .string()
+    .length(6, "Please enter the 6-digit reset code")
+    .regex(/^\d{6}$/, "Reset code must contain digits only"),
 });
 
 export const PasswordResetVerifyEmail = ({
@@ -30,7 +34,8 @@ export const PasswordResetVerifyEmail = ({
   handleStateChange,
 }: {
   email: string;
-  handleStateChange: (value: any) => void;
+  /** Called with the validated OTP so the parent can pass it to ResetPassword. */
+  handleStateChange: (otp: string) => void;
 }) => {
   const router = useRouter();
   const username = email?.split("@")[0];
@@ -38,8 +43,6 @@ export const PasswordResetVerifyEmail = ({
 
   const [emailSent, setEmailSent] = useState(false);
   const [isSending, setIsSending] = useState(false);
-  const [completedEmailVerification, setCompletedEmailVerification] =
-    useState(false);
   const [canResend, setCanResend] = useState(true);
   const [timeLeft, setTimeLeft] = useState(0);
 
@@ -63,23 +66,16 @@ export const PasswordResetVerifyEmail = ({
     setIsSending(true);
 
     try {
-      await api.post("/send-verification", { email });
+      // /auth/forgot-password sends the reset OTP to the user's inbox.
+      // It always returns 200 regardless of whether the email exists (prevents enumeration).
+      await api.post("/v1/auth/forgot-password", { email });
 
-      toast.success(`${username}, verification code sent to your email!`);
+      toast.success(`Reset code sent to ${email}!`);
       setCanResend(false);
-      setTimeLeft(60); // 1 minute cooldown
+      setTimeLeft(60); // 1-minute cooldown
     } catch (error: any) {
       console.error(error);
-      toast.error(JSON.stringify(error));
-      if (error.response.status === 401) {
-        // router.replace("/login");
-        return;
-      }
-      toast.error(
-        typeof error.message === "string"
-          ? error.message
-          : JSON.stringify(error.message)
-      );
+      toast.error(error?.data?.error ?? error?.message ?? "Failed to send reset code");
     } finally {
       setIsSending(false);
       setIsVerifying(false);
@@ -94,73 +90,12 @@ export const PasswordResetVerifyEmail = ({
   });
 
   async function onSubmit({ code }: z.infer<typeof formSchema>) {
-    setIsVerifying(true);
-
-    try {
-      await api.post("/verify-email", { code, email });
-
-      toast.success(`${username}, your email has been verified successfully!`);
-      setCompletedEmailVerification(true);
-      handleStateChange(false);
-    } catch (error: any) {
-      toast.error(
-        error?.response?.data
-          ? error?.response?.data?.error
-          : JSON.stringify(error.response?.data) || "Verification failed"
-      );
-      // toast.error(
-      //   typeof error.message === "string"
-      //     ? error.message
-      //     : error.response.data || JSON.stringify(error.message)
-      // );
-    } finally {
-      setIsVerifying(false);
-    }
-  }
-
-  if (completedEmailVerification) {
-    return (
-      <div className="min-h-screen flex flex-col font-poppins">
-        <div
-          className="h-32 w-full fixed"
-          style={{
-            background: "url('/landing-page-menu-gradient.svg')",
-            backgroundRepeat: "no-repeat",
-            backgroundSize: "cover",
-            backgroundPosition: "center center",
-          }}
-        />
-        <div className="flex items-center justify-center flex-1 ">
-          <div className="flex-1 flex items-center justify-center bg-white max-w-3xl shadow-2xl rounded-lg p-8 sm:p-16">
-            <div className="w-full max-w-2xl space-y-8">
-              {/* Logo and Header */}
-              <div className="space-y-6">
-                <div className="flex flex-col space-y-8 items-center justify-center">
-                  <img src="/cverai-logo.png" className="w-28 h-8" alt="Logo" />
-                  <img src="success-icon.svg" alt="success" />
-                </div>
-              </div>
-
-              <div className="text-center space-y-2">
-                <h2 className="font-bold">Email Verification</h2>
-                <p className="text-gray-400 text-xs">
-                  Your email has been verified!
-                </p>
-              </div>
-              <Button
-                type="submit"
-                className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors"
-                onClick={() => {
-                  router.push("/onboarding");
-                }}
-              >
-                Continue
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+    // We do NOT call verify-email here — that endpoint is for account email
+    // verification, not password reset.  The OTP itself is only consumed server-side
+    // when /auth/reset-password is called with { email, otp, newPassword }.
+    // We simply pass the validated code to the parent so it can provide it to
+    // the ResetPassword component.
+    handleStateChange(code);
   }
 
   return (
@@ -194,10 +129,7 @@ export const PasswordResetVerifyEmail = ({
             <Button
               variant={"ghost"}
               className="absolute top-4 right-5"
-              onClick={async () => {
-                await api.delete("/delete");
-                router.push("/register");
-              }}
+              onClick={() => router.push("/login")}
             >
               <X className="size-4" />
             </Button>

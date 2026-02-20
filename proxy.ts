@@ -9,26 +9,34 @@ async function verifySessionToken(
 ): Promise<Partial<IUser> | null> {
   try {
     const secret = new TextEncoder().encode(getJwtSecret());
-    const { payload } = await jwtVerify(token, secret, {
-      issuer: "nextjs-app",
-    });
 
+    // NOTE: no `issuer` option — the backend TokenService does not call
+    // .setIssuer(), so enforcing one rejects every valid access token.
+    const { payload } = await jwtVerify(token, secret);
+
+    // Guard against refresh tokens being used here by design.
+    if (payload["type"] !== "access") return null;
+
+    // New JWT shape (server/modules/auth/services/token.service.ts):
+    //   sub              → userId  (JWT standard "subject")
+    //   email            → user's email address
+    //   emailVerified    → DB-level email verification flag
+    //   onboardingComplete → whether the user finished onboarding
     return {
-      uid: payload.uid as string,
-      email: payload.email as string,
-      emailVerified: payload.emailVerified as boolean,
-      onboardingComplete: payload.onboardingComplete as boolean,
-      customClaims: payload.customClaims as Record<string, any> | undefined,
-      displayName: payload?.displayName as string,
+      id: (payload.sub ?? payload["userId"]) as string,
+      email: payload["email"] as string,
+      emailVerified: payload["emailVerified"] as boolean,
+      onboardingComplete: payload["onboardingComplete"] as boolean,
     };
   } catch (err) {
+    // Expired / malformed tokens are treated as unauthenticated; no throw.
     console.error("JWT verification failed:", err);
     return null;
   }
 }
 
 const publicPaths = ["/login", "/register", "/reset-password"];
-const protectedPaths = ["/dashboard/home"];
+const protectedPaths = ["/dashboard"];
 const verifyEmailPath = "/verify-email";
 const onboardingPath = "/onboarding";
 
@@ -45,7 +53,12 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const sessionToken = request.cookies.get("session")?.value;
+  // The backend now issues an `access_token` httpOnly cookie (15-min maxAge).
+  // The legacy `session` cookie is checked as a fallback so existing browser
+  // sessions remain valid during the migration window.
+  const sessionToken =
+    request.cookies.get("access_token")?.value ??
+    request.cookies.get("session")?.value;
 
   const session = sessionToken ? await verifySessionToken(sessionToken) : null;
 
