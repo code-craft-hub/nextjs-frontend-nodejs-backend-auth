@@ -5,15 +5,13 @@ import { useEffect, useState } from "react";
 import { PremiumUserPage } from "./PremiumUserPage";
 import { useQuery } from "@tanstack/react-query";
 import { userQueries } from "@module/user";
-import { getDaysRemaining } from "@/lib/utils/helpers";
+import { getDaysRemaining, isSubscriptionActive } from "@/lib/utils/helpers";
 import { toast } from "sonner";
 
 export const Billing = ({
   reference,
-  isCreditExpired,
 }: {
   reference: string;
-  isCreditExpired: boolean;
 }) => {
   const { data: user } = useQuery(userQueries.detail());
   const [completed, setCompleted] = useState(Boolean(user?.isProUser) || false);
@@ -25,11 +23,22 @@ export const Billing = ({
     setShowPlan(value);
   };
 
+  console.log(user)
+
   const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
   const remainingDays = getDaysRemaining(user?.currentPeriodEnd ?? null);
   const REFERRAL = `${APP_URL}/register?referral=${
     user?.referralCode ?? "EXA0Q4YZ"
   }`;
+
+     const hasActiveSubscription = isSubscriptionActive(user?.currentPeriodEnd);
+
+
+  console.log("REmaining days: ", remainingDays);
+  console.log("hasActiveSubscription: ", hasActiveSubscription);
+  console.log("user?.currentPeriodEnd: ", user?.currentPeriodEnd);
+  console.log("user?.isProUser: ", user?.isProUser);
+  console.log("user?.creditBalance: ", user?.creditBalance);
   const usersReferred = user?.referralCount || user?.usersReferred?.length || 0;
 
   const handleReferralCopy = () => {
@@ -41,9 +50,7 @@ export const Billing = ({
     setCompleted(Boolean(user?.isProUser));
   }, [user?.isProUser]);
 
-  // useEffect(() => {
-  //   startConfetti();
-  // }, []);
+  const heading = user?.accountTier === "none" ? "You're on a Free Trial" : `You're on the ${user?.accountTier} plan`;
 
   return !completed ? (
     showPlan ? (
@@ -53,49 +60,47 @@ export const Billing = ({
         handleShowPlan={handleShowPlan}
       />
     ) : (
-      <div className="flex flex-col items-center max-w-5xl mx-auto gap-[30px] relative ">
-        <section className="bg-gradient-to-b space-y-4 from-[#FF9A56] to-[#FF6B35] rounded-[12px] w-full p-4 sm:p-8">
+      <div className="flex flex-col items-center max-w-5xl mx-auto gap-7.5 relative ">
+        <section className="bg-linear-to-b space-y-4 from-[#FF9A56] to-[#FF6B35] rounded-[12px] w-full p-4 sm:p-8">
           <div className="flex gap-4 justify-between w-full">
             <div className="text-white space-y-2">
               <h1 className="font-semibold font-inter sm:text-2xl">
-                {isCreditExpired
-                  ? "You've used up your free credits"
-                  : "Free Trial"}
+                {heading}
               </h1>
               <p className="text-white/80 ">
                 Explore all features with your trial period
               </p>
             </div>
-            {isCreditExpired
+            {hasActiveSubscription
               ? null
               : Number(remainingDays) > 0 && (
-                  <div className="flex shrink-0 flex-col justify-center items-center gap-[4px] w-[97.67px] h-[81px] bg-[rgba(255,255,255,0.2)] rounded-[8px]">
-                    <p className="font-inter text-center font-semibold text-[32px] leading-[32px] text-white">
+                  <div className="flex shrink-0 flex-col justify-center items-center gap-1 w-[97.67px] h-20.25 bg-[rgba(255,255,255,0.2)] rounded-xl">
+                    <p className="font-inter text-center font-semibold text-[32px] leading-8 text-white">
                       {remainingDays}
                     </p>
-                    <p className="font-inter font-medium text-[14px] leading-[21px] text-center text-white">
+                    <p className="font-inter font-medium text-[14px] leading-5.25 text-center text-white">
                       day{Number(remainingDays) > 1 && "s"} left
                     </p>
                   </div>
                 )}
           </div>
           <div className="flex flex-wrap items-center  gap-4 relative">
-            <div className="flex flex-col items-start gap-[4px]">
-              {isCreditExpired ? null : (
+            <div className="flex flex-col items-start gap-1">
+              {hasActiveSubscription ? null : (
                 <p className="relative">
-                  <span className=" font-['Inter'] font-medium text-[14px] leading-[21px] text-white">
-                    {isCreditExpired
-                      ? "Your trial has expired"
+                  <span className=" font-['Inter'] font-medium text-[14px] leading-5.25 text-white">
+                    {hasActiveSubscription
+                      ? "You're on a Pro plan"
                       : "Upgrade to Pro or refer 5 people to continue enjoying all the features from Cver AI."}
                   </span>
                 </p>
               )}
               <p className=" opacity-80 relative max-sm:text-2xs">
-                <span className="font-inter font-normal text-[12px] leading-[18px] text-white">
+                <span className="font-inter font-normal text-[12px] leading-4.5 text-white">
                   Upgrade now or refer friends to extend your access. In the
                   main time you have{" "}
                   <span className="font-bold underline">
-                    {user?.creditBalance ?? 0} credits {isCreditExpired && "(expired)"}
+                    {user?.creditBalance ?? 0} credits {hasActiveSubscription && "(active)"}
                   </span>
                 </span>
               </p>
@@ -106,20 +111,20 @@ export const Billing = ({
         <main className="flex justify-between items-center gap-4 bg-white border w-full p-4 sm:p-8 rounded-[12px] text-white font-inter">
           <div className="w-full space-y-4">
             <div className="space-y-1">
-              <p className=" font-semibold text-[18px] leading-[27px] text-[#344054]">
+              <p className=" font-semibold text-[18px] leading-6.75 text-[#344054]">
                 Referral Program
               </p>
-              <p className=" font-normal text-[14px] leading-[21px] text-[#667085]">
+              <p className=" font-normal text-[14px] leading-5.25 text-[#667085]">
                 Refer 5 friends to unlock 7 extra days of access
               </p>
             </div>
             <section className="">
-              <p className=" font-medium text-[14px] leading-[21px] text-[#344054]">
+              <p className=" font-medium text-[14px] leading-5.25 text-[#344054]">
                 Your Referral Code
               </p>
               <div className="flex flex-col sm:flex-row justify-between gap-4">
-                <div className="box-border flex flex-col justify-center p-2 px-4 w-full bg-[#F9FAFB] border border-[#D0D5DD] rounded-[8px]">
-                  <p className="font-semibold text-xs md:text-[16px] leading-[24px] text-[#101828] tracking-[0.8px]">
+                <div className="box-border flex flex-col justify-center p-2 px-4 w-full bg-[#F9FAFB] border border-[#D0D5DD] rounded-xl">
+                  <p className="font-semibold text-xs md:text-[16px] leading-6 text-[#101828] tracking-[0.8px]">
                     {REFERRAL}
                   </p>
                 </div>
@@ -131,19 +136,19 @@ export const Billing = ({
             <section className="">
               <div className="flex space-y-2 flex-row justify-between items-center relative">
                 <p className=" relative">
-                  <span className="font-inter font-medium text-[14px] leading-[21px] text-[#344054]">
+                  <span className="font-inter font-medium text-[14px] leading-5.25 text-[#344054]">
                     Referral Progress
                   </span>
                 </p>
                 <p className=" relative">
-                  <span className="font-inter font-semibold text-[14px] leading-[21px] text-[#4680EE]">
+                  <span className="font-inter font-semibold text-[14px] leading-5.25 text-[#4680EE]">
                     {usersReferred} of 5 completed
                   </span>
                 </p>
               </div>
-              <div className="flex items-center w-full h-[10px] bg-[#E5E7EB] rounded-full relative">
+              <div className="flex items-center w-full h-2.5 bg-[#E5E7EB] rounded-full relative">
                 <div
-                  className="h-[10px] bg-[#4680EE] rounded-full"
+                  className="h-2.5 bg-[#4680EE] rounded-full"
                   style={{
                     width: `${Math.min(
                       usersReferred * 10 + (usersReferred > 0 ? 50 : 2),
@@ -153,21 +158,21 @@ export const Billing = ({
                 />
               </div>
 
-              <p className="font-['Inter'] mt-3 font-normal text-[12px] leading-[18px] text-[#667085] ">
+              <p className="font-['Inter'] mt-3 font-normal text-[12px] leading-4.5 text-[#667085] ">
                 {5 - usersReferred} more referrals needed to unlock 7 extra days
               </p>
             </section>
 
             <section className="">
-              <div className="box-border flex flex-row items-start gap-[12px] p-4  bg-[#EFF6FF] border border-[#BEDBFF] rounded-[8px]">
-                <div className="flex flex-col items-start gap-[4px] relative">
+              <div className="box-border flex flex-row items-start gap-3 p-4  bg-[#EFF6FF] border border-[#BEDBFF] rounded-xl">
+                <div className="flex flex-col items-start gap-1 relative">
                   <p className="relative flex gap-2 items-center">
                     <Info className="text-blue-500 size-5 " />
-                    <span className=" font-['Inter'] font-medium text-[13px] leading-[20px] text-[#344054]">
+                    <span className=" font-['Inter'] font-medium text-[13px] leading-5 text-[#344054]">
                       How referrals work
                     </span>
                   </p>
-                  <p className="ml-6 font-['Inter'] font-normal text-[12px] leading-[18px] text-[#667085]">
+                  <p className="ml-6 font-['Inter'] font-normal text-[12px] leading-4.5 text-[#667085]">
                     Share your code with friends. When 5 people sign up using
                     your code during your trial, you&apos;ll receive 7 extra
                     days of access
@@ -177,12 +182,12 @@ export const Billing = ({
             </section>
           </div>
         </main>
-        <main className="flex flex-col sm:flex-row justify-between items-center gap-4 bg-gradient-to-b w-full p-4 sm:p-8 from-[#4680EE] to-[#3A6FD4] rounded-[12px] text-white font-inter">
+        <main className="flex flex-col sm:flex-row justify-between items-center gap-4 bg-linear-to-b w-full p-4 sm:p-8 from-[#4680EE] to-[#3A6FD4] rounded-[12px] text-white font-inter">
           <div className="w-full">
-            <p className="font-semibold text-[20px] leading-[30px]">
+            <p className="font-semibold text-[20px] leading-7.5">
               Ready to Upgrade?
             </p>
-            <p className="font-normal text-[14px] leading-[21px]">
+            <p className="font-normal text-[14px] leading-5.25">
               Get unlimited access with a paid subscription
             </p>
           </div>

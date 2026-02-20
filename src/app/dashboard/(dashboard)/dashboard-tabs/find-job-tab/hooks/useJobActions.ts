@@ -5,13 +5,13 @@ import { useRouter } from "next/navigation";
 import { useCallback } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { apiService } from "@/hooks/use-auth";
 import {
   useUpdateJobApplicationHistoryMutation,
   useUpdateJobMutation,
 } from "@/lib/mutations/jobs.mutations";
 import type { JobType } from "@/types";
 import { BOOKMARK_IDS_QUERY_KEY } from "./useBookmarkedJobIds";
+import { gmailApi } from "@/lib/api/gmail.api";
 
 /**
  * Encapsulates all job interaction side-effects (bookmark, apply).
@@ -61,8 +61,8 @@ export function useJobActions() {
           return;
         }
 
-        const { authorized } = await apiService.gmailOauthStatus();
-
+      const { data } = await gmailApi.checkAuthStatus();
+      const authorized = data?.authorized;
         if (!authorized) {
           toast.error(
             "✨ Go to Settings and authorize Cver AI to send emails on your behalf.",

@@ -10,13 +10,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/hooks/use-auth";
 import { useQuery } from "@tanstack/react-query";
 import { userQueries } from "@module/user";
 import { api } from "@/lib/api/client";
+import { authApi } from "@/lib/api/auth.api";
 
 export const UserMenu = () => {
-  const { logout } = useAuth();
   const { data: user } = useQuery(userQueries.detail());
   const router = useRouter();
 
@@ -42,7 +41,7 @@ export const UserMenu = () => {
             <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => logout()}>
+          <DropdownMenuItem onClick={() => authApi.logout()}>
             Log out
             <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
           </DropdownMenuItem>

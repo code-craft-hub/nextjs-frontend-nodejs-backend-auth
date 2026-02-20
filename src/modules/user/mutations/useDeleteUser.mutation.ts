@@ -22,7 +22,7 @@ export function useDeleteUserMutation() {
           if (!old) return old;
           return {
             ...old,
-            data: old.data.filter((user) => user.uid !== id),
+            data: old.data.filter((user) => user.id !== id),
             total: old.total - 1,
           };
         },

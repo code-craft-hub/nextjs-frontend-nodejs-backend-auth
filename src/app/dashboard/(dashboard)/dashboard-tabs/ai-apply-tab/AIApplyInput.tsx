@@ -27,12 +27,12 @@ import { UploadedFile } from "@/types";
 import { cn } from "@/lib/utils";
 import { useDocumentExtraction } from "@/app/onboarding/onboarding-pages/AnyFormatToText";
 import { isEmpty } from "lodash";
-import { apiService } from "@/hooks/use-auth";
 import { Separator } from "@/components/ui/separator";
 import { userQueries } from "@module/user";
 import { useQuery } from "@tanstack/react-query";
 import JoinOurTelegramGroupAlert from "@/components/shared/JoinOurTelegramGroupAlert";
 import { buildAutoApplyStartUrl } from "@/lib/utils/ai-apply-navigation";
+import { gmailApi } from "@/lib/api/gmail.api";
 
 const FORM_SCHEMA = z.object({
   jobDescription: z.string().min(2, {
@@ -101,7 +101,8 @@ export const AIApplyInput = memo(
           [];
 
         if (user?.email) {
-          const { authorized } = await apiService.gmailOauthStatus();
+          const { data } = await gmailApi.checkAuthStatus();
+          const authorized = data?.authorized;
 
           if (!authorized) {
             toast(
@@ -137,10 +138,7 @@ export const AIApplyInput = memo(
 
         // Route to tailor cover letter with "pending" placeholder ID
         // The backend will generate the actual documentId
-        const startUrl = buildAutoApplyStartUrl(
-          fullJobDescription,
-          recruiter,
-        );
+        const startUrl = buildAutoApplyStartUrl(fullJobDescription, recruiter);
         router.push(startUrl);
       },
       [router, extractedText, user?.email],

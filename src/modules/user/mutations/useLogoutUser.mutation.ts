@@ -2,4 +2,4 @@
  * Re-exported from the canonical auth module.
  * Import directly from "@module/auth" in new code.
  */
-export { authQueries } from "@module/auth";
+export { useLogoutMutation as useLogoutUserMutation } from "@module/auth";

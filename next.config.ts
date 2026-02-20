@@ -25,6 +25,8 @@ export default isDev ? nextConfig : withSentryConfig(nextConfig, {
 
   org: "cverai",
 
+
+
   project: "cverai-nextjs-frontend",
 
   // Only print logs for uploading source maps in CI

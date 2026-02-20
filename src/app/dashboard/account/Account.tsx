@@ -10,13 +10,9 @@ import { userQueries } from "@module/user";
 import { sendGTMEvent } from "@next/third-parties/google";
 import { useFireworksConfetti } from "@/components/ui/confetti";
 import { Button } from "@/components/ui/button";
-import { apiService } from "@/hooks/use-auth";
 import { CompletedPaymentModal } from "@/components/shared/CompletedPaymentModal";
+import { useDeleteAccountMutation } from "@module/auth";
 
-// InsufficientCreditsModal is intentionally NOT rendered on the account/billing page.
-// The billing page is where users go TO resolve an expired plan, so blocking them
-// with a modal here would prevent them from upgrading. It should only appear on
-// feature pages (resume builder, auto-apply, etc.) where the action requires credits.
 
 export const AccountClient = ({
   tab,
@@ -33,16 +29,10 @@ export const AccountClient = ({
 
   const { start: startConfetti } = useFireworksConfetti();
 
-  // A user is on a "free trial" / expired plan when:
-  // - They are not a pro user, OR
-  // - Their subscription period has ended.
-  // Source of truth: server-provided `currentPeriodEnd` from userSubscriptions table.
-  const isCreditExpired =
-    !user?.isProUser ||
-    user?.currentPeriodEnd === null ||
-    new Date(user?.currentPeriodEnd ?? "") < new Date();
+ 
 
   const isDevMode = process.env.NODE_ENV === "development";
+  const deleteAccount = useDeleteAccountMutation();
 
   useEffect(() => {
     if (user?.firstName) {
@@ -91,14 +81,15 @@ export const AccountClient = ({
       {currentTab === "account" || currentTab === undefined ? (
         <UserProfileForm />
       ) : currentTab === "billing" ? (
-        <Billing reference={reference} isCreditExpired={isCreditExpired} />
+        <Billing reference={reference} />
       ) : (
         <PasswordUpdateForm />
       )}
 
       {isDevMode && (
         <Button
-          onClick={() => apiService.deleteUser()}
+          onClick={() => deleteAccount.mutate()}
+          disabled={deleteAccount.isPending}
           variant="destructive"
         >
           Delete Account

@@ -1,9 +1,9 @@
 import { useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { apiService } from "@/hooks/use-auth";
 import { JobType } from "@/types";
 import { buildAutoApplyStartUrl } from "@/lib/utils/ai-apply-navigation";
+import { gmailApi } from "@/lib/api/gmail.api";
 
 export function useJobActions() {
   const router = useRouter();
@@ -15,7 +15,8 @@ export function useJobActions() {
         return;
       }
 
-      const { authorized } = await apiService.gmailOauthStatus();
+      const { data } = await gmailApi.checkAuthStatus();
+      const authorized = data?.authorized;
 
       if (!authorized) {
         toast.error(
@@ -33,7 +34,7 @@ export function useJobActions() {
         );
         return;
       }
-      
+
       const startUrl = buildAutoApplyStartUrl(
         job.descriptionText || "",
         job.emailApply || "",
