@@ -1,11 +1,10 @@
 // lib/api/interview.api.ts
 import { InterviewQuestion } from "@/types";
-import { api } from "./client";
+import { api, BACKEND_API_VERSION } from "./client";
 import type {
   PaginatedResponse,
   PaginationParams,
 } from "@/lib/types";
-import { BACKEND_API_VERSION } from "./profile.api";
 
 
 export interface CreateInterviewQuestionData {

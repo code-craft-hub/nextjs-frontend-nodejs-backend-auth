@@ -1,5 +1,4 @@
-import { api } from "@/lib/api/client";
-import { BACKEND_API_VERSION } from "@/lib/api/profile.api";
+import { api, BACKEND_API_VERSION } from "@/lib/api/client";
 
 export interface OnboardingStep1Data {
   country: string;

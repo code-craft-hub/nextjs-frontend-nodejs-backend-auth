@@ -1,7 +1,5 @@
 import { ProfileData, ProfileResponse } from "../types";
-import { api } from "./client";
-
-export const BACKEND_API_VERSION = "v1";
+import { api, BACKEND_API_VERSION } from "./client";
 
 // API functions
 export const profileApi = {

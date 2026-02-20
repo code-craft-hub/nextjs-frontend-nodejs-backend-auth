@@ -1,10 +1,9 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
-import { BASEURL } from "@/lib/api/client";
-import { BACKEND_API_VERSION } from "@/lib/api/profile.api";
+import { API_URL } from "@/lib/api/client";
 
-const API_URL = `${BASEURL}/${BACKEND_API_VERSION}/cover-letters/stream`;
+const APP_API_URL = `${API_URL}/cover-letters/stream`;
 
 export interface StreamState {
   title: string;
@@ -37,7 +36,7 @@ export function useCoverLetterStream() {
       abortRef.current = new AbortController();
 
       try {
-        const response = await fetch(API_URL, {
+        const response = await fetch(APP_API_URL, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

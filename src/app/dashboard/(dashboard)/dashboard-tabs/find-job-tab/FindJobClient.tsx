@@ -1,182 +1,187 @@
-import { ArrowRight, Loader2 } from "lucide-react";
+"use client";
+
+import { Loader2, Search, X } from "lucide-react";
 import {
-  ColumnFiltersState,
+  ColumnDef,
   flexRender,
   getCoreRowModel,
-  getFilteredRowModel,
   getSortedRowModel,
   SortingState,
   useReactTable,
-  VisibilityState,
 } from "@tanstack/react-table";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
-import { JobType } from "@/types";
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import type { JobType } from "@/types";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { jobsQueries } from "@/lib/queries/jobs.queries";
-import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useState,
+  useDeferredValue,
+} from "react";
 import { Button } from "@/components/ui/button";
-import { JobFilters } from "@/lib/types/jobs";
+import type { JobFilters } from "@/lib/types/jobs";
 import { ReportCard } from "@/app/dashboard/jobs/components/ReportCard";
-import JobSearchInput from "@/components/shared/JobSearchInput";
-import { userQueries } from "@module/user";
-import { getDataSource } from "@/lib/utils/helpers";
-import { jobMatcher } from "@/services/job-matcher";
 import { useRouter } from "next/navigation";
 import MobileFindJob from "./MobileFindJob";
+import { useBookmarkedJobIds } from "./hooks/useBookmarkedJobIds";
 
-export default function JobDashboard({
-  hideToMenus,
-  initialJobs,
-  fingJobsColumns,
-  filters,
-}: {
-  initialJobs: JobType[];
-  fingJobsColumns: any;
+interface FindJobClientProps {
+  columns: ColumnDef<JobType>[];
   filters: Omit<JobFilters, "page">;
   hideToMenus?: boolean;
-}) {
+}
+
+export default function FindJobClient({
+  columns,
+  filters,
+  hideToMenus,
+}: FindJobClientProps) {
+  const router = useRouter();
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = useState({});
-  const [searchValue, setSearchValue] = useState(() => {
-    return filters;
-  });
-  const [isAutoFetching, setIsAutoFetching] = useState(false);
-  const totalScoreRef = useRef<number>(0);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchFilters, setSearchFilters] =
+    useState<Omit<JobFilters, "page">>(filters);
+
+  /**
+   * useDeferredValue schedules the filter computation at low React priority so
+   * the input stays lag-free even with thousands of jobs in memory. The UI
+   * shows the previous filtered list while the deferred computation runs — no
+   * artificial debounce delay, just React's concurrent scheduler.
+   */
+  const deferredQuery = useDeferredValue(searchQuery);
+  const isSearchPending = searchQuery !== deferredQuery;
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
-    useInfiniteQuery(jobsQueries.infinite(searchValue));
+    useInfiniteQuery(jobsQueries.infinite(searchFilters));
 
-  const { data: user } = useQuery(userQueries.detail());
-  const userDataSource = getDataSource(user);
-  const userJobTitlePreference =
-    userDataSource?.key || userDataSource?.title || "";
+  /**
+   * Lightweight query: fetches bookmark record IDs only (not full job objects).
+   * bookmarkedJobs / appliedJobs are no longer stored on the user document —
+   * they live in their own tables with dedicated APIs.
+   */
+  const bookmarkedIds = useBookmarkedJobIds();
 
+  /**
+   * Debounce: 300ms after the user stops typing, push the search term into
+   * searchFilters to trigger a fresh server-side ilike query. React Query
+   * caches by key, so re-typing a previous query reuses cached results.
+   */
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setSearchFilters((prev) => ({
+        ...prev,
+        title: searchQuery.trim() || undefined,
+      }));
+    }, 300);
+    return () => clearTimeout(timeout);
+  }, [searchQuery]);
+
+  /**
+   * Flatten API pages and decorate each job with its bookmark state.
+   * isBookmarked is derived from the dedicated bookmarks API (useBookmarkedJobIds),
+   * not from the user document which no longer carries these arrays.
+   */
   const allJobs = useMemo(() => {
-    const bookmarkedIdSet = new Set(user?.bookmarkedJobs || []);
-    const scores = [];
-    const appliedJobsIdSet = new Set(
-      user?.appliedJobs?.map((job) => job.id) || []
-    );
     const jobs = data?.pages.flatMap((page) => page.data) ?? [];
-    const jobData = jobs
-      .map((job) => {
-        const jobContent = job?.title + " " + job?.descriptionText;
+    return jobs.map((job) => ({
+      ...job,
+      isBookmarked: bookmarkedIds.has(job.id),
+    }));
+  }, [data, bookmarkedIds]);
 
-        const completeMatch = jobMatcher.calculateMatch(
-          userJobTitlePreference,
-          jobContent || ""
-        );
-
-        if (completeMatch.score >= 50) {
-          scores.push(completeMatch.score);
-        }
-        return {
-          ...job,
-          isBookmarked: bookmarkedIdSet.has(job.id),
-          isApplied: appliedJobsIdSet.has(job.id),
-          matchPercentage: completeMatch.score.toString(),
-          matchDetails: completeMatch,
-        };
-      })
-      .sort((a, b) => {
-        return parseInt(b.matchPercentage) - parseInt(a.matchPercentage);
-      });
-
-    totalScoreRef.current = scores.length;
-    return jobData;
-  }, [
-    data,
-    initialJobs,
-    user?.bookmarkedJobs?.length,
-    user?.appliedJobs?.length,
-  ]);
+  /**
+   * Instant local filter powered by the deferred search query.
+   * Searches title, company name, and location so users can find a job
+   * regardless of which field they know. The computation is non-blocking
+   * because it's driven by deferredQuery (low-priority concurrent update).
+   */
+  const filteredJobs = useMemo(() => {
+    const q = deferredQuery.trim().toLowerCase();
+    if (!q) return allJobs;
+    return allJobs.filter(
+      (job) =>
+        job.title?.toLowerCase().includes(q) ||
+        job.companyName?.toLowerCase().includes(q) ||
+        job.location?.toLowerCase().includes(q)
+    );
+  }, [allJobs, deferredQuery]);
 
   const table = useReactTable({
-    data: allJobs,
-    columns: fingJobsColumns,
+    data: filteredJobs,
+    columns,
     onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: setRowSelection,
-    state: {
-      sorting,
-      columnFilters,
-      columnVisibility,
-      rowSelection,
-    },
+    state: { sorting },
   });
 
+  /**
+   * Auto-fetch: when the current pages have no local matches for the active
+   * query, silently fetch the next page. Because searchFilters.title is already
+   * updated (debounced), the server returns pre-filtered results — each page
+   * load is meaningful rather than wasted traffic.
+   */
+  const filteredCount = filteredJobs.length;
+
   useEffect(() => {
-    const checkAndFetchMore = async () => {
-      const currentSearchValue = table
-        .getColumn("title")
-        ?.getFilterValue() as string;
-
-      if (!currentSearchValue || currentSearchValue.trim() === "") {
-        setIsAutoFetching(false);
-        return;
-      }
-
-      const filteredRows = table.getFilteredRowModel().rows;
-
-      if (filteredRows.length === 0 && hasNextPage && !isFetchingNextPage) {
-        setIsAutoFetching(true);
-        await fetchNextPage();
-      } else {
-        setIsAutoFetching(false);
-      }
-    };
-    checkAndFetchMore();
+    if (!deferredQuery.trim() || isFetchingNextPage || !hasNextPage) return;
+    if (filteredCount === 0) fetchNextPage();
   }, [
-    table.getColumn("title")?.getFilterValue(),
-    table.getFilteredRowModel().rows.length,
+    deferredQuery,
+    filteredCount,
     hasNextPage,
     isFetchingNextPage,
     fetchNextPage,
   ]);
 
   const visibleRows = table.getRowModel().rows;
-  const hasNoResults = visibleRows.length === 0;
-
-  const handleSearchSubmit = (data: any) => {
-    setSearchValue((prev) => ({ ...prev, title: data }));
-  };
-
-  const router = useRouter();
 
   return (
     <div className="w-full flex flex-col gap-6">
-      {!hideToMenus && <ReportCard matchPercentage={totalScoreRef.current} />}
-      <JobSearchInput table={table} handleSearchSubmit={handleSearchSubmit} />
-      <div className="flex flex-col gap-4">
-        <div className="flex justify-between">
-          <div className="">All Jobs</div>
-          <p className="text-xs flex gap-1 text-gray-400">
-            <span className="">View all</span>
-            <ArrowRight className="size-4" />
-          </p>
-        </div>
+      {!hideToMenus && <ReportCard />}
+
+      {/* Instant search input */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-gray-400 pointer-events-none" />
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Search by title, company, or location..."
+          className="w-full pl-9 pr-9 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+        />
+        {searchQuery && !isSearchPending && (
+          <button
+            onClick={() => setSearchQuery("")}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+          >
+            <X className="size-4" />
+          </button>
+        )}
+        {isSearchPending && (
+          <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 size-4 animate-spin text-gray-400 pointer-events-none" />
+        )}
       </div>
 
+      <span className="text-sm text-gray-500">
+        {filteredCount > 0 ? `${filteredCount} jobs` : "All Jobs"}
+      </span>
+
+      {/* Desktop table — hidden below lg */}
       <div className="hidden lg:grid grid-cols-1">
         <Table>
           <TableBody>
-            {visibleRows.length ? (
+            {visibleRows.length > 0 ? (
               visibleRows.map((row) => (
                 <TableRow
-                  onClick={() => {
+                  key={row.id}
+                  className="hover:bg-white border-b hover:border-primary hover:border-2 hover:rounded-2xl hover:cursor-pointer"
+                  onClick={() =>
                     router.push(
                       `/dashboard/jobs/${row.original.id}?referrer=dashboard&title=${row.original.title}`
-                    );
-                  }}
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                  className="hover:bg-white border-b !rounded-3xl hover:border-primary hover:border-[2px] hover:rounded-2xl hover:cursor-pointer"
+                    )
+                  }
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
@@ -191,18 +196,18 @@ export default function JobDashboard({
             ) : (
               <TableRow>
                 <TableCell
-                  colSpan={fingJobsColumns.length}
+                  colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  {isLoading ? (
+                  {isLoading || isFetchingNextPage ? (
                     <div className="flex items-center justify-center gap-2">
                       <Loader2 className="h-4 w-4 animate-spin" />
-                      <span>Searching for matching jobs...</span>
+                      <span>Searching for jobs...</span>
                     </div>
-                  ) : hasNoResults && !hasNextPage ? (
-                    <span>No results found. All data has been searched.</span>
+                  ) : !hasNextPage ? (
+                    <span>No results found.</span>
                   ) : (
-                    <span>No results.</span>
+                    <span>Loading...</span>
                   )}
                 </TableCell>
               </TableRow>
@@ -210,8 +215,11 @@ export default function JobDashboard({
           </TableBody>
         </Table>
       </div>
-      <MobileFindJob allJobs={allJobs} />
-      {hasNextPage && !isAutoFetching && (
+
+      {/* Mobile card list — visible below lg */}
+      <MobileFindJob allJobs={filteredJobs} />
+
+      {hasNextPage && (
         <div className="flex justify-center">
           <Button
             onClick={() => fetchNextPage()}

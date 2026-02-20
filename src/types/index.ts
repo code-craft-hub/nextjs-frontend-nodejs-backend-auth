@@ -145,14 +145,7 @@ export interface IUser {
   website?: string;
   portfolio?: string;
   profile: string;
-  recommendationsData?: any[];
-  appliedJobs?: { id: string; appliedDate: string }[];
-  analytics?: {
-    totalApplications: number;
-    totalResumes: number;
-    totalCoverLetters: number;
-    totalInterviewQuestions: number;
-  };
+  recommendationsData?: any[]
   createdAt?: string | Date;
   updatedAt?: string | Date;
 }

@@ -1,9 +1,8 @@
 // lib/api/jobs.api.ts
 import { JobType } from "@/types";
-import { api } from "./client";
+import { api, BACKEND_API_VERSION } from "./client";
 import type { PaginatedResponse } from "@/lib/types";
 import type { RecommendationsResponse } from "@/app/dashboard/(dashboard)/components/recent-activity/types";
-import { BACKEND_API_VERSION } from "./profile.api";
 
 export const jobsApi = {
   // Get all jobs with advanced filtering

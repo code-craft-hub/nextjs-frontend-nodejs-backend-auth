@@ -1,11 +1,10 @@
 // lib/api/cover-letters.api.ts
 import { CoverLetter } from "@/types";
-import { api } from "./client";
+import { api, BACKEND_API_VERSION } from "./client";
 import type {
   PaginatedResponse,
   PaginationParams,
 } from "@/lib/types";
-import { BACKEND_API_VERSION } from "./profile.api";
 
 export interface CreateCoverLetterData {
   title: string;

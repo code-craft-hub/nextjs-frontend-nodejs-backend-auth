@@ -1,11 +1,7 @@
-import { Toggle } from "@/components/ui/toggle";
-import { apiService } from "@/hooks/use-auth";
-import {
-  useUpdateJobApplicationHistoryMutation,
-  useUpdateJobMutation,
-} from "@/lib/mutations/jobs.mutations";
-import { formatAppliedDate } from "@/lib/utils/helpers";
-import { JobType } from "@/types";
+"use client";
+
+import { memo } from "react";
+import { useRouter } from "next/navigation";
 import {
   ArrowRight,
   BookmarkIcon,
@@ -14,175 +10,117 @@ import {
   MapPin,
   Sparkles,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
-import  { memo } from "react";
-import { toast } from "sonner";
-import { v4 as uuidv4 } from "uuid";
+import { Toggle } from "@/components/ui/toggle";
+import { formatAppliedDate } from "@/lib/utils/helpers";
+import type { JobType } from "@/types";
+import { useJobActions } from "./hooks/useJobActions";
 
 const MobileFindJob = memo(({ allJobs }: { allJobs: JobType[] }) => {
-  const updateJobApplicationHistory = useUpdateJobApplicationHistoryMutation();
-
-  const updateJobs = useUpdateJobMutation();
-  const handleApply = async ({ event, job }: { event: any; job: JobType }) => {
-    event.preventDefault();
-    event.stopPropagation();
-    if (!job.emailApply) {
-      updateJobApplicationHistory.mutate({
-        id: String(job.id),
-        data: {
-          appliedJobs: job.id,
-        },
-      });
-      window.open(!!job.applyUrl ? job.applyUrl : job.link, "__blank");
-      return;
-    }
-
-    const { authorized } = await apiService.gmailOauthStatus();
-
-    if (!authorized) {
-      toast.error(
-        "✨ Go to the Settings page and enable authorization for Cver AI to send emails on your behalf. This option is located in the second card.",
-        {
-          action: {
-            label: "Authorize now",
-            onClick: () =>
-              router.push(`/dashboard/settings?tab=ai-applypreference`),
-          },
-          classNames: {
-            actionButton: "!bg-blue-600 hover:!bg-blue-700 !text-white !h-8",
-          },
-        }
-      );
-      return;
-    }
-
-    const params = new URLSearchParams();
-    params.set("jobDescription", JSON.stringify(job.descriptionText || ""));
-    params.set("recruiterEmail", encodeURIComponent(job.emailApply));
-
-    updateJobApplicationHistory.mutate({
-      id: String(job.id),
-      data: {
-        appliedJobs: job.id,
-      },
-    });
-    router.push(
-      `/dashboard/tailor-cover-letter/${uuidv4()}?${params}&aiApply=true`
-    );
-  };
   const router = useRouter();
+  const { handleBookmark, handleApply } = useJobActions();
+
   return (
     <div className="space-y-4 lg:hidden">
-      {allJobs.map((job) => {
-        const isBookmarked = job.isBookmarked || false;
-        return (
-          <div
-            key={job.id}
-            className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow"
-            onClick={() => {
-              router.push(
-                `/dashboard/jobs/${job?.id}?referrer=jobs&title=${job?.title}`
-              );
-            }}
-          >
-            <div className="flex items-start gap-4">
-              <div className="shrink-0 h-full  flex items-center justify-center">
-                <img
-                  src={!!job.companyLogo ? job.companyLogo : "/placeholder.jpg"}
-                  alt={job.company}
-                  className="w-10 h-10 object-contain"
-                />
-              </div>
-              <div className="flex-1">
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex items-center gap-3">
-                    <h2 className="text-sm font-semibold text-gray-900 capitalize break-words">
-                      {job.title}
-                    </h2>
-                    <span className="px-3 hidden sm:flex py-1 bg-blue-50 text-blue-600 text-2xs text-nowrap sm:text-xs rounded-full">
-                      {job.employmentType || job.jobType}
-                    </span>
-                  </div>
-                  <div
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      updateJobs.mutate({
-                        id: String(job.id),
-                        data: {
-                          isBookmarked: !isBookmarked,
-                        },
-                      });
-                    }}
-                    className="flex justify-end -mt-2 -mr-2"
-                  >
-                    <Toggle
-                      pressed={isBookmarked || false}
-                      aria-label="Toggle bookmark"
-                      size="sm"
-                      // variant="outline"
-                      className="data-[state=on]:bg-transparent data-[state=on]:*:[svg]:fill-black data-[state=on]:*:[svg]:stroke-black"
-                    >
-                      <BookmarkIcon />
-                    </Toggle>
-                  </div>
-                </div>
+      {allJobs.map((job) => (
+        <div
+          key={job.id}
+          className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow"
+          onClick={() =>
+            router.push(
+              `/dashboard/jobs/${job.id}?referrer=jobs&title=${job.title}`
+            )
+          }
+        >
+          <div className="flex items-start gap-4">
+            <div className="shrink-0 flex items-center justify-center">
+              <img
+                src={job.companyLogo || "/placeholder.jpg"}
+                alt={job.company}
+                className="w-10 h-10 object-contain"
+              />
+            </div>
 
-                <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-3">
-                  <div className="flex items-center gap-1">
-                    <MapPin className="size-3 shrink-0" />
-                    <span className="text-xs">{job.location}</span>
-                  </div>
-                  {!!job?.salary && (
-                    <div className="flex items-center gap-1">
-                      <DollarSign className="size-3" />
-                      <span className="text-xs">{job.salary}</span>
-                    </div>
-                  )}
-                  <div className="flex items-center gap-1">
-                    <Calendar className="size-3" />
-                    <span className="text-xs text-nowrap">
-                      {formatAppliedDate(
-                        job?.scrapedAt || job?.postedAt || job?.updatedAt
-                      )}
-                    </span>
-                  </div>
-                  <span className="px-3 sm:hidden py-1 bg-blue-50 text-blue-600 text-2xs text-nowrap sm:text-xs rounded-full">
+            <div className="flex-1">
+              <div className="flex items-start justify-between mb-3">
+                <div className="flex items-center gap-3">
+                  <h2 className="text-sm font-semibold text-gray-900 capitalize wrap-break-word">
+                    {job.title}
+                  </h2>
+                  <span className="px-3 hidden sm:flex py-1 bg-blue-50 text-blue-600 text-2xs text-nowrap sm:text-xs rounded-full">
                     {job.employmentType || job.jobType}
                   </span>
                 </div>
 
-                <div className="flex items-center justify-between">
-                  {Number(job?.matchPercentage || 0) > 40 && (
-                    <div className="flex items-center gap-1 text-green-600 text-xs font-medium">
-                      <span>%</span>
-                      <span>{job.matchPercentage} match</span>
-                    </div>
-                  )}
-                  <button
-                    onClick={(event) => {
-                      handleApply({ event, job });
-                    }}
-                    className=" bg-blue-50 text-blue-600 px-2 py-2 text-2xs rounded-lg hover:bg-blue-100 transition-colors flex items-center gap-2 font-medium"
+                <div
+                  className="flex justify-end -mt-2 -mr-2"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleBookmark(job);
+                  }}
+                >
+                  <Toggle
+                    pressed={job.isBookmarked}
+                    aria-label="Toggle bookmark"
+                    size="sm"
+                    className="data-[state=on]:bg-transparent data-[state=on]:*:[svg]:fill-black data-[state=on]:*:[svg]:stroke-black"
                   >
-                    {job?.emailApply ? (
-                      <>
-                        Auto Apply
-                        <Sparkles className="size-3 text-blue-500" />
-                      </>
-                    ) : (
-                      <>
-                        Apply Now
-                        <ArrowRight className="size-3" />
-                      </>
-                    )}
-                  </button>
+                    <BookmarkIcon />
+                  </Toggle>
                 </div>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-3">
+                <div className="flex items-center gap-1">
+                  <MapPin className="size-3 shrink-0" />
+                  <span className="text-xs">{job.location}</span>
+                </div>
+                {!!job.salary && (
+                  <div className="flex items-center gap-1">
+                    <DollarSign className="size-3" />
+                    <span className="text-xs">{job.salary}</span>
+                  </div>
+                )}
+                <div className="flex items-center gap-1">
+                  <Calendar className="size-3" />
+                  <span className="text-xs text-nowrap">
+                    {formatAppliedDate(
+                      job.scrapedAt || job.postedAt || job.updatedAt
+                    )}
+                  </span>
+                </div>
+                <span className="px-3 sm:hidden py-1 bg-blue-50 text-blue-600 text-2xs text-nowrap sm:text-xs rounded-full">
+                  {job.employmentType || job.jobType}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between">
+                {Number(job.matchPercentage || 0) > 40 && (
+                  <span className="text-green-600 text-xs font-medium">
+                    {job.matchPercentage}% match
+                  </span>
+                )}
+                <button
+                  className="bg-blue-50 text-blue-600 px-2 py-2 text-2xs rounded-lg hover:bg-blue-100 transition-colors flex items-center gap-2 font-medium"
+                  onClick={(e) => handleApply(job, e)}
+                >
+                  {job.emailApply ? (
+                    <>
+                      Auto Apply
+                      <Sparkles className="size-3 text-blue-500" />
+                    </>
+                  ) : (
+                    <>
+                      Apply Now
+                      <ArrowRight className="size-3" />
+                    </>
+                  )}
+                </button>
               </div>
             </div>
           </div>
-        );
-      })}
+        </div>
+      ))}
     </div>
   );
 });
