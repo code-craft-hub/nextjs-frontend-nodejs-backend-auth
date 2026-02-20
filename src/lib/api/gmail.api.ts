@@ -58,7 +58,7 @@ interface ApiResponse<T> {
 
 // ─── API Client ───────────────────────────────────────────────────
 
-const GMAIL_AUTH_BASE = `${BACKEND_API_VERSION}/auth/gmail`;
+const GMAIL_AUTH_BASE = `/auth/gmail`;
 
 export const gmailApi = {
   getAuthUrl: (token?: string) =>

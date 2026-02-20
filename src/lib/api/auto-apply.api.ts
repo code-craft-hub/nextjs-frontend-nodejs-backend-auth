@@ -1,4 +1,4 @@
-import { api, BACKEND_API_VERSION } from "./client";
+import { api } from "./client";
 
 // ─── Types ────────────────────────────────────────────────────────
 
@@ -69,7 +69,7 @@ interface ApiResponse<T> {
 
 // ─── API Client ───────────────────────────────────────────────────
 
-const AUTO_APPLY_BASE = `${BACKEND_API_VERSION}/auto-applies`;
+const AUTO_APPLY_BASE = `/auto-applies`;
 
 export const autoApplyApi = {
   create: (data: CreateAutoApplyData, token?: string) =>

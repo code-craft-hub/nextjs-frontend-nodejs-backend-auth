@@ -1,62 +1,200 @@
-const isClientSide = typeof window !== "undefined";
-const isDevelopment = process.env.NODE_ENV === "development";
+/**
+ * @file api-client.ts
+ * @description Production-grade, type-safe HTTP client for Next.js (App Router compatible).
+ *
+ * Features:
+ *  - Environment-aware base URL resolution with strict validation
+ *  - Serialised token refresh via a proper mutex (no double-refresh storms)
+ *  - Per-request AbortController with configurable timeout
+ *  - Safe redirect after session expiry (no mid-flight side-effects)
+ *  - Content-Type auto-detection (JSON / FormData / URLSearchParams)
+ *  - Fully typed errors with discriminated union support
+ *  - Zero external dependencies
+ */
 
-export const BACKEND_API_VERSION = "v1";
+// ─── Environment Resolution ──────────────────────────────────────────────────
 
-export const BASEURL =
-  isClientSide && isDevelopment ? "/api" : process.env.NEXT_PUBLIC_AUTH_API_URL;
+const IS_CLIENT = typeof window !== "undefined";
+const IS_DEV = process.env.NODE_ENV === "development";
 
-export const API_URL = `${BASEURL}/${BACKEND_API_VERSION}`;
+/**
+ * Resolves the base URL with strict validation to prevent silent misconfiguration.
+ *
+ * Rules:
+ *  - Client + Dev  → relative "/api" so Next.js rewrites proxy to the backend
+ *  - All other cases → absolute URL from NEXT_PUBLIC_AUTH_API_URL
+ *
+ * Throws at module initialisation in server environments if the env var is
+ * missing so the deployment fails fast rather than silently hitting localhost.
+ */
+function resolveBaseUrl(): string {
+  if (IS_CLIENT && IS_DEV) {
+    // Dev client: rely on next.config rewrites to forward /api → backend
+    return "/api";
+  }
+
+  const envUrl = process.env.NEXT_PUBLIC_AUTH_API_URL;
+
+  if (!envUrl) {
+    const message =
+      "[api-client] NEXT_PUBLIC_AUTH_API_URL is not set. " +
+      "All API requests will fail. Set this variable in your environment.";
+
+    // In server/build contexts throw hard so CI catches the misconfiguration.
+    // In client production we log loudly instead of crashing the app shell.
+    if (!IS_CLIENT) throw new Error(message);
+    console.error(message);
+    return ""; // Will produce a clear fetch error rather than hitting localhost.
+  }
+
+  return envUrl;
+}
+
+export const BACKEND_API_VERSION = "v1" as const;
+export const BASEURL = resolveBaseUrl();
+export const API_URL = `${BASEURL}/${BACKEND_API_VERSION}` as const;
+
+// ─── Error Types ─────────────────────────────────────────────────────────────
+
+/** Structured shape returned by the backend on error responses. */
+export interface ApiErrorPayload {
+  error?: string;
+  message?: string;
+  code?: string;
+  details?: unknown;
+}
 
 export class APIError extends Error {
+  public readonly status: number;
+  public readonly statusText: string;
+  public readonly data: ApiErrorPayload;
+  public readonly requestId?: string;
+
   constructor(
-    public status: number,
-    public statusText: string,
-    public data: any,
+    status: number,
+    statusText: string,
+    data: ApiErrorPayload,
+    requestId?: string,
   ) {
-    super(`API Error: ${status} ${statusText}`);
+    super(`APIError ${status}: ${data.error ?? data.message ?? statusText}`);
     this.name = "APIError";
+    this.status = status;
+    this.statusText = statusText;
+    this.data = data;
+    this.requestId = requestId;
+
+    // Maintain proper prototype chain in transpiled environments
+    Object.setPrototypeOf(this, new.target.prototype);
+  }
+
+  /** True when the error represents an authentication failure. */
+  get isUnauthorized(): boolean {
+    return this.status === 401;
+  }
+
+  /** True when the error represents a permission failure. */
+  get isForbidden(): boolean {
+    return this.status === 403;
+  }
+
+  /** True when the error represents a validation failure. */
+  get isValidationError(): boolean {
+    return this.status === 422 || this.status === 400;
+  }
+
+  /** True when the error originates from server infrastructure. */
+  get isServerError(): boolean {
+    return this.status >= 500;
   }
 }
 
-export interface FetchOptions extends RequestInit {
-  params?: Record<string, string | number | boolean>;
-  token?: string;
+/** Thrown when a request exceeds the configured timeout. */
+export class RequestTimeoutError extends Error {
+  constructor(timeoutMs: number, endpoint: string) {
+    super(
+      `Request to "${endpoint}" timed out after ${timeoutMs}ms`,
+    );
+    this.name = "RequestTimeoutError";
+    Object.setPrototypeOf(this, new.target.prototype);
+  }
 }
 
-// ─── Token Refresh State ─────────────────────────────────────────────────────
-// Serialises concurrent 401 responses so only one refresh call is made.
-// All in-flight requests wait for the same refresh promise.
-let isRefreshing = false;
-let refreshPromise: Promise<boolean> | null = null;
+// ─── Request Options ─────────────────────────────────────────────────────────
+
+export interface FetchOptions extends Omit<RequestInit, "body"> {
+  /** Typed query string parameters — serialised automatically. */
+  params?: Record<string, string | number | boolean | null | undefined>;
+
+  /**
+   * Explicit Bearer token. When omitted the client relies on the
+   * httpOnly access_token cookie sent automatically via credentials:"include".
+   */
+  token?: string;
+
+  /**
+   * Request body. Supports:
+   *  - Plain objects / arrays → serialised as JSON
+   *  - FormData              → sent as-is (browser sets boundary)
+   *  - URLSearchParams       → sent as application/x-www-form-urlencoded
+   *  - string / null         → sent as-is
+   */
+  body?: unknown;
+
+  /**
+   * Abort the request after this many milliseconds.
+   * Defaults to DEFAULT_TIMEOUT_MS. Pass 0 to disable.
+   */
+  timeoutMs?: number;
+
+  /**
+   * When true, a 401 will NOT trigger the token-refresh flow.
+   * Set this for the refresh endpoint itself to prevent loops.
+   */
+  skipRefresh?: boolean;
+}
+
+// ─── Token Refresh Mutex ─────────────────────────────────────────────────────
 
 /**
- * Attempt to rotate the access token using the httpOnly refresh_token cookie.
- * Returns true if a new access_token cookie was issued, false otherwise.
+ * A simple promise-based mutex that ensures only one refresh request
+ * is in-flight at any time. All concurrent callers await the same promise.
  *
- * The refresh_token cookie path is "/api/v1/auth" — the browser will send it
- * automatically when we POST to that exact path.
+ * The promise is nulled out ONLY after all microtask continuations have
+ * had a chance to subscribe, avoiding the window where `refreshPromise`
+ * is null but `isRefreshing` is still logically true.
+ */
+const refreshMutex = (() => {
+  let activePromise: Promise<boolean> | null = null;
+
+  return {
+    acquire(task: () => Promise<boolean>): Promise<boolean> {
+      if (activePromise) return activePromise;
+
+      activePromise = task().finally(() => {
+        // Use a microtask tick so any concurrent awaits already queued on
+        // `activePromise` resolve BEFORE we clear the reference.
+        // This prevents a second refresh storm.
+        queueMicrotask(() => {
+          activePromise = null;
+        });
+      });
+
+      return activePromise;
+    },
+  };
+})();
+
+/**
+ * POST to the refresh endpoint. The httpOnly `refresh_token` cookie is
+ * sent automatically by the browser because credentials:"include" is set
+ * and the cookie path matches "/api/v1/auth".
  */
 async function refreshAccessToken(): Promise<boolean> {
-  // Serialise concurrent refresh attempts into a single request.
-  if (isRefreshing && refreshPromise) return refreshPromise;
-
-  isRefreshing = true;
-  refreshPromise = (async () => {
+  return refreshMutex.acquire(async () => {
     try {
-      const origin =
-        typeof window !== "undefined"
-          ? window.location.origin
-          : "http://localhost";
+      const refreshUrl = buildUrl("/auth/refresh");
 
-      const url = BASEURL?.startsWith("http")
-        ? `${BASEURL}/${BACKEND_API_VERSION}/auth/refresh`
-        : new URL(
-            `${BASEURL}/${BACKEND_API_VERSION}/auth/refresh`,
-            origin,
-          ).toString();
-
-      const response = await fetch(url, {
+      const response = await fetch(refreshUrl, {
         method: "POST",
         credentials: "include",
       });
@@ -64,118 +202,290 @@ async function refreshAccessToken(): Promise<boolean> {
       return response.ok;
     } catch {
       return false;
-    } finally {
-      isRefreshing = false;
-      refreshPromise = null;
     }
-  })();
-
-  return refreshPromise;
+  });
 }
 
-// ─── Core Fetch Wrapper ───────────────────────────────────────────────────────
+// ─── URL Builder ─────────────────────────────────────────────────────────────
 
+const DEFAULT_TIMEOUT_MS = 60_000; // 60 s
+
+/**
+ * Constructs a fully-qualified URL from an endpoint path.
+ * Handles both absolute (https://…) and relative (/api) base URLs safely
+ * WITHOUT falling back to localhost.
+ */
+function buildUrl(endpoint: string, params?: FetchOptions["params"]): string {
+  let url: URL;
+
+  const fullPath = `${BASEURL}/${BACKEND_API_VERSION}${endpoint}`;
+
+  if (BASEURL.startsWith("http://") || BASEURL.startsWith("https://")) {
+    url = new URL(fullPath);
+  } else if (IS_CLIENT) {
+    // Relative base URL — safe because we are in a browser context.
+    url = new URL(fullPath, window.location.origin);
+  } else {
+    // Server-side with a relative base is a misconfiguration.
+    // Produce a descriptive error rather than silently pointing at localhost.
+    throw new Error(
+      `[api-client] Cannot build absolute URL server-side from relative BASEURL "${BASEURL}". ` +
+        `Ensure NEXT_PUBLIC_AUTH_API_URL is set to an absolute URL.`,
+    );
+  }
+
+  if (params) {
+    for (const [key, value] of Object.entries(params)) {
+      if (value !== undefined && value !== null) {
+        url.searchParams.append(key, String(value));
+      }
+    }
+  }
+
+  return url.toString();
+}
+
+// ─── Header Builder ───────────────────────────────────────────────────────────
+
+/**
+ * Constructs request headers. Deliberately skips Content-Type for FormData
+ * and URLSearchParams so the browser/runtime can set the correct boundary.
+ */
+function buildHeaders(
+  body: unknown,
+  token?: string,
+  extraHeaders?: HeadersInit,
+): HeadersInit {
+  const headers: Record<string, string> = {};
+
+  // Only set Content-Type for JSON-serialisable bodies.
+  if (
+    body !== undefined &&
+    body !== null &&
+    !(body instanceof FormData) &&
+    !(body instanceof URLSearchParams) &&
+    typeof body !== "string"
+  ) {
+    headers["Content-Type"] = "application/json";
+  }
+
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  // Allow caller overrides (e.g. custom Content-Type, tracing headers)
+  if (extraHeaders) {
+    const entries =
+      extraHeaders instanceof Headers
+        ? Array.from(extraHeaders.entries())
+        : Object.entries(extraHeaders as Record<string, string>);
+
+    for (const [k, v] of entries) {
+      headers[k] = v;
+    }
+  }
+
+  return headers;
+}
+
+// ─── Body Serialiser ──────────────────────────────────────────────────────────
+
+function serialiseBody(body: unknown): BodyInit | undefined {
+  if (body === undefined || body === null) return undefined;
+  if (
+    body instanceof FormData ||
+    body instanceof URLSearchParams ||
+    typeof body === "string"
+  ) {
+    return body as BodyInit;
+  }
+  return JSON.stringify(body);
+}
+
+// ─── Response Parser ──────────────────────────────────────────────────────────
+
+async function parseResponse<T>(response: Response): Promise<T> {
+  const contentType = response.headers.get("Content-Type") ?? "";
+
+  if (contentType.includes("application/json")) {
+    return response.json() as Promise<T>;
+  }
+
+  if (contentType.includes("text/")) {
+    return response.text() as unknown as T;
+  }
+
+  // Binary (blob, stream, etc.)
+  return response.blob() as unknown as T;
+}
+
+// ─── Core Fetch Client ────────────────────────────────────────────────────────
+
+/**
+ * Core fetch wrapper. Handles:
+ *  - Typed query params
+ *  - Automatic JSON / FormData / URLSearchParams body serialisation
+ *  - Bearer token injection
+ *  - Request timeout via AbortController
+ *  - Transparent 401 → token refresh → single retry
+ *  - Safe post-session-expiry redirect (after error propagation)
+ */
 export async function apiClient<T>(
   endpoint: string,
   options: FetchOptions = {},
   _isRetry = false,
 ): Promise<T> {
-  const { token, params, ...fetchOptions } = options;
+  const {
+    token,
+    params,
+    body,
+    timeoutMs = DEFAULT_TIMEOUT_MS,
+    skipRefresh = false,
+    headers: extraHeaders,
+    ...restOptions
+  } = options;
 
-  let url: URL;
+  // ── Timeout ─────────────────────────────────────────────────────────────
+  const controller = new AbortController();
+  let timeoutHandle: ReturnType<typeof setTimeout> | undefined;
 
-  if (BASEURL?.startsWith("http")) {
-    url = new URL(`${BASEURL}${endpoint}`);
-  } else {
-    const origin =
-      typeof window !== "undefined"
-        ? window.location.origin
-        : "http://localhost";
-    url = new URL(`${BASEURL}${endpoint}`, origin);
+  if (timeoutMs > 0) {
+    timeoutHandle = setTimeout(() => controller.abort(), timeoutMs);
   }
 
-  if (params) {
-    Object.entries(params).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        url.searchParams.append(key, String(value));
-      }
+  try {
+    const url = buildUrl(endpoint, params);
+    const serialisedBody = serialiseBody(body);
+    const headers = buildHeaders(body, token, extraHeaders);
+
+    const response = await fetch(url, {
+      ...restOptions,
+      headers,
+      body: serialisedBody,
+      signal: controller.signal,
+      // Never send cookies in server-side renders — httpOnly cookies are
+      // session-bound to the browser. On the server, use explicit tokens.
+      credentials: IS_CLIENT ? "include" : "omit",
     });
-  }
 
-  const headers: HeadersInit = {
-    "Content-Type": "application/json",
-    ...(fetchOptions.headers || {}),
-  };
+    // ── Success Path ─────────────────────────────────────────────────────
+    if (response.ok) {
+      return parseResponse<T>(response);
+    }
 
-  if (token) {
-    (headers as Record<string, string>)["Authorization"] = `Bearer ${token}`;
-  }
+    // ── Error Path ───────────────────────────────────────────────────────
+    let errorData: ApiErrorPayload = {};
+    try {
+      errorData = await response.json();
+    } catch {
+      errorData = { error: response.statusText || "Request failed" };
+    }
 
-  const isServerSide = typeof window === "undefined";
+    const requestId = response.headers.get("X-Request-Id") ?? undefined;
 
-  const response = await fetch(url.toString(), {
-    ...fetchOptions,
-    headers,
-    credentials: isServerSide ? "omit" : "include",
-  });
-
-  const data = await response.json().catch(() => ({ error: "Request failed" }));
-
-  if (!response.ok) {
-    // ── 401 recovery: attempt token rotation, then retry once ──────────────
-    // Skip retry for the refresh endpoint itself to prevent loops.
-    const isRefreshEndpoint = endpoint.includes("/auth/refresh");
-
+    // ── 401 Recovery ─────────────────────────────────────────────────────
     if (
       response.status === 401 &&
-      typeof window !== "undefined" &&
+      IS_CLIENT &&
       !_isRetry &&
-      !isRefreshEndpoint
+      !skipRefresh
     ) {
       const refreshed = await refreshAccessToken();
 
       if (refreshed) {
-        // Retry the original request with the new access_token cookie in place.
+        // New access_token cookie is now in the jar — retry once.
         return apiClient<T>(endpoint, options, true);
       }
 
-      // Refresh failed — session is fully expired; send user to login.
-      window.location.href = "/login";
+      // Refresh failed → session fully expired.
+      // Throw first so any catch blocks can react (clear stores, show modal),
+      // then redirect on the next tick so navigation is never mid-throw.
+      const error = new APIError(
+        response.status,
+        response.statusText,
+        errorData,
+        requestId,
+      );
+
+      queueMicrotask(() => {
+        if (typeof window !== "undefined") {
+          window.location.href = "/login";
+        }
+      });
+
+      throw error;
     }
 
-    throw new APIError(response.status, data.error || "Request failed", data);
-  }
+    throw new APIError(
+      response.status,
+      response.statusText,
+      errorData,
+      requestId,
+    );
+  } catch (error) {
+    if (error instanceof APIError) throw error;
 
-  return data;
+    // AbortController fired → rethrow as a descriptive timeout error
+    if (error instanceof DOMException && error.name === "AbortError") {
+      throw new RequestTimeoutError(timeoutMs, endpoint);
+    }
+
+    // Network-level failure (DNS, connection refused, etc.)
+    throw error;
+  } finally {
+    clearTimeout(timeoutHandle);
+  }
 }
 
-// ─── Convenience Methods ──────────────────────────────────────────────────────
+// ─── Type-safe Convenience Methods ───────────────────────────────────────────
 
 export const api = {
-  get: <T>(endpoint: string, options?: FetchOptions) =>
-    apiClient<T>(endpoint, { ...options, method: "GET" }),
+  get<T>(endpoint: string, options?: FetchOptions): Promise<T> {
+    return apiClient<T>(endpoint, { ...options, method: "GET" });
+  },
 
-  post: <T>(endpoint: string, data?: any, options?: FetchOptions) =>
-    apiClient<T>(endpoint, {
+  post<T>(
+    endpoint: string,
+    data?: unknown,
+    options?: FetchOptions,
+  ): Promise<T> {
+    return apiClient<T>(endpoint, { ...options, method: "POST", body: data });
+  },
+
+  put<T>(
+    endpoint: string,
+    data?: unknown,
+    options?: FetchOptions,
+  ): Promise<T> {
+    return apiClient<T>(endpoint, { ...options, method: "PUT", body: data });
+  },
+
+  patch<T>(
+    endpoint: string,
+    data?: unknown,
+    options?: FetchOptions,
+  ): Promise<T> {
+    return apiClient<T>(endpoint, { ...options, method: "PATCH", body: data });
+  },
+
+  delete<T>(endpoint: string, options?: FetchOptions): Promise<T> {
+    return apiClient<T>(endpoint, { ...options, method: "DELETE" });
+  },
+
+  /**
+   * Upload a file or form payload. Accepts FormData or URLSearchParams.
+   * Content-Type is intentionally NOT set so the browser adds the multipart
+   * boundary automatically.
+   */
+  upload<T>(
+    endpoint: string,
+    formData: FormData | URLSearchParams,
+    options?: FetchOptions,
+  ): Promise<T> {
+    return apiClient<T>(endpoint, {
       ...options,
       method: "POST",
-      body: JSON.stringify(data),
-    }),
-
-  put: <T>(endpoint: string, data?: any, options?: FetchOptions) =>
-    apiClient<T>(endpoint, {
-      ...options,
-      method: "PUT",
-      body: JSON.stringify(data),
-    }),
-
-  patch: <T>(endpoint: string, data?: any, options?: FetchOptions) =>
-    apiClient<T>(endpoint, {
-      ...options,
-      method: "PATCH",
-      body: JSON.stringify(data),
-    }),
-
-  delete: <T>(endpoint: string, options?: FetchOptions) =>
-    apiClient<T>(endpoint, { ...options, method: "DELETE" }),
-};
+      body: formData,
+    });
+  },
+} as const;

@@ -14,7 +14,7 @@ export const jobsApi = {
   // Get all jobs with advanced filtering
   autoApply: () => {
     return api.get<{ data: RecommendationsResponse }>(
-      `/${BACKEND_API_VERSION}/recommendations`,
+      `/recommendations`,
     );
   },
   autoApplyGet: (params?: any, token?: string) => {

@@ -1,6 +1,6 @@
-import { api, BACKEND_API_VERSION } from "./client";
+import { api } from "./client";
 
-const JOB_RECOMMENDATION_API = `/${BACKEND_API_VERSION}/recommendations`;
+const JOB_RECOMMENDATION_API = `/recommendations`;
 
 export const recommendationsApi = {
   /**

@@ -1,6 +1,6 @@
 // lib/api/cover-letters.api.ts
 import { CoverLetter } from "@/types";
-import { api, BACKEND_API_VERSION } from "./client";
+import { api } from "./client";
 import type {
   PaginatedResponse,
   PaginationParams,
@@ -36,7 +36,7 @@ export const coverLetterApi = {
   // Get all cover letters
   getCoverLetters: (params?: CoverLetterFilters, token?: string) =>
     api.get<PaginatedResponse<CoverLetter>>(
-      `/${BACKEND_API_VERSION}/cover-letters?` +
+      `/cover-letters?` +
         new URLSearchParams(params as Record<string, string>).toString(),
       { token }
     ),
@@ -44,7 +44,7 @@ export const coverLetterApi = {
   // Get cover letter by ID
   getCoverLetter: async (id: string, token?: string) => {
     const { data } = await api.get<{ data: CoverLetter }>(
-      `/${BACKEND_API_VERSION}/cover-letters/${id}`,
+      `/cover-letters/${id}`,
       { token }
     );
     return data;
@@ -52,23 +52,23 @@ export const coverLetterApi = {
 
   // Create cover letter
   createCoverLetter: (data: CreateCoverLetterData, token?: string) =>
-    api.post<CoverLetter>(`/${BACKEND_API_VERSION}/cover-letters`, data, { token }),
+    api.post<CoverLetter>(`/cover-letters`, data, { token }),
 
 
   generateCoverLetter: (data: CreateCoverLetterData, token?: string) =>
-    api.post<CoverLetter>(`/${BACKEND_API_VERSION}/cover-letters/stream`, data, { token }),
+    api.post<CoverLetter>(`/cover-letters/stream`, data, { token }),
 
   // Update cover letter
   updateCoverLetter: (id: string, data: UpdateCoverLetterData, token?: string) =>
-    api.patch<CoverLetter>(`/${BACKEND_API_VERSION}/cover-letters/${id}`, data, { token }),
+    api.patch<CoverLetter>(`/cover-letters/${id}`, data, { token }),
 
   // Delete cover letter
-  deleteCoverLetter: (id: string, token?: string) => api.delete<void>(`/${BACKEND_API_VERSION}/cover-letters/${id}`, { token }),
+  deleteCoverLetter: (id: string, token?: string) => api.delete<void>(`/cover-letters/${id}`, { token }),
 
   // Hard delete cover letter
-  hardDeleteCoverLetter: (id: string, token?: string) => api.delete<void>(`/${BACKEND_API_VERSION}/cover-letters/${id}/hard-delete`, { token }),
+  hardDeleteCoverLetter: (id: string, token?: string) => api.delete<void>(`/cover-letters/${id}/hard-delete`, { token }),
 
   // Duplicate cover letter
   duplicateCoverLetter: (id: string, token?: string) =>
-    api.post<CoverLetter>(`/${BACKEND_API_VERSION}/cover-letters/${id}/duplicate`, undefined, { token }),
+    api.post<CoverLetter>(`/cover-letters/${id}/duplicate`, undefined, { token }),
 };
