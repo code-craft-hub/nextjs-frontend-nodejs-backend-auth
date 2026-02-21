@@ -56,9 +56,29 @@ export const API_URL = `${BASEURL}/${BACKEND_API_VERSION}` as const;
 
 // ─── Error Types ─────────────────────────────────────────────────────────────
 
-/** Structured shape returned by the backend on error responses. */
+/**
+ * The nested error object emitted by the Express `appErrorHandler`.
+ * Distinct from the top-level `message` field which duplicates it for
+ * human consumption.
+ */
+export interface ApiErrorDetail {
+  code?: string;
+  message?: string;
+}
+
+/**
+ * Structured shape returned by the backend on error responses.
+ *
+ * Two shapes exist depending on the error source:
+ *  - `userAuthMiddleware` direct responses: `{ error: string, code: string }`
+ *  - `appErrorHandler` (via next(err)):     `{ error: { code, message }, message: string }`
+ *
+ * Both are handled by `APIError.extractMessage`.
+ */
 export interface ApiErrorPayload {
-  error?: string;
+  /** Either a plain string (middleware errors) or a structured object (AppError). */
+  error?: string | ApiErrorDetail;
+  /** Top-level human-readable message — mirrors `error.message` in AppError responses. */
   message?: string;
   code?: string;
   details?: unknown;
@@ -70,13 +90,26 @@ export class APIError extends Error {
   public readonly data: ApiErrorPayload;
   public readonly requestId?: string;
 
+  /**
+   * Normalises the heterogeneous `error` field into a single human-readable string.
+   * Handles both the middleware plain-string shape and the AppError nested-object shape.
+   */
+  static extractMessage(data: ApiErrorPayload, fallback: string): string {
+    const { error, message } = data;
+    if (typeof error === "string" && error) return error;
+    if (error !== null && typeof error === "object") {
+      return error.message ?? message ?? fallback;
+    }
+    return message ?? fallback;
+  }
+
   constructor(
     status: number,
     statusText: string,
     data: ApiErrorPayload,
     requestId?: string,
   ) {
-    super(`APIError ${status}: ${data.error ?? data.message ?? statusText}`);
+    super(`APIError ${status}: ${APIError.extractMessage(data, statusText)}`);
     this.name = "APIError";
     this.status = status;
     this.statusText = statusText;

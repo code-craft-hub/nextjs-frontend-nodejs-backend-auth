@@ -5,11 +5,11 @@ import { ArrowRight, MapPin, Sparkles } from "lucide-react";
 import { JobFilters } from "@/lib/types/jobs";
 import { jobsQueries } from "@/lib/queries/jobs.queries";
 import { useQuery } from "@tanstack/react-query";
-import { apiService } from "@/hooks/use-auth";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { v4 as uuidv4 } from "uuid";
 import { cn } from "@/lib/utils";
+import { gmailApi } from "@/lib/api/gmail.api";
 
 export const FeatureJobs = ({ filters }: { filters: JobFilters }) => {
   const { data: jobs } = useQuery(jobsQueries.all(filters));
@@ -37,7 +37,7 @@ export const FeatureJobs = ({ filters }: { filters: JobFilters }) => {
               key={index}
               className={cn(
                 "bg-white rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow p-4 space-y-4",
-                !!job?.emailApply && "shadow-blue-100 shadow-2xl "
+                !!job?.emailApply && "shadow-blue-100 shadow-2xl ",
               )}
             >
               <div className="flex justify-between">
@@ -55,8 +55,8 @@ export const FeatureJobs = ({ filters }: { filters: JobFilters }) => {
                   {!!job?.jobType
                     ? job?.jobType
                     : job?.employmentType
-                    ? job.employmentType
-                    : "On-site"}
+                      ? job.employmentType
+                      : "On-site"}
                 </span>
                 {job?.salary && (
                   <span className=" text-gray-400 text-xs">
@@ -89,13 +89,12 @@ export const FeatureJobs = ({ filters }: { filters: JobFilters }) => {
                       if (!job?.emailApply) {
                         window.open(
                           !!job.link ? job?.link : job?.applyUrl,
-                          "__blank"
+                          "__blank",
                         );
                         return;
                       }
 
-                      const { authorized } =
-                        await apiService.gmailOauthStatus();
+                      const { authorized } = await gmailApi.checkAuthStatus();
 
                       if (!authorized) {
                         toast.error(
@@ -105,14 +104,14 @@ export const FeatureJobs = ({ filters }: { filters: JobFilters }) => {
                               label: "Authorize now",
                               onClick: () =>
                                 router.push(
-                                  `/dashboard/settings?tab=ai-applypreference`
+                                  `/dashboard/settings?tab=ai-applypreference`,
                                 ),
                             },
                             classNames: {
                               actionButton:
                                 "!bg-blue-600 hover:!bg-blue-700 !text-white !h-8",
                             },
-                          }
+                          },
                         );
 
                         return;
@@ -121,14 +120,14 @@ export const FeatureJobs = ({ filters }: { filters: JobFilters }) => {
                       const params = new URLSearchParams();
                       params.set(
                         "jobDescription",
-                        JSON.stringify(job?.descriptionText || "")
+                        JSON.stringify(job?.descriptionText || ""),
                       );
                       params.set(
                         "recruiterEmail",
-                        encodeURIComponent(job?.emailApply)
+                        encodeURIComponent(job?.emailApply),
                       );
                       router.push(
-                        `/dashboard/tailor-cover-letter/${uuidv4()}?${params}&aiApply=true`
+                        `/dashboard/tailor-cover-letter/${uuidv4()}?${params}&aiApply=true`,
                       );
                     }}
                   >

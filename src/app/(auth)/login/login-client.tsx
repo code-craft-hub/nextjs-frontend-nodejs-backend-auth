@@ -15,7 +15,7 @@ import {
 import { useGoogleLogin } from "@react-oauth/google";
 import { Input } from "@/components/ui/input";
 import { Eye, EyeOff } from "lucide-react";
-import { api } from "@/lib/api/client";
+import { api, APIError } from "@/lib/api/client";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -126,6 +126,9 @@ export const LoginClient = () => {
         const result = await api.post<{ data: { user: { onboardingComplete: boolean; emailVerified: boolean } } }>(
           "/auth/google",
           { code: codeResponse.code },
+          // skipRefresh: a 401 here means Google auth failed, not an expired
+          // session. Attempting a token refresh would be wrong and misleading.
+          { skipRefresh: true },
         );
         const user = result?.data?.user;
         if (user && !user.emailVerified) {
@@ -156,18 +159,22 @@ export const LoginClient = () => {
   const onSubmit = async (values: z.infer<typeof LoginSchema>) => {
     try {
       setIsLoginLoading(true);
-      await api.post("/auth/login", {
-        email: values.email,
-        password: values.password,
-      });
+      await api.post(
+        "/auth/login",
+        { email: values.email, password: values.password },
+        // skipRefresh: a 401 here means wrong credentials, not an expired
+        // session. Attempting a token refresh would be incorrect and would
+        // produce a confusing second 401 in the console.
+        { skipRefresh: true },
+      );
       toast.success("Login successful!");
       router.push("/dashboard/home");
-    } catch (error: any) {
-      console.error("Login error:", error);
-      toast.error(
-        error?.response?.data?.message || "Login failed. Please try again.",
-      );
-      return;
+    } catch (error) {
+      const message =
+        error instanceof APIError
+          ? APIError.extractMessage(error.data, "Login failed. Please try again.")
+          : "Login failed. Please try again.";
+      toast.error(message);
     } finally {
       setIsLoginLoading(false);
     }

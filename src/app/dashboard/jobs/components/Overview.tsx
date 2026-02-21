@@ -41,6 +41,7 @@ import {
 import MobileOverview from "./MobileOverview";
 import AuthorizeGoogle from "@/hooks/gmail/AuthorizeGoogle";
 import { useApplyJob } from "@/hooks/useApplyJob";
+import { jobPostsQueries } from "@/lib/queries/job-posts.queries";
 
 export default function Overview() {
   const router = useRouter();
@@ -66,7 +67,7 @@ export default function Overview() {
       limit: 20,
       title: searchValue.trim() || undefined,
     }),
-    [searchValue]
+    [searchValue],
   );
 
   const updateJobs = useUpdateJobMutation();
@@ -81,8 +82,6 @@ export default function Overview() {
     },
   });
 
-
-
   const {
     data,
     fetchNextPage,
@@ -91,7 +90,7 @@ export default function Overview() {
     isFetching,
     isRefetching,
     isFetchingNextPage,
-  } = useInfiniteQuery(jobsQueries?.infinite(infiniteFilters));
+  } = useInfiniteQuery(jobPostsQueries?.infinite(infiniteFilters));
 
   const allJobs = useMemo(() => {
     const jobs = data?.pages.flatMap((page) => page.data) ?? [];
@@ -103,7 +102,7 @@ export default function Overview() {
 
         const completeMatch = jobMatcher.calculateMatch(
           userJobTitlePreference,
-          jobContent || ""
+          jobContent || "",
         );
 
         if (completeMatch.score >= 50) {
@@ -184,7 +183,7 @@ export default function Overview() {
             key={item.id}
             className={cn(
               "group flex gap-2 data-[state=active]:bg-primary  data-[state=active]:text-white  p-2 hover:bg-primary hover:text-white hover-cursor-pointer items-center justify-start rounded-md w-44  hover:shadow-sm hover:cursor-pointer",
-              item.isActive && "bg-blue-500 text-white"
+              item.isActive && "bg-blue-500 text-white",
             )}
           >
             <div className="size-fit rounded-sm">
@@ -193,7 +192,7 @@ export default function Overview() {
                 alt={item.label}
                 className={cn(
                   "size-4 group-hover:brightness-0 group-hover:invert group-data-[state=active]:brightness-0 group-data-[state=active]:invert",
-                  item.isActive && "brightness-0 invert"
+                  item.isActive && "brightness-0 invert",
                 )}
               />
             </div>
@@ -267,7 +266,7 @@ export default function Overview() {
                     key={row.id}
                     onClick={() =>
                       router.push(
-                        `/dashboard/jobs/${row.original.id}?referrer=jobs&title=${row.original.title}`
+                        `/dashboard/jobs/${row.original.id}?referrer=jobs&title=${row.original.title}`,
                       )
                     }
                     className="hover:bg-white border-b rounded-3xl! hover:border-primary hover:border-2 hover:rounded-2xl hover:cursor-pointer"
@@ -276,7 +275,7 @@ export default function Overview() {
                       <TableCell key={cell.id}>
                         {flexRender(
                           cell.column.columnDef.cell,
-                          cell.getContext()
+                          cell.getContext(),
                         )}
                       </TableCell>
                     ))}

@@ -1,13 +1,47 @@
-import { queryOptions } from "@tanstack/react-query";
-import { recommendationsApi } from "@/lib/api/recommendations.api";
+import { infiniteQueryOptions, queryOptions } from "@tanstack/react-query";
+import { recommendationsApi, RecommendationsResponse } from "@/lib/api/recommendations.api";
 import { queryKeys } from "@/lib/query/keys";
 
+const POLLING_INTERVAL_MS = 3_000;
+
 export const recommendationsQueries = {
-  userRecommendations: (token?: string) =>
-    queryOptions({
+  /**
+   * Infinite query for the user's saved AI job recommendations.
+   *
+   * Behaviour:
+   *  - Pages sorted by match score DESC (best matches first).
+   *  - Auto-polls every 3 s while `status` is "queued"/"processing"
+   *    OR while `isGenerating` is true (covers the "recommend more" flow).
+   *  - Polling stops automatically once the pipeline goes idle.
+   */
+  userRecommendations: () =>
+    infiniteQueryOptions({
       queryKey: queryKeys.recommendations.user(),
-      queryFn: () => recommendationsApi.getUserRecommendations(token),
-      staleTime: 10 * 60 * 1000,
+      queryFn: ({ pageParam }) =>
+        recommendationsApi.getUserRecommendations({ page: pageParam as number }),
+      initialPageParam: 1,
+      getNextPageParam: (lastPage) => {
+        const d = lastPage.data;
+        return d.hasMore ? d.page + 1 : undefined;
+      },
+      /**
+       * Poll while the backend is generating recommendations.
+       * TQ evaluates this after every successful fetch, so polling stops
+       * automatically once `isGenerating` becomes false.
+       */
+      refetchInterval: (query) => {
+        const pages = query.state.data?.pages as
+          | { data: RecommendationsResponse }[]
+          | undefined;
+        if (!pages?.length) return false;
+        const last = pages[pages.length - 1]?.data;
+        if (!last) return false;
+        const { status, isGenerating } = last;
+        const isActive =
+          isGenerating || status === "queued" || status === "processing";
+        return isActive ? POLLING_INTERVAL_MS : false;
+      },
+      staleTime: 5 * 60 * 1000,
     }),
 
   quickSearch: (jobTitle: string, skills?: string, limit = 10) =>

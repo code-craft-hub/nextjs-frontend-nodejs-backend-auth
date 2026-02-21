@@ -1,42 +1,24 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { cookies } from "next/headers";
-import { jwtVerify, SignJWT } from "jose";
+import { jwtVerify } from "jose";
 import { IUser } from "@/types";
 
 const JWT_SECRET = process.env.JWT_SECRET;
-const JWT_ISSUER = "nextjs-app";
-const JWT_EXPIRY = "7d";
-
-export async function createSessionToken(userSession: IUser): Promise<string> {
-  const secret = new TextEncoder().encode(JWT_SECRET);
-
-  return await new SignJWT({ ...userSession })
-    .setProtectedHeader({ alg: "HS256" })
-    .setIssuedAt()
-    .setExpirationTime(JWT_EXPIRY)
-    .setIssuer(JWT_ISSUER)
-    .sign(secret);
-}
 
 // Verify session token
 export async function verifySessionToken(
-  token: string
-): Promise<Partial<IUser & {customClaims: Record<string, any>}> | null> {
+  token: string,
+): Promise<Partial<IUser & { customClaims: Record<string, any> }> | null> {
   try {
-    const secret = new TextEncoder().encode(process.env.JWT_SECRET);
+    const secret = new TextEncoder().encode(JWT_SECRET);
 
-    const { payload } = await jwtVerify(token, secret, {
-      issuer: JWT_ISSUER,
-    });
+    const { payload } = await jwtVerify(token, secret);
 
     return {
       email: payload.email as string,
       emailVerified: payload.emailVerified as boolean,
       onboardingComplete: payload.onboardingComplete as boolean,
       customClaims: payload.customClaims as Record<string, any> | undefined,
-      displayName: payload?.displayName as string,
-      firstName: payload?.firstName as string,
-      lastName: payload?.lastName as string,
     };
   } catch (err) {
     console.error("JWT verification failed:", err);
@@ -44,25 +26,9 @@ export async function verifySessionToken(
   }
 }
 
-// Create session cookie
-export function setSessionCookie(response: NextResponse, sessionToken: string) {
-  response.cookies.set("session", sessionToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    maxAge: 60 * 60 * 24 * 7, // 7 days
-    path: "/",
-  });
-}
-
-// Clear session cookie
-// export function clearSessionCookie(response: NextResponse) {
-//   response.cookies.delete("session");
-// }
-
 // Get session from request (for API routes)
 export async function getSessionFromRequest(
-  request: NextRequest
+  request: NextRequest,
 ): Promise<Partial<IUser> | null> {
   const sessionToken = request.cookies.get("session")?.value;
   if (!sessionToken) return null;
@@ -86,7 +52,7 @@ async function verifyAccessToken(
     const { payload } = await jwtVerify(token, secret);
 
     // Reject refresh tokens and any other non-access token types.
-    if (payload["type"] !== "access") return null;
+    // if (payload["type"] !== "access") return null;
 
     return {
       email: payload.email as string,
@@ -107,10 +73,8 @@ async function verifyAccessToken(
  * cookie from the previous auth system — they will be directed to log in again.
  */
 export async function getSessionFromCookies(): Promise<Partial<IUser> | null> {
-  const cookieStore = await cookies();
-  const accessToken = cookieStore.get("access_token")?.value;
-  if (!accessToken) return null;
-  return verifyAccessToken(accessToken);
+  const cookieStore = (await resolveCookiesToken()) ?? "";
+  return verifyAccessToken(cookieStore);
 }
 
 /**
@@ -118,9 +82,18 @@ export async function getSessionFromCookies(): Promise<Partial<IUser> | null> {
  * fetch calls that target the Express backend.
  */
 export async function getCookiesToken(): Promise<string | null> {
-  const cookieStore = await cookies();
-  return cookieStore.get("access_token")?.value ?? null;
+  return await resolveCookiesToken();
 }
 
+async function resolveCookiesToken(): Promise<string | null> {
+  const cookieStore = await cookies();
 
+  let cookieValue = null;
+  if (cookieStore.get("access_token")?.value) {
+    cookieValue = cookieStore.get("access_token")?.value;
+  } else if (cookieStore.get("session")?.value) {
+    cookieValue = cookieStore.get("session")?.value;
+  }
 
+  return cookieValue ?? null;
+}
