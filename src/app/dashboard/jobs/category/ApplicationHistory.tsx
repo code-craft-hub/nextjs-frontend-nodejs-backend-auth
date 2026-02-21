@@ -11,7 +11,6 @@ import {
   VisibilityState,
 } from "@tanstack/react-table";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import { jobsQueries } from "@/lib/queries/jobs.queries";
 import { useRouter } from "next/navigation";
 import { SearchBar, SearchBarRef } from "./JobSearchBar";
 
@@ -32,6 +31,7 @@ import { usePrefetchJob } from "@/hooks/usePrefetchJob";
 import MobileOverview from "../components/MobileOverview";
 import { sendGTMEvent } from "@next/third-parties/google";
 import { OverviewEmpty, OverviewSkeleton } from "../components/OverviewColumn";
+import jobApplicationQueries from "@/lib/queries/application-history.queries";
 
 export const ApplicationHistory = ({ children }: { children: ReactNode }) => {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -51,11 +51,6 @@ export const ApplicationHistory = ({ children }: { children: ReactNode }) => {
       });
   }, [user?.firstName]);
 
-  const appliedJobsMap = useMemo(() => {
-    return new Map(
-      user?.appliedJobs?.map((job) => [job?.id, job?.appliedDate]) || []
-    );
-  }, [user?.appliedJobs]);
 
   const updateJobApplicationHistory = useUpdateJobApplicationHistoryMutation();
 
@@ -63,8 +58,6 @@ export const ApplicationHistory = ({ children }: { children: ReactNode }) => {
 
   const router = useRouter();
 
-  const appliedJobsIds = (user?.appliedJobs?.map((job) => job.id) ||
-    []) as string[];
 
   const {
     data,
@@ -74,15 +67,14 @@ export const ApplicationHistory = ({ children }: { children: ReactNode }) => {
     isLoading,
     isFetching,
     isRefetching,
-  } = useInfiniteQuery(jobsQueries.appliedJobs(appliedJobsIds, "", 20));
+  } = useInfiniteQuery(jobApplicationQueries.infiniteList())
 
   const allJobs = useMemo(() => {
     const jobs = data?.pages.flatMap((page) => page.data) ?? [];
     return jobs.map((job) => ({
       ...job,
-      appliedDate: appliedJobsMap?.get(job?.id) || null,
     }));
-  }, [data, user?.appliedJobs?.length]);
+  }, [data]);
 
   const columns = getFindJobsColumns({
     router,

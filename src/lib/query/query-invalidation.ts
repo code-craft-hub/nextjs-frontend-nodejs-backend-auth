@@ -2,6 +2,8 @@ import { QueryClient } from "@tanstack/react-query";
 import { queryKeys } from "./keys";
 import { aiSettingsKeys } from "./ai-settings.keys";
 import { autoApplyKeys } from "./auto-apply.keys";
+import { bookmarkKeys } from "./bookmarks.keys";
+import { jobApplicationKeys } from "./job-applications.keys";
 import { invalidateUserQueries } from "@module/user";
 
 /**
@@ -240,30 +242,45 @@ export const invalidateJobPostDetail = (
 // ─── Job Applications Queries ─────────────────────────────────
 
 export const invalidateJobApplicationsQueries = (queryClient: QueryClient) => {
-  return Promise.all([
-    queryClient.invalidateQueries({
-      queryKey: queryKeys.jobApplications.lists(),
-    }),
-    queryClient.invalidateQueries({
-      queryKey: queryKeys.jobApplications.details(),
-    }),
-  ]);
-};
-
-export const invalidateJobApplicationLists = (queryClient: QueryClient) => {
   return queryClient.invalidateQueries({
-    queryKey: queryKeys.jobApplications.lists(),
+    queryKey: jobApplicationKeys.all,
   });
 };
 
-export const invalidateJobApplicationDetail = (
+export const invalidateApplicationLists = (queryClient: QueryClient) => {
+  return Promise.all([
+    queryClient.invalidateQueries({ queryKey: jobApplicationKeys.lists() }),
+    queryClient.invalidateQueries({ queryKey: jobApplicationKeys.infinite() }),
+  ]);
+};
+
+export const invalidateApplicationDetail = (
   queryClient: QueryClient,
   applicationId: string,
 ) => {
   return queryClient.invalidateQueries({
-    queryKey: queryKeys.jobApplications.detail(applicationId),
+    queryKey: jobApplicationKeys.detail(applicationId),
   });
 };
+
+export const invalidateApplicationCheck = (
+  queryClient: QueryClient,
+  jobId: string,
+) => {
+  return queryClient.invalidateQueries({
+    queryKey: jobApplicationKeys.check(jobId),
+  });
+};
+
+export const invalidateAllApplicationChecks = (queryClient: QueryClient) => {
+  return queryClient.invalidateQueries({ queryKey: jobApplicationKeys.checks() });
+};
+
+/** @deprecated Use invalidateApplicationLists */
+export const invalidateJobApplicationLists = invalidateApplicationLists;
+
+/** @deprecated Use invalidateApplicationDetail */
+export const invalidateJobApplicationDetail = invalidateApplicationDetail;
 
 // ─── Recommendations Queries ─────────────────────────────────
 
@@ -336,4 +353,39 @@ export const invalidateAllUserQueries = (queryClient: QueryClient) => {
     invalidateUserQueries(queryClient),
     invalidateAllAIQueries(queryClient),
   ]);
+};
+
+// ─── Bookmark Queries ────────────────────────────────────────
+
+export const invalidateBookmarkLists = (queryClient: QueryClient) => {
+  return Promise.all([
+    queryClient.invalidateQueries({ queryKey: bookmarkKeys.lists() }),
+    queryClient.invalidateQueries({ queryKey: bookmarkKeys.infinite() }),
+  ]);
+};
+
+export const invalidateBookmarkDetail = (
+  queryClient: QueryClient,
+  bookmarkId: string,
+) => {
+  return queryClient.invalidateQueries({
+    queryKey: bookmarkKeys.detail(bookmarkId),
+  });
+};
+
+export const invalidateBookmarkCheck = (
+  queryClient: QueryClient,
+  jobId: string,
+) => {
+  return queryClient.invalidateQueries({
+    queryKey: bookmarkKeys.check(jobId),
+  });
+};
+
+export const invalidateAllBookmarkChecks = (queryClient: QueryClient) => {
+  return queryClient.invalidateQueries({ queryKey: bookmarkKeys.checks() });
+};
+
+export const invalidateAllBookmarkQueries = (queryClient: QueryClient) => {
+  return queryClient.invalidateQueries({ queryKey: bookmarkKeys.all });
 };

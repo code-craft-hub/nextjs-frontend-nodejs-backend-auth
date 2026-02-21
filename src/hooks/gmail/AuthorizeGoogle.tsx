@@ -73,9 +73,9 @@ const AuthorizeGoogle: React.FC<{
   // ✅ Check Gmail Auth on Hover
   const handleCheckAuthStatus = useCallback(async () => {
     try {
-      const { data } = await checkAuthStatus();
-      form.setValue("authorized", data?.authorized || false);
-      return data;
+      const { authorized } = await checkAuthStatus();
+      form.setValue("authorized", authorized || false);
+      return authorized;
     } catch (error) {
       console.error("Error checking auth status:", error);
     }

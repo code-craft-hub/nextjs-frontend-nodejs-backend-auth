@@ -18,13 +18,12 @@ import { useUpdateJobMutation } from "@/lib/mutations/jobs.mutations";
 
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { jobsQueries } from "@/lib/queries/jobs.queries";
-
 import { SearchBar, SearchBarRef } from "./JobSearchBar";
 import MobileOverview from "../components/MobileOverview";
 import { sendGTMEvent } from "@next/third-parties/google";
 import { OverviewColumn, OverviewEmpty, OverviewSkeleton } from "../components/OverviewColumn";
 import { useApplyJob } from "@/hooks/useApplyJob";
+import { bookmarksQueries } from "@/lib/queries/bookmarks.queries";
 
 export const SavedJobs = ({ children }: { children: ReactNode }) => {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -59,7 +58,7 @@ export const SavedJobs = ({ children }: { children: ReactNode }) => {
     isLoading,
     isFetching,
     isRefetching,
-  } = useInfiniteQuery(jobsQueries.bookmarked());
+  } = useInfiniteQuery(bookmarksQueries.infiniteList());
 
 
 
@@ -74,9 +73,7 @@ export const SavedJobs = ({ children }: { children: ReactNode }) => {
          
         };
       })
-      .sort((a, b) => {
-        return parseInt(b?.matchPercentage) - parseInt(a?.matchPercentage);
-      });
+      
   }, [data]);
 
   const columns = OverviewColumn({
