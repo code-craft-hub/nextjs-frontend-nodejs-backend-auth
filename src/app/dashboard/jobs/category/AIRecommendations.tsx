@@ -7,28 +7,23 @@ import {
   getCoreRowModel,
   getFilteredRowModel,
   getSortedRowModel,
-  Row,
   SortingState,
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
-import { v4 as uuidv4 } from "uuid";
 import { userQueries } from "@module/user";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
-import {
-  useUpdateJobApplicationHistoryMutation,
-  useUpdateJobMutation,
-} from "@/lib/mutations/jobs.mutations";
+import { useUpdateJobMutation } from "@/lib/mutations/jobs.mutations";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { jobsQueries } from "@/lib/queries/jobs.queries";
 import { getDataSource } from "@/lib/utils/helpers";
 import { jobMatcher } from "@/services/job-matcher";
-import { toast } from "sonner";
 import { JobType } from "@/types";
 import MobileOverview from "../components/MobileOverview";
 import { sendGTMEvent } from "@next/third-parties/google";
 import { OverviewColumn, OverviewEmpty, OverviewSkeleton } from "../components/OverviewColumn";
+import { useApplyJob } from "@/hooks/useApplyJob";
 
 export const AIRecommendations = ({ children }: { children: ReactNode }) => {
   const { data: user } = useQuery(userQueries.detail());
@@ -52,9 +47,8 @@ export const AIRecommendations = ({ children }: { children: ReactNode }) => {
       });
   }, [user?.firstName]);
 
-  const updateJobApplicationHistory = useUpdateJobApplicationHistoryMutation();
-
   const updateJobs = useUpdateJobMutation();
+  const { applyToJob: handleApply } = useApplyJob();
 
   const router = useRouter();
 
@@ -94,66 +88,6 @@ export const AIRecommendations = ({ children }: { children: ReactNode }) => {
     //   return parseInt(b?.createdAt) - parseInt(a?.createdAt);
     // });
   }, [data,]);
-
-  const handleApply = async ({
-    event,
-    row,
-  }: {
-    event: any;
-    row: Row<JobType>;
-  }) => {
-    event.preventDefault();
-    event.stopPropagation();
-    if (!row.original?.emailApply) {
-      updateJobApplicationHistory.mutate({
-        id: String(row.original.id),
-        data: {
-          appliedJobs: row.original.id,
-        },
-      });
-      window.open(
-        !!row.original?.applyUrl ? row.original?.applyUrl : row.original?.link,
-        "__blank"
-      );
-      return;
-    }
-
-    const { authorized } = await apiService.gmailOauthStatus();
-
-    if (!authorized) {
-      toast.error(
-        "✨ Go to the Settings page and enable authorization for Cver AI to send emails on your behalf. This option is located in the second card.",
-        {
-          action: {
-            label: "Authorize now",
-            onClick: () =>
-              router.push(`/dashboard/settings?tab=ai-applypreference`),
-          },
-          classNames: {
-            actionButton: "!bg-blue-600 hover:!bg-blue-700 !text-white !h-8",
-          },
-        }
-      );
-      return;
-    }
-
-    const params = new URLSearchParams();
-    params.set(
-      "jobDescription",
-      JSON.stringify(row.original?.descriptionText || "")
-    );
-    params.set("recruiterEmail", encodeURIComponent(row.original?.emailApply));
-
-    updateJobApplicationHistory.mutate({
-      id: String(row.original.id),
-      data: {
-        appliedJobs: row.original.id,
-      },
-    });
-    router.push(
-      `/dashboard/tailor-cover-letter/${uuidv4()}?${params}&aiApply=true`
-    );
-  };
 
   const columns = OverviewColumn({
     router,

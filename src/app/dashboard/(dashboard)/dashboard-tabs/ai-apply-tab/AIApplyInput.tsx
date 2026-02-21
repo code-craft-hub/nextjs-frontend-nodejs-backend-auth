@@ -101,8 +101,7 @@ export const AIApplyInput = memo(
           [];
 
         if (user?.email) {
-          const { data } = await gmailApi.checkAuthStatus();
-          const authorized = data?.authorized;
+          const { authorized } = await gmailApi.checkAuthStatus();
 
           if (!authorized) {
             toast(

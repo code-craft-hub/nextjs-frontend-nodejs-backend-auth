@@ -7,33 +7,24 @@ import {
   getCoreRowModel,
   getFilteredRowModel,
   getSortedRowModel,
-  Row,
   SortingState,
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
 
-import { v4 as uuidv4 } from "uuid";
 import { userQueries } from "@module/user";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
-import {
-  useUpdateJobApplicationHistoryMutation,
-  useUpdateJobMutation,
-} from "@/lib/mutations/jobs.mutations";
+import { useUpdateJobMutation } from "@/lib/mutations/jobs.mutations";
 
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { jobsQueries } from "@/lib/queries/jobs.queries";
 
 import { SearchBar, SearchBarRef } from "./JobSearchBar";
-import { getDataSource } from "@/lib/utils/helpers";
-import { jobMatcher } from "@/services/job-matcher";
-import { toast } from "sonner";
-import { apiService } from "@/hooks/use-auth";
-import { JobType } from "@/types";
 import MobileOverview from "../components/MobileOverview";
 import { sendGTMEvent } from "@next/third-parties/google";
 import { OverviewColumn, OverviewEmpty, OverviewSkeleton } from "../components/OverviewColumn";
+import { useApplyJob } from "@/hooks/useApplyJob";
 
 export const SavedJobs = ({ children }: { children: ReactNode }) => {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -52,16 +43,13 @@ export const SavedJobs = ({ children }: { children: ReactNode }) => {
         value: `${user?.firstName} viewed Saved Jobs Page`,
       });
   }, [user?.firstName]);
-  const userDataSource = getDataSource(user);
-  const userJobTitlePreference =
-    userDataSource?.key || userDataSource?.title || "";
-  const updateJobApplicationHistory = useUpdateJobApplicationHistoryMutation();
-
+ 
+  
   const updateJobs = useUpdateJobMutation();
+  const { applyToJob: handleApply } = useApplyJob();
 
   const router = useRouter();
 
-  const bookmarkedIds = (user?.bookmarkedJobs || []) as string[];
 
   const {
     data,
@@ -71,93 +59,25 @@ export const SavedJobs = ({ children }: { children: ReactNode }) => {
     isLoading,
     isFetching,
     isRefetching,
-  } = useInfiniteQuery(jobsQueries.bookmarked(bookmarkedIds, "", 20));
+  } = useInfiniteQuery(jobsQueries.bookmarked());
 
-  const bookmarkedIdSet = useMemo(() => {
-    return new Set(bookmarkedIds);
-  }, [bookmarkedIds]);
+
 
   const allJobs = useMemo(() => {
     const jobs = data?.pages.flatMap((page) => page.data) ?? [];
     return jobs
       .map((job) => {
-        const jobContent = job?.title + " " + job?.descriptionText;
 
-        const completeMatch = jobMatcher.calculateMatch(
-          userJobTitlePreference,
-          jobContent || ""
-        );
+       
         return {
           ...job,
-          isBookmarked: bookmarkedIdSet?.has(job?.id),
-          matchPercentage: completeMatch?.score?.toString(),
-          matchDetails: completeMatch,
+         
         };
       })
       .sort((a, b) => {
         return parseInt(b?.matchPercentage) - parseInt(a?.matchPercentage);
       });
-  }, [data, user?.bookmarkedJobs?.length]);
-
-  const handleApply = async ({
-    event,
-    row,
-  }: {
-    event: any;
-    row: Row<JobType>;
-  }) => {
-    event.preventDefault();
-    event.stopPropagation();
-    if (!row.original?.emailApply) {
-      updateJobApplicationHistory.mutate({
-        id: String(row.original.id),
-        data: {
-          appliedJobs: row.original.id,
-        },
-      });
-      window.open(
-        !!row.original?.applyUrl ? row.original?.applyUrl : row.original?.link,
-        "__blank"
-      );
-      return;
-    }
-
-    const { authorized } = await apiService.gmailOauthStatus();
-
-    if (!authorized) {
-      toast.error(
-        "✨ Go to the Settings page and enable authorization for Cver AI to send emails on your behalf. This option is located in the second card.",
-        {
-          action: {
-            label: "Authorize now",
-            onClick: () =>
-              router.push(`/dashboard/settings?tab=ai-applypreference`),
-          },
-          classNames: {
-            actionButton: "!bg-blue-600 hover:!bg-blue-700 !text-white !h-8",
-          },
-        }
-      );
-      return;
-    }
-
-    const params = new URLSearchParams();
-    params.set(
-      "jobDescription",
-      JSON.stringify(row.original?.descriptionText || "")
-    );
-    params.set("recruiterEmail", encodeURIComponent(row.original?.emailApply));
-
-    updateJobApplicationHistory.mutate({
-      id: String(row.original.id),
-      data: {
-        appliedJobs: row.original.id,
-      },
-    });
-    router.push(
-      `/dashboard/tailor-cover-letter/${uuidv4()}?${params}&aiApply=true`
-    );
-  };
+  }, [data]);
 
   const columns = OverviewColumn({
     router,

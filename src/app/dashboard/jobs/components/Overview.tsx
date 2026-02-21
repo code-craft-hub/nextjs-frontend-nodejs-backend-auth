@@ -7,7 +7,6 @@ import {
   getCoreRowModel,
   getFilteredRowModel,
   getSortedRowModel,
-  Row,
   SortingState,
   useReactTable,
   VisibilityState,
@@ -24,17 +23,11 @@ import { useRouter } from "next/navigation";
 import { jobsQueries } from "@/lib/queries/jobs.queries";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { leftMenuItems } from "@/lib/utils/constants";
-import { v4 as uuidv4 } from "uuid";
 import { ArrowRight, SearchIcon, Loader2 } from "lucide-react";
 import { getDataSource } from "@/lib/utils/helpers";
-import { JobType } from "@/types";
-import { toast } from "sonner";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { useForm } from "react-hook-form";
-import {
-  useUpdateJobApplicationHistoryMutation,
-  useUpdateJobMutation,
-} from "@/lib/mutations/jobs.mutations";
+import { useUpdateJobMutation } from "@/lib/mutations/jobs.mutations";
 import { ReportCard } from "./ReportCard";
 import { jobMatcher } from "@/services/job-matcher";
 import { sendGTMEvent } from "@next/third-parties/google";
@@ -47,7 +40,7 @@ import {
 } from "./OverviewColumn";
 import MobileOverview from "./MobileOverview";
 import AuthorizeGoogle from "@/hooks/gmail/AuthorizeGoogle";
-import { gmailApi } from "@/lib/api/gmail.api";
+import { useApplyJob } from "@/hooks/useApplyJob";
 
 export default function Overview() {
   const router = useRouter();
@@ -77,7 +70,7 @@ export default function Overview() {
   );
 
   const updateJobs = useUpdateJobMutation();
-  const updateJobApplicationHistory = useUpdateJobApplicationHistoryMutation();
+  const { applyToJob: handleApply } = useApplyJob();
   const userDataSource = getDataSource(user);
   const userJobTitlePreference =
     userDataSource?.key || userDataSource?.title || "";
@@ -88,19 +81,7 @@ export default function Overview() {
     },
   });
 
-  const bookmarkedIds = (user?.bookmarkedJobs || []) as string[];
-  const appliedJobsIds = (user?.appliedJobs?.map((job) => job.id) ||
-    []) as string[];
 
-  const bookmarkedIdSet = useMemo(
-    () => new Set(bookmarkedIds),
-    [bookmarkedIds]
-  );
-
-  const appliedJobsIdSet = useMemo(
-    () => new Set(appliedJobsIds),
-    [appliedJobsIds]
-  );
 
   const {
     data,
@@ -130,10 +111,6 @@ export default function Overview() {
         }
         return {
           ...job,
-          isBookmarked: bookmarkedIdSet?.has(job?.id),
-          isApplied: appliedJobsIdSet?.has(job?.id),
-          matchPercentage: completeMatch?.score?.toString(),
-          matchDetails: completeMatch,
         };
       })
       .sort((a, b) => {
@@ -141,68 +118,8 @@ export default function Overview() {
       });
     totalScoreRef.current = scores.length;
     return jobData;
-  }, [data, user?.bookmarkedJobs?.length, user?.appliedJobs?.length]);
+  }, [data]);
 
-  const handleApply = async ({
-    event,
-    row,
-  }: {
-    event: any;
-    row: Row<JobType>;
-  }) => {
-    event.preventDefault();
-    event.stopPropagation();
-    if (!row.original?.emailApply) {
-      updateJobApplicationHistory.mutate({
-        id: String(row.original.id),
-        data: {
-          appliedJobs: row.original.id,
-        },
-      });
-      window.open(
-        !!row.original?.applyUrl ? row.original?.applyUrl : row.original?.link,
-        "__blank"
-      );
-      return;
-    }
-
-    const { data } = await gmailApi.checkAuthStatus()
-    const authorized = data?.authorized;
-    
-    if (!authorized) {
-      toast.error(
-        "✨ Go to the Settings page and enable authorization for Cver AI to send emails on your behalf. This option is located in the second card.",
-        {
-          action: {
-            label: "Authorize now",
-            onClick: () =>
-              router.push(`/dashboard/settings?tab=ai-applypreference`),
-          },
-          classNames: {
-            actionButton: "!bg-blue-600 hover:!bg-blue-700 !text-white !h-8",
-          },
-        }
-      );
-      return;
-    }
-
-    const params = new URLSearchParams();
-    params.set(
-      "jobDescription",
-      JSON.stringify(row.original?.descriptionText || "")
-    );
-    params.set("recruiterEmail", encodeURIComponent(row.original?.emailApply));
-
-    updateJobApplicationHistory.mutate({
-      id: String(row.original.id),
-      data: {
-        appliedJobs: row.original.id,
-      },
-    });
-    router.push(
-      `/dashboard/tailor-cover-letter/${uuidv4()}?${params}&aiApply=true`
-    );
-  };
   const columns = OverviewColumn({
     router,
     updateJobs,

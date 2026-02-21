@@ -24,13 +24,16 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
+
+export type ApplyHandler = (job: JobType, e?: React.MouseEvent) => void;
+
 export const OverviewColumn = ({
   updateJobs,
   handleApply,
 }: {
   router: AppRouterInstance;
   updateJobs?: any;
-  handleApply?: any;
+  handleApply?: ApplyHandler;
 }): ColumnDef<JobType>[] => [
   {
     accessorKey: "companyText",
@@ -150,7 +153,7 @@ export const OverviewColumn = ({
           <Button
             disabled={row.original.isApplied}
             className="w-full disabled:opacity-50 disabled:cursor-not-allowed disabled:text-gray-400"
-            onClick={(event) => handleApply({ event, row })}
+            onClick={(event) => handleApply?.(row.original, event)}
             variant={"button"}
           >
             {row.original?.emailApply ? "Auto Apply" : "Apply Now"}

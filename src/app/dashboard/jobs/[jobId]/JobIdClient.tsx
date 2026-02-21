@@ -1,8 +1,6 @@
 "use client";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useUpdateJobApplicationHistoryMutation } from "@/lib/mutations/jobs.mutations";
 import { jobsQueries } from "@/lib/queries/jobs.queries";
-import { userQueries } from "@module/user";
 import { postedDate } from "@/lib/utils/helpers";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -17,9 +15,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { toast } from "sonner";
-import { v4 as uuidv4 } from "uuid";
-import { gmailApi } from "@/lib/api/gmail.api";
+import { useApplyJob } from "@/hooks/useApplyJob";
 
 export const JobIdClient = ({
   jobId,
@@ -29,8 +25,7 @@ export const JobIdClient = ({
   referrer: string;
 }) => {
   const { data, isLoading } = useQuery(jobsQueries.detail(jobId));
-  const { data: user } = useQuery(userQueries.detail());
-  const updateJobApplicationHistory = useUpdateJobApplicationHistoryMutation();
+  const { applyToJob } = useApplyJob();
 
   const [pageTitle, setPageTitle] = useState("AI Recommendations");
   const job = data?.data;
@@ -53,53 +48,6 @@ export const JobIdClient = ({
     }
   };
 
-  const handleApplyClick = async () => {
-    if (!job) return;
-
-    updateJobApplicationHistory.mutate({
-      id: job.id,
-      data: {
-        appliedJobs: job.id,
-      },
-    });
-
-    if (!job?.emailApply) {
-      window.open(!!job.link ? job?.link : job?.applyUrl, "__blank");
-      return;
-    }
-
-    if (user?.email && job?.emailApply) {
-      const { data } = await gmailApi.checkAuthStatus();
-
-      const authorized = data?.authorized ?? false;
-      
-      if (!authorized) {
-        toast(
-          "Please authorize Cver AI to send emails on your behalf from the settings page.  ",
-          {
-            action: {
-              label: "Authorize now",
-              onClick: () =>
-                router.push(`/dashboard/settings?tab=ai-applypreference`),
-            },
-            classNames: {
-              // toast: "!bg-yellow-50 !border-yellow-200",
-              actionButton: "!bg-blue-600 hover:!bg-blue-700 !text-white !h-8",
-            },
-          },
-        );
-
-        return;
-      }
-    }
-
-    const params = new URLSearchParams();
-    params.set("jobDescription", JSON.stringify(job?.descriptionText || ""));
-    params.set("recruiterEmail", encodeURIComponent(job?.emailApply));
-    router.push(
-      `/dashboard/tailor-cover-letter/${uuidv4()}?${params}&aiApply=true`,
-    );
-  };
   return (
     <div>
       <div className="min-h-screen bg-gray-50">
@@ -142,7 +90,7 @@ export const JobIdClient = ({
                 </div>
               )}
               <button
-                onClick={() => handleApplyClick()}
+                onClick={(e) => job && applyToJob(job, e)}
                 className="bg-blue-600 max-sm:text-2xs hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-medium max-sm:w-full"
               >
                 Apply Now{" "}

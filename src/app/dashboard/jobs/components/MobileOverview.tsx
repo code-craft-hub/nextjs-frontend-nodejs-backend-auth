@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { memo } from "react";
+import { ApplyHandler } from "./OverviewColumn";
 
 const MobileOverview = memo(
   ({
@@ -20,7 +21,7 @@ const MobileOverview = memo(
   }: {
     allJobs: JobType[];
     updateJobs?: any;
-    handleApply?: any;
+    handleApply?: ApplyHandler;
   }) => {
     const router = useRouter();
     return (
@@ -114,10 +115,7 @@ const MobileOverview = memo(
                       </div>
                     )}
                     <button
-                      onClick={(event) => {
-                        const row = { original: job };
-                        handleApply({ event, row });
-                      }}
+                      onClick={(event) => handleApply?.(job, event)}
                       className=" bg-blue-50 text-blue-600 px-2 py-2 text-2xs rounded-lg hover:bg-blue-100 transition-colors flex items-center gap-2 font-medium"
                     >
                       {job?.emailApply ? (

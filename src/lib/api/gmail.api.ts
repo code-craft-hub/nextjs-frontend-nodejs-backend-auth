@@ -73,10 +73,15 @@ export const gmailApi = {
       { token },
     ),
 
-  checkAuthStatus: (token?: string) =>
-    api.get<ApiResponse<AuthStatusResponse>>(`${GMAIL_AUTH_BASE}/status`, {
-      token,
-    }),
+  checkAuthStatus: async (token?: string) => {
+    const { data } = await api.get<ApiResponse<AuthStatusResponse>>(
+      `${GMAIL_AUTH_BASE}/status`,
+      {
+        token,
+      },
+    );
+    return data;
+  },
 
   getAccount: (token?: string) =>
     api.get<ApiResponse<AccountResponse>>(`${GMAIL_AUTH_BASE}/account`, {
