@@ -408,7 +408,10 @@ export async function apiClient<T>(
       );
 
       queueMicrotask(() => {
-        if (typeof window !== "undefined") {
+        if (
+          typeof window !== "undefined" &&
+          window.location.pathname !== "/login"
+        ) {
           window.location.href = "/login";
         }
       });

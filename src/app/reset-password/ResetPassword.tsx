@@ -53,7 +53,7 @@ export const ResetPassword = ({
 
     try {
       // Server expects: { email, otp, newPassword }  (auth.validator.ts → resetPasswordSchema)
-      await api.post("/v1/auth/reset-password", {
+      await api.post("/auth/reset-password", {
         email,
         otp,
         newPassword: password,

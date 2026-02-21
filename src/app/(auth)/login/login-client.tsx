@@ -124,7 +124,7 @@ export const LoginClient = () => {
       try {
         setIsLoginLoading(true);
         const result = await api.post<{ data: { user: { onboardingComplete: boolean; emailVerified: boolean } } }>(
-          "/v1/auth/google",
+          "/auth/google",
           { code: codeResponse.code },
         );
         const user = result?.data?.user;
@@ -156,7 +156,7 @@ export const LoginClient = () => {
   const onSubmit = async (values: z.infer<typeof LoginSchema>) => {
     try {
       setIsLoginLoading(true);
-      await api.post("/v1/auth/login", {
+      await api.post("/auth/login", {
         email: values.email,
         password: values.password,
       });

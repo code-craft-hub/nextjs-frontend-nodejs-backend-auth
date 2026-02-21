@@ -41,7 +41,7 @@ export default function RegisterClient({ referral }: { referral?: string }) {
       try {
         setLoading(true);
         const result = await api.post<{ data: { user: { onboardingComplete: boolean } } }>(
-          "/v1/auth/google",
+          "/auth/google",
           { code: codeResponse.code },
         );
         // New Google users haven't completed onboarding; existing ones go to dashboard.
@@ -75,7 +75,7 @@ export default function RegisterClient({ referral }: { referral?: string }) {
   const onSubmit = async (values: RegisterUserSchema) => {
     try {
       setLoading(true);
-      await api.post("/v1/auth/register", values);
+      await api.post("/auth/register", values);
       toast.success("Registration successful! Please check your email.");
       router.push("/verify-email");
     } catch (error: any) {

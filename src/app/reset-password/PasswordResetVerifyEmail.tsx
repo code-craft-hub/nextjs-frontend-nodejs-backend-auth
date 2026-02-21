@@ -68,7 +68,7 @@ export const PasswordResetVerifyEmail = ({
     try {
       // /auth/forgot-password sends the reset OTP to the user's inbox.
       // It always returns 200 regardless of whether the email exists (prevents enumeration).
-      await api.post("/v1/auth/forgot-password", { email });
+      await api.post("/auth/forgot-password", { email });
 
       toast.success(`Reset code sent to ${email}!`);
       setCanResend(false);

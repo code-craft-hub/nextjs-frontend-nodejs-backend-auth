@@ -69,19 +69,57 @@ export async function getSessionFromRequest(
   return verifySessionToken(sessionToken);
 }
 
-// Get session from cookies (for server components)
-export async function getSessionFromCookies(): Promise<Partial<IUser> | null> {
-  const cookieStore = await cookies();
-  const sessionToken = cookieStore.get("session")?.value;
-  if (!sessionToken) return null;
-  return verifySessionToken(sessionToken);
+/**
+ * Verify a token issued by the Express backend (new auth system).
+ *
+ * The backend signs access tokens with HS256 using JWT_SECRET. There is no
+ * issuer constraint — the token type claim ("access") is checked instead to
+ * guard against accidentally accepting refresh tokens.
+ *
+ * Returns null (never throws) so callers can treat any failure as unauthenticated.
+ */
+async function verifyAccessToken(
+  token: string,
+): Promise<Partial<IUser> | null> {
+  try {
+    const secret = new TextEncoder().encode(process.env.JWT_SECRET);
+    const { payload } = await jwtVerify(token, secret);
+
+    // Reject refresh tokens and any other non-access token types.
+    if (payload["type"] !== "access") return null;
+
+    return {
+      email: payload.email as string,
+      emailVerified: payload.emailVerified as boolean,
+      onboardingComplete: payload.onboardingComplete as boolean,
+    };
+  } catch {
+    // Expired, wrong signature, malformed — all treated as unauthenticated.
+    return null;
+  }
 }
 
+/**
+ * Get session from cookies (for server components).
+ *
+ * Reads the `access_token` httpOnly cookie set by the Express backend on login.
+ * Falls back gracefully to null for users who still carry a legacy `session`
+ * cookie from the previous auth system — they will be directed to log in again.
+ */
+export async function getSessionFromCookies(): Promise<Partial<IUser> | null> {
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get("access_token")?.value;
+  if (!accessToken) return null;
+  return verifyAccessToken(accessToken);
+}
+
+/**
+ * Returns the raw `access_token` JWT for use as a Bearer token in server-side
+ * fetch calls that target the Express backend.
+ */
 export async function getCookiesToken(): Promise<string | null> {
   const cookieStore = await cookies();
-  const sessionToken = cookieStore.get("session")?.value;
-  if (!sessionToken) return null;
-  return sessionToken;
+  return cookieStore.get("access_token")?.value ?? null;
 }
 
 
