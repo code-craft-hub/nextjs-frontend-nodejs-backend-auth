@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { jwtVerify } from "jose";
 import { IUser } from "@/types";
 
-const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_SECRET = process.env.NEXT_PUBLIC_JWT_SECRET;
 
 // Verify session token
 export async function verifySessionToken(
@@ -48,7 +48,7 @@ async function verifyAccessToken(
   token: string,
 ): Promise<Partial<IUser> | null> {
   try {
-    const secret = new TextEncoder().encode(process.env.JWT_SECRET);
+    const secret = new TextEncoder().encode(process.env.NEXT_PUBLIC_JWT_SECRET);
     const { payload } = await jwtVerify(token, secret);
 
     // Reject refresh tokens and any other non-access token types.
@@ -74,7 +74,14 @@ async function verifyAccessToken(
  */
 export async function getSessionFromCookies(): Promise<Partial<IUser> | null> {
   const cookieStore = (await resolveCookiesToken()) ?? "";
-  return verifyAccessToken(cookieStore);
+  const verifiedSession = await verifyAccessToken(cookieStore);
+  console.log(
+    "getSessionFromCookies token:",
+    cookieStore,
+    "verify result:",
+    verifiedSession,
+  );
+  return verifiedSession;
 }
 
 /**
@@ -90,8 +97,10 @@ async function resolveCookiesToken(): Promise<string | null> {
 
   let cookieValue = null;
   if (cookieStore.get("access_token")?.value) {
+    console.log("Found access_token cookie");
     cookieValue = cookieStore.get("access_token")?.value;
   } else if (cookieStore.get("session")?.value) {
+    console.log("Found legacy session cookie");
     cookieValue = cookieStore.get("session")?.value;
   }
 

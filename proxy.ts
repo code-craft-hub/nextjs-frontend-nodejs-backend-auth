@@ -2,20 +2,22 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { jwtVerify } from "jose";
 import { IUser } from "./src/types";
-import { getJwtSecret } from "./src/lib/utils/helpers";
+// import { getJwtSecret } from "./src/lib/utils/helpers";
 
 async function verifySessionToken(
   token: string
 ): Promise<Partial<IUser> | null> {
   try {
-    const secret = new TextEncoder().encode(getJwtSecret());
+    // const secret = new TextEncoder().encode(getJwtSecret());
+    const secret = new TextEncoder().encode(process.env.NEXT_PUBLIC_JWT_SECRET);
 
     // NOTE: no `issuer` option — the backend TokenService does not call
     // .setIssuer(), so enforcing one rejects every valid access token.
     const { payload } = await jwtVerify(token, secret);
 
+    console.log("verifySessionToken payload:", payload);
     // Guard against refresh tokens being used here by design.
-    if (payload["type"] !== "access") return null;
+    // if (payload["type"] !== "access") return null;
 
     // New JWT shape (server/modules/auth/services/token.service.ts):
     //   sub              → userId  (JWT standard "subject")

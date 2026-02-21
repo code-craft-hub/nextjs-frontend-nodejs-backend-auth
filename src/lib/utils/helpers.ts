@@ -197,19 +197,21 @@ export const expireNextThreeDays = () => {
 };
 
 export const getJwtSecret = () => {
-  const secret = process.env.JWT_SECRET?.trim();
+  const secret = process.env.NEXT_PUBLIC_JWT_SECRET?.trim();
 
   if (!secret) {
-    throw new Error("JWT_SECRET environment variable is not defined");
+    throw new Error(
+      "NEXT_PUBLIC_JWT_SECRET environment variable is not defined",
+    );
   }
 
   if (secret.length === 0) {
-    throw new Error("JWT_SECRET environment variable is empty");
+    throw new Error("NEXT_PUBLIC_JWT_SECRET environment variable is empty");
   }
 
   if (secret.length < 32) {
     console.warn(
-      `[WARNING] JWT_SECRET is only ${secret.length} characters. ` +
+      `[WARNING] NEXT_PUBLIC_JWT_SECRET is only ${secret.length} characters. ` +
         "Recommended minimum is 32 characters for security.",
     );
   }

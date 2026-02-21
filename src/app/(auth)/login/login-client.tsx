@@ -18,6 +18,8 @@ import { Eye, EyeOff } from "lucide-react";
 import { api, APIError } from "@/lib/api/client";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
+import { userQueries } from "@/modules/user";
 
 const LoginSchema = z.object({
   email: z.email({ message: "Please enter a valid email address." }),
@@ -114,6 +116,8 @@ function FloatingLabelInput({
 export const LoginClient = () => {
   const router = useRouter();
   const [isLoginLoading, setIsLoginLoading] = useState(false);
+  const {data: user} = useQuery(userQueries.detail())
+  console.log("LoginClient user query result", { user });
   // const { login, isLoginLoading } = useAuth();
 
   // Google OAuth — authorization-code flow.  The backend exchanges the
