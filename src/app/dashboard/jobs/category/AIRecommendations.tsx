@@ -24,7 +24,6 @@ import { useRouter } from "next/navigation";
 import { jobsQueries } from "@/lib/queries/jobs.queries";
 import { getDataSource } from "@/lib/utils/helpers";
 import { jobMatcher } from "@/services/job-matcher";
-import { apiService } from "@/hooks/use-auth";
 import { toast } from "sonner";
 import { JobType } from "@/types";
 import MobileOverview from "../components/MobileOverview";
@@ -59,7 +58,6 @@ export const AIRecommendations = ({ children }: { children: ReactNode }) => {
 
   const router = useRouter();
 
-  const bookmarkedIds = (user?.bookmarkedJobs || []) as string[];
 
   const {
     data,
@@ -75,9 +73,6 @@ export const AIRecommendations = ({ children }: { children: ReactNode }) => {
     })
   );
 
-  const bookmarkedIdSet = useMemo(() => {
-    return new Set(bookmarkedIds);
-  }, [bookmarkedIds]);
 
   const allJobs = useMemo(() => {
     const jobs = data?.pages.flatMap((page) => page.data) ?? [];
@@ -91,7 +86,6 @@ export const AIRecommendations = ({ children }: { children: ReactNode }) => {
       );
       return {
         ...job,
-        isBookmarked: bookmarkedIdSet?.has(job?.id),
         matchPercentage: completeMatch?.score?.toString(),
         matchDetails: completeMatch,
       };
@@ -99,7 +93,7 @@ export const AIRecommendations = ({ children }: { children: ReactNode }) => {
     // .sort((a, b) => {
     //   return parseInt(b?.createdAt) - parseInt(a?.createdAt);
     // });
-  }, [data, user?.bookmarkedJobs?.length, user?.appliedJobs?.length]);
+  }, [data,]);
 
   const handleApply = async ({
     event,

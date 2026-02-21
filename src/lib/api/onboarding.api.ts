@@ -37,9 +37,7 @@ export const onboardingApi = {
   // Update job
   updateJob: (id: string, data: any) => api.patch<JobType>(`/jobs/${id}`, data),
 
-  // Update application history of a job
-  updateJobApplicationHistory: (id: string, data: any) =>
-    api.patch<JobType>(`/jobs/application-history/${id}`, data),
+
 
   // Delete job
   deleteJob: (id: string) => api.delete<void>(`/job-recommendations/${id}`),

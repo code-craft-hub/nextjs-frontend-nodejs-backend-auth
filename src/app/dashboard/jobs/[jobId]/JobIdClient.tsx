@@ -1,6 +1,5 @@
 "use client";
 import { Skeleton } from "@/components/ui/skeleton";
-import { apiService } from "@/hooks/use-auth";
 import { useUpdateJobApplicationHistoryMutation } from "@/lib/mutations/jobs.mutations";
 import { jobsQueries } from "@/lib/queries/jobs.queries";
 import { userQueries } from "@module/user";
@@ -20,6 +19,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
+import { gmailApi } from "@/lib/api/gmail.api";
 
 export const JobIdClient = ({
   jobId,
@@ -69,8 +69,10 @@ export const JobIdClient = ({
     }
 
     if (user?.email && job?.emailApply) {
-      const { authorized } = await apiService.gmailOauthStatus();
+      const { data } = await gmailApi.checkAuthStatus();
 
+      const authorized = data?.authorized ?? false;
+      
       if (!authorized) {
         toast(
           "Please authorize Cver AI to send emails on your behalf from the settings page.  ",
@@ -84,7 +86,7 @@ export const JobIdClient = ({
               // toast: "!bg-yellow-50 !border-yellow-200",
               actionButton: "!bg-blue-600 hover:!bg-blue-700 !text-white !h-8",
             },
-          }
+          },
         );
 
         return;
@@ -95,7 +97,7 @@ export const JobIdClient = ({
     params.set("jobDescription", JSON.stringify(job?.descriptionText || ""));
     params.set("recruiterEmail", encodeURIComponent(job?.emailApply));
     router.push(
-      `/dashboard/tailor-cover-letter/${uuidv4()}?${params}&aiApply=true`
+      `/dashboard/tailor-cover-letter/${uuidv4()}?${params}&aiApply=true`,
     );
   };
   return (

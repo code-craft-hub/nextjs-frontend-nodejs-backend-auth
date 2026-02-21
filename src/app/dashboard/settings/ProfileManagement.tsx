@@ -18,23 +18,19 @@ export const ProfileManagement: React.FC = () => {
   const { uploadResume, error: uploadError } = useResumeUploadWithProgress();
 
   const handleFileSelect = async (file: File) => {
-    toast.promise(uploadResume(file), {
+    await toast.promise(uploadResume(file), {
       loading: "Preparing your resume...",
       success: () => {
         queryClient.invalidateQueries({ queryKey: queryKeys.users.lists() });
         queryClient.invalidateQueries({ queryKey: queryKeys.users.all });
-        queryClient.invalidateQueries({ queryKey: resumeQueries.uploaded().queryKey });
-        // if (window !== undefined) {
-        //   window.location.href = "/dashboard/home";
-        // }
+        queryClient.invalidateQueries({
+          queryKey: resumeQueries.uploaded().queryKey,
+        });
         return `${user?.firstName}, your resume is saved!`;
       },
-      error: (error) => {
-        return (
-          "Failed to upload resume" +
-          (error instanceof Error ? `: ${error.message}` : "")
-        );
-      },
+      error: (error) =>
+        "Failed to upload resume" +
+        (error instanceof Error ? `: ${error.message}` : ""),
     });
   };
 

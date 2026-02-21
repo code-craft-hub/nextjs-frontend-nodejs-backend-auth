@@ -89,6 +89,8 @@ export interface JobPost {
   qualityScore?: number | null;
   createdAt?: string | Date | null;
   updatedAt?: string | Date | null;
+  /** Populated by the backend when the request is authenticated. */
+  isBookmarked?: boolean;
 }
 
 export interface ProfileData {

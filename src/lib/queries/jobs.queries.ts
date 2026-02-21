@@ -56,7 +56,7 @@ export const jobsQueries = {
   autoApply: () => {
     return queryOptions({
       queryKey: queryKeys.jobs.autoApply(),
-      queryFn: () => jobsApi.autoApply(),
+      queryFn: () => recommendationsApi.getUserRecommendations(),
       staleTime: 10 * 60 * 1000,
       refetchInterval: (query) => {
         const recommendations = query.state.data?.data?.recommendations;

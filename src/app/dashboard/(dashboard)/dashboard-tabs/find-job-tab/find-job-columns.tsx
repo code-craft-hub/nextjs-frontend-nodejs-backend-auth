@@ -4,17 +4,26 @@ import {
   Calendar,
   DollarSign,
   MapPin,
-  Sparkles,
 } from "lucide-react";
 import { PiOfficeChairFill } from "react-icons/pi";
 import { Button } from "@/components/ui/button";
 import { Toggle } from "@/components/ui/toggle";
 import { formatAppliedDate } from "@/lib/utils/helpers";
-import type { JobType } from "@/types";
+import type { JobPost } from "@/types";
 
 interface JobColumnCallbacks {
-  onBookmark: (job: JobType) => void;
-  onApply: (job: JobType, e: React.MouseEvent) => void;
+  onBookmark: (job: JobPost) => void;
+  onApply: (job: JobPost, e: React.MouseEvent) => void;
+}
+
+/** Formats a salaryInfo object into a human-readable string, or null if absent. */
+function formatSalary(salaryInfo: JobPost["salaryInfo"]): string | null {
+  if (!salaryInfo?.min && !salaryInfo?.max) return null;
+  const { currency = "", min, max, period } = salaryInfo;
+  const range = max
+    ? `${min?.toLocaleString()}-${max.toLocaleString()}`
+    : min?.toLocaleString() ?? "";
+  return `${currency}${range}${period ? `/${period}` : ""}`.trim() || null;
 }
 
 /**
@@ -24,7 +33,7 @@ interface JobColumnCallbacks {
 export function getJobColumns({
   onBookmark,
   onApply,
-}: JobColumnCallbacks): ColumnDef<JobType>[] {
+}: JobColumnCallbacks): ColumnDef<JobPost>[] {
   return [
     {
       accessorKey: "companyText",
@@ -33,7 +42,7 @@ export function getJobColumns({
         <div className="shrink-0 flex items-center justify-center size-16">
           <img
             src={row.original.companyLogo || "/placeholder.jpg"}
-            alt={row.original.companyText}
+            alt={row.original.companyName ?? ""}
             className="size-12 object-contain"
           />
         </div>
@@ -44,9 +53,8 @@ export function getJobColumns({
       header: "Title",
       cell: ({ row }) => {
         const job = row.original;
-        const matchPct = Number(job.matchPercentage) || 0;
-        const jobLabel = job.jobType || job.employmentType;
-        const dateStr = job.scrapedAt || job.postedAt || job.updatedAt;
+        const salary = formatSalary(job.salaryInfo);
+        const dateStr = job.postedAt || job.createdAt || job.updatedAt;
 
         return (
           <div className="capitalize">
@@ -54,13 +62,10 @@ export function getJobColumns({
               <span className="font-medium text-xs overflow-hidden truncate max-w-44">
                 {row.getValue("title")}
               </span>
-              {jobLabel && (
+              {job.employmentType && (
                 <span className="bg-blue-50 rounded text-blue-600 px-2 py-1 text-2xs">
-                  {jobLabel}
+                  {job.employmentType}
                 </span>
-              )}
-              {matchPct > 40 && (
-                <Sparkles className="text-yellow-500 size-4" />
               )}
             </div>
             <div className="flex gap-x-4 mt-1">
@@ -74,19 +79,16 @@ export function getJobColumns({
                 <PiOfficeChairFill className="size-3" />
                 <span className="text-2xs">{job.companyName}</span>
               </p>
-              {!!job.salary && (
+              {salary && (
                 <p className="flex gap-1 text-gray-400 items-center">
                   <DollarSign className="size-3" />
-                  <span className="text-2xs">{job.salary}</span>
+                  <span className="text-2xs">{salary}</span>
                 </p>
               )}
               <p className="flex gap-1 text-gray-400 items-center">
                 <Calendar className="size-3" />
                 <span className="text-2xs">{formatAppliedDate(dateStr)}</span>
               </p>
-              {matchPct > 40 && (
-                <span className="text-2xs text-green-400">{matchPct}%</span>
-              )}
             </div>
           </div>
         );
@@ -105,7 +107,7 @@ export function getJobColumns({
           }}
         >
           <Toggle
-            pressed={row.original.isBookmarked}
+            pressed={!!row.original.isBookmarked}
             aria-label="Toggle bookmark"
             size="sm"
             variant="outline"
@@ -129,9 +131,6 @@ export function getJobColumns({
               variant={"button"}
             >
               {job.emailApply ? "Auto Apply" : "Apply Now"}
-              {job.emailApply && (
-                <Sparkles className="text-yellow-500 size-3 ml-1" />
-              )}
             </Button>
           </div>
         );

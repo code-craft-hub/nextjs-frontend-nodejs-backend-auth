@@ -1,10 +1,40 @@
+import { JobType } from "@/types";
 import { api } from "./client";
 const JOB_RECOMMENDATION_API = `/recommendations`;
+
+export interface RecommendationMetrics {
+  experimentId: string | null;
+  geminiReasoning: string;
+  matchingFeatures: {
+    matchedSkills: string[];
+    scoreBreakdown: Record<string, unknown>;
+    searchCriteria: Record<string, unknown>;
+  };
+  modelVersion: string;
+}
+
+export interface JobRecommendation {
+  id: string;
+  confidenceScore: number;
+  matchScore: number;
+  status: string;
+  viewedAt: string | null;
+  rankPosition: number;
+  createdAt: string;
+  metrics: RecommendationMetrics;
+  job: JobType;
+}
+
+export interface RecommendationsResponse {
+  recommendations: JobRecommendation[];
+  count: number;
+  status: string;
+}
 
 export const recommendationsApi = {
   // GET /recommendations - returns saved recommendations or queues generation
   getUserRecommendations: (token?: string) =>
-    api.get(`${JOB_RECOMMENDATION_API}`, { token }),
+    api.get<{ data: RecommendationsResponse }>(`${JOB_RECOMMENDATION_API}`, { token }),
 
   // POST /recommendations - get recommendations based on request body (optionally save)
   getRecommendations: (payload: any, token?: string) =>

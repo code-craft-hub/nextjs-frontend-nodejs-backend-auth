@@ -1,4 +1,4 @@
-import { BACKEND_API_VERSION } from "@/lib/api/client";
+import { API_URL } from "@/lib/api/client";
 import { useState, useCallback, useRef } from "react";
 
 export interface UploadProgress {
@@ -27,14 +27,11 @@ export const useResumeUploadWithProgress = () => {
 
       // Create the upload request
       // const response = await fetch(baseURL+'/onboarding-user/upload', {
-      const response = await fetch(
-         `/${BACKEND_API_VERSION}/resumes/upload`,
-        {
-          method: "POST",
-          body: formData,
-          credentials: "include",
-        },
-      );
+      const response = await fetch(`${API_URL}/resumes/upload`, {
+        method: "POST",
+        body: formData,
+        credentials: "include",
+      });
 
       if (!response.ok) {
         throw new Error("Upload failed");

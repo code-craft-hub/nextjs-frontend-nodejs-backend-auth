@@ -9,7 +9,7 @@ import {
   useUpdateJobApplicationHistoryMutation,
   useUpdateJobMutation,
 } from "@/lib/mutations/jobs.mutations";
-import type { JobType } from "@/types";
+import type { JobPost } from "@/types";
 import { BOOKMARK_IDS_QUERY_KEY } from "./useBookmarkedJobIds";
 import { gmailApi } from "@/lib/api/gmail.api";
 
@@ -25,7 +25,7 @@ export function useJobActions() {
     useUpdateJobApplicationHistoryMutation();
 
   const handleBookmark = useCallback(
-    (job: JobType) => {
+    (job: JobPost) => {
       updateJobMutate(
         {
           id: String(job.id),
@@ -36,16 +36,18 @@ export function useJobActions() {
           // isBookmarked state from the bookmarks API (source of truth).
           onSettled: () =>
             queryClient.invalidateQueries({ queryKey: BOOKMARK_IDS_QUERY_KEY }),
-        }
+        },
       );
     },
-    [updateJobMutate, queryClient]
+    [updateJobMutate, queryClient],
   );
 
   const handleApply = useCallback(
-    async (job: JobType, e?: React.MouseEvent) => {
+    async (job: JobPost, e?: React.MouseEvent) => {
       e?.preventDefault();
       e?.stopPropagation();
+
+      const link = !!job.applyUrl ? job.applyUrl : job.link;
 
       try {
         if (!job.emailApply) {
@@ -53,16 +55,12 @@ export function useJobActions() {
             id: String(job.id),
             data: { appliedJobs: job.id },
           });
-          window.open(
-            job.applyUrl ?? job.link,
-            "_blank",
-            "noopener,noreferrer"
-          );
+          window.open(link, "_blank", "noopener,noreferrer");
           return;
         }
 
-      const { data } = await gmailApi.checkAuthStatus();
-      const authorized = data?.authorized;
+        const { data } = await gmailApi.checkAuthStatus();
+        const authorized = data?.authorized;
         if (!authorized) {
           toast.error(
             "✨ Go to Settings and authorize Cver AI to send emails on your behalf.",
@@ -76,7 +74,7 @@ export function useJobActions() {
                 actionButton:
                   "!bg-blue-600 hover:!bg-blue-700 !text-white !h-8",
               },
-            }
+            },
           );
           return;
         }
@@ -91,13 +89,13 @@ export function useJobActions() {
           recruiterEmail: encodeURIComponent(job.emailApply),
         });
         router.push(
-          `/dashboard/tailor-cover-letter/${uuidv4()}?${params}&aiApply=true`
+          `/dashboard/tailor-cover-letter/${uuidv4()}?${params}&aiApply=true`,
         );
       } catch {
         toast.error("Something went wrong. Please try again.");
       }
     },
-    [router, recordApplicationMutate]
+    [router, recordApplicationMutate],
   );
 
   return { handleBookmark, handleApply };

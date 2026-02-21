@@ -10,9 +10,8 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
-import type { JobType } from "@/types";
+import type { JobPost } from "@/types";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { jobsQueries } from "@/lib/queries/jobs.queries";
 import {
   useEffect,
   useMemo,
@@ -24,10 +23,10 @@ import type { JobFilters } from "@/lib/types/jobs";
 import { ReportCard } from "@/app/dashboard/jobs/components/ReportCard";
 import { useRouter } from "next/navigation";
 import MobileFindJob from "./MobileFindJob";
-import { useBookmarkedJobIds } from "./hooks/useBookmarkedJobIds";
+import { jobPostsQueries } from "@/lib/queries/job-posts.queries";
 
 interface FindJobClientProps {
-  columns: ColumnDef<JobType>[];
+  columns: ColumnDef<JobPost>[];
   filters: Omit<JobFilters, "page">;
   hideToMenus?: boolean;
 }
@@ -53,14 +52,7 @@ export default function FindJobClient({
   const isSearchPending = searchQuery !== deferredQuery;
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
-    useInfiniteQuery(jobsQueries.infinite(searchFilters));
-
-  /**
-   * Lightweight query: fetches bookmark record IDs only (not full job objects).
-   * bookmarkedJobs / appliedJobs are no longer stored on the user document —
-   * they live in their own tables with dedicated APIs.
-   */
-  const bookmarkedIds = useBookmarkedJobIds();
+    useInfiniteQuery(jobPostsQueries.infinite(searchFilters));
 
   /**
    * Debounce: 300ms after the user stops typing, push the search term into
@@ -78,17 +70,14 @@ export default function FindJobClient({
   }, [searchQuery]);
 
   /**
-   * Flatten API pages and decorate each job with its bookmark state.
-   * isBookmarked is derived from the dedicated bookmarks API (useBookmarkedJobIds),
-   * not from the user document which no longer carries these arrays.
+   * Flatten all fetched pages into a single job array.
+   * `isBookmarked` is set server-side via the authenticated list endpoint —
+   * no client-side decoration or extra bookmark API call required.
    */
-  const allJobs = useMemo(() => {
-    const jobs = data?.pages.flatMap((page) => page.data) ?? [];
-    return jobs.map((job) => ({
-      ...job,
-      isBookmarked: bookmarkedIds.has(job.id),
-    }));
-  }, [data, bookmarkedIds]);
+  const allJobs = useMemo(
+    () => data?.pages.flatMap((page) => page.data) ?? [],
+    [data],
+  );
 
   /**
    * Instant local filter powered by the deferred search query.

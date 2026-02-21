@@ -1,4 +1,3 @@
-// lib/queries/application-history.queries.ts
 import { queryOptions, infiniteQueryOptions } from "@tanstack/react-query";
 import { jobApplicationsApi } from "@/lib/api/job-applications.api";
 import { queryKeys } from "@/lib/query/keys";

@@ -31,7 +31,7 @@ export const jobsApi = {
   getJob: async (id: string, token?: string) => {
     try {
       const data = await api.get<{ data: JobType }>(
-        `/job-recommendations/${id}`,
+        `/job-posts/${id}`,
         { token },
       );
       return data;
@@ -45,10 +45,6 @@ export const jobsApi = {
 
   // Update job
   updateJob: (id: string, data: any) => api.patch<JobType>(`/jobs/${id}`, data),
-
-  // Update application history of a job
-  updateJobApplicationHistory: (id: string, data: any) =>
-    api.patch<JobType>(`/jobs/application-history/${id}`, data),
 
   // Delete job
   deleteJob: (id: string) => api.delete<void>(`/job-recommendations/${id}`),
