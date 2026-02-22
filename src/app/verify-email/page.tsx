@@ -9,11 +9,10 @@ import { getCookiesToken } from "@/lib/auth.utils";
 
 export default async function VerifyEmailPage() {
   const session = await requireAuth();
-  const token = (await getCookiesToken()) ?? "";
-
+  const token = await getCookiesToken();
 
   // Redirect if email already verified
-  if (session.emailVerified) {
+  if (session?.emailVerified) {
     if (!session.onboardingComplete) {
       redirect("/onboarding");
     } else {
@@ -22,7 +21,7 @@ export default async function VerifyEmailPage() {
   }
 
   const queryClient = createServerQueryClient();
-  await queryClient.fetchQuery(userQueries.detail(token));
+  if (token) await queryClient.fetchQuery(userQueries.detail(token));
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <VerifyEmailClient />

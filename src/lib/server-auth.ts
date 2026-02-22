@@ -2,8 +2,7 @@ import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
 import { getSessionFromCookies } from './auth.utils';
 
-// Server-side auth check
-// Attempts to get session from cookies; performs server-side refresh if needed.
+
 export async function getServerSession() {
   return await getSessionFromCookies();
 }
