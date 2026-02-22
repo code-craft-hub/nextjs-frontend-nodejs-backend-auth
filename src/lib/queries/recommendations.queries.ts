@@ -19,7 +19,6 @@ export const recommendationsQueries = {
       queryKey: queryKeys.recommendations.user(),
       queryFn: ({ pageParam }) =>
         recommendationsApi.getUserRecommendations({ page: pageParam as number }),
-      initialPageParam: 1,
       getNextPageParam: (lastPage) => {
         const d = lastPage.data;
         return d.hasMore ? d.page + 1 : undefined;
@@ -42,7 +41,7 @@ export const recommendationsQueries = {
         return isActive ? POLLING_INTERVAL_MS : false;
       },
       staleTime: 5 * 60 * 1000,
-    }),
+    } as const),
 
   quickSearch: (jobTitle: string, skills?: string, limit = 10) =>
     queryOptions({

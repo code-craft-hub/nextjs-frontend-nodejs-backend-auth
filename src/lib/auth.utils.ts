@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { cookies } from "next/headers";
 import { jwtVerify } from "jose";
 import { IUser } from "@/types";
+import { API_URL } from "./api/client";
 
 const JWT_SECRET = process.env.NEXT_PUBLIC_JWT_SECRET;
 
@@ -69,19 +70,100 @@ async function verifyAccessToken(
  * Get session from cookies (for server components).
  *
  * Reads the `access_token` httpOnly cookie set by the Express backend on login.
+ * If access_token is missing/expired but refresh_token exists, attempts a server-side
+ * refresh before giving up. This prevents race conditions where middleware allows the
+ * request through while the token is in-flight.
  * Falls back gracefully to null for users who still carry a legacy `session`
  * cookie from the previous auth system — they will be directed to log in again.
  */
 export async function getSessionFromCookies(): Promise<Partial<IUser> | null> {
   const cookieStore = (await resolveCookiesToken()) ?? "";
-  const verifiedSession = await verifyAccessToken(cookieStore);
+  let verifiedSession = await verifyAccessToken(cookieStore);
+
+  // If no valid access_token but refresh_token exists, attempt server-side refresh
+  if (!verifiedSession) {
+    const hasRefreshToken = await hasRefreshTokenCookie();
+    if (hasRefreshToken) {
+      console.log(
+        "[getSessionFromCookies] No access_token but refresh_token exists, attempting server-side refresh...",
+      );
+      const refreshed = await serverSideRefresh();
+      if (refreshed) {
+        // Refresh succeeded; read the new access_token
+        const newAccessToken = await resolveCookiesToken();
+        verifiedSession = await verifyAccessToken(newAccessToken ?? "");
+        console.log("[getSessionFromCookies] After server-side refresh, verified session:", !!verifiedSession);
+      } else {
+        console.warn("[getSessionFromCookies] Server-side refresh failed, returning null");
+      }
+    } else {
+      console.warn("[getSessionFromCookies] No refresh_token available, cannot attempt refresh");
+    }
+  }
+
   console.log(
-    "getSessionFromCookies token:",
-    cookieStore,
-    "verify result:",
-    verifiedSession,
+    "[getSessionFromCookies] Final result - token exists:",
+    !!cookieStore,
+    "verified session:",
+    !!verifiedSession,
   );
   return verifiedSession;
+}
+
+/**
+ * Check if refresh_token cookie exists.
+ */
+async function hasRefreshTokenCookie(): Promise<boolean> {
+  const cookieStore = await cookies();
+  console.log("[hasRefreshTokenCookie] Checking for refresh_token cookie:", cookieStore.get("refresh_token")?.value);
+
+  console.log("[ALL COOKIES] ✅✅✅", cookieStore.getAll());
+  return !!cookieStore.get("refresh_token")?.value;
+}
+
+/**
+ * Perform a server-side token refresh by calling the backend endpoint.
+ * Manually reads the refresh_token cookie and sends it via Cookie header
+ * (credentials: "include" only works in browser context, not server-side Node.js).
+ *
+ * Returns true if refresh succeeded, false otherwise.
+ */
+async function serverSideRefresh(): Promise<boolean> {
+  try {
+    const cookieStore = await cookies();
+    const refreshToken = cookieStore.get("refresh_token")?.value;
+
+    if (!refreshToken) {
+      console.warn("[serverSideRefresh] No refresh_token found in cookies");
+      return false;
+    }
+
+    const refreshUrl = new URL("/auth/refresh", API_URL).toString();
+
+    const response = await fetch(refreshUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Cookie": `refresh_token=${refreshToken}`,
+      },
+    });
+
+    if (response.ok) {
+      console.log("[serverSideRefresh] Token refresh succeeded");
+      return true;
+    }
+
+    console.warn(
+      "[serverSideRefresh] Refresh failed with status",
+      response.status,
+      "response:",
+      await response.text(),
+    );
+    return false;
+  } catch (error) {
+    console.error("[serverSideRefresh] Error during refresh:", error);
+    return false;
+  }
 }
 
 /**

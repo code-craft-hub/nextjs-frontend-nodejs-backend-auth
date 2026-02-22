@@ -445,6 +445,8 @@ export async function apiClient<T>(
           typeof window !== "undefined" &&
           window.location.pathname !== "/login"
         ) {
+
+          console.log("[LOGOUT] called from [API CLIENT] IN [QUEUE MICROTASK] after refresh failure");
           window.location.href = "/login";
         }
       });

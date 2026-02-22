@@ -153,7 +153,10 @@ export const AIRecommendations = ({ children }: { children: ReactNode }) => {
     isLoading,
     isFetchingNextPage,
     isFetching,
-  } = useInfiniteQuery(recommendationsQueries.userRecommendations());
+  } = useInfiniteQuery({
+    ...recommendationsQueries.userRecommendations(),
+    initialPageParam: 1,
+  });
 
   // ── Derive status from the last fetched page ───────────────────────────────
   const lastPage = data?.pages[data.pages.length - 1]?.data;

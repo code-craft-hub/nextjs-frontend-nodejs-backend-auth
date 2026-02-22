@@ -38,7 +38,6 @@ export const PasswordResetVerifyEmail = ({
   handleStateChange: (otp: string) => void;
 }) => {
   const router = useRouter();
-  const username = email?.split("@")[0];
   const [isVerifying, setIsVerifying] = useState(false);
 
   const [emailSent, setEmailSent] = useState(false);

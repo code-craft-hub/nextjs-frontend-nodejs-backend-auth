@@ -73,10 +73,7 @@ export const VerifyEmailClient = () => {
     } catch (error: any) {
       console.error(error);
       // APIError (from client.ts) exposes `.status` directly, not `.response.status`.
-      if (error?.status === 401) {
-        router.replace("/login");
-        return;
-      }
+    
       toast.error(error?.data?.error ?? error?.message ?? "Failed to send code");
     } finally {
       setIsSending(false);
