@@ -25,12 +25,15 @@ export async function prefetchDashboardData(
     await queryClient.prefetchQuery(autoApplyQueries.all());
 
     // Infinite queries (these may have pagination under the hood)
-    await queryClient.prefetchInfiniteQuery(
-      recommendationsQueries.userRecommendations(),
-    );
+    await queryClient.prefetchInfiniteQuery({
+      ...recommendationsQueries.userRecommendations(),
+      initialPageParam: 1,
+    });
     await queryClient.prefetchInfiniteQuery(jobPostsQueries.infinite(filters));
     await queryClient.prefetchInfiniteQuery(bookmarksQueries.infiniteList());
-    await queryClient.prefetchInfiniteQuery(jobApplicationQueries.infiniteList());
+    await queryClient.prefetchInfiniteQuery(
+      jobApplicationQueries.infiniteList(),
+    );
   } catch (error) {
     console.error("Error prefetching dashboard data:", error);
   }

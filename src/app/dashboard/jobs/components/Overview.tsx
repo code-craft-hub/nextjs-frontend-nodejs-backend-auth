@@ -20,7 +20,6 @@ import {
 } from "@/components/ui/form";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
-import { jobsQueries } from "@/lib/queries/jobs.queries";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { leftMenuItems } from "@/lib/utils/constants";
 import { ArrowRight, SearchIcon, Loader2 } from "lucide-react";

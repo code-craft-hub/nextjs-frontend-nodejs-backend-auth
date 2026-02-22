@@ -25,7 +25,10 @@ export const FindJob = memo(({ filters }: { filters: JobFilters }) => {
         AI Job Recommendation
       </h1>
       <div className="grid pb-16">
-        <FindJobClient columns={columns} filters={filters} />
+        <FindJobClient 
+        
+        // columns={columns} filters={filters} 
+        />
       </div>
     </div>
   );
