@@ -11,29 +11,27 @@ import { QueryClient } from "@tanstack/react-query";
 
 type DashboardPrefetchParams = {
   filters: JobFilters;
-  autoApplyFilters: JobFilters;
 };
 
 export async function prefetchDashboardData(
   queryClient: QueryClient,
   { filters }: DashboardPrefetchParams,
 ) {
-  await queryClient.prefetchQuery(resumeQueries.all(filters));
-  await queryClient.prefetchQuery(interviewQuestionQueries.all(filters));
-  await queryClient.prefetchQuery(coverLetterQueries.all(filters));
-  await queryClient.prefetchQuery(autoApplyQueries.all());
+  try {
+    // Regular queries
+    await queryClient.prefetchQuery(resumeQueries.all(filters));
+    await queryClient.prefetchQuery(interviewQuestionQueries.all(filters));
+    await queryClient.prefetchQuery(coverLetterQueries.all(filters));
+    await queryClient.prefetchQuery(autoApplyQueries.all());
 
-  // Infinite query separately (important)
-  await queryClient.prefetchInfiniteQuery(
-    recommendationsQueries.userRecommendations(),
-  );
-  await queryClient.prefetchInfiniteQuery(jobPostsQueries.infinite(filters));
-  await queryClient.prefetchInfiniteQuery(bookmarksQueries.infiniteList());
-  await queryClient.prefetchInfiniteQuery(jobApplicationQueries.infiniteList());
-
-  // log the cache to confirm that all have completed
-  console.log(
-    "Prefetched Dashboard Data:",
-    queryClient.getQueryCache().getAll(),
-  );
+    // Infinite queries (these may have pagination under the hood)
+    await queryClient.prefetchInfiniteQuery(
+      recommendationsQueries.userRecommendations(),
+    );
+    await queryClient.prefetchInfiniteQuery(jobPostsQueries.infinite(filters));
+    await queryClient.prefetchInfiniteQuery(bookmarksQueries.infiniteList());
+    await queryClient.prefetchInfiniteQuery(jobApplicationQueries.infiniteList());
+  } catch (error) {
+    console.error("Error prefetching dashboard data:", error);
+  }
 }

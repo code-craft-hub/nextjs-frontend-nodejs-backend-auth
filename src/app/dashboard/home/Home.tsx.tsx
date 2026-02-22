@@ -21,7 +21,7 @@ export const HomeClient = memo(
   ({ tab, jobDescription }: { tab: DashboardTab; jobDescription: string }) => {
     const { data: user } = useQuery(userQueries.detail());
     const title = getDataSource(user)?.title;
-    
+
     const filters: JobFilters = {
       page: 1,
       limit: 20,
@@ -44,7 +44,6 @@ export const HomeClient = memo(
 
     useDashboardPrefetch({
       filters,
-      autoApplyFilters,
     });
 
     return (

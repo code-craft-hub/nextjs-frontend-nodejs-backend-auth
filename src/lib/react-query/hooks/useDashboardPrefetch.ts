@@ -7,13 +7,11 @@ import { JobFilters } from "@/lib/types/jobs";
 
 type UseDashboardPrefetchProps = {
   filters: JobFilters;
-  autoApplyFilters: JobFilters;
   enabled?: boolean;
 };
 
 export function useDashboardPrefetch({
   filters,
-  autoApplyFilters,
   enabled = true,
 }: UseDashboardPrefetchProps) {
   const queryClient = useQueryClient();
@@ -23,7 +21,6 @@ export function useDashboardPrefetch({
 
     prefetchDashboardData(queryClient, {
       filters,
-      autoApplyFilters,
     });
-  }, [queryClient, filters, autoApplyFilters, enabled]);
+  }, [queryClient, filters, enabled]);
 }

@@ -17,6 +17,7 @@ import {
   useMemo,
   useState,
   useDeferredValue,
+  useRef,
 } from "react";
 import { Button } from "@/components/ui/button";
 import type { JobFilters } from "@/lib/types/jobs";
@@ -41,6 +42,7 @@ export default function FindJobClient({
   const [searchQuery, setSearchQuery] = useState("");
   const [searchFilters, setSearchFilters] =
     useState<Omit<JobFilters, "page">>(filters);
+  const isInitializedRef = useRef(false);
 
   /**
    * useDeferredValue schedules the filter computation at low React priority so
@@ -52,14 +54,23 @@ export default function FindJobClient({
   const isSearchPending = searchQuery !== deferredQuery;
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
-    useInfiniteQuery(jobPostsQueries.infinite(searchFilters));
+    useInfiniteQuery({
+      ...jobPostsQueries.infinite(searchFilters),
+      initialPageParam: 1,
+    });
 
   /**
    * Debounce: 300ms after the user stops typing, push the search term into
    * searchFilters to trigger a fresh server-side ilike query. React Query
    * caches by key, so re-typing a previous query reuses cached results.
+   * Skip the initial render to avoid refetching prefetched data.
    */
   useEffect(() => {
+    if (!isInitializedRef.current) {
+      isInitializedRef.current = true;
+      return;
+    }
+    
     const timeout = setTimeout(() => {
       setSearchFilters((prev) => ({
         ...prev,
