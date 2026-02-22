@@ -22,10 +22,17 @@ interface DashboardLayoutProps {
 
 const DashboardLayout = async ({ children }: DashboardLayoutProps) => {
   await requireOnboarding();
-  const token = (await getCookiesToken()) ?? "";
+  const token = await getCookiesToken();
   const queryClient = createServerQueryClient();
-  const user = await queryClient.fetchQuery(userQueries.detail(token));
-  console.log("DashboardLayout user:", user.id);
+  let user = null;
+
+  // Only attempt server-side user fetch when an access token exists.
+  // If there's no access token but a refresh token exists, the client
+  // will perform rotation; skip server fetch to avoid a 401 during SSR.
+  if (token) {
+    user = await queryClient.fetchQuery(userQueries.detail(token));
+    console.log("DashboardLayout user:", user.id);
+  }
   // await queryClient.prefetchQuery(userQueries.detail(token));
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>

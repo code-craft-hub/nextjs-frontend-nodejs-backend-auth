@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation';
+import { cookies } from 'next/headers';
 import { getSessionFromCookies } from './auth.utils';
 
 // Cached server-side auth check
@@ -11,6 +12,12 @@ export async function requireAuth() {
   const session = await getServerSession();
 
   if (!session) {
+    // If a refresh token exists, allow the page to render and let the
+    // client attempt token rotation. Only redirect when no refresh token is present.
+    const cookieStore = await cookies();
+    if (cookieStore.get('refresh_token')) {
+      return null;
+    }
     redirect('/login');
   }
   return session;
@@ -18,6 +25,7 @@ export async function requireAuth() {
 
 export async function requireOnboarding() {
   const session = await requireAuth();
+  if (!session) return null;
   if (!session.onboardingComplete) {
     redirect('/onboarding');
   }
@@ -37,6 +45,7 @@ export async function redirectIfAuthenticated() {
 
 export async function requireEmailVerification() {
   const session = await requireAuth();
+  if (!session) return null;
   if (!session.emailVerified) {
     redirect('/verify-email');
   }
