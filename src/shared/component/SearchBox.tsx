@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -5,16 +6,15 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
+import { SearchIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 
-
 const SearchBox = () => {
-    
-      const form = useForm<any>({
-        defaultValues: {
-          searchValue: "",
-        },
-      });
+  const form = useForm<any>({
+    defaultValues: {
+      searchValue: "",
+    },
+  });
   return (
     <div>
       <div className="bg-white shadow-lg px-2 flex gap-4 justify-between rounded-lg">
