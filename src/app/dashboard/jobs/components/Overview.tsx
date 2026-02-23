@@ -1,16 +1,22 @@
 "use client";
+
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useForm } from "react-hook-form";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
+import { ArrowRight, SearchIcon } from "lucide-react";
+import { sendGTMEvent } from "@next/third-parties/google";
+
+import { cn } from "@/lib/utils";
+import { leftMenuItems } from "@/lib/utils/constants";
+import { getDataSource } from "@/lib/utils/helpers";
+import { jobMatcher } from "@/services/job-matcher";
+import { userQueries } from "@module/user";
+import { useUpdateJobMutation } from "@/lib/mutations/jobs.mutations";
+import { useApplyJob } from "@/hooks/useApplyJob";
+import { jobPostsQueries } from "@/lib/queries/job-posts.queries";
+
 import { Button } from "@/components/ui/button";
-import {
-  ColumnFiltersState,
-  flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getSortedRowModel,
-  SortingState,
-  useReactTable,
-  VisibilityState,
-} from "@tanstack/react-table";
 import {
   Form,
   FormControl,
@@ -18,68 +24,48 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
-import { cn } from "@/lib/utils";
-import { useRouter } from "next/navigation";
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import { leftMenuItems } from "@/lib/utils/constants";
-import { ArrowRight, SearchIcon, Loader2 } from "lucide-react";
-import { getDataSource } from "@/lib/utils/helpers";
-import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
-import { useForm } from "react-hook-form";
-import { useUpdateJobMutation } from "@/lib/mutations/jobs.mutations";
-import { ReportCard } from "./ReportCard";
-import { jobMatcher } from "@/services/job-matcher";
-import { sendGTMEvent } from "@next/third-parties/google";
 import InsufficientCreditsModal from "@/components/shared/InsufficientCreditsModal";
-import { userQueries } from "@module/user";
-import {
-  OverviewColumn,
-  OverviewEmpty,
-  OverviewSkeleton,
-} from "./OverviewColumn";
-import MobileOverview from "./MobileOverview";
 import AuthorizeGoogle from "@/hooks/gmail/AuthorizeGoogle";
-import { useApplyJob } from "@/hooks/useApplyJob";
-import { jobPostsQueries } from "@/lib/queries/job-posts.queries";
+
+import { OverviewColumn } from "./OverviewColumn";
+import { useJobsTable } from "../_hooks/useJobsTable";
+import { JobsTable } from "./JobsTable";
+import { LoadMoreButton } from "./LoadMoreButton";
+import { ReportCard } from "./ReportCard";
+import MobileOverview from "./MobileOverview";
 
 export default function Overview() {
   const router = useRouter();
   const [searchValue, setSearchValue] = useState("");
-  const [isAutoFetching, setIsAutoFetching] = useState(false);
-  const [sorting, setSorting] = useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = useState({});
-  const totalScoreRef = useRef<number>(0);
+  const goodMatchCountRef = useRef(0);
+
   const { data: user } = useQuery(userQueries.detail());
 
   useEffect(() => {
-    if (user?.firstName)
+    if (user?.firstName) {
       sendGTMEvent({
-        event: `Job Page`,
-        value: `${user?.firstName} viewed Job Page`,
+        event: "Job Page",
+        value: `${user.firstName} viewed Job Page`,
       });
+    }
   }, [user?.firstName]);
 
+  const userDataSource = getDataSource(user);
+  const userJobTitlePreference =
+    userDataSource?.key || userDataSource?.title || "";
+
+  const form = useForm<{ searchQuery: string }>({
+    defaultValues: { searchQuery: "" },
+  });
+
+  // Server-side search: changing searchValue triggers a fresh API call.
   const infiniteFilters = useMemo(
-    () => ({
-      limit: 20,
-      title: searchValue.trim() || undefined,
-    }),
+    () => ({ limit: 20, title: searchValue.trim() || undefined }),
     [searchValue],
   );
 
   const updateJobs = useUpdateJobMutation();
   const { applyToJob: handleApply } = useApplyJob();
-  const userDataSource = getDataSource(user);
-  const userJobTitlePreference =
-    userDataSource?.key || userDataSource?.title || "";
-
-  const form = useForm<any>({
-    defaultValues: {
-      username: "",
-    },
-  });
 
   const {
     data,
@@ -89,99 +75,64 @@ export default function Overview() {
     isFetching,
     isRefetching,
     isFetchingNextPage,
-  } = useInfiniteQuery(jobPostsQueries?.infinite(infiniteFilters));
+  } = useInfiniteQuery(jobPostsQueries.infinite(infiniteFilters));
 
   const allJobs = useMemo(() => {
     const jobs = data?.pages.flatMap((page) => page.data) ?? [];
-    const scores = [];
+    let goodMatchCount = 0;
 
-    const jobData = jobs
+    const sorted = jobs
       .map((job) => {
-        const jobContent = job?.title + " " + job?.descriptionText;
-
-        const completeMatch = jobMatcher.calculateMatch(
+        const content = `${job.title ?? ""} ${job.descriptionText ?? ""}`;
+        const match = jobMatcher.calculateMatch(
           userJobTitlePreference,
-          jobContent || "",
+          content,
         );
-
-        if (completeMatch.score >= 50) {
-          scores.push(completeMatch.score);
-        }
-        return {
-          ...job,
-        };
+        if (match.score >= 50) goodMatchCount++;
+        return job;
       })
-      .sort((a, b) => {
-        return parseInt(b.matchPercentage) - parseInt(a.matchPercentage);
-      });
-    totalScoreRef.current = scores.length;
-    return jobData;
-  }, [data]);
+      .sort(
+        (a, b) =>
+          parseInt(b.matchPercentage ?? "0") -
+          parseInt(a.matchPercentage ?? "0"),
+      );
 
-  const columns = OverviewColumn({
-    router,
-    updateJobs,
-    handleApply,
-  });
-  const table = useReactTable({
-    data: allJobs,
-    columns: columns,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: setRowSelection,
-    state: {
-      sorting,
-      columnFilters,
-      columnVisibility,
-      rowSelection,
-    },
-  });
+    goodMatchCountRef.current = goodMatchCount;
+    return sorted;
+  }, [data, userJobTitlePreference]);
 
-  const resetSearchToDefault = () => {
+  const columns = OverviewColumn({ router, updateJobs, handleApply });
+  const table = useJobsTable(allJobs, columns);
+
+  function resetSearch() {
     setSearchValue("");
     table.getColumn("title")?.setFilterValue(undefined);
-    setIsAutoFetching(false);
-  };
+  }
 
-  const onSubmit = async ({ username }: any) => {
-    const trimmedSearch = username.trim();
+  function onSubmit({ searchQuery }: { searchQuery: string }) {
+    const trimmed = searchQuery.trim();
     sendGTMEvent({
-      event: `Job Page Search - ${username}`,
-      value: `${user?.firstName} viewed Job Page`,
+      event: `Job Page Search - ${searchQuery}`,
+      value: `${user?.firstName} searched jobs`,
     });
-    setSearchValue(trimmedSearch);
-    table.getColumn("title")?.setFilterValue(trimmedSearch);
+    setSearchValue(trimmed);
+    table.getColumn("title")?.setFilterValue(trimmed || undefined);
+  }
 
-    const currentSearchValue = table
-      .getColumn("title")
-      ?.getFilterValue() as string;
-    if (!currentSearchValue || currentSearchValue.trim() === "") {
-      setIsAutoFetching(false);
-      return;
-    }
-    setIsAutoFetching(false);
-  };
-  const visibleRows = table.getRowModel().rows;
   const isSearching =
     isLoading || isFetching || isRefetching || isFetchingNextPage;
-  const hasNoResults =
-    !isSearching && (data?.pages?.[0]?.data?.length ?? 0) === 0;
+  const hasNoResults = !isSearching && (data?.pages?.[0]?.data?.length ?? 0) === 0;
 
   return (
-    <div className="lg:gap-6 lg:flex ">
+    <div className="lg:gap-6 lg:flex">
+      {/* Left sidebar nav */}
       <div className="bg-white p-3 h-fit rounded-md hidden lg:flex lg:flex-col gap-1">
         {leftMenuItems.map((item) => (
           <div
-            onClick={() => {
-              router.push(item.url);
-            }}
             key={item.id}
+            onClick={() => router.push(item.url)}
             className={cn(
-              "group flex gap-2 data-[state=active]:bg-primary  data-[state=active]:text-white  p-2 hover:bg-primary hover:text-white hover-cursor-pointer items-center justify-start rounded-md w-44  hover:shadow-sm hover:cursor-pointer",
+              "group flex gap-2 p-2 hover:bg-primary hover:text-white items-center justify-start rounded-md w-44 hover:shadow-sm hover:cursor-pointer",
               item.isActive && "bg-blue-500 text-white",
             )}
           >
@@ -190,32 +141,34 @@ export default function Overview() {
                 src={item.icon}
                 alt={item.label}
                 className={cn(
-                  "size-4 group-hover:brightness-0 group-hover:invert group-data-[state=active]:brightness-0 group-data-[state=active]:invert",
+                  "size-4 group-hover:brightness-0 group-hover:invert",
                   item.isActive && "brightness-0 invert",
                 )}
               />
             </div>
-            <div className="">
-              <p className="text-xs">{item.label}</p>
-            </div>
+            <p className="text-xs">{item.label}</p>
           </div>
         ))}
       </div>
+
+      {/* Main content */}
       <div className="w-full flex flex-col gap-6">
-        <ReportCard matchPercentage={totalScoreRef.current} />
+        <ReportCard matchPercentage={goodMatchCountRef.current} />
+
+        {/* Search bar */}
         <div className="bg-white shadow-lg px-2 flex gap-4 justify-between rounded-lg">
           <div className="flex items-center gap-2 w-full">
-            <SearchIcon className="size-4 " />
+            <SearchIcon className="size-4" />
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
-                className="flex gap-2 w-full  justify-between items-center "
+                className="flex gap-2 w-full justify-between items-center"
               >
                 <FormField
                   control={form.control}
-                  name="username"
+                  name="searchQuery"
                   render={({ field }) => (
-                    <FormItem className=" w-full">
+                    <FormItem className="w-full">
                       <FormControl>
                         <input
                           className="border-none focus:border-none focus:outline-none w-full bg-white! focus:bg-white! h-14"
@@ -227,91 +180,54 @@ export default function Overview() {
                     </FormItem>
                   )}
                 />
-                <Button type="submit" disabled={hasNoResults || isSearching}>
+                <Button type="submit" disabled={isSearching}>
                   Search
                 </Button>
               </form>
             </Form>
           </div>
         </div>
-        <div className="flex flex-col gap-4">
-          <div className="flex justify-between">
-            <div className="">All Jobs</div>
-            <p className="text-xs flex gap-1 text-gray-400">
-              <span className="">View all</span>
-              <ArrowRight className="size-4" />
-            </p>
-          </div>
+
+        <div className="flex justify-between">
+          <p>All Jobs</p>
+          <p className="text-xs flex gap-1 text-gray-400">
+            <span>View all</span>
+            <ArrowRight className="size-4" />
+          </p>
         </div>
-        <div className="hidden lg:grid grid-cols-1">
-          <Table>
-            <TableBody>
-              {isSearching ? (
-                <div className="grid gap-4">
-                  {Array.from({ length: 4 }).map((_, index) => (
-                    <OverviewSkeleton key={index} />
-                  ))}
-                </div>
-              ) : hasNoResults ? (
-                <div className="flex flex-col gap-1 text-muted-foreground">
-                  <OverviewEmpty
-                    searchValue={searchValue}
-                    resetSearchToDefault={resetSearchToDefault}
-                  />
-                </div>
-              ) : (
-                visibleRows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    onClick={() =>
-                      router.push(
-                        `/dashboard/jobs/${row.original.id}?referrer=jobs&title=${row.original.title}`,
-                      )
-                    }
-                    className="hover:bg-white border-b rounded-3xl! hover:border-primary hover:border-2 hover:rounded-2xl hover:cursor-pointer"
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext(),
-                        )}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </div>
+
+        {/* Desktop table */}
+        <JobsTable
+          table={table}
+          isLoading={isSearching}
+          hasNoResults={hasNoResults}
+          searchValue={searchValue}
+          onResetSearch={resetSearch}
+          skeletonCount={4}
+          onRowClick={(row) =>
+            router.push(
+              `/dashboard/jobs/${row.original.id}?referrer=jobs&title=${encodeURIComponent(row.original.title ?? "")}`,
+            )
+          }
+        />
+
+        {/* Mobile list */}
         <MobileOverview
           allJobs={allJobs}
           updateJobs={updateJobs}
           handleApply={handleApply}
+          referrer="jobs"
         />
-        {hasNextPage && !isAutoFetching && (
-          <div className="flex justify-center">
-            <Button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                fetchNextPage();
-              }}
-              disabled={isFetchingNextPage}
-              variant="outline"
-            >
-              {isFetchingNextPage ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Loading more...
-                </>
-              ) : (
-                "Load More Jobs"
-              )}
-            </Button>
-          </div>
-        )}
+
+        {/* Pagination */}
+        <LoadMoreButton
+          hasNextPage={hasNextPage ?? false}
+          isFetchingNextPage={isFetchingNextPage}
+          onLoadMore={() => fetchNextPage()}
+          label="Load More Jobs"
+        />
       </div>
+
       <AuthorizeGoogle hidden={true} />
       <InsufficientCreditsModal />
     </div>

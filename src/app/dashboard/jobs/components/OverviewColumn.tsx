@@ -1,20 +1,7 @@
 "use client";
-import { Button } from "@/components/ui/button";
 
-import { ColumnDef } from "@tanstack/react-table";
-import {
-  BookmarkIcon,
-  Calendar,
-  DollarSign,
-  FolderOpen,
-  MapPin,
-  Sparkles,
-} from "lucide-react";
-import { formatAppliedDate } from "@/lib/utils/helpers";
-import { JobType } from "@/types";
+import { Button } from "@/components/ui/button";
 import { Toggle } from "@/components/ui/toggle";
-import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import { PiOfficeChairFill } from "react-icons/pi";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Empty,
@@ -24,15 +11,40 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
+import { ColumnDef } from "@tanstack/react-table";
+import {
+  BookmarkIcon,
+  Calendar,
+  DollarSign,
+  FolderOpen,
+  MapPin,
+  Sparkles,
+} from "lucide-react";
+import { PiOfficeChairFill } from "react-icons/pi";
+import { formatAppliedDate } from "@/lib/utils/helpers";
+import { JobType } from "@/types";
+
+// ─── Shared types ─────────────────────────────────────────────────────────────
 
 export type ApplyHandler = (job: JobType, e?: React.MouseEvent) => void;
+
+/** Minimum interface required for the bookmark-toggle mutation. */
+export interface JobUpdateMutation {
+  mutate: (variables: {
+    id: string;
+    data: Partial<Pick<JobType, "isBookmarked" | "isApplied">>;
+  }) => void;
+}
+
+// ─── Overview columns (Overview, AIRecommendations, SavedJobs) ────────────────
 
 export const OverviewColumn = ({
   updateJobs,
   handleApply,
 }: {
-  router: AppRouterInstance;
-  updateJobs?: any;
+  /** Unused – kept so existing callers compile without changes. */
+  router?: unknown;
+  updateJobs?: JobUpdateMutation;
   handleApply?: ApplyHandler;
 }): ColumnDef<JobType>[] => [
   {
@@ -41,13 +53,9 @@ export const OverviewColumn = ({
     cell: ({ row }) => (
       <div className="shrink-0 flex items-center justify-center size-16">
         <img
-          src={
-            !!row.original.companyLogo
-              ? row.original.companyLogo
-              : "/placeholder.jpg"
-          }
+          src={row.original.companyLogo || "/placeholder.jpg"}
           alt={row.original.companyText}
-          className="size-12"
+          className="size-12 object-contain"
         />
       </div>
     ),
@@ -58,23 +66,19 @@ export const OverviewColumn = ({
     cell: ({ row }) => {
       const matchPercentage = Number(row.original.matchPercentage) || 0;
       return (
-        <div className="capitalize ">
+        <div className="capitalize">
           <div className="flex gap-4 items-center">
             <div className="font-medium text-xs max-w-sm overflow-hidden">
               {row.getValue("title")}
             </div>
             <div className="bg-blue-50 rounded text-blue-600 px-2 py-1">
               <span className="text-2xs">
-                {!!row.original.jobType
-                  ? row.original.jobType
-                  : row.original.employmentType}
+                {row.original.jobType || row.original.employmentType}
               </span>
             </div>
-            <div className="">
-              {matchPercentage > 40 && (
-                <Sparkles className="text-yellow-500 size-4" />
-              )}
-            </div>
+            {matchPercentage > 40 && (
+              <Sparkles className="text-yellow-500 size-4" />
+            )}
           </div>
           <div className="flex gap-x-4 mt-1">
             <p className="flex gap-1 text-gray-400 items-center">
@@ -85,19 +89,19 @@ export const OverviewColumn = ({
               <PiOfficeChairFill className="size-3" />
               <span className="text-2xs">{row.original.companyName}</span>
             </p>
-            {!!row.original?.salary && (
+            {row.original.salary && (
               <p className="flex gap-1 text-gray-400 items-center">
                 <DollarSign className="size-3" />
-                <span className="text-2xs">{row.original?.salary}</span>
+                <span className="text-2xs">{row.original.salary}</span>
               </p>
             )}
             <p className="flex gap-1 text-gray-400 items-center">
               <Calendar className="size-3" />
               <span className="text-2xs">
                 {formatAppliedDate(
-                  row.original?.scrapedAt ||
-                    row.original?.postedAt ||
-                    row.original?.updatedAt
+                  row.original.scrapedAt ||
+                    row.original.postedAt ||
+                    row.original.updatedAt,
                 )}
               </span>
             </p>
@@ -109,30 +113,28 @@ export const OverviewColumn = ({
       );
     },
   },
-  { accessorKey: "location", cell: () => <div></div> },
-  { accessorKey: "jobType", cell: () => <div></div> },
-  { accessorKey: "employmentType", cell: () => <div></div> },
+  // Hidden accessor columns — present only so TanStack Table can filter them.
+  { accessorKey: "location", cell: () => <div /> },
+  { accessorKey: "jobType", cell: () => <div /> },
+  { accessorKey: "employmentType", cell: () => <div /> },
   {
     accessorKey: "isBookmarked",
     cell: ({ row }) => {
-      const isBookmarked = row.original.isBookmarked || false;
-
+      const isBookmarked = row.original.isBookmarked ?? false;
       return (
         <div
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
-            updateJobs.mutate({
+            updateJobs?.mutate({
               id: String(row.original.id),
-              data: {
-                isBookmarked: !isBookmarked,
-              },
+              data: { isBookmarked: !isBookmarked },
             });
           }}
           className="flex justify-end"
         >
           <Toggle
-            pressed={isBookmarked || false}
+            pressed={isBookmarked}
             aria-label="Toggle bookmark"
             size="sm"
             variant="outline"
@@ -147,25 +149,119 @@ export const OverviewColumn = ({
   {
     id: "actions",
     enableHiding: false,
-    cell: ({ row }) => {
-      return (
-        <div className="flex justify-end">
-          <Button
-            disabled={row.original.isApplied}
-            className="w-full disabled:opacity-50 disabled:cursor-not-allowed disabled:text-gray-400"
-            onClick={(event) => handleApply?.(row.original, event)}
-            variant={"button"}
-          >
-            {row.original?.emailApply ? "Auto Apply" : "Apply Now"}
-            {row.original?.emailApply && (
-              <Sparkles className="text-3 text-yellow" />
-            )}
-          </Button>
-        </div>
-      );
-    },
+    cell: ({ row }) => (
+      <div className="flex justify-end">
+        <Button
+          disabled={row.original.isApplied}
+          className="w-full disabled:opacity-50 disabled:cursor-not-allowed disabled:text-gray-400"
+          onClick={(e) => handleApply?.(row.original, e)}
+          variant="button"
+        >
+          {row.original.emailApply ? "Auto Apply" : "Apply Now"}
+          {row.original.emailApply && (
+            <Sparkles className="size-3 text-yellow-400" />
+          )}
+        </Button>
+      </div>
+    ),
   },
 ];
+
+// ─── Application History columns ──────────────────────────────────────────────
+
+/**
+ * Column definition for the Application History view.
+ * Shows the applied date and a "View Details" CTA instead of Apply/Bookmark.
+ */
+export const ApplicationHistoryColumn = ({
+  prefetchJob,
+  onViewDetails,
+}: {
+  prefetchJob?: (jobId: string) => void;
+  onViewDetails?: (jobId: string) => void;
+}): ColumnDef<JobType>[] => [
+  {
+    accessorKey: "companyText",
+    header: "Company",
+    cell: ({ row }) => (
+      <div className="shrink-0 flex items-center justify-center size-16">
+        <img
+          src={row.original.companyLogo || "/placeholder.jpg"}
+          alt={row.original.companyText}
+          className="size-12 object-contain"
+        />
+      </div>
+    ),
+  },
+  {
+    accessorKey: "title",
+    header: "Title",
+    cell: ({ row }) => (
+      <div className="capitalize">
+        <div className="flex gap-4 items-center">
+          <div className="font-medium text-xs max-w-44 truncate">
+            {row.getValue("title")}
+          </div>
+          <div className="bg-blue-50 rounded-2xl text-blue-600 px-2 py-1">
+            <span className="text-2xs">
+              {row.original.jobType || row.original.employmentType}
+            </span>
+          </div>
+        </div>
+        <div className="flex gap-x-4 mt-1">
+          <p className="flex gap-1 text-gray-400 items-center">
+            <MapPin className="size-3" />
+            <span className="text-2xs">{row.original.location}</span>
+          </p>
+          <p className="flex gap-1 text-gray-400 items-center">
+            <PiOfficeChairFill className="size-3" />
+            <span className="text-2xs">{row.original.companyName}</span>
+          </p>
+          {row.original.salary && (
+            <p className="flex gap-1 text-gray-400 items-center">
+              <DollarSign className="size-3" />
+              <span className="text-2xs">{row.original.salary}</span>
+            </p>
+          )}
+        </div>
+      </div>
+    ),
+  },
+  { accessorKey: "location", cell: () => <div /> },
+  { accessorKey: "jobType", cell: () => <div /> },
+  { accessorKey: "employmentType", cell: () => <div /> },
+  {
+    accessorKey: "appliedDate",
+    header: "Applied Date",
+    cell: ({ row }) => (
+      <div className="font-medium text-xs">
+        {formatAppliedDate(row.getValue("appliedDate"))}
+      </div>
+    ),
+  },
+  {
+    id: "actions",
+    enableHiding: false,
+    cell: ({ row }) => (
+      <div className="flex justify-end">
+        <Button
+          className="w-full bg-[#F1F2F4] hover:bg-[#E2E4E8] text-primary border-0"
+          onClick={(e) => {
+            e.stopPropagation();
+            onViewDetails?.(row.original.id);
+          }}
+          variant="outline"
+          onMouseEnter={() => prefetchJob?.(row.original.id)}
+          onFocus={() => prefetchJob?.(row.original.id)}
+        >
+          View Details
+        </Button>
+      </div>
+    ),
+  },
+];
+
+// ─── Skeleton & empty state ───────────────────────────────────────────────────
 
 export function OverviewSkeleton() {
   return (
@@ -192,18 +288,22 @@ export function OverviewEmpty({
         <EmptyMedia variant="icon">
           <FolderOpen />
         </EmptyMedia>
-        <EmptyTitle> No jobs found for &apos;{searchValue}&apos;</EmptyTitle>
+        <EmptyTitle>
+          No jobs found{searchValue ? ` for '${searchValue}'` : ""}
+        </EmptyTitle>
         <EmptyDescription>
           Try a different keyword or broaden your search.
         </EmptyDescription>
       </EmptyHeader>
-      <EmptyContent>
-        <div className="flex">
-          <Button onClick={resetSearchToDefault} variant="outline">
-            Reset Search
-          </Button>
-        </div>
-      </EmptyContent>
+      {resetSearchToDefault && (
+        <EmptyContent>
+          <div className="flex">
+            <Button onClick={resetSearchToDefault} variant="outline">
+              Reset Search
+            </Button>
+          </div>
+        </EmptyContent>
+      )}
     </Empty>
   );
 }

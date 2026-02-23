@@ -1,51 +1,35 @@
 "use client";
 
-import { ReactNode, useEffect, useMemo, useState } from "react";
-import {
-  ColumnFiltersState,
-  flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getSortedRowModel,
-  SortingState,
-  useReactTable,
-  VisibilityState,
-} from "@tanstack/react-table";
-import { userQueries } from "@module/user";
-import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
-import { useUpdateJobMutation } from "@/lib/mutations/jobs.mutations";
-import {
-  useInfiniteQuery,
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { ReactNode, useEffect, useMemo } from "react";
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { getDataSource } from "@/lib/utils/helpers";
-import MobileOverview from "../components/MobileOverview";
+import { Loader2, RefreshCw, UserCircle } from "lucide-react";
 import { sendGTMEvent } from "@next/third-parties/google";
-import {
-  OverviewColumn,
-  OverviewEmpty,
-  OverviewSkeleton,
-} from "../components/OverviewColumn";
+
+import { userQueries } from "@module/user";
+import { useUpdateJobMutation } from "@/lib/mutations/jobs.mutations";
 import { useApplyJob } from "@/hooks/useApplyJob";
+import { getDataSource } from "@/lib/utils/helpers";
+import { queryKeys } from "@/lib/query/keys";
+import { JobType } from "@/types";
+import { Button } from "@/components/ui/button";
+
 import recommendationsApi, {
   JobRecommendation,
 } from "@/lib/api/recommendations.api";
 import recommendationsQueries from "@/lib/queries/recommendations.queries";
-import { queryKeys } from "@/lib/query/keys";
-import { JobType } from "@/types";
-import { Loader2, RefreshCw, UserCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
+import { OverviewColumn } from "../components/OverviewColumn";
+import { useJobsTable } from "../_hooks/useJobsTable";
+import { JobsTable } from "../components/JobsTable";
+import { LoadMoreButton } from "../components/LoadMoreButton";
+import MobileOverview from "../components/MobileOverview";
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 /**
- * Flatten a saved JobRecommendation into the JobType shape that OverviewColumn
- * expects, merging AI-computed scores into the job object.
+ * Flattens a saved JobRecommendation into the JobType shape that
+ * OverviewColumn expects, merging AI-computed scores into the job object.
  */
 function toJobRow(rec: JobRecommendation): JobType & {
   matchPercentage?: string;
@@ -55,16 +39,15 @@ function toJobRow(rec: JobRecommendation): JobType & {
   const job = rec.job ?? {};
   return {
     ...(job as JobType),
-    id: job.id ?? rec.id,           // fall back to recommendation id if job has none
-    matchPercentage: rec.matchScore != null ? String(rec.matchScore) : undefined,
+    id: job.id ?? rec.id,
+    matchPercentage:
+      rec.matchScore != null ? String(rec.matchScore) : undefined,
     recommendationId: rec.id,
     rankPosition: rec.rankPosition,
   };
 }
 
-// ---------------------------------------------------------------------------
-// Status UI components
-// ---------------------------------------------------------------------------
+// ─── Status banners ───────────────────────────────────────────────────────────
 
 function GeneratingBanner({ message }: { message?: string }) {
   return (
@@ -83,13 +66,13 @@ function IncompleteProfileBanner({
 }: {
   missingFields?: string[];
 }) {
-  const fieldLabels: Record<string, string> = {
+  const FIELD_LABELS: Record<string, string> = {
     job_title: "job title",
     skills: "skills",
   };
 
   const missing = (missingFields ?? [])
-    .map((f) => fieldLabels[f] ?? f)
+    .map((f) => FIELD_LABELS[f] ?? f)
     .join(" and ");
 
   return (
@@ -115,11 +98,9 @@ function IncompleteProfileBanner({
   );
 }
 
-// ---------------------------------------------------------------------------
-// Main component
-// ---------------------------------------------------------------------------
+// ─── Main component ───────────────────────────────────────────────────────────
 
-export const AIRecommendations = ({ children }: { children: ReactNode }) => {
+export const AIRecommendations = ({ children }: { children?: ReactNode }) => {
   const router = useRouter();
   const queryClient = useQueryClient();
 
@@ -127,11 +108,6 @@ export const AIRecommendations = ({ children }: { children: ReactNode }) => {
   const userDataSource = getDataSource(user);
   const userJobTitlePreference =
     userDataSource?.key || userDataSource?.title || "";
-
-  const [sorting, setSorting] = useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = useState({});
 
   useEffect(() => {
     if (user?.firstName) {
@@ -145,7 +121,7 @@ export const AIRecommendations = ({ children }: { children: ReactNode }) => {
   const updateJobs = useUpdateJobMutation();
   const { applyToJob: handleApply } = useApplyJob();
 
-  // ── Infinite query (with auto-polling via refetchInterval) ─────────────────
+  // ── Data fetching with auto-polling ──────────────────────────────────────
   const {
     data,
     fetchNextPage,
@@ -158,7 +134,7 @@ export const AIRecommendations = ({ children }: { children: ReactNode }) => {
     initialPageParam: 1,
   });
 
-  // ── Derive status from the last fetched page ───────────────────────────────
+  // ── Derive pipeline status from last page ────────────────────────────────
   const lastPage = data?.pages[data.pages.length - 1]?.data;
   const pipelineStatus = lastPage?.status;
   const isGenerating = lastPage?.isGenerating ?? false;
@@ -166,19 +142,17 @@ export const AIRecommendations = ({ children }: { children: ReactNode }) => {
   const generatingMessage = lastPage?.message;
   const totalCount = lastPage?.total ?? 0;
 
-  // ── "Recommend more" mutation ──────────────────────────────────────────────
+  // ── "Recommend more" mutation ────────────────────────────────────────────
   const generateMoreMutation = useMutation({
     mutationFn: () => recommendationsApi.generateMore(),
     onSuccess: () => {
-      // Force a refetch so the query immediately sees isGenerating: true
-      // and the refetchInterval starts polling.
       queryClient.invalidateQueries({
         queryKey: queryKeys.recommendations.user(),
       });
     },
   });
 
-  // ── Flatten all pages into a single job list ───────────────────────────────
+  // ── Flatten pages → job rows ─────────────────────────────────────────────
   const allJobs = useMemo(
     () =>
       data?.pages.flatMap((page) =>
@@ -187,37 +161,19 @@ export const AIRecommendations = ({ children }: { children: ReactNode }) => {
     [data],
   );
 
-  // ── Table setup ────────────────────────────────────────────────────────────
+  // ── Table ────────────────────────────────────────────────────────────────
   const columns = OverviewColumn({ router, updateJobs, handleApply });
+  const table = useJobsTable(allJobs, columns);
 
-  const table = useReactTable({
-    data: allJobs,
-    columns,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: setRowSelection,
-    state: { sorting, columnFilters, columnVisibility, rowSelection },
-  });
-
-  const visibleRows = table.getRowModel().rows;
-
-  // ── Derived booleans ───────────────────────────────────────────────────────
-  const isInitialLoading = isLoading;
+  // ── Derived booleans ─────────────────────────────────────────────────────
   const isIncomplete = pipelineStatus === "incomplete_profile";
   const isPipelineActive =
     pipelineStatus === "queued" || pipelineStatus === "processing";
   const hasRecommendations = allJobs.length > 0;
   const hasNoResults =
-    !isInitialLoading &&
-    !isPipelineActive &&
-    !isIncomplete &&
-    !hasRecommendations;
+    !isLoading && !isPipelineActive && !isIncomplete && !hasRecommendations;
 
-  // ── Render ─────────────────────────────────────────────────────────────────
+  // ── Render ───────────────────────────────────────────────────────────────
   return (
     <div className="font-inter grid grid-cols-1 w-full overflow-hidden gap-4 xl:gap-8">
       <div className="space-y-4 w-full">
@@ -228,93 +184,52 @@ export const AIRecommendations = ({ children }: { children: ReactNode }) => {
         {children}
 
         {/* Status banners */}
-        {(isPipelineActive || (isGenerating && !isInitialLoading)) && (
+        {(isPipelineActive || (isGenerating && !isLoading)) && (
           <GeneratingBanner message={generatingMessage} />
         )}
-        {isIncomplete && !isInitialLoading && (
+        {isIncomplete && !isLoading && (
           <IncompleteProfileBanner missingFields={missingFields} />
         )}
 
         <div className="w-full flex flex-col gap-6">
           {/* Desktop table */}
-          <div className="overflow-hidden border-none hidden lg:grid grid-cols-1">
-            <Table>
-              <TableBody>
-                {isInitialLoading ? (
-                  <div className="grid gap-4">
-                    {Array.from({ length: 8 }).map((_, i) => (
-                      <OverviewSkeleton key={i} />
-                    ))}
-                  </div>
-                ) : hasNoResults ? (
-                  <div className="flex flex-col gap-1 text-muted-foreground">
-                    <OverviewEmpty searchValue={userJobTitlePreference} />
-                  </div>
-                ) : (
-                  visibleRows.map((row) => (
-                    <TableRow
-                      key={row.id}
-                      data-state={row.getIsSelected() && "selected"}
-                      className="hover:bg-white border-b rounded-3xl! hover:border-primary hover:border-2 hover:rounded-2xl hover:cursor-pointer"
-                      onClick={() => {
-                        const original = row.original as JobType & {
-                          id?: string;
-                          title?: string;
-                        };
-                        router.push(
-                          `/dashboard/jobs/${original.id}?referrer=ai-recommendations&title=${encodeURIComponent(original.title ?? "")}`,
-                        );
-                      }}
-                    >
-                      {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id}>
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext(),
-                          )}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
+          <JobsTable
+            table={table}
+            isLoading={isLoading}
+            hasNoResults={hasNoResults}
+            searchValue={userJobTitlePreference}
+            skeletonCount={8}
+            onRowClick={(row) => {
+              const job = row.original as JobType & { id?: string; title?: string };
+              router.push(
+                `/dashboard/jobs/${job.id}?referrer=ai-recommendations&title=${encodeURIComponent(job.title ?? "")}`,
+              );
+            }}
+          />
 
           {/* Mobile list */}
           <MobileOverview
             allJobs={allJobs}
             updateJobs={updateJobs}
             handleApply={handleApply}
+            referrer="ai-recommendations"
           />
 
-          {/* Load more pages (infinite scroll trigger) */}
-          {hasNextPage && (
-            <div className="flex justify-center mt-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => fetchNextPage()}
-                disabled={isFetchingNextPage}
-              >
-                {isFetchingNextPage ? (
-                  <>
-                    <Loader2 className="mr-2 size-4 animate-spin" />
-                    Loading…
-                  </>
-                ) : (
-                  "Load more"
-                )}
-              </Button>
-            </div>
-          )}
+          {/* Pagination */}
+          <LoadMoreButton
+            hasNextPage={hasNextPage ?? false}
+            isFetchingNextPage={isFetchingNextPage}
+            onLoadMore={() => fetchNextPage()}
+            label="Load more"
+          />
 
-          {/* Recommend more — shown when the pipeline is idle and recs exist */}
+          {/* Recommend more — idle pipeline, recs exist */}
           {pipelineStatus === "ready" && hasRecommendations && (
             <div className="flex flex-col items-center gap-2 pt-4">
               {totalCount > 0 && (
                 <p className="text-xs text-muted-foreground">
-                  {totalCount} recommendation{totalCount !== 1 ? "s" : ""} saved
+                  {totalCount} recommendation
+                  {totalCount !== 1 ? "s" : ""} saved
                 </p>
               )}
               <Button

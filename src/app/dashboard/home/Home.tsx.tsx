@@ -46,6 +46,8 @@ export const HomeClient = memo(
       filters,
     });
 
+    return <FindJob filters={filters} />;
+
     return (
       <>
         <TopGradient />

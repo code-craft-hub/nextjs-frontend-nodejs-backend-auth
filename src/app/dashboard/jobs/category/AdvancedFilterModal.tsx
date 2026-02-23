@@ -328,17 +328,16 @@ const AdvancedJobFilter: React.FC<AdvancedFilterProps> = ({
 
 // Demo component to show usage
 export default function AdvancedFilterModal() {
-  const handleFilterChange = (filters: FilterState) => {
-    console.log("Filters changed:", filters);
+  const handleFilterChange = (_filters: FilterState) => {
+    // TODO: wire to parent state when this modal is connected to the job list
   };
 
-  const handleApplyFilters = (filters: FilterState) => {
-    console.log("Applying filters:", filters);
-    // Implement your filter application logic here
+  const handleApplyFilters = (_filters: FilterState) => {
+    // TODO: pass applied filters up to the job list query
   };
 
   return (
-    <div className="bg-red-500 w-full">
+    <div className="w-full">
       <Dialog>
         <form>
           <DialogTrigger asChild>

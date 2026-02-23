@@ -62,58 +62,63 @@ export function useUpdateJobMutation() {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: any }) =>
       jobsApi.updateJob(id, data),
-    // onMutate: async ({ id, data }) => {
-    //   await queryClient.cancelQueries({ queryKey: queryKeys.jobs.detail(id) });
 
-    //   const previousJob = queryClient.getQueryData(queryKeys.jobs.detail(id));
+    /**
+     * Optimistic update strategy for the bookmark toggle (and any other
+     * single-field patch on a job):
+     *
+     * 1. Immediately flip `isBookmarked` (or the patched field) in every
+     *    job-posts infinite-query page so the UI reacts without a round-trip.
+     * 2. On error, restore the snapshot.
+     * 3. On settle, invalidate the user query so the bookmarkedJobs count
+     *    in ReportCard / SavedJobs stays accurate.
+     */
+    onMutate: async ({ id, data }) => {
+      // Cancel any in-flight fetches for the job-posts list so they don't
+      // overwrite our optimistic update.
+      await queryClient.cancelQueries({
+        queryKey: [...queryKeys.jobPosts.lists(), "infinite"],
+      });
 
-    //   // Update detail view
-    //   queryClient.setQueryData<any>(queryKeys.jobs.detail(id), (old: any) => {
-    //     if (!old) return old;
-    //     return { ...old, ...data, updatedAt: new Date().toISOString() };
-    //   });
+      // Snapshot all infinite pages before mutation
+      const previousPages = queryClient.getQueriesData({
+        queryKey: [...queryKeys.jobPosts.lists(), "infinite"],
+      });
 
-    //   // Update in all list queries
-    //   queryClient.setQueriesData<PaginatedResponse<any>>(
-    //     { queryKey: queryKeys.jobs.lists() },
-    //     (old) => {
-    //       if (!old) return old;
-    //       return {
-    //         ...old,
-    //         data: old.data.map((job) =>
-    //           job.id === id
-    //             ? { ...job, ...data, updatedAt: new Date().toISOString() }
-    //             : job
-    //         ),
-    //       };
-    //     }
-    //   );
+      // Optimistically patch the matching job in every cached page
+      queryClient.setQueriesData(
+        { queryKey: [...queryKeys.jobPosts.lists(), "infinite"] },
+        (old: any) => {
+          if (!old?.pages) return old;
+          return {
+            ...old,
+            pages: old.pages.map((page: any) => ({
+              ...page,
+              data: page.data?.map((job: any) =>
+                job.id === id
+                  ? { ...job, ...data, updatedAt: new Date().toISOString() }
+                  : job,
+              ),
+            })),
+          };
+        },
+      );
 
-    //   return { previousJob };
-    // },
-    // onError: (_err, { id }, context) => {
-    //   if (context?.previousJob) {
-    //     queryClient.setQueryData(
-    //       queryKeys.jobs.detail(id),
-    //       context.previousJob
-    //     );
-    //   }
-    // },
-    onSuccess: (_updatedJob) => {
-      // Update stats if status changed
-      // queryClient.invalidateQueries({ queryKey: queryKeys.jobs.stats() });
-      
-      // Invalidate similar jobs if tags or other metadata changed
-      // queryClient.invalidateQueries({
-        //   queryKey: [...queryKeys.jobs.all, "similar"],
-        // });
-      },
-      onSettled: (_data, _error, 
-        // { id }
-      ) => {
+      return { previousPages };
+    },
+
+    onError: (_err, _variables, context) => {
+      // Roll back to the snapshot on failure
+      if (context?.previousPages) {
+        context.previousPages.forEach(([queryKey, data]) => {
+          queryClient.setQueryData(queryKey, data);
+        });
+      }
+    },
+
+    onSettled: () => {
+      // Keep the user object (bookmarkedJobs count) in sync
       queryClient.invalidateQueries({ queryKey: queryKeys.users.all });
-      // queryClient.invalidateQueries({ queryKey: queryKeys.jobs.detail(id) });
-      // queryClient.invalidateQueries({ queryKey: queryKeys.jobs.lists() });
     },
   });
 }
@@ -123,58 +128,9 @@ export function useUpdateJobApplicationHistoryMutation() {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: any }) =>
       jobsApi.updateJobApplicationHistory(id, data),
-    // onMutate: async ({ id, data }) => {
-    //   await queryClient.cancelQueries({ queryKey: queryKeys.jobs.detail(id) });
-
-    //   const previousJob = queryClient.getQueryData(queryKeys.jobs.detail(id));
-
-    //   // Update detail view
-    //   queryClient.setQueryData<any>(queryKeys.jobs.detail(id), (old: any) => {
-    //     if (!old) return old;
-    //     return { ...old, ...data, updatedAt: new Date().toISOString() };
-    //   });
-
-    //   // Update in all list queries
-    //   queryClient.setQueriesData<PaginatedResponse<any>>(
-    //     { queryKey: queryKeys.jobs.lists() },
-    //     (old) => {
-    //       if (!old) return old;
-    //       return {
-    //         ...old,
-    //         data: old.data.map((job) =>
-    //           job.id === id
-    //             ? { ...job, ...data, updatedAt: new Date().toISOString() }
-    //             : job
-    //         ),
-    //       };
-    //     }
-    //   );
-
-    //   return { previousJob };
-    // },
-    // onError: (_err, { id }, context) => {
-    //   if (context?.previousJob) {
-    //     queryClient.setQueryData(
-    //       queryKeys.jobs.detail(id),
-    //       context.previousJob
-    //     );
-    //   }
-    // },
-    onSuccess: (_updatedJob) => {
-      // Update stats if status changed
-      // queryClient.invalidateQueries({ queryKey: queryKeys.jobs.stats() });
-      
-      // Invalidate similar jobs if tags or other metadata changed
-      // queryClient.invalidateQueries({
-        //   queryKey: [...queryKeys.jobs.all, "similar"],
-        // });
-      },
-      onSettled: (_data, _error, 
-        // { id }
-      ) => {
+    onSettled: () => {
+      // Invalidate user so appliedJobs count stays accurate in ReportCard
       queryClient.invalidateQueries({ queryKey: queryKeys.users.all });
-      // queryClient.invalidateQueries({ queryKey: queryKeys.jobs.detail(id) });
-      // queryClient.invalidateQueries({ queryKey: queryKeys.jobs.lists() });
     },
   });
 }

@@ -1,20 +1,20 @@
 "use client";
+
 import { cn } from "@/lib/utils";
-import { memo, useCallback, useMemo } from "react";
-import { ApplicationHistory } from "./ApplicationHistory";
-import { SavedJobs } from "./SavedJobs";
-import { AIRecommendations } from "./AIRecommendations";
-import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { memo, useCallback, useMemo } from "react";
+import { useRouter } from "next/navigation";
 
-type ComponentId =
-  | "overview"
-  | "ai-recommendations"
-  | "saved-jobs"
-  | "application-history";
+import { AIRecommendations } from "./AIRecommendations";
+import { SavedJobs } from "./SavedJobs";
+import { ApplicationHistory } from "./ApplicationHistory";
 
-interface MenuItem {
-  id: ComponentId;
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+type TabId = "ai-recommendations" | "saved-jobs" | "application-history";
+
+interface NavItem {
+  id: TabId;
   label: string;
   icon: string;
   url: string;
@@ -24,14 +24,9 @@ interface CategoryProps {
   tab: string;
 }
 
-// Constants - moved outside component to prevent recreation
-const MENU_ITEMS: ReadonlyArray<MenuItem> = [
-  {
-    id: "overview",
-    label: "Overview",
-    icon: "/overview.svg",
-    url: "/dashboard/jobs",
-  },
+// ─── Constants ────────────────────────────────────────────────────────────────
+
+const NAV_ITEMS: ReadonlyArray<NavItem> = [
   {
     id: "ai-recommendations",
     label: "AI Recommendations",
@@ -52,40 +47,33 @@ const MENU_ITEMS: ReadonlyArray<MenuItem> = [
   },
 ] as const;
 
-const COMPONENT_MAP: Record<
-  ComponentId,
-  React.ComponentType<{ children?: React.ReactNode }>
-> = {
-  overview: ({ children }) => <AIRecommendations>{children}</AIRecommendations>,
-  "ai-recommendations": ({ children }) => (
-    <AIRecommendations>{children}</AIRecommendations>
-  ),
-  "saved-jobs": ({ children }) => <SavedJobs>{children}</SavedJobs>,
-  "application-history": ({ children }) => (
-    <ApplicationHistory>{children}</ApplicationHistory>
-  ),
+/** Maps a valid tab ID to the component that renders its content. */
+const TAB_COMPONENTS: Record<TabId, React.ComponentType<{ children?: React.ReactNode }>> = {
+  "ai-recommendations": AIRecommendations,
+  "saved-jobs": SavedJobs,
+  "application-history": ApplicationHistory,
 };
 
-// Extracted MenuItem component for better performance and separation of concerns
-const MenuItem = memo<{
-  item: MenuItem;
+const DEFAULT_TAB: TabId = "ai-recommendations";
+
+// ─── NavButton ────────────────────────────────────────────────────────────────
+
+const NavButton = memo<{
+  item: NavItem;
   isActive: boolean;
-  onClick: (item: MenuItem) => void;
-}>(({ item, isActive, onClick }) => {
-  const handleClick = useCallback(() => {
-    onClick(item);
-  }, [item, onClick]);
+  onClick: (item: NavItem) => void;
+}>(function NavButton({ item, isActive, onClick }) {
+  const handleClick = useCallback(() => onClick(item), [item, onClick]);
 
   return (
     <button
       type="button"
       onClick={handleClick}
-      className={cn(
-        "group flex gap-2 data-[state=active]:bg-primary  data-[state=active]:text-white  p-2 hover:bg-primary hover:text-white hover-cursor-pointer items-center justify-start rounded-md  hover:shadow-sm hover:cursor-pointer",
-
-        isActive && "bg-primary text-white"
-      )}
       aria-current={isActive ? "page" : undefined}
+      className={cn(
+        "group flex gap-2 p-2 hover:bg-primary hover:text-white items-center justify-start rounded-md hover:shadow-sm hover:cursor-pointer",
+        isActive && "bg-primary text-white",
+      )}
     >
       <div className="size-4 shrink-0">
         <Image
@@ -94,9 +82,8 @@ const MenuItem = memo<{
           width={16}
           height={16}
           className={cn(
-            "size-4 transition-all",
-            "group-hover:brightness-0 group-hover:invert",
-            isActive && "brightness-0 invert"
+            "size-4 transition-all group-hover:brightness-0 group-hover:invert",
+            isActive && "brightness-0 invert",
           )}
         />
       </div>
@@ -105,61 +92,59 @@ const MenuItem = memo<{
   );
 });
 
-MenuItem.displayName = "MenuItem";
+// ─── Category ─────────────────────────────────────────────────────────────────
 
-// Main component
-export const Category = memo<CategoryProps>(({ tab }) => {
+export const Category = memo<CategoryProps>(function Category({ tab }) {
   const router = useRouter();
 
-  // Normalize tab to handle both query param and overview
-  const activeTab = useMemo(() => {
-    return tab || "overview";
+  const activeTab = useMemo<TabId>(() => {
+    const isValid = (t: string): t is TabId =>
+      t in TAB_COMPONENTS;
+    return isValid(tab) ? tab : DEFAULT_TAB;
   }, [tab]);
 
-  // Memoized handler to prevent unnecessary recreations
-  const handleComponentChange = useCallback(
-    (item: MenuItem) => {
-      if (item.id === "overview") {
-        router.push("/dashboard/jobs");
-        return;
-      }
-
+  const handleNavClick = useCallback(
+    (item: NavItem) => {
       router.push(item.url);
     },
-    [router]
+    [router],
   );
 
-  // Get the active component based on current tab
-  const ActiveComponent = useMemo(() => {
-    return COMPONENT_MAP[activeTab as ComponentId] || AIRecommendations;
-  }, [activeTab]);
+  const ActiveComponent = TAB_COMPONENTS[activeTab];
+
+  const nav = (
+    <nav className="bg-white p-3 h-fit rounded-md flex gap-1">
+      {NAV_ITEMS.map((item) => (
+        <NavButton
+          key={item.id}
+          item={item}
+          isActive={activeTab === item.id}
+          onClick={handleNavClick}
+        />
+      ))}
+    </nav>
+  );
 
   return (
-    <div className="">
+    <div>
+      {/* Mobile: nav above content */}
       <div className="lg:hidden">
         <ActiveComponent>
-          <div className="flex flex-col md:flex-row  gap-4 lg:gap-6">
-            <nav className="bg-white p-3 justify-between h-fit w-full rounded-md flex flex-row gap-1">
-              {MENU_ITEMS.map((item) => (
-                <MenuItem
-                  key={item.id}
-                  item={item}
-                  isActive={activeTab === item.id}
-                  onClick={handleComponentChange}
-                />
-              ))}
-            </nav>
+          <div className="flex flex-col md:flex-row gap-4 lg:gap-6">
+            <div className="w-full">{nav}</div>
           </div>
         </ActiveComponent>
       </div>
-      <div className="hidden lg:flex  gap-4 lg:gap-6">
+
+      {/* Desktop: nav on the left, content on the right */}
+      <div className="hidden lg:flex gap-4 lg:gap-6">
         <nav className="bg-white p-3 h-fit rounded-md flex flex-col gap-1">
-          {MENU_ITEMS.map((item) => (
-            <MenuItem
+          {NAV_ITEMS.map((item) => (
+            <NavButton
               key={item.id}
               item={item}
               isActive={activeTab === item.id}
-              onClick={handleComponentChange}
+              onClick={handleNavClick}
             />
           ))}
         </nav>
@@ -170,5 +155,3 @@ export const Category = memo<CategoryProps>(({ tab }) => {
     </div>
   );
 });
-
-Category.displayName = "Category";
