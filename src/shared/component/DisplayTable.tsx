@@ -1,56 +1,146 @@
-import React from "react";
+"use client";
+import { useState } from "react";
+import {
+  ColumnFiltersState,
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getSortedRowModel,
+  SortingState,
+  useReactTable,
+  VisibilityState,
+} from "@tanstack/react-table";
+import { useRouter } from "next/navigation";
+import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
+import { useUpdateJobMutation } from "@/lib/mutations/jobs.mutations";
+import { useApplyJob } from "@/hooks/useApplyJob";
+import { ReportCard } from "@/app/dashboard/jobs/components/ReportCard";
+import { OverviewColumn } from "@/app/dashboard/jobs/components/OverviewColumn";
+import { OverviewEmpty } from "./column";
+import MobileOverview from "@/app/dashboard/jobs/components/MobileOverview";
 
-export default function DisplayTable({ job }: { job: any }) {
-  const title: string = job?.title ?? "Untitled role";
-  const company: string = job?.company ?? job?.organization ?? "Unknown";
-  const location: string = job?.location ?? job?.city ?? "Remote";
-  const postedAt = job?.postedAt ?? job?.createdAt ?? null;
-  const snippet: string = job?.description
-    ? String(job.description).slice(0, 180)
-    : "";
+export default function DisplayTable({
+  allJobs,
+  // fetchNextPage,
+  // hasNextPage,
+  isLoading,
+  isFetching,
+  isRefetching,
+  isFetchingNextPage,
+  totalScore = 0,
+}: {
+  allJobs: any[];
+  fetchNextPage?: () => void;
+  hasNextPage?: boolean;
+  isLoading?: boolean;
+  isFetching?: boolean;
+  isRefetching?: boolean;
+  isFetchingNextPage?: boolean;
+  totalScore?: number;
+}) {
+  const router = useRouter();
 
-  const href = `/dashboard/jobs/${job?.id}?referrer=dashboard&title=${encodeURIComponent(
-    title,
-  )}`;
+  const updateJobs = useUpdateJobMutation();
+  const { applyToJob: handleApply } = useApplyJob();
+
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = useState({});
+
+  const columns = OverviewColumn({
+    router,
+    updateJobs,
+    handleApply,
+  });
+
+  const table = useReactTable({
+    data: allJobs ?? [],
+    columns: columns,
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    onColumnVisibilityChange: setColumnVisibility,
+    onRowSelectionChange: setRowSelection,
+    state: {
+      sorting,
+      columnFilters,
+      columnVisibility,
+      rowSelection,
+    },
+  });
+
+  const visibleRows = table.getRowModel().rows;
+  const isSearching =
+    isLoading || isFetching || isRefetching || isFetchingNextPage;
+  const hasNoResults = !isSearching && (allJobs?.length ?? 0) === 0;
 
   return (
-    <article className="w-full border rounded-lg p-4 hover:shadow transition-shadow bg-white">
-      {/* Desktop row layout */}
-      <a href={href} className="hidden lg:flex gap-4 items-center">
-        <div className="flex-1">
-          <h3 className="text-lg font-semibold">{title}</h3>
-          <div className="text-sm text-muted-foreground">
-            {company} • {location}
-          </div>
-          <p className="mt-2 text-sm text-muted-foreground">
-            {snippet}
-            {snippet.length === 180 ? "..." : ""}
-          </p>
-        </div>
-        <div className="w-40 text-right text-sm text-muted-foreground">
-          {postedAt ? new Date(postedAt).toLocaleDateString() : ""}
-        </div>
-      </a>
+    <div className="w-full flex flex-col gap-6">
+      <ReportCard matchPercentage={totalScore} />
 
-      {/* Mobile card layout */}
-      <a href={href} className="lg:hidden block">
-        <div className="flex flex-col gap-2">
-          <div className="flex justify-between items-start">
-            <div>
-              <h3 className="text-base font-medium">{title}</h3>
-              <div className="text-sm text-muted-foreground">{company}</div>
-            </div>
-            <div className="text-xs text-muted-foreground">
-              {postedAt ? new Date(postedAt).toLocaleDateString() : ""}
-            </div>
-          </div>
-          <div className="text-sm text-muted-foreground">{location}</div>
-          <p className="text-sm text-muted-foreground">
-            {snippet}
-            {snippet.length === 180 ? "..." : ""}
-          </p>
+      <div className="hidden lg:grid grid-cols-1">
+        <Table>
+          <TableBody>
+            {hasNoResults ? (
+              <div className="flex flex-col gap-1 text-muted-foreground">
+                <OverviewEmpty
+                  searchValue={undefined}
+                  resetSearchToDefault={() => {}}
+                />
+              </div>
+            ) : (
+              visibleRows.map((row) => (
+                <TableRow
+                  key={row.id}
+                  onClick={() =>
+                    router.push(
+                      `/dashboard/jobs/${row.original.id}?referrer=jobs&title=${row.original.title}`,
+                    )
+                  }
+                  className="hover:bg-white border-b rounded-3xl! hover:border-primary hover:border-2 hover:rounded-2xl hover:cursor-pointer"
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </div>
+
+      <MobileOverview
+        allJobs={allJobs}
+        updateJobs={updateJobs}
+        handleApply={handleApply}
+      />
+
+      {/* {hasNextPage && (
+        <div className="flex justify-center">
+          <Button
+            onClick={() => fetchNextPage?.()}
+            disabled={isFetchingNextPage}
+            variant="outline"
+          >
+            {isFetchingNextPage ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Loading more...
+              </>
+            ) : (
+              "Load More Jobs"
+            )}
+          </Button>
         </div>
-      </a>
-    </article>
+      )} */}
+    </div>
   );
 }

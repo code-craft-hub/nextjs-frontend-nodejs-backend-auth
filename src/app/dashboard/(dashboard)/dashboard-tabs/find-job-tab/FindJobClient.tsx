@@ -1,5 +1,6 @@
 "use client";
 
+import { useForm } from "react-hook-form";
 import { API_URL } from "@/lib/api/client";
 import DisplayTable from "@/shared/component/DisplayTable";
 import { useInfiniteQuery } from "@tanstack/react-query";
@@ -28,11 +29,9 @@ export function useInfiniteJobs(query?: string) {
     queryFn: ({ pageParam }) => fetchJobs({ pageParam, query }),
     initialPageParam: undefined,
     getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
-    // enabled: query !== undefined,
   });
 }
 
-import { useForm } from "react-hook-form";
 
 type SearchForm = {
   query: string;
@@ -90,9 +89,15 @@ export function JobSearchForm({
 }
 
 export function JobList({ query }: { query?: string }) {
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useInfiniteJobs(query);
-
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+    isFetching,
+    isRefetching,
+  } = useInfiniteJobs(query);
   const handleIntersect = useCallback(() => {
     if (!isFetchingNextPage && hasNextPage) {
       fetchNextPage();
@@ -104,15 +109,21 @@ export function JobList({ query }: { query?: string }) {
     Boolean(hasNextPage),
   );
 
+  const allJobs = data?.pages.flatMap((p) => p.items ?? []) ?? [];
+
   return (
     <>
-      {data?.pages.flatMap((page) =>
-        page.items.map((job: any, index: number) => (
-          <DisplayTable key={`${job.id}-${index}`} job={job} />
-        )),
-      )}
+      <DisplayTable
+        allJobs={allJobs}
+        fetchNextPage={fetchNextPage}
+        hasNextPage={Boolean(hasNextPage)}
+        isLoading={isLoading}
+        isFetching={isFetching}
+        isRefetching={isRefetching}
+        isFetchingNextPage={isFetchingNextPage}
+        totalScore={0}
+      />
 
-      {/* Sentinel */}
       <div ref={sentinelRef} />
 
       {isFetchingNextPage && <div>Loading more…</div>}
