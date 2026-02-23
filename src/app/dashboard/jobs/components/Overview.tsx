@@ -32,7 +32,7 @@ import { useJobsTable } from "../_hooks/useJobsTable";
 import { JobsTable } from "./JobsTable";
 import { LoadMoreButton } from "./LoadMoreButton";
 import { ReportCard } from "./ReportCard";
-import MobileOverview from "./MobileOverview";
+import MobileOverview from "../../../../shared/component/MobileOverview";
 
 export default function Overview() {
   const router = useRouter();
@@ -121,7 +121,8 @@ export default function Overview() {
 
   const isSearching =
     isLoading || isFetching || isRefetching || isFetchingNextPage;
-  const hasNoResults = !isSearching && (data?.pages?.[0]?.data?.length ?? 0) === 0;
+  const hasNoResults =
+    !isSearching && (data?.pages?.[0]?.data?.length ?? 0) === 0;
 
   return (
     <div className="lg:gap-6 lg:flex">

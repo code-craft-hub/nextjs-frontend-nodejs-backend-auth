@@ -1,5 +1,13 @@
-import { InfiniteData, useMutation, useQueryClient } from "@tanstack/react-query";
-import { bookmarksApi, type Bookmark, type BookmarkListResponse } from "@/lib/api/bookmarks.api";
+import {
+  InfiniteData,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
+import {
+  bookmarksApi,
+  type Bookmark,
+  type BookmarkListResponse,
+} from "@/lib/api/bookmarks.api";
 import { bookmarkKeys } from "@/lib/query/bookmarks.keys";
 import {
   invalidateBookmarkLists,
@@ -67,10 +75,9 @@ export function useRemoveBookmarkMutation() {
     onMutate: async (bookmarkId) => {
       await queryClient.cancelQueries({ queryKey: bookmarkKeys.infinite() });
 
-      const previousInfinite =
-        queryClient.getQueryData<InfiniteData<BookmarkListResponse>>(
-          bookmarkKeys.infinite(),
-        );
+      const previousInfinite = queryClient.getQueryData<
+        InfiniteData<BookmarkListResponse>
+      >(bookmarkKeys.infinite());
 
       queryClient.setQueryData<InfiniteData<BookmarkListResponse>>(
         bookmarkKeys.infinite(),
@@ -129,10 +136,9 @@ export function useRemoveBookmarkByJobMutation() {
       await queryClient.cancelQueries({ queryKey: bookmarkKeys.infinite() });
 
       const previousCheck = queryClient.getQueryData(bookmarkKeys.check(jobId));
-      const previousInfinite =
-        queryClient.getQueryData<InfiniteData<BookmarkListResponse>>(
-          bookmarkKeys.infinite(),
-        );
+      const previousInfinite = queryClient.getQueryData<
+        InfiniteData<BookmarkListResponse>
+      >(bookmarkKeys.infinite());
 
       queryClient.setQueryData(bookmarkKeys.check(jobId), {
         success: true,
@@ -178,6 +184,63 @@ export function useRemoveBookmarkByJobMutation() {
     onSettled: (_data, _err, jobId) => {
       invalidateBookmarkCheck(queryClient, jobId);
       invalidateBookmarkLists(queryClient);
+    },
+  });
+}
+
+export function useToggleBookmarkByJobMutation() {
+  const createBookmark = useCreateBookmarkMutation();
+  const removeBookmarkByJob = useRemoveBookmarkByJobMutation();
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      jobId,
+      isBookmarked,
+    }: {
+      jobId: string;
+      isBookmarked: boolean;
+    }) => {
+      if (isBookmarked) {
+        await removeBookmarkByJob.mutateAsync(jobId);
+      } else {
+        await createBookmark.mutateAsync(jobId);
+      }
+    },
+
+    // Optimistically flip isBookmarked in every cached jobs page so the
+    // Toggle in JobRow reacts instantly without waiting for a refetch.
+    onMutate: async ({ jobId, isBookmarked }) => {
+      await qc.cancelQueries({ queryKey: ["jobs"] });
+
+      const previousJobs = qc.getQueriesData({ queryKey: ["jobs"] });
+
+      qc.setQueriesData({ queryKey: ["jobs"] }, (old: any) => {
+        if (!old?.pages) return old;
+        return {
+          ...old,
+          pages: old.pages.map((page: any) => ({
+            ...page,
+            items: page.items?.map((job: any) =>
+              job.id === jobId
+                ? { ...job, isBookmarked: !isBookmarked }
+                : job,
+            ),
+          })),
+        };
+      });
+
+      return { previousJobs };
+    },
+
+    onError: (_err, _variables, context) => {
+      context?.previousJobs?.forEach(([queryKey, data]: any) => {
+        qc.setQueryData(queryKey, data);
+      });
+    },
+
+    onSettled: () => {
+      qc.invalidateQueries({ queryKey: ["jobs"] });
     },
   });
 }

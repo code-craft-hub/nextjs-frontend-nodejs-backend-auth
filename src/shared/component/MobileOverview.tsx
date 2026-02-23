@@ -11,7 +11,10 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { memo } from "react";
-import { ApplyHandler, JobUpdateMutation } from "./OverviewColumn";
+import {
+  ApplyHandler,
+  JobUpdateMutation,
+} from "../../app/dashboard/jobs/components/OverviewColumn";
 
 interface MobileOverviewProps {
   allJobs: JobType[];
@@ -68,9 +71,7 @@ const MobileOverview = memo(function MobileOverview({
                     <h2 className="text-sm font-semibold text-gray-900 capitalize truncate">
                       {job.title}
                     </h2>
-                    <span className="px-3 hidden sm:inline-flex py-1 bg-blue-50 text-blue-600 text-2xs whitespace-nowrap rounded-full shrink-0">
-                      {job.employmentType || job.jobType}
-                    </span>
+                   
                   </div>
 
                   <div
@@ -114,7 +115,7 @@ const MobileOverview = memo(function MobileOverview({
                       )}
                     </span>
                   </div>
-                  <span className="px-3 sm:hidden py-1 bg-blue-50 text-blue-600 text-2xs whitespace-nowrap rounded-full">
+                  <span className="px-3 py-1 bg-blue-50 text-blue-600 text-2xs whitespace-nowrap rounded-full">
                     {job.employmentType || job.jobType}
                   </span>
                 </div>

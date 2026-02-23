@@ -14,7 +14,7 @@ import { ApplicationHistoryColumn } from "../components/OverviewColumn";
 import { useJobsTable } from "../_hooks/useJobsTable";
 import { JobsTable } from "../components/JobsTable";
 import { LoadMoreButton } from "../components/LoadMoreButton";
-import MobileOverview from "../components/MobileOverview";
+import MobileOverview from "../../../../shared/component/MobileOverview";
 import { SearchBar, SearchBarRef } from "./JobSearchBar";
 
 export const ApplicationHistory = ({ children }: { children?: ReactNode }) => {
@@ -106,10 +106,7 @@ export const ApplicationHistory = ({ children }: { children?: ReactNode }) => {
           />
 
           {/* Mobile view — no apply/bookmark actions for history items */}
-          <MobileOverview
-            allJobs={allJobs}
-            referrer="application-history"
-          />
+          <MobileOverview allJobs={allJobs} referrer="application-history" />
 
           <LoadMoreButton
             hasNextPage={hasNextPage ?? false}

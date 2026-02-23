@@ -1,7 +1,12 @@
 "use client";
 
 import { ReactNode, useEffect, useMemo } from "react";
-import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { Loader2, RefreshCw, UserCircle } from "lucide-react";
 import { sendGTMEvent } from "@next/third-parties/google";
@@ -23,7 +28,7 @@ import { OverviewColumn } from "../components/OverviewColumn";
 import { useJobsTable } from "../_hooks/useJobsTable";
 import { JobsTable } from "../components/JobsTable";
 import { LoadMoreButton } from "../components/LoadMoreButton";
-import MobileOverview from "../components/MobileOverview";
+import MobileOverview from "../../../../shared/component/MobileOverview";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -155,9 +160,8 @@ export const AIRecommendations = ({ children }: { children?: ReactNode }) => {
   // ── Flatten pages → job rows ─────────────────────────────────────────────
   const allJobs = useMemo(
     () =>
-      data?.pages.flatMap((page) =>
-        page.data.recommendations.map(toJobRow),
-      ) ?? [],
+      data?.pages.flatMap((page) => page.data.recommendations.map(toJobRow)) ??
+      [],
     [data],
   );
 
@@ -200,7 +204,10 @@ export const AIRecommendations = ({ children }: { children?: ReactNode }) => {
             searchValue={userJobTitlePreference}
             skeletonCount={8}
             onRowClick={(row) => {
-              const job = row.original as JobType & { id?: string; title?: string };
+              const job = row.original as JobType & {
+                id?: string;
+                title?: string;
+              };
               router.push(
                 `/dashboard/jobs/${job.id}?referrer=ai-recommendations&title=${encodeURIComponent(job.title ?? "")}`,
               );

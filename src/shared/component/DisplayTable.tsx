@@ -17,7 +17,7 @@ import { useApplyJob } from "@/hooks/useApplyJob";
 import { ReportCard } from "@/app/dashboard/jobs/components/ReportCard";
 import { OverviewColumn } from "@/app/dashboard/jobs/components/OverviewColumn";
 import { OverviewEmpty } from "./column";
-import MobileOverview from "@/app/dashboard/jobs/components/MobileOverview";
+import MobileOverview from "@/shared/component/MobileOverview";
 
 export default function DisplayTable({
   allJobs,

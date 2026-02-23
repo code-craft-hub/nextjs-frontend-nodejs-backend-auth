@@ -1,4 +1,5 @@
-import { api } from "./client";
+
+import { api } from "@/lib/api/client";
 import type { PaginatedResponse } from "@/lib/types";
 import type { JobPost } from "@/types";
 
@@ -10,8 +11,8 @@ export const jobPostsApi = {
     api.get<PaginatedResponse<JobPost>>("/job-posts/search", { params, token }),
 
   query: (params?: any, token?: string) =>
-    api.get<PaginatedResponse<{items: JobPost[]}>>("/job-posts/query", { params, token }),
-    
+    api.get<PaginatedResponse<JobPost>>("/job-posts/search", { params, token }),
+
   fullTextSearch: (q: string, page = 1, limit = 20, token?: string) =>
     api.get<PaginatedResponse<JobPost>>("/job-posts/fts", {
       params: { q, page, limit },

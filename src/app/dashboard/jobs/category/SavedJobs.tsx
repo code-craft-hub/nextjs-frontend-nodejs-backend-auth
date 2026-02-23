@@ -15,7 +15,7 @@ import { OverviewColumn } from "../components/OverviewColumn";
 import { useJobsTable } from "../_hooks/useJobsTable";
 import { JobsTable } from "../components/JobsTable";
 import { LoadMoreButton } from "../components/LoadMoreButton";
-import MobileOverview from "../components/MobileOverview";
+import MobileOverview from "../../../../shared/component/MobileOverview";
 import { SearchBar, SearchBarRef } from "./JobSearchBar";
 
 export const SavedJobs = ({ children }: { children?: ReactNode }) => {
