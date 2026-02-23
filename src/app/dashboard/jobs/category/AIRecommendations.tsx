@@ -14,9 +14,7 @@ import { sendGTMEvent } from "@next/third-parties/google";
 import { userQueries } from "@module/user";
 import { useUpdateJobMutation } from "@/lib/mutations/jobs.mutations";
 import { useApplyJob } from "@/hooks/useApplyJob";
-import { getDataSource } from "@/lib/utils/helpers";
 import { queryKeys } from "@/lib/query/keys";
-import { JobType } from "@/types";
 import { Button } from "@/components/ui/button";
 
 import recommendationsApi, {
@@ -28,7 +26,8 @@ import { OverviewColumn } from "../components/OverviewColumn";
 import { useJobsTable } from "../_hooks/useJobsTable";
 import { JobsTable } from "../components/JobsTable";
 import { LoadMoreButton } from "../components/LoadMoreButton";
-import MobileOverview from "../../../../shared/component/MobileOverview";
+import MobileOverview from "../../../../modules/job-posts/components/MobileOverview";
+import { JobPost } from "@/modules/job-posts";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -36,14 +35,14 @@ import MobileOverview from "../../../../shared/component/MobileOverview";
  * Flattens a saved JobRecommendation into the JobType shape that
  * OverviewColumn expects, merging AI-computed scores into the job object.
  */
-function toJobRow(rec: JobRecommendation): JobType & {
+function toJobRow(rec: JobRecommendation): JobPost & {
   matchPercentage?: string;
   recommendationId: string;
   rankPosition: number | null;
 } {
   const job = rec.job ?? {};
   return {
-    ...(job as JobType),
+    ...(job as JobPost),
     id: job.id ?? rec.id,
     matchPercentage:
       rec.matchScore != null ? String(rec.matchScore) : undefined,
@@ -110,9 +109,6 @@ export const AIRecommendations = ({ children }: { children?: ReactNode }) => {
   const queryClient = useQueryClient();
 
   const { data: user } = useQuery(userQueries.detail());
-  const userDataSource = getDataSource(user);
-  const userJobTitlePreference =
-    userDataSource?.key || userDataSource?.title || "";
 
   useEffect(() => {
     if (user?.firstName) {

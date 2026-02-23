@@ -1,5 +1,5 @@
 "use client";
-import MobileOverview from "@/shared/component/MobileOverview";
+import MobileOverview from "@/modules/job-posts/components/MobileOverview";
 import { useRouter } from "next/navigation";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -19,11 +19,11 @@ import {
 } from "@/components/ui/tooltip";
 import { PiOfficeChairFill } from "react-icons/pi";
 import { formatAppliedDate } from "@/lib/utils/helpers";
-import { JobType } from "@/types";
 import { useUpdateJobMutation } from "@/lib/mutations/jobs.mutations";
 import { useApplyJob } from "@/hooks/useApplyJob";
 import type { ApplyHandler } from "@/app/dashboard/jobs/components/OverviewColumn";
 import { useToggleBookmarkByJobMutation } from "@/lib/mutations/bookmarks.mutations";
+import { JobPost } from "../types";
 
 // ─── Row ──────────────────────────────────────────────────────────────────────
 
@@ -33,14 +33,12 @@ function JobRow({
   handleBookmark,
   onRowClick,
 }: {
-  job: JobType;
+  job: JobPost;
   handleApply?: ApplyHandler;
   handleBookmark?: () => void;
   onRowClick: () => void;
 }) {
-  const isBookmarked = job.isBookmarked ?? false;
-  const matchPercentage = Number(job.matchPercentage) || 0;
-
+  const isBookmarked = job?.isBookmarked ?? false;
 
   return (
     <TableRow
@@ -51,8 +49,8 @@ function JobRow({
       <TableCell className="w-16 shrink-0">
         <div className="flex items-center justify-center size-16">
           <img
-            src={job.companyLogo || "/placeholder.jpg"}
-            alt={job.companyText ?? ""}
+            src={job?.companyLogo || "/placeholder.jpg"}
+            alt={job?.companyText ?? ""}
             className="size-12 object-contain"
           />
         </div>
@@ -69,52 +67,42 @@ function JobRow({
                   type="button"
                 >
                   <div className="capitalize font-medium text-xs truncate min-w-0 max-w-xs">
-                    {job.title}
+                    {job?.title}
                   </div>
                 </TooltipTrigger>
                 <TooltipContent className="capitalize">
-                  {job.title}
+                  {job?.title}
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
 
             <div className="bg-blue-50 rounded text-blue-600 px-2 py-1 shrink-0">
               <span className="text-2xs whitespace-nowrap">
-                {job.jobType || job.employmentType}
+                {job?.jobType || job?.employmentType}
               </span>
             </div>
-            {matchPercentage > 40 && (
-              <Sparkles className="text-yellow-500 size-4 shrink-0" />
-            )}
           </div>
           <div className="flex flex-wrap gap-x-3 gap-y-1 mt-1">
             <p className="flex gap-1 text-gray-400 items-center min-w-0">
               <MapPin className="size-3 shrink-0" />
-              <span className="text-2xs truncate">{job.location}</span>
+              <span className="text-2xs truncate">{job?.location}</span>
             </p>
             <p className="flex gap-1 text-gray-400 items-center min-w-0">
               <PiOfficeChairFill className="size-3 shrink-0" />
-              <span className="text-2xs truncate">{job.companyName}</span>
+              <span className="text-2xs truncate">{job?.companyName}</span>
             </p>
-            {job.salary && (
+            {job?.salary && (
               <p className="hidden lg:flex gap-1 text-gray-400 items-center">
                 <DollarSign className="size-3 shrink-0" />
-                <span className="text-2xs">{job.salary}</span>
+                <span className="text-2xs">{job?.salary}</span>
               </p>
             )}
             <p className="hidden lg:flex gap-1 text-gray-400 items-center">
               <Calendar className="size-3 shrink-0" />
               <span className="text-2xs whitespace-nowrap">
-                {formatAppliedDate(
-                  job.scrapedAt || job.postedAt || job.updatedAt,
-                )}
+                {formatAppliedDate(job?.postedAt || job?.updatedAt)}
               </span>
             </p>
-            {matchPercentage > 40 && (
-              <p className="text-2xs text-green-400 shrink-0">
-                {matchPercentage}%
-              </p>
-            )}
           </div>
         </div>
       </TableCell>
@@ -145,7 +133,6 @@ function JobRow({
       <TableCell className="w-32">
         <div className="flex justify-end">
           <Button
-            disabled={job.isApplied}
             className="whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed disabled:text-gray-400"
             onClick={(e) => {
               e.stopPropagation();
@@ -153,8 +140,8 @@ function JobRow({
             }}
             variant="button"
           >
-            {job.emailApply ? "Auto Apply" : "Apply Now"}
-            {job.emailApply && <Sparkles className="size-3 text-yellow-400" />}
+            {job?.emailApply ? "Auto Apply" : "Apply Now"}
+            {job?.emailApply && <Sparkles className="size-3 text-yellow-400" />}
           </Button>
         </div>
       </TableCell>
@@ -164,7 +151,13 @@ function JobRow({
 
 // ─── Table ────────────────────────────────────────────────────────────────────
 
-export default function JobsTable({ allJobs, referrer }: { allJobs: JobType[]; referrer: string }) {
+export default function JobsTable({
+  allJobs,
+  referrer,
+}: {
+  allJobs: JobPost[];
+  referrer: string;
+}) {
   const router = useRouter();
   const updateJobs = useUpdateJobMutation();
   const toggleBookmark = useToggleBookmarkByJobMutation();
@@ -177,18 +170,18 @@ export default function JobsTable({ allJobs, referrer }: { allJobs: JobType[]; r
           <TableBody>
             {allJobs.map((job) => (
               <JobRow
-                key={job.id}
+                key={job?.id}
                 job={job}
                 handleApply={handleApply}
                 handleBookmark={() =>
                   toggleBookmark.mutate({
-                    jobId: job.id,
-                    isBookmarked: job.isBookmarked ?? false,
+                    jobId: job?.id,
+                    isBookmarked: job?.isBookmarked ?? false,
                   })
                 }
                 onRowClick={() =>
                   router.push(
-                    `/dashboard/jobs/${job.id}?referrer=${referrer ?? "jobs"}&title=${encodeURIComponent(job.title ?? "")}`,
+                    `/dashboard/jobs/${job?.id}?referrer=${referrer ?? "jobs"}&title=${encodeURIComponent(job?.title ?? "")}`,
                   )
                 }
               />
@@ -198,7 +191,7 @@ export default function JobsTable({ allJobs, referrer }: { allJobs: JobType[]; r
       </div>
 
       {/* Mobile (MobileOverview has lg:hidden internally; this wrapper cuts it at md) */}
-      <div className="lg:hidden">
+      <div className="lg:hidden mt-4">
         <MobileOverview
           allJobs={allJobs}
           updateJobs={updateJobs}

@@ -6,7 +6,6 @@ import { prefetchWithPriority } from "@/lib/query/parallel-prefetch";
 import { HydrationBoundary } from "@/components/hydration-boundary";
 import { dehydrate } from "@tanstack/react-query";
 import { userQueries } from "@module/user";
-import { getDataSource } from "@/lib/utils/helpers";
 import { getCookiesToken, getSessionFromCookies } from "@/lib/auth.utils";
 
 export const dynamic = "force-dynamic";
@@ -25,12 +24,10 @@ const LandingPage = async () => {
 
     if (cookieUser) {
       user = await queryClient.fetchQuery(userQueries.detail(token));
-      const userDataSource = getDataSource(user);
 
       filters = {
         page: 1,
         limit: 10,
-        title: userDataSource?.key || userDataSource?.title || "",
       };
       await prefetchWithPriority(queryClient, [
         {

@@ -14,37 +14,6 @@ export type UploadedFile = {
 export type DashboardTab = "ai-apply" | "find-jobs" | "tailor-cv";
 
 
-export type JobType = {
-  id: string;
-  title: string;
-  company: string;
-  companyLogo: string;
-  companyIcon: string;
-  companyText: string;
-  location: string;
-  salary: string;
-  relevanceScore: number;
-  postedTime: string;
-  matchPercentage: string;
-  jobType: string;
-  updatedAt?: string;
-  applyUrl?: string;
-  isBookmarked: boolean;
-  isFilled: boolean;
-  companyName: string;
-  descriptionText: string;
-  descriptionHtml: string;
-  link: string;
-  isApplied: boolean;
-  salaryInfo: any;
-  appliedDate?: string;
-  emailApply: string;
-  postedAt: string;
-  scrapedDate: string;
-  scrapedAt: string;
-  sponsorCategory: string;
-  employmentType?: string;
-};
 
 export interface JobApplication {
   id: string;
@@ -60,38 +29,7 @@ export interface JobApplication {
   metadata?: Record<string, any> | null;
 }
 
-export interface JobPost {
-  id: string;
-  title: string;
-  link?: string | null;
-  companyName?: string | null;
-  companyLogo?: string | null;
-  companyIcon?: string | null;
-  companyText?: string | null;
-  location?: string | null;
-  salaryInfo?: {
-    min?: number;
-    max?: number;
-    currency?: string;
-    period?: string;
-  } | null;
-  postedAt?: string | Date | null;
-  descriptionHtml?: string | null;
-  descriptionText?: string | null;
-  applyUrl?: string | null;
-  jobFunction?: string | null;
-  employmentType?: string | null;
-  expireAt?: string | Date | null;
-  emailApply?: string | null;
-  source?: string | null;
-  payload?: Record<string, any> | null;
-  isProcessed?: boolean;
-  qualityScore?: number | null;
-  createdAt?: string | Date | null;
-  updatedAt?: string | Date | null;
-  /** Populated by the backend when the request is authenticated. */
-  isBookmarked?: boolean;
-}
+
 
 export interface ProfileData {
   id: string;

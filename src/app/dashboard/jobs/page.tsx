@@ -1,4 +1,4 @@
-import Overview from "./components/Overview";
+import Overview from "../../../modules/job-posts/components/Overview";
 
 const JobListingsPage = async () => {
   return (

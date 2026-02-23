@@ -3,10 +3,10 @@ import { autoApplyQueries } from "@/lib/queries/auto-apply.queries";
 import { bookmarksQueries } from "@/lib/queries/bookmarks.queries";
 import { coverLetterQueries } from "@/lib/queries/cover-letter.queries";
 import { interviewQuestionQueries } from "@/lib/queries/interview.queries";
-import { jobPostsQueries } from "@/lib/queries/job-posts.queries";
 import recommendationsQueries from "@/lib/queries/recommendations.queries";
 import { resumeQueries } from "@/lib/queries/resume.queries";
 import { JobFilters } from "@/lib/types/jobs";
+import { jobPostsQueries } from "@/modules/job-posts";
 import { QueryClient } from "@tanstack/react-query";
 
 type DashboardPrefetchParams = {

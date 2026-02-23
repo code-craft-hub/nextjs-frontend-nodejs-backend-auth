@@ -12,7 +12,6 @@ import { JobFilters } from "@/lib/types/jobs";
 import { userQueries } from "@module/user";
 import { useQuery } from "@tanstack/react-query";
 import { sendGTMEvent } from "@next/third-parties/google";
-import { getDataSource } from "@/lib/utils/helpers";
 import { useDashboardPrefetch } from "@/lib/react-query/hooks/useDashboardPrefetch";
 import InsufficientCreditsModal from "@/components/shared/InsufficientCreditsModal";
 import AuthorizeGoogle from "@/hooks/gmail/AuthorizeGoogle";
@@ -20,18 +19,15 @@ import AuthorizeGoogle from "@/hooks/gmail/AuthorizeGoogle";
 export const HomeClient = memo(
   ({ tab, jobDescription }: { tab: DashboardTab; jobDescription: string }) => {
     const { data: user } = useQuery(userQueries.detail());
-    const title = getDataSource(user)?.title;
 
     const filters: JobFilters = {
       page: 1,
       limit: 20,
-      title: title || "",
     };
 
     const autoApplyFilters: JobFilters = {
       page: 1,
       limit: 30,
-      title: title || "",
     };
 
     useEffect(() => {

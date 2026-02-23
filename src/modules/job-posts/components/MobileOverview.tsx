@@ -1,6 +1,5 @@
 import { Toggle } from "@/components/ui/toggle";
 import { formatAppliedDate } from "@/lib/utils/helpers";
-import { JobType } from "@/types";
 import {
   ArrowRight,
   BookmarkIcon,
@@ -14,10 +13,11 @@ import { memo } from "react";
 import {
   ApplyHandler,
   JobUpdateMutation,
-} from "../../app/dashboard/jobs/components/OverviewColumn";
+} from "../../../app/dashboard/jobs/components/OverviewColumn";
+import { JobPost } from "../types";
 
 interface MobileOverviewProps {
-  allJobs: JobType[];
+  allJobs: JobPost[];
   updateJobs?: JobUpdateMutation;
   handleApply?: ApplyHandler;
   /**
@@ -43,24 +43,23 @@ const MobileOverview = memo(function MobileOverview({
   return (
     <div className="space-y-4 lg:hidden">
       {allJobs.map((job) => {
-        const isBookmarked = job.isBookmarked ?? false;
-        const matchPercentage = Number(job.matchPercentage ?? 0);
+        const isBookmarked = job?.isBookmarked ?? false;
 
         return (
           <div
-            key={job.id}
+            key={job?.id}
             className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow cursor-pointer"
             onClick={() =>
               router.push(
-                `/dashboard/jobs/${job.id}?referrer=${referrer}&title=${encodeURIComponent(job.title ?? "")}`,
+                `/dashboard/jobs/${job?.id}?referrer=${referrer}&title=${encodeURIComponent(job?.title ?? "")}`,
               )
             }
           >
             <div className="flex items-start gap-4">
               <div className="shrink-0 flex items-center justify-center">
                 <img
-                  src={job.companyLogo || "/placeholder.jpg"}
-                  alt={job.company ?? ""}
+                  src={job?.companyLogo || "/placeholder.jpg"}
+                  alt={job?.company ?? ""}
                   className="w-10 h-10 object-contain"
                 />
               </div>
@@ -69,9 +68,8 @@ const MobileOverview = memo(function MobileOverview({
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-3 min-w-0">
                     <h2 className="text-sm font-semibold text-gray-900 capitalize truncate">
-                      {job.title}
+                      {job?.title}
                     </h2>
-                   
                   </div>
 
                   <div
@@ -79,7 +77,7 @@ const MobileOverview = memo(function MobileOverview({
                       e.preventDefault();
                       e.stopPropagation();
                       updateJobs?.mutate({
-                        id: String(job.id),
+                        id: String(job?.id),
                         data: { isBookmarked: !isBookmarked },
                       });
                     }}
@@ -99,33 +97,29 @@ const MobileOverview = memo(function MobileOverview({
                 <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-3">
                   <div className="flex items-center gap-1">
                     <MapPin className="size-3 shrink-0" />
-                    <span className="text-xs">{job.location}</span>
+                    <span className="text-xs">{job?.location}</span>
                   </div>
-                  {job.salary && (
+                  {job?.salary && (
                     <div className="flex items-center gap-1">
                       <DollarSign className="size-3" />
-                      <span className="text-xs">{job.salary}</span>
+                      <span className="text-xs">{job?.salary}</span>
                     </div>
                   )}
                   <div className="flex items-center gap-1">
                     <Calendar className="size-3" />
                     <span className="text-xs whitespace-nowrap">
                       {formatAppliedDate(
-                        job.scrapedAt || job.postedAt || job.updatedAt,
+                        job?.postedAt || job?.updatedAt,
                       )}
                     </span>
                   </div>
                   <span className="px-3 py-1 bg-blue-50 text-blue-600 text-2xs whitespace-nowrap rounded-full">
-                    {job.employmentType || job.jobType}
+                    {job?.employmentType || job?.jobType}
                   </span>
                 </div>
 
                 <div className="flex items-center justify-between">
-                  {matchPercentage > 40 && (
-                    <p className="text-green-600 text-xs font-medium">
-                      {matchPercentage}% match
-                    </p>
-                  )}
+                 
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -133,7 +127,7 @@ const MobileOverview = memo(function MobileOverview({
                     }}
                     className="ml-auto bg-blue-50 text-blue-600 px-2 py-2 text-2xs rounded-lg hover:bg-blue-100 transition-colors flex items-center gap-2 font-medium"
                   >
-                    {job.emailApply ? (
+                    {job?.emailApply ? (
                       <>
                         Auto Apply
                         <Sparkles className="size-3 text-blue-500" />

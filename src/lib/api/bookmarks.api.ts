@@ -16,7 +16,7 @@ export interface Bookmark {
 export interface BookmarkResponse {
   success: boolean;
   message: string;
-  data: Bookmark;
+  data: { action: "created" | "removed"; bookmark: Bookmark };
 }
 
 export interface BookmarkListResponse {

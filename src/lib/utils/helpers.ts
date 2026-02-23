@@ -1,9 +1,8 @@
 import { differenceInCalendarDays } from "date-fns";
 import { formatDistanceToNow, isValid } from "date-fns";
-import { ApiError, IUser, QAItem } from "@/types";
+import { ApiError, QAItem } from "@/types";
 import { jsonrepair } from "jsonrepair";
 import { MouseEvent } from "react";
-import { isEmpty } from "lodash";
 
 /**
  * Calculates the number of full days remaining until a future date.
@@ -250,18 +249,7 @@ export const formatAppliedDate = (dateString?: string): string => {
   }
 };
 
-//  TODO: DELETE
-export const getDataSource = (user?: Partial<IUser>) => {
-  let dataSource = Array.isArray(user?.dataSource)
-    ? user?.dataSource?.find(
-        (profile) => profile.id === user?.defaultDataSource,
-      )
-    : [];
 
-  if (isEmpty(dataSource)) dataSource = user?.dataSource?.[0];
-
-  return dataSource;
-};
 export const smoothlyScrollToView = (
   e: MouseEvent<HTMLAnchorElement>,
   href: string,

@@ -27,10 +27,8 @@ export function JobList({ query }: { query?: string }) {
 
   console.log("Rendering JobList with data:", data);
   const allJobs = data?.pages ?? [];
-  // const allJobs = data?.pages.flatMap((p) => p.items ?? []) ?? [];
 
   return (
-    // Dim old results while a new search query is in flight
     <div
       style={{
         opacity: isPlaceholderData ? 0.5 : 1,

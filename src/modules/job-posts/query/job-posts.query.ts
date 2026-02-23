@@ -1,19 +1,20 @@
-// lib/queries/job-posts.queries.ts
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { queryOptions, infiniteQueryOptions } from "@tanstack/react-query";
-import { jobPostsApi } from "@/lib/api/job-posts.api";
-import { queryKeys } from "@/lib/query/keys";
+import { jobPostsKeys } from "./job-post.keys";
+import jobPostsApi from "../api/job-posts.api";
+import type { InfiniteJobsResponse } from "../types";
 
 export const jobPostsQueries = {
   list: (params: Record<string, any> = {}, token?: string) =>
     queryOptions({
-      queryKey: queryKeys.jobPosts.list(params),
+      queryKey: jobPostsKeys.jobPosts.list(params),
       queryFn: () => jobPostsApi.list(params, token),
       staleTime: 10 * 60 * 1000,
     }),
 
   infinite: (params: Record<string, any> = {}, token?: string) =>
     infiniteQueryOptions({
-      queryKey: [...queryKeys.jobPosts.lists(), "infinite", params],
+      queryKey: [...jobPostsKeys.jobPosts.lists(), "infinite", params],
       queryFn: ({ pageParam }) =>
         jobPostsApi.list(
           { ...params, page: pageParam, limit: params.limit || 20 },
@@ -33,7 +34,7 @@ export const jobPostsQueries = {
 
   search: (params: Record<string, any> = {}, token?: string) =>
     queryOptions({
-      queryKey: queryKeys.jobPosts.search(params.q || ""),
+      queryKey: jobPostsKeys.jobPosts.search(params.q || ""),
       queryFn: () => jobPostsApi.search(params, token),
       staleTime: 30 * 1000,
       enabled: !!params.q && String(params.q).trim().length >= 2,
@@ -41,7 +42,7 @@ export const jobPostsQueries = {
 
   fullTextSearch: (q: string, page = 1, limit = 20, token?: string) =>
     queryOptions({
-      queryKey: queryKeys.jobPosts.fts(q),
+      queryKey: jobPostsKeys.jobPosts.fts(q),
       queryFn: () => jobPostsApi.fullTextSearch(q, page, limit, token),
       staleTime: 30 * 1000,
       enabled: !!q && q.trim().length > 0,
@@ -49,21 +50,21 @@ export const jobPostsQueries = {
 
   active: (params: Record<string, any> = {}, token?: string) =>
     queryOptions({
-      queryKey: queryKeys.jobPosts.active(),
+      queryKey: jobPostsKeys.jobPosts.active(),
       queryFn: () => jobPostsApi.getActiveJobs(params, token),
       staleTime: 5 * 60 * 1000,
     }),
 
   unprocessed: (limit = 100, token?: string) =>
     queryOptions({
-      queryKey: queryKeys.jobPosts.unprocessed(),
+      queryKey: jobPostsKeys.jobPosts.unprocessed(),
       queryFn: () => jobPostsApi.getUnprocessed(limit, token),
       staleTime: 5 * 60 * 1000,
     }),
 
   stats: (token?: string) =>
     queryOptions({
-      queryKey: queryKeys.jobPosts.stats(),
+      queryKey: jobPostsKeys.jobPosts.stats(),
       queryFn: () => jobPostsApi.getStats(token),
       staleTime: 5 * 60 * 1000,
     }),
@@ -74,7 +75,7 @@ export const jobPostsQueries = {
     token?: string,
   ) =>
     queryOptions({
-      queryKey: queryKeys.jobPosts.company(companyName, params),
+      queryKey: jobPostsKeys.jobPosts.company(companyName, params),
       queryFn: () => jobPostsApi.getByCompany(companyName, params, token),
       staleTime: 10 * 60 * 1000,
       enabled: !!companyName,
@@ -86,7 +87,7 @@ export const jobPostsQueries = {
     token?: string,
   ) =>
     queryOptions({
-      queryKey: queryKeys.jobPosts.location(location, params),
+      queryKey: jobPostsKeys.jobPosts.location(location, params),
       queryFn: () => jobPostsApi.getByLocation(location, params, token),
       staleTime: 10 * 60 * 1000,
       enabled: !!location,
@@ -94,7 +95,7 @@ export const jobPostsQueries = {
 
   detail: (id: string, token?: string) =>
     queryOptions({
-      queryKey: queryKeys.jobPosts.detail(id),
+      queryKey: jobPostsKeys.jobPosts.detail(id),
       queryFn: () => jobPostsApi.getById(id, token),
       staleTime: 5 * 60 * 1000,
       enabled: !!id,
@@ -117,3 +118,30 @@ export const jobPostsQueries = {
     mutationFn: () => jobPostsApi.delete(id, token),
   }),
 };
+
+export function useInfiniteJobs(query?: string) {
+  return useInfiniteQuery<
+    InfiniteJobsResponse,
+    Error,
+    {
+      pages: InfiniteJobsResponse["items"];
+      pageParams: (string | undefined)[];
+    },
+    ReturnType<typeof jobPostsKeys.jobPosts.infinite>,
+    string | undefined
+  >({
+    queryKey: jobPostsKeys.jobPosts.infinite(query),
+    queryFn: ({ pageParam }) => jobPostsApi.query({ query, cursor: pageParam }),
+    initialPageParam: undefined,
+    getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 10,
+    select: (data) => {
+      return {
+        pages: data.pages.flatMap((page) => page.items),
+        pageParams: data.pageParams,
+      };
+    },
+    placeholderData: (previousData) => previousData,
+  });
+}
