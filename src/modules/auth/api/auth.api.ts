@@ -1,4 +1,4 @@
-import { api, BACKEND_API_VERSION } from "@/lib/api/client";
+import { api } from "@/lib/api/client";
 import type {
   AuthSession,
   LoginCredentials,
@@ -7,29 +7,26 @@ import type {
   RegisterData,
 } from "./auth.api.types";
 
-const BASE = `/${BACKEND_API_VERSION}/auth`;
-
 export const authApi = {
   // ─── Session ────────────────────────────────────────────────
-  getSession: () => api.get<AuthSession>(`${BASE}/session`),
+  getSession: () => api.get<AuthSession>(`/session`),
 
-  getProfile: () => api.get<AuthSession["user"]>(`${BASE}/users`),
+  getProfile: () => api.get<AuthSession["user"]>(`/users`),
 
   // ─── Auth Actions ───────────────────────────────────────────
   login: (credentials: LoginCredentials) =>
-    api.post<AuthSession>(`${BASE}/login`, credentials),
+    api.post<AuthSession>(`/login`, credentials),
 
-  register: (data: RegisterData) =>
-    api.post<AuthSession>(`${BASE}/register`, data),
+  register: (data: RegisterData) => api.post<AuthSession>(`/register`, data),
 
-  logout: () => api.post<void>(`${BASE}/logout`),
+  logout: () => api.post<void>(`/logout`),
 
-  refresh: () => api.post<AuthSession>(`${BASE}/refresh`),
+  refresh: () => api.post<AuthSession>(`/refresh`),
 
   // ─── Password Reset ─────────────────────────────────────────
   requestPasswordReset: ({ email }: PasswordResetRequest) =>
-    api.post<void>(`${BASE}/password-reset`, { email }),
+    api.post<void>(`/password-reset`, { email }),
 
   resetPassword: ({ token, newPassword }: PasswordResetConfirm) =>
-    api.post<void>(`${BASE}/password-reset/confirm`, { token, newPassword }),
+    api.post<void>(`/password-reset/confirm`, { token, newPassword }),
 };

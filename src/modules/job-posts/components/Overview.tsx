@@ -35,7 +35,7 @@ export default function Overview() {
       <div className={cn(open && "hidden")}>
         <LeftMenu />
       </div>
-      <div className="grid grid-cols-1 pb-16">
+      <div className="grid grid-cols-1 gap-4 pb-16">
         <ReportCard matchPercentage={0} />
         <JobSearchForm onSubmit={handleSearch} />
         <JobList query={query} />

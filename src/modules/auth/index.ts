@@ -31,3 +31,6 @@ export { useDeleteAccountMutation } from "./mutations/useDeleteAccount.mutation"
 
 // ─── Composed Hooks ─────────────────────────────────────────
 export { useAuth } from "./hooks/useAuth";
+
+
+export {FloatingLabelInput} from "./component/FloatingLabelInput";

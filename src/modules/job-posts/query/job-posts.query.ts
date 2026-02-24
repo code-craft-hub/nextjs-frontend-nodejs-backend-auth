@@ -143,5 +143,6 @@ export function useInfiniteJobs(query?: string) {
       };
     },
     placeholderData: (previousData) => previousData,
+    retry: 1,
   });
 }

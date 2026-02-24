@@ -210,12 +210,18 @@ export function useToggleBookmarkByJobMutation() {
 
     // Optimistically flip isBookmarked in every cached jobs page so the
     // Toggle in JobRow reacts instantly without waiting for a refetch.
+    // Targets both ["job-posts"] (job-posts module) and ["jobs"] (jobs module)
+    // because both use the same backend endpoint under different cache keys.
     onMutate: async ({ jobId, isBookmarked }) => {
-      await qc.cancelQueries({ queryKey: ["jobs"] });
+      await Promise.all([
+        qc.cancelQueries({ queryKey: ["job-posts"] }),
+        qc.cancelQueries({ queryKey: ["jobs"] }),
+      ]);
 
+      const previousJobPosts = qc.getQueriesData({ queryKey: ["job-posts"] });
       const previousJobs = qc.getQueriesData({ queryKey: ["jobs"] });
 
-      qc.setQueriesData({ queryKey: ["jobs"] }, (old: any) => {
+      const flipBookmark = (old: any) => {
         if (!old?.pages) return old;
         return {
           ...old,
@@ -228,18 +234,25 @@ export function useToggleBookmarkByJobMutation() {
             ),
           })),
         };
-      });
+      };
 
-      return { previousJobs };
+      qc.setQueriesData({ queryKey: ["job-posts"] }, flipBookmark);
+      qc.setQueriesData({ queryKey: ["jobs"] }, flipBookmark);
+
+      return { previousJobPosts, previousJobs };
     },
 
     onError: (_err, _variables, context) => {
+      context?.previousJobPosts?.forEach(([queryKey, data]: any) => {
+        qc.setQueryData(queryKey, data);
+      });
       context?.previousJobs?.forEach(([queryKey, data]: any) => {
         qc.setQueryData(queryKey, data);
       });
     },
 
     onSettled: () => {
+      qc.invalidateQueries({ queryKey: ["job-posts"] });
       qc.invalidateQueries({ queryKey: ["jobs"] });
     },
   });

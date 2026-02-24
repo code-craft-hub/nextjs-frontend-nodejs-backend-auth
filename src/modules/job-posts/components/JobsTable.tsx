@@ -40,6 +40,8 @@ function JobRow({
 }) {
   const isBookmarked = job?.isBookmarked ?? false;
 
+  console.log(" [bookmark] JobRow render", isBookmarked === true && { jobId: job?.id, isBookmarked });
+
   return (
     <TableRow
       onClick={onRowClick}

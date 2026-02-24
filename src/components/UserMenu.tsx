@@ -12,7 +12,6 @@ import {
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { userQueries } from "@module/user";
-import { api } from "@/lib/api/client";
 import { authApi } from "@/lib/api/auth.api";
 
 export const UserMenu = () => {
@@ -50,7 +49,7 @@ export const UserMenu = () => {
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={async () => {
-                  await api.delete("/delete");
+                  await authApi.logout()
                   router.push(`/login`);
                 }}
               >
