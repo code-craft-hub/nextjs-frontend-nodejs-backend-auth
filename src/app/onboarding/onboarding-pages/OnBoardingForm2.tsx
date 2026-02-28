@@ -2,7 +2,6 @@
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { useAuth } from "@/hooks/use-auth";
 import { OnboardingFormProps } from "@/types";
 import { useIsMobile } from "@/hooks/use-mobile";
 import Progress from "./Progress";
@@ -27,7 +26,6 @@ export const OnBoardingForm2 = ({
   const handleEditClick = (value: boolean) => {
     setEditResume(value);
   };
-  const { isUpdatingUserLoading } = useAuth();
   const { data: user } = useQuery(userQueries.detail());
   const {
     uploadResume,
@@ -145,13 +143,13 @@ export const OnBoardingForm2 = ({
                   variant={"outline"}
                   onClick={() => onPrev()}
                   className="onboarding-btn"
-                  disabled={isUpdatingUserLoading || isUploading}
+                  disabled={isUploading}
                 >
                   Previous
                 </Button>
                 <Button
                   type="submit"
-                  disabled={isUpdatingUserLoading || isUploading}
+                  disabled={isUploading}
                   className="onboarding-btn overflow-hidden"
                 >
                   {isUploading ? "Processing..." : "Save and Continue"}

@@ -34,3 +34,4 @@ export { useAuth } from "./hooks/useAuth";
 
 
 export {FloatingLabelInput} from "./component/FloatingLabelInput";
+export {GoogleButton} from "./component/google-button";

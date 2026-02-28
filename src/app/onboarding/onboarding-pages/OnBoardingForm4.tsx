@@ -15,7 +15,6 @@ import { OnboardingFormProps } from "@/types";
 import { cn } from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox";
 import { motion } from "framer-motion";
-import { useAuth } from "@/hooks/use-auth";
 import OnboardingTabs from "./OnBoardingTabs";
 import Progress from "./Progress";
 import { useIsMobile } from "@/hooks/use-mobile";

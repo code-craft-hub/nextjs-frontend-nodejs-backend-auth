@@ -5,7 +5,6 @@ import { motion } from "framer-motion";
 import Progress from "./Progress";
 import { Button } from "@/components/ui/button";
 import { creditCard } from "@/app/(landing-page)/constants";
-import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import {
@@ -20,7 +19,6 @@ import { useUpdateOnboarding } from "@/hooks/mutations";
 
 export const OnBoardingForm7 = ({ onPrev, children }: OnboardingFormProps) => {
   const [seletePlan, setSeletePlan] = useState("free");
-  const { completeOnboarding, isOnboardingLoading } = useAuth();
   const { data: user } = useQuery(userQueries.detail());
 
   const updateOnboarding = useUpdateOnboarding({

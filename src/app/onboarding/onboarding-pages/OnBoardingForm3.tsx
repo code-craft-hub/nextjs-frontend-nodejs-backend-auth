@@ -15,15 +15,12 @@ import { cn } from "@/lib/utils";
 import { OnboardingFormProps } from "@/types";
 import { Checkbox } from "@/components/ui/checkbox";
 import { motion } from "framer-motion";
-import { useAuth } from "@/hooks/use-auth";
 import OnboardingTabs from "./OnBoardingTabs";
 import { useIsMobile } from "@/hooks/use-mobile";
 import Progress from "./Progress";
 import { userQueries } from "@module/user";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect } from "react";
 import { useUpdateOnboarding } from "@/hooks/mutations";
-import { useUserLocation } from "@/hooks/geo-location/ip-geolocation.provider";
 
 const formSchema = z
   .object({
@@ -54,9 +51,6 @@ export const OnBoardingForm3 = ({
   onPrev,
   children,
 }: OnboardingFormProps) => {
-  const { isUpdatingUserLoading } = useAuth();
-  const { continent } = useUserLocation();
-
   const { data: user } = useQuery(userQueries.detail());
 
   const form = useForm({
@@ -72,18 +66,17 @@ export const OnBoardingForm3 = ({
     },
   });
 
-  useEffect(() => {
-    if (user?.dataSource) {
-      const data = user.dataSource[0];
-      form.setValue("partTime", data?.partTime || false);
-      form.setValue("fullTime", data?.fullTime || false);
-      form.setValue("intership", data?.intership || false);
-      form.setValue("contract", data?.contract || false);
-      form.setValue("hybrid", data?.hybrid || false);
-      form.setValue("remote", data?.remote || false);
-      form.setValue("onsite", data?.onsite || false);
-    }
-  }, [user, form, continent]);
+  // useEffect(() => {
+  //   if (user?.dataSource) {
+  //     form.setValue("partTime", data?.partTime || false);
+  //     form.setValue("fullTime", data?.fullTime || false);
+  //     form.setValue("intership", data?.intership || false);
+  //     form.setValue("contract", data?.contract || false);
+  //     form.setValue("hybrid", data?.hybrid || false);
+  //     form.setValue("remote", data?.remote || false);
+  //     form.setValue("onsite", data?.onsite || false);
+  //   }
+  // }, [user, form, continent]);
 
   const updateOnboarding = useUpdateOnboarding({
     userFirstName: user?.firstName,
@@ -343,14 +336,8 @@ export const OnBoardingForm3 = ({
                 >
                   Previous
                 </Button>
-                <Button
-                  type="submit"
-                  disabled={isUpdatingUserLoading}
-                  className="onboarding-btn"
-                >
-                  {isUpdatingUserLoading
-                    ? "Saving..."
-                    : "Save and Continue"}{" "}
+                <Button type="submit" className="onboarding-btn">
+                  Save and Continue
                 </Button>
               </div>
             </form>

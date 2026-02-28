@@ -16,7 +16,6 @@ import {
 
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { OnboardingFormProps } from "@/types";
-import { useAuth } from "@/hooks/use-auth";
 import { FloatingLabelInput } from "./FloatingInput";
 import Progress from "./Progress";
 import { cn } from "@/lib/utils";

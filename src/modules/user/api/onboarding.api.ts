@@ -1,4 +1,4 @@
-import { api, BACKEND_API_VERSION } from "@/lib/api/client";
+import { api } from "@/lib/api/client";
 
 export interface OnboardingStep1Data {
   country: string;
@@ -37,7 +37,7 @@ export interface OnboardingUpdateResponse {
 export const updateOnboardingStep = async (
   payload: OnboardingUpdatePayload,
 ) => {
-  const response = await api.patch(`/${BACKEND_API_VERSION}/users/onboarding/step`, payload) as any;
+  const response = await api.patch(`/users/onboarding/step`, payload) as any;
   return response?.data;
 };
 

@@ -15,7 +15,6 @@ import {
 import "react-phone-number-input/style.css";
 import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
 import { motion } from "framer-motion";
-import { useAuth } from "@/hooks/use-auth";
 import { OnboardingFormProps } from "@/types";
 import Progress from "./Progress";
 import { FloatingLabelInput } from "./FloatingInput";
@@ -38,7 +37,6 @@ export const OnBoardingForm1 = ({
   onPrev,
   children,
 }: OnboardingFormProps) => {
-  const { isUpdatingUserLoading } = useAuth();
   const { data: user } = useQuery(userQueries.detail());
   const {
     countryName: country,
@@ -144,7 +142,7 @@ export const OnBoardingForm1 = ({
                     <FormControl>
                       <FloatingLabelInput
                         label="Select a city"
-                        isUpdatingUserLoading={isUpdatingUserLoading}
+                        // isUpdatingUserLoading={isUpdatingUserLoading}
                         {...field}
                       />
                     </FormControl>
@@ -199,10 +197,9 @@ export const OnBoardingForm1 = ({
                 </Button>
                 <Button
                   type="submit"
-                  disabled={isUpdatingUserLoading}
                   className="onboarding-btn"
                 >
-                  {isUpdatingUserLoading ? "Saving..." : "Save and Continue"}
+                  Save and Continue
                 </Button>
               </div>
             </form>
