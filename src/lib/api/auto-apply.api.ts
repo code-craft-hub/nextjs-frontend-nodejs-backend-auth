@@ -125,6 +125,6 @@ export const autoApplyApi = {
   bulkDelete: (ids: string[], token?: string) =>
     api.delete<ApiResponse<{ deletedCount: number; message: string }>>(
       `${AUTO_APPLY_BASE}/bulk-delete`,
-      { token, body: JSON.stringify({ ids }) },
+      { body: { ids }, token },
     ),
 };

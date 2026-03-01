@@ -111,6 +111,8 @@ export function AIApplyDatatable({ data }: { data: AutoApplyRecord[] }) {
       setIsDeleting(true);
       const ids = getSelectedIds();
 
+      console.log("Deleting records with IDs:", ids);
+
       await autoApplyApi.bulkDelete(ids);
 
       await queryClient.invalidateQueries({
