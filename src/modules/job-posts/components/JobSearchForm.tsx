@@ -1,3 +1,4 @@
+"use client"
 import SearchBox from "@/shared/component/SearchBox";
 
 export function JobSearchForm({

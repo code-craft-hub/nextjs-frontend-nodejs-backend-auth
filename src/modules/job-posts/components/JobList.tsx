@@ -1,3 +1,4 @@
+"use client";
 import { useIntersectionObserver } from "../hooks/useIntersectionObserver";
 import { useCallback } from "react";
 import JobsTable from "./JobsTable";

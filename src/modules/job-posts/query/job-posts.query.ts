@@ -11,7 +11,7 @@ export const jobPostsQueries = {
       staleTime: 10 * 60 * 1000,
     }),
 
-  infinite: (query?: string) =>
+  infinite: (query?: string, token?: string) =>
     infiniteQueryOptions<
       InfiniteJobsResponse,
       Error,
@@ -20,7 +20,7 @@ export const jobPostsQueries = {
       string | undefined
     >({
       queryKey: jobPostsKeys.jobPosts.infinite(query),
-      queryFn: ({ pageParam }) => jobPostsApi.query({ query, cursor: pageParam }),
+      queryFn: ({ pageParam }) => jobPostsApi.query({ query, cursor: pageParam }, token),
       initialPageParam: undefined,
       getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
       staleTime: 1000 * 60 * 5,

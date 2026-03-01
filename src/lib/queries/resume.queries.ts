@@ -7,7 +7,7 @@ export const resumeQueries = {
   all: (params: ResumeFilters = {}, token?:string) =>
     queryOptions({
       queryKey: queryKeys.resumes.list(params),
-      queryFn: () => resumeApi.getResumes(params, token),
+      queryFn: () => resumeApi.getGenerateResumes(params, token),
       staleTime: 5 * 60 * 1000,
     }),
 

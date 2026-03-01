@@ -81,6 +81,12 @@ export const resumeApi = {
         new URLSearchParams(params as Record<string, string>).toString(),
       { token },
     ),
+  getGenerateResumes: (params?: ResumeFilters, token?: string) =>
+    api.get<PaginatedResponse<ResumeAggregate>>(
+      `${RESUME_BASE}/generated?` +
+        new URLSearchParams(params as Record<string, string>).toString(),
+      { token },
+    ),
 
   listUploaded: async (params?: ResumeFilters, token?: string) => {
     const data = await api.get<ApiResponse<ResumeAggregate[]>>(
