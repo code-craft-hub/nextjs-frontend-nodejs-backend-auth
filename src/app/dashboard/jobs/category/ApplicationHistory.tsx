@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useEffect, useMemo, useRef, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { sendGTMEvent } from "@next/third-parties/google";
@@ -15,7 +15,6 @@ import { useJobsTable } from "../_hooks/useJobsTable";
 import { JobsTable } from "../components/JobsTable";
 import MobileOverview from "../../../../modules/job-posts/components/MobileOverview";
 import { SearchBar, SearchBarRef } from "./JobSearchBar";
-import { JobPost } from "@/modules/job-posts";
 
 export const ApplicationHistory = ({ children }: { children?: ReactNode }) => {
   const router = useRouter();
@@ -36,14 +35,18 @@ export const ApplicationHistory = ({ children }: { children?: ReactNode }) => {
   }, [user?.firstName]);
 
   const {
-    data,
+    data: allJobs,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
     isLoading,
     isFetching,
     isRefetching,
-  } = useInfiniteQuery(jobApplicationQueries.infiniteList());
+  } = useInfiniteQuery({
+    ...jobApplicationQueries.infiniteList(),
+    select: (data) => data.pages.flatMap((page) => page?.data ?? []),
+  });
+
 
   useEffect(() => {
     const el = sentinelRef.current;
@@ -62,17 +65,12 @@ export const ApplicationHistory = ({ children }: { children?: ReactNode }) => {
     return () => observer.disconnect();
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  const allJobs = useMemo<JobPost[]>(
-    () => data?.pages.flatMap((page) => page.data) ?? [],
-    [data],
-  );
-
   const columns = ApplicationHistoryColumn({
     prefetchJob,
     onViewDetails: (jobId) =>
       router.push(`/dashboard/jobs/${jobId}?referrer=application-history`),
   });
-  const table = useJobsTable(allJobs, columns);
+  const table = useJobsTable(allJobs ?? [], columns);
 
   function resetSearch() {
     setSearchValue("");
@@ -81,10 +79,8 @@ export const ApplicationHistory = ({ children }: { children?: ReactNode }) => {
 
   const isSearching =
     isLoading || isFetching || isRefetching || isFetchingNextPage;
-  const visibleRows = table.getRowModel().rows;
-  const hasNoResults =
-    !isSearching &&
-    ((data?.pages?.[0]?.data?.length ?? 0) === 0 || visibleRows.length === 0);
+  const visibleRows = table?.getRowModel().rows ?? [];
+  const hasNoResults = !isSearching && visibleRows.length === 0;
 
   return (
     <div className="font-inter grid grid-cols-1 w-full overflow-hidden gap-4 xl:gap-8">
@@ -111,14 +107,14 @@ export const ApplicationHistory = ({ children }: { children?: ReactNode }) => {
         <div className="w-full flex flex-col gap-6">
           <JobsTable
             table={table}
-            isLoading={isSearching}
+            isLoading={isLoading}
             hasNoResults={hasNoResults}
             searchValue={searchValue}
             onResetSearch={resetSearch}
             skeletonCount={5}
             onRowClick={(row) =>
               router.push(
-                `/dashboard/jobs/${row.original.id}?referrer=application-history&title=${encodeURIComponent(row.original.title ?? "")}`,
+                `/dashboard/jobs/${row.original.jobId}?referrer=application-history&title=${encodeURIComponent(row.original.title ?? "")}`,
               )
             }
           />

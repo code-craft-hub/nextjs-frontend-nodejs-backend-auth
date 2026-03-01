@@ -4,36 +4,33 @@ import { bookmarkKeys } from "@/lib/query/bookmarks.keys";
 
 export const bookmarksQueries = {
   /**
-   * Single page — useful for admin views or non-scrolling lists.
+   * First page only — for non-scrolling overview lists.
    */
-  list: (page = 1, limit = 20) =>
+  list: (limit = 20) =>
     queryOptions({
-      queryKey: bookmarkKeys.list({ page, limit }),
-      queryFn: () => bookmarksApi.list(page, limit),
+      queryKey: bookmarkKeys.list({ limit }),
+      queryFn: () => bookmarksApi.list(undefined, limit),
       staleTime: 2 * 60 * 1000,
     }),
 
   /**
    * Infinite scroll — drives the Saved Jobs feed.
    *
-   * The backend does not expose a total count, so we use the heuristic:
-   *   count < limit  →  we're on the last page
-   *   count === limit →  there may be more pages
+   * Uses cursor-based pagination: `nextCursor` from the last page is passed as
+   * `cursor` to fetch the next batch. `null` means no more pages.
+   *
+   * Returned via `infiniteQueryOptions` so it can be passed directly to
+   * both `useInfiniteQuery` and `queryClient.prefetchInfiniteQuery`.
    */
   infiniteList: (limit = 20) =>
     infiniteQueryOptions({
       queryKey: bookmarkKeys.infinite(),
-      queryFn: ({ pageParam }) => bookmarksApi.list(pageParam, limit),
-      getNextPageParam: (lastPage) => {
-        const { page, count } = lastPage.pagination;
-        return count === limit ? page + 1 : undefined;
-      },
-      getPreviousPageParam: (firstPage) => {
-        const { page } = firstPage.pagination;
-        return page > 1 ? page - 1 : undefined;
-      },
-      initialPageParam: 1,
-      staleTime: 2 * 60 * 1000,
+      queryFn: ({ pageParam }) =>
+        bookmarksApi.list(pageParam ?? undefined, limit),
+      getNextPageParam: (lastPage) =>
+        lastPage.pagination.nextCursor ?? undefined,
+      initialPageParam: undefined as string | undefined,
+      staleTime: 10 * 60 * 1000,
     }),
 
   /**

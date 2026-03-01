@@ -43,18 +43,18 @@ export function JobsTable<T extends object>({
       <Table>
         <TableBody>
           {isLoading ? (
-            <div className="grid gap-4">
+            <td className="grid gap-4">
               {Array.from({ length: skeletonCount }).map((_, i) => (
                 <OverviewSkeleton key={i} />
               ))}
-            </div>
+            </td>
           ) : hasNoResults ? (
-            <div className="flex flex-col gap-1 text-muted-foreground">
+            <td className="flex flex-col gap-1 text-muted-foreground">
               <OverviewEmpty
                 searchValue={searchValue}
                 resetSearchToDefault={onResetSearch}
               />
-            </div>
+            </td>
           ) : (
             visibleRows.map((row) => (
               <TableRow

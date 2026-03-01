@@ -13,23 +13,33 @@ export type UploadedFile = {
 };
 export type DashboardTab = "ai-apply" | "find-jobs" | "tailor-cv";
 
-
-
 export interface JobApplication {
   id: string;
   userId: string;
   jobId: string;
+  title: string;
+  companyLogo: string;
+  companyName: string;
+  appliedDate: string;
+  isBookmarked: boolean;
+  companyText: string;
+  isApplied: boolean;
+  location: string;
+  salary: string;
+  postedAt: string;
+  employmentType: string;
+  emailApply: string;
+  jobType: string;
+  company: string;
   status: string;
-  appliedAt?: string | Date;
-  statusUpdatedAt?: string | Date | null;
-  updatedAt?: string | Date | null;
-  deletedAt?: string | Date | null;
-  resumeId?: string | null;
-  coverLetter?: string | null;
-  metadata?: Record<string, any> | null;
+  appliedAt?: string;
+  statusUpdatedAt?: string;
+  updatedAt?: string;
+  deletedAt?: string;
+  resumeId?: string;
+  coverLetter?: string;
+  metadata?: Record<string, any>;
 }
-
-
 
 export interface ProfileData {
   id: string;
@@ -220,7 +230,6 @@ export interface ResumeSection {
   error?: string;
 }
 
-
 export interface FloatingLabelInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   id?: string;
   label: string;
@@ -228,7 +237,6 @@ export interface FloatingLabelInputProps extends React.InputHTMLAttributes<HTMLI
   className?: string;
   showPasswordToggle?: boolean;
 }
-
 
 // Represents API Error structure
 export interface ApiError {
@@ -239,7 +247,6 @@ export interface ApiError {
     details?: Record<string, any>;
   };
 }
-
 
 export type StreamData = ResumeFormData;
 

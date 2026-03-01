@@ -26,7 +26,7 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { Table } from "@tanstack/react-table";
-import { JobType } from "@/types";
+import { JobApplication } from "@/types";
 
 const searchSchema = z.object({
   searchValue: z.string(),
@@ -39,8 +39,8 @@ export interface SearchBarRef {
 }
 
 interface SearchBarProps {
-  allJobs?: JobType[];
-  table?: Table<JobType>;
+  allJobs?: JobApplication[];
+  table?: Table<JobApplication>;
   onSearchValueChange?: (value: string) => void;
 }
 
@@ -126,7 +126,7 @@ export const SearchBar = forwardRef<SearchBarRef, SearchBarProps>(
             onSubmit={form.handleSubmit(onSubmit)}
             className="w-full grid grid-cols-1"
           >
-            <Card className="w-full grid grid-cols-1 lg:grid lg:grid-cols-4 justify-between flex-row lg:items-center gap-2 px-4 py-4">
+            <Card className="w-full grid grid-cols-1 md:grid-cols-4 justify-between flex-row lg:items-center gap-2 px-4 py-4">
               {/* Text search */}
               <div className="relative p-1 lg:border-r lg:border-black/40 mr-1">
                 <FormField
@@ -137,9 +137,7 @@ export const SearchBar = forwardRef<SearchBarRef, SearchBarProps>(
                       <FormControl>
                         <input
                           {...field}
-                          onChange={(e) =>
-                            handleInputChange(e, field.onChange)
-                          }
+                          onChange={(e) => handleInputChange(e, field.onChange)}
                           type="text"
                           placeholder="Job title / company name"
                           className="w-full outline-none pl-3 placeholder:text-xs"
@@ -253,8 +251,14 @@ export const SearchBar = forwardRef<SearchBarRef, SearchBarProps>(
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
-
-              <Button type="submit">Search</Button>
+              {/* {showClearButton ? (
+                <X
+                  className="size-4 hover:cursor-pointer"
+                  onClick={clearAllColumnFilters}
+                />
+              ) : ( */}
+                <Button type="submit">Search</Button>
+              {/* )} */}
             </Card>
           </form>
         </Form>

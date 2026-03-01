@@ -1,3 +1,4 @@
+import { JobApplication } from "@/types";
 import { api } from "./client";
 
 // ─── Entity Types ─────────────────────────────────────────────────────────────
@@ -21,11 +22,11 @@ export interface BookmarkResponse {
 
 export interface BookmarkListResponse {
   success: boolean;
-  data: Bookmark[];
+  data: JobApplication[];
   pagination: {
-    page: number;
     limit: number;
     count: number;
+    nextCursor: string | null;
   };
 }
 
@@ -58,11 +59,12 @@ export const bookmarksApi = {
 
   /**
    * GET /users/bookmarks
-   * Retrieve the authenticated user's bookmarks with pagination.
+   * Retrieve the authenticated user's bookmarks — cursor-based.
+   * Pass `cursor` (ISO string from a previous response's `nextCursor`) for subsequent pages.
    */
-  list: (page = 1, limit = 20) =>
+  list: (cursor?: string, limit = 20) =>
     api.get<BookmarkListResponse>("/users/bookmarks", {
-      params: { page, limit },
+      params: cursor !== undefined ? { cursor, limit } : { limit },
     }),
 
   /**

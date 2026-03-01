@@ -1,27 +1,27 @@
 "use client";
 
-import { ReactNode, useEffect, useMemo, useRef, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { sendGTMEvent } from "@next/third-parties/google";
+import { Loader2 } from "lucide-react";
 
 import { userQueries } from "@module/user";
 import { useUpdateJobMutation } from "@/lib/mutations/jobs.mutations";
 import { useApplyJob } from "@/hooks/useApplyJob";
 import { bookmarksQueries } from "@/lib/queries/bookmarks.queries";
 
-import { OverviewColumn } from "../components/OverviewColumn";
+import { BookmarkedColumn } from "../components/BookmarkedColumn";
 import { useJobsTable } from "../_hooks/useJobsTable";
 import { JobsTable } from "../components/JobsTable";
-import { LoadMoreButton } from "../components/LoadMoreButton";
 import MobileOverview from "../../../../modules/job-posts/components/MobileOverview";
 import { SearchBar, SearchBarRef } from "./JobSearchBar";
-import { JobPost } from "@/modules/job-posts";
 
 export const SavedJobs = ({ children }: { children?: ReactNode }) => {
   const router = useRouter();
   const [searchValue, setSearchValue] = useState("");
   const searchBarRef = useRef<SearchBarRef>(null);
+  const sentinelRef = useRef<HTMLDivElement>(null);
 
   const { data: user } = useQuery(userQueries.detail());
 
@@ -38,22 +38,39 @@ export const SavedJobs = ({ children }: { children?: ReactNode }) => {
   const { applyToJob: handleApply } = useApplyJob();
 
   const {
-    data,
+    data: allJobs,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
     isLoading,
     isFetching,
     isRefetching,
-  } = useInfiniteQuery(bookmarksQueries.infiniteList());
+  } = useInfiniteQuery({
+    ...bookmarksQueries.infiniteList(),
+    select: (data) => data.pages.flatMap((page) => page?.data ?? []),
+  });
 
-  const allJobs = useMemo<JobPost[]>(
-    () => data?.pages.flatMap((page) => page.data) ?? [],
-    [data],
-  );
+  console.log("Fetched bookmarked jobs", allJobs);
 
-  const columns = OverviewColumn({ router, updateJobs, handleApply });
-  const table = useJobsTable(allJobs, columns);
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      { threshold: 0.1 },
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  const columns = BookmarkedColumn({ router, updateJobs, handleApply });
+  const table = useJobsTable(allJobs ?? [], columns);
 
   function resetSearch() {
     setSearchValue("");
@@ -65,7 +82,7 @@ export const SavedJobs = ({ children }: { children?: ReactNode }) => {
   const visibleRows = table.getRowModel().rows;
   const hasNoResults =
     !isSearching &&
-    ((data?.pages?.[0]?.data?.length ?? 0) === 0 || visibleRows.length === 0);
+    (allJobs?.length === 0 || visibleRows.length === 0);
 
   return (
     <div className="font-inter grid grid-cols-1 w-full overflow-hidden gap-4 xl:gap-8">
@@ -99,7 +116,7 @@ export const SavedJobs = ({ children }: { children?: ReactNode }) => {
             skeletonCount={5}
             onRowClick={(row) =>
               router.push(
-                `/dashboard/jobs/${row.original.id}?referrer=saved-jobs&title=${encodeURIComponent(row.original.title ?? "")}`,
+                `/dashboard/jobs/${row.original.jobId}?referrer=saved-jobs&title=${encodeURIComponent(row.original.title ?? "")}`,
               )
             }
           />
@@ -111,11 +128,13 @@ export const SavedJobs = ({ children }: { children?: ReactNode }) => {
             referrer="saved-jobs"
           />
 
-          <LoadMoreButton
-            hasNextPage={hasNextPage ?? false}
-            isFetchingNextPage={isFetchingNextPage}
-            onLoadMore={() => fetchNextPage()}
-          />
+          {/* Sentinel — triggers the next page fetch via IntersectionObserver */}
+          <div ref={sentinelRef} className="h-4" />
+          {isFetchingNextPage && (
+            <div className="flex justify-center py-4">
+              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+            </div>
+          )}
         </div>
       </div>
     </div>

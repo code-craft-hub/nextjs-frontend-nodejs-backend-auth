@@ -71,7 +71,7 @@ const NavButton = memo<{
       onClick={handleClick}
       aria-current={isActive ? "page" : undefined}
       className={cn(
-        "group flex gap-2 p-2 hover:bg-primary hover:text-white items-center justify-start rounded-md hover:shadow-sm hover:cursor-pointer",
+        "group flex w-full gap-2 p-2 hover:bg-primary hover:text-white items-center justify-center md:justify-start rounded-md hover:shadow-sm hover:cursor-pointer",
         isActive && "bg-primary text-white",
       )}
     >
@@ -113,7 +113,7 @@ export const Category = memo<CategoryProps>(function Category({ tab }) {
   const ActiveComponent = TAB_COMPONENTS[activeTab];
 
   const nav = (
-    <nav className="bg-white p-3 h-fit rounded-md flex gap-1">
+    <nav className="bg-white p-3 h-fit rounded-md flex justify-between gap-1">
       {NAV_ITEMS.map((item) => (
         <NavButton
           key={item.id}

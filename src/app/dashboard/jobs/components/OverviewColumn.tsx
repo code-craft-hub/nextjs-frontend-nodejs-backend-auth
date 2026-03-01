@@ -22,17 +22,17 @@ import {
 } from "lucide-react";
 import { PiOfficeChairFill } from "react-icons/pi";
 import { formatAppliedDate } from "@/lib/utils/helpers";
-import { JobType } from "@/types";
+import { JobApplication } from "@/types";
 
 // ─── Shared types ─────────────────────────────────────────────────────────────
 
-export type ApplyHandler = (job: JobType, e?: React.MouseEvent) => void;
+export type ApplyHandler = (job: JobApplication, e?: React.MouseEvent) => void;
 
 /** Minimum interface required for the bookmark-toggle mutation. */
 export interface JobUpdateMutation {
   mutate: (variables: {
     id: string;
-    data: Partial<Pick<JobType, "isBookmarked" | "isApplied">>;
+    data: Partial<Pick<JobApplication, "isBookmarked" | "isApplied">>;
   }) => void;
 }
 
@@ -46,7 +46,7 @@ export const OverviewColumn = ({
   router?: unknown;
   updateJobs?: JobUpdateMutation;
   handleApply?: ApplyHandler;
-}): ColumnDef<JobType>[] => [
+}): ColumnDef<JobApplication>[] => [
   {
     accessorKey: "companyText",
     header: "Company",
@@ -64,7 +64,6 @@ export const OverviewColumn = ({
     accessorKey: "title",
     header: "Title",
     cell: ({ row }) => {
-      const matchPercentage = Number(row.original.matchPercentage) || 0;
       return (
         <div className="capitalize">
           <div className="flex gap-4 items-center">
@@ -76,9 +75,6 @@ export const OverviewColumn = ({
                 {row.original.jobType || row.original.employmentType}
               </span>
             </div>
-            {matchPercentage > 40 && (
-              <Sparkles className="text-yellow-500 size-4" />
-            )}
           </div>
           <div className="flex gap-x-4 mt-1">
             <p className="flex gap-1 text-gray-400 items-center">
@@ -99,15 +95,12 @@ export const OverviewColumn = ({
               <Calendar className="size-3" />
               <span className="text-2xs">
                 {formatAppliedDate(
-                  row.original.scrapedAt ||
-                    row.original.postedAt ||
-                    row.original.updatedAt,
+                  !!row.original.postedAt
+                    ? row.original.postedAt
+                    : row.original.updatedAt,
                 )}
               </span>
             </p>
-            {matchPercentage > 40 && (
-              <p className="text-2xs text-green-400">{matchPercentage}%</p>
-            )}
           </div>
         </div>
       );
@@ -121,6 +114,7 @@ export const OverviewColumn = ({
     accessorKey: "isBookmarked",
     cell: ({ row }) => {
       const isBookmarked = row.original.isBookmarked ?? false;
+
       return (
         <div
           onClick={(e) => {
@@ -167,6 +161,7 @@ export const OverviewColumn = ({
   },
 ];
 
+
 // ─── Application History columns ──────────────────────────────────────────────
 
 /**
@@ -179,7 +174,7 @@ export const ApplicationHistoryColumn = ({
 }: {
   prefetchJob?: (jobId: string) => void;
   onViewDetails?: (jobId: string) => void;
-}): ColumnDef<JobType>[] => [
+}): ColumnDef<JobApplication>[] => [
   {
     accessorKey: "companyText",
     header: "Company",
@@ -235,7 +230,13 @@ export const ApplicationHistoryColumn = ({
     header: "Applied Date",
     cell: ({ row }) => (
       <div className="font-medium text-xs">
-        {formatAppliedDate(row.getValue("appliedDate"))}
+        {formatAppliedDate(
+          !!row.original.appliedDate
+            ? row.original.appliedDate
+            : !!row.original.postedAt
+              ? row.original.postedAt
+              : row.original.updatedAt,
+        )}
       </div>
     ),
   },
@@ -248,11 +249,11 @@ export const ApplicationHistoryColumn = ({
           className="w-full bg-[#F1F2F4] hover:bg-[#E2E4E8] text-primary border-0"
           onClick={(e) => {
             e.stopPropagation();
-            onViewDetails?.(row.original.id);
+            onViewDetails?.(row.original.jobId);
           }}
           variant="outline"
-          onMouseEnter={() => prefetchJob?.(row.original.id)}
-          onFocus={() => prefetchJob?.(row.original.id)}
+          onMouseEnter={() => prefetchJob?.(row.original.jobId)}
+          onFocus={() => prefetchJob?.(row.original.jobId)}
         >
           View Details
         </Button>

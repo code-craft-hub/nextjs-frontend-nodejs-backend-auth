@@ -3,7 +3,7 @@ export const bookmarkKeys = {
 
   // List variants (paginated)
   lists: () => [...bookmarkKeys.all, "list"] as const,
-  list: (params: { page?: number; limit?: number }) =>
+  list: (params: { limit?: number }) =>
     [...bookmarkKeys.lists(), params] as const,
 
   // Infinite scroll variant

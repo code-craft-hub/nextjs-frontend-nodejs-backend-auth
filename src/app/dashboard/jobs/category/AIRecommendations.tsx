@@ -136,7 +136,7 @@ export const AIRecommendations = ({ children }: { children?: ReactNode }) => {
   });
 
   // ── Derive pipeline status from last page ────────────────────────────────
-  const lastPage = data?.pages[data.pages.length - 1]?.data;
+  const lastPage = (data?.pages[data.pages.length - 1] as any)?.data;
   const pipelineStatus = lastPage?.status;
   const isGenerating = lastPage?.isGenerating ?? false;
   const missingFields = lastPage?.missingFields;
@@ -156,7 +156,7 @@ export const AIRecommendations = ({ children }: { children?: ReactNode }) => {
   // ── Flatten pages → job rows ─────────────────────────────────────────────
   const allJobs = useMemo(
     () =>
-      data?.pages.flatMap((page) => page.data.recommendations.map(toJobRow)) ??
+      data?.pages.flatMap((page) => (page as any)?.data?.recommendations.map(toJobRow)) ??
       [],
     [data],
   );
@@ -197,10 +197,9 @@ export const AIRecommendations = ({ children }: { children?: ReactNode }) => {
             table={table}
             isLoading={isLoading}
             hasNoResults={hasNoResults}
-            searchValue={userJobTitlePreference}
             skeletonCount={8}
             onRowClick={(row) => {
-              const job = row.original as JobType & {
+              const job = row.original as any & {
                 id?: string;
                 title?: string;
               };

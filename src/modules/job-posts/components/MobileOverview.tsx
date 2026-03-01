@@ -14,10 +14,10 @@ import {
   ApplyHandler,
   JobUpdateMutation,
 } from "../../../app/dashboard/jobs/components/OverviewColumn";
-import { JobPost } from "../types";
+import { JobApplication } from "@/types";
 
 interface MobileOverviewProps {
-  allJobs: JobPost[];
+  allJobs?: JobApplication[];
   updateJobs?: JobUpdateMutation;
   handleApply?: ApplyHandler;
   /**
@@ -42,7 +42,7 @@ const MobileOverview = memo(function MobileOverview({
 
   return (
     <div className="space-y-4 lg:hidden">
-      {allJobs.map((job) => {
+      {allJobs?.map((job) => {
         const isBookmarked = job?.isBookmarked ?? false;
 
         return (
