@@ -76,9 +76,9 @@ export async function proxy(request: NextRequest) {
         return NextResponse.redirect(new URL(verifyEmailPath, request.url));
       }
       // Then check onboarding
-      if (!session.onboardingComplete) {
-        return NextResponse.redirect(new URL(onboardingPath, request.url));
-      }
+      // if (!session.onboardingComplete) {
+      //   return NextResponse.redirect(new URL(onboardingPath, request.url));
+      // }
       // Finally redirect to dashboard
       return NextResponse.redirect(new URL("/dashboard/home", request.url));
     }
