@@ -35,7 +35,7 @@ export default function OnboardingClient() {
 
   const router = useRouter();
   const handleDeleteAccount = async () => {
-    authApi.logout();
+   await authApi.logout();
     router.push("/login");
     // deleteAccount.mutate(undefined, {
     //   onSuccess: () => {
