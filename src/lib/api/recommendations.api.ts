@@ -1,5 +1,6 @@
 import { JobType } from "@/types";
 import { api } from "./client";
+import type { PaginatedResponse } from "@/lib/types";
 
 const JOB_RECOMMENDATION_API = `/recommendations`;
 
@@ -85,7 +86,7 @@ export const recommendationsApi = {
    * Get recommendations based on explicit request body (optionally save to DB).
    */
   getRecommendations: (payload: Record<string, unknown>, token?: string) =>
-    api.post(`${JOB_RECOMMENDATION_API}`, payload, { token }),
+    api.post<PaginatedResponse<JobType>>(`${JOB_RECOMMENDATION_API}`, payload, { token }),
 
   /**
    * GET /recommendations/quick-search

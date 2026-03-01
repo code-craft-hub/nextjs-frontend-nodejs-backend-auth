@@ -1,14 +1,10 @@
 import {
-  InfiniteData,
   useMutation,
   useQueryClient,
 } from "@tanstack/react-query";
 import {
   bookmarksApi,
-  type Bookmark,
-  type BookmarkListResponse,
 } from "@/lib/api/bookmarks.api";
-import { bookmarkKeys } from "@/lib/query/bookmarks.keys";
 import {
   invalidateBookmarkLists,
   invalidateBookmarkCheck,

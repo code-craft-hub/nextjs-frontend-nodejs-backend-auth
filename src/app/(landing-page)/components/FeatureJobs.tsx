@@ -88,6 +88,7 @@ export const FeatureJobs = ({ filters }: { filters: JobFilters }) => {
                     onClick={async () => {
                       if (!job?.emailApply) {
                         window.open(
+                          // @ts-ignore
                           !!job.link ? job?.link : job?.applyUrl,
                           "__blank",
                         );

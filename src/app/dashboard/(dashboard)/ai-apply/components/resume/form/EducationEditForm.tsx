@@ -48,9 +48,9 @@ export const EducationEditForm: React.FC<EducationEditFormProps> = ({
               degree: "",
               fieldOfStudy: "",
               schoolName: "",
-              educationStart: "",
-              educationEnd: "",
-              schoolLocation: "",
+              startDate: "",
+              endDate: "",
+              location: "",
             }}
             renderFields={(index) => (
               <>
@@ -97,7 +97,7 @@ export const EducationEditForm: React.FC<EducationEditFormProps> = ({
                 />
                 <FormField
                   control={form.control}
-                  name={`education.${index}.schoolLocation`}
+                  name={`education.${index}.location`}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Location</FormLabel>
@@ -111,14 +111,14 @@ export const EducationEditForm: React.FC<EducationEditFormProps> = ({
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
-                    name={`education.${index}.educationStart`}
+                    name={`education.${index}.startDate`}
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Start Date</FormLabel>
                         <FormControl>
                           <Input
                             type="month"
-                            value={toValidDate(field.value, "month")}
+                            value={toValidDate(field.value as string, "month")}
                             onChange={(e) => field.onChange(e.target.value)}
                           />
                         </FormControl>
@@ -128,14 +128,14 @@ export const EducationEditForm: React.FC<EducationEditFormProps> = ({
                   />
                   <FormField
                     control={form.control}
-                    name={`education.${index}.educationEnd`}
+                    name={`education.${index}.endDate`}
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>End Date</FormLabel>
                         <FormControl>
                           <Input
                             type="month"
-                            value={toValidDate(field.value, "month")}
+                            value={toValidDate(field.value as string, "month")}
                             onChange={(e) => field.onChange(e.target.value)}
                           />
                         </FormControl>

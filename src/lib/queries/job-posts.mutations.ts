@@ -1,5 +1,5 @@
 import { QueryClient, type UseMutationOptions } from "@tanstack/react-query";
-import { jobPostsApi } from "@/lib/api/job-posts.api";
+import { jobPostsApi } from "@/modules/job-posts";
 import { invalidateJobPostsQueries } from "@/lib/query/query-invalidation";
 
 export const createJobPostMutationOptions = (
@@ -12,6 +12,7 @@ export const createJobPostMutationOptions = (
 export const createManyJobPostsMutationOptions = (
   queryClient: QueryClient,
 ): UseMutationOptions => ({
+  // @ts-ignore
   mutationFn: (items: any[]) => jobPostsApi.createMany(items),
   onSettled: () => invalidateJobPostsQueries(queryClient),
 });

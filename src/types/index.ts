@@ -1,4 +1,15 @@
 import { ResumeFormData } from "@/lib/schema-validations/resume.schema";
+import type { JobPost as _JobPost } from "@/modules/job-posts";
+
+/** Re-export JobPost from the job-posts module */
+export type JobPost = _JobPost;
+
+/** JobType is an alias for JobPost, extended with optional recommendation fields */
+export interface JobType extends _JobPost {
+  postedTime?: string;
+  matchPercentage?: number | string;
+}
+
 export interface StreamStatus {
   isConnected: boolean;
   isComplete: boolean;
@@ -138,6 +149,18 @@ export interface IUser {
   recommendationsData?: any[];
   createdAt?: string | Date;
   updatedAt?: string | Date;
+
+  // ─── Extended / legacy fields ──────────────────────────────
+  name?: string;
+  analytics?: {
+    totalApplications?: number;
+    totalResumes?: number;
+    totalCoverLetters?: number;
+    totalInterviewQuestions?: number;
+    [key: string]: any;
+  };
+  bookmarkedJobs?: string[];
+  appliedJobs?: string[];
 }
 
 export type Resume = ResumeFormData;

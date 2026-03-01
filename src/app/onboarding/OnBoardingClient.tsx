@@ -13,12 +13,7 @@ import { OnBoardingForm6 } from "./onboarding-pages/OnBoardingForm6";
 import { OnBoardingForm7 } from "./onboarding-pages/OnBoardingForm7";
 import { useRouter } from "next/navigation";
 import { api } from "@/lib/api/client";
-import { userQueries } from "@module/user";
-import { useQuery } from "@tanstack/react-query";
-
 export default function OnboardingClient() {
-  const { data: user } = useQuery(userQueries.detail());
-
   const [currentStep, setCurrentStep] = useState(0);
   const steps = [
     OnBoardingForm0,

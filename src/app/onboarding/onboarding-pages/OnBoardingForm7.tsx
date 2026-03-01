@@ -35,8 +35,6 @@ export const OnBoardingForm7 = ({ onPrev, children }: OnboardingFormProps) => {
         credit: 5,
       });
 
-      await completeOnboarding();
-
       if (plan === "free") {
         router.push("/dashboard/home");
         return;
@@ -196,7 +194,7 @@ export const OnBoardingForm7 = ({ onPrev, children }: OnboardingFormProps) => {
                       setSeletePlan(plan.tier.toLowerCase());
                       handleComplete(plan.tier.toLowerCase());
                     }}
-                    disabled={isOnboardingLoading}
+                    disabled={updateOnboarding.isPending}
                     type="button"
                   >
                     Choose this plan
@@ -214,7 +212,7 @@ export const OnBoardingForm7 = ({ onPrev, children }: OnboardingFormProps) => {
                 Previous
               </Button>
               <Button
-                disabled={isOnboardingLoading}
+                disabled={updateOnboarding.isPending}
                 onClick={() => {
                   handleComplete("free");
                 }}

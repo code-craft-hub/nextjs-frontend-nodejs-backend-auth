@@ -33,7 +33,7 @@ export const RecentActivityCard = memo(function RecentActivityCard() {
     return recommendations.map((recommendation, index) => (
       <JobCard
         key={recommendation.id ?? index}
-        recommendation={recommendation}
+        recommendation={recommendation as any}
         onJobClick={handleJobClick}
         onPreview={handlePreview}
       />

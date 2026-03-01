@@ -58,8 +58,8 @@ export const WorkExperienceEditForm: React.FC<WorkExperienceEditFormProps> = ({
               jobTitle: "",
               companyName: "",
               location: "",
-              jobStart: "",
-              jobEnd: "",
+              startDate: "",
+              endDate: "",
               responsibilities: [""],
             }}
             renderFields={(index) => (
@@ -108,14 +108,14 @@ export const WorkExperienceEditForm: React.FC<WorkExperienceEditFormProps> = ({
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
-                    name={`workExperience.${index}.jobStart`}
+                    name={`workExperience.${index}.startDate`}
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Start Date</FormLabel>
                         <FormControl>
                           <Input
                             type="month"
-                            value={toValidDate(field.value, "month")}
+                            value={toValidDate(field.value as string, "month")}
                             onChange={(e) => field.onChange(e.target.value)}
                           />
                         </FormControl>
@@ -125,7 +125,7 @@ export const WorkExperienceEditForm: React.FC<WorkExperienceEditFormProps> = ({
                   />
                   <FormField
                     control={form.control}
-                    name={`workExperience.${index}.jobEnd`}
+                    name={`workExperience.${index}.endDate`}
                     render={({ field }) => {
                       return (
                         <FormItem>
@@ -133,7 +133,7 @@ export const WorkExperienceEditForm: React.FC<WorkExperienceEditFormProps> = ({
                           <FormControl>
                             <Input
                               type="month"
-                              value={toValidDate(field.value, "month")}
+                              value={toValidDate(field.value as string, "month")}
                               onChange={(e) => field.onChange(e.target.value)}
                             />
                           </FormControl>

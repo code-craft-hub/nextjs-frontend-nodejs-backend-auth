@@ -45,6 +45,10 @@ export const jobsApi = {
   // Update job
   updateJob: (id: string, data: any) => api.patch<JobPost>(`/jobs/${id}`, data),
 
+  // Update job application history
+  updateJobApplicationHistory: (id: string, data: any) =>
+    api.patch<JobPost>(`/job-recommendations/${id}/application`, data),
+
   // Delete job
   deleteJob: (id: string) => api.delete<void>(`/job-recommendations/${id}`),
 

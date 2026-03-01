@@ -46,7 +46,7 @@ export const OverviewColumn = ({
               ? row.original.companyLogo
               : "/placeholder.jpg"
           }
-          alt={row.original.companyText}
+          alt={row.original.companyText ?? ""}
           className="size-12"
         />
       </div>
@@ -95,7 +95,6 @@ export const OverviewColumn = ({
               <Calendar className="size-3" />
               <span className="text-2xs">
                 {formatAppliedDate(
-                  row.original?.scrapedAt ||
                     row.original?.postedAt ||
                     row.original?.updatedAt
                 )}
@@ -151,7 +150,7 @@ export const OverviewColumn = ({
       return (
         <div className="flex justify-end">
           <Button
-            disabled={row.original.isApplied}
+            disabled={(row.original as any)?.isApplied}
             className="w-full disabled:opacity-50 disabled:cursor-not-allowed disabled:text-gray-400"
             onClick={(event) => handleApply?.(row.original, event)}
             variant={"button"}

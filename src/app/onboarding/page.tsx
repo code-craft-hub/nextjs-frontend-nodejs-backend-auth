@@ -12,7 +12,7 @@ export default async function OnboardingPage() {
   const session = await requireEmailVerification();
   const queryClient = createServerQueryClient();
   await queryClient.prefetchQuery(userQueries.detail(token));
-  if (session.onboardingComplete) {
+  if (session?.onboardingComplete) {
     redirect("/dashboard/home");
   }
 

@@ -38,7 +38,6 @@ export const OnBoardingForm4 = ({
   onPrev,
   children,
 }: OnboardingFormProps) => {
-  const { isUpdatingUserLoading } = useAuth();
   const { data: user } = useQuery(userQueries.detail());
 
   const form = useForm({
@@ -311,10 +310,10 @@ export const OnBoardingForm4 = ({
                 </Button>
                 <Button
                   type="submit"
-                  disabled={isUpdatingUserLoading}
+                  disabled={updateOnboarding.isPending}
                   className="onboarding-btn"
                 >
-                  {isUpdatingUserLoading
+                  {updateOnboarding.isPending
                     ? "Saving..."
                     : "Save and Continue"}{" "}
                 </Button>

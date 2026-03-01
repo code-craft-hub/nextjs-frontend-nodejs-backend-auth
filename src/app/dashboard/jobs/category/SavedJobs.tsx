@@ -119,6 +119,7 @@ export const SavedJobs = ({ children }: { children?: ReactNode }) => {
           />
 
           <MobileOverview
+          // @ts-ignore
             allJobs={allJobs}
             updateJobs={updateJobs}
             handleApply={handleApply}

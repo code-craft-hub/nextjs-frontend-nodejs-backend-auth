@@ -77,17 +77,17 @@ export function useUpdateJobMutation() {
       // Cancel any in-flight fetches for the job-posts list so they don't
       // overwrite our optimistic update.
       await queryClient.cancelQueries({
-        queryKey: [...queryKeys.jobPosts.lists(), "infinite"],
+        queryKey: [...queryKeys.jobs.lists(), "infinite"],
       });
 
       // Snapshot all infinite pages before mutation
       const previousPages = queryClient.getQueriesData({
-        queryKey: [...queryKeys.jobPosts.lists(), "infinite"],
+        queryKey: [...queryKeys.jobs.lists(), "infinite"],
       });
 
       // Optimistically patch the matching job in every cached page
       queryClient.setQueriesData(
-        { queryKey: [...queryKeys.jobPosts.lists(), "infinite"] },
+        { queryKey: [...queryKeys.jobs.lists(), "infinite"] },
         (old: any) => {
           if (!old?.pages) return old;
           return {

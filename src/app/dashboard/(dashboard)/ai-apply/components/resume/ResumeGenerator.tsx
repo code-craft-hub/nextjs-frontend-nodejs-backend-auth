@@ -2,10 +2,9 @@
 import { useEffect, useRef } from "react";
 import { useResumeStream } from "@/hooks/stream-resume-hook";
 import { toast } from "sonner";
-import { useAuth } from "@/hooks/use-auth";
+import { useQuery } from "@tanstack/react-query";
+import { userQueries } from "@module/user";
 import { EditableResume } from "./EditableResume";
-import { COLLECTIONS } from "@/lib/utils/constants";
-import { BASEURL } from "@/lib/api/client";
 
 // const backendUrl = process.env.NEXT_PUBLIC_AUTH_API_URL;
 export const ResumeGenerator = ({
@@ -15,17 +14,13 @@ export const ResumeGenerator = ({
   jobDescription: string;
   resumeId: string;
 }) => {
-  const { streamData, streamStatus, startStream } = useResumeStream(
-    BASEURL + "/new-resume-generation",
-    resumeId,
-  );
-  const { user, useCareerDoc } = useAuth();
-  const {
-    data: existingResume,
-    isFetched,
-    status,
-  } = useCareerDoc<any>(resumeId, COLLECTIONS.RESUME);
-  // const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const { streamData, streamStatus, startStream } = useResumeStream();
+  const { data: user } = useQuery(userQueries.detail());
+
+  // existingResume is not fetched via Firestore anymore; always generate
+  const existingResume = null;
+  const isFetched = true;
+  const status = "success";
 
   const resultsEndRef = useRef<HTMLDivElement>(null);
 
@@ -38,17 +33,10 @@ export const ResumeGenerator = ({
     }
   }, [streamData]);
 
-  // const cancelTimeout = () => {
-  //   if (timeoutRef.current) {
-  //     clearTimeout(timeoutRef.current);
-  //   }
-  // };
-
   useEffect(() => {
     if (isFetched && status === "success") {
       if (user && jobDescription && !existingResume) {
-        // hasGeneratedRef.current = true;
-        toast.promise(startStream(user, jobDescription), {
+        toast.promise(startStream(jobDescription), {
           loading: "Generating your tailored resume...",
           success: () => {
             return {
@@ -65,14 +53,8 @@ export const ResumeGenerator = ({
 
   return (
     <div className="py-4 sm:py-8">
-      {/* Resume Id {resumeId}
-      <br />
-      */}
-      {/* Status: {streamStatus.isConnected ? "Connected" : "Disconnected"} |{" "}
-      isStreaming: {streamStatus.isComplete ? "Complete" : "In Progress"} */}
       <EditableResume
         data={resumeData}
-        // cancelTimeout={cancelTimeout}
         resumeId={resumeId}
         isStreaming={streamStatus.isComplete}
       />

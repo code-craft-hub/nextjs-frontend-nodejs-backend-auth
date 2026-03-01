@@ -13,7 +13,7 @@ export interface RecommendationMetrics {
 
 export interface JobRecommendation {
   id: string;
-  confidenceScore: number;
+  confidenceScore: number | null;
   matchScore: number;
   status: string;
   viewedAt: string | null;

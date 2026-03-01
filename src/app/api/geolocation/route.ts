@@ -59,7 +59,7 @@ async function fetchProvider(
   }
 }
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     const results = await Promise.allSettled(
       PROVIDERS.map((p) => fetchProvider(p)),

@@ -55,8 +55,8 @@ export const JobCard = memo(function JobCard({
           · <span className="font-inter text-gray-400">{salaryDisplay}</span>
         </p>
         <JobBadges
-          employmentType={job.employmentType}
-          location={job.location}
+          employmentType={job.employmentType ?? ""}
+          location={job.location ?? ""}
           matchScore={matchScore}
         />
       </div>

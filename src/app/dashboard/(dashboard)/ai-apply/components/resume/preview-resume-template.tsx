@@ -3,12 +3,21 @@ import { Card } from "@/components/ui/card";
 import { userQueries } from "@module/user";
 import { cn } from "@/lib/utils";
 import { monthYear, normalizeToString } from "@/lib/utils/helpers";
-import { IUser } from "@/types";
+import { ResumeFormData } from "@/lib/schema-validations/resume.schema";
 import { useQuery } from "@tanstack/react-query";
 import { memo } from "react";
 
+type PreviewResumeData = Partial<ResumeFormData> & {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  phoneNumber?: string;
+  address?: string;
+  portfolio?: string;
+};
+
 interface PreviewResumeProps {
-  data: Partial<IUser>;
+  data: PreviewResumeData;
   isStreaming?: boolean;
   pause?: boolean;
   cancelTimeout?: () => void;

@@ -3,7 +3,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/pagination";
 import { FaCircleCheck } from "react-icons/fa6";
-import { useUserLocation } from "@/hooks/get-user-location";
+import { useUserLocation } from "@/hooks/geo-location/ip-geolocation.provider";
 import { creditCard } from "@/constants/data";
 import { formatCurrencyNG, formatCurrencyUSA } from "@/lib/utils/helpers";
 import { Button } from "../ui/button";

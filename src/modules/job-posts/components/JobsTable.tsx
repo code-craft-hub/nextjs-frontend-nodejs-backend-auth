@@ -21,9 +21,8 @@ import { PiOfficeChairFill } from "react-icons/pi";
 import { formatAppliedDate } from "@/lib/utils/helpers";
 import { useUpdateJobMutation } from "@/lib/mutations/jobs.mutations";
 import { useApplyJob } from "@/hooks/useApplyJob";
-import type { ApplyHandler } from "@/app/dashboard/jobs/components/OverviewColumn";
 import { useToggleBookmarkByJobMutation } from "@/lib/mutations/bookmarks.mutations";
-import { JobApplication } from "@/types";
+import type { JobPost } from "@/modules/job-posts";
 
 // ─── Row ──────────────────────────────────────────────────────────────────────
 
@@ -33,8 +32,8 @@ function JobRow({
   handleBookmark,
   onRowClick,
 }: {
-  job: JobApplication;
-  handleApply?: ApplyHandler;
+  job: JobPost;
+  handleApply?: (job: JobPost, e?: React.MouseEvent) => void;
   handleBookmark?: () => void;
   onRowClick: () => void;
 }) {
@@ -154,7 +153,7 @@ export default function JobsTable({
   allJobs,
   referrer,
 }: {
-  allJobs: JobApplication[];
+  allJobs: JobPost[];
   referrer: string;
 }) {
   const router = useRouter();

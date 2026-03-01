@@ -11,6 +11,7 @@ export function useJobActions() {
   const handleJobClick = useCallback(
     async (job: JobType) => {
       if (!job?.emailApply) {
+        // @ts-ignore
         window.open(job.link ? job.link : job.applyUrl, "__blank");
         return;
       }

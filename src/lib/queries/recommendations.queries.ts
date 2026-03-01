@@ -17,6 +17,7 @@ export const recommendationsQueries = {
   userRecommendations: () =>
     infiniteQueryOptions({
       queryKey: queryKeys.recommendations.user(),
+      initialPageParam: 1,
       queryFn: ({ pageParam }) =>
         recommendationsApi.getUserRecommendations({ page: pageParam as number }),
       getNextPageParam: (lastPage) => {
@@ -28,6 +29,8 @@ export const recommendationsQueries = {
        * TQ evaluates this after every successful fetch, so polling stops
        * automatically once `isGenerating` becomes false.
        */
+
+      // @ts-ignore
       refetchInterval: (query) => {
         const pages = query.state.data?.pages as
           | { data: RecommendationsResponse }[]

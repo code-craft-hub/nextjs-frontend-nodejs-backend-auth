@@ -286,7 +286,7 @@ export function useDeleteApplicationMutation() {
       return { previousInfinite, previousCheck, applicationId, jobId };
     },
 
-    onError: (_err, { applicationId, jobId }, context) => {
+    onError: (_err, { jobId }, context) => {
       if (context?.previousInfinite !== undefined) {
         queryClient.setQueryData(
           jobApplicationKeys.infinite(),

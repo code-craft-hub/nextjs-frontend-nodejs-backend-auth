@@ -27,7 +27,7 @@ export const overviewColumns: ColumnDef<JobType>[] = [
               ? row.original.companyLogo
               : "/placeholder.jpg"
           }
-          alt={row.original.companyText}
+          alt={row.original.companyText ?? ""}
         />
       </div>
     ),

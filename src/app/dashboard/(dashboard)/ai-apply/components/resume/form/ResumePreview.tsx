@@ -24,21 +24,21 @@ export const ResumePreview: React.FC<ResumePreviewProps> = ({
   );
 
   const contactInfo = [
-    data.contact?.email || user?.email,
-    data.contact?.phoneNumber || user?.phoneNumber,
-    data.contact?.address,
-    data.contact?.portfolio,
+    data.email || user?.email,
+    data.phoneNumber || user?.phoneNumber,
+    data.address,
+    data.portfolio,
   ]
     .filter(Boolean)
     .join(" | ");
 
   const initialData = {
-    firstName: user?.firstName ?? data.contact?.firstName,
-    lastName: user?.lastName ?? data.contact?.lastName,
-    email: user?.email ?? data.contact?.email,
-    phoneNumber: user?.phoneNumber ?? data.contact?.phoneNumber,
-    address: user?.address ?? data.contact?.address,
-    portfolio: data.contact?.portfolio,
+    firstName: user?.firstName ?? data.firstName,
+    lastName: user?.lastName ?? data.lastName,
+    email: user?.email ?? data.email,
+    phoneNumber: user?.phoneNumber ?? data.phoneNumber,
+    address: user?.address ?? data.address,
+    portfolio: data.portfolio,
   };
   return (
     <div className="bg-white rounded-lg shadow-lg p-8 space-y-6 relative">

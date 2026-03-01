@@ -10,16 +10,13 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { memo } from "react";
-import {
-  ApplyHandler,
-  JobUpdateMutation,
-} from "../../../app/dashboard/jobs/components/OverviewColumn";
-import { JobApplication } from "@/types";
+import { JobUpdateMutation } from "../../../app/dashboard/jobs/components/OverviewColumn";
+import type { JobPost } from "@/modules/job-posts";
 
 interface MobileOverviewProps {
-  allJobs?: JobApplication[];
+  allJobs?: JobPost[];
   updateJobs?: JobUpdateMutation;
-  handleApply?: ApplyHandler;
+  handleApply?: (job: JobPost, e?: React.MouseEvent) => void;
   /**
    * Used to build the back-navigation URL on the job detail page.
    * Must match one of the referrer values expected by JobIdClient.
