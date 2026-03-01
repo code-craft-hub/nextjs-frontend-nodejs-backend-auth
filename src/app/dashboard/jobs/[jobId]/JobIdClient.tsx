@@ -19,13 +19,13 @@ import { useApplyJob } from "@/hooks/useApplyJob";
 
 // ─── Referrer → page title mapping ───────────────────────────────────────────
 
-const REFERRER_TITLES: Record<string, string> = {
-  "ai-recommendations": "AI Recommendations",
-  "saved-jobs": "Saved Jobs",
-  "application-history": "Application History",
-  dashboard: "Dashboard",
-  jobs: "All Jobs",
-};
+// const REFERRER_TITLES: Record<string, string> = {
+//   "ai-recommendations": "AI Recommendations",
+//   "saved-jobs": "Saved Jobs",
+//   "application-history": "Application History",
+//   dashboard: "Dashboard",
+//   jobs: "All Jobs",
+// };
 
 // ─── Back navigation ──────────────────────────────────────────────────────────
 
@@ -52,7 +52,7 @@ export const JobIdClient = ({
   const job = data?.data;
 
   // Derive title and back URL from the referrer — no state needed.
-  const pageTitle = REFERRER_TITLES[referrer] ?? "Job Details";
+  // const pageTitle = REFERRER_TITLES[referrer] ?? "Job Details";
   const backUrl = REFERRER_URLS[referrer] ?? "/dashboard/jobs";
 
   return (
@@ -68,7 +68,7 @@ export const JobIdClient = ({
         </button>
 
         <h1 className="text-2xl sm:text-4xl font-bold text-center my-8">
-          {pageTitle}
+         Job Details
         </h1>
 
         {/* Company header */}

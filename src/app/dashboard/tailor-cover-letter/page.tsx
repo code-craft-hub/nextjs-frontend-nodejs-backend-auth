@@ -4,16 +4,19 @@ import { coverLetterQueries } from "@/lib/queries/cover-letter.queries";
 import { getCookiesToken } from "@/lib/auth.utils";
 import { HydrationBoundary } from "@/components/hydration-boundary";
 import { dehydrate } from "@tanstack/react-query";
+import { isPlaceholderId } from "@/lib/utils/ai-apply-navigation";
 
 const TailorCoverLetterPage = async ({ searchParams }: any) => {
   const token = (await getCookiesToken()) ?? "";
-  const { coverLetterId } = await searchParams;
+  const { coverLetterDocId } = await searchParams;
 
   const queryClient = createServerQueryClient();
 
-  await queryClient.prefetchQuery(
-    coverLetterQueries.detail(coverLetterId, token),
-  );
+  if (!isPlaceholderId(coverLetterDocId)) {
+    await queryClient.prefetchQuery(
+      coverLetterQueries.detail(coverLetterDocId, token),
+    );
+  }
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
