@@ -184,6 +184,30 @@ export interface FetchOptions extends Omit<RequestInit, "body"> {
   skipRefresh?: boolean;
 }
 
+// ─── Logout Intent ────────────────────────────────────────────────────────────
+
+/**
+ * When true, the refresh flow is suppressed for all concurrent requests.
+ *
+ * Set this immediately before initiating a logout so that any in-flight
+ * requests that receive a 401 do NOT fire a pointless refresh against a
+ * server that has already cleared the session cookies.
+ *
+ * The flag is cleared if the logout call itself fails, and is naturally
+ * reset on the next full-page navigation (module state re-initialises).
+ */
+let _logoutIntentActive = false;
+
+/** Mark that the user has explicitly chosen to sign out. */
+export function markLogoutIntent(): void {
+  _logoutIntentActive = true;
+}
+
+/** Reverts the logout intent (call on logout failure to restore normal flow). */
+export function clearLogoutIntent(): void {
+  _logoutIntentActive = false;
+}
+
 // ─── Token Refresh Mutex ─────────────────────────────────────────────────────
 
 /**
@@ -221,6 +245,10 @@ const refreshMutex = (() => {
  * and the cookie path matches "/api/v1/auth".
  */
 async function refreshAccessToken(): Promise<boolean> {
+  // User explicitly signed out — skip the refresh entirely so we don't
+  // hammer the server with pointless 401-generating refresh requests.
+  if (_logoutIntentActive) return false;
+
   return refreshMutex.acquire(async () => {
     try {
       const refreshUrl = buildUrl("/auth/refresh");

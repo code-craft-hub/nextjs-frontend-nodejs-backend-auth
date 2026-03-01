@@ -1,4 +1,4 @@
-import { api } from "@/lib/api/client";
+import { api, clearLogoutIntent, markLogoutIntent } from "@/lib/api/client";
 import type {
   AuthSession,
   LoginCredentials,
@@ -19,7 +19,17 @@ export const authApi = {
 
   register: (data: RegisterData) => api.post<AuthSession>(`/register`, data),
 
-  logout: () => api.post<void>(`/auth/logout`),
+  logout: async () => {
+    // Signal the HTTP client to skip refresh for any concurrent 401s —
+    // the user's intent is clear. Reverted on failure so normal flow resumes.
+    markLogoutIntent();
+    try {
+      return await api.post<void>(`/auth/logout`);
+    } catch (error) {
+      clearLogoutIntent();
+      throw error;
+    }
+  },
 
   refresh: () => api.post<AuthSession>(`/refresh`),
 
