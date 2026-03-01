@@ -4,23 +4,24 @@ import { ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { sendGTMEvent } from "@next/third-parties/google";
+import { Loader2 } from "lucide-react";
 
 import { userQueries } from "@module/user";
 import { usePrefetchJob } from "@/hooks/usePrefetchJob";
 import jobApplicationQueries from "@/lib/queries/application-history.queries";
-import { JobType } from "@/types";
 
 import { ApplicationHistoryColumn } from "../components/OverviewColumn";
 import { useJobsTable } from "../_hooks/useJobsTable";
 import { JobsTable } from "../components/JobsTable";
-import { LoadMoreButton } from "../components/LoadMoreButton";
 import MobileOverview from "../../../../modules/job-posts/components/MobileOverview";
 import { SearchBar, SearchBarRef } from "./JobSearchBar";
+import { JobPost } from "@/modules/job-posts";
 
 export const ApplicationHistory = ({ children }: { children?: ReactNode }) => {
   const router = useRouter();
   const [searchValue, setSearchValue] = useState("");
   const searchBarRef = useRef<SearchBarRef>(null);
+  const sentinelRef = useRef<HTMLDivElement>(null);
 
   const { data: user } = useQuery(userQueries.detail());
   const { prefetchJob } = usePrefetchJob();
@@ -44,7 +45,24 @@ export const ApplicationHistory = ({ children }: { children?: ReactNode }) => {
     isRefetching,
   } = useInfiniteQuery(jobApplicationQueries.infiniteList());
 
-  const allJobs = useMemo<JobType[]>(
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      { threshold: 0.1 },
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  const allJobs = useMemo<JobPost[]>(
     () => data?.pages.flatMap((page) => page.data) ?? [],
     [data],
   );
@@ -108,11 +126,13 @@ export const ApplicationHistory = ({ children }: { children?: ReactNode }) => {
           {/* Mobile view — no apply/bookmark actions for history items */}
           <MobileOverview allJobs={allJobs} referrer="application-history" />
 
-          <LoadMoreButton
-            hasNextPage={hasNextPage ?? false}
-            isFetchingNextPage={isFetchingNextPage}
-            onLoadMore={() => fetchNextPage()}
-          />
+          {/* Sentinel — triggers the next page fetch via IntersectionObserver */}
+          <div ref={sentinelRef} className="h-4" />
+          {isFetchingNextPage && (
+            <div className="flex justify-center py-4">
+              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+            </div>
+          )}
         </div>
       </div>
     </div>

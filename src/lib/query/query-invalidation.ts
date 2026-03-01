@@ -5,6 +5,7 @@ import { autoApplyKeys } from "./auto-apply.keys";
 import { bookmarkKeys } from "./bookmarks.keys";
 import { jobApplicationKeys } from "./job-applications.keys";
 import { invalidateUserQueries } from "@module/user";
+import { jobPostsKeys } from "@/modules/job-posts";
 
 /**
  * Centralized query invalidation utilities
@@ -218,15 +219,15 @@ export const invalidateJobsLists = (queryClient: QueryClient) => {
 
 export const invalidateJobPostsQueries = (queryClient: QueryClient) => {
   return Promise.all([
-    queryClient.invalidateQueries({ queryKey: queryKeys.jobPosts.lists() }),
-    queryClient.invalidateQueries({ queryKey: queryKeys.jobPosts.details() }),
-    queryClient.invalidateQueries({ queryKey: queryKeys.jobPosts.stats() }),
+    queryClient.invalidateQueries({ queryKey: jobPostsKeys.jobPosts.lists() }),
+    queryClient.invalidateQueries({ queryKey: jobPostsKeys.jobPosts.details() }),
+    queryClient.invalidateQueries({ queryKey: jobPostsKeys.jobPosts.stats() }),
   ]);
 };
 
 export const invalidateJobPostLists = (queryClient: QueryClient) => {
   return queryClient.invalidateQueries({
-    queryKey: queryKeys.jobPosts.lists(),
+    queryKey: jobPostsKeys.jobPosts.lists(),
   });
 };
 
@@ -235,7 +236,7 @@ export const invalidateJobPostDetail = (
   jobPostId: string,
 ) => {
   return queryClient.invalidateQueries({
-    queryKey: queryKeys.jobPosts.detail(jobPostId),
+    queryKey: jobPostsKeys.jobPosts.detail(jobPostId),
   });
 };
 

@@ -9,7 +9,6 @@ import { userQueries } from "@module/user";
 import { useUpdateJobMutation } from "@/lib/mutations/jobs.mutations";
 import { useApplyJob } from "@/hooks/useApplyJob";
 import { bookmarksQueries } from "@/lib/queries/bookmarks.queries";
-import { JobType } from "@/types";
 
 import { OverviewColumn } from "../components/OverviewColumn";
 import { useJobsTable } from "../_hooks/useJobsTable";
@@ -17,6 +16,7 @@ import { JobsTable } from "../components/JobsTable";
 import { LoadMoreButton } from "../components/LoadMoreButton";
 import MobileOverview from "../../../../modules/job-posts/components/MobileOverview";
 import { SearchBar, SearchBarRef } from "./JobSearchBar";
+import { JobPost } from "@/modules/job-posts";
 
 export const SavedJobs = ({ children }: { children?: ReactNode }) => {
   const router = useRouter();
@@ -47,7 +47,7 @@ export const SavedJobs = ({ children }: { children?: ReactNode }) => {
     isRefetching,
   } = useInfiniteQuery(bookmarksQueries.infiniteList());
 
-  const allJobs = useMemo<JobType[]>(
+  const allJobs = useMemo<JobPost[]>(
     () => data?.pages.flatMap((page) => page.data) ?? [],
     [data],
   );

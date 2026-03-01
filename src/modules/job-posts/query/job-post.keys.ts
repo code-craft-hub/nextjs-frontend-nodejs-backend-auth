@@ -5,7 +5,11 @@ export const jobPostsKeys = {
     list: (filters: Record<string, any>) =>
       [...jobPostsKeys.jobPosts.lists(), filters] as const,
     infinite: (query?: string) =>
-      [...jobPostsKeys.jobPosts.all, "infinite", query] as const,
+      [
+        ...jobPostsKeys.jobPosts.all,
+        "infinite",
+        ...(query ? [query] : []),
+      ] as const,
     details: () => [...jobPostsKeys.jobPosts.all, "detail"] as const,
     detail: (id: string) => [...jobPostsKeys.jobPosts.details(), id] as const,
     stats: () => [...jobPostsKeys.jobPosts.all, "stats"] as const,

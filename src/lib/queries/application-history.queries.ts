@@ -4,36 +4,29 @@ import { jobApplicationKeys } from "@/lib/query/job-applications.keys";
 
 export const jobApplicationQueries = {
   /**
-   * Single page — for non-scrolling admin or overview lists.
+   * First page only — for non-scrolling overview lists.
    */
-  list: (page = 1, limit = 20, token?: string) =>
+  list: (limit = 20, token?: string) =>
     queryOptions({
-      queryKey: jobApplicationKeys.list({ page, limit }),
-      queryFn: () => jobApplicationsApi.list(page, limit, token),
+      queryKey: jobApplicationKeys.list({ limit }),
+      queryFn: () => jobApplicationsApi.list(undefined, limit, token),
       staleTime: 5 * 60 * 1000,
     }),
 
   /**
    * Infinite scroll — drives the Application History feed.
    *
-   * The backend does not expose a total count, so we use the heuristic:
-   *   count < limit  →  we're on the last page
-   *   count === limit →  there may be more pages
+   * Uses cursor-based pagination: `nextCursor` from the last page is passed as
+   * `cursor` to fetch the next batch. `null` means no more pages.
    */
   infiniteList: (limit = 20, token?: string) =>
     infiniteQueryOptions({
       queryKey: jobApplicationKeys.infinite(),
       queryFn: ({ pageParam }) =>
-        jobApplicationsApi.list(pageParam, limit, token),
-      getNextPageParam: (lastPage) => {
-        const { page, count } = lastPage.pagination;
-        return count === limit ? page + 1 : undefined;
-      },
-      getPreviousPageParam: (firstPage) => {
-        const { page } = firstPage.pagination;
-        return page > 1 ? page - 1 : undefined;
-      },
-      initialPageParam: 1,
+        jobApplicationsApi.list(pageParam ?? undefined, limit, token),
+      getNextPageParam: (lastPage) =>
+        lastPage.pagination.nextCursor ?? undefined,
+      initialPageParam: undefined as string | undefined,
       staleTime: 5 * 60 * 1000,
     }),
 
@@ -84,7 +77,7 @@ export const jobApplicationQueries = {
     }),
 
   /**
-   * Admin view — all applications with pagination.
+   * Admin view — all applications with offset pagination.
    */
   adminList: (page = 1, limit = 20, token?: string) =>
     queryOptions({

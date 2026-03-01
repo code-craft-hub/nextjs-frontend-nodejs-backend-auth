@@ -42,8 +42,6 @@ export const HomeClient = memo(
       filters,
     });
 
-    return <FindJob filters={filters} />;
-
     return (
       <>
         <TopGradient />
@@ -85,7 +83,7 @@ export const HomeClient = memo(
               <AIJobCustomization filters={autoApplyFilters} />
             </TabsContent>
             <TabsContent value="find-jobs">
-              <FindJob filters={filters} />
+              <FindJob />
             </TabsContent>
           </Tabs>
         </div>

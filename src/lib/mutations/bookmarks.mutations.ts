@@ -13,6 +13,7 @@ import {
   invalidateBookmarkLists,
   invalidateBookmarkCheck,
 } from "@/lib/query/query-invalidation";
+import { jobPostsKeys } from "@/modules/job-posts";
 
 // ─── Create ───────────────────────────────────────────────────────────────────
 
@@ -24,36 +25,37 @@ import {
  * Rolls back on error; invalidates on settle to sync real server state.
  */
 export function useCreateBookmarkMutation() {
-  const queryClient = useQueryClient();
+  const qc = useQueryClient();
 
   return useMutation({
     mutationFn: (jobId: string) => bookmarksApi.create(jobId),
 
-    onMutate: async (jobId) => {
-      await queryClient.cancelQueries({ queryKey: bookmarkKeys.check(jobId) });
+    // onMutate: async (jobId) => {
+    //   await qc.cancelQueries({ queryKey: bookmarkKeys.check(jobId) });
 
-      const previousCheck = queryClient.getQueryData(bookmarkKeys.check(jobId));
+    //   const previousCheck = qc.getQueryData(bookmarkKeys.check(jobId));
 
-      queryClient.setQueryData(bookmarkKeys.check(jobId), {
-        success: true,
-        data: { bookmarked: true },
-      });
+    //   qc.setQueryData(bookmarkKeys.check(jobId), {
+    //     success: true,
+    //     data: { bookmarked: true },
+    //   });
 
-      return { previousCheck, jobId };
-    },
+    //   return { previousCheck, jobId };
+    // },
 
-    onError: (_err, jobId, context) => {
-      if (context?.previousCheck !== undefined) {
-        queryClient.setQueryData(
-          bookmarkKeys.check(jobId),
-          context.previousCheck,
-        );
-      }
-    },
+    // onError: (_err, jobId, context) => {
+    //   if (context?.previousCheck !== undefined) {
+    //     qc.setQueryData(
+    //       bookmarkKeys.check(jobId),
+    //       context.previousCheck,
+    //     );
+    //   }
+    // },
 
     onSettled: (_data, _err, jobId) => {
-      invalidateBookmarkCheck(queryClient, jobId);
-      invalidateBookmarkLists(queryClient);
+      invalidateBookmarkCheck(qc, jobId);
+      invalidateBookmarkLists(qc);
+      qc.invalidateQueries({ queryKey: jobPostsKeys.jobPosts.infinite() });
     },
   });
 }
@@ -67,50 +69,50 @@ export function useCreateBookmarkMutation() {
  * immediately. Rolls back on error.
  */
 export function useRemoveBookmarkMutation() {
-  const queryClient = useQueryClient();
+  const qc = useQueryClient();
 
   return useMutation({
     mutationFn: (bookmarkId: string) => bookmarksApi.removeById(bookmarkId),
 
-    onMutate: async (bookmarkId) => {
-      await queryClient.cancelQueries({ queryKey: bookmarkKeys.infinite() });
+    // onMutate: async (bookmarkId) => {
+    //   await qc.cancelQueries({ queryKey: bookmarkKeys.infinite() });
 
-      const previousInfinite = queryClient.getQueryData<
-        InfiniteData<BookmarkListResponse>
-      >(bookmarkKeys.infinite());
+    //   const previousInfinite = qc.getQueryData<
+    //     InfiniteData<BookmarkListResponse>
+    //   >(bookmarkKeys.infinite());
 
-      queryClient.setQueryData<InfiniteData<BookmarkListResponse>>(
-        bookmarkKeys.infinite(),
-        (old) => {
-          if (!old) return old;
-          return {
-            ...old,
-            pages: old.pages.map((page) => ({
-              ...page,
-              data: page.data.filter((b: Bookmark) => b.id !== bookmarkId),
-              pagination: {
-                ...page.pagination,
-                count: Math.max(0, page.pagination.count - 1),
-              },
-            })),
-          };
-        },
-      );
+    //   qc.setQueryData<InfiniteData<BookmarkListResponse>>(
+    //     bookmarkKeys.infinite(),
+    //     (old) => {
+    //       if (!old) return old;
+    //       return {
+    //         ...old,
+    //         pages: old.pages.map((page) => ({
+    //           ...page,
+    //           data: page.data.filter((b: Bookmark) => b.id !== bookmarkId),
+    //           pagination: {
+    //             ...page.pagination,
+    //             count: Math.max(0, page.pagination.count - 1),
+    //           },
+    //         })),
+    //       };
+    //     },
+    //   );
 
-      return { previousInfinite, bookmarkId };
-    },
+    //   return { previousInfinite, bookmarkId };
+    // },
 
-    onError: (_err, _bookmarkId, context) => {
-      if (context?.previousInfinite !== undefined) {
-        queryClient.setQueryData(
-          bookmarkKeys.infinite(),
-          context.previousInfinite,
-        );
-      }
-    },
+    // onError: (_err, _bookmarkId, context) => {
+    //   if (context?.previousInfinite !== undefined) {
+    //     qc.setQueryData(
+    //       bookmarkKeys.infinite(),
+    //       context.previousInfinite,
+    //     );
+    //   }
+    // },
 
     onSettled: () => {
-      invalidateBookmarkLists(queryClient);
+      invalidateBookmarkLists(qc);
     },
   });
 }
@@ -126,64 +128,59 @@ export function useRemoveBookmarkMutation() {
  * Both roll back on error.
  */
 export function useRemoveBookmarkByJobMutation() {
-  const queryClient = useQueryClient();
+  const qc = useQueryClient();
 
   return useMutation({
     mutationFn: (jobId: string) => bookmarksApi.removeByJob(jobId),
 
-    onMutate: async (jobId) => {
-      await queryClient.cancelQueries({ queryKey: bookmarkKeys.check(jobId) });
-      await queryClient.cancelQueries({ queryKey: bookmarkKeys.infinite() });
+    // onMutate: async (jobId) => {
+    //   await qc.cancelQueries({ queryKey: bookmarkKeys.check(jobId) });
+    //   await qc.cancelQueries({ queryKey: bookmarkKeys.infinite() });
 
-      const previousCheck = queryClient.getQueryData(bookmarkKeys.check(jobId));
-      const previousInfinite = queryClient.getQueryData<
-        InfiniteData<BookmarkListResponse>
-      >(bookmarkKeys.infinite());
+    //   const previousCheck = qc.getQueryData(bookmarkKeys.check(jobId));
+    //   const previousInfinite = qc.getQueryData<
+    //     InfiniteData<BookmarkListResponse>
+    //   >(bookmarkKeys.infinite());
 
-      queryClient.setQueryData(bookmarkKeys.check(jobId), {
-        success: true,
-        data: { bookmarked: false },
-      });
+    //   qc.setQueryData(bookmarkKeys.check(jobId), {
+    //     success: true,
+    //     data: { bookmarked: false },
+    //   });
 
-      queryClient.setQueryData<InfiniteData<BookmarkListResponse>>(
-        bookmarkKeys.infinite(),
-        (old) => {
-          if (!old) return old;
-          return {
-            ...old,
-            pages: old.pages.map((page) => ({
-              ...page,
-              data: page.data.filter((b: Bookmark) => b.jobId !== jobId),
-              pagination: {
-                ...page.pagination,
-                count: Math.max(0, page.pagination.count - 1),
-              },
-            })),
-          };
-        },
-      );
+    //   qc.setQueryData<InfiniteData<BookmarkListResponse>>(
+    //     bookmarkKeys.infinite(),
+    //     (old) => {
+    //       if (!old) return old;
+    //       return {
+    //         ...old,
+    //         pages: old.pages.map((page) => ({
+    //           ...page,
+    //           data: page.data.filter((b: Bookmark) => b.jobId !== jobId),
+    //           pagination: {
+    //             ...page.pagination,
+    //             count: Math.max(0, page.pagination.count - 1),
+    //           },
+    //         })),
+    //       };
+    //     },
+    //   );
 
-      return { previousCheck, previousInfinite, jobId };
-    },
+    //   return { previousCheck, previousInfinite, jobId };
+    // },
 
-    onError: (_err, jobId, context) => {
-      if (context?.previousCheck !== undefined) {
-        queryClient.setQueryData(
-          bookmarkKeys.check(jobId),
-          context.previousCheck,
-        );
-      }
-      if (context?.previousInfinite !== undefined) {
-        queryClient.setQueryData(
-          bookmarkKeys.infinite(),
-          context.previousInfinite,
-        );
-      }
-    },
+    // onError: (_err, jobId, context) => {
+    //   if (context?.previousCheck !== undefined) {
+    //     qc.setQueryData(bookmarkKeys.check(jobId), context.previousCheck);
+    //   }
+    //   if (context?.previousInfinite !== undefined) {
+    //     qc.setQueryData(bookmarkKeys.infinite(), context.previousInfinite);
+    //   }
+    // },
 
     onSettled: (_data, _err, jobId) => {
-      invalidateBookmarkCheck(queryClient, jobId);
-      invalidateBookmarkLists(queryClient);
+      invalidateBookmarkCheck(qc, jobId);
+      invalidateBookmarkLists(qc);
+      qc.invalidateQueries({ queryKey: jobPostsKeys.jobPosts.infinite() });
     },
   });
 }
@@ -191,7 +188,6 @@ export function useRemoveBookmarkByJobMutation() {
 export function useToggleBookmarkByJobMutation() {
   const createBookmark = useCreateBookmarkMutation();
   const removeBookmarkByJob = useRemoveBookmarkByJobMutation();
-  const qc = useQueryClient();
 
   return useMutation({
     mutationFn: async ({
@@ -202,58 +198,12 @@ export function useToggleBookmarkByJobMutation() {
       isBookmarked: boolean;
     }) => {
       if (isBookmarked) {
+        console.log("Removing bookmark for jobId", jobId);
         await removeBookmarkByJob.mutateAsync(jobId);
       } else {
+        console.log("Creating bookmark for jobId", jobId);
         await createBookmark.mutateAsync(jobId);
       }
-    },
-
-    // Optimistically flip isBookmarked in every cached jobs page so the
-    // Toggle in JobRow reacts instantly without waiting for a refetch.
-    // Targets both ["job-posts"] (job-posts module) and ["jobs"] (jobs module)
-    // because both use the same backend endpoint under different cache keys.
-    onMutate: async ({ jobId, isBookmarked }) => {
-      await Promise.all([
-        qc.cancelQueries({ queryKey: ["job-posts"] }),
-        qc.cancelQueries({ queryKey: ["jobs"] }),
-      ]);
-
-      const previousJobPosts = qc.getQueriesData({ queryKey: ["job-posts"] });
-      const previousJobs = qc.getQueriesData({ queryKey: ["jobs"] });
-
-      const flipBookmark = (old: any) => {
-        if (!old?.pages) return old;
-        return {
-          ...old,
-          pages: old.pages.map((page: any) => ({
-            ...page,
-            items: page.items?.map((job: any) =>
-              job.id === jobId
-                ? { ...job, isBookmarked: !isBookmarked }
-                : job,
-            ),
-          })),
-        };
-      };
-
-      qc.setQueriesData({ queryKey: ["job-posts"] }, flipBookmark);
-      qc.setQueriesData({ queryKey: ["jobs"] }, flipBookmark);
-
-      return { previousJobPosts, previousJobs };
-    },
-
-    onError: (_err, _variables, context) => {
-      context?.previousJobPosts?.forEach(([queryKey, data]: any) => {
-        qc.setQueryData(queryKey, data);
-      });
-      context?.previousJobs?.forEach(([queryKey, data]: any) => {
-        qc.setQueryData(queryKey, data);
-      });
-    },
-
-    onSettled: () => {
-      qc.invalidateQueries({ queryKey: ["job-posts"] });
-      qc.invalidateQueries({ queryKey: ["jobs"] });
     },
   });
 }

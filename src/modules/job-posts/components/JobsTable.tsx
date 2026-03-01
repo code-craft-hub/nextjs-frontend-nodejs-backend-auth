@@ -40,8 +40,6 @@ function JobRow({
 }) {
   const isBookmarked = job?.isBookmarked ?? false;
 
-  console.log(" [bookmark] JobRow render", isBookmarked === true && { jobId: job?.id, isBookmarked });
-
   return (
     <TableRow
       onClick={onRowClick}
@@ -109,7 +107,6 @@ function JobRow({
         </div>
       </TableCell>
 
-      {/* Bookmark — fixed narrow column */}
       <TableCell className="w-12">
         <div
           onClick={(e) => {
@@ -175,12 +172,12 @@ export default function JobsTable({
                 key={job?.id}
                 job={job}
                 handleApply={handleApply}
-                handleBookmark={() =>
+                handleBookmark={() => {
                   toggleBookmark.mutate({
                     jobId: job?.id,
                     isBookmarked: job?.isBookmarked ?? false,
-                  })
-                }
+                  });
+                }}
                 onRowClick={() =>
                   router.push(
                     `/dashboard/jobs/${job?.id}?referrer=${referrer ?? "jobs"}&title=${encodeURIComponent(job?.title ?? "")}`,

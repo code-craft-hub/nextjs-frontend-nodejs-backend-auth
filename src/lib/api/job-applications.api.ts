@@ -34,13 +34,24 @@ export interface ApplicationDetailResponse {
 }
 
 /**
- * Matches the actual backend controller shape:
- *   { success, data: JobApplication[], pagination: { page, limit, count } }
- *
- * NOTE: `count` is the item count for the current page only, not the total.
- *       Use `count < limit` to determine whether a next page exists.
+ * Cursor-based list response — used by GET /job-applications (user's own applications).
+ * `nextCursor` is an ISO timestamp string to pass as `?cursor=` for the next page,
+ * or null when there are no more results.
  */
 export interface ApplicationListResponse {
+  success: boolean;
+  data: JobApplication[];
+  pagination: {
+    limit: number;
+    count: number;
+    nextCursor: string | null;
+  };
+}
+
+/**
+ * Offset-based list response — used by admin endpoints that still use page/limit.
+ */
+export interface AdminApplicationListResponse {
   success: boolean;
   data: JobApplication[];
   pagination: {
@@ -79,11 +90,12 @@ export const jobApplicationsApi = {
 
   /**
    * GET /job-applications
-   * Retrieve the authenticated user's applications with pagination.
+   * Retrieve the authenticated user's applications — cursor-based.
+   * Pass `cursor` (ISO string from a previous response's `nextCursor`) for subsequent pages.
    */
-  list: (page = 1, limit = 20, token?: string) =>
+  list: (cursor?: string, limit = 20, token?: string) =>
     api.get<ApplicationListResponse>("/job-applications", {
-      params: { page, limit },
+      params: cursor !== undefined ? { cursor, limit } : { limit },
       token,
     }),
 
@@ -170,10 +182,10 @@ export const jobApplicationsApi = {
 
   /**
    * GET /job-applications/admin/list
-   * List all applications — admin view with pagination.
+   * List all applications — admin view with offset pagination.
    */
   adminList: (page = 1, limit = 20, token?: string) =>
-    api.get<ApplicationListResponse>("/job-applications/admin/list", {
+    api.get<AdminApplicationListResponse>("/job-applications/admin/list", {
       params: { page, limit },
       token,
     }),

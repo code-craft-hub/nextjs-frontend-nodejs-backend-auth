@@ -25,7 +25,6 @@ export function JobList({ query }: { query?: string }) {
     Boolean(hasNextPage),
   );
 
-  console.log("Rendering JobList with data:", data);
   const allJobs = data?.pages ?? [];
 
   return (

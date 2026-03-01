@@ -29,7 +29,9 @@ export async function prefetchDashboardData(
       ...recommendationsQueries.userRecommendations(),
       initialPageParam: 1,
     });
-    await queryClient.prefetchInfiniteQuery(jobPostsQueries.infinite(filters));
+
+    await queryClient.prefetchInfiniteQuery(jobPostsQueries.infinite());
+
     await queryClient.prefetchInfiniteQuery(bookmarksQueries.infiniteList());
     await queryClient.prefetchInfiniteQuery(
       jobApplicationQueries.infiniteList(),
