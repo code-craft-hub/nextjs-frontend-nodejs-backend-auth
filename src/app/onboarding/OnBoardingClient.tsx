@@ -11,9 +11,14 @@ import { OnBoardingForm4 } from "./onboarding-pages/OnBoardingForm4";
 import { OnBoardingForm5 } from "./onboarding-pages/OnBoardingForm5";
 import { OnBoardingForm6 } from "./onboarding-pages/OnBoardingForm6";
 import { OnBoardingForm7 } from "./onboarding-pages/OnBoardingForm7";
-import { useRouter } from "next/navigation";
-import { api } from "@/lib/api/client";
+// import { useRouter } from "next/navigation";
+import { authApi, 
+  // useDeleteAccountMutation 
+} from "@/modules/auth";
+
 export default function OnboardingClient() {
+  // const deleteAccount = useDeleteAccountMutation();
+
   const [currentStep, setCurrentStep] = useState(0);
   const steps = [
     OnBoardingForm0,
@@ -27,11 +32,14 @@ export default function OnboardingClient() {
   ];
   const totalSteps = steps.length;
 
-  const router = useRouter();
-  const deleteAccount = async () => {
-    await api.delete("/delete");
-    // await api.post("/logout");
-    router.push("/login");
+  // const router = useRouter();
+  const handleDeleteAccount = async () => {
+    authApi.logout();
+    // deleteAccount.mutate(undefined, {
+    //   onSuccess: () => {
+    //     router.push("/login");
+    //   },
+    // });
   };
 
   const nextStep = () => {
@@ -62,7 +70,11 @@ export default function OnboardingClient() {
           fromDataSourceStep={fromDataSourceStep}
         >
           <div className="">
-            <Button className="" variant={"ghost"} onClick={deleteAccount}>
+            <Button
+              className=""
+              variant={"ghost"}
+              onClick={handleDeleteAccount}
+            >
               <X />
             </Button>
           </div>

@@ -19,21 +19,12 @@ export const userApi = {
   },
 
   // Create user
-  createUser: (data: CreateUserData) =>
-    api.post<IUser>(`/users`, data),
+  createUser: (data: CreateUserData) => api.post<IUser>(`/users`, data),
 
   // Update user
   updateUser: (data: UpdateUserData) =>
-    api.put<{ success: boolean; data: { userId: string } }>(
-      `/users`,
-      data,
-    ),
+    api.put<{ success: boolean; data: { userId: string } }>(`/users`, data),
 
   // Delete user
-  deleteUser: (id: string) =>
-    api.delete<void>(`/users/${id}`),
-
-  // Batch operations
-  deleteUsers: (ids: string[]) =>
-    api.post<void>(`/users/batch/delete`, { ids }),
+  deleteUser: () => api.delete<void>(`/auth/account`),
 };

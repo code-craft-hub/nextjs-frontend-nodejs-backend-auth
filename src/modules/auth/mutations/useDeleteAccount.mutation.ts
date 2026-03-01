@@ -1,22 +1,16 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { userApi } from "@module/user";
-import { authQueryKeys } from "../queries/auth.queryKeys";
-import type { IUser } from "@/types";
+import { useRouter } from "next/navigation";
 
 export function useDeleteAccountMutation() {
   const queryClient = useQueryClient();
+  const router = useRouter();
 
   return useMutation({
-    mutationFn: () => {
-      const profile = queryClient.getQueryData<Partial<IUser>>(
-        authQueryKeys.profile(),
-      );
-      if (!profile?.id) throw new Error("No authenticated user found");
-      return userApi.deleteUser(profile.id);
-    },
+    mutationFn: () => userApi.deleteUser(),
     onSuccess: () => {
-      // Wipe entire cache — account no longer exists
       queryClient.clear();
+      router.push("/register");
     },
   });
 }
