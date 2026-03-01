@@ -11,9 +11,10 @@ import { OnBoardingForm4 } from "./onboarding-pages/OnBoardingForm4";
 import { OnBoardingForm5 } from "./onboarding-pages/OnBoardingForm5";
 import { OnBoardingForm6 } from "./onboarding-pages/OnBoardingForm6";
 import { OnBoardingForm7 } from "./onboarding-pages/OnBoardingForm7";
-// import { useRouter } from "next/navigation";
-import { authApi, 
-  // useDeleteAccountMutation 
+import { useRouter } from "next/navigation";
+import {
+  authApi,
+  // useDeleteAccountMutation
 } from "@/modules/auth";
 
 export default function OnboardingClient() {
@@ -32,9 +33,10 @@ export default function OnboardingClient() {
   ];
   const totalSteps = steps.length;
 
-  // const router = useRouter();
+  const router = useRouter();
   const handleDeleteAccount = async () => {
     authApi.logout();
+    router.push("/login");
     // deleteAccount.mutate(undefined, {
     //   onSuccess: () => {
     //     router.push("/login");
