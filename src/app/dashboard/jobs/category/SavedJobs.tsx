@@ -50,8 +50,6 @@ export const SavedJobs = ({ children }: { children?: ReactNode }) => {
     select: (data) => data.pages.flatMap((page) => page?.data ?? []),
   });
 
-  console.log("Fetched bookmarked jobs", allJobs);
-
   useEffect(() => {
     const el = sentinelRef.current;
     if (!el) return;
@@ -81,8 +79,7 @@ export const SavedJobs = ({ children }: { children?: ReactNode }) => {
     isLoading || isFetching || isRefetching || isFetchingNextPage;
   const visibleRows = table.getRowModel().rows;
   const hasNoResults =
-    !isSearching &&
-    (allJobs?.length === 0 || visibleRows.length === 0);
+    !isSearching && (allJobs?.length === 0 || visibleRows.length === 0);
 
   return (
     <div className="font-inter grid grid-cols-1 w-full overflow-hidden gap-4 xl:gap-8">

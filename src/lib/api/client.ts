@@ -144,9 +144,7 @@ export class APIError extends Error {
 /** Thrown when a request exceeds the configured timeout. */
 export class RequestTimeoutError extends Error {
   constructor(timeoutMs: number, endpoint: string) {
-    super(
-      `Request to "${endpoint}" timed out after ${timeoutMs}ms`,
-    );
+    super(`Request to "${endpoint}" timed out after ${timeoutMs}ms`);
     this.name = "RequestTimeoutError";
     Object.setPrototypeOf(this, new.target.prototype);
   }
@@ -417,12 +415,7 @@ export async function apiClient<T>(
     const requestId = response.headers.get("X-Request-Id") ?? undefined;
 
     // ── 401 Recovery ─────────────────────────────────────────────────────
-    if (
-      response.status === 401 &&
-      IS_CLIENT &&
-      !_isRetry &&
-      !skipRefresh
-    ) {
+    if (response.status === 401 && IS_CLIENT && !_isRetry && !skipRefresh) {
       const refreshed = await refreshAccessToken();
 
       if (refreshed) {
@@ -445,8 +438,6 @@ export async function apiClient<T>(
           typeof window !== "undefined" &&
           window.location.pathname !== "/login"
         ) {
-
-          console.log("[LOGOUT] called from [API CLIENT] IN [QUEUE MICROTASK] after refresh failure");
           window.location.href = "/login";
         }
       });
@@ -490,11 +481,7 @@ export const api = {
     return apiClient<T>(endpoint, { ...options, method: "POST", body: data });
   },
 
-  put<T>(
-    endpoint: string,
-    data?: unknown,
-    options?: FetchOptions,
-  ): Promise<T> {
+  put<T>(endpoint: string, data?: unknown, options?: FetchOptions): Promise<T> {
     return apiClient<T>(endpoint, { ...options, method: "PUT", body: data });
   },
 

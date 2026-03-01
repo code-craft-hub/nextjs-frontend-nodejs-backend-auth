@@ -50,11 +50,6 @@ export default function AutoApplyClient() {
     if (jobDescription && user && !hasStartedRef.current) {
       hasStartedRef.current = true;
 
-      console.log("[AutoApply] Starting generation with params:", {
-        jobId,
-        useMasterCv,
-      });
-
       if (useMasterCv) {
         // Only generate cover letter when using master CV
         toast.promise(

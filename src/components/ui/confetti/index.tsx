@@ -410,9 +410,9 @@ export const useFireworksConfetti = (
  *   duration={20000}
  *   particleCount={100}
  *   colors={['#ff0000', '#00ff00', '#0000ff']}
- *   onStart={() => console.log('Started!')}
- *   onStop={() => console.log('Stopped!')}
- * />
+ *   onStart={() => {}}
+ *   onStop={() => {}}
+ 
  */
 export const FireworksConfetti: FC<FireworksConfettiProps> = memo(
   ({

@@ -4,12 +4,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { toast } from "sonner";
 
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { Switch } from "@/components/ui/switch";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import {
@@ -84,7 +79,6 @@ const AuthorizeGoogle: React.FC<{
   useEffect(() => {
     const callCheckAuthOnce = async () => {
       const checkValue = await handleCheckAuthStatus();
-      console.log("Initial Gmail auth status:", checkValue);
       if (checkAuth) {
         checkAuth(checkValue);
       }
@@ -152,4 +146,3 @@ const AuthorizeGoogle: React.FC<{
 };
 
 export default AuthorizeGoogle;
-

@@ -76,14 +76,12 @@ export function useSSE() {
 
         // Handle heartbeat
         if (type === SSEEventType.HEARTBEAT) {
-          // console.log("💓 Heartbeat received:", data);
           resetHeartbeatTimeout();
           return;
         }
 
         // Handle connection opened
         if (type === SSEEventType.CONNECTION_OPENED) {
-          console.log("🔌 Connection opened:", data);
           resetHeartbeatTimeout();
           return;
         }
@@ -95,8 +93,6 @@ export function useSSE() {
           updated.set(job.id, job);
           return updated;
         });
-
-        console.log(`📊 Job event [${type}]:`, job);
       } catch (error) {
         console.error(`Error parsing ${type}:`, error);
       }
@@ -107,11 +103,8 @@ export function useSSE() {
   const connect = useCallback(() => {
     // Prevent multiple simultaneous connections
     if (eventSourceRef.current?.readyState === EventSource.OPEN) {
-      console.log("Already connected");
       return;
     }
-
-    console.log(`🔄 Connecting to SSE (attempt ${reconnectAttempts + 1})...`);
 
     const eventSource = new EventSource(SSE_URL, {
       withCredentials: true,
@@ -123,7 +116,6 @@ export function useSSE() {
       setConnected(true);
       setError(null);
       setReconnectAttempts(0);
-      console.log("✅ SSE connected");
       resetHeartbeatTimeout();
     };
 
@@ -148,7 +140,6 @@ export function useSSE() {
         // Attempt reconnection
         if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
           const delay = calculateRetryDelay(reconnectAttempts);
-          console.log(`🔄 Reconnecting in ${Math.round(delay / 1000)}s...`);
 
           reconnectTimeoutRef.current = setTimeout(() => {
             setReconnectAttempts((prev) => prev + 1);
@@ -177,7 +168,6 @@ export function useSSE() {
   ]);
 
   const disconnect = useCallback(() => {
-    console.log("🛑 Manually disconnecting SSE");
     isManualDisconnectRef.current = true;
 
     if (reconnectTimeoutRef.current) {

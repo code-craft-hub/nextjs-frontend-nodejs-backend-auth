@@ -198,10 +198,8 @@ export function useToggleBookmarkByJobMutation() {
       isBookmarked: boolean;
     }) => {
       if (isBookmarked) {
-        console.log("Removing bookmark for jobId", jobId);
         await removeBookmarkByJob.mutateAsync(jobId);
       } else {
-        console.log("Creating bookmark for jobId", jobId);
         await createBookmark.mutateAsync(jobId);
       }
     },

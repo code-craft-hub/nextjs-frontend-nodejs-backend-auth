@@ -102,10 +102,8 @@ async function resolveCookiesToken(): Promise<string | null> {
 
   let cookieValue = null;
   if (cookieStore.get("access_token")?.value) {
-    console.log("Found access_token cookie");
     cookieValue = cookieStore.get("access_token")?.value;
   } else if (cookieStore.get("session")?.value) {
-    console.log("Found legacy session cookie");
     cookieValue = cookieStore.get("session")?.value;
   }
 

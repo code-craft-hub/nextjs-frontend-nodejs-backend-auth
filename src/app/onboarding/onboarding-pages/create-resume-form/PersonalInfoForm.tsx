@@ -131,7 +131,6 @@ export default function PersonalInfoForm({
       return toast.error("Please provide a value for the resume title.");
     }
 
-    console.log("Resume Title for auto-generation:", title);
     toast.success(`Auto-generating your resume title: ${title}`);
     onboardingResumeUploadCompleted?.();
     await resumeApi.autoNewResume(title);

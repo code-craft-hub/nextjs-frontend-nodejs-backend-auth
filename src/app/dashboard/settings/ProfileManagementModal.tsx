@@ -80,7 +80,6 @@ export default function ProfileManagementModal({
   }, [resume, reset]);
 
   const onSubmit = (data: Record<string, unknown>) => {
-    console.log("Form data to submit:", data);
     updateResume.mutate(
       { id: resume!.id, data },
       {
@@ -118,7 +117,6 @@ export default function ProfileManagementModal({
   };
 
   const isSubmitting = updateResume.isPending;
-
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -165,11 +163,13 @@ export default function ProfileManagementModal({
                         <SelectContent>
                           <SelectGroup>
                             <SelectLabel>Select Job</SelectLabel>
-                            {getOptionsWithValue(jobLevels, field.value).map((job) => (
-                              <SelectItem value={job} key={job}>
-                                {job}
-                              </SelectItem>
-                            ))}
+                            {getOptionsWithValue(jobLevels, field.value).map(
+                              (job) => (
+                                <SelectItem value={job} key={job}>
+                                  {job}
+                                </SelectItem>
+                              ),
+                            )}
                           </SelectGroup>
                         </SelectContent>
                       </Select>
@@ -193,11 +193,13 @@ export default function ProfileManagementModal({
                         <SelectContent>
                           <SelectGroup>
                             <SelectLabel>Select Job Type</SelectLabel>
-                            {getOptionsWithValue(jobTypes, field.value).map((job) => (
-                              <SelectItem value={job} key={job}>
-                                {job}
-                              </SelectItem>
-                            ))}
+                            {getOptionsWithValue(jobTypes, field.value).map(
+                              (job) => (
+                                <SelectItem value={job} key={job}>
+                                  {job}
+                                </SelectItem>
+                              ),
+                            )}
                           </SelectGroup>
                         </SelectContent>
                       </Select>

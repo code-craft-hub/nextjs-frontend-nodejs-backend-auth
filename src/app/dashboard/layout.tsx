@@ -31,7 +31,6 @@ const DashboardLayout = async ({ children }: DashboardLayoutProps) => {
   // will perform rotation; skip server fetch to avoid a 401 during SSR.
   if (token) {
     user = await queryClient.fetchQuery(userQueries.detail(token));
-    console.log("DashboardLayout user:", user.id);
   }
   // await queryClient.prefetchQuery(userQueries.detail(token));
   return (

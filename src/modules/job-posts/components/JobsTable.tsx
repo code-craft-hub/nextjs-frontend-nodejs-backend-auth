@@ -23,7 +23,7 @@ import { useUpdateJobMutation } from "@/lib/mutations/jobs.mutations";
 import { useApplyJob } from "@/hooks/useApplyJob";
 import type { ApplyHandler } from "@/app/dashboard/jobs/components/OverviewColumn";
 import { useToggleBookmarkByJobMutation } from "@/lib/mutations/bookmarks.mutations";
-import { JobPost } from "../types";
+import { JobApplication } from "@/types";
 
 // ─── Row ──────────────────────────────────────────────────────────────────────
 
@@ -33,7 +33,7 @@ function JobRow({
   handleBookmark,
   onRowClick,
 }: {
-  job: JobPost;
+  job: JobApplication;
   handleApply?: ApplyHandler;
   handleBookmark?: () => void;
   onRowClick: () => void;
@@ -154,7 +154,7 @@ export default function JobsTable({
   allJobs,
   referrer,
 }: {
-  allJobs: JobPost[];
+  allJobs: JobApplication[];
   referrer: string;
 }) {
   const router = useRouter();

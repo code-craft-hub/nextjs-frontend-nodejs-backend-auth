@@ -66,13 +66,6 @@ export const TailorResume = () => {
     resumeQueries.detail(resumeId ?? ""),
   );
 
-  console.log(
-    "Existing resume data from query:",
-    existingResume,
-    "Status:",
-    resumeStatus,
-  );
-
   const { streamData, streamStatus, startStream, documentId } =
     useResumeStream();
 

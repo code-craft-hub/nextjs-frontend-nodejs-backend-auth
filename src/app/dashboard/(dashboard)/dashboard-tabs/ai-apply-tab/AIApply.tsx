@@ -10,8 +10,6 @@ export const AIApply = memo(
   ({ jobDescription }: { jobDescription: string }) => {
     const { data: aiApply } = useQuery(autoApplyQueries.all());
 
-    console.log("AI Apply Data:", aiApply);
-
     return (
       <div className="flex flex-col font-poppins relative">
         <div className="mb-12">

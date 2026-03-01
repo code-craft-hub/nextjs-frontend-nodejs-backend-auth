@@ -24,7 +24,6 @@ export const GoogleButton = ({
       );
       const user = result?.data?.user;
 
-      console.log("Google login API result:", result);
       if (user && !user.emailVerified) {
         router.push("/verify-email");
       } else if (user && !user.onboardingComplete) {
@@ -41,7 +40,7 @@ export const GoogleButton = ({
   };
 
   const handleGoogleLoginError = () => {
-    console.log("GoogleLogin (button) failed");
+    // Handle Google login error
   };
   return (
     <div>

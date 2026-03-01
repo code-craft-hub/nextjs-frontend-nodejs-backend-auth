@@ -8,11 +8,7 @@ import { userQueries } from "@module/user";
 import { getDaysRemaining, isSubscriptionActive } from "@/lib/utils/helpers";
 import { toast } from "sonner";
 
-export const Billing = ({
-  reference,
-}: {
-  reference: string;
-}) => {
+export const Billing = ({ reference }: { reference: string }) => {
   const { data: user } = useQuery(userQueries.detail());
   const [completed, setCompleted] = useState(Boolean(user?.isProUser) || false);
   const [showPlan, setShowPlan] = useState(false);
@@ -23,22 +19,14 @@ export const Billing = ({
     setShowPlan(value);
   };
 
-  console.log(user)
-
   const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
   const remainingDays = getDaysRemaining(user?.currentPeriodEnd ?? null);
   const REFERRAL = `${APP_URL}/register?referral=${
     user?.referralCode ?? "EXA0Q4YZ"
   }`;
 
-     const hasActiveSubscription = isSubscriptionActive(user?.currentPeriodEnd);
+  const hasActiveSubscription = isSubscriptionActive(user?.currentPeriodEnd);
 
-
-  console.log("REmaining days: ", remainingDays);
-  console.log("hasActiveSubscription: ", hasActiveSubscription);
-  console.log("user?.currentPeriodEnd: ", user?.currentPeriodEnd);
-  console.log("user?.isProUser: ", user?.isProUser);
-  console.log("user?.creditBalance: ", user?.creditBalance);
   const usersReferred = user?.referralCount || user?.usersReferred?.length || 0;
 
   const handleReferralCopy = () => {
@@ -50,7 +38,10 @@ export const Billing = ({
     setCompleted(Boolean(user?.isProUser));
   }, [user?.isProUser]);
 
-  const heading = user?.accountTier === "none" ? "You're on a Free Trial" : `You're on the ${user?.accountTier} plan`;
+  const heading =
+    user?.accountTier === "none"
+      ? "You're on a Free Trial"
+      : `You're on the ${user?.accountTier} plan`;
 
   return !completed ? (
     showPlan ? (
@@ -100,7 +91,8 @@ export const Billing = ({
                   Upgrade now or refer friends to extend your access. In the
                   main time you have{" "}
                   <span className="font-bold underline">
-                    {user?.creditBalance ?? 0} credits {hasActiveSubscription && "(active)"}
+                    {user?.creditBalance ?? 0} credits{" "}
+                    {hasActiveSubscription && "(active)"}
                   </span>
                 </span>
               </p>
@@ -152,7 +144,7 @@ export const Billing = ({
                   style={{
                     width: `${Math.min(
                       usersReferred * 10 + (usersReferred > 0 ? 50 : 2),
-                      100
+                      100,
                     )}%`,
                   }}
                 />

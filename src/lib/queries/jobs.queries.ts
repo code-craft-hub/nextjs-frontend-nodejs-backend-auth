@@ -52,10 +52,10 @@ export const jobsQueries = {
     });
   },
 
-  autoApply: () => {
+  autoApply: (token?: string) => {
     return queryOptions({
       queryKey: queryKeys.jobs.autoApply(),
-      queryFn: () => recommendationsApi.getUserRecommendations(),
+      queryFn: () => recommendationsApi.getUserRecommendations({}, token),
       staleTime: 10 * 60 * 1000,
       refetchInterval: (query) => {
         const recommendations = query.state.data?.data?.recommendations;

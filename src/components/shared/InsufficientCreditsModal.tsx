@@ -28,8 +28,6 @@ export default function InsufficientCreditsModal() {
 
   const hasActiveSubscription = isSubscriptionActive(user?.currentPeriodEnd);
 
-  console.log(" DATA ====: ", hasActiveSubscription);
-
   useEffect(() => {
     if (!user?.isEligibleForReward) return;
 

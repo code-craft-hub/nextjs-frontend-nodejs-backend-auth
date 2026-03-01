@@ -5,7 +5,7 @@ import { IUser } from "./src/types";
 // import { getJwtSecret } from "./src/lib/utils/helpers";
 
 async function verifySessionToken(
-  token: string
+  token: string,
 ): Promise<Partial<IUser> | null> {
   try {
     // const secret = new TextEncoder().encode(getJwtSecret());
@@ -15,7 +15,6 @@ async function verifySessionToken(
     // .setIssuer(), so enforcing one rejects every valid access token.
     const { payload } = await jwtVerify(token, secret);
 
-    console.log("verifySessionToken payload:", payload);
     // Guard against refresh tokens being used here by design.
     // if (payload["type"] !== "access") return null;
 
@@ -74,16 +73,13 @@ export async function proxy(request: NextRequest) {
       // Check email verification first
       // change later: add the ! inside the if condition
       if (!session.emailVerified) {
-        console.log("[LOGOUT] called in [PROXY PUBLIC PATHS] redirecting to /verify-email because emailVerified=false");
         return NextResponse.redirect(new URL(verifyEmailPath, request.url));
       }
       // Then check onboarding
       if (!session.onboardingComplete) {
-        console.log("[LOGOUT] called in [PROXY PUBLIC PATHS] redirecting to /onboarding because onboardingComplete=false");
         return NextResponse.redirect(new URL(onboardingPath, request.url));
       }
       // Finally redirect to dashboard
-      console.log("[LOGOUT] called in [PROXY PUBLIC PATHS] redirecting to /dashboard/home because user is authenticated and complete");
       return NextResponse.redirect(new URL("/dashboard/home", request.url));
     }
     return NextResponse.next();
@@ -92,15 +88,12 @@ export async function proxy(request: NextRequest) {
   // Email verification path
   if (pathname === verifyEmailPath) {
     if (!session) {
-      console.log("[LOGOUT] called in [EMAIL VERIFY] because no valid session token found for protected path:", pathname);
       return NextResponse.redirect(new URL("/login", request.url));
     }
     if (session.emailVerified) {
       if (!session.onboardingComplete) {
-        console.log("[LOGOUT] called in [EMAIL VERIFY] redirecting to /onboarding because email is verified but onboarding incomplete");
         return NextResponse.redirect(new URL(onboardingPath, request.url));
       } else {
-        console.log("[LOGOUT] called in [EMAIL VERIFY] redirecting to /dashboard/home because user is fully verified and onboarded");
         return NextResponse.redirect(new URL("/dashboard/home", request.url));
       }
     }
@@ -110,15 +103,12 @@ export async function proxy(request: NextRequest) {
   // Onboarding path
   if (pathname === onboardingPath) {
     if (!session) {
-      console.log("[LOGOUT] called in [ONBOARDING PATH] because no valid session token found for protected path:", pathname);
       return NextResponse.redirect(new URL("/login", request.url));
     }
     if (!session.emailVerified) {
-      console.log("[LOGOUT] called in [ONBOARDING PATH] redirecting to /verify-email because email not verified");
       return NextResponse.redirect(new URL(verifyEmailPath, request.url));
     }
     if (session.onboardingComplete) {
-      console.log("[LOGOUT] called in [ONBOARDING PATH] redirecting to /dashboard/home because onboarding is complete");
       return NextResponse.redirect(new URL("/dashboard/home", request.url));
     }
     return NextResponse.next();
@@ -127,15 +117,12 @@ export async function proxy(request: NextRequest) {
   // Protected paths
   if (protectedPaths.some((path) => pathname.startsWith(path))) {
     if (!session) {
-      console.log("[LOGOUT] called in [PROXY] because no valid session token found for protected path:", pathname);
       return NextResponse.redirect(new URL("/login", request.url));
     }
     if (!session.emailVerified) {
-      console.log("[LOGOUT] called in [PROXY PROTECTED] redirecting to /verify-email because email not verified for path:", pathname);
       return NextResponse.redirect(new URL(verifyEmailPath, request.url));
     }
     if (!session.onboardingComplete) {
-      console.log("[LOGOUT] called in [PROXY PROTECTED] redirecting to /onboarding because onboarding incomplete for path:", pathname);
       return NextResponse.redirect(new URL(onboardingPath, request.url));
     }
     return NextResponse.next();
