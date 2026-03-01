@@ -28,7 +28,7 @@ export const OnBoardingForm7 = ({ onPrev, children }: OnboardingFormProps) => {
   const router = useRouter();
   const handleComplete = async (plan: string) => {
     try {
-      updateOnboarding.mutate({
+      await updateOnboarding.mutateAsync({
         stepNumber: 6,
         plan: "basic",
         expiryTime: expireNextThreeDays,

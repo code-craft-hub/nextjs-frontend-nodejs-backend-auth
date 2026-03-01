@@ -12,13 +12,13 @@ import {
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { userQueries } from "@module/user";
-import { authApi } from "@/lib/api/auth.api";
+import { useLogoutMutation } from "@/modules/auth";
 
 export const UserMenu = () => {
   const { data: user } = useQuery(userQueries.detail());
   const router = useRouter();
 
-  const isAdmin = (user as any)?.role === "admin";
+  const logout = useLogoutMutation();
 
   return (
     <div className="flex px-4">
@@ -40,24 +40,10 @@ export const UserMenu = () => {
             <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => authApi.logout()}>
+          <DropdownMenuItem onClick={() => logout.mutate()}>
             Log out
             <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
           </DropdownMenuItem>
-          {isAdmin && (
-            <>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={async () => {
-                  await authApi.logout()
-                  router.push(`/login`);
-                }}
-              >
-                Delete Account
-                <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
-              </DropdownMenuItem>
-            </>
-          )}
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
