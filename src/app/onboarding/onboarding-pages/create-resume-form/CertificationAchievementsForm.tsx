@@ -55,7 +55,7 @@ function CertificationCard({
   canRemove: boolean;
 }) {
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 p-2 sm:p-6 space-y-5">
+    <div className="bg-white rounded-2xl border border-gray-200 p-4 space-y-5">
       <div className="flex items-center gap-3">
         <h2 className="text-lg font-bold text-gray-900">
           Certification #{index + 1}
@@ -317,7 +317,7 @@ export default function CertificationAchievementsForm({
 
   return (
     <div className="w-full flex flex-col gap-6 relative">
-      <div className="w-full bg-white rounded-2xl border border-gray-200 shadow-sm p-6 md:p-8">
+      <div className="w-full bg-white rounded-2xl border border-gray-200 shadow-sm p-4 md:p-6">
         {/* Section header */}
         <div className="flex items-start gap-4 mb-7">
           <span className="flex items-center justify-center w-11 h-11 rounded-full bg-yellow-100 shrink-0 mt-0.5">

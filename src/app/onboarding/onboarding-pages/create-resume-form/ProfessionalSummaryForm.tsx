@@ -88,7 +88,7 @@ export default function ProfessionalSummaryForm({
   }
 
   return (
-    <div className="w-full bg-white rounded-2xl border border-gray-100 shadow-sm p-2 sm:p-6 relative">
+    <div className="w-full bg-white rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-6 relative">
       {/* ── Section header ──────────────────────────────────────────── */}
       <CloseEditButton
         onClick={() => handleEditClick(false)}

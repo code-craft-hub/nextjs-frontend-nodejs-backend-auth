@@ -162,7 +162,7 @@ export default function EducationSection({
     isCreating;
 
   return (
-    <div className="w-full relative bg-white rounded-2xl p-2 sm:p-6">
+    <div className="w-full relative bg-white rounded-2xl p-4 sm:p-6">
       <CloseEditButton
         onClick={() => handleEditClick(false)}
         ariaLabel="Close education form"

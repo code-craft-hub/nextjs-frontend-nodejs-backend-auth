@@ -136,9 +136,9 @@ export default function PersonalInfoForm({
     await resumeApi.autoNewResume(title);
   };
   return (
-    <div className="w-full bg-white rounded-2xl border border-gray-100 shadow-sm p-2 sm:p-6 relative">
+    <div className="w-full bg-white rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-6 relative">
       {/* Section header */}
-      <div className="flex items-center gap-3 mb-8 relative">
+      <div className="flex flex-wrap items-center gap-3 mb-8 relative">
         <span className="flex items-center justify-center size-12 rounded-full bg-indigo-50 text-indigo-400">
           <User className="w-5 h-5" />
         </span>

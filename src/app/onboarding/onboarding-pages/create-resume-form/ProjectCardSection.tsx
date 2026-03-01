@@ -53,7 +53,7 @@ function ProjectCard({
   canRemove: boolean;
 }) {
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 p-2 sm:p-6 space-y-5">
+    <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-6 space-y-5">
       <div className="flex items-center gap-3">
         <h2 className="text-lg font-bold text-gray-900">
           Project #{index + 1}
@@ -264,7 +264,7 @@ export default function ProjectsForm({
     isCreating;
 
   return (
-    <div className="w-full relative bg-white p-2 sm:p-6 rounded-2xl">
+    <div className="w-full relative bg-white p-4 sm:p-6 rounded-2xl">
       <CloseEditButton
         onClick={() => handleEditClick(false)}
         ariaLabel="Close projects form"

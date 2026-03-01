@@ -181,7 +181,7 @@ function ExperienceCard({
   } = useFieldArray({ control, name: `experiences.${index}.responsibilities` });
 
   return (
-    <div className=" border rounded-2xl border-gray-200 p-2 sm:p-6 space-y-5">
+    <div className=" border rounded-2xl border-gray-200 p-4 sm:p-6 space-y-5">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-bold text-gray-900">
           Experience #{index + 1}
@@ -507,7 +507,7 @@ export default function ExperienceForm({
     isCreating;
 
   return (
-    <div className="w-full relative bg-white rounded-2xl p-2 sm:p-6 ">
+    <div className="w-full relative bg-white rounded-2xl p-4 sm:p-6 ">
       <CloseEditButton
         onClick={() => handleEditClick(false)}
         ariaLabel="Close work experience form"
