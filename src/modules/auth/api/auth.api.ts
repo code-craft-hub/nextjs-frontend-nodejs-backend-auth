@@ -19,7 +19,7 @@ export const authApi = {
 
   register: (data: RegisterData) => api.post<AuthSession>(`/register`, data),
 
-  logout: () => api.post<void>(`/logout`),
+  logout: () => api.post<void>(`/auth/logout`),
 
   refresh: () => api.post<AuthSession>(`/refresh`),
 
