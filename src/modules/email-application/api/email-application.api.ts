@@ -1,10 +1,10 @@
-import { api, API_URL } from "@/lib/api/client";
+import { api } from "@/lib/api/client";
 import type {
   SendEmailApplicationPayload,
   SendEmailApplicationResponse,
 } from "./email-application.api.types";
 
-const EMAIL_APPLICATION_BASE = `/${API_URL}/email-applications`;
+const EMAIL_APPLICATION_BASE = `/email-applications`;
 
 /**
  * Email Application API Client
