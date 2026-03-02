@@ -1,7 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Copy, Info } from "lucide-react";
 import { UpgradeModal } from "./UpgradeModal";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useFireworksConfetti } from "@/components/ui/confetti";
 import { PremiumUserPage } from "./PremiumUserPage";
 import { useQuery } from "@tanstack/react-query";
 import { userQueries } from "@module/user";
@@ -37,6 +38,19 @@ export const Billing = ({ reference }: { reference: string }) => {
   useEffect(() => {
     setCompleted(Boolean(user?.isProUser));
   }, [user?.isProUser]);
+
+  const { start: startConfetti } = useFireworksConfetti();
+  const prevMilestoneRef = useRef<number | undefined>(undefined);
+  useEffect(() => {
+    if (user?.milestoneCount == null) return;
+    if (
+      prevMilestoneRef.current !== undefined &&
+      user.milestoneCount > prevMilestoneRef.current
+    ) {
+      startConfetti();
+    }
+    prevMilestoneRef.current = user.milestoneCount;
+  }, [user?.milestoneCount, startConfetti]);
 
   const heading =
     user?.accountTier === "none"

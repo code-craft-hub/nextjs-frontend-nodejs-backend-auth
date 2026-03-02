@@ -122,6 +122,7 @@ export interface IUser {
   // ─── Referrals (from userReferrals table) ──────────────────
   referralCode?: string;
   referralCount?: number;
+  milestoneCount?: number;
   usersReferred?: string[];
   referredBy?: string;
   isEligibleForReward?: boolean;
