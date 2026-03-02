@@ -4,7 +4,7 @@ import { createServerQueryClient } from "@/lib/query/prefetch";
 import { getCookiesToken, getSessionFromCookies } from "@/lib/auth.utils";
 import { userQueries } from "@module/user";
 import AdminPageClient from "./AdminPageClient";
-import { redirect } from "next/navigation";
+// import { redirect } from "next/navigation";
 
 export default async function AdminPage() {
   const token = await getCookiesToken();
@@ -17,8 +17,9 @@ export default async function AdminPage() {
       queryClient.prefetchQuery(userQueries.adminRecentSignups(token)),
     ]);
   }
+  console.log("cookieUser", cookieUser);
 
-  if (cookieUser?.role !== "admin") redirect("/dashboard/home");
+  // if (cookieUser?.role !== "admin") redirect("/dashboard/home");
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <AdminPageClient />
