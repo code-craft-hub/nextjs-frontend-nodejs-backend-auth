@@ -106,7 +106,7 @@ export interface IUser {
     | "locked";
   /** "basic" | "pro" — controls feature gating */
   accountTier: string;
-  role?: any[];
+  role?: "user" | "admin" | "superadmin";
 
   // ─── Subscription (from userSubscriptions table) ───────────
   /** Whether the user currently has an active Pro subscription */

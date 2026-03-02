@@ -17,6 +17,8 @@ export function useAuth() {
   const logoutMutation = useLogoutMutation();
   const registerMutation = useRegisterMutation();
 
+  console.log("useAuth session data: ", sessionQuery, sessionQuery.data, sessionQuery.data?.user);
+
   return {
     // ─── State ────────────────────────────────────────────────
     user: sessionQuery.data?.user ?? null,
