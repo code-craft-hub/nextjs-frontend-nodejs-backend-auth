@@ -17,6 +17,7 @@ import Link from "next/link";
 import { smoothlyScrollToView } from "@/lib/utils/helpers";
 import { useState } from "react";
 import { IUser } from "@/types";
+import { useUserQuery } from "@module/user";
 
 export const Header = ({
   url,
@@ -27,6 +28,9 @@ export const Header = ({
 }) => {
   const router = useRouter();
   const [modal, setModal] = useState(false);
+  const { data: currentUser } = useUserQuery();
+  
+  const isAuthenticated = !!currentUser || !!user;
 
   return (
     <div>
@@ -58,7 +62,7 @@ export const Header = ({
               ))}
             </nav>
             <div className="hidden lg:flex items-center space-x-4">
-              {!!user ? (
+              {isAuthenticated ? (
                 <Button
                   onClick={() => router.push(`/dashboard/home`)}
                   className="bg-blue-600 hover:bg-blue-700 text-white px-6 rounded-lg"
@@ -123,7 +127,7 @@ export const Header = ({
                 </SheetClose>
 
                 <SheetFooter>
-                  {!!user ? (
+                  {isAuthenticated ? (
                     <SheetClose asChild>
                       <Button
                         onClick={() => {

@@ -57,11 +57,23 @@ export async function proxy(request: NextRequest) {
   // The backend now issues an `access_token` httpOnly cookie (15-min maxAge).
   // The legacy `session` cookie is checked as a fallback so existing browser
   // sessions remain valid during the migration window.
-  const sessionToken =
-    request.cookies.get("access_token")?.value ??
-    request.cookies.get("session")?.value;
+  const accessToken = request.cookies.get("access_token")?.value;
+  const legacySessionToken = request.cookies.get("session")?.value;
+  const sessionToken = accessToken ? accessToken : legacySessionToken;
 
   const session = sessionToken ? await verifySessionToken(sessionToken) : null;
+
+  // When only a legacy `session` cookie is present and the Next.js middleware
+  // cannot verify it (different secret, expired JWT, wrong format), we must NOT
+  // redirect immediately. Only the Express backend can handle the upgrade via
+  // upgradeLegacySessionCookie. Pass the request through and let the backend
+  // either upgrade the session (setting new cookies) or return 401 (handled by
+  // the frontend auth layer). This prevents legacy users from being logged out
+  // before the upgrade logic ever runs.
+  const hasLegacySessionOnly = !accessToken && !!legacySessionToken && !session;
+  if (hasLegacySessionOnly) {
+    return NextResponse.next();
+  }
 
   if (pathname === "/") {
     return NextResponse.next();
