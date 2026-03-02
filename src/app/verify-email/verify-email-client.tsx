@@ -22,6 +22,7 @@ import { X } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { userQueries } from "@module/user";
 import { api } from "@/lib/api/client";
+import { useLogoutMutation } from "@/modules/auth";
 
 // Server validates exactly 6 numeric digits (auth.validator.ts → otpSchema).
 const formSchema = z.object({
@@ -35,6 +36,7 @@ export const VerifyEmailClient = () => {
   const { data: user } = useQuery(userQueries.detail());
   const router = useRouter();
   const [isVerifying, setIsVerifying] = useState(false);
+  const logout = useLogoutMutation();
 
   const [emailSent, setEmailSent] = useState(false);
   const [isSending, setIsSending] = useState(false);
@@ -193,10 +195,7 @@ export const VerifyEmailClient = () => {
             <Button
               variant={"ghost"}
               className="absolute top-4 right-5"
-              onClick={async () => {
-                await api.delete("/v1/users");
-                router.push("/register");
-              }}
+              onClick={async () => await logout.mutateAsync()}
             >
               <X className="size-4" />
             </Button>

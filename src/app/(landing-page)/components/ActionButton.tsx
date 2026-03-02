@@ -17,7 +17,7 @@ export const ActionButton = memo(
             hovered === option.name
               ? "bg-primary/14 flex gap-2 rounded-xl items-center justify-center"
               : "glass-button",
-            "!text-black sm:w-32 gap-2 p-3"
+            "text-black! sm:w-32 gap-2 p-3"
           )}
         >
           <img
