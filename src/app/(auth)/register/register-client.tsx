@@ -49,8 +49,8 @@ export default function RegisterClient({ referral }: { referral?: string }) {
 
   const handleGetReferralCode = () => {
     const referralCode = form.getValues("referralCode");
-    return referralCode;
-  }
+    return referralCode || "";
+  };
 
   const onSubmit = async (values: RegisterUserSchema) => {
     try {
@@ -379,7 +379,10 @@ export default function RegisterClient({ referral }: { referral?: string }) {
               </div>
 
               {/* Social Login Buttons */}
-              <GoogleButton handleLoading={handleLoading} referralCode={handleGetReferralCode()} />
+              <GoogleButton
+                handleLoading={handleLoading}
+                getReferralCode={handleGetReferralCode}
+              />
             </form>
           </Form>
         </div>

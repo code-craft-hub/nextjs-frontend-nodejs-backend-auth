@@ -5,25 +5,26 @@ import { toast } from "sonner";
 
 export const GoogleButton = ({
   handleLoading,
-  referralCode,
+  getReferralCode,
 }: {
   handleLoading: (loading: boolean) => void;
-  referralCode?: string;
+  getReferralCode?: () => string;
 }) => {
   const router = useRouter();
-      console.log("Referral code in GoogleButton:", referralCode);
 
   const handleGoogleLoginSuccess = async (response: CredentialResponse) => {
     try {
       handleLoading(true);
-      console.log("Referral code in GoogleButton:", referralCode);
+      const referralCode = getReferralCode?.();
+
+      console.log("Google login successful. Credential:", referralCode);
       const result = await api.post<{
         data: {
           user: { onboardingComplete: boolean; emailVerified: boolean };
         };
       }>(
         "/auth/google",
-        { credential: response.credential, referralCode: referralCode },
+        { credential: response.credential, referralCode },
         { skipRefresh: true },
       );
       const user = result?.data?.user;
