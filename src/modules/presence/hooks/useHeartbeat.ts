@@ -9,6 +9,15 @@ import { presenceApi } from "../api/presence.api";
 const HEARTBEAT_INTERVAL_MS = 30_000;
 
 /**
+ * Module-level throttle guard — shared across all instances of useHeartbeat
+ * (StrictMode double-mount, Fast Refresh re-mounts, multiple components).
+ * Prevents burst 429s by ensuring at most one heartbeat fires per 15 s
+ * across the entire tab, regardless of how many times the hook re-mounts.
+ */
+let lastHeartbeatAt = 0;
+const MIN_BEAT_GAP_MS = 15_000;
+
+/**
  * Fires a silent heartbeat to the presence endpoint every 30 seconds while
  * the user is authenticated, keeping their `lastSeenAt` record fresh.
  *
@@ -37,6 +46,9 @@ export function useHeartbeat(): void {
     if (!user) return;
 
     const sendBeat = () => {
+      const now = Date.now();
+      if (now - lastHeartbeatAt < MIN_BEAT_GAP_MS) return;
+      lastHeartbeatAt = now;
       presenceApi.heartbeat(pathnameRef.current).catch(() => {
         // Intentionally swallowed — heartbeat failure must never surface to UX.
       });

@@ -1,7 +1,7 @@
 import type { IUser } from "@/types";
 import { api } from "@/lib/api/client";
 import type { PaginatedResponse, PaginationParams } from "@/lib/types";
-import type { CreateUserData, UpdateUserData, IRecentUser } from "./user.api.types";
+import type { CreateUserData, UpdateUserData, IRecentUser, IUserLookup } from "./user.api.types";
 
 export const userApi = {
   // Get all users (with pagination)
@@ -48,5 +48,15 @@ export const userApi = {
 
     if (data?.success) return { data: data.data, nextCursor: data.nextCursor };
     throw new Error("Failed to fetch recent signups");
+  },
+
+  // Admin: look up a user by email before impersonating
+  lookupByEmail: async (email: string) => {
+    const data = await api.get<{
+      success: boolean;
+      found: boolean;
+      user: IUserLookup | null;
+    }>(`/auth/admin/lookup`, { params: { email } });
+    return data;
   },
 };

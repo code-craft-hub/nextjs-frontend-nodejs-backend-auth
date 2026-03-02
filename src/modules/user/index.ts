@@ -1,6 +1,6 @@
 // ─── API ────────────────────────────────────────────────────
 export { userApi } from "./api/user.api";
-export type { CreateUserData, UpdateUserData, IRecentUser } from "./api/user.api.types";
+export type { CreateUserData, UpdateUserData, IRecentUser, IUserLookup } from "./api/user.api.types";
 export {
   updateOnboardingStep,
   getOnboardingStatus,

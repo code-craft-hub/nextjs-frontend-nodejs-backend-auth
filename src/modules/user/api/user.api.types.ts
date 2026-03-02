@@ -32,3 +32,15 @@ export interface IRecentUser {
   displayName: string | null;
   photoUrl: string | null;
 }
+
+export interface IUserLookup {
+  email: string;
+  displayName: string | null;
+  firstName: string | null;
+  lastName: string | null;
+  photoUrl: string | null;
+  accountStatus: string;
+  accountTier: string;
+  role: string;
+  emailVerified: boolean;
+}
