@@ -21,7 +21,9 @@ export default async function VerifyEmailPage() {
   }
 
   const queryClient = createServerQueryClient();
-  if (token) await queryClient.fetchQuery(userQueries.detail(token));
+  if (token) {
+    await queryClient.fetchQuery(userQueries.detail(token));
+  }
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <VerifyEmailClient />

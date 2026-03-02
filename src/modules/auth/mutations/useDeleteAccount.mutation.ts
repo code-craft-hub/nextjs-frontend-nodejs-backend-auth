@@ -10,7 +10,7 @@ export function useDeleteAccountMutation() {
     mutationFn: () => userApi.deleteUser(),
     onSuccess: () => {
       queryClient.clear();
-      router.push("/register");
+      router.push("/login");
     },
   });
 }

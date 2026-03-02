@@ -62,7 +62,7 @@ export const ResetPassword = ({
       toast.success("Password reset successfully. Please log in again.");
       router.push("/login");
     } catch (error: any) {
-      const errorString = JSON.stringify(error?.data?.error ?? error?.message);
+      const errorString = JSON.stringify(error?.data?.error?.message ?? error?.message);
       toast.error(
         errorString ??
           "Reset failed. The code may have expired — please request a new one.",

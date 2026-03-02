@@ -74,8 +74,8 @@ export const PasswordResetVerifyEmail = ({
       setTimeLeft(60); // 1-minute cooldown
     } catch (error: any) {
       console.error(error);
-      const errorString = JSON.stringify(error?.data?.error ?? error?.message);
-      toast.error(errorString ?? error?.message ?? "Failed to send reset code");
+      const errorString = JSON.stringify(error?.data?.error?.message ?? error?.message);
+      toast.error(errorString ??  "Failed to send reset code");
     } finally {
       setIsSending(false);
       setIsVerifying(false);

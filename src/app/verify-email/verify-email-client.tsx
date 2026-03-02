@@ -36,9 +36,6 @@ export const VerifyEmailClient = () => {
   const { data: user } = useQuery(userQueries.detail());
   const deleteAccount = useDeleteAccountMutation();
 
-  const userName = !!user?.firstName
-    ? user.firstName
-    : user?.email?.split("@")[0];
   const router = useRouter();
   const [isVerifying, setIsVerifying] = useState(false);
   const logout = useLogoutMutation();
@@ -79,19 +76,23 @@ export const VerifyEmailClient = () => {
     setIsSending(true);
 
     try {
-      await api.post("/auth/resend-verification", undefined, {
+      const response = await api.post("/auth/resend-verification", undefined, {
         skipRefresh: true,
       });
 
-      toast.success(`${userName}, verification code sent to your email!`);
+      console.log("Resend verification response:", response, "user : ", user);
+
+      toast.success(
+        `Verification code sent to your email!}`,
+      );
       setCanResend(false);
       setTimeLeft(60); // 1-minute cooldown matches the server-side rate limiter
     } catch (error: any) {
       console.error(error);
       // APIError (from client.ts) exposes `.status` directly, not `.response.status`.
 
-      const errorString = JSON.stringify(error?.data?.error ?? error?.message);
-      toast.error(errorString ?? "Failed to send code");
+      // const errorString = JSON.stringify(error?.data?.error ?? error?.message);
+      toast.error("Failed to send code");
     } finally {
       setIsSending(false);
       setIsVerifying(false);
@@ -117,10 +118,12 @@ export const VerifyEmailClient = () => {
       // allows navigation to /onboarding without redirecting back here.
       await api.post("/auth/refresh");
 
-      toast.success(`${userName}, your email has been verified successfully!`);
+      toast.success(`Your email has been verified successfully!`);
       setCompletedEmailVerification(true);
     } catch (error: any) {
-      const errorString = JSON.stringify(error?.data?.error ?? error?.message);
+      const errorString = JSON.stringify(
+        error?.data?.error?.message ?? error?.message,
+      );
       toast.error(errorString ?? "Verification failed");
     } finally {
       setIsVerifying(false);
