@@ -465,6 +465,7 @@ export async function apiClient<T>(
         if (
           typeof window !== "undefined" &&
           window.location.pathname !== "/login" &&
+          window.location.pathname !== "/register" &&
           window.location.pathname !== "/"
         ) {
           window.location.href = "/login";
