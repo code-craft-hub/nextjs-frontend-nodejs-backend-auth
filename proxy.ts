@@ -9,7 +9,7 @@ async function verifySessionToken(
 ): Promise<Partial<IUser> | null> {
   try {
     // const secret = new TextEncoder().encode(getJwtSecret());
-    const secret = new TextEncoder().encode(process.env.NEXT_PUBLIC_JWT_SECRET);
+    const secret = new TextEncoder().encode(process.env.JWT_SECRET);
 
     // NOTE: no `issuer` option — the backend TokenService does not call
     // .setIssuer(), so enforcing one rejects every valid access token.

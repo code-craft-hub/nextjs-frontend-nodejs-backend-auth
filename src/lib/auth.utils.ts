@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { jwtVerify } from "jose";
 import { IUser } from "@/types";
 
-const JWT_SECRET = process.env.NEXT_PUBLIC_JWT_SECRET;
+const JWT_SECRET = process.env.JWT_SECRET;
 
 // Verify session token
 export async function verifySessionToken(
@@ -48,7 +48,7 @@ async function verifyAccessToken(
   token: string,
 ): Promise<Partial<IUser> | null> {
   try {
-    const secret = new TextEncoder().encode(process.env.NEXT_PUBLIC_JWT_SECRET);
+    const secret = new TextEncoder().encode(process.env.JWT_SECRET);
     const { payload } = await jwtVerify(token, secret);
 
     // Reject refresh tokens and any other non-access token types.
