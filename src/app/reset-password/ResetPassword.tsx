@@ -62,9 +62,9 @@ export const ResetPassword = ({
       toast.success("Password reset successfully. Please log in again.");
       router.push("/login");
     } catch (error: any) {
+      const errorString = JSON.stringify(error?.data?.error ?? error?.message);
       toast.error(
-        error?.data?.error ??
-          error?.message ??
+        errorString ??
           "Reset failed. The code may have expired — please request a new one.",
       );
     } finally {
@@ -129,7 +129,9 @@ export const ResetPassword = ({
                         className="absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-md text-muted-foreground/80 transition-[color,box-shadow] outline-none hover:text-foreground focus:z-10 focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
                         type="button"
                         onClick={toggleVisibility}
-                        aria-label={isVisible ? "Hide password" : "Show password"}
+                        aria-label={
+                          isVisible ? "Hide password" : "Show password"
+                        }
                         aria-pressed={isVisible}
                       >
                         {isVisible ? (

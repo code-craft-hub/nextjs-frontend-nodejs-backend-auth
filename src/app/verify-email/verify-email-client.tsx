@@ -22,7 +22,7 @@ import { X } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { userQueries } from "@module/user";
 import { api } from "@/lib/api/client";
-import { useLogoutMutation } from "@/modules/auth";
+import { useDeleteAccountMutation, useLogoutMutation } from "@/modules/auth";
 
 // Server validates exactly 6 numeric digits (auth.validator.ts → otpSchema).
 const formSchema = z.object({
@@ -34,10 +34,23 @@ const formSchema = z.object({
 
 export const VerifyEmailClient = () => {
   const { data: user } = useQuery(userQueries.detail());
-  const userName = !! user?.firstName ? user.firstName : user?.email?.split("@")[0];
+  const deleteAccount = useDeleteAccountMutation();
+
+  const userName = !!user?.firstName
+    ? user.firstName
+    : user?.email?.split("@")[0];
   const router = useRouter();
   const [isVerifying, setIsVerifying] = useState(false);
   const logout = useLogoutMutation();
+  const isDev = process.env.NODE_ENV === "development";
+
+  const handleLogoutOrDelete = async () => {
+    if (isDev) {
+      await deleteAccount.mutateAsync();
+    }
+    await logout.mutateAsync();
+    router.push("/login");
+  };
 
   const [emailSent, setEmailSent] = useState(false);
   const [isSending, setIsSending] = useState(false);
@@ -70,18 +83,15 @@ export const VerifyEmailClient = () => {
         skipRefresh: true,
       });
 
-      toast.success(
-        `${userName}, verification code sent to your email!`,
-      );
+      toast.success(`${userName}, verification code sent to your email!`);
       setCanResend(false);
       setTimeLeft(60); // 1-minute cooldown matches the server-side rate limiter
     } catch (error: any) {
       console.error(error);
       // APIError (from client.ts) exposes `.status` directly, not `.response.status`.
 
-      toast.error(
-        error?.data?.error ?? error?.message ?? "Failed to send code",
-      );
+      const errorString = JSON.stringify(error?.data?.error ?? error?.message);
+      toast.error(errorString ?? "Failed to send code");
     } finally {
       setIsSending(false);
       setIsVerifying(false);
@@ -107,14 +117,11 @@ export const VerifyEmailClient = () => {
       // allows navigation to /onboarding without redirecting back here.
       await api.post("/auth/refresh");
 
-      toast.success(
-        `${userName}, your email has been verified successfully!`,
-      );
+      toast.success(`${userName}, your email has been verified successfully!`);
       setCompletedEmailVerification(true);
     } catch (error: any) {
-      toast.error(
-        error?.data?.error ?? error?.message ?? "Verification failed",
-      );
+      const errorString = JSON.stringify(error?.data?.error ?? error?.message);
+      toast.error(errorString ?? "Verification failed");
     } finally {
       setIsVerifying(false);
     }
@@ -196,7 +203,7 @@ export const VerifyEmailClient = () => {
             <Button
               variant={"ghost"}
               className="absolute top-4 right-5"
-              onClick={async () => await logout.mutateAsync()}
+              onClick={async () => await handleLogoutOrDelete()}
             >
               <X className="size-4" />
             </Button>

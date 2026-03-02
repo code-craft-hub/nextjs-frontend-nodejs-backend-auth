@@ -74,7 +74,8 @@ export const PasswordResetVerifyEmail = ({
       setTimeLeft(60); // 1-minute cooldown
     } catch (error: any) {
       console.error(error);
-      toast.error(error?.data?.error ?? error?.message ?? "Failed to send reset code");
+      const errorString = JSON.stringify(error?.data?.error ?? error?.message);
+      toast.error(errorString ?? error?.message ?? "Failed to send reset code");
     } finally {
       setIsSending(false);
       setIsVerifying(false);
@@ -143,7 +144,7 @@ export const PasswordResetVerifyEmail = ({
                         htmlFor={"email-verification-code"}
                         className={cn(
                           "absolute left-3 z-10 px-1 text-sm font-medium  bg-background text-muted-foreground pointer-events-none font-poppins",
-                          true ? "-top-2.5 text-xs " : "top-3"
+                          true ? "-top-2.5 text-xs " : "top-3",
                         )}
                       >
                         Verification Code
@@ -171,8 +172,8 @@ export const PasswordResetVerifyEmail = ({
                     {isSending
                       ? "Sending..."
                       : canResend
-                      ? "Resend verification code"
-                      : `Resend in ${timeLeft}s`}
+                        ? "Resend verification code"
+                        : `Resend in ${timeLeft}s`}
                   </Button>{" "}
                 </p>
                 <Button
