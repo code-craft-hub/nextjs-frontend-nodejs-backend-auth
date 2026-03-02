@@ -17,6 +17,13 @@ export const userQueries = {
       queryFn: () => userApi.getUser(token),
       staleTime: 10 * 60 * 1000,
     }),
+
+  adminRecentSignups: (token?: string) =>
+    queryOptions({
+      queryKey: queryKeys.users.recentSignups(),
+      queryFn: () => userApi.getRecentSignups(token),
+      staleTime: 60 * 1000, // 1 minute — fresh data for admin view
+    }),
 };
 
 // ─── Invalidation Helpers ──────────────────────────────────

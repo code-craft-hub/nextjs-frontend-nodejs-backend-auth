@@ -1,7 +1,7 @@
 import type { IUser } from "@/types";
 import { api } from "@/lib/api/client";
 import type { PaginatedResponse, PaginationParams } from "@/lib/types";
-import type { CreateUserData, UpdateUserData } from "./user.api.types";
+import type { CreateUserData, UpdateUserData, IRecentUser } from "./user.api.types";
 
 export const userApi = {
   // Get all users (with pagination)
@@ -27,4 +27,14 @@ export const userApi = {
 
   // Delete user
   deleteUser: () => api.delete<void>(`/auth/account`),
+
+  // Admin: users who signed up in the last 24 hours
+  getRecentSignups: async (token?: string) => {
+    const data = await api.get<{ success: boolean; data: IRecentUser[] }>(
+      `/users/admin/recent`,
+      { token },
+    );
+    if (data?.success) return data.data;
+    throw new Error("Failed to fetch recent signups");
+  },
 };

@@ -19,3 +19,16 @@ export interface UpdateUserData {
 }
 
 export type { IUser };
+
+export interface IRecentUser {
+  id: string;
+  email: string;
+  role: string;
+  accountStatus: string;
+  accountTier: string;
+  createdAt: string;
+  firstName: string | null;
+  lastName: string | null;
+  displayName: string | null;
+  photoUrl: string | null;
+}

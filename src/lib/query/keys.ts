@@ -12,6 +12,7 @@ export const queryKeys = {
     detail: () => [...queryKeys.users.details(), "user"] as const,
     infinite: (params: Omit<PaginationParams, "page">) =>
       [...queryKeys.users.all, "infinite", params] as const,
+    recentSignups: () => [...queryKeys.users.all, "admin", "recent"] as const,
   },
 
   // Auth keys
