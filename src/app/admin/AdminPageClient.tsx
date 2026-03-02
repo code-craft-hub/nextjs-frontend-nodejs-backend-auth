@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { useUserQuery } from "@module/user";
 import { userQueries } from "@module/user/queries/user.queryOptions";
 import { api } from "@/lib/api/client";
@@ -14,7 +15,9 @@ function formatRelativeTime(isoDate: string): string {
   if (diffMins < 1) return "just now";
   if (diffMins < 60) return `${diffMins}m ago`;
   const diffHrs = Math.floor(diffMins / 60);
-  return `${diffHrs}h ago`;
+  if (diffHrs < 24) return `${diffHrs}h ago`;
+  const diffDays = Math.floor(diffHrs / 24);
+  return `${diffDays}d ago`;
 }
 
 function RecentUserRow({
@@ -84,9 +87,35 @@ export default function AdminPageClient() {
   const router = useRouter();
   const queryClient = useQueryClient();
 
-  const { data: recentUsers = [], isLoading: isLoadingRecent } = useQuery(
-    userQueries.adminRecentSignups(),
-  );
+  const {
+    data,
+    isLoading,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  } = useInfiniteQuery(userQueries.adminRecentSignupsInfinite());
+
+  const allUsers = data?.pages.flatMap((page) => page.data) ?? [];
+  const totalCount = allUsers.length;
+
+  // Intersection observer sentinel for infinite scroll
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      { threshold: 0.1 },
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const [email, setEmail] = useState("");
   const [isPending, setIsPending] = useState(false);
@@ -169,27 +198,27 @@ export default function AdminPageClient() {
           )}
         </div>
 
-        {/* ── Recent signups ── */}
+        {/* ── All users (infinite scroll) ── */}
         <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
           <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
             <h2 className="text-base font-semibold text-gray-900">
-              New Signups
+              All Users
               <span className="ml-2 text-sm font-normal text-gray-400">
-                last 24 hours
+                newest first
               </span>
             </h2>
             <span className="rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-medium text-blue-700">
-              {recentUsers.length} user{recentUsers.length !== 1 ? "s" : ""}
+              {totalCount} loaded
             </span>
           </div>
 
-          {isLoadingRecent ? (
+          {isLoading ? (
             <div className="py-12 text-center text-sm text-gray-400">
               Loading…
             </div>
-          ) : recentUsers.length === 0 ? (
+          ) : allUsers.length === 0 ? (
             <div className="py-12 text-center text-sm text-gray-400">
-              No new signups in the last 24 hours.
+              No users found.
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -212,7 +241,7 @@ export default function AdminPageClient() {
                   </tr>
                 </thead>
                 <tbody>
-                  {recentUsers.map((user) => (
+                  {allUsers.map((user) => (
                     <RecentUserRow
                       key={user.id}
                       user={user}
@@ -221,6 +250,21 @@ export default function AdminPageClient() {
                   ))}
                 </tbody>
               </table>
+
+              {/* Sentinel — triggers next page fetch when visible */}
+              <div ref={sentinelRef} className="h-1" />
+
+              {isFetchingNextPage && (
+                <div className="py-4 text-center text-sm text-gray-400">
+                  Loading more…
+                </div>
+              )}
+
+              {!hasNextPage && allUsers.length > 0 && (
+                <div className="py-4 text-center text-xs text-gray-300">
+                  All users loaded
+                </div>
+              )}
             </div>
           )}
         </div>

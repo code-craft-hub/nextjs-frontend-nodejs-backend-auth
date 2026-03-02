@@ -14,7 +14,10 @@ export default async function AdminPage() {
   if (token) {
     await Promise.all([
       queryClient.prefetchQuery(userQueries.detail(token)),
-      queryClient.prefetchQuery(userQueries.adminRecentSignups(token)),
+      queryClient.prefetchInfiniteQuery({
+        ...userQueries.adminRecentSignupsInfinite(token),
+        pages: 1,
+      }),
     ]);
   }
   console.log("cookieUser", cookieUser);

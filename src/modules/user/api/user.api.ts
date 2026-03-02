@@ -28,13 +28,25 @@ export const userApi = {
   // Delete user
   deleteUser: () => api.delete<void>(`/auth/account`),
 
-  // Admin: users who signed up in the last 24 hours
-  getRecentSignups: async (token?: string) => {
-    const data = await api.get<{ success: boolean; data: IRecentUser[] }>(
-      `/users/admin/recent`,
-      { token },
-    );
-    if (data?.success) return data.data;
+  // Admin: all users, cursor-paginated newest-first
+  getRecentSignups: async (params?: {
+    cursor?: string;
+    limit?: number;
+    token?: string;
+  }) => {
+    const { cursor, limit, token } = params ?? {};
+    const qs = new URLSearchParams();
+    if (cursor) qs.set("cursor", cursor);
+    if (limit) qs.set("limit", String(limit));
+    const query = qs.toString();
+
+    const data = await api.get<{
+      success: boolean;
+      data: IRecentUser[];
+      nextCursor: string | null;
+    }>(`/users/admin/recent${query ? `?${query}` : ""}`, { token });
+
+    if (data?.success) return { data: data.data, nextCursor: data.nextCursor };
     throw new Error("Failed to fetch recent signups");
   },
 };
