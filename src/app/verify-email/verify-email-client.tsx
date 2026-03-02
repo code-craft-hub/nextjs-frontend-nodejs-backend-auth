@@ -54,7 +54,7 @@ export const VerifyEmailClient = () => {
 
   useEffect(() => {
     if (!emailSent) {
-      setEmailSent(true);      
+      setEmailSent(true);
       sendVerificationCode();
     }
   }, [emailSent]);
@@ -63,18 +63,22 @@ export const VerifyEmailClient = () => {
     setIsSending(true);
 
     try {
-      await api.post("/v1/auth/resend-verification");
+      await api.post("/auth/resend-verification", undefined, {
+        skipRefresh: true,
+      });
 
       toast.success(
-        `${user?.firstName}, verification code sent to your email!`
+        `${user?.firstName}, verification code sent to your email!`,
       );
       setCanResend(false);
       setTimeLeft(60); // 1-minute cooldown matches the server-side rate limiter
     } catch (error: any) {
       console.error(error);
       // APIError (from client.ts) exposes `.status` directly, not `.response.status`.
-    
-      toast.error(error?.data?.error ?? error?.message ?? "Failed to send code");
+
+      toast.error(
+        error?.data?.error ?? error?.message ?? "Failed to send code",
+      );
     } finally {
       setIsSending(false);
       setIsVerifying(false);
@@ -93,19 +97,21 @@ export const VerifyEmailClient = () => {
 
     try {
       // Server expects the field name `otp`, not `code`.
-      await api.post("/v1/auth/verify-email", { otp: code });
+      await api.post("/auth/verify-email", { otp: code });
 
       // The access token still carries emailVerified: false from registration.
       // Rotate it immediately so the middleware sees the updated claim and
       // allows navigation to /onboarding without redirecting back here.
-      await api.post("/v1/auth/refresh");
+      await api.post("/auth/refresh");
 
       toast.success(
-        `${user?.firstName}, your email has been verified successfully!`
+        `${user?.firstName}, your email has been verified successfully!`,
       );
       setCompletedEmailVerification(true);
     } catch (error: any) {
-      toast.error(error?.data?.error ?? error?.message ?? "Verification failed");
+      toast.error(
+        error?.data?.error ?? error?.message ?? "Verification failed",
+      );
     } finally {
       setIsVerifying(false);
     }
@@ -205,7 +211,7 @@ export const VerifyEmailClient = () => {
                         htmlFor={"email-verification-code"}
                         className={cn(
                           "absolute left-3 z-10 px-1 text-sm font-medium  bg-background text-muted-foreground pointer-events-none font-poppins",
-                          true ? "-top-2.5 text-xs " : "top-3"
+                          true ? "-top-2.5 text-xs " : "top-3",
                         )}
                       >
                         Verification Code
@@ -233,8 +239,8 @@ export const VerifyEmailClient = () => {
                     {isSending
                       ? "Sending..."
                       : canResend
-                      ? "Resend verification code"
-                      : `Resend in ${timeLeft}s`}
+                        ? "Resend verification code"
+                        : `Resend in ${timeLeft}s`}
                   </Button>{" "}
                 </p>
                 <Button

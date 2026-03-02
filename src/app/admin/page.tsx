@@ -2,14 +2,16 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@module/auth";
+import { useUserQuery } from "@module/user";
 import { api } from "@/lib/api/client";
 import { useQueryClient } from "@tanstack/react-query";
 
 export default function AdminPage() {
-  const { user, isLoading } = useAuth();
+  const { data: user, isLoading } = useUserQuery();
   const router = useRouter();
   const queryClient = useQueryClient();
+
+  console.log("AdminPage user data: ", user);
 
   const [email, setEmail] = useState("");
   const [isPending, setIsPending] = useState(false);

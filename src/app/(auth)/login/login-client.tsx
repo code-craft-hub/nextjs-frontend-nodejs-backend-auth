@@ -30,7 +30,7 @@ export const LoginClient = () => {
 
   const handleLoading = (loading: boolean) => {
     setIsLoginLoading(loading);
-  }
+  };
   const form = useForm({
     resolver: zodResolver(LoginSchema),
     defaultValues: {
@@ -45,9 +45,6 @@ export const LoginClient = () => {
       await api.post(
         "/auth/login",
         { email: values.email, password: values.password },
-        // skipRefresh: a 401 here means wrong credentials, not an expired
-        // session. Attempting a token refresh would be incorrect and would
-        // produce a confusing second 401 in the console.
         { skipRefresh: true },
       );
       toast.success("Login successful!");
