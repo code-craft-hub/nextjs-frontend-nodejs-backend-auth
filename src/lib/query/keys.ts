@@ -17,6 +17,15 @@ export const queryKeys = {
       [...queryKeys.users.all, "admin", "recent", "infinite"] as const,
   },
 
+  // Presence keys
+  presence: {
+    all: ["presence"] as const,
+    stats: () => [...queryKeys.presence.all, "stats"] as const,
+    activeUsers: () => [...queryKeys.presence.all, "active-users"] as const,
+    activeUsersInfinite: () =>
+      [...queryKeys.presence.all, "active-users", "infinite"] as const,
+  },
+
   // Auth keys
   auth: {
     all: ["auth"] as const,

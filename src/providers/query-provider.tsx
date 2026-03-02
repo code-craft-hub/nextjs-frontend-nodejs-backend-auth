@@ -5,6 +5,17 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Toaster } from "sonner";
+import { useHeartbeat } from "@/modules/presence";
+
+/**
+ * Mounts the presence heartbeat for any authenticated user.
+ * Must live INSIDE QueryClientProvider so useUserQuery has access to the cache.
+ * Returns null — purely a side-effect component.
+ */
+function HeartbeatRunner() {
+  useHeartbeat();
+  return null;
+}
 
 // Create a stable query client instance
 const createQueryClient = () => {
@@ -69,6 +80,7 @@ export function Providers({ children }: ProvidersProps) {
         <GoogleOAuthProvider
           clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}
         >
+          <HeartbeatRunner />
           {children}
           {process.env.NODE_ENV === "development" && (
             <ReactQueryDevtools initialIsOpen={false} position="right" />

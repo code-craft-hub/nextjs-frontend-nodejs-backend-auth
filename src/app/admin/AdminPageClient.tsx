@@ -2,12 +2,18 @@
 
 import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import Link from "next/link";
 import { useUserQuery } from "@module/user";
 import { userQueries } from "@module/user/queries/user.queryOptions";
+import { presenceQueries } from "@/modules/presence";
 import { api } from "@/lib/api/client";
 import type { IRecentUser } from "@module/user";
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Helpers
+// ─────────────────────────────────────────────────────────────────────────────
 
 function formatRelativeTime(isoDate: string): string {
   const diffMs = Date.now() - new Date(isoDate).getTime();
@@ -16,9 +22,17 @@ function formatRelativeTime(isoDate: string): string {
   if (diffMins < 60) return `${diffMins}m ago`;
   const diffHrs = Math.floor(diffMins / 60);
   if (diffHrs < 24) return `${diffHrs}h ago`;
-  const diffDays = Math.floor(diffHrs / 24);
-  return `${diffDays}d ago`;
+  return `${Math.floor(diffHrs / 24)}d ago`;
 }
+
+function formatWindowLabel(windowMs: number): string {
+  const mins = Math.round(windowMs / 60_000);
+  return `last ${mins} min`;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Sub-components
+// ─────────────────────────────────────────────────────────────────────────────
 
 function RecentUserRow({
   user,
@@ -82,11 +96,19 @@ function RecentUserRow({
   );
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Page
+// ─────────────────────────────────────────────────────────────────────────────
+
 export default function AdminPageClient() {
   const { data: currentUser } = useUserQuery();
   const router = useRouter();
   const queryClient = useQueryClient();
 
+  // ── Active users summary ──────────────────────────────────────────────────
+  const { data: presenceStats } = useQuery(presenceQueries.stats());
+
+  // ── All users (infinite scroll) ──────────────────────────────────────────
   const {
     data,
     isLoading,
@@ -96,44 +118,41 @@ export default function AdminPageClient() {
   } = useInfiniteQuery(userQueries.adminRecentSignupsInfinite());
 
   const allUsers = data?.pages.flatMap((page) => page.data) ?? [];
-  const totalCount = allUsers.length;
 
-  // Intersection observer sentinel for infinite scroll
+  // Intersection-observer sentinel for infinite scroll
   const sentinelRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const el = sentinelRef.current;
     if (!el) return;
-
     const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+      ([entry]) => {
+        if (entry.isIntersecting && hasNextPage && !isFetchingNextPage) {
           fetchNextPage();
         }
       },
       { threshold: 0.1 },
     );
-
     observer.observe(el);
     return () => observer.disconnect();
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
+  // ── Impersonation form ───────────────────────────────────────────────────
   const [email, setEmail] = useState("");
   const [isPending, setIsPending] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [impersonateError, setImpersonateError] = useState<string | null>(null);
 
   async function handleImpersonate(targetEmail: string) {
-    setError(null);
+    setImpersonateError(null);
     setIsPending(true);
     setEmail(targetEmail);
-
     try {
       await api.post("/auth/admin/impersonate", { email: targetEmail });
       await queryClient.resetQueries();
       router.push("/dashboard");
     } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : "Impersonation failed";
-      setError(message);
+      setImpersonateError(
+        err instanceof Error ? err.message : "Impersonation failed",
+      );
     } finally {
       setIsPending(false);
       setEmail("");
@@ -148,7 +167,8 @@ export default function AdminPageClient() {
   return (
     <main className="min-h-screen bg-gray-50 p-6">
       <div className="mx-auto max-w-4xl space-y-6">
-        {/* ── Header ── */}
+
+        {/* ── Header ───────────────────────────────────────────────────── */}
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-semibold text-gray-900">
@@ -163,7 +183,39 @@ export default function AdminPageClient() {
           </div>
         </div>
 
-        {/* ── Impersonate form ── */}
+        {/* ── Active Users Card ─────────────────────────────────────────── */}
+        <Link
+          href="/admin/presence"
+          className="block rounded-2xl border border-gray-200 bg-white p-6 shadow-sm hover:border-green-300 hover:shadow-md transition-all group"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              {/* Pulsing live indicator */}
+              <span className="relative flex h-3 w-3">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500" />
+              </span>
+              <div>
+                <p className="text-sm font-medium text-gray-500">
+                  Active Users
+                  <span className="ml-1.5 text-xs font-normal text-gray-400">
+                    {presenceStats
+                      ? formatWindowLabel(presenceStats.windowMs)
+                      : "last 5 min"}
+                  </span>
+                </p>
+                <p className="text-3xl font-bold text-gray-900 tabular-nums">
+                  {presenceStats?.activeCount ?? "—"}
+                </p>
+              </div>
+            </div>
+            <span className="text-sm font-medium text-green-600 group-hover:text-green-700 transition-colors">
+              View details →
+            </span>
+          </div>
+        </Link>
+
+        {/* ── Impersonate form ──────────────────────────────────────────── */}
         <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
           <h2 className="mb-1 text-base font-semibold text-gray-900">
             Impersonate User
@@ -191,14 +243,14 @@ export default function AdminPageClient() {
             </button>
           </form>
 
-          {error && (
+          {impersonateError && (
             <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">
-              {error}
+              {impersonateError}
             </p>
           )}
         </div>
 
-        {/* ── All users (infinite scroll) ── */}
+        {/* ── All users (infinite scroll) ───────────────────────────────── */}
         <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
           <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
             <h2 className="text-base font-semibold text-gray-900">
@@ -208,7 +260,7 @@ export default function AdminPageClient() {
               </span>
             </h2>
             <span className="rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-medium text-blue-700">
-              {totalCount} loaded
+              {allUsers.length} loaded
             </span>
           </div>
 
@@ -251,7 +303,7 @@ export default function AdminPageClient() {
                 </tbody>
               </table>
 
-              {/* Sentinel — triggers next page fetch when visible */}
+              {/* Sentinel — triggers next page when it enters the viewport */}
               <div ref={sentinelRef} className="h-1" />
 
               {isFetchingNextPage && (
