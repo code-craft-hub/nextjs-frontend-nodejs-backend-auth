@@ -20,7 +20,6 @@ export default async function AdminPage() {
       }),
     ]);
   }
-  console.log("cookieUser", cookieUser);
 
   if (cookieUser?.role !== "admin") redirect("/dashboard/home");
   return (

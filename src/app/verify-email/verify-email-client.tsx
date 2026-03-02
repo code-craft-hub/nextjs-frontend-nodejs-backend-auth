@@ -34,6 +34,7 @@ const formSchema = z.object({
 
 export const VerifyEmailClient = () => {
   const { data: user } = useQuery(userQueries.detail());
+  const userName = !! user?.firstName ? user.firstName : user?.email?.split("@")[0];
   const router = useRouter();
   const [isVerifying, setIsVerifying] = useState(false);
   const logout = useLogoutMutation();
@@ -70,7 +71,7 @@ export const VerifyEmailClient = () => {
       });
 
       toast.success(
-        `${user?.firstName}, verification code sent to your email!`,
+        `${userName}, verification code sent to your email!`,
       );
       setCanResend(false);
       setTimeLeft(60); // 1-minute cooldown matches the server-side rate limiter
@@ -107,7 +108,7 @@ export const VerifyEmailClient = () => {
       await api.post("/auth/refresh");
 
       toast.success(
-        `${user?.firstName}, your email has been verified successfully!`,
+        `${userName}, your email has been verified successfully!`,
       );
       setCompletedEmailVerification(true);
     } catch (error: any) {
