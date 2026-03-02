@@ -54,11 +54,7 @@ async function verifyAccessToken(
     // Reject refresh tokens and any other non-access token types.
     // if (payload["type"] !== "access") return null;
 
-    return {
-      email: payload.email as string,
-      emailVerified: payload.emailVerified as boolean,
-      onboardingComplete: payload.onboardingComplete as boolean,
-    };
+    return payload as Partial<IUser>;
   } catch {
     // Expired, wrong signature, malformed — all treated as unauthenticated.
     return null;

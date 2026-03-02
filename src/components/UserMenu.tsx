@@ -18,6 +18,8 @@ export const UserMenu = () => {
   const { data: user } = useQuery(userQueries.detail());
   const router = useRouter();
 
+  const isAdmin = user?.role === "admin";
+
   const logout = useLogoutMutation();
 
   return (
@@ -44,6 +46,12 @@ export const UserMenu = () => {
             Log out
             <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
           </DropdownMenuItem>
+          {isAdmin && (
+            <DropdownMenuItem onClick={() => router.push(`/admin`)}>
+              Admin
+              <DropdownMenuShortcut>⇧⌘A</DropdownMenuShortcut>
+            </DropdownMenuItem>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
