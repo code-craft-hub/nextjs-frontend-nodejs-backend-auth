@@ -19,6 +19,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useUpdateUserMutation } from "@module/user";
 import { zodResolver } from "@hookform/resolvers/zod";
 
+const CVERAI_NUMBER = process.env.NEXT_PUBLIC_CVERAI_NUMBER || "+436767391022"; 
+
 export const e164PhoneNumberSchema = z
   .string()
   .trim()
@@ -94,7 +96,7 @@ export const UserProfileForm: React.FC<{
       toast.success(`${normalizedPhoneNumber} updated successfully!`);
 
       if (referrer === "whatsapp") {
-        window.open(`https://wa.me/${normalizedPhoneNumber}`, "_blank");
+        window.open(`https://wa.me/${CVERAI_NUMBER}`, "_blank");
       }
     }
   }, [phoneNumber, user?.phoneNumber]);
