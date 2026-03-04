@@ -96,7 +96,7 @@ export const UserProfileForm: React.FC<{
       toast.success(`${normalizedPhoneNumber} updated successfully!`);
 
       if (referrer === "whatsapp") {
-        window.open(`https://wa.me/${CVERAI_NUMBER}`, "_blank");
+        window.location.href = `https://wa.me/${CVERAI_NUMBER}?text=Hi`;
       }
     }
   }, [phoneNumber, user?.phoneNumber]);
