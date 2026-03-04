@@ -128,7 +128,7 @@ export const OnBoardingForm2 = ({
                 />
               </label>
             </div>
-            <form className="space-y-6 w-full">
+            <div className="space-y-6 w-full">
               {(error || uploadError) && (
                 <div className="text-red-500 w-full p-3 bg-red-50 rounded-md">
                   {typeof error === "string"
@@ -151,11 +151,12 @@ export const OnBoardingForm2 = ({
                   type="submit"
                   disabled={isUploading}
                   className="onboarding-btn overflow-hidden"
+                  onClick={() => onNext()}
                 >
                   {isUploading ? "Processing..." : "Save and Continue"}
                 </Button>
               </div>
-            </form>
+            </div>
           </div>
         )}
       </div>
