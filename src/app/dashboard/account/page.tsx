@@ -17,6 +17,7 @@ const AccountPage = async ({ searchParams }: any) => {
   const tab = resolvedParams?.tab as string | undefined;
   const event = resolvedParams?.event as string | undefined;
   const reference = resolvedParams?.reference as string | undefined;
+  const phoneNumber = resolvedParams?.phoneNumber as string | undefined;
 
   const token = (await getCookiesToken()) ?? "";
   const queryClient = createServerQueryClient();
@@ -54,7 +55,12 @@ const AccountPage = async ({ searchParams }: any) => {
   return (
     <div className="p-4 sm:p-8">
       <HydrationBoundary state={dehydrate(queryClient)}>
-        <AccountClient tab={tab ?? ""} event={event ?? ""} reference={reference ?? ""} />
+        <AccountClient
+          tab={tab ?? ""}
+          event={event ?? ""}
+          reference={reference ?? ""}
+          phoneNumber={phoneNumber}
+        />
       </HydrationBoundary>
     </div>
   );

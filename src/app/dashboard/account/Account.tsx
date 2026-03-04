@@ -18,10 +18,12 @@ export const AccountClient = ({
   tab,
   event,
   reference,
+  phoneNumber,
 }: {
   tab: string;
   event: string;
   reference: string;
+  phoneNumber?: string;
 }) => {
   const [currentTab, setCurrentTab] = useState(tab || "account");
   const { data: user } = useQuery(userQueries.detail());
@@ -79,7 +81,7 @@ export const AccountClient = ({
       </div>
 
       {currentTab === "account" || currentTab === undefined ? (
-        <UserProfileForm />
+        <UserProfileForm phoneNumber={phoneNumber} />
       ) : currentTab === "billing" ? (
         <Billing reference={reference} />
       ) : (

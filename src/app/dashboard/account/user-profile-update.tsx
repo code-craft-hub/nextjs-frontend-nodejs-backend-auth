@@ -1,4 +1,5 @@
 "use client";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import {
@@ -39,7 +40,7 @@ const profileSchema = z.object({
 
 type ProfileFormData = z.infer<typeof profileSchema>;
 
-export const UserProfileForm: React.FC = () => {
+export const UserProfileForm: React.FC<{ phoneNumber?: string }> = ({ phoneNumber }) => {
   const { data: user } = useQuery(userQueries.detail());
   // const location = useUserLocation();
   const updateUser = useUpdateUserMutation();
@@ -51,10 +52,44 @@ export const UserProfileForm: React.FC = () => {
       country: user?.country || "",
       state: user?.state || "",
       countryCode: user?.countryCode || "",
-      phoneNumber: user?.phoneNumber || "",
+      phoneNumber: phoneNumber || user?.phoneNumber || "",
       email: user?.email || "",
     },
   });
+
+  // Update form when user data changes
+  useEffect(() => {
+    if (user && form.formState.isDirty === false) {
+      form.reset({
+        firstName: user?.firstName || "",
+        lastName: user?.lastName || "",
+        country: user?.country || "",
+        state: user?.state || "",
+        countryCode: user?.countryCode || "",
+        phoneNumber: phoneNumber || user?.phoneNumber || "",
+        email: user?.email || "",
+      });
+    }
+  }, [user, phoneNumber, form]);
+
+  // Auto-sync phone number if provided via URL
+  useEffect(() => {
+    if (phoneNumber && user?.phoneNumber !== phoneNumber) {
+      const normalizedPhoneNumber = phoneNumber.replace(/\s+/g, "");
+      updateUser.mutate({
+        data: {
+          firstName: user?.firstName,
+          lastName: user?.lastName,
+          state: user?.state,
+          country: user?.country,
+          countryCode: user?.countryCode,
+          phoneNumber: normalizedPhoneNumber,
+          displayName: `${user?.firstName} ${user?.lastName}`,
+        },
+      });
+      toast.success("Phone number updated successfully!");
+    }
+  }, [phoneNumber, user?.phoneNumber]);
 
   const onSubmit = ({
     firstName,
