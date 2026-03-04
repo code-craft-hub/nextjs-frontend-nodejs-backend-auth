@@ -18,6 +18,8 @@ const AccountPage = async ({ searchParams }: any) => {
   const event = resolvedParams?.event as string | undefined;
   const reference = resolvedParams?.reference as string | undefined;
   const phoneNumber = resolvedParams?.phoneNumber as string | undefined;
+  const referrer = resolvedParams?.referrer as string | undefined;
+
 
   const token = (await getCookiesToken()) ?? "";
   const queryClient = createServerQueryClient();
@@ -60,6 +62,7 @@ const AccountPage = async ({ searchParams }: any) => {
           event={event ?? ""}
           reference={reference ?? ""}
           phoneNumber={phoneNumber}
+          referrer={referrer}
         />
       </HydrationBoundary>
     </div>

@@ -40,7 +40,10 @@ const profileSchema = z.object({
 
 type ProfileFormData = z.infer<typeof profileSchema>;
 
-export const UserProfileForm: React.FC<{ phoneNumber?: string }> = ({ phoneNumber }) => {
+export const UserProfileForm: React.FC<{
+  phoneNumber?: string;
+  referrer?: string;
+}> = ({ phoneNumber, referrer }) => {
   const { data: user } = useQuery(userQueries.detail());
   // const location = useUserLocation();
   const updateUser = useUpdateUserMutation();
@@ -87,7 +90,12 @@ export const UserProfileForm: React.FC<{ phoneNumber?: string }> = ({ phoneNumbe
           displayName: `${user?.firstName} ${user?.lastName}`,
         },
       });
-      toast.success("Phone number updated successfully!");
+
+      toast.success(`${normalizedPhoneNumber} updated successfully!`);
+
+      if (referrer === "whatsapp") {
+        window.open(`https://wa.me/${normalizedPhoneNumber}`, "_blank");
+      }
     }
   }, [phoneNumber, user?.phoneNumber]);
 
