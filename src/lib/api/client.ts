@@ -317,6 +317,8 @@ function buildUrl(endpoint: string, params?: FetchOptions["params"]): string {
 /**
  * Constructs request headers. Deliberately skips Content-Type for FormData
  * and URLSearchParams so the browser/runtime can set the correct boundary.
+ *
+ * Also includes device detection headers for activity tracking on the server.
  */
 function buildHeaders(
   body: unknown,
@@ -338,6 +340,22 @@ function buildHeaders(
 
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  // Add device detection headers for server-side activity tracking
+  // Only in client context — server-side rendering has no browser environment
+  if (IS_CLIENT) {
+    try {
+      // Dynamically import to avoid circular dependencies
+      const {
+        getDeviceInfoHeaders,
+      } = require("./../../lib/device-detection.utils");
+      const deviceHeaders = getDeviceInfoHeaders();
+      Object.assign(headers, deviceHeaders);
+    } catch {
+      // Silently fail if device detection is not available
+      // This prevents build issues if the utility is not present
+    }
   }
 
   // Allow caller overrides (e.g. custom Content-Type, tracing headers)
