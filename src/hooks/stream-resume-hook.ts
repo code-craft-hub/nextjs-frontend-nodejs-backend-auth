@@ -220,6 +220,7 @@ export const useResumeStream = (): UseResumeStreamReturn => {
           ...prev,
           error: eventData.error || eventData.message || "Unknown error",
           isConnected: false,
+          isComplete: true,
         }));
         return;
       }

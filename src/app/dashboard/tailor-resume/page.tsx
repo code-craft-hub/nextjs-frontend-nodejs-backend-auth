@@ -10,7 +10,7 @@ const TailorResumePage = async ({ searchParams }: any) => {
   const token = (await getCookiesToken()) ?? "";
 
   const queryClient = createServerQueryClient();
-  await queryClient.prefetchQuery(resumeQueries.detail(resumeId, token));
+  if(!!resumeId) await queryClient.prefetchQuery(resumeQueries.detail(resumeId, token));
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
