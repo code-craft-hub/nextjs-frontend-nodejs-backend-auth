@@ -1,7 +1,12 @@
 import type { IUser } from "@/types";
 import { api } from "@/lib/api/client";
 import type { PaginatedResponse, PaginationParams } from "@/lib/types";
-import type { CreateUserData, UpdateUserData, IRecentUser, IUserLookup } from "./user.api.types";
+import type {
+  CreateUserData,
+  UpdateUserData,
+  IRecentUser,
+  IUserLookup,
+} from "./user.api.types";
 
 export const userApi = {
   // Get all users (with pagination)
@@ -12,7 +17,7 @@ export const userApi = {
   getUser: async (token?: string) => {
     const data = await api.get<{ data: Partial<IUser>; success: boolean }>(
       `/users`,
-      { token },
+      { token, skipRedirect: true },
     );
     if (data?.success) return data.data;
     throw new Error("Failed to fetch user data");

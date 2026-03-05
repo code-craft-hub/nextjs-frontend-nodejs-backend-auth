@@ -182,6 +182,14 @@ export interface FetchOptions extends Omit<RequestInit, "body"> {
    * Set this for the refresh endpoint itself to prevent loops.
    */
   skipRefresh?: boolean;
+
+  /**
+   * When true, the client will _not_ automatically redirect the browser
+   * to `/login` when a 401 response occurs. Used by public pages that
+   * attempt to probe authentication status (e.g. header/user query).
+   * Defaults to `false`.
+   */
+  skipRedirect?: boolean;
 }
 
 // ─── Logout Intent ────────────────────────────────────────────────────────────
@@ -400,6 +408,7 @@ export async function apiClient<T>(
     body,
     timeoutMs = DEFAULT_TIMEOUT_MS,
     skipRefresh = false,
+    skipRedirect = false,
     headers: extraHeaders,
     ...restOptions
   } = options;
@@ -463,6 +472,7 @@ export async function apiClient<T>(
 
       queueMicrotask(() => {
         if (
+          !skipRedirect &&
           typeof window !== "undefined" &&
           window.location.pathname !== "/login" &&
           window.location.pathname !== "/register" &&
