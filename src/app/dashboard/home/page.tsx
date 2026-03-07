@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { HomeClient } from "./Home.tsx";
+import { HomeClient } from "./Home";
 import { HydrationBoundary } from "@/components/hydration-boundary";
 import { dehydrate } from "@tanstack/react-query";
 import { createServerQueryClient } from "@/lib/query/prefetch";

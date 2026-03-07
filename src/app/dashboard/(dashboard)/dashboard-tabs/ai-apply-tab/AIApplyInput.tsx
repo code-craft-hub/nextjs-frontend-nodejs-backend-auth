@@ -33,6 +33,7 @@ import { useQuery } from "@tanstack/react-query";
 import JoinOurTelegramGroupAlert from "@/components/shared/JoinOurTelegramGroupAlert";
 import { buildAutoApplyStartUrl } from "@/lib/utils/ai-apply-navigation";
 import { gmailApi } from "@/lib/api/gmail.api";
+import { useDefaultResumeGuard } from "@/hooks/useDefaultResumeGuard";
 
 const FORM_SCHEMA = z.object({
   jobDescription: z.string().min(2, {
@@ -43,6 +44,7 @@ const FORM_SCHEMA = z.object({
 export const AIApplyInput = memo(
   ({ jobDescription }: { jobDescription: string }) => {
     const { data: user } = useQuery(userQueries.detail());
+    const { requireDefaultResume } = useDefaultResumeGuard();
     const [uploadedFiles, setUploadedFiles] = useState<UploadedFile | null>(
       null,
     );
@@ -95,6 +97,8 @@ export const AIApplyInput = memo(
 
     const onSubmit = useCallback(
       async ({ jobDescription }: z.infer<typeof FORM_SCHEMA>) => {
+        if (!requireDefaultResume()) return;
+
         const foundEmails =
           jobDescription.match(emailRegex) ||
           extractedText.match(emailRegex) ||
@@ -140,7 +144,7 @@ export const AIApplyInput = memo(
         const startUrl = buildAutoApplyStartUrl(fullJobDescription, recruiter);
         router.push(startUrl);
       },
-      [router, extractedText, user?.email],
+      [router, extractedText, user?.email, requireDefaultResume],
     );
 
     return (

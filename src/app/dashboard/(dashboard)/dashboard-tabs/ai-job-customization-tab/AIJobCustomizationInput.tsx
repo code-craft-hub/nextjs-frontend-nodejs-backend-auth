@@ -34,6 +34,7 @@ import { Separator } from "@/components/ui/separator";
 import { FileUploadForm } from "@/components/FileUploadForm";
 import { isEmpty } from "lodash";
 import JoinOurTelegramGroupAlert from "@/components/shared/JoinOurTelegramGroupAlert";
+import { useDefaultResumeGuard } from "@/hooks/useDefaultResumeGuard";
 
 const FORM_SCHEMA = z.object({
   jobDescription: z.string().min(2, {
@@ -43,6 +44,7 @@ const FORM_SCHEMA = z.object({
 
 export const AIJobCustomizationInput = memo(() => {
   const { data: user } = useQuery(userQueries.detail());
+  const { requireDefaultResume } = useDefaultResumeGuard();
   const [docsInput, setDocsInput] = useState<ActionValue>("tailor-resume");
   // const [userProfile, setUserProfile] = useState<string[]>([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -62,6 +64,8 @@ export const AIJobCustomizationInput = memo(() => {
   });
 
   const onSubmit = ({ jobDescription }: z.infer<typeof FORM_SCHEMA>) => {
+    if (!requireDefaultResume()) return;
+
     if (noCredit) {
       toast.error(`Please upgrade or refer more people to Cver AI`);
       return;

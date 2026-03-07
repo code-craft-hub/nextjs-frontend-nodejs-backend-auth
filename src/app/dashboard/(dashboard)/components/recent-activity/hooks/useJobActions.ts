@@ -4,9 +4,11 @@ import { toast } from "sonner";
 import { JobType } from "@/types";
 import { buildAutoApplyStartUrl } from "@/lib/utils/ai-apply-navigation";
 import { gmailApi } from "@/lib/api/gmail.api";
+import { useDefaultResumeGuard } from "@/hooks/useDefaultResumeGuard";
 
 export function useJobActions() {
   const router = useRouter();
+  const { requireDefaultResume } = useDefaultResumeGuard();
 
   const handleJobClick = useCallback(
     async (job: JobType) => {
@@ -15,6 +17,8 @@ export function useJobActions() {
         window.open(job.link ? job.link : job.applyUrl, "__blank");
         return;
       }
+
+      if (!requireDefaultResume()) return;
 
       const { authorized } = await gmailApi.checkAuthStatus();
 
@@ -42,7 +46,7 @@ export function useJobActions() {
       );
       router.push(startUrl);
     },
-    [router],
+    [router, requireDefaultResume],
   );
 
   const handlePreview = useCallback(
