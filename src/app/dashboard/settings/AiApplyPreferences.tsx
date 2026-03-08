@@ -165,7 +165,7 @@ export const AiApplyPreferences: React.FC = () => {
           // actions: ["Disconnect", "Edit"],
         },
         {
-          label: "Enable WhatsApp Applications",
+          label: "Enable WhatsApp Recommendation & Applications",
           description: "Allow applications via WhatsApp",
           type: "toggle",
           key: "enableWhatsAppApplications",
