@@ -9,27 +9,28 @@ type ProviderResult = {
 const PROVIDERS = [
   {
     name: "ipapi",
-    url: "https://ipapi.co/json/",
+    getUrl: (ip: string) => `https://ipapi.co/${ip}/json/`,
   },
   {
     name: "ipwho",
-    url: "https://ipwho.is/",
+    getUrl: (ip: string) => `https://ipwho.is/${ip}`,
   },
   {
     name: "freeipapi",
-    url: "https://freeipapi.com/api/json",
+    getUrl: (ip: string) => `https://freeipapi.com/api/json/${ip}`,
   },
 ] as const;
 
 async function fetchProvider(
   provider: (typeof PROVIDERS)[number],
+  ip: string,
   timeoutMs = 5000,
 ): Promise<ProviderResult> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
-    const res = await fetch(provider.url, {
+    const res = await fetch(provider.getUrl(ip), {
       signal: controller.signal,
       headers: {
         accept: "application/json",
@@ -59,10 +60,15 @@ async function fetchProvider(
   }
 }
 
-export async function GET(_request: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
+    const ip =
+      request.headers.get("x-forwarded-for")?.split(",")[0].trim() ??
+      request.headers.get("x-real-ip") ??
+      "";
+
     const results = await Promise.allSettled(
-      PROVIDERS.map((p) => fetchProvider(p)),
+      PROVIDERS.map((p) => fetchProvider(p, ip)),
     );
 
     let merged: Record<string, unknown> = {};

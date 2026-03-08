@@ -1,46 +1,28 @@
-import { Button } from "@/components/ui/button";
-import { Copy, Info } from "lucide-react";
 import { UpgradeModal } from "./UpgradeModal";
 import { useEffect, useRef, useState } from "react";
 import { useFireworksConfetti } from "@/components/ui/confetti";
 import { PremiumUserPage } from "./PremiumUserPage";
 import { useQuery } from "@tanstack/react-query";
 import { userQueries } from "@module/user";
-import { getDaysRemaining, isSubscriptionActive } from "@/lib/utils/helpers";
-import { toast } from "sonner";
+import { isSubscriptionActive } from "@/lib/utils/helpers";
+import { TrialBanner } from "./TrialBanner";
+import { ReferralCard } from "./ReferralCard";
+import { UpgradeBanner } from "./UpgradeBanner";
 
 export const Billing = ({ reference }: { reference: string }) => {
   const { data: user } = useQuery(userQueries.detail());
-  const [completed, setCompleted] = useState(Boolean(user?.isProUser) || false);
-  const [showPlan, setShowPlan] = useState(false);
-  const handleStateChange = (value: boolean) => {
-    setCompleted(value);
-  };
-  const handleShowPlan = (value: boolean) => {
-    setShowPlan(value);
-  };
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [justUpgraded, setJustUpgraded] = useState(false);
 
-  const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-  const remainingDays = getDaysRemaining(user?.currentPeriodEnd ?? null);
-  const REFERRAL = `${APP_URL}/register?referral=${
-    user?.referralCode ?? "EXA0Q4YZ"
-  }`;
-
-  const hasActiveSubscription = isSubscriptionActive(user?.currentPeriodEnd);
-
-  const usersReferred = user?.referralCount || user?.usersReferred?.length || 0;
-
-  const handleReferralCopy = () => {
-    navigator.clipboard.writeText(REFERRAL);
-    toast.success("Referral code copied to clipboard!");
-  };
-
-  useEffect(() => {
-    setCompleted(Boolean(user?.isProUser));
-  }, [user?.isProUser]);
+  const isPro =
+    justUpgraded ||
+    Boolean(user?.isProUser) ||
+    user?.accountTier === "pro" ||
+    isSubscriptionActive(user?.currentPeriodEnd);
 
   const { start: startConfetti } = useFireworksConfetti();
   const prevMilestoneRef = useRef<number | undefined>(undefined);
+
   useEffect(() => {
     if (user?.milestoneCount == null) return;
     if (
@@ -52,165 +34,27 @@ export const Billing = ({ reference }: { reference: string }) => {
     prevMilestoneRef.current = user.milestoneCount;
   }, [user?.milestoneCount, startConfetti]);
 
-  const heading =
-    user?.accountTier === "none"
-      ? "You're on a Free Trial"
-      : `You're on the ${user?.accountTier} plan`;
+  if (isPro) {
+    return <PremiumUserPage />;
+  }
 
-  return !completed ? (
-    showPlan ? (
+  if (showUpgradeModal) {
+    return (
       <UpgradeModal
         trxReference={reference}
-        handleStateChange={handleStateChange}
-        handleShowPlan={handleShowPlan}
+        handleStateChange={(value: boolean) => {
+          if (value) setJustUpgraded(true);
+        }}
+        handleShowPlan={setShowUpgradeModal}
       />
-    ) : (
-      <div className="flex flex-col items-center max-w-5xl mx-auto gap-7.5 relative ">
-        <section className="bg-linear-to-b space-y-4 from-[#FF9A56] to-[#FF6B35] rounded-[12px] w-full p-4 sm:p-8">
-          <div className="flex gap-4 justify-between w-full">
-            <div className="text-white space-y-2">
-              <h1 className="font-semibold font-inter sm:text-2xl">
-                {heading}
-              </h1>
-              <p className="text-white/80 ">
-                Explore all features with your trial period
-              </p>
-            </div>
-            {hasActiveSubscription
-              ? null
-              : Number(remainingDays) > 0 && (
-                  <div className="flex shrink-0 flex-col justify-center items-center gap-1 w-[97.67px] h-20.25 bg-[rgba(255,255,255,0.2)] rounded-xl">
-                    <p className="font-inter text-center font-semibold text-[32px] leading-8 text-white">
-                      {remainingDays}
-                    </p>
-                    <p className="font-inter font-medium text-[14px] leading-5.25 text-center text-white">
-                      day{Number(remainingDays) > 1 && "s"} left
-                    </p>
-                  </div>
-                )}
-          </div>
-          <div className="flex flex-wrap items-center  gap-4 relative">
-            <div className="flex flex-col items-start gap-1">
-              {hasActiveSubscription ? null : (
-                <p className="relative">
-                  <span className=" font-['Inter'] font-medium text-[14px] leading-5.25 text-white">
-                    {hasActiveSubscription
-                      ? "You're on a Pro plan"
-                      : "Upgrade to Pro or refer 5 people to continue enjoying all the features from Cver AI."}
-                  </span>
-                </p>
-              )}
-              <p className=" opacity-80 relative max-sm:text-2xs">
-                <span className="font-inter font-normal text-[12px] leading-4.5 text-white">
-                  Upgrade now or refer friends to extend your access. In the
-                  main time you have{" "}
-                  <span className="font-bold underline">
-                    {user?.creditBalance ?? 0} credits{" "}
-                    {hasActiveSubscription && "(active)"}
-                  </span>
-                </span>
-              </p>
-            </div>
-          </div>
-        </section>
+    );
+  }
 
-        <main className="flex justify-between items-center gap-4 bg-white border w-full p-4 sm:p-8 rounded-[12px] text-white font-inter">
-          <div className="w-full space-y-4">
-            <div className="space-y-1">
-              <p className=" font-semibold text-[18px] leading-6.75 text-[#344054]">
-                Referral Program
-              </p>
-              <p className=" font-normal text-[14px] leading-5.25 text-[#667085]">
-                Refer 5 friends to unlock 7 extra days of access
-              </p>
-            </div>
-            <section className="">
-              <p className=" font-medium text-[14px] leading-5.25 text-[#344054]">
-                Your Referral Code
-              </p>
-              <div className="flex flex-col sm:flex-row justify-between gap-4">
-                <div className="box-border flex flex-col justify-center p-2 px-4 w-full bg-[#F9FAFB] border border-[#D0D5DD] rounded-xl">
-                  <p className="font-semibold text-xs md:text-[16px] leading-6 text-[#101828] tracking-[0.8px]">
-                    {REFERRAL}
-                  </p>
-                </div>
-                <Button className="h-12" onClick={handleReferralCopy}>
-                  <Copy /> Copy Code
-                </Button>
-              </div>
-            </section>
-            <section className="">
-              <div className="flex space-y-2 flex-row justify-between items-center relative">
-                <p className=" relative">
-                  <span className="font-inter font-medium text-[14px] leading-5.25 text-[#344054]">
-                    Referral Progress
-                  </span>
-                </p>
-                <p className=" relative">
-                  <span className="font-inter font-semibold text-[14px] leading-5.25 text-[#4680EE]">
-                    {usersReferred} of 5 completed
-                  </span>
-                </p>
-              </div>
-              <div className="flex items-center w-full h-2.5 bg-[#E5E7EB] rounded-full relative">
-                <div
-                  className="h-2.5 bg-[#4680EE] rounded-full"
-                  style={{
-                    width: `${Math.min(
-                      usersReferred * 10 + (usersReferred > 0 ? 50 : 2),
-                      100,
-                    )}%`,
-                  }}
-                />
-              </div>
-
-              <p className="font-['Inter'] mt-3 font-normal text-[12px] leading-4.5 text-[#667085] ">
-                {5 - usersReferred} more referrals needed to unlock 7 extra days
-              </p>
-            </section>
-
-            <section className="">
-              <div className="box-border flex flex-row items-start gap-3 p-4  bg-[#EFF6FF] border border-[#BEDBFF] rounded-xl">
-                <div className="flex flex-col items-start gap-1 relative">
-                  <p className="relative flex gap-2 items-center">
-                    <Info className="text-blue-500 size-5 " />
-                    <span className=" font-['Inter'] font-medium text-[13px] leading-5 text-[#344054]">
-                      How referrals work
-                    </span>
-                  </p>
-                  <p className="ml-6 font-['Inter'] font-normal text-[12px] leading-4.5 text-[#667085]">
-                    Share your code with friends. When 5 people sign up using
-                    your code during your trial, you&apos;ll receive 7 extra
-                    days of access
-                  </p>
-                </div>
-              </div>
-            </section>
-          </div>
-        </main>
-        <main className="flex flex-col sm:flex-row justify-between items-center gap-4 bg-linear-to-b w-full p-4 sm:p-8 from-[#4680EE] to-[#3A6FD4] rounded-[12px] text-white font-inter">
-          <div className="w-full">
-            <p className="font-semibold text-[20px] leading-7.5">
-              Ready to Upgrade?
-            </p>
-            <p className="font-normal text-[14px] leading-5.25">
-              Get unlimited access with a paid subscription
-            </p>
-          </div>
-
-          <Button
-            onClick={() => {
-              handleShowPlan(true);
-            }}
-            className="max-sm:w-full"
-            variant={"outline"}
-          >
-            Upgrade Now
-          </Button>
-        </main>
-      </div>
-    )
-  ) : (
-    <PremiumUserPage />
+  return (
+    <div className="flex flex-col items-center max-w-5xl mx-auto gap-7.5 relative">
+      <TrialBanner user={user} />
+      <ReferralCard user={user} />
+      <UpgradeBanner onUpgrade={() => setShowUpgradeModal(true)} />
+    </div>
   );
 };
