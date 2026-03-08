@@ -55,10 +55,9 @@ export default function RegisterClient({ referral }: { referral?: string }) {
   const onSubmit = async (values: RegisterUserSchema) => {
     try {
       setLoading(true);
-      const response = await api.post("/auth/register", values, { skipRefresh: true });
+      await api.post("/auth/register", values, { skipRefresh: true });
       toast.success("Registration successful! Please check your email.");
 
-      console.log("Registration response:", response);
       router.push("/verify-email");
     } catch (error: any) {
       console.error("Registration error:", error);

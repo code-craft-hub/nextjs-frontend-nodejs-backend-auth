@@ -17,7 +17,6 @@ export const GoogleButton = ({
       handleLoading(true);
       const referralCode = getReferralCode?.();
 
-      console.log("Google login successful. Credential:", referralCode);
       const result = await api.post<{
         data: {
           user: { onboardingComplete: boolean; emailVerified: boolean };

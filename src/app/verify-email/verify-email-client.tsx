@@ -19,8 +19,6 @@ import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { X } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
-import { userQueries } from "@module/user";
 import { api } from "@/lib/api/client";
 import { useDeleteAccountMutation, useLogoutMutation } from "@/modules/auth";
 
@@ -33,7 +31,7 @@ const formSchema = z.object({
 });
 
 export const VerifyEmailClient = () => {
-  const { data: user } = useQuery(userQueries.detail());
+
   const deleteAccount = useDeleteAccountMutation();
 
   const router = useRouter();
@@ -76,11 +74,9 @@ export const VerifyEmailClient = () => {
     setIsSending(true);
 
     try {
-      const response = await api.post("/auth/resend-verification", undefined, {
+      await api.post("/auth/resend-verification", undefined, {
         skipRefresh: true,
       });
-
-      console.log("Resend verification response:", response, "user : ", user);
 
       toast.success(
         `Verification code sent to your email!}`,
