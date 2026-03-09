@@ -85,6 +85,8 @@ export const queryKeys = {
     details: () => [...queryKeys.blogs.all, "detail"] as const,
     detail: (id: string) => [...queryKeys.blogs.details(), id] as const,
     published: () => [...queryKeys.blogs.all, "published"] as const,
+    stats: () => [...queryKeys.blogs.all, "stats"] as const,
+    viewHistory: (id: string) => [...queryKeys.blogs.all, "view-history", id] as const,
   },
   jobs: {
     all: ["jobs"] as const,

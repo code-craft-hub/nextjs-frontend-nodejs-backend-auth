@@ -14,7 +14,7 @@ export function BlogList() {
     return <div>Loading...</div>; // Rarely shown
   }
 
-  if (!data?.data.length) {
+  if (!data?.items.length) {
     return <div>No blogs found</div>;
   }
 

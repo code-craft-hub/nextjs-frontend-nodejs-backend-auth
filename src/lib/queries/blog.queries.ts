@@ -1,24 +1,26 @@
 // lib/queries/blog.queries.ts
-import { queryOptions } from '@tanstack/react-query';
-import { blogApi, type BlogFilters } from '@/lib/api/blog.api';
-import { queryKeys } from '@/lib/query/keys';
-import type { PaginationParams } from '@/lib/types';
+import { queryOptions } from "@tanstack/react-query";
+import { blogApi, type BlogFilters } from "@/lib/api/blog.api";
+import { queryKeys } from "@/lib/query/keys";
 
 export const blogQueries = {
-  all: (params: BlogFilters = {}) =>
+  /** Paginated, filterable blog list. */
+  list: (params: BlogFilters = {}) =>
     queryOptions({
       queryKey: queryKeys.blogs.list(params),
       queryFn: () => blogApi.getBlogs(params),
-      staleTime: 3 * 60 * 1000, // 3 minutes for blog lists
+      staleTime: 3 * 60 * 1000,
     }),
 
-  published: (params: PaginationParams = {}) =>
+  /** Published blogs only (public feed). */
+  published: (params: Omit<BlogFilters, "status"> = {}) =>
     queryOptions({
       queryKey: queryKeys.blogs.published(),
-      queryFn: () => blogApi.getPublishedBlogs(params),
-      staleTime: 10 * 60 * 1000, // 10 minutes for public content
+      queryFn: () => blogApi.getBlogs({ ...params, status: "publish" }),
+      staleTime: 10 * 60 * 1000,
     }),
 
+  /** Single blog post. Fetching auto-records a view server-side. */
   detail: (id: string) =>
     queryOptions({
       queryKey: queryKeys.blogs.detail(id),
@@ -27,11 +29,20 @@ export const blogQueries = {
       enabled: !!id,
     }),
 
-  bySlug: (slug: string) =>
+  /** Aggregate stats for the dashboard. */
+  stats: () =>
     queryOptions({
-      queryKey: [...queryKeys.blogs.all, 'slug', slug],
-      queryFn: () => blogApi.getBlogBySlug(slug),
-      staleTime: 10 * 60 * 1000,
-      enabled: !!slug,
+      queryKey: queryKeys.blogs.stats(),
+      queryFn: () => blogApi.getStats(),
+      staleTime: 60 * 1000, // 1 minute — stats change frequently
+    }),
+
+  /** Per-blog daily view history. */
+  viewHistory: (id: string, days = 30) =>
+    queryOptions({
+      queryKey: queryKeys.blogs.viewHistory(id),
+      queryFn: () => blogApi.getViewHistory(id, days),
+      staleTime: 5 * 60 * 1000,
+      enabled: !!id,
     }),
 };

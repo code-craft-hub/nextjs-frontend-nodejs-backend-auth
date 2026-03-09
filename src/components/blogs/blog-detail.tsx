@@ -14,7 +14,7 @@ interface BlogDetailProps {
 export function BlogDetail({ id }: BlogDetailProps) {
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
-  const [editData, setEditData] = useState({ title: '', content: '' });
+  const [editData, setEditData] = useState({ title: '', descriptionHtml: '' });
 
   // Data loads instantly from SSR cache
   const { data: blog } = useQuery(blogQueries.detail(id));
@@ -42,7 +42,8 @@ export function BlogDetail({ id }: BlogDetailProps) {
   };
 
   const handleTogglePublish = async () => {
-    await togglePublishMutation.mutateAsync(id);
+    if (!blog) return;
+    await togglePublishMutation.mutateAsync({ id, currentStatus: blog.status });
     // Toggle happens instantly in UI before server confirms
   };
 
@@ -56,8 +57,8 @@ export function BlogDetail({ id }: BlogDetailProps) {
           className="w-full text-3xl font-bold mb-4 p-2 border rounded"
         />
         <textarea
-          value={editData.content || blog.content}
-          onChange={(e) => setEditData({ ...editData, content: e.target.value })}
+          value={editData.descriptionHtml || blog.descriptionHtml || ''}
+          onChange={(e) => setEditData({ ...editData, descriptionHtml: e.target.value })}
           className="w-full h-64 p-2 border rounded mb-4"
         />
         <div className="flex gap-2">
@@ -87,14 +88,14 @@ export function BlogDetail({ id }: BlogDetailProps) {
           <button
             onClick={handleTogglePublish}
             className={`px-4 py-2 rounded ${
-              blog.published ? 'bg-yellow-500' : 'bg-green-500'
+              blog.status === 'publish' ? 'bg-yellow-500' : 'bg-green-500'
             } text-white hover:opacity-90`}
           >
-            {blog.published ? 'Unpublish' : 'Publish'}
+            {blog.status === 'publish' ? 'Unpublish' : 'Publish'}
           </button>
           <button
             onClick={() => {
-              setEditData({ title: blog.title, content: blog.content });
+              setEditData({ title: blog.title, descriptionHtml: blog.descriptionHtml ?? '' });
               setIsEditing(true);
             }}
             className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
@@ -115,21 +116,8 @@ export function BlogDetail({ id }: BlogDetailProps) {
         <p className="text-gray-600 mb-4">
           {new Date(blog.createdAt).toLocaleDateString()}
         </p>
-        <div dangerouslySetInnerHTML={{ __html: blog.content }} />
+        <div dangerouslySetInnerHTML={{ __html: blog.descriptionHtml ?? '' }} />
       </div>
-
-      {blog.tags && blog.tags.length > 0 && (
-        <div className="mt-6 flex gap-2">
-          {blog.tags.map((tag) => (
-            <span
-              key={tag}
-              className="px-3 py-1 bg-gray-200 rounded-full text-sm"
-            >
-              {tag}
-            </span>
-          ))}
-        </div>
-      )}
     </div>
   );
 }
