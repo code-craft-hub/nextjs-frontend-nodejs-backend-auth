@@ -14,11 +14,7 @@ export const Billing = ({ reference }: { reference: string }) => {
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [justUpgraded, setJustUpgraded] = useState(false);
 
-  const isPro =
-    justUpgraded ||
-    Boolean(user?.isProUser) ||
-    user?.accountTier === "pro" ||
-    isSubscriptionActive(user?.currentPeriodEnd);
+  const isPro = user?.accountTier === "pro";
 
   const { start: startConfetti } = useFireworksConfetti();
   const prevMilestoneRef = useRef<number | undefined>(undefined);
