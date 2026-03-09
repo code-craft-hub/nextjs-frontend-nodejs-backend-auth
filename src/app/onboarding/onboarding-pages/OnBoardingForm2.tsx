@@ -1,5 +1,4 @@
 "use client";
-import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { OnboardingFormProps } from "@/types";
@@ -13,14 +12,11 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { userQueries } from "@module/user";
 import { useResumeUploadWithProgress } from "@/hooks/useResumeUploadWithProgress";
 import { queryKeys } from "@/lib/query/keys";
-import { Checkbox } from "@/components/ui/checkbox";
 import CreateUserResume from "./create-resume-form/CreateUserResume";
+import { Bot, Edit3 } from "lucide-react";
+import { AutoGenerateTitleDialog } from "./get-title-dialog";
 
-export const OnBoardingForm2 = ({
-  onNext,
-  onPrev,
-  children,
-}: OnboardingFormProps) => {
+export const OnBoardingForm2 = ({ onNext, children }: OnboardingFormProps) => {
   const queryClient = useQueryClient();
   const [editResume, setEditResume] = useState(false);
   const handleEditClick = (value: boolean) => {
@@ -115,18 +111,33 @@ export const OnBoardingForm2 = ({
                 </div>
               </div>
             )}
-            <div className=" border border-blue-100 w-full p-4 rounded-md">
-              <label
-                htmlFor="create-resume-checkbox"
-                className="flex w-full justify-between items-center "
-              >
-                <p className="">Create from crash</p>
-                <Checkbox
-                  id="create-resume-checkbox"
-                  checked={editResume}
-                  onCheckedChange={() => handleEditClick(true)}
-                />
-              </label>
+
+            <div className="grid grid-cols-2 gap-4 w-full">
+              <div className=" border bg-green-50 border-green-100 w-full p-2 sm:p-4 rounded-md">
+                <label
+                  htmlFor="create-resume-checkbox"
+                  className="flex w-full justify-between items-center "
+                  onClick={() => handleEditClick(true)}
+                >
+                  <div className="flex gap-2 items-center">
+                    <Edit3 className="size-4" />
+                    <p className="max-sm:text-xs">Create from crash</p>
+                  </div>
+                </label>
+              </div>
+              <AutoGenerateTitleDialog onNext={onNext}>
+                <div className=" border bg-blue-50 border-blue-100 w-full p-2 sm:p-4 rounded-md">
+                  <label
+                    htmlFor="create-resume-checkbox"
+                    className="flex w-full justify-between items-center "
+                  >
+                    <div className="flex gap-2 items-center">
+                      <Bot className="size" />
+                      <p className="max-sm:text-xs">Let AI create for me</p>
+                    </div>
+                  </label>
+                </div>
+              </AutoGenerateTitleDialog>
             </div>
             <div className="space-y-6 w-full">
               {(error || uploadError) && (
@@ -137,25 +148,6 @@ export const OnBoardingForm2 = ({
                       "Failed to process document. Please try again."}
                 </div>
               )}
-              <div className="flex gap-4">
-                <Button
-                  type="button"
-                  variant={"outline"}
-                  onClick={() => onPrev()}
-                  className="onboarding-btn"
-                  disabled={isUploading}
-                >
-                  Previous
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={isUploading}
-                  className="onboarding-btn overflow-hidden"
-                  onClick={() => onNext()}
-                >
-                  {isUploading ? "Processing..." : "Save and Continue"}
-                </Button>
-              </div>
             </div>
           </div>
         )}

@@ -17,7 +17,11 @@ import { userQueries } from "@module/user";
 import { toast } from "sonner";
 import { useUpdateOnboarding } from "@/hooks/mutations";
 
-export const OnBoardingForm7 = ({ onPrev, children }: OnboardingFormProps) => {
+export const OnBoardingForm7 = ({
+  onNext,
+  onPrev,
+  children,
+}: OnboardingFormProps) => {
   const [seletePlan, setSeletePlan] = useState("free");
   const { data: user } = useQuery(userQueries.detail());
 
@@ -36,7 +40,7 @@ export const OnBoardingForm7 = ({ onPrev, children }: OnboardingFormProps) => {
       });
 
       if (plan === "free") {
-        router.push("/dashboard/home");
+        onNext();
         return;
       }
 

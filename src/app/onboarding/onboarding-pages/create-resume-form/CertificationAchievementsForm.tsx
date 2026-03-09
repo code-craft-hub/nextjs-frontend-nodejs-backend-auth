@@ -30,7 +30,13 @@ const certificationEntrySchema = z.object({
   id: z.string().optional(),
   title: z.string().optional(),
   issuer: z.string().optional(),
-  issueDate: z.string().optional(),
+  issueDate: z
+    .string()
+    .refine(
+      (val) => !val || /^\d{4}-\d{2}-\d{2}$/.test(val),
+      "Invalid date format (YYYY-MM-DD)"
+    )
+    .optional(),
   description: z.string().optional(),
   credentialUrl: z.string().optional(),
 });
@@ -123,7 +129,7 @@ function CertificationCard({
               </FormLabel>
               <FormControl>
                 <Input
-                  placeholder="e.g., 2023 or 01/2023"
+                  type="date"
                   className="h-12 rounded-xl border-gray-200 bg-white placeholder:text-gray-300 text-gray-800 text-sm focus-visible:ring-indigo-400 focus-visible:ring-1 focus-visible:border-indigo-400"
                   {...field}
                 />
@@ -227,16 +233,24 @@ export default function CertificationAchievementsForm({
     defaultValues: {
       certifications:
         existingCertifications.length > 0
-          ? existingCertifications.map((cert) => ({
-              id: cert.id || undefined,
-              title: cert.title || cert.name || "",
-              issuer: cert.issuer || "",
-              issueDate: cert.issueDate
-                ? new Date(cert.issueDate).getFullYear().toString()
-                : "",
-              description: cert.description || "",
-              credentialUrl: cert.credentialUrl || "",
-            }))
+          ? existingCertifications.map((cert) => {
+              let formattedDate = "";
+              if (cert.issueDate) {
+                const date = new Date(cert.issueDate);
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, "0");
+                const day = String(date.getDate()).padStart(2, "0");
+                formattedDate = `${year}-${month}-${day}`;
+              }
+              return {
+                id: cert.id || undefined,
+                title: cert.title || cert.name || "",
+                issuer: cert.issuer || "",
+                issueDate: formattedDate,
+                description: cert.description || "",
+                credentialUrl: cert.credentialUrl || "",
+              };
+            })
           : [
               {
                 title: "",

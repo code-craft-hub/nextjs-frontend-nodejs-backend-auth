@@ -23,7 +23,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { userQueries } from "@module/user";
 import { useQuery } from "@tanstack/react-query";
 import { useUpdateOnboarding } from "@/hooks/mutations";
-import { useUserLocation } from "@/hooks/geo-location/ip-geolocation.provider";
+import { useUserLocation } from "@/hooks/useUserLocation";
 const formSchema = z.object({
   country: z.string({ message: "Please enter a valid country name." }),
   state: z.string({ message: "Please enter a valid state name." }),
@@ -38,13 +38,8 @@ export const OnBoardingForm1 = ({
   children,
 }: OnboardingFormProps) => {
   const { data: user } = useQuery(userQueries.detail());
-  const {
-    countryName: country,
-    regionName: region,
-    countryCode,
-    zipCode: postal,
-    cityName: city,
-  } = useUserLocation();
+  const location = useUserLocation();
+  const { country, region, city, countryCode } = location || {};
 
   const updateOnboarding = useUpdateOnboarding({
     userFirstName: user?.firstName,
@@ -69,7 +64,7 @@ export const OnBoardingForm1 = ({
 
   useEffect(() => {
     form.setValue("country", country ?? "");
-    form.setValue("state", user?.state ?? region ?? "");
+    form.setValue("state", region ?? user?.state ?? "");
   }, [country, region, form, user]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
@@ -77,7 +72,6 @@ export const OnBoardingForm1 = ({
     updateOnboarding.mutate({
       stepNumber: 1,
       ...values,
-      postalCode: postal,
       countryCode: countryCode,
       city: city,
       address: `${city}, ${region}, ${country}`,
@@ -195,10 +189,7 @@ export const OnBoardingForm1 = ({
                 >
                   Previous
                 </Button>
-                <Button
-                  type="submit"
-                  className="onboarding-btn"
-                >
+                <Button type="submit" className="onboarding-btn">
                   Save and Continue
                 </Button>
               </div>

@@ -60,6 +60,29 @@ async function fetchProvider(
   }
 }
 
+function normalizeLocationData(
+  data: Record<string, unknown>,
+): Record<string, unknown> {
+  return {
+    countryCode: data.country_code || data.countryCode || data.country_code,
+    countryName:
+      data.country_name ||
+      data.countryName ||
+      data.country ||
+      (typeof data.country === "string" ? data.country : ""),
+    regionCode: data.region_code || data.regionCode,
+    regionName:
+      data.region ||
+      data.regionName ||
+      (typeof data.region === "string" ? data.region : ""),
+    cityName: data.city || data.cityName,
+    zipCode: data.postal_code || data.postal || data.zipCode,
+    latitude: data.latitude,
+    longitude: data.longitude,
+    ip: data.ip || data.ipAddress,
+  };
+}
+
 export async function GET(request: NextRequest) {
   try {
     const ip =
@@ -74,7 +97,7 @@ export async function GET(request: NextRequest) {
     let merged: Record<string, unknown> = {};
 
     for (const r of results) {
-      if (r.status === "fulfilled") {
+      if (r.status === "fulfilled" && r.value.data) {
         merged = {
           ...merged,
           ...r.value.data,
@@ -82,7 +105,10 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    return NextResponse.json(merged);
+    // Normalize the merged data to consistent field names
+    const normalized = normalizeLocationData(merged);
+
+    return NextResponse.json(normalized);
   } catch (error) {
     console.error("Geolocation API error:", error);
     return NextResponse.json(

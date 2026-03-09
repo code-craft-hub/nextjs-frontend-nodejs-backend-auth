@@ -12,7 +12,7 @@ interface FloatingLabelInputProps extends React.InputHTMLAttributes<HTMLInputEle
   showPasswordToggle?: boolean;
 }
 
-export function FloatingLabelInput({
+export function   FloatingLabelInput({
   id,
   label,
   type = "text",

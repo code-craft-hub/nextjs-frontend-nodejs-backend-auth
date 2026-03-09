@@ -7,11 +7,24 @@ import type {
   RegisterData,
 } from "./auth.api.types";
 
+export interface VerificationTokenStatus {
+  hasActiveToken: boolean;
+  expiresAt: string | null;
+}
+
 export const authApi = {
   // ─── Session ────────────────────────────────────────────────
   getSession: () => api.get<AuthSession>(`/session`),
 
   getProfile: () => api.get<AuthSession["user"]>(`/users`),
+
+  getVerificationTokenStatus: async () => {
+    const res = await api.get<{ success: boolean; data: VerificationTokenStatus }>(
+      `/auth/verification-token-status`,
+    );
+    if (res?.success) return res.data;
+    throw new Error("Failed to fetch verification token status");
+  },
 
   // ─── Auth Actions ───────────────────────────────────────────
   login: (credentials: LoginCredentials) =>

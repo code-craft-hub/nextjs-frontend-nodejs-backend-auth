@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { VerifyEmailClient } from "./verify-email-client";
 import { createServerQueryClient } from "@/lib/query/prefetch";
 import { userQueries } from "@module/user";
+import { authQueries } from "@/modules/auth";
 import { HydrationBoundary } from "@/components/hydration-boundary";
 import { dehydrate } from "@tanstack/react-query";
 import { getCookiesToken } from "@/lib/auth.utils";
@@ -21,9 +22,11 @@ export default async function VerifyEmailPage() {
   }
 
   const queryClient = createServerQueryClient();
-  if (token) {
-    await queryClient.fetchQuery(userQueries.detail(token));
-  }
+  await Promise.all([
+    token ? queryClient.fetchQuery(userQueries.detail(token)) : Promise.resolve(),
+    queryClient.fetchQuery(authQueries.verificationTokenStatus()),
+  ]);
+
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <VerifyEmailClient />

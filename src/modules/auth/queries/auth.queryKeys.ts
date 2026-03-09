@@ -12,4 +12,7 @@ export const authQueryKeys = {
 
   profiles: () => [...authQueryKeys.all, "profile"] as const,
   profile: () => [...authQueryKeys.profiles(), "me"] as const,
+
+  verificationTokenStatus: () =>
+    [...authQueryKeys.all, "verification-token-status"] as const,
 };

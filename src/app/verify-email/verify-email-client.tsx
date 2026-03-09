@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -20,7 +19,8 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { X } from "lucide-react";
 import { api } from "@/lib/api/client";
-import { useDeleteAccountMutation, useLogoutMutation } from "@/modules/auth";
+import { useDeleteAccountMutation, useLogoutMutation, authQueries } from "@/modules/auth";
+import { useQuery } from "@tanstack/react-query";
 
 // Server validates exactly 6 numeric digits (auth.validator.ts → otpSchema).
 const formSchema = z.object({
@@ -47,7 +47,11 @@ export const VerifyEmailClient = () => {
     router.push("/login");
   };
 
-  const [emailSent, setEmailSent] = useState(false);
+  // Prefetched by the server component — tells us if a live OTP already exists
+  // for this user so we don't blast a new code every time the mobile browser reloads.
+  const { data: tokenStatus } = useQuery(authQueries.verificationTokenStatus());
+
+  const hasSentInitialRef = useRef(false);
   const [isSending, setIsSending] = useState(false);
   const [completedEmailVerification, setCompletedEmailVerification] =
     useState(false);
@@ -63,12 +67,26 @@ export const VerifyEmailClient = () => {
     }
   }, [timeLeft]);
 
+  // Initialise the cooldown from the server-prefetched token expiry so the
+  // countdown is accurate even after a page reload.
   useEffect(() => {
-    if (!emailSent) {
-      setEmailSent(true);
-      sendVerificationCode();
+    if (!tokenStatus?.hasActiveToken || !tokenStatus.expiresAt) return;
+    const secsLeft = Math.round(
+      (new Date(tokenStatus.expiresAt).getTime() - Date.now()) / 1000,
+    );
+    if (secsLeft > 0) {
+      setCanResend(false);
+      setTimeLeft(secsLeft);
     }
-  }, [emailSent]);
+  }, [tokenStatus]);
+
+  useEffect(() => {
+    if (hasSentInitialRef.current) return;
+    hasSentInitialRef.current = true;
+    // Skip auto-send when the server confirmed a live OTP already exists.
+    if (tokenStatus?.hasActiveToken) return;
+    sendVerificationCode();
+  }, [tokenStatus]);
   const sendVerificationCode = async () => {
     setIsVerifying(true);
     setIsSending(true);

@@ -13,10 +13,12 @@ import { OnBoardingForm6 } from "./onboarding-pages/OnBoardingForm6";
 import { OnBoardingForm7 } from "./onboarding-pages/OnBoardingForm7";
 import { useRouter } from "next/navigation";
 import { authApi, useDeleteAccountMutation } from "@/modules/auth";
+import { useUserLocation } from "@/hooks/useUserLocation";
+import { OnBoardingForm8 } from "./onboarding-pages/OnBoardingForm8";
 
 export default function OnboardingClient() {
   const deleteAccount = useDeleteAccountMutation();
-
+  useUserLocation();
   const isDev = process.env.NODE_ENV === "development";
 
   const [currentStep, setCurrentStep] = useState(0);
@@ -29,6 +31,8 @@ export default function OnboardingClient() {
     OnBoardingForm5,
     OnBoardingForm6,
     OnBoardingForm7,
+    OnBoardingForm8,
+
   ];
   const totalSteps = steps.length;
 

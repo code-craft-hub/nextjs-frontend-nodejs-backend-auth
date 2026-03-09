@@ -7,6 +7,7 @@ export type {
   PasswordResetRequest,
   PasswordResetConfirm,
 } from "./api/auth.api.types";
+export type { VerificationTokenStatus } from "./api/auth.api";
 
 // ─── Query Keys ─────────────────────────────────────────────
 export { authQueryKeys } from "./queries/auth.queryKeys";

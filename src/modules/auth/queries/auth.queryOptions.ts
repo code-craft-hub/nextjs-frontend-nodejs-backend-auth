@@ -18,6 +18,14 @@ export const authQueries = {
       staleTime: 10 * 60 * 1000,
       retry: false,
     }),
+
+  verificationTokenStatus: () =>
+    queryOptions({
+      queryKey: authQueryKeys.verificationTokenStatus(),
+      queryFn: authApi.getVerificationTokenStatus,
+      staleTime: 0, // always fresh — page reloads are the exact scenario we handle
+      retry: false,
+    }),
 };
 
 // ─── Invalidation Helpers ──────────────────────────────────
