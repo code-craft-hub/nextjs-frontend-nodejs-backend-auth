@@ -60,10 +60,10 @@ export default function Error({
             Go to home
           </Button>
           <Button
-            variant="ghost"
+            variant="destructive"
             onClick={handleLogout}
             disabled={logout.isPending}
-            className="w-full h-11 text-red-500 hover:text-red-600 hover:bg-red-50"
+            className="w-full h-11"
           >
             {logout.isPending ? "Logging out..." : "Logout"}
           </Button>

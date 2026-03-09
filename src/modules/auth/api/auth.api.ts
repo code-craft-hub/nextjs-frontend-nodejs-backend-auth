@@ -18,9 +18,10 @@ export const authApi = {
 
   getProfile: () => api.get<AuthSession["user"]>(`/users`),
 
-  getVerificationTokenStatus: async () => {
+  getVerificationTokenStatus: async (token?: string) => {
     const res = await api.get<{ success: boolean; data: VerificationTokenStatus }>(
       `/auth/verification-token-status`,
+      { token },
     );
     if (res?.success) return res.data;
     throw new Error("Failed to fetch verification token status");

@@ -19,10 +19,10 @@ export const authQueries = {
       retry: false,
     }),
 
-  verificationTokenStatus: () =>
+  verificationTokenStatus: (token?: string) =>
     queryOptions({
       queryKey: authQueryKeys.verificationTokenStatus(),
-      queryFn: authApi.getVerificationTokenStatus,
+      queryFn: () => authApi.getVerificationTokenStatus(token),
       staleTime: 0, // always fresh — page reloads are the exact scenario we handle
       retry: false,
     }),

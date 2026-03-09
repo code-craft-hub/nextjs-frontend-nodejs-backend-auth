@@ -24,7 +24,7 @@ export default async function VerifyEmailPage() {
   const queryClient = createServerQueryClient();
   await Promise.all([
     token ? queryClient.fetchQuery(userQueries.detail(token)) : Promise.resolve(),
-    queryClient.fetchQuery(authQueries.verificationTokenStatus()),
+    queryClient.fetchQuery(authQueries.verificationTokenStatus(token ?? undefined)),
   ]);
 
   return (
