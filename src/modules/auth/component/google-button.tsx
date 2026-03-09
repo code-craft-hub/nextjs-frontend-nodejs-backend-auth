@@ -1,3 +1,4 @@
+"use client";
 import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
 import { api } from "@/lib/api/client";
 import { useRouter } from "next/navigation";
