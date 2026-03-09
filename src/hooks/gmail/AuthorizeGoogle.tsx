@@ -50,7 +50,7 @@ const AuthorizeGoogle: React.FC<{
         if (result.success) {
           toast.success("Gmail authorization successful!");
           form.setValue("authorized", true);
-          router.push("/dashboard/settings");
+          router.push("/dashboard/home");
         } else {
           throw new Error("Authorization failed");
         }

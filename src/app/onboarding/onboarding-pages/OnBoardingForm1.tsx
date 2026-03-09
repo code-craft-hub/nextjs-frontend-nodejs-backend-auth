@@ -64,7 +64,7 @@ export const OnBoardingForm1 = ({
 
   useEffect(() => {
     form.setValue("country", country ?? "");
-    form.setValue("state", region ?? user?.state ?? "");
+    form.setValue("state", city ?? region ?? user?.state ?? "");
   }, [country, region, form, user]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
@@ -166,7 +166,9 @@ export const OnBoardingForm1 = ({
                           {...field}
                           id={inputId}
                           international
-                          defaultCountry={(countryCode as any) ?? "US"}
+                          defaultCountry={
+                            (countryCode as any) ?? country ?? "US"
+                          }
                           placeholder="Enter phone number"
                           className="border-0! outline-none! ring-0!"
                           numberInputProps={{

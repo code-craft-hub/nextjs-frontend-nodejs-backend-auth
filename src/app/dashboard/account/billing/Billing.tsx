@@ -4,7 +4,6 @@ import { useFireworksConfetti } from "@/components/ui/confetti";
 import { PremiumUserPage } from "./PremiumUserPage";
 import { useQuery } from "@tanstack/react-query";
 import { userQueries } from "@module/user";
-import { isSubscriptionActive } from "@/lib/utils/helpers";
 import { TrialBanner } from "./TrialBanner";
 import { ReferralCard } from "./ReferralCard";
 import { UpgradeBanner } from "./UpgradeBanner";
@@ -12,7 +11,7 @@ import { UpgradeBanner } from "./UpgradeBanner";
 export const Billing = ({ reference }: { reference: string }) => {
   const { data: user } = useQuery(userQueries.detail());
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
-  const [justUpgraded, setJustUpgraded] = useState(false);
+  const [_justUpgraded, setJustUpgraded] = useState(false);
 
   const isPro = user?.accountTier === "pro";
 

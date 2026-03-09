@@ -86,6 +86,7 @@ export const AiApplyPreferences: React.FC = () => {
 
   const checkAuth = async (value: boolean ): Promise<void> => {
     setOauthState(value);
+   
   };
 
   const settingsConfig: Setting[] = [
