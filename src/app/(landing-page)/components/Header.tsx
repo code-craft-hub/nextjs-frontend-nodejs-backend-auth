@@ -12,7 +12,7 @@ import {
 import { navItems } from "../constants";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { smoothlyScrollToView } from "@/lib/utils/helpers";
 import { useState } from "react";
@@ -20,17 +20,35 @@ import { IUser } from "@/types";
 import { useUserQuery } from "@module/user";
 
 export const Header = ({
-  url,
   user,
 }: {
-  url?: string;
   user?: Partial<IUser> | null;
 }) => {
   const router = useRouter();
+  const pathname = usePathname();
   const [modal, setModal] = useState(false);
   const { data: currentUser } = useUserQuery();
-  
+
   const isAuthenticated = !!currentUser || !!user;
+
+  // Handle navigation: if not on homepage, go to homepage first then scroll to anchor
+  const handleNavClick = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    navUrl: string,
+  ) => {
+    e.preventDefault();
+
+    // Check if we're on the homepage
+    const isHomepage = pathname === "/" || pathname === "";
+
+    if (!isHomepage) {
+      // Not on homepage, so navigate to homepage with the anchor
+      router.push(`/${navUrl}`);
+    } else {
+      // Already on homepage, just scroll to the anchor
+      smoothlyScrollToView(e, navUrl);
+    }
+  };
 
   return (
     <div>
@@ -46,15 +64,7 @@ export const Header = ({
                 <Link
                   key={nav.name}
                   href={nav.url}
-                  onClick={(e) => {
-                    if (url) {
-                      e.preventDefault();
-                      router.push(url);
-                      smoothlyScrollToView(e, nav.url);
-                    } else {
-                      smoothlyScrollToView(e, nav.url);
-                    }
-                  }}
+                  onClick={(e) => handleNavClick(e, nav.url)}
                   className="font-medium font-poppins text-black transition-colors hover:text-primary px-4 py-2 rounded-xl"
                 >
                   {nav.name}
@@ -107,14 +117,7 @@ export const Header = ({
                         key={nav.name}
                         href={nav.url}
                         onClick={(e) => {
-                          if (url) {
-                            e.preventDefault();
-                            router.push(url);
-                            smoothlyScrollToView(e, nav.url);
-                          } else {
-                            smoothlyScrollToView(e, nav.url);
-                          }
-
+                          handleNavClick(e, nav.url);
                           setModal(false);
                         }}
                         className="font-poppins text-black hover:text-gray-900 transition-colors hover:bg-accent px-4 py-2 border-t w-full text-start flex gap-2"

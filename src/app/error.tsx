@@ -16,7 +16,11 @@ export default function Error({
   const logout = useLogoutMutation();
 
   useEffect(() => {
+    console.group(`[Error Boundary] ${error?.name ?? "Error"}: ${error?.message}`);
     console.error(error);
+    if (error?.stack) console.error("Stack trace:\n" + error.stack);
+    if (error?.digest) console.error("Digest:", error.digest);
+    console.groupEnd();
   }, [error]);
 
   const handleLogout = async () => {

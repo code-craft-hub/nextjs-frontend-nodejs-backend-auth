@@ -1,12 +1,12 @@
 "use client";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import "./glass.css";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Footer } from "@/components/landing-page/Footer";
 import {
   actionButtons,
-  blogs,
   coreFeatures,
   faqItems,
   howItWorks,
@@ -21,6 +21,12 @@ import { JobFilters } from "@/lib/types/jobs";
 import { IUser } from "@/types";
 import Pricing from "./components/Pricing";
 import { VideoModal } from "./components/VideoModal";
+import { useRouter } from "next/navigation";
+import { blogQueries } from "@/lib/queries/blog.queries";
+import {
+  BlogCard,
+  BlogCardSkeleton,
+} from "@/modules/blog/components/homeComponents/BlogCard";
 
 export const LandingPageClient = ({
   filters,
@@ -30,7 +36,13 @@ export const LandingPageClient = ({
   user: Partial<IUser> | null;
 }) => {
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
+  const router = useRouter();
 
+  // Fetch real blogs - limit to 3 for landing page
+  const { data: blogsData, isLoading: blogsLoading } = useQuery(
+    blogQueries.list({ limit: 3, status: "publish" }),
+  );
+  const blogs = blogsData?.items ?? [];
   return (
     <div className="min-h-screen bg-white font-poppins">
       <section
@@ -75,7 +87,7 @@ export const LandingPageClient = ({
                     <div
                       className={cn(
                         "w-16 h-16 mx-auto mb-10 shadow-2xl rounded-2xl flex items-center justify-center",
-                        item.color
+                        item.color,
                       )}
                     >
                       <img src={item.icons} alt={item.title} />
@@ -176,8 +188,6 @@ export const LandingPageClient = ({
         </div>
       </section>
 
-      
-
       <section id="pricing" className="py-20">
         <Pricing />
       </section>
@@ -243,31 +253,21 @@ export const LandingPageClient = ({
               <p className="text-xs">
                 Don&#39;t miss out—get the latest job updates and blog insights!
               </p>
-              <div className="flex gap-2 items-center mt-1">
-                <p className="text-blue-500 text-[12px]">See more posts</p>
+              <button
+                onClick={() => router.push("/blog")}
+                className="flex gap-2 items-center mt-1 text-blue-500 text-[12px] hover:underline"
+              >
+                <p>See more posts</p>
                 <ChevronRight className="size-3" />
-              </div>
+              </button>
             </div>
           </div>
           <div className="grid md:grid-cols-3 gap-8">
-            {blogs.map((blog) => (
-              <article className="space-y-4 " key={blog.title}>
-                <div className="relative h-40 w-full rounded-2xl overflow-hidden">
-                  <img
-                    src={blog.image}
-                    className="absolute inset-0 w-full h-full object-cover object-center"
-                    alt={blog.title}
-                  />
-                </div>
-
-                <div className="">
-                  <span className="text-[#667085] text-xs font-semibold tracking-wide">
-                    {blog.title}
-                  </span>
-                  <h3 className="text-gray-900 mt-2 mb-3">{blog.heading}</h3>
-                </div>
-              </article>
-            ))}
+            {blogsLoading
+              ? Array.from({ length: 3 }).map((_, i) => (
+                  <BlogCardSkeleton key={i} />
+                ))
+              : blogs.map((blog) => <BlogCard key={blog.id} blog={blog} />)}
           </div>
         </div>
       </section>

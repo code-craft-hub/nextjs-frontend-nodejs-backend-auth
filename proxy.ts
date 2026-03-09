@@ -37,6 +37,7 @@ async function verifySessionToken(
 }
 
 const publicPaths = ["/login", "/register", "/reset-password"];
+const publicAccessiblePaths = ["/blog"]; // Publicly accessible routes (no auth required, no redirects)
 const protectedPaths = ["/dashboard"];
 const verifyEmailPath = "/verify-email";
 const onboardingPath = "/onboarding";
@@ -76,6 +77,11 @@ export async function proxy(request: NextRequest) {
   }
 
   if (pathname === "/") {
+    return NextResponse.next();
+  }
+
+  // Publicly accessible paths (authenticated or unauthenticated users can access)
+  if (publicAccessiblePaths.includes(pathname)) {
     return NextResponse.next();
   }
 

@@ -83,7 +83,12 @@ export default function RegisterClient({ referral }: { referral?: string }) {
         <div className="w-full max-w-md space-y-8">
           {/* Logo and Header */}
           <div className="space-y-6">
-            <div className="flex items-center space-x-2">
+            <div
+              onClick={() => {
+                router.push("/");
+              }}
+              className="flex items-center space-x-2"
+            >
               <img src="/cverai-logo.png" className="w-28 h-8" alt="" />
             </div>
             <div>

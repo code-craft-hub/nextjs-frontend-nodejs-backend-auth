@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import Link from "next/link";
@@ -12,11 +13,15 @@ import type { BlogWithViews } from "@/lib/types";
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function formatDate(iso: string): string {
+  const date = new Date(iso);
+  // Check if the date is valid, use today's date if invalid
+  const validDate = isNaN(date.getTime()) ? new Date() : date;
+
   return new Intl.DateTimeFormat("en-US", {
     year: "numeric",
     month: "long",
     day: "numeric",
-  }).format(new Date(iso));
+  }).format(validDate);
 }
 
 function estimateReadTime(html: string | null): number {
@@ -97,12 +102,34 @@ export function BlogDetailClient({
   isAuthenticated,
 }: BlogDetailClientProps) {
   const { data: blog, isLoading } = useQuery(blogQueries.detail(blogId));
+  const { data: allBlogs } = useQuery(blogQueries.list());
 
   useBlogMetrics({
     blogId,
     blogTitle: blog?.title ?? "",
     isAuthenticated,
   });
+
+  // Generate related blogs: prioritize same category, then other categories
+  const relatedBlogs = React.useMemo(() => {
+    if (!allBlogs || !blog) return [];
+
+    const blogs = allBlogs?.items ?? [];
+    if (!Array.isArray(blogs)) return [];
+
+    const filtered = blogs.filter((b: any) => b.id !== blogId);
+
+    // Separate by category
+    const sameCategory = filtered.filter(
+      (b: any) => b.category === blog.category && blog.category,
+    );
+    const otherCategories = filtered.filter(
+      (b: any) => b.category !== blog.category || !blog.category,
+    );
+
+    // Combine: same category first, then others, limit to 6
+    return [...sameCategory, ...otherCategories].slice(0, 6);
+  }, [allBlogs, blog, blogId]);
 
   if (isLoading) {
     return <BlogDetailSkeleton />;
@@ -112,7 +139,10 @@ export function BlogDetailClient({
     return (
       <div className="py-24 text-center">
         <p className="text-muted-foreground">Post not found.</p>
-        <Link href="/blog" className="mt-4 inline-block text-sm text-primary underline">
+        <Link
+          href="/blog"
+          className="mt-4 inline-block text-sm text-primary underline"
+        >
           Back to Blog
         </Link>
       </div>
@@ -123,14 +153,14 @@ export function BlogDetailClient({
   const readTime = estimateReadTime(blog.descriptionHtml);
 
   return (
-    <article className="max-w-screen-md mx-auto px-4 sm:px-8 pb-16 space-y-8">
+    <article className="max-w-3xl mx-auto px-4 sm:px-8 pb-16 space-y-8">
       {/* Back nav */}
       <Link
         href="/blog"
-        className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+        className="inline-flex items-center gap-1 mt-8 text-xs text-primary hover:underline"
       >
         <ChevronLeft className="size-4" />
-        Back to Blog
+        Back to Blogs
       </Link>
 
       {/* Header */}
@@ -216,7 +246,7 @@ export function BlogDetailClient({
       />
 
       {/* Related posts */}
-      <RelatedBlogs related={blog.related} />
+      <RelatedBlogs related={relatedBlogs} />
     </article>
   );
 }
@@ -225,7 +255,7 @@ export function BlogDetailClient({
 
 function BlogDetailSkeleton() {
   return (
-    <div className="max-w-screen-md mx-auto px-4 sm:px-8 pb-16 space-y-6 animate-pulse">
+    <div className="max-w-3xl mx-auto px-4 sm:px-8 pb-16 space-y-6 animate-pulse">
       <div className="h-4 w-16 rounded bg-muted" />
       <div className="space-y-3">
         <div className="h-8 w-3/4 rounded bg-muted" />
@@ -237,7 +267,11 @@ function BlogDetailSkeleton() {
       </div>
       <div className="aspect-video w-full rounded-2xl bg-muted" />
       {Array.from({ length: 6 }).map((_, i) => (
-        <div key={i} className="h-4 rounded bg-muted" style={{ width: `${70 + (i % 3) * 10}%` }} />
+        <div
+          key={i}
+          className="h-4 rounded bg-muted"
+          style={{ width: `${70 + (i % 3) * 10}%` }}
+        />
       ))}
       <div className="mt-16 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {[0, 1, 2].map((i) => (

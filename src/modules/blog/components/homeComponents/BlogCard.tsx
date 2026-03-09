@@ -9,11 +9,15 @@ import type { BlogWithViews } from "@/lib/types";
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
 function formatDate(iso: string): string {
+  const date = new Date(iso);
+  // Check if the date is valid, use today's date if invalid
+  const validDate = isNaN(date.getTime()) ? new Date() : date;
+
   return new Intl.DateTimeFormat("en-US", {
     year: "numeric",
     month: "short",
     day: "numeric",
-  }).format(new Date(iso));
+  }).format(validDate);
 }
 
 function estimateReadTime(html: string | null): number {
@@ -56,7 +60,7 @@ export function BlogCard({ blog, onMouseEnter, className }: BlogCardProps) {
             className="object-cover object-center transition-transform duration-500 group-hover:scale-105"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary/10 to-primary/5">
+          <div className="flex h-full w-full items-center justify-center bg-linear-to-br from-primary/10 to-primary/5">
             <span className="text-4xl text-primary/30">✍</span>
           </div>
         )}
@@ -95,7 +99,7 @@ export function BlogCard({ blog, onMouseEnter, className }: BlogCardProps) {
                 {blog.authorName.charAt(0).toUpperCase()}
               </div>
             )}
-            <span className="text-xs font-medium text-foreground truncate max-w-[120px]">
+            <span className="text-xs font-medium text-foreground truncate max-w-30">
               {blog.authorName}
             </span>
           </div>

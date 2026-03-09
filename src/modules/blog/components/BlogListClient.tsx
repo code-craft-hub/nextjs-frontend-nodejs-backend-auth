@@ -2,19 +2,20 @@
 
 import { useState, useCallback } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Search } from "lucide-react";
 import { blogQueries } from "@/lib/queries/blog.queries";
 import { BlogCard, BlogCardSkeleton } from "./homeComponents/BlogCard";
+import { BlogSearchForm } from "./BlogSearchForm";
 import type { BlogFilters } from "@/lib/api/blog.api";
-
-// ─── BlogListClient ─────────────────────────────────────────────────────────
 
 interface BlogListClientProps {
   initialFilters?: BlogFilters;
   isAuthenticated?: boolean;
 }
 
-export function BlogListClient({ initialFilters, isAuthenticated: _isAuthenticated }: BlogListClientProps) {
+export function BlogListClient({
+  initialFilters,
+  isAuthenticated: _isAuthenticated,
+}: BlogListClientProps) {
   const queryClient = useQueryClient();
   const [filters, setFilters] = useState<BlogFilters>({
     status: "publish",
@@ -22,7 +23,6 @@ export function BlogListClient({ initialFilters, isAuthenticated: _isAuthenticat
     limit: 12,
     ...initialFilters,
   });
-  const [search, setSearch] = useState("");
 
   const { data, isLoading, isFetching } = useQuery(blogQueries.list(filters));
 
@@ -34,9 +34,12 @@ export function BlogListClient({ initialFilters, isAuthenticated: _isAuthenticat
     [queryClient],
   );
 
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setFilters((prev) => ({ ...prev, search: search || undefined, page: 1 }));
+  const handleSearchSubmit = (searchQuery: string) => {
+    setFilters((prev) => ({
+      ...prev,
+      search: searchQuery || undefined,
+      page: 1,
+    }));
   };
 
   const handleCategoryClick = (category: string | null) => {
@@ -64,26 +67,7 @@ export function BlogListClient({ initialFilters, isAuthenticated: _isAuthenticat
   return (
     <section className="space-y-8">
       {/* Search + filter bar */}
-      <div className="flex flex-col sm:flex-row gap-3">
-        <form onSubmit={handleSearchSubmit} className="flex flex-1 gap-2">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-            <input
-              type="search"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search posts…"
-              className="w-full rounded-lg border border-input bg-background py-2 pl-9 pr-4 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-            />
-          </div>
-          <button
-            type="submit"
-            className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition hover:bg-primary/90"
-          >
-            Search
-          </button>
-        </form>
-      </div>
+      <BlogSearchForm onSubmit={handleSearchSubmit} />
 
       {/* Category chips */}
       {categories.length > 0 && (
@@ -121,7 +105,9 @@ export function BlogListClient({ initialFilters, isAuthenticated: _isAuthenticat
         }`}
       >
         {isLoading
-          ? Array.from({ length: 6 }).map((_, i) => <BlogCardSkeleton key={i} />)
+          ? Array.from({ length: 6 }).map((_, i) => (
+              <BlogCardSkeleton key={i} />
+            ))
           : blogs.map((blog) => (
               <BlogCard
                 key={blog.id}
@@ -141,8 +127,11 @@ export function BlogListClient({ initialFilters, isAuthenticated: _isAuthenticat
               <button
                 className="text-primary underline"
                 onClick={() => {
-                  setSearch("");
-                  setFilters((prev) => ({ ...prev, search: undefined, page: 1 }));
+                  setFilters((prev) => ({
+                    ...prev,
+                    search: undefined,
+                    page: 1,
+                  }));
                 }}
               >
                 clear the search

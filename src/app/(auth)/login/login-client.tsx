@@ -81,7 +81,12 @@ export const LoginClient = () => {
       <div className="flex-1 min-h-screen flex items-center justify-center p-8 bg-white">
         <div className="w-full max-w-md space-y-8">
           <div className="space-y-6">
-            <div className="flex items-center space-x-2">
+            <div
+              onClick={() => {
+                router.push("/");
+              }}
+              className="flex items-center space-x-2"
+            >
               <img src="/cverai-logo.png" className="w-28 h-8" alt="" />
             </div>
             <div>

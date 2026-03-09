@@ -1,3 +1,5 @@
+"use client";
+
 import { capitalize } from "lodash";
 import { social } from "@/constants/data";
 import Link from "next/link";
@@ -7,7 +9,7 @@ import { navItems } from "@/app/(landing-page)/constants";
 export const Footer = () => {
   return (
     <footer id="footer" className="bg-[#E4ECFE]">
-      <div className="px-4 sm:px-8 w-full max-w-screen-xl mx-auto py-8 sm:py-16 overflow-hidden">
+      <div className="px-4 sm:px-8 w-full max-w-7xl mx-auto py-8 sm:py-16 overflow-hidden">
         <div className="flex flex-col md:flex-row max-md:gap-8">
           {/* Brand + Social */}
           <div className="w-full md:w-5/12">
@@ -23,7 +25,7 @@ export const Footer = () => {
               {social.map(({ href, icon }: any, index: number) => (
                 <a
                   key={index}
-                  className="text-[#667085] text-[28px] border-[2px] border-blue-200 p-2 rounded-full hover:scale-110 transition-transform duration-300"
+                  className="text-[#667085] text-[28px] border-2 border-blue-200 p-2 rounded-full hover:scale-110 transition-transform duration-300"
                   href={href}
                   rel="noreferrer"
                   target="_blank"
