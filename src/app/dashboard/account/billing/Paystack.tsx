@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { userQueries } from "@module/user";
-import { api, BACKEND_API_VERSION } from "@/lib/api/client";
+import { api } from "@/lib/api/client";
 import { generateIdempotencyKey } from "@/lib/utils/helpers";
 import { toast } from "sonner";
 
@@ -53,7 +53,7 @@ export const PaystackPaymentGateway = ({
       const idempotencyKey = generateIdempotencyKey();
 
       const result = await api.post<InitializePaymentResponse>(
-        `/${BACKEND_API_VERSION}/paystack/payments/initialize`,
+        `/paystack/payments/initialize`,
         {
           // Email is also validated server-side from the auth token.
           // This is purely for pre-filling the Paystack checkout form.
@@ -102,7 +102,7 @@ export const PaystackPaymentGateway = ({
   const verifyPayment = async (reference: string) => {
     try {
       const result = await api.get<VerifyPaymentResponse>(
-        `/${BACKEND_API_VERSION}/paystack/payments/verify/${reference}`,
+        `/paystack/payments/verify/${reference}`,
       );
 
       if (result?.data?.isProUser) {

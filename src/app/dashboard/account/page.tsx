@@ -1,7 +1,7 @@
 import { createServerQueryClient } from "@/lib/query/prefetch";
 import { dehydrate } from "@tanstack/react-query";
 import { HydrationBoundary } from "@/components/hydration-boundary";
-import { api, BACKEND_API_VERSION } from "@/lib/api/client";
+import { api } from "@/lib/api/client";
 import { redirect } from "next/navigation";
 import { AccountClient } from "./Account";
 import { getCookiesToken } from "@/lib/auth.utils";
@@ -31,7 +31,7 @@ const AccountPage = async ({ searchParams }: any) => {
       // NOTE: This is the server-side verify call.
       // The webhook is the authoritative payment processor; this is for immediate UI feedback.
       const { data } = await api.get<{ data: VerifyPaymentData }>(
-        `/${BACKEND_API_VERSION}/paystack/payments/verify/${reference}`,
+        `/paystack/payments/verify/${reference}`,
         { token },
       );
       paymentData = data;
