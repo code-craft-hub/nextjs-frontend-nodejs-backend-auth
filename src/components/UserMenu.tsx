@@ -22,6 +22,10 @@ export const UserMenu = () => {
 
   const logout = useLogoutMutation();
 
+  const handleNavigateToAdmin = () => {
+    window.open("https://admin.cverai.com", "_blank");
+  };
+
   return (
     <div className="flex px-4">
       <DropdownMenu>
@@ -47,7 +51,7 @@ export const UserMenu = () => {
             <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
           </DropdownMenuItem>
           {isAdmin && (
-            <DropdownMenuItem onClick={() => router.push(`/admin`)}>
+            <DropdownMenuItem onClick={handleNavigateToAdmin}>
               Admin
               <DropdownMenuShortcut>⇧⌘A</DropdownMenuShortcut>
             </DropdownMenuItem>
