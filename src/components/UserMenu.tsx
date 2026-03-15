@@ -23,7 +23,7 @@ export const UserMenu = () => {
   const logout = useLogoutMutation();
 
   const handleNavigateToAdmin = () => {
-    window.open("https://admin.cverai.com", "_blank");
+    window.location.href = process.env.NEXT_PUBLIC_ADMIN_URL ?? "http://localhost:3002/dashboard";
   };
 
   return (
