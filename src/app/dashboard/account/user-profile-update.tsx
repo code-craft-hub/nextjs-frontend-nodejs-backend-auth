@@ -26,7 +26,7 @@ export const e164PhoneNumberSchema = z
   .trim()
   .regex(/^[1-9]\d{1,14}$/, {
     message:
-      "Invalid phone number. Must be in E.164 format (e.g. +14155552671)",
+      "Invalid phone number. Must be in E.164 format (e.g. 14155552671)",
   });
 
 // Zod validation schema
