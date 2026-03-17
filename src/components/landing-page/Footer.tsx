@@ -52,7 +52,7 @@ export const Footer = () => {
                     >
                       <Link
                         href={item.url}
-                        onClick={(e) => smoothlyScrollToView(e,item.url)}
+                        onClick={(e) => smoothlyScrollToView(e, item.url)}
                         className="transition-all duration-300 flex gap-4 capitalize"
                       >
                         {capitalize(item.name)}
@@ -107,6 +107,14 @@ export const Footer = () => {
           </div>
         </div>
       </div>
+      <Link
+        href="https://gemini.google.com"
+        className="flex items-center justify-center pb-8 text-sm"
+        target="_blank"
+        rel="noreferrer"
+      >
+        Powered by Gemini
+      </Link>
     </footer>
   );
 };

@@ -385,10 +385,12 @@ export default function RegisterClient({ referral }: { referral?: string }) {
               </div>
 
               {/* Social Login Buttons */}
-              <GoogleButton
-                handleLoading={handleLoading}
-                getReferralCode={handleGetReferralCode}
-              />
+              <div className="flex items-center justify-center">
+                <GoogleButton
+                  handleLoading={handleLoading}
+                  getReferralCode={handleGetReferralCode}
+                />
+              </div>
             </form>
           </Form>
         </div>
