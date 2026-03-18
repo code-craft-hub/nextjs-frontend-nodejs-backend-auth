@@ -92,19 +92,18 @@ export const PasswordResetVerifyEmail = ({
   });
 
   async function onSubmit({ code }: z.infer<typeof formSchema>) {
+    setIsVerifying(true);
     try {
-      await api.post("/auth/verify-email", { otp: code });
-      // await api.post("/auth/refresh");
+      // Validate the OTP server-side without consuming it.
+      // The token is only marked as used when /auth/reset-password is called.
+      await api.post("/auth/verify-reset-otp", { email, otp: code });
       handleStateChange(code);
     } catch (error) {
       console.error("Verification failed:", error);
+      toast.error("Invalid or expired reset code. Please try again.");
+    } finally {
+      setIsVerifying(false);
     }
-
-    // We do NOT call verify-email here — that endpoint is for account email
-    // verification, not password reset.  The OTP itself is only consumed server-side
-    // when /auth/reset-password is called with { email, otp, newPassword }.
-    // We simply pass the validated code to the parent so it can provide it to
-    // the ResetPassword component.
   }
 
   return (

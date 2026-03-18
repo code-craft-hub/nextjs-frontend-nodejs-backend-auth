@@ -16,10 +16,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import {
-  authQueries,
-  useChangePasswordMutation,
-} from "@/modules/auth";
+import { useChangePasswordMutation } from "@/modules/auth";
+import { userQueries } from "@/modules/user";
 import { APIError } from "@/lib/api/client";
 
 // ─── Password requirement checker ────────────────────────────────────────────
@@ -41,12 +39,12 @@ const newPasswordSchema = z
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export const PasswordUpdateForm: React.FC = () => {
-  const { data: session } = useQuery(authQueries.session());
+  const { data: user } = useQuery(userQueries.detail());
   const changePassword = useChangePasswordMutation();
 
   // Google-only users have provider === "google" and no password set.
   // For them, currentPassword is irrelevant — they're adding one for the first time.
-  const isGoogleOnly = session?.user?.provider === "google";
+  const isGoogleOnly = user?.provider === "google";
 
   // Build a schema that conditionally requires currentPassword
   const schema = useMemo(
