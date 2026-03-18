@@ -6,6 +6,13 @@ import { normalizeJobFilters } from "../query/normalize-filters";
 import recommendationsApi from "../api/recommendations.api";
 
 export const jobsQueries = {
+  featured: (limit = 6) =>
+    queryOptions({
+      queryKey: [...queryKeys.jobs.lists(), "featured", limit] as const,
+      queryFn: () => jobsApi.getPublicJobs({ page: 1, limit }),
+      staleTime: 10 * 60 * 1000,
+    }),
+
   all: (filters: JobFilters = {}, token?: string) => {
     const normalized = normalizeJobFilters(filters);
     return queryOptions({

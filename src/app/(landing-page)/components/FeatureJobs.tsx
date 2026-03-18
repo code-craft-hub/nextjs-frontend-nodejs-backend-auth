@@ -2,7 +2,6 @@
 
 import { Button } from "@/components/ui/button";
 import { ArrowRight, MapPin, Sparkles } from "lucide-react";
-import { JobFilters } from "@/lib/types/jobs";
 import { jobsQueries } from "@/lib/queries/jobs.queries";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -11,15 +10,15 @@ import { v4 as uuidv4 } from "uuid";
 import { cn } from "@/lib/utils";
 import { gmailApi } from "@/lib/api/gmail.api";
 
-export const FeatureJobs = ({ filters }: { filters: JobFilters }) => {
-  const { data: jobs } = useQuery(jobsQueries.all(filters));
+export const FeatureJobs = () => {
+  const { data: jobs } = useQuery(jobsQueries.featured());
 
   const router = useRouter();
   if (!jobs || jobs.data?.length === 0) {
     return null;
   }
   return (
-    <section id="feature-jobs" className="pb-20">
+    <section id="feature-jobs" className="pt-6 md:pt-20 pb-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center mb-12">
           <h2 className="text-3xl font-bold text-gray-900">Featured Jobs</h2>

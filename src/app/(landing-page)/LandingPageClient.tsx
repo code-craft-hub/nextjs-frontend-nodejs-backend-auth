@@ -17,7 +17,6 @@ import { LandingPageInput } from "./components/LandingPageInput";
 import { ActionButton } from "./components/ActionButton";
 import { MeetCverai } from "./components/MeetCverai";
 import { FeatureJobs } from "./components/FeatureJobs";
-import { JobFilters } from "@/lib/types/jobs";
 import { IUser } from "@/types";
 import Pricing from "./components/Pricing";
 import { VideoModal } from "./components/VideoModal";
@@ -29,10 +28,8 @@ import {
 } from "@/modules/blog/components/homeComponents/BlogCard";
 
 export const LandingPageClient = ({
-  filters,
   user,
 }: {
-  filters: JobFilters;
   user: Partial<IUser> | null;
 }) => {
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
@@ -115,7 +112,7 @@ export const LandingPageClient = ({
         <VideoModal />
       </div>
 
-      {user && <FeatureJobs filters={filters} />}
+      <FeatureJobs />
 
       {/* Core Features */}
       <section id="features" className="py-20">

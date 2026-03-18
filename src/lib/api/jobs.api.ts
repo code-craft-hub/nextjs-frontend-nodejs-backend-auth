@@ -4,6 +4,10 @@ import type { RecommendationsResponse } from "@/app/dashboard/(dashboard)/compon
 import { JobPost } from "@/modules/job-posts";
 
 export const jobsApi = {
+  // Get public job posts (no auth required) — used on the landing page
+  getPublicJobs: (params?: { page?: number; limit?: number }, token?: string) =>
+    api.get<PaginatedResponse<JobPost>>("/job-posts", { params, token }),
+
   // Get all jobs with advanced filtering
   getJobs: (params?: any, token?: string) =>
     api.get<PaginatedResponse<JobPost>>("/job-recommendations/search/ilike", {
