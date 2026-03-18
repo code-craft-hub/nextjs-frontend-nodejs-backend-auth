@@ -85,8 +85,8 @@ export const PasswordUpdateForm: React.FC = () => {
         currentPassword: isGoogleOnly ? undefined : data.currentPassword,
         newPassword: data.newPassword,
       });
-      // onSuccess in the mutation handles cache clear + redirect to /login
-      toast.success("Password updated. Please log in again.");
+      toast.success("Password updated successfully.");
+      form.reset();
     } catch (err) {
       const apiErr = err as APIError;
       const message =
