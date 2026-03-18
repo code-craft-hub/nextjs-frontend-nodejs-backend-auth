@@ -6,6 +6,7 @@ export type {
   AuthSession,
   PasswordResetRequest,
   PasswordResetConfirm,
+  ChangePasswordData,
 } from "./api/auth.api.types";
 export type { VerificationTokenStatus } from "./api/auth.api";
 
@@ -29,6 +30,7 @@ export { useRegisterMutation } from "./mutations/useRegister.mutation";
 export { useLogoutMutation } from "./mutations/useLogout.mutation";
 export { useRefreshTokenMutation } from "./mutations/useRefreshToken.mutation";
 export { useDeleteAccountMutation } from "./mutations/useDeleteAccount.mutation";
+export { useChangePasswordMutation } from "./mutations/useChangePassword.mutation";
 
 // ─── Composed Hooks ─────────────────────────────────────────
 export { useAuth } from "./hooks/useAuth";

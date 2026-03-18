@@ -1,6 +1,7 @@
 import { api, clearLogoutIntent, markLogoutIntent } from "@/lib/api/client";
 import type {
   AuthSession,
+  ChangePasswordData,
   LoginCredentials,
   PasswordResetConfirm,
   PasswordResetRequest,
@@ -53,4 +54,8 @@ export const authApi = {
 
   resetPassword: ({ token, newPassword }: PasswordResetConfirm) =>
     api.post<void>(`/password-reset/confirm`, { token, newPassword }),
+
+  // ─── Password Management ────────────────────────────────────
+  changePassword: (data: ChangePasswordData) =>
+    api.put<void>(`/auth/change-password`, data),
 };

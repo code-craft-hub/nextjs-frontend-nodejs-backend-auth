@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { UserProfileForm } from "./user-profile-update";
-import { PasswordUpdateForm } from "./user-password-update";
+import { PasswordUpdateForm } from "./Security";
 import { cn } from "@/lib/utils";
 import { Billing } from "./billing/Billing";
 import { CreditCard, Shield, User2 } from "lucide-react";

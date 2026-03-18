@@ -24,3 +24,9 @@ export interface PasswordResetConfirm {
   token: string;
   newPassword: string;
 }
+
+export interface ChangePasswordData {
+  /** Required for email/password accounts. Omit for Google-only accounts setting a password for the first time. */
+  currentPassword?: string;
+  newPassword: string;
+}

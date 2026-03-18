@@ -71,11 +71,13 @@ export const PasswordResetVerifyEmail = ({
 
       toast.success(`Reset code sent to ${email}!`);
       setCanResend(false);
-      setTimeLeft(60); // 1-minute cooldown
+      setTimeLeft(10); // 1-minute cooldown
     } catch (error: any) {
       console.error(error);
-      const errorString = JSON.stringify(error?.data?.error?.message ?? error?.message);
-      toast.error(errorString ??  "Failed to send reset code");
+      const errorString = JSON.stringify(
+        error?.data?.error?.message ?? error?.message,
+      );
+      toast.error(errorString ?? "Failed to send reset code");
     } finally {
       setIsSending(false);
       setIsVerifying(false);
@@ -90,12 +92,19 @@ export const PasswordResetVerifyEmail = ({
   });
 
   async function onSubmit({ code }: z.infer<typeof formSchema>) {
+    try {
+      await api.post("/auth/verify-email", { otp: code });
+      // await api.post("/auth/refresh");
+      handleStateChange(code);
+    } catch (error) {
+      console.error("Verification failed:", error);
+    }
+
     // We do NOT call verify-email here — that endpoint is for account email
     // verification, not password reset.  The OTP itself is only consumed server-side
     // when /auth/reset-password is called with { email, otp, newPassword }.
     // We simply pass the validated code to the parent so it can provide it to
     // the ResetPassword component.
-    handleStateChange(code);
   }
 
   return (

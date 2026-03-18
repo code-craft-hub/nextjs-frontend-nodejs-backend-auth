@@ -97,15 +97,12 @@ export const VerifyEmailClient = () => {
       });
 
       toast.success(
-        `Verification code sent to your email!}`,
+        `Verification code sent to your email!`,
       );
       setCanResend(false);
-      setTimeLeft(60); // 1-minute cooldown matches the server-side rate limiter
+      setTimeLeft(10);
     } catch (error: any) {
       console.error(error);
-      // APIError (from client.ts) exposes `.status` directly, not `.response.status`.
-
-      // const errorString = JSON.stringify(error?.data?.error ?? error?.message);
       toast.error("Failed to send code");
     } finally {
       setIsSending(false);
