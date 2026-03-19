@@ -24,7 +24,7 @@
 // import { ReportCard } from "@/app/dashboard/jobs/components/ReportCard";
 // import { useRouter } from "next/navigation";
 // import MobileFindJob from "./MobileFindJob";
-// import { jobPostsQueries } from "@/lib/queries/job-posts.queries";
+// import { jobPostsQueries } from "@/features/job-posts/queries/job-posts.query";
 
 // interface FindJobClientProps {
 //   columns: ColumnDef<JobPost>[];
