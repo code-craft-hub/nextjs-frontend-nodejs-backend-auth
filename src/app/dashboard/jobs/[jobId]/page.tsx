@@ -1,4 +1,4 @@
-import { JobIdClient } from "./JobIdClient";
+import { JobIdClient } from "@/features/jobs/components/JobIdClient";
 const JobIdPage = async ({
   params,
   searchParams,

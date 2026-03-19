@@ -1,6 +1,6 @@
 import { requireEmailVerification } from "@/lib/server-auth";
 import { redirect } from "next/navigation";
-import OnboardingClient from "./OnBoardingClient";
+import OnboardingClient from "@/features/onboarding/components/OnBoardingClient";
 import { createServerQueryClient } from "@/shared/query/prefetch";
 import { userQueries } from "@features/user";
 import { HydrationBoundary } from "@/components/hydration-boundary";

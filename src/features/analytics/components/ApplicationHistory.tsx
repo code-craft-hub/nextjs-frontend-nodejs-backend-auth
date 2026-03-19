@@ -10,11 +10,11 @@ import { userQueries } from "@features/user";
 import { usePrefetchJob } from "@/features/jobs/hooks/usePrefetchJob";
 import jobApplicationQueries from "@/features/analytics/queries/application-history.queries";
 
-import { ApplicationHistoryColumn } from "../components/OverviewColumn";
-import { useJobsTable } from "../_hooks/useJobsTable";
-import { JobsTable } from "../components/JobsTable";
+import { ApplicationHistoryColumn } from "@/features/jobs/components/OverviewColumn";
+import { useJobsTable } from "@/features/jobs/hooks/useJobsTable";
+import { JobsTable } from "@/features/jobs/components/JobsTable";
 import MobileOverview from "@/features/job-posts/components/MobileOverview";
-import { SearchBar, SearchBarRef } from "./JobSearchBar";
+import { SearchBar, SearchBarRef } from "@/features/jobs/components/JobSearchBar";
 
 export const ApplicationHistory = ({ children }: { children?: ReactNode }) => {
   const router = useRouter();

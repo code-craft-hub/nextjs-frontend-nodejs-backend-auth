@@ -21,7 +21,7 @@
 // } from "react";
 // import { Button } from "@/components/ui/button";
 // import type { JobFilters } from "@/shared/types/jobs.types";
-// import { ReportCard } from "@/app/dashboard/jobs/components/ReportCard";
+// import { ReportCard } from "@/features/jobs/components/ReportCard";
 // import { useRouter } from "next/navigation";
 // import MobileFindJob from "./MobileFindJob";
 // import { jobPostsQueries } from "@/features/job-posts/queries/job-posts.query";

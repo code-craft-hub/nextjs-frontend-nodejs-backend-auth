@@ -5,9 +5,9 @@ import Image from "next/image";
 import { memo, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 
-import { AIRecommendations } from "./AIRecommendations";
-import { SavedJobs } from "./SavedJobs";
-import { ApplicationHistory } from "./ApplicationHistory";
+import { AIRecommendations } from "@/features/recommendations/components/AIRecommendations";
+import { SavedJobs } from "@/features/bookmarks/components/SavedJobs";
+import { ApplicationHistory } from "@/features/analytics/components/ApplicationHistory";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

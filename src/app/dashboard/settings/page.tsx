@@ -1,5 +1,5 @@
 import { getCookiesToken } from "@/lib/auth.utils";
-import Settings from "./Settings";
+import Settings from "@/features/settings/components/Settings";
 import { createServerQueryClient } from "@/shared/query/prefetch";
 import { aiSettingsQueries } from "@/features/ai-settings/queries/ai-settings.queries";
 import { HydrationBoundary } from "@/components/hydration-boundary";

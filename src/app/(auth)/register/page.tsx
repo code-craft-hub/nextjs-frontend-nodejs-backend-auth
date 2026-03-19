@@ -1,5 +1,5 @@
 // import { redirectIfAuthenticated } from "@/lib/server-auth";
-import RegisterClient from "./register-client";
+import RegisterClient from "@/features/auth/components/register-client";
 
 export default async function RegisterPage({
   searchParams,

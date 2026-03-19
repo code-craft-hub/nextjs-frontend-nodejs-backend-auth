@@ -1,4 +1,4 @@
-import { LandingPageClient } from "./LandingPageClient";
+import { LandingPageClient } from "@/features/landing/components/LandingPageClient";
 import { createServerQueryClient } from "@/shared/query/prefetch";
 import { jobsQueries } from "@/features/jobs/queries/jobs.queries";
 import { prefetchWithPriority } from "@/shared/query/parallel-prefetch";

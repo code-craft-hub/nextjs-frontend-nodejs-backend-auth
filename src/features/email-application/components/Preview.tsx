@@ -1,6 +1,6 @@
 "use client";
 
-import { ProgressIndicator } from "../(dashboard)/ai-apply/progress-indicator";
+import { ProgressIndicator } from "@/features/ai-apply/components/progress-indicator";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
@@ -14,9 +14,9 @@ import { Loader, Send, Sparkles, Trash } from "lucide-react";
 import { sendGTMEvent } from "@next/third-parties/google";
 import { useFireworksConfetti } from "@/components/ui/confetti";
 import AuthorizeGoogle from "@/features/email-application/hooks/AuthorizeGoogle";
-import TailorCoverLetterDisplay from "../tailor-cover-letter/TailorCoverLetterDisplay";
-import { ViewResume } from "../tailor-resume/ViewResume";
-import CreateUserResume from "@/app/onboarding/onboarding-pages/create-resume-form/CreateUserResume";
+import TailorCoverLetterDisplay from "@/features/cover-letter/components/TailorCoverLetterDisplay";
+import { ViewResume } from "@/features/resume/components/ViewResume";
+import CreateUserResume from "@/features/onboarding/components/onboarding-pages/create-resume-form/CreateUserResume";
 import { aiSettingsQueries } from "@/features/ai-settings/queries/ai-settings.queries";
 import { normalizeResumeData } from "@/lib/utils/resume-normalizer";
 import {

@@ -10,8 +10,8 @@ import { useCreateAutoApplyMutation } from "@/features/auto-apply/mutations/auto
 import { userQueries } from "@features/user";
 import { buildPreviewUrl } from "@/lib/utils/ai-apply-navigation";
 import { invalidateDocumentGenerationQueries } from "@/shared/query/query-invalidation";
-import { TailorCoverLetterDisplayStreaming } from "../tailor-cover-letter/TailorCoverLetterDisplayStreaming";
-import { ResumeLoadingSkeleton } from "../tailor-resume/components/resume-loading-skeleton";
+import { TailorCoverLetterDisplayStreaming } from "@/features/cover-letter/components/TailorCoverLetterDisplayStreaming";
+import { ResumeLoadingSkeleton } from "@/features/resume/components/resume-loading-skeleton";
 import { aiSettingsQueries } from "@/features/ai-settings/queries/ai-settings.queries";
 
 export default function AutoApplyClient() {

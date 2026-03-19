@@ -12,10 +12,10 @@ import { useApplyJob } from "@/features/jobs/hooks/useApplyJob";
 import { bookmarksQueries } from "@/features/bookmarks/queries/bookmarks.queries";
 
 import { BookmarkedColumn } from "../components/BookmarkedColumn";
-import { useJobsTable } from "../_hooks/useJobsTable";
-import { JobsTable } from "../components/JobsTable";
+import { useJobsTable } from "@/features/jobs/hooks/useJobsTable";
+import { JobsTable } from "@/features/jobs/components/JobsTable";
 import MobileOverview from "@/features/job-posts/components/MobileOverview";
-import { SearchBar, SearchBarRef } from "./JobSearchBar";
+import { SearchBar, SearchBarRef } from "@/features/jobs/components/JobSearchBar";
 
 export const SavedJobs = ({ children }: { children?: ReactNode }) => {
   const router = useRouter();

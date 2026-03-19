@@ -1,7 +1,7 @@
 "use client";
-import { AnalyticsCard } from "./components/AnalyticsCard";
-import { UsageTrendDashboard } from "./components/line-bar-chart";
-import { AnalyticsBarChart } from "./components/AnalyticsBarChart";
+import { AnalyticsCard } from "./AnalyticsCard";
+import { UsageTrendDashboard } from "./line-bar-chart";
+import { AnalyticsBarChart } from "./AnalyticsBarChart";
 const AnalyticsClient = () => {
     
   return (

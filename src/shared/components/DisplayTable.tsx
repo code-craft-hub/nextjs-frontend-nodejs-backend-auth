@@ -14,8 +14,8 @@ import { useRouter } from "next/navigation";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { useUpdateJobMutation } from "@/features/jobs/mutations/jobs.mutations";
 import { useApplyJob } from "@/features/jobs/hooks/useApplyJob";
-import { ReportCard } from "@/app/dashboard/jobs/components/ReportCard";
-import { OverviewColumn } from "@/app/dashboard/jobs/components/OverviewColumn";
+import { ReportCard } from "@/features/jobs/components/ReportCard";
+import { OverviewColumn } from "@/features/jobs/components/OverviewColumn";
 import { OverviewEmpty } from "./column";
 import MobileOverview from "@/features/job-posts/components/MobileOverview";
 

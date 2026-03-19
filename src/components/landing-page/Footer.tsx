@@ -4,7 +4,7 @@ import { capitalize } from "lodash";
 import { social } from "@/shared/constants/data";
 import Link from "next/link";
 import { smoothlyScrollToView } from "@/lib/utils/helpers";
-import { navItems } from "@/app/(landing-page)/constants";
+import { navItems } from "@/features/landing/constants";
 
 export const Footer = () => {
   return (

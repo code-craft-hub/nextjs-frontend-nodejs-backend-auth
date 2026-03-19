@@ -5,7 +5,7 @@ import { userQueries } from "@features/user";
 import { prefetchWithPriority } from "@/shared/query/parallel-prefetch";
 import { getCookiesToken } from "@/lib/auth.utils";
 import { aiSettingsQueries } from "@/features/ai-settings/queries/ai-settings.queries";
-import AutoApplyClient from "./AutoApplyClient";
+import AutoApplyClient from "@/features/auto-apply/components/AutoApplyClient";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;

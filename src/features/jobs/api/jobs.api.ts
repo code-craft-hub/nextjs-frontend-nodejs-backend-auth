@@ -1,6 +1,6 @@
 import { api } from "@/shared/api/client";
 import type { PaginatedResponse } from "@/shared/types/lib.types";
-import type { RecommendationsResponse } from "@/app/dashboard/(dashboard)/components/recent-activity/types";
+import type { RecommendationsResponse } from "@/features/dashboard/components/recent-activity/types";
 import { JobPost } from "@/features/job-posts";
 
 export const jobsApi = {

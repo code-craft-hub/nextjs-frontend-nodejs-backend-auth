@@ -1,4 +1,4 @@
-import { TailorInterviewQuestion } from "./TailorInterviewQuestion";
+import { TailorInterviewQuestion } from "@/features/interview/components/TailorInterviewQuestion";
 import { createServerQueryClient } from "@/shared/query/prefetch";
 import { interviewQuestionQueries } from "@/features/interview/queries/interview.queries";
 import { HydrationBoundary } from "@/components/hydration-boundary";

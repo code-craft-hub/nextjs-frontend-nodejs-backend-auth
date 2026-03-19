@@ -1,7 +1,7 @@
 "use client";
 
 import { memo, useMemo } from "react";
-import { RecentActivityCard } from "../../components/RecentActivityCard";
+import { RecentActivityCard } from "@/features/dashboard/components/RecentActivityCard";
 import { AIJobCustomizationDatatable } from "./AIJobCustomizationDatatable";
 import { AIJobCustomizationInput } from "./AIJobCustomizationInput";
 import { isEmpty } from "lodash";

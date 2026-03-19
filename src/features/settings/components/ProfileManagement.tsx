@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { userQueries } from "@features/user";
 import AuthorizeGoogle from "@/features/email-application/hooks/AuthorizeGoogle";
 import { toast } from "sonner";
-import { FileUploadZone } from "@/app/onboarding/onboarding-pages/AnyFormatToText";
+import { FileUploadZone } from "@/features/onboarding/components/onboarding-pages/AnyFormatToText";
 import { ProfileCard } from "./ProfileCard";
 import { useResumeUploadWithProgress } from "@/features/resume/hooks/useResumeUploadWithProgress";
 import { resumeQueries } from "@/features/resume/queries/resume.queries";

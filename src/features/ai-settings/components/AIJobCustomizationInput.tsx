@@ -22,11 +22,11 @@ import {
   ACTION_OPTIONS,
   ActionValue,
   PROFILE_OPTIONS,
-} from "../../components/constants";
-import { SelectOptions } from "../../components/SelectOptions";
+} from "@/features/dashboard/components/constants";
+import { SelectOptions } from "@/features/dashboard/components/SelectOptions";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
-import { useDocumentExtraction } from "@/app/onboarding/onboarding-pages/AnyFormatToText";
+import { useDocumentExtraction } from "@/features/onboarding/components/onboarding-pages/AnyFormatToText";
 import { UploadedFile } from "@/shared/types";
 import { userQueries } from "@features/user";
 import { useQuery } from "@tanstack/react-query";

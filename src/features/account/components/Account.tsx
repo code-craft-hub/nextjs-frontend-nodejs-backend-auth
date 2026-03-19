@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { UserProfileForm } from "./user-profile-update";
 import { PasswordUpdateForm } from "./Security";
 import { cn } from "@/lib/utils";
-import { Billing } from "./billing/Billing";
+import { Billing } from "./Billing";
 import { CreditCard, Shield, User2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { userQueries } from "@features/user";

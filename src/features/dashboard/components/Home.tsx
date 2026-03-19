@@ -2,11 +2,11 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import { memo, useEffect } from "react";
-import { AIApply } from "../(dashboard)/dashboard-tabs/ai-apply-tab/AIApply";
-import { FindJob } from "../(dashboard)/dashboard-tabs/find-job-tab/FindJob";
+import { AIApply } from "@/features/ai-apply/components/AIApply";
+import { FindJob } from "@/features/jobs/components/FindJob";
 import { DashboardTab } from "@/shared/types";
-import { TAB_ITEMS } from "../../(landing-page)/constants";
-import { AIJobCustomization } from "../(dashboard)/dashboard-tabs/ai-job-customization-tab/AIJobCustomization";
+import { TAB_ITEMS } from "@/features/landing/constants";
+import { AIJobCustomization } from "@/features/ai-settings/components/AIJobCustomization";
 import { TopGradient } from "@/components/shared/TopGradient";
 import { JobFilters } from "@/shared/types/jobs.types";
 import { userQueries } from "@features/user";

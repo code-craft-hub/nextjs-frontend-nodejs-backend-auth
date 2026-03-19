@@ -1,4 +1,4 @@
-import { ProgressIndicator } from "@/app/dashboard/(dashboard)/ai-apply/progress-indicator";
+import { ProgressIndicator } from "@/features/ai-apply/components/progress-indicator";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 

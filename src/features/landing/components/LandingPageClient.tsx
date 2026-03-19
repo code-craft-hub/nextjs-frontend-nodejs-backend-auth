@@ -11,15 +11,15 @@ import {
   faqItems,
   howItWorks,
   testimonials,
-} from "./constants";
-import { Header } from "./components/Header";
-import { LandingPageInput } from "./components/LandingPageInput";
-import { ActionButton } from "./components/ActionButton";
-import { MeetCverai } from "./components/MeetCverai";
-import { FeatureJobs } from "./components/FeatureJobs";
+} from "../constants";
+import { Header } from "./Header";
+import { LandingPageInput } from "./LandingPageInput";
+import { ActionButton } from "./ActionButton";
+import { MeetCverai } from "./MeetCverai";
+import { FeatureJobs } from "./FeatureJobs";
 import { IUser } from "@/shared/types";
-import Pricing from "./components/Pricing";
-import { VideoModal } from "./components/VideoModal";
+import Pricing from "./Pricing";
+import { VideoModal } from "./VideoModal";
 import { useRouter } from "next/navigation";
 import { blogQueries } from "@/features/blog/queries/blog.queries";
 import {

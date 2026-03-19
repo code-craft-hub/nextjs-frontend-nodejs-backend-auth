@@ -1,7 +1,7 @@
 "use client";
 import { memo } from "react";
 import { AIApplyInput } from "./AIApplyInput";
-import { RecentActivityCard } from "../../components/RecentActivityCard";
+import { RecentActivityCard } from "@/features/dashboard/components/RecentActivityCard";
 import { AIApplyDatatable } from "./AIApplyDatatable";
 import { useQuery } from "@tanstack/react-query";
 import { autoApplyQueries } from "@/features/auto-apply/queries/auto-apply.queries";

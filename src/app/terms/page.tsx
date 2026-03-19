@@ -1,7 +1,7 @@
 "use client";
 
 import { Footer } from "@/components/landing-page/Footer";
-import { Header } from "../(landing-page)/components/Header";
+import { Header } from "@/features/landing/components/Header";
 
 const Terms = () => {
   return (

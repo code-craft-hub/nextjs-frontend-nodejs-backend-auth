@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { sendGTMEvent } from "@next/third-parties/google";
 import { cn } from "@/lib/utils";
 import { userQueries } from "@features/user";
-import { ReportCard } from "../../../app/dashboard/jobs/components/ReportCard";
+import { ReportCard } from "@/features/jobs/components/ReportCard";
 import { JobList } from "@/features/job-posts";
 import { useCallback } from "react";
 import { JobSearchForm } from "@/features/job-posts/components/JobSearchForm";

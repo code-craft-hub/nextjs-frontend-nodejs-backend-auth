@@ -1,6 +1,6 @@
 import { requireAuth } from "@/lib/server-auth";
 import { redirect } from "next/navigation";
-import { VerifyEmailClient } from "./verify-email-client";
+import { VerifyEmailClient } from "@/features/auth/components/verify-email-client";
 import { createServerQueryClient } from "@/shared/query/prefetch";
 import { userQueries } from "@features/user";
 import { authQueries } from "@/features/auth";

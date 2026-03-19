@@ -1,4 +1,4 @@
-import TailorCoverLetter from "./TailorCoverLetter";
+import TailorCoverLetter from "@/features/cover-letter/components/TailorCoverLetter";
 import { createServerQueryClient } from "@/shared/query/prefetch";
 import { coverLetterQueries } from "@/features/cover-letter/queries/cover-letter.queries";
 import { getCookiesToken } from "@/lib/auth.utils";

@@ -5,7 +5,7 @@ import { createServerQueryClient } from "@/shared/query/prefetch";
 import { blogQueries } from "@/features/blog/queries/blog.queries";
 import { getCookiesToken } from "@/lib/auth.utils";
 import { BlogListClient } from "@/features/blog/components/BlogListClient";
-import { Header } from "@/app/(landing-page)/components/Header";
+import { Header } from "@/features/landing/components/Header";
 import { Footer } from "@/components/landing-page/Footer";
 
 export const metadata: Metadata = {

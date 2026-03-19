@@ -1,4 +1,4 @@
-import { Category } from "./CategoryClient";
+import { Category } from "@/features/jobs/components/CategoryClient";
 
 const CategoryPage = async ({ searchParams }: any) => {
   const tab = (await searchParams)?.tab;

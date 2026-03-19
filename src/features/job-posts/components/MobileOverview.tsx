@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { memo } from "react";
-import { JobUpdateMutation } from "../../../app/dashboard/jobs/components/OverviewColumn";
+import { JobUpdateMutation } from "@/features/jobs/components/OverviewColumn";
 import type { JobPost } from "@/features/job-posts";
 
 interface MobileOverviewProps {

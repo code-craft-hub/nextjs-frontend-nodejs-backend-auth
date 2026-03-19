@@ -22,10 +22,10 @@ import recommendationsApi, {
 } from "@/features/recommendations/api/recommendations.api";
 import recommendationsQueries from "@/features/recommendations/queries/recommendations.queries";
 
-import { OverviewColumn } from "../components/OverviewColumn";
-import { useJobsTable } from "../_hooks/useJobsTable";
-import { JobsTable } from "../components/JobsTable";
-import { LoadMoreButton } from "../components/LoadMoreButton";
+import { OverviewColumn } from "@/features/jobs/components/OverviewColumn";
+import { useJobsTable } from "@/features/jobs/hooks/useJobsTable";
+import { JobsTable } from "@/features/jobs/components/JobsTable";
+import { LoadMoreButton } from "@/features/jobs/components/LoadMoreButton";
 import MobileOverview from "@/features/job-posts/components/MobileOverview";
 import { JobPost } from "@/features/job-posts";
 

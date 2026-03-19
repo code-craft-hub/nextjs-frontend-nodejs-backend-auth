@@ -4,7 +4,7 @@ import { useCallback } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useUpdateJobMutation } from "@/features/jobs/mutations/jobs.mutations";
 import type { JobPost } from "@/shared/types";
-import { BOOKMARK_IDS_QUERY_KEY } from "./useBookmarkedJobIds";
+import { BOOKMARK_IDS_QUERY_KEY } from "@/features/bookmarks/hooks/useBookmarkedJobIds";
 import { useApplyJob } from "@/features/jobs/hooks/useApplyJob";
 
 /**

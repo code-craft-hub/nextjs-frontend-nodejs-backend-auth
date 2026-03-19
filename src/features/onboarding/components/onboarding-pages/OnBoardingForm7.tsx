@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 
 import Progress from "./Progress";
 import { Button } from "@/components/ui/button";
-import { creditCard } from "@/app/(landing-page)/constants";
+import { creditCard } from "@/features/landing/constants";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import {

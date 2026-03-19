@@ -12,7 +12,7 @@ import {
 import { Toggle } from "@/components/ui/toggle";
 import { formatAppliedDate } from "@/lib/utils/helpers";
 import type { JobPost } from "@/shared/types";
-import { useJobActions } from "./hooks/useJobActions";
+import { useJobActions } from "@/features/jobs/hooks/useJobActions";
 
 const MobileFindJob = memo(({ allJobs }: { allJobs: JobPost[] }) => {
   const router = useRouter();

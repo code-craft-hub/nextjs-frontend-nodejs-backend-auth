@@ -19,13 +19,13 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
-import { PROFILE_OPTIONS } from "../../components/constants";
+import { PROFILE_OPTIONS } from "@/features/dashboard/components/constants";
 import { useRouter } from "next/navigation";
 import { emailRegex } from "@/validation";
 import { FileUploadForm } from "@/components/FileUploadForm";
 import { UploadedFile } from "@/shared/types";
 import { cn } from "@/lib/utils";
-import { useDocumentExtraction } from "@/app/onboarding/onboarding-pages/AnyFormatToText";
+import { useDocumentExtraction } from "@/features/onboarding/components/onboarding-pages/AnyFormatToText";
 import { isEmpty } from "lodash";
 import { Separator } from "@/components/ui/separator";
 import { userQueries } from "@features/user";

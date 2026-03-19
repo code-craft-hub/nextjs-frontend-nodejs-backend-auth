@@ -1,4 +1,4 @@
-import Preview from "./Preview";
+import Preview from "@/features/email-application/components/Preview";
 import { HydrationBoundary } from "@/components/hydration-boundary";
 import { dehydrate } from "@tanstack/react-query";
 import { createServerQueryClient } from "@/shared/query/prefetch";

@@ -1,4 +1,4 @@
-import ResetPasswordClient from "./ResetPasswordClient";
+import ResetPasswordClient from "@/features/auth/components/ResetPasswordClient";
 // import { redirect } from "next/navigation";
 
 export default async function ResetPassword({

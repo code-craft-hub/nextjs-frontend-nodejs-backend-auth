@@ -2,7 +2,7 @@
 import { useCallback, useState } from "react";
 import { JobSearchForm } from "@/features/job-posts/components/JobSearchForm";
 import { JobList } from "@/features/job-posts/components/JobList";
-import { ReportCard } from "@/app/dashboard/jobs/components/ReportCard";
+import { ReportCard } from "@/features/jobs/components/ReportCard";
 
 export default function JobsPage() {
   const [query, setQuery] = useState<string | undefined>(undefined);

@@ -6,7 +6,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { UserMenu } from "@/components/UserMenu";
-import { DynamicBreadcrumb } from "./components/DynamicBreadcrumb";
+import { DynamicBreadcrumb } from "@/features/dashboard/components/DynamicBreadcrumb";
 import { requireOnboarding } from "@/lib/server-auth";
 import { createServerQueryClient } from "@/shared/query/prefetch";
 import { userQueries } from "@features/user";
