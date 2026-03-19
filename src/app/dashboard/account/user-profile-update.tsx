@@ -20,11 +20,12 @@ import { useUpdateUserMutation } from "@module/user";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 const CVERAI_NUMBER = process.env.NEXT_PUBLIC_CVERAI_NUMBER || "+436767391022";
+const E164_REGEX = /^\+?[1-9]\d{6,14}$/;
 
 export const e164PhoneNumberSchema = z
   .string()
   .trim()
-  .regex(/^[1-9]\d{1,14}$/, {
+  .regex(E164_REGEX, {
     message:
       "Invalid phone number. Must be in E.164 format (e.g. 14155552671)",
   });

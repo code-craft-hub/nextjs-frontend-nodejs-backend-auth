@@ -45,8 +45,6 @@ export function AutoGenerateTitleDialog({
   });
 
   const onSubmit = async ({ title }: z.infer<typeof titleSchema>) => {
-    console.log(title);
-
     toast.success(`Auto-generating your resume title: ${title}`);
     onNext?.();
     await resumeApi.autoNewResume(title);

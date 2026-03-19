@@ -12,7 +12,7 @@ import { createServerQueryClient } from "@/lib/query/prefetch";
 import { userQueries } from "@module/user";
 import { HydrationBoundary } from "@/components/hydration-boundary";
 import { dehydrate } from "@tanstack/react-query";
-import { getCookiesToken } from "@/lib/auth.utils";
+import { getCookiesToken, getSessionFromCookies } from "@/lib/auth.utils";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -24,9 +24,8 @@ const DashboardLayout = async ({ children }: DashboardLayoutProps) => {
   await requireOnboarding();
   const token = await getCookiesToken();
   const queryClient = createServerQueryClient();
-  // Only attempt server-side user fetch when an access token exists.
-  // If there's no access token but a refresh token exists, the client
-  // will perform rotation; skip server fetch to avoid a 401 during SSR.
+  const authUser = await getSessionFromCookies();
+  console.log("DashboardLayout authUser:", authUser);
   if (token) {
     await queryClient.fetchQuery(userQueries.detail(token));
   }
@@ -46,7 +45,7 @@ const DashboardLayout = async ({ children }: DashboardLayoutProps) => {
               <DynamicBreadcrumb />
             </div>
             <div className="ml-auto">
-              <UserMenu />
+              <UserMenu role={authUser?.role} />
             </div>
           </header>
           <div className="w-full min-h-screen bg-[#F5F7FA]">{children}</div>

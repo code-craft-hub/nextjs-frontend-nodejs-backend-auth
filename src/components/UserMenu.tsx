@@ -14,16 +14,17 @@ import { useQuery } from "@tanstack/react-query";
 import { userQueries } from "@module/user";
 import { useLogoutMutation } from "@/modules/auth";
 
-export const UserMenu = () => {
+export const UserMenu = ({ role }: { role?: string }) => {
   const { data: user } = useQuery(userQueries.detail());
   const router = useRouter();
 
-  const isAdmin = user?.role === "admin";
+  const isAdmin = role === "admin";
 
   const logout = useLogoutMutation();
 
   const handleNavigateToAdmin = () => {
-    window.location.href = process.env.NEXT_PUBLIC_ADMIN_URL ?? "http://localhost:3002/dashboard";
+    window.location.href =
+      process.env.NEXT_PUBLIC_ADMIN_URL ?? "http://localhost:3002/dashboard";
   };
 
   return (
