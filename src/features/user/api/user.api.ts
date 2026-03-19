@@ -1,5 +1,5 @@
 import type { IUser } from "@/types";
-import { api } from "@/lib/api/client";
+import { api } from "@/shared/api/client";
 import type { PaginatedResponse, PaginationParams } from "@/lib/types";
 import type {
   CreateUserData,

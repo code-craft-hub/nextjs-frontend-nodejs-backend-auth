@@ -1,6 +1,6 @@
 import { TailorResume } from "./TailorResume";
-import { createServerQueryClient } from "@/lib/query/prefetch";
-import { resumeQueries } from "@/lib/queries/resume.queries";
+import { createServerQueryClient } from "@/shared/query/prefetch";
+import { resumeQueries } from "@/features/resume/queries/resume.queries";
 import { HydrationBoundary } from "@/components/hydration-boundary";
 import { dehydrate } from "@tanstack/react-query";
 import { getCookiesToken } from "@/lib/auth.utils";

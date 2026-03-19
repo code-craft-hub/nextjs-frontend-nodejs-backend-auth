@@ -1,6 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
-import { BASEURL } from "@/lib/api/client";
+import { BASEURL } from "@/shared/api/client";
 import { IUser } from "@/types";
 import { Button } from "@/components/ui/button";
 import { DownloadIcon, Loader } from "lucide-react";

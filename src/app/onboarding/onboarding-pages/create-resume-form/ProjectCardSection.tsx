@@ -20,7 +20,7 @@ import {
   useCreateProjectMutation,
   useUpdateProjectMutation,
   useDeleteProjectMutation,
-} from "@/lib/mutations/resume.mutations";
+} from "@/features/resume/mutations/resume.mutations";
 import { PiOfficeChair } from "react-icons/pi";
 
 // ─── Schema ────────────────────────────────────────────────────────

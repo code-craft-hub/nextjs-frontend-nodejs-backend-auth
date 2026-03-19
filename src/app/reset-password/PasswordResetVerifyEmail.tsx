@@ -19,7 +19,7 @@ import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { X } from "lucide-react";
-import { api } from "@/lib/api/client";
+import { api } from "@/shared/api/client";
 
 // Server validates exactly 6 numeric digits (auth.validator.ts → otpSchema).
 const formSchema = z.object({

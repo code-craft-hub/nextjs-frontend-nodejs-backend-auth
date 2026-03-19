@@ -1,6 +1,6 @@
 import { infiniteQueryOptions, queryOptions } from "@tanstack/react-query";
-import { jobApplicationsApi } from "@/lib/api/job-applications.api";
-import { jobApplicationKeys } from "@/lib/query/job-applications.keys";
+import { jobApplicationsApi } from "@/features/analytics/api/job-applications.api";
+import { jobApplicationKeys } from "@/features/analytics/queries/job-applications.keys";
 
 export const jobApplicationQueries = {
   /**

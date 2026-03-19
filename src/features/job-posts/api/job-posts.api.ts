@@ -1,5 +1,5 @@
 
-import { api } from "@/lib/api/client";
+import { api } from "@/shared/api/client";
 import type { PaginatedResponse } from "@/lib/types";
 import type { InfiniteJobsResponse, JobPost } from "../types";
 

@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { resumeQueries } from "@/lib/queries/resume.queries";
+import { resumeQueries } from "@/features/resume/queries/resume.queries";
 import { userQueries } from "@features/user";
 import { ResumeDownloadButton } from "./ResumeDownloadButton";
 import { TrashIcon } from "lucide-react";
@@ -16,7 +16,7 @@ import { buildResumeUpdateUrl } from "@/lib/utils/ai-apply-navigation";
 import CreateUserResume from "@/app/onboarding/onboarding-pages/create-resume-form/CreateUserResume";
 import { useFireworksConfetti } from "@/components/ui/confetti";
 import { ViewResume } from "./ViewResume";
-import { useDeleteResumeMutation } from "@/lib/mutations/resume.mutations";
+import { useDeleteResumeMutation } from "@/features/resume/mutations/resume.mutations";
 
 /**
  * Normalize API response data to match the expected UI schema

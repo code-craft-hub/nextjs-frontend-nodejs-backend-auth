@@ -22,7 +22,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { CoverLetter, IUser } from "@/types";
 import { EditIcon, Loader } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useUpdateCoverLetterMutation } from "@/lib/mutations/cover-letter.mutations";
+import { useUpdateCoverLetterMutation } from "@/features/cover-letter/mutations/cover-letter.mutations";
 
 // Validation schema
 const coverLetterSchema = z.object({

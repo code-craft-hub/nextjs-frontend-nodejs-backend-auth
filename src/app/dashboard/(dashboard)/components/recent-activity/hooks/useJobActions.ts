@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { JobType } from "@/types";
 import { buildAutoApplyStartUrl } from "@/lib/utils/ai-apply-navigation";
-import { gmailApi } from "@/lib/api/gmail.api";
+import { gmailApi } from "@/features/email-application/api/gmail.api";
 import { useDefaultResumeGuard } from "@/hooks/useDefaultResumeGuard";
 
 export function useJobActions() {

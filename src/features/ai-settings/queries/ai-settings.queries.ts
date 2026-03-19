@@ -1,6 +1,6 @@
 import { queryOptions } from "@tanstack/react-query";
-import { aiSettingsApi } from "@/lib/api/ai-settings.api";
-import { aiSettingsKeys } from "@/lib/query/ai-settings.keys";
+import { aiSettingsApi } from "@/features/ai-settings/api/ai-settings.api";
+import { aiSettingsKeys } from "@/features/ai-settings/queries/ai-settings.keys";
 
 export const aiSettingsQueries = {
   detail: (token?: string) =>

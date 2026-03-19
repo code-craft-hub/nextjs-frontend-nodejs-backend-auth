@@ -1,4 +1,4 @@
-import { API_URL } from "@/lib/api/client";
+import { API_URL } from "@/shared/api/client";
 import { useState, useCallback, useRef } from "react";
 
 export interface UploadProgress {

@@ -7,7 +7,7 @@ import {
   UseResumeStreamReturn,
 } from "@/types";
 import { jsonrepair } from "jsonrepair";
-import { API_URL } from "@/lib/api/client";
+import { API_URL } from "@/shared/api/client";
 
 export const useResumeStream = (): UseResumeStreamReturn => {
   const [streamData, setStreamData] = useState<StreamData>(() => ({

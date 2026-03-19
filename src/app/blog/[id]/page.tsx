@@ -1,8 +1,8 @@
 import { type Metadata } from "next";
 import { dehydrate } from "@tanstack/react-query";
 import { HydrationBoundary } from "@/components/hydration-boundary";
-import { createServerQueryClient } from "@/lib/query/prefetch";
-import { blogQueries } from "@/lib/queries/blog.queries";
+import { createServerQueryClient } from "@/shared/query/prefetch";
+import { blogQueries } from "@/features/blog/queries/blog.queries";
 import { getCookiesToken } from "@/lib/auth.utils";
 import { BlogDetailClient } from "@/modules/blog/components/BlogDetailClient";
 import { Header } from "@/app/(landing-page)/components/Header";

@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { userQueries } from "@features/user";
 import { useResumeUploadWithProgress } from "@/hooks/useResumeUploadWithProgress";
-import { queryKeys } from "@/lib/query/keys";
+import { queryKeys } from "@/shared/query/keys";
 import CreateUserResume from "./create-resume-form/CreateUserResume";
 import { Bot, Edit3 } from "lucide-react";
 import { AutoGenerateTitleDialog } from "./get-title-dialog";

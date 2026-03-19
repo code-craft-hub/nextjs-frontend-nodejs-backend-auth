@@ -4,7 +4,7 @@ import { memo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { jobsQueries } from "@/lib/queries/jobs.queries";
+import { jobsQueries } from "@/features/jobs/queries/jobs.queries";
 import { useJobActions } from "./hooks/useJobActions";
 import { JobCard } from "./JobCard";
 import { LoadingSkeleton } from "./LoadingSkeleton";

@@ -18,7 +18,7 @@ import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
-import { api } from "@/lib/api/client";
+import { api } from "@/shared/api/client";
 
 // Mirror the server-side password policy (auth.validator.ts → passwordSchema).
 const formSchema = z.object({

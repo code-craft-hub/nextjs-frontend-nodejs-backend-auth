@@ -4,13 +4,13 @@ import {
   type ApplicationListResponse,
   type CreateApplicationData,
   type UpdateApplicationData,
-} from "@/lib/api/job-applications.api";
-import { jobApplicationKeys } from "@/lib/query/job-applications.keys";
+} from "@/features/analytics/api/job-applications.api";
+import { jobApplicationKeys } from "@/features/analytics/queries/job-applications.keys";
 import type { JobApplication } from "@/types";
 import {
   invalidateApplicationLists,
   invalidateApplicationCheck,
-} from "@/lib/query/query-invalidation";
+} from "@/shared/query/query-invalidation";
 
 // ─── Create ───────────────────────────────────────────────────────────────────
 

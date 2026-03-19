@@ -1,4 +1,4 @@
-import { api } from "@/lib/api/client";
+import { api } from "@/shared/api/client";
 import type { IActiveUser, IPresenceStats } from "./presence.api.types";
 
 export const presenceApi = {

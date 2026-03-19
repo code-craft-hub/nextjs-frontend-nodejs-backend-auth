@@ -1,10 +1,10 @@
 import { getCookiesToken } from "@/lib/auth.utils";
 import Settings from "./Settings";
-import { createServerQueryClient } from "@/lib/query/prefetch";
-import { aiSettingsQueries } from "@/lib/queries/ai-settings.queries";
+import { createServerQueryClient } from "@/shared/query/prefetch";
+import { aiSettingsQueries } from "@/features/ai-settings/queries/ai-settings.queries";
 import { HydrationBoundary } from "@/components/hydration-boundary";
 import { dehydrate } from "@tanstack/react-query";
-import { resumeQueries } from "@/lib/queries/resume.queries";
+import { resumeQueries } from "@/features/resume/queries/resume.queries";
 
 const SettingsPage = async ({
   searchParams,

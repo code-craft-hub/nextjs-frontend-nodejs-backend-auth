@@ -36,9 +36,9 @@ import { Loader2, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { AIApplyColumn } from "./AIApplyColumn";
-import { AutoApplyRecord, autoApplyApi } from "@/lib/api/auto-apply.api";
-import { queryKeys } from "@/lib/query/keys";
-import { autoApplyKeys } from "@/lib/query/auto-apply.keys";
+import { AutoApplyRecord, autoApplyApi } from "@/features/auto-apply/api/auto-apply.api";
+import { queryKeys } from "@/shared/query/keys";
+import { autoApplyKeys } from "@/features/auto-apply/queries/auto-apply.keys";
 
 export function AIApplyDatatable({ data }: { data: AutoApplyRecord[] }) {
   const router = useRouter();

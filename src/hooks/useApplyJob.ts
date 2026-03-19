@@ -3,8 +3,8 @@
 import { useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { useUpdateJobApplicationHistoryMutation } from "@/lib/mutations/jobs.mutations";
-import { gmailApi } from "@/lib/api/gmail.api";
+import { useUpdateJobApplicationHistoryMutation } from "@/features/jobs/mutations/jobs.mutations";
+import { gmailApi } from "@/features/email-application/api/gmail.api";
 import { buildAutoApplyStartUrl } from "@/lib/utils/ai-apply-navigation";
 
 /**

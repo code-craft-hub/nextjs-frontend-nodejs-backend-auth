@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { userQueries } from "@features/user";
-import { api } from "@/lib/api/client";
+import { api } from "@/shared/api/client";
 import { generateIdempotencyKey } from "@/lib/utils/helpers";
 import { toast } from "sonner";
 

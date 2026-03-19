@@ -3,12 +3,12 @@ import {
   autoApplyApi,
   type CreateAutoApplyData,
   type UpdateAutoApplyData,
-} from "@/lib/api/auto-apply.api";
+} from "@/features/auto-apply/api/auto-apply.api";
 import {
   invalidateAutoApplyLists,
   invalidateAutoApplyDetail,
   invalidateAutoApplyCount,
-} from "@/lib/query/query-invalidation";
+} from "@/shared/query/query-invalidation";
 
 export function useCreateAutoApplyMutation() {
   const queryClient = useQueryClient();

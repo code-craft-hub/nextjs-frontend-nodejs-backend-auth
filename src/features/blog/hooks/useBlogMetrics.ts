@@ -17,7 +17,7 @@
  */
 
 import { useEffect, useRef, useCallback } from "react";
-import { userActivityApi } from "@/lib/api/user-activity.api";
+import { userActivityApi } from "@/features/analytics/api/user-activity.api";
 
 interface UseBlogMetricsOptions {
   blogId: string;

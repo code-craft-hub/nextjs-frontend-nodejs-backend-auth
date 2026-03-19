@@ -3,8 +3,8 @@ import {
   aiSettingsApi,
   type CreateAISettingsData,
   type UpdateAISettingsData,
-} from "@/lib/api/ai-settings.api";
-import { invalidateAISettingsQueries } from "@/lib/query/query-invalidation";
+} from "@/features/ai-settings/api/ai-settings.api";
+import { invalidateAISettingsQueries } from "@/shared/query/query-invalidation";
 
 export function useCreateOrUpdateAISettingsMutation() {
   const queryClient = useQueryClient();

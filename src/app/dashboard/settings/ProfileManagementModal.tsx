@@ -21,7 +21,7 @@ import { BookmarkIcon, Loader2 } from "lucide-react";
 import { Toggle } from "@/components/ui/toggle";
 import { toast } from "sonner";
 import { ResumeAggregate } from "@/shared/types/resume.types";
-import { useUpdateResumeMutation } from "@/lib/mutations/resume.mutations";
+import { useUpdateResumeMutation } from "@/features/resume/mutations/resume.mutations";
 
 const jobLevels = ["Entry Level", "Mid Level", "Senior Level"];
 const jobTypes = ["Full Time", "Part Time", "Contract"];

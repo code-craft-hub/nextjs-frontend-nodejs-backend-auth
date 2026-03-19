@@ -12,15 +12,15 @@ import { Loader2, RefreshCw, UserCircle } from "lucide-react";
 import { sendGTMEvent } from "@next/third-parties/google";
 
 import { userQueries } from "@features/user";
-import { useUpdateJobMutation } from "@/lib/mutations/jobs.mutations";
+import { useUpdateJobMutation } from "@/features/jobs/mutations/jobs.mutations";
 import { useApplyJob } from "@/hooks/useApplyJob";
-import { queryKeys } from "@/lib/query/keys";
+import { queryKeys } from "@/shared/query/keys";
 import { Button } from "@/components/ui/button";
 
 import recommendationsApi, {
   JobRecommendation,
-} from "@/lib/api/recommendations.api";
-import recommendationsQueries from "@/lib/queries/recommendations.queries";
+} from "@/features/recommendations/api/recommendations.api";
+import recommendationsQueries from "@/features/recommendations/queries/recommendations.queries";
 
 import { OverviewColumn } from "../components/OverviewColumn";
 import { useJobsTable } from "../_hooks/useJobsTable";

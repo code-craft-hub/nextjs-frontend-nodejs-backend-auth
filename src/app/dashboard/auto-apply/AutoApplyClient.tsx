@@ -6,13 +6,13 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useResumeStream } from "@/hooks/stream-resume-hook";
 import { useCoverLetterStream } from "@/hooks/useCoverLetterGenerator";
-import { useCreateAutoApplyMutation } from "@/lib/mutations/auto-apply.mutations";
+import { useCreateAutoApplyMutation } from "@/features/auto-apply/mutations/auto-apply.mutations";
 import { userQueries } from "@features/user";
 import { buildPreviewUrl } from "@/lib/utils/ai-apply-navigation";
-import { invalidateDocumentGenerationQueries } from "@/lib/query/query-invalidation";
+import { invalidateDocumentGenerationQueries } from "@/shared/query/query-invalidation";
 import { TailorCoverLetterDisplayStreaming } from "../tailor-cover-letter/TailorCoverLetterDisplayStreaming";
 import { ResumeLoadingSkeleton } from "../tailor-resume/components/resume-loading-skeleton";
-import { aiSettingsQueries } from "@/lib/queries/ai-settings.queries";
+import { aiSettingsQueries } from "@/features/ai-settings/queries/ai-settings.queries";
 
 export default function AutoApplyClient() {
   const router = useRouter();

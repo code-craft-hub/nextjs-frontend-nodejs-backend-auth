@@ -1,6 +1,6 @@
 // src/services/api/cover-letter.service.ts
 
-import { BACKEND_API_VERSION, BASEURL } from "@/lib/api/client";
+import { BACKEND_API_VERSION, BASEURL } from "@/shared/api/client";
 import { IUser } from "@/types";
 
 export interface CoverLetterRequest {

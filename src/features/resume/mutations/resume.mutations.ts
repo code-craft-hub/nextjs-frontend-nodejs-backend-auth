@@ -3,12 +3,12 @@ import {
   resumeApi,
   type CreateResumeData,
   type UpdateResumeData,
-} from "@/lib/api/resume.api";
-import { queryKeys } from "@/lib/query/keys";
+} from "@/features/resume/api/resume.api";
+import { queryKeys } from "@/shared/query/keys";
 import {
   invalidateResumeDetail,
   invalidateResumeLists,
-} from "@/lib/query/query-invalidation";
+} from "@/shared/query/query-invalidation";
 import type { PaginatedResponse } from "@/lib/types";
 import type {
   WorkExperienceEntry,

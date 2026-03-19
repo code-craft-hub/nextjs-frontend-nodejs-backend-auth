@@ -2,13 +2,13 @@
 
 import { Button } from "@/components/ui/button";
 import { ArrowRight, MapPin, Sparkles } from "lucide-react";
-import { jobsQueries } from "@/lib/queries/jobs.queries";
+import { jobsQueries } from "@/features/jobs/queries/jobs.queries";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { v4 as uuidv4 } from "uuid";
 import { cn } from "@/lib/utils";
-import { gmailApi } from "@/lib/api/gmail.api";
+import { gmailApi } from "@/features/email-application/api/gmail.api";
 
 export const FeatureJobs = () => {
   const { data: jobs } = useQuery(jobsQueries.featured());

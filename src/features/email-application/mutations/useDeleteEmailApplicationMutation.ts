@@ -7,10 +7,10 @@ import {
   invalidateResumeQueries,
   invalidateCoverLetterQueries,
   invalidateAIApplyQueries,
-} from "@/lib/query/query-invalidation";
-import { autoApplyApi } from "@/lib/api/auto-apply.api";
-import { resumeApi } from "@/lib/api/resume.api";
-import { coverLetterApi } from "@/lib/api/cover-letter.api";
+} from "@/shared/query/query-invalidation";
+import { autoApplyApi } from "@/features/auto-apply/api/auto-apply.api";
+import { resumeApi } from "@/features/resume/api/resume.api";
+import { coverLetterApi } from "@/features/cover-letter/api/cover-letter.api";
 
 /**
  * Hook for deleting an email application

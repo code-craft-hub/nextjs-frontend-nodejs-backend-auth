@@ -8,7 +8,7 @@ import { Loader2 } from "lucide-react";
 
 import { userQueries } from "@features/user";
 import { usePrefetchJob } from "@/hooks/usePrefetchJob";
-import jobApplicationQueries from "@/lib/queries/application-history.queries";
+import jobApplicationQueries from "@/features/analytics/queries/application-history.queries";
 
 import { ApplicationHistoryColumn } from "../components/OverviewColumn";
 import { useJobsTable } from "../_hooks/useJobsTable";

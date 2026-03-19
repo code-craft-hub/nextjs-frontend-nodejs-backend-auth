@@ -1,13 +1,13 @@
 import Preview from "./Preview";
 import { HydrationBoundary } from "@/components/hydration-boundary";
 import { dehydrate } from "@tanstack/react-query";
-import { createServerQueryClient } from "@/lib/query/prefetch";
+import { createServerQueryClient } from "@/shared/query/prefetch";
 import { userQueries } from "@features/user";
-import { prefetchWithPriority } from "@/lib/query/parallel-prefetch";
-import { resumeQueries } from "@/lib/queries/resume.queries";
-import { coverLetterQueries } from "@/lib/queries/cover-letter.queries";
+import { prefetchWithPriority } from "@/shared/query/parallel-prefetch";
+import { resumeQueries } from "@/features/resume/queries/resume.queries";
+import { coverLetterQueries } from "@/features/cover-letter/queries/cover-letter.queries";
 import { getCookiesToken } from "@/lib/auth.utils";
-import { aiSettingsQueries } from "@/lib/queries/ai-settings.queries";
+import { aiSettingsQueries } from "@/features/ai-settings/queries/ai-settings.queries";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;

@@ -1,4 +1,4 @@
-import { api, clearLogoutIntent, markLogoutIntent } from "@/lib/api/client";
+import { api, clearLogoutIntent, markLogoutIntent } from "@/shared/api/client";
 import type {
   AuthSession,
   ChangePasswordData,

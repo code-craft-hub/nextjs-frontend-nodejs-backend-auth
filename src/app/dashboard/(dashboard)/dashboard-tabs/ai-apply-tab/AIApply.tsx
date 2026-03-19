@@ -4,7 +4,7 @@ import { AIApplyInput } from "./AIApplyInput";
 import { RecentActivityCard } from "../../components/RecentActivityCard";
 import { AIApplyDatatable } from "./AIApplyDatatable";
 import { useQuery } from "@tanstack/react-query";
-import { autoApplyQueries } from "@/lib/queries/auto-apply.queries";
+import { autoApplyQueries } from "@/features/auto-apply/queries/auto-apply.queries";
 
 export const AIApply = memo(
   ({ jobDescription }: { jobDescription: string }) => {

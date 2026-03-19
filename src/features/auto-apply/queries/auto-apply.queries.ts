@@ -1,6 +1,6 @@
 import { queryOptions } from "@tanstack/react-query";
-import { autoApplyApi } from "@/lib/api/auto-apply.api";
-import { autoApplyKeys } from "@/lib/query/auto-apply.keys";
+import { autoApplyApi } from "@/features/auto-apply/api/auto-apply.api";
+import { autoApplyKeys } from "@/features/auto-apply/queries/auto-apply.keys";
 
 export const autoApplyQueries = {
   all: (token?: string) =>

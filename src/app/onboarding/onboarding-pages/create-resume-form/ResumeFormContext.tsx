@@ -8,7 +8,7 @@ import {
   useState,
 } from "react";
 import type { ResumeAggregate } from "@/shared/types/resume.types";
-import { useCreateNewResumeMutation } from "@/lib/mutations/resume.mutations";
+import { useCreateNewResumeMutation } from "@/features/resume/mutations/resume.mutations";
 
 interface ResumeFormContextValue {
   resumeId: string | null;

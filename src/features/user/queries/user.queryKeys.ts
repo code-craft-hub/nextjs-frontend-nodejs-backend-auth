@@ -1,4 +1,4 @@
-import { queryKeys } from "@/lib/query/keys";
+import { queryKeys } from "@/shared/query/keys";
 import type { PaginationParams } from "@/lib/types";
 
 export const userQueryKeys = {

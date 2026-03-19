@@ -8,7 +8,7 @@ import {
   invalidateResumeQueries,
   invalidateCoverLetterQueries,
   invalidateAIApplyQueries,
-} from "@/lib/query/query-invalidation";
+} from "@/shared/query/query-invalidation";
 import { invalidateUserQueries } from "@features/user";
 
 /**

@@ -7,9 +7,9 @@ import { sendGTMEvent } from "@next/third-parties/google";
 import { Loader2 } from "lucide-react";
 
 import { userQueries } from "@features/user";
-import { useUpdateJobMutation } from "@/lib/mutations/jobs.mutations";
+import { useUpdateJobMutation } from "@/features/jobs/mutations/jobs.mutations";
 import { useApplyJob } from "@/hooks/useApplyJob";
-import { bookmarksQueries } from "@/lib/queries/bookmarks.queries";
+import { bookmarksQueries } from "@/features/bookmarks/queries/bookmarks.queries";
 
 import { BookmarkedColumn } from "../components/BookmarkedColumn";
 import { useJobsTable } from "../_hooks/useJobsTable";

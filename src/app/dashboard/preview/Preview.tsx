@@ -7,8 +7,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { userQueries } from "@features/user";
-import { resumeQueries } from "@/lib/queries/resume.queries";
-import { coverLetterQueries } from "@/lib/queries/cover-letter.queries";
+import { resumeQueries } from "@/features/resume/queries/resume.queries";
+import { coverLetterQueries } from "@/features/cover-letter/queries/cover-letter.queries";
 import { CongratulationModal } from "@/components/shared/CongratulationModal";
 import { Loader, Send, Sparkles, Trash } from "lucide-react";
 import { sendGTMEvent } from "@next/third-parties/google";
@@ -17,7 +17,7 @@ import AuthorizeGoogle from "@/hooks/gmail/AuthorizeGoogle";
 import TailorCoverLetterDisplay from "../tailor-cover-letter/TailorCoverLetterDisplay";
 import { ViewResume } from "../tailor-resume/ViewResume";
 import CreateUserResume from "@/app/onboarding/onboarding-pages/create-resume-form/CreateUserResume";
-import { aiSettingsQueries } from "@/lib/queries/ai-settings.queries";
+import { aiSettingsQueries } from "@/features/ai-settings/queries/ai-settings.queries";
 import { normalizeResumeData } from "@/lib/utils/resume-normalizer";
 import {
   useSendEmailApplicationMutation,

@@ -1,6 +1,6 @@
 "use client";
 import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
-import { api } from "@/lib/api/client";
+import { api } from "@/shared/api/client";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 

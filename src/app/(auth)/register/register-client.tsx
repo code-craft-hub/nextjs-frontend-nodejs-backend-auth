@@ -22,7 +22,7 @@ import { cn } from "@/lib/utils";
 import { inputField } from "@/lib/utils/constants";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { api } from "@/lib/api/client";
+import { api } from "@/shared/api/client";
 import { GoogleButton } from "@/modules/auth";
 
 export default function RegisterClient({ referral }: { referral?: string }) {

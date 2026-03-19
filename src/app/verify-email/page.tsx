@@ -1,7 +1,7 @@
 import { requireAuth } from "@/lib/server-auth";
 import { redirect } from "next/navigation";
 import { VerifyEmailClient } from "./verify-email-client";
-import { createServerQueryClient } from "@/lib/query/prefetch";
+import { createServerQueryClient } from "@/shared/query/prefetch";
 import { userQueries } from "@features/user";
 import { authQueries } from "@/modules/auth";
 import { HydrationBoundary } from "@/components/hydration-boundary";

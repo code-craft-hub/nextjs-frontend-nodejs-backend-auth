@@ -19,9 +19,9 @@ import {
 } from "@/components/ui/tooltip";
 import { PiOfficeChairFill } from "react-icons/pi";
 import { formatAppliedDate } from "@/lib/utils/helpers";
-import { useUpdateJobMutation } from "@/lib/mutations/jobs.mutations";
+import { useUpdateJobMutation } from "@/features/jobs/mutations/jobs.mutations";
 import { useApplyJob } from "@/hooks/useApplyJob";
-import { useToggleBookmarkByJobMutation } from "@/lib/mutations/bookmarks.mutations";
+import { useToggleBookmarkByJobMutation } from "@/features/bookmarks/mutations/bookmarks.mutations";
 import type { JobPost } from "@/modules/job-posts";
 
 // ─── Row ──────────────────────────────────────────────────────────────────────

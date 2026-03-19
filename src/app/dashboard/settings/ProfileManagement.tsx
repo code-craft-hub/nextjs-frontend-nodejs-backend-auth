@@ -6,8 +6,8 @@ import { toast } from "sonner";
 import { FileUploadZone } from "@/app/onboarding/onboarding-pages/AnyFormatToText";
 import { ProfileCard } from "./ProfileCard";
 import { useResumeUploadWithProgress } from "@/hooks/useResumeUploadWithProgress";
-import { resumeQueries } from "@/lib/queries/resume.queries";
-import { queryKeys } from "@/lib/query/keys";
+import { resumeQueries } from "@/features/resume/queries/resume.queries";
+import { queryKeys } from "@/shared/query/keys";
 
 export const ProfileManagement: React.FC = () => {
   const { data: user } = useQuery(userQueries.detail());

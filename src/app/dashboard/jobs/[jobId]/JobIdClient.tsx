@@ -1,7 +1,7 @@
 "use client";
 
 import { Skeleton } from "@/components/ui/skeleton";
-import { jobsQueries } from "@/lib/queries/jobs.queries";
+import { jobsQueries } from "@/features/jobs/queries/jobs.queries";
 import { postedDate } from "@/lib/utils/helpers";
 import { useQuery } from "@tanstack/react-query";
 import {

@@ -21,8 +21,8 @@ import {
   useCreateCertificationMutation,
   useUpdateCertificationMutation,
   useDeleteCertificationMutation,
-} from "@/lib/mutations/resume.mutations";
-import { useTriggerJobRecommendationsMutation } from "@/lib/mutations/recommendations.mutations";
+} from "@/features/resume/mutations/resume.mutations";
+import { useTriggerJobRecommendationsMutation } from "@/features/recommendations/mutations/recommendations.mutations";
 
 // ─── Schema ────────────────────────────────────────────────────────
 

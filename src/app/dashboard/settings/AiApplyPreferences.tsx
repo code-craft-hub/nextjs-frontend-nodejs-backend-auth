@@ -2,9 +2,9 @@ import { cn } from "@/lib/utils";
 import { JSX, useState } from "react";
 import AuthorizeGoogle from "../../../hooks/gmail/AuthorizeGoogle";
 import { userQueries } from "@features/user";
-import { aiSettingsQueries } from "@/lib/queries/ai-settings.queries";
+import { aiSettingsQueries } from "@/features/ai-settings/queries/ai-settings.queries";
 import { useQuery } from "@tanstack/react-query";
-import { useUpdateAISettingsMutation } from "@/lib/mutations/ai-settings.mutations";
+import { useUpdateAISettingsMutation } from "@/features/ai-settings/mutations/ai-settings.mutations";
 interface SettingOption {
   label: string;
   description: string;

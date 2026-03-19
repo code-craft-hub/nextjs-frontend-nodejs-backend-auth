@@ -1,6 +1,6 @@
 import { queryOptions, infiniteQueryOptions } from "@tanstack/react-query";
-import { jobsApi } from "@/lib/api/jobs.api";
-import { queryKeys } from "@/lib/query/keys";
+import { jobsApi } from "@/features/jobs/api/jobs.api";
+import { queryKeys } from "@/shared/query/keys";
 import type { JobFilters } from "@/lib/types/jobs";
 import { normalizeJobFilters } from "../query/normalize-filters";
 import recommendationsApi from "../api/recommendations.api";

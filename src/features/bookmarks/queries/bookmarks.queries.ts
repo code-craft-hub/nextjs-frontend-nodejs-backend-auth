@@ -1,6 +1,6 @@
 import { infiniteQueryOptions, queryOptions } from "@tanstack/react-query";
-import { bookmarksApi } from "@/lib/api/bookmarks.api";
-import { bookmarkKeys } from "@/lib/query/bookmarks.keys";
+import { bookmarksApi } from "@/features/bookmarks/api/bookmarks.api";
+import { bookmarkKeys } from "@/features/bookmarks/queries/bookmarks.keys";
 
 export const bookmarksQueries = {
   /**

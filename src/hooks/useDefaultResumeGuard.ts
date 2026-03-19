@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { resumeQueries } from "@/lib/queries/resume.queries";
+import { resumeQueries } from "@/features/resume/queries/resume.queries";
 
 const PROFILE_MANAGEMENT_URL = "/dashboard/settings?tab=profile-management";
 

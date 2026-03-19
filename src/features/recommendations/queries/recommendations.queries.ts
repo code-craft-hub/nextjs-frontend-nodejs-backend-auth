@@ -1,6 +1,6 @@
 import { infiniteQueryOptions, queryOptions } from "@tanstack/react-query";
-import { recommendationsApi, RecommendationsResponse } from "@/lib/api/recommendations.api";
-import { queryKeys } from "@/lib/query/keys";
+import { recommendationsApi, RecommendationsResponse } from "@/features/recommendations/api/recommendations.api";
+import { queryKeys } from "@/shared/query/keys";
 
 const POLLING_INTERVAL_MS = 3_000;
 

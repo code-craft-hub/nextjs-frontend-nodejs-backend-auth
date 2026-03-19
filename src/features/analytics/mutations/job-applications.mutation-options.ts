@@ -1,6 +1,6 @@
 import { QueryClient, type UseMutationOptions } from "@tanstack/react-query";
-import { jobApplicationsApi } from "@/lib/api/job-applications.api";
-import { invalidateJobApplicationsQueries } from "@/lib/query/query-invalidation";
+import { jobApplicationsApi } from "@/features/analytics/api/job-applications.api";
+import { invalidateJobApplicationsQueries } from "@/shared/query/query-invalidation";
 
 export const createApplicationMutationOptions = (
   queryClient: QueryClient,

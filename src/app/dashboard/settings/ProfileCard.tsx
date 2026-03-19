@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import ProfileManagementModal from "./ProfileManagementModal";
 import { ResumeAggregate } from "@/shared/types/resume.types";
 import { formatAppliedDate } from "@/lib/utils/helpers";
-import { useDeleteResumeMutation } from "@/lib/mutations/resume.mutations";
+import { useDeleteResumeMutation } from "@/features/resume/mutations/resume.mutations";
 
 export const ProfileCard: React.FC<{
   resume: ResumeAggregate;

@@ -30,10 +30,10 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useResumeForm } from "./ResumeFormContext";
-import { useUpdateResumeMutation } from "@/lib/mutations/resume.mutations";
+import { useUpdateResumeMutation } from "@/features/resume/mutations/resume.mutations";
 import { CloseEditButton } from "@/components/shared/CloseEditButton";
 import { toast } from "sonner";
-import { resumeApi } from "@/lib/api/resume.api";
+import { resumeApi } from "@/features/resume/api/resume.api";
 import { useSearchParams } from "next/navigation";
 
 // ─── Schema ────────────────────────────────────────────────────────

@@ -1,7 +1,7 @@
 import { LandingPageClient } from "./LandingPageClient";
-import { createServerQueryClient } from "@/lib/query/prefetch";
-import { jobsQueries } from "@/lib/queries/jobs.queries";
-import { prefetchWithPriority } from "@/lib/query/parallel-prefetch";
+import { createServerQueryClient } from "@/shared/query/prefetch";
+import { jobsQueries } from "@/features/jobs/queries/jobs.queries";
+import { prefetchWithPriority } from "@/shared/query/parallel-prefetch";
 import { HydrationBoundary } from "@/components/hydration-boundary";
 import { dehydrate } from "@tanstack/react-query";
 import { userQueries } from "@features/user";

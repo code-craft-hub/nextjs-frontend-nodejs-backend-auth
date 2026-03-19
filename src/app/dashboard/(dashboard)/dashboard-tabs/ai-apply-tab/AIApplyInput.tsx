@@ -32,7 +32,7 @@ import { userQueries } from "@features/user";
 import { useQuery } from "@tanstack/react-query";
 import JoinOurTelegramGroupAlert from "@/components/shared/JoinOurTelegramGroupAlert";
 import { buildAutoApplyStartUrl } from "@/lib/utils/ai-apply-navigation";
-import { gmailApi } from "@/lib/api/gmail.api";
+import { gmailApi } from "@/features/email-application/api/gmail.api";
 import { useDefaultResumeGuard } from "@/hooks/useDefaultResumeGuard";
 
 const FORM_SCHEMA = z.object({

@@ -12,7 +12,7 @@ import { jobPostsKeys } from "@/modules/job-posts";
  *
  * Usage in mutations:
  * ```ts
- * import { invalidateResumeQueries } from "@/lib/query/query-invalidation";
+ * import { invalidateResumeQueries } from "@/shared/query/query-invalidation";
  *
  * export function useCreateResumeMutation() {
  *   const queryClient = useQueryClient();
@@ -27,7 +27,7 @@ import { jobPostsKeys } from "@/modules/job-posts";
  *
  * Usage in components/actions after async operations:
  * ```ts
- * import { invalidateDocumentGenerationQueries } from "@/lib/query/query-invalidation";
+ * import { invalidateDocumentGenerationQueries } from "@/shared/query/query-invalidation";
  *
  * const queryClient = useQueryClient();
  * await generateDocuments();

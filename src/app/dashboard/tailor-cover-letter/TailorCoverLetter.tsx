@@ -5,7 +5,7 @@ import { useCoverLetterStream } from "@/hooks/useCoverLetterGenerator";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { userQueries } from "@features/user";
-import { coverLetterQueries } from "@/lib/queries/cover-letter.queries";
+import { coverLetterQueries } from "@/features/cover-letter/queries/cover-letter.queries";
 import {
   buildCoverLetterUpdateUrl,
   isPlaceholderId,

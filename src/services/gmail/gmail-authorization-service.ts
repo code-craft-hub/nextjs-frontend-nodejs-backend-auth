@@ -2,7 +2,7 @@ import {
   gmailApi,
   EmailFormData,
   EmailPayload,
-} from "@/lib/api/gmail.api";
+} from "@/features/email-application/api/gmail.api";
 import { fileToBase64 } from "@/lib/utils/helpers";
 
 export type { EmailFormData };

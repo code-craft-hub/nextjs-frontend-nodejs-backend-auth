@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronLeft, Calendar, Clock, Eye } from "lucide-react";
-import { blogQueries } from "@/lib/queries/blog.queries";
+import { blogQueries } from "@/features/blog/queries/blog.queries";
 import { BlogCard, BlogCardSkeleton } from "./homeComponents/BlogCard";
 import { useBlogMetrics } from "../hooks/useBlogMetrics";
 import type { BlogWithViews } from "@/lib/types";

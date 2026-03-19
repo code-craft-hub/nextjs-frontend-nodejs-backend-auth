@@ -1,7 +1,7 @@
 // lib/queries/blog.queries.ts
 import { queryOptions } from "@tanstack/react-query";
-import { blogApi, type BlogFilters } from "@/lib/api/blog.api";
-import { queryKeys } from "@/lib/query/keys";
+import { blogApi, type BlogFilters } from "@/features/blog/api/blog.api";
+import { queryKeys } from "@/shared/query/keys";
 
 export const blogQueries = {
   /** Paginated, filterable blog list. */

@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Star, X, ArrowLeft } from "lucide-react";
 import { useResumeForm } from "./ResumeFormContext";
-import { useAddSkillsMutation } from "@/lib/mutations/resume.mutations";
+import { useAddSkillsMutation } from "@/features/resume/mutations/resume.mutations";
 import { CloseEditButton } from "@/components/shared/CloseEditButton";
 
 // ─── Schema ────────────────────────────────────────────────────────

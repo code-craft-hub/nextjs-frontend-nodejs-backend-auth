@@ -41,10 +41,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { resumeApi } from "@/lib/api/resume.api";
-import { coverLetterApi } from "@/lib/api/cover-letter.api";
-import { interviewQuestionApi } from "@/lib/api/interview.api";
-import { queryKeys } from "@/lib/query/keys";
+import { resumeApi } from "@/features/resume/api/resume.api";
+import { coverLetterApi } from "@/features/cover-letter/api/cover-letter.api";
+import { interviewQuestionApi } from "@/features/interview/api/interview.api";
+import { queryKeys } from "@/shared/query/keys";
 
 export const schema = z.object({
   id: z.number(),

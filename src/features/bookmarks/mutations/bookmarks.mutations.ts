@@ -4,11 +4,11 @@ import {
 } from "@tanstack/react-query";
 import {
   bookmarksApi,
-} from "@/lib/api/bookmarks.api";
+} from "@/features/bookmarks/api/bookmarks.api";
 import {
   invalidateBookmarkLists,
   invalidateBookmarkCheck,
-} from "@/lib/query/query-invalidation";
+} from "@/shared/query/query-invalidation";
 import { jobPostsKeys } from "@/modules/job-posts";
 
 // ─── Create ───────────────────────────────────────────────────────────────────

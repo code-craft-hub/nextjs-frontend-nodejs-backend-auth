@@ -21,7 +21,7 @@ import { IUser } from "@/types";
 import Pricing from "./components/Pricing";
 import { VideoModal } from "./components/VideoModal";
 import { useRouter } from "next/navigation";
-import { blogQueries } from "@/lib/queries/blog.queries";
+import { blogQueries } from "@/features/blog/queries/blog.queries";
 import {
   BlogCard,
   BlogCardSkeleton,

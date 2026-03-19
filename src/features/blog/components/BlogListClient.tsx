@@ -2,10 +2,10 @@
 
 import { useState, useCallback } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { blogQueries } from "@/lib/queries/blog.queries";
+import { blogQueries } from "@/features/blog/queries/blog.queries";
 import { BlogCard, BlogCardSkeleton } from "./homeComponents/BlogCard";
 import { BlogSearchForm } from "./BlogSearchForm";
-import type { BlogFilters } from "@/lib/api/blog.api";
+import type { BlogFilters } from "@/features/blog/api/blog.api";
 
 interface BlogListClientProps {
   initialFilters?: BlogFilters;

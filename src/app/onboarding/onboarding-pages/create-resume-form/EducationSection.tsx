@@ -19,7 +19,7 @@ import {
   useCreateEducationMutation,
   useUpdateEducationMutation,
   useDeleteEducationMutation,
-} from "@/lib/mutations/resume.mutations";
+} from "@/features/resume/mutations/resume.mutations";
 import { CloseEditButton } from "@/components/shared/CloseEditButton";
 
 // ─── Schema ────────────────────────────────────────────────────────

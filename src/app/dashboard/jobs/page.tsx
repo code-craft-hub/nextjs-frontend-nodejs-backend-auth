@@ -1,6 +1,6 @@
 import { dehydrate } from "@tanstack/react-query";
 import Overview from "../../../modules/job-posts/components/Overview";
-import { createServerQueryClient } from "@/lib/query/prefetch";
+import { createServerQueryClient } from "@/shared/query/prefetch";
 import { HydrationBoundary } from "@/components/hydration-boundary";
 import { getCookiesToken } from "@/lib/auth.utils";
 import { jobPostsQueries } from "@/modules/job-posts";

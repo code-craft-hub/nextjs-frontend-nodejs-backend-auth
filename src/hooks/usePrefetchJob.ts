@@ -1,5 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { jobsQueries } from "@/lib/queries/jobs.queries";
+import { jobsQueries } from "@/features/jobs/queries/jobs.queries";
 
 export const usePrefetchJob = () => {
   const queryClient = useQueryClient();

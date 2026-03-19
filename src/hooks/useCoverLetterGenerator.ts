@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
-import { API_URL } from "@/lib/api/client";
+import { API_URL } from "@/shared/api/client";
 
 const APP_API_URL = `${API_URL}/cover-letters/stream`;
 

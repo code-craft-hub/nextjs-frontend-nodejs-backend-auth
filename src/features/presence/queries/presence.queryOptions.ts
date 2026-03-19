@@ -3,7 +3,7 @@ import {
   queryOptions,
 } from "@tanstack/react-query";
 import { presenceApi } from "../api/presence.api";
-import { queryKeys } from "@/lib/query/keys";
+import { queryKeys } from "@/shared/query/keys";
 
 /** Stale/refetch interval shared by all presence queries (30 s). */
 const PRESENCE_INTERVAL_MS = 30_000;

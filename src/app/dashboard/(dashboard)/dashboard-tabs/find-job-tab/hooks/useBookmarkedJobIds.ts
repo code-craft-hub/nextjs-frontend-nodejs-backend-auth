@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { api, BACKEND_API_VERSION } from "@/lib/api/client";
+import { api, BACKEND_API_VERSION } from "@/shared/api/client";
 
 interface BookmarkRecord {
   id: string;

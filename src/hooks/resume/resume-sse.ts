@@ -1,4 +1,4 @@
-import { BASEURL } from "@/lib/api/client";
+import { BASEURL } from "@/shared/api/client";
 import { useState, useEffect, useRef, useCallback } from "react";
 
 export type JobStatus = "waiting" | "active" | "completed" | "failed";

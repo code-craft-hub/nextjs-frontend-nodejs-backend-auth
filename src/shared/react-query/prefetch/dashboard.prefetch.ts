@@ -1,10 +1,10 @@
-import jobApplicationQueries from "@/lib/queries/application-history.queries";
-import { autoApplyQueries } from "@/lib/queries/auto-apply.queries";
-import { bookmarksQueries } from "@/lib/queries/bookmarks.queries";
-import { coverLetterQueries } from "@/lib/queries/cover-letter.queries";
-import { interviewQuestionQueries } from "@/lib/queries/interview.queries";
-import recommendationsQueries from "@/lib/queries/recommendations.queries";
-import { resumeQueries } from "@/lib/queries/resume.queries";
+import jobApplicationQueries from "@/features/analytics/queries/application-history.queries";
+import { autoApplyQueries } from "@/features/auto-apply/queries/auto-apply.queries";
+import { bookmarksQueries } from "@/features/bookmarks/queries/bookmarks.queries";
+import { coverLetterQueries } from "@/features/cover-letter/queries/cover-letter.queries";
+import { interviewQuestionQueries } from "@/features/interview/queries/interview.queries";
+import recommendationsQueries from "@/features/recommendations/queries/recommendations.queries";
+import { resumeQueries } from "@/features/resume/queries/resume.queries";
 import { JobFilters } from "@/lib/types/jobs";
 import { jobPostsQueries } from "@/modules/job-posts";
 import { QueryClient } from "@tanstack/react-query";

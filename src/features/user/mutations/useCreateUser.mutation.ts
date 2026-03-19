@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { userApi } from "../api/user.api";
 import type { CreateUserData } from "../api/user.api.types";
-import { queryKeys } from "@/lib/query/keys";
+import { queryKeys } from "@/shared/query/keys";
 import type { PaginatedResponse } from "@/lib/types";
 import type { IUser } from "@/types";
 import { invalidateUserLists } from "../queries/user.queryOptions";

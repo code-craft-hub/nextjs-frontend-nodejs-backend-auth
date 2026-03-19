@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 
 import { Checkbox } from "@/components/ui/checkbox";
 import { Skeleton } from "@/components/ui/skeleton";
-import { AutoApplyRecord } from "@/lib/api/auto-apply.api";
+import { AutoApplyRecord } from "@/features/auto-apply/api/auto-apply.api";
 
 import { cn } from "@/lib/utils";
 

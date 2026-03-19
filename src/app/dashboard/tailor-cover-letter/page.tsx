@@ -1,6 +1,6 @@
 import TailorCoverLetter from "./TailorCoverLetter";
-import { createServerQueryClient } from "@/lib/query/prefetch";
-import { coverLetterQueries } from "@/lib/queries/cover-letter.queries";
+import { createServerQueryClient } from "@/shared/query/prefetch";
+import { coverLetterQueries } from "@/features/cover-letter/queries/cover-letter.queries";
 import { getCookiesToken } from "@/lib/auth.utils";
 import { HydrationBoundary } from "@/components/hydration-boundary";
 import { dehydrate } from "@tanstack/react-query";

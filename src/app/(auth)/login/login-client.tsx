@@ -12,7 +12,7 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
-import { api, APIError } from "@/lib/api/client";
+import { api, APIError } from "@/shared/api/client";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { FloatingLabelInput, GoogleButton } from "@/modules/auth";

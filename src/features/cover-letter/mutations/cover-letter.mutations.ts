@@ -3,12 +3,12 @@ import {
   coverLetterApi,
   type CreateCoverLetterData,
   type UpdateCoverLetterData,
-} from "@/lib/api/cover-letter.api";
-import { queryKeys } from "@/lib/query/keys";
+} from "@/features/cover-letter/api/cover-letter.api";
+import { queryKeys } from "@/shared/query/keys";
 import {
   invalidateCoverLetterDetail,
   invalidateCoverLetterLists,
-} from "@/lib/query/query-invalidation";
+} from "@/shared/query/query-invalidation";
 import type { PaginatedResponse } from "@/lib/types";
 import { CoverLetter } from "@/types";
 

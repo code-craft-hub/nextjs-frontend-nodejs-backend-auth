@@ -9,10 +9,10 @@ import { QAItem } from "@/types";
 import { extractCompleteJsonObjects } from "@/lib/utils/helpers";
 import TailorInterviewQuestionEmptyState from "./TailorInterviewQuestionEmptyState";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { interviewQuestionQueries } from "@/lib/queries/interview.queries";
+import { interviewQuestionQueries } from "@/features/interview/queries/interview.queries";
 import { userQueries } from "@features/user";
 import { sendGTMEvent } from "@next/third-parties/google";
-import { API_URL } from "@/lib/api/client";
+import { API_URL } from "@/shared/api/client";
 import { useFireworksConfetti } from "@/components/ui/confetti";
 
 export const TailorInterviewQuestion = ({

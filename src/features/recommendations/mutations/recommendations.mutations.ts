@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { recommendationsApi } from "@/lib/api/recommendations.api";
-import { queryKeys } from "@/lib/query/keys";
+import { recommendationsApi } from "@/features/recommendations/api/recommendations.api";
+import { queryKeys } from "@/shared/query/keys";
 
 export const useTriggerJobRecommendationsMutation = () => {
   return useMutation({

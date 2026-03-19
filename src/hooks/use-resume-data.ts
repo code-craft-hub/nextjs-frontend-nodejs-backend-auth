@@ -6,8 +6,8 @@ import {
   ResumeFormData,
 } from "@/lib/schema-validations/resume.schema";
 import { createApiError } from "@/lib/utils/helpers";
-import { resumeQueries } from "@/lib/queries/resume.queries";
-import { resumeApi } from "@/lib/api/resume.api";
+import { resumeQueries } from "@/features/resume/queries/resume.queries";
+import { resumeApi } from "@/features/resume/api/resume.api";
 
 const updateResumeField = async <T>(
   payload: UpdatePayload<T>,

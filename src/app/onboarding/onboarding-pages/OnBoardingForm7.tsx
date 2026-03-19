@@ -11,7 +11,7 @@ import {
   expireNextThreeDays,
   generateIdempotencyKey,
 } from "@/lib/utils/helpers";
-import { BASEURL } from "@/lib/api/client";
+import { BASEURL } from "@/shared/api/client";
 import { useQuery } from "@tanstack/react-query";
 import { userQueries } from "@features/user";
 import { toast } from "sonner";

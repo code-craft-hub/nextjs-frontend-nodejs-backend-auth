@@ -1,7 +1,7 @@
 // lib/queries/user.server.queries.ts
 import { queryOptions } from "@tanstack/react-query";
-import { userServerApi } from "@/lib/api/user.server.api";
-import { queryKeys } from "@/lib/query/keys";
+import { userServerApi } from "@/shared/api/user.server.api";
+import { queryKeys } from "@/shared/query/keys";
 import type { PaginationParams } from "@/lib/types";
 
 export const userServerQueries = {

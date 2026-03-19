@@ -7,9 +7,9 @@ import { AIJobCustomizationInput } from "./AIJobCustomizationInput";
 import { isEmpty } from "lodash";
 import { JobFilters } from "@/lib/types/jobs";
 import { useQuery } from "@tanstack/react-query";
-import { resumeQueries } from "@/lib/queries/resume.queries";
-import { coverLetterQueries } from "@/lib/queries/cover-letter.queries";
-import { interviewQuestionQueries } from "@/lib/queries/interview.queries";
+import { resumeQueries } from "@/features/resume/queries/resume.queries";
+import { coverLetterQueries } from "@/features/cover-letter/queries/cover-letter.queries";
+import { interviewQuestionQueries } from "@/features/interview/queries/interview.queries";
 import { shuffleArray } from "@/lib/utils/helpers";
 
 export const AIJobCustomization = memo(

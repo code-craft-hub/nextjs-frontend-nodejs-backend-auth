@@ -15,7 +15,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Lightbulb, BriefcaseBusiness, ArrowLeft } from "lucide-react";
 import { useResumeForm } from "./ResumeFormContext";
-import { useUpdateResumeMutation } from "@/lib/mutations/resume.mutations";
+import { useUpdateResumeMutation } from "@/features/resume/mutations/resume.mutations";
 import { CloseEditButton } from "@/components/shared/CloseEditButton";
 
 // ─── Schema ────────────────────────────────────────────────────────
