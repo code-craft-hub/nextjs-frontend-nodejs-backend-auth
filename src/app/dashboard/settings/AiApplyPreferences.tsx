@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import { JSX, useState } from "react";
-import AuthorizeGoogle from "../../../hooks/gmail/AuthorizeGoogle";
+import AuthorizeGoogle from "@/features/email-application/hooks/AuthorizeGoogle";
 import { userQueries } from "@features/user";
 import { aiSettingsQueries } from "@/features/ai-settings/queries/ai-settings.queries";
 import { useQuery } from "@tanstack/react-query";

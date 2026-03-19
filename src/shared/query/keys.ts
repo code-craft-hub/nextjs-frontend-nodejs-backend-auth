@@ -1,4 +1,4 @@
-import { PaginationParams } from "@/shared/types";
+import { PaginationParams } from "@/shared/types/lib.types";
 import { JobFilters } from "@/shared/types/jobs.types";
 
 export const queryKeys = {

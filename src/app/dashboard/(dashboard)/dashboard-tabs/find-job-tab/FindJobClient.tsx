@@ -1,7 +1,7 @@
 "use client";
 import { useCallback, useState } from "react";
 import { JobSearchForm } from "@/features/job-posts/components/JobSearchForm";
-import { JobList } from "@/modules/job-posts/components/JobList";
+import { JobList } from "@/features/job-posts/components/JobList";
 import { ReportCard } from "@/app/dashboard/jobs/components/ReportCard";
 
 export default function JobsPage() {

@@ -25,7 +25,7 @@ import { blogQueries } from "@/features/blog/queries/blog.queries";
 import {
   BlogCard,
   BlogCardSkeleton,
-} from "@/modules/blog/components/homeComponents/BlogCard";
+} from "@/features/blog/components/homeComponents/BlogCard";
 
 export const LandingPageClient = ({
   user,

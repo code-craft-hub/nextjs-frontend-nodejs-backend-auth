@@ -4,7 +4,7 @@ import { HydrationBoundary } from "@/components/hydration-boundary";
 import { createServerQueryClient } from "@/shared/query/prefetch";
 import { blogQueries } from "@/features/blog/queries/blog.queries";
 import { getCookiesToken } from "@/lib/auth.utils";
-import { BlogDetailClient } from "@/modules/blog/components/BlogDetailClient";
+import { BlogDetailClient } from "@/features/blog/components/BlogDetailClient";
 import { Header } from "@/app/(landing-page)/components/Header";
 import { Footer } from "@/components/landing-page/Footer";
 

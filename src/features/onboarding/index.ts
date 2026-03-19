@@ -2,4 +2,4 @@
 export { onboardingApi } from "./api/onboarding.api";
 
 // ─── Mutations ──────────────────────────────────────────────
-export * from "./mutations/onboarding.mutations";
+// useUpdateOnboarding lives in features/user (onboarding is user-driven)
