@@ -11,7 +11,7 @@ import { useRouter } from "next/navigation";
 import { Loader2, RefreshCw, UserCircle } from "lucide-react";
 import { sendGTMEvent } from "@next/third-parties/google";
 
-import { userQueries } from "@module/user";
+import { userQueries } from "@features/user";
 import { useUpdateJobMutation } from "@/lib/mutations/jobs.mutations";
 import { useApplyJob } from "@/hooks/useApplyJob";
 import { queryKeys } from "@/lib/query/keys";

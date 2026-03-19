@@ -1,6 +1,6 @@
 "use client"
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { userApi } from "@module/user";
+import { userApi } from "@features/user";
 import { useRouter } from "next/navigation";
 
 export function useDeleteAccountMutation() {

@@ -1,1 +1,1 @@
-export { useUserQuery } from "@module/user";
+export { useUserQuery } from "@features/user";

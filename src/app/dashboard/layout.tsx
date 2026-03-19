@@ -9,7 +9,7 @@ import { UserMenu } from "@/components/UserMenu";
 import { DynamicBreadcrumb } from "./components/DynamicBreadcrumb";
 import { requireOnboarding } from "@/lib/server-auth";
 import { createServerQueryClient } from "@/lib/query/prefetch";
-import { userQueries } from "@module/user";
+import { userQueries } from "@features/user";
 import { HydrationBoundary } from "@/components/hydration-boundary";
 import { dehydrate } from "@tanstack/react-query";
 import { getCookiesToken, getSessionFromCookies } from "@/lib/auth.utils";

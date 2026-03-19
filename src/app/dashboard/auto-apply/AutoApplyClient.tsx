@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { useResumeStream } from "@/hooks/stream-resume-hook";
 import { useCoverLetterStream } from "@/hooks/useCoverLetterGenerator";
 import { useCreateAutoApplyMutation } from "@/lib/mutations/auto-apply.mutations";
-import { userQueries } from "@module/user";
+import { userQueries } from "@features/user";
 import { buildPreviewUrl } from "@/lib/utils/ai-apply-navigation";
 import { invalidateDocumentGenerationQueries } from "@/lib/query/query-invalidation";
 import { TailorCoverLetterDisplayStreaming } from "../tailor-cover-letter/TailorCoverLetterDisplayStreaming";

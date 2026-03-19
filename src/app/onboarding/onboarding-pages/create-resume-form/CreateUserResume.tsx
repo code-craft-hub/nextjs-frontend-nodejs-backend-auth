@@ -1,4 +1,4 @@
-import type { ResumeAggregate } from "@/types/resume.types";
+import type { ResumeAggregate } from "@/shared/types/resume.types";
 import { ResumeFormProvider } from "./ResumeFormContext";
 import ResumeFormLayout from "./ResumeFormLayout";
 

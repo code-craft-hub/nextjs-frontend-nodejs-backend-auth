@@ -1,12 +1,12 @@
 /**
  * Re-exported from the canonical auth module.
- * Import directly from "@module/auth" in new code.
+ * Import directly from "@features/auth" in new code.
  */
-export { authApi } from "@module/auth";
+export { authApi } from "@features/auth";
 export type {
   AuthSession,
   LoginCredentials,
   RegisterData,
   PasswordResetRequest,
   PasswordResetConfirm,
-} from "@module/auth";
+} from "@features/auth";

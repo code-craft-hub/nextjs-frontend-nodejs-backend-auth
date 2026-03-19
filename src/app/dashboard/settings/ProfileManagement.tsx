@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { userQueries } from "@module/user";
+import { userQueries } from "@features/user";
 import AuthorizeGoogle from "../../../hooks/gmail/AuthorizeGoogle";
 import { toast } from "sonner";
 import { FileUploadZone } from "@/app/onboarding/onboarding-pages/AnyFormatToText";

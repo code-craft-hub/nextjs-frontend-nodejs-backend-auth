@@ -1,4 +1,4 @@
-import { Providers } from "@/providers/query-provider";
+import { Providers } from "@/shared/providers/query-provider";
 import "./globals.css";
 import {
   EB_Garamond,

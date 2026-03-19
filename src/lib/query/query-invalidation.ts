@@ -4,7 +4,7 @@ import { aiSettingsKeys } from "./ai-settings.keys";
 import { autoApplyKeys } from "./auto-apply.keys";
 import { bookmarkKeys } from "./bookmarks.keys";
 import { jobApplicationKeys } from "./job-applications.keys";
-import { invalidateUserQueries } from "@module/user";
+import { invalidateUserQueries } from "@features/user";
 import { jobPostsKeys } from "@/modules/job-posts";
 
 /**

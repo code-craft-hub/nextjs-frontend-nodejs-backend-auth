@@ -36,5 +36,5 @@ export { useChangePasswordMutation } from "./mutations/useChangePassword.mutatio
 export { useAuth } from "./hooks/useAuth";
 
 
-export {FloatingLabelInput} from "./component/FloatingLabelInput";
-export {GoogleButton} from "./component/google-button";
+export {FloatingLabelInput} from "./components/FloatingLabelInput";
+export {GoogleButton} from "./components/google-button";

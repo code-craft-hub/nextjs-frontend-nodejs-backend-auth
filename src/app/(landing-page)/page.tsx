@@ -4,7 +4,7 @@ import { jobsQueries } from "@/lib/queries/jobs.queries";
 import { prefetchWithPriority } from "@/lib/query/parallel-prefetch";
 import { HydrationBoundary } from "@/components/hydration-boundary";
 import { dehydrate } from "@tanstack/react-query";
-import { userQueries } from "@module/user";
+import { userQueries } from "@features/user";
 import { getCookiesToken, getSessionFromCookies } from "@/lib/auth.utils";
 
 export const dynamic = "force-dynamic";

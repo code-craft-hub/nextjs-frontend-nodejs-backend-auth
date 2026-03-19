@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { resumeQueries } from "@/lib/queries/resume.queries";
-import { userQueries } from "@module/user";
+import { userQueries } from "@features/user";
 import { ResumeDownloadButton } from "./ResumeDownloadButton";
 import { TrashIcon } from "lucide-react";
 import { sendGTMEvent } from "@next/third-parties/google";

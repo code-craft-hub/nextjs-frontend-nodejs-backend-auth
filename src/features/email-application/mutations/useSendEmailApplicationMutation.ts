@@ -9,7 +9,7 @@ import {
   invalidateCoverLetterQueries,
   invalidateAIApplyQueries,
 } from "@/lib/query/query-invalidation";
-import { invalidateUserQueries } from "@module/user";
+import { invalidateUserQueries } from "@features/user";
 
 /**
  * Hook for sending an email application

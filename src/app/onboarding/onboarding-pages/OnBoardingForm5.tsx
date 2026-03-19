@@ -19,8 +19,8 @@ import { OnboardingFormProps } from "@/types";
 import { FloatingLabelInput } from "./FloatingInput";
 import Progress from "./Progress";
 import { cn } from "@/lib/utils";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { userQueries } from "@module/user";
+import { useIsMobile } from "@/shared/hooks/use-mobile";
+import { userQueries } from "@features/user";
 import { useQuery } from "@tanstack/react-query";
 import { useUpdateOnboarding } from "@/hooks/mutations";
 const formSchema = z.object({

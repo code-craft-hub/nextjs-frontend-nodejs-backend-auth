@@ -2,7 +2,7 @@ import Preview from "./Preview";
 import { HydrationBoundary } from "@/components/hydration-boundary";
 import { dehydrate } from "@tanstack/react-query";
 import { createServerQueryClient } from "@/lib/query/prefetch";
-import { userQueries } from "@module/user";
+import { userQueries } from "@features/user";
 import { prefetchWithPriority } from "@/lib/query/parallel-prefetch";
 import { resumeQueries } from "@/lib/queries/resume.queries";
 import { coverLetterQueries } from "@/lib/queries/cover-letter.queries";

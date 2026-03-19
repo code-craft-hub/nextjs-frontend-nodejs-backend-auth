@@ -20,7 +20,7 @@ import { Edit, Loader2 } from "lucide-react";
 import { ContactEditForm } from "./form/ContactEditForm";
 import { useResumeData } from "@/hooks/use-resume-data";
 import { useQuery } from "@tanstack/react-query";
-import { userQueries } from "@module/user";
+import { userQueries } from "@features/user";
 
 const SectionWrapper = memo(
   ({

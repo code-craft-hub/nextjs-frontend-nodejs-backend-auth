@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { sendGTMEvent } from "@next/third-parties/google";
 import { Loader2 } from "lucide-react";
 
-import { userQueries } from "@module/user";
+import { userQueries } from "@features/user";
 import { usePrefetchJob } from "@/hooks/usePrefetchJob";
 import jobApplicationQueries from "@/lib/queries/application-history.queries";
 

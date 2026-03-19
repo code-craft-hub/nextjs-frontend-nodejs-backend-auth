@@ -6,12 +6,12 @@ import { cn } from "@/lib/utils";
 import { Billing } from "./billing/Billing";
 import { CreditCard, Shield, User2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { userQueries } from "@module/user";
+import { userQueries } from "@features/user";
 import { sendGTMEvent } from "@next/third-parties/google";
 import { useFireworksConfetti } from "@/components/ui/confetti";
 import { Button } from "@/components/ui/button";
 import { CompletedPaymentModal } from "@/components/shared/CompletedPaymentModal";
-import { useDeleteAccountMutation } from "@module/auth";
+import { useDeleteAccountMutation } from "@features/auth";
 
 
 export const AccountClient = ({

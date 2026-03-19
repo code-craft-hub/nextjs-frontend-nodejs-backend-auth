@@ -15,7 +15,7 @@ import type {
   EducationEntry,
   ProjectEntry,
   CertificationEntry,
-} from "@/types/resume.types";
+} from "@/shared/types/resume.types";
 import { resumeQueries } from "../queries/resume.queries";
 
 // ─── Resume Mutations ─────────────────────────────────────────────

@@ -7,7 +7,7 @@ import {
   useMemo,
   useState,
 } from "react";
-import type { ResumeAggregate } from "@/types/resume.types";
+import type { ResumeAggregate } from "@/shared/types/resume.types";
 import { useCreateNewResumeMutation } from "@/lib/mutations/resume.mutations";
 
 interface ResumeFormContextValue {

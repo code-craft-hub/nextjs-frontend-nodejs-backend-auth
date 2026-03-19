@@ -4,7 +4,7 @@ import type {
   EducationEntry,
   ProjectEntry,
   CertificationEntry,
-} from "@/types/resume.types";
+} from "@/shared/types/resume.types";
 import { api } from "./client";
 import type { PaginatedResponse, PaginationParams } from "@/lib/types";
 

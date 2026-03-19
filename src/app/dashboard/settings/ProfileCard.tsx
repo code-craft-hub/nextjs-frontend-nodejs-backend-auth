@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronRight, Sparkles, Trash } from "lucide-react";
 import { cn } from "@/lib/utils";
 import ProfileManagementModal from "./ProfileManagementModal";
-import { ResumeAggregate } from "@/types/resume.types";
+import { ResumeAggregate } from "@/shared/types/resume.types";
 import { formatAppliedDate } from "@/lib/utils/helpers";
 import { useDeleteResumeMutation } from "@/lib/mutations/resume.mutations";
 

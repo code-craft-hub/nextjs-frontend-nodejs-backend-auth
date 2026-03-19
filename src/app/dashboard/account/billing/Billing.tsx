@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useFireworksConfetti } from "@/components/ui/confetti";
 import { PremiumUserPage } from "./PremiumUserPage";
 import { useQuery } from "@tanstack/react-query";
-import { userQueries } from "@module/user";
+import { userQueries } from "@features/user";
 import { TrialBanner } from "./TrialBanner";
 import { ReferralCard } from "./ReferralCard";
 import { UpgradeBanner } from "./UpgradeBanner";

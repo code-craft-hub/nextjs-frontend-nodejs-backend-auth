@@ -2,8 +2,8 @@
 export { default as jobPostsApi } from "./api/job-posts.api";
 
 // Query
-export { jobPostsQueries, useInfiniteJobs } from "./query/job-posts.query";
-export { jobPostsKeys } from "./query/job-post.keys";
+export { jobPostsQueries, useInfiniteJobs } from "./queries/job-posts.query";
+export { jobPostsKeys } from "./queries/job-post.keys";
 
 // Types
 export type { SearchForm, InfiniteJobsResponse, JobPost } from "./types";

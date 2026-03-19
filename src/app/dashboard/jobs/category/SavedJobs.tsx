@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { sendGTMEvent } from "@next/third-parties/google";
 import { Loader2 } from "lucide-react";
 
-import { userQueries } from "@module/user";
+import { userQueries } from "@features/user";
 import { useUpdateJobMutation } from "@/lib/mutations/jobs.mutations";
 import { useApplyJob } from "@/hooks/useApplyJob";
 import { bookmarksQueries } from "@/lib/queries/bookmarks.queries";

@@ -16,9 +16,9 @@ import { OnboardingFormProps } from "@/types";
 import { Checkbox } from "@/components/ui/checkbox";
 import { motion } from "framer-motion";
 import OnboardingTabs from "./OnBoardingTabs";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useIsMobile } from "@/shared/hooks/use-mobile";
 import Progress from "./Progress";
-import { userQueries } from "@module/user";
+import { userQueries } from "@features/user";
 import { useQuery } from "@tanstack/react-query";
 import { useUpdateOnboarding } from "@/hooks/mutations";
 

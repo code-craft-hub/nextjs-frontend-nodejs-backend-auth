@@ -1,5 +1,5 @@
 "use client"
-import SearchBox from "@/shared/component/SearchBox";
+import SearchBox from "@/shared/components/SearchBox";
 
 export function JobSearchForm({
   onSubmit,

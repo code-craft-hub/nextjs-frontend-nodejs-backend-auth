@@ -28,7 +28,7 @@ import { cn } from "@/lib/utils";
 import { useDocumentExtraction } from "@/app/onboarding/onboarding-pages/AnyFormatToText";
 import { isEmpty } from "lodash";
 import { Separator } from "@/components/ui/separator";
-import { userQueries } from "@module/user";
+import { userQueries } from "@features/user";
 import { useQuery } from "@tanstack/react-query";
 import JoinOurTelegramGroupAlert from "@/components/shared/JoinOurTelegramGroupAlert";
 import { buildAutoApplyStartUrl } from "@/lib/utils/ai-apply-navigation";

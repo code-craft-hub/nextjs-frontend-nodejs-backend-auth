@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
-import { useUserQuery } from "@module/user";
+import { useUserQuery } from "@features/user";
 import { presenceApi } from "../api/presence.api";
 
 /** How often the client pings the server (ms). Server active window = 5 min. */

@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { sendGTMEvent } from "@next/third-parties/google";
 import { cn } from "@/lib/utils";
-import { userQueries } from "@module/user";
+import { userQueries } from "@features/user";
 import { ReportCard } from "../../../app/dashboard/jobs/components/ReportCard";
 import { JobList } from "@/modules/job-posts";
 import { useCallback } from "react";

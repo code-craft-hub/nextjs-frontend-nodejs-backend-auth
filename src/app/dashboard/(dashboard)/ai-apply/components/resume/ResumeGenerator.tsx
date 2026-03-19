@@ -3,7 +3,7 @@ import { useEffect, useRef } from "react";
 import { useResumeStream } from "@/hooks/stream-resume-hook";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
-import { userQueries } from "@module/user";
+import { userQueries } from "@features/user";
 import { EditableResume } from "./EditableResume";
 
 // const backendUrl = process.env.NEXT_PUBLIC_AUTH_API_URL;

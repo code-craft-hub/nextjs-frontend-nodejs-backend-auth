@@ -2,14 +2,14 @@
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { OnboardingFormProps } from "@/types";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useIsMobile } from "@/shared/hooks/use-mobile";
 import Progress from "./Progress";
 import OnboardingTabs from "./OnBoardingTabs";
 import { FileUploadZone, useDocumentExtraction } from "./AnyFormatToText";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { userQueries } from "@module/user";
+import { userQueries } from "@features/user";
 import { useResumeUploadWithProgress } from "@/hooks/useResumeUploadWithProgress";
 import { queryKeys } from "@/lib/query/keys";
 import CreateUserResume from "./create-resume-form/CreateUserResume";

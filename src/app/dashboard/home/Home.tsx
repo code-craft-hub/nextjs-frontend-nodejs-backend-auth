@@ -9,7 +9,7 @@ import { TAB_ITEMS } from "../../(landing-page)/constants";
 import { AIJobCustomization } from "../(dashboard)/dashboard-tabs/ai-job-customization-tab/AIJobCustomization";
 import { TopGradient } from "@/components/shared/TopGradient";
 import { JobFilters } from "@/lib/types/jobs";
-import { userQueries } from "@module/user";
+import { userQueries } from "@features/user";
 import { useQuery } from "@tanstack/react-query";
 import { sendGTMEvent } from "@next/third-parties/google";
 import { useDashboardPrefetch } from "@/lib/react-query/hooks/useDashboardPrefetch";

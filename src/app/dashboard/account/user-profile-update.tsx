@@ -14,9 +14,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { userQueries } from "@module/user";
+import { userQueries } from "@features/user";
 import { useQuery } from "@tanstack/react-query";
-import { useUpdateUserMutation } from "@module/user";
+import { useUpdateUserMutation } from "@features/user";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 const CVERAI_NUMBER = process.env.NEXT_PUBLIC_CVERAI_NUMBER || "+436767391022";

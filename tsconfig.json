@@ -23,7 +23,9 @@
     ],
     "paths": {
       "@/*": ["./src/*"],
-      "@module/*": ["./src/modules/*"]
+      "@features/*": ["./src/features/*"],
+      "@shared/*": ["./src/shared/*"],
+      "@module/*": ["./src/features/*"]
     }
   },
   "include": [

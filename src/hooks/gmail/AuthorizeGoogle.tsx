@@ -14,7 +14,7 @@ import {
 } from "../../services/gmail/gmail-authorization-service";
 import { isValidEmail } from "@/validation";
 import { useQuery } from "@tanstack/react-query";
-import { userQueries } from "@module/user";
+import { userQueries } from "@features/user";
 
 const FormSchema = z.object({
   authorized: z.boolean().default(false).optional(),

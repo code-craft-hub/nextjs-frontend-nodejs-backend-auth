@@ -1,2 +1,2 @@
-export { useUpdateOnboarding } from "@module/user";
-export type { UseUpdateOnboardingOptions } from "@module/user";
+export { useUpdateOnboarding } from "@features/user";
+export type { UseUpdateOnboardingOptions } from "@features/user";
