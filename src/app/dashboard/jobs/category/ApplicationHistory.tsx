@@ -13,7 +13,7 @@ import jobApplicationQueries from "@/features/analytics/queries/application-hist
 import { ApplicationHistoryColumn } from "../components/OverviewColumn";
 import { useJobsTable } from "../_hooks/useJobsTable";
 import { JobsTable } from "../components/JobsTable";
-import MobileOverview from "../../../../modules/job-posts/components/MobileOverview";
+import MobileOverview from "@/features/job-posts/components/MobileOverview";
 import { SearchBar, SearchBarRef } from "./JobSearchBar";
 
 export const ApplicationHistory = ({ children }: { children?: ReactNode }) => {

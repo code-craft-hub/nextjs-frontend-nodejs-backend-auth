@@ -2,7 +2,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { authQueries } from '@/lib/queries/auth.queries';
+import { authQueries } from '@/features/auth/queries/auth-lib.queries';
 import { useState } from 'react';
 
 export function LiveUserStatus() {

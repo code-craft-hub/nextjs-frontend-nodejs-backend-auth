@@ -6,7 +6,7 @@ import { interviewQuestionQueries } from "@/features/interview/queries/interview
 import recommendationsQueries from "@/features/recommendations/queries/recommendations.queries";
 import { resumeQueries } from "@/features/resume/queries/resume.queries";
 import { JobFilters } from "@/shared/types/jobs.types";
-import { jobPostsQueries } from "@/modules/job-posts";
+import { jobPostsQueries } from "@/features/job-posts";
 import { QueryClient } from "@tanstack/react-query";
 
 type DashboardPrefetchParams = {

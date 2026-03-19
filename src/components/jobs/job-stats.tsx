@@ -1,7 +1,7 @@
 // components/jobs/job-stats.tsx
 'use client';
 
-import type { JobStats as JobStatsType } from '@/lib/types/jobs';
+import type { JobStats as JobStatsType } from '@/shared/types/jobs.types';
 
 interface JobStatsProps {
   stats: JobStatsType;

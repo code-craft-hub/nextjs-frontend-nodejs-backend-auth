@@ -1,7 +1,7 @@
 // components/jobs/job-card.tsx
 'use client';
 
-import type { Job } from '@/lib/types/jobs';
+import type { Job } from '@/shared/types/jobs.types';
 import { JobType } from '@/shared/types';
 
 interface JobCardProps {

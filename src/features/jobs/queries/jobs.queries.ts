@@ -2,8 +2,8 @@ import { queryOptions, infiniteQueryOptions } from "@tanstack/react-query";
 import { jobsApi } from "@/features/jobs/api/jobs.api";
 import { queryKeys } from "@/shared/query/keys";
 import type { JobFilters } from "@/shared/types/jobs.types";
-import { normalizeJobFilters } from "../query/normalize-filters";
-import recommendationsApi from "../api/recommendations.api";
+import { normalizeJobFilters } from "@/shared/query/normalize-filters";
+import recommendationsApi from "@/features/recommendations/api/recommendations.api";
 
 export const jobsQueries = {
   featured: (limit = 6) =>

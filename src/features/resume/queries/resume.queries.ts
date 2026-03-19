@@ -1,7 +1,7 @@
 // lib/queries/resume.queries.ts
 import { queryOptions } from '@tanstack/react-query';
-import { resumeApi, type ResumeFilters } from '@/lib/api/resume.api';
-import { queryKeys } from '@/lib/query/keys';
+import { resumeApi, type ResumeFilters } from '@/features/resume/api/resume.api';
+import { queryKeys } from '@/shared/query/keys';
 
 export const resumeQueries = {
   all: (params: ResumeFilters = {}, token?:string) =>

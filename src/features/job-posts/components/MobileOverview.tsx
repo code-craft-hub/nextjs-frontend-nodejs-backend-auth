@@ -11,7 +11,7 @@ import {
 import { useRouter } from "next/navigation";
 import { memo } from "react";
 import { JobUpdateMutation } from "../../../app/dashboard/jobs/components/OverviewColumn";
-import type { JobPost } from "@/modules/job-posts";
+import type { JobPost } from "@/features/job-posts";
 
 interface MobileOverviewProps {
   allJobs?: JobPost[];

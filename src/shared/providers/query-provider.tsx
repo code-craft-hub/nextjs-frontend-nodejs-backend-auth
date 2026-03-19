@@ -5,7 +5,7 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Toaster } from "sonner";
-import { useHeartbeat } from "@/modules/presence";
+import { useHeartbeat } from "@/features/presence";
 
 /**
  * Mounts the presence heartbeat for any authenticated user.

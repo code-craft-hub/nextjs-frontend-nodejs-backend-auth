@@ -2,8 +2,8 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { coverLetterApi } from '@/lib/api/cover-letter.api';
-import { queryKeys } from '@/lib/query/keys';
+import { coverLetterApi } from '@/features/cover-letter/api/cover-letter.api';
+import { queryKeys } from '@/shared/query/keys';
 import { useState, useEffect } from 'react';
 
 export function SmartSearch() {

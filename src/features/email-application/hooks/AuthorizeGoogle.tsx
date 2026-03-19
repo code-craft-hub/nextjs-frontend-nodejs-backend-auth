@@ -11,7 +11,7 @@ import {
   checkAuthStatus,
   requestAuthUrl,
   sendAuthorizationCode,
-} from "../../services/gmail/gmail-authorization-service";
+} from "@/features/email-application/api/gmail-authorization.service";
 import { isValidEmail } from "@/validation";
 import { useQuery } from "@tanstack/react-query";
 import { userQueries } from "@features/user";

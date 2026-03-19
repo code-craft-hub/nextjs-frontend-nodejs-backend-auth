@@ -5,9 +5,9 @@ import { sendGTMEvent } from "@next/third-parties/google";
 import { cn } from "@/lib/utils";
 import { userQueries } from "@features/user";
 import { ReportCard } from "../../../app/dashboard/jobs/components/ReportCard";
-import { JobList } from "@/modules/job-posts";
+import { JobList } from "@/features/job-posts";
 import { useCallback } from "react";
-import { JobSearchForm } from "@/modules/job-posts/components/JobSearchForm";
+import { JobSearchForm } from "@/features/job-posts/components/JobSearchForm";
 import { useSidebar } from "@/components/ui/sidebar";
 import LeftMenu from "./LeftMenu";
 

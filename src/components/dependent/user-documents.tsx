@@ -2,9 +2,9 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { authQueries } from '@/lib/queries/auth.queries';
-import { coverLetterQueries } from '@/lib/queries/cover-letter.queries';
-import { resumeQueries } from '@/lib/queries/resume.queries';
+import { authQueries } from '@/features/auth/queries/auth-lib.queries';
+import { coverLetterQueries } from '@/features/cover-letter/queries/cover-letter.queries';
+import { resumeQueries } from '@/features/resume/queries/resume.queries';
 
 export function UserDocuments() {
   // First query: Get user profile

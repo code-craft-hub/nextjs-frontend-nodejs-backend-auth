@@ -1,11 +1,11 @@
 import { QueryClient } from "@tanstack/react-query";
 import { queryKeys } from "./keys";
-import { aiSettingsKeys } from "./ai-settings.keys";
-import { autoApplyKeys } from "./auto-apply.keys";
-import { bookmarkKeys } from "./bookmarks.keys";
-import { jobApplicationKeys } from "./job-applications.keys";
+import { aiSettingsKeys } from "@/features/ai-settings/queries/ai-settings.keys";
+import { autoApplyKeys } from "@/features/auto-apply/queries/auto-apply.keys";
+import { bookmarkKeys } from "@/features/bookmarks/queries/bookmarks.keys";
+import { jobApplicationKeys } from "@/features/analytics/queries/job-applications.keys";
 import { invalidateUserQueries } from "@features/user";
-import { jobPostsKeys } from "@/modules/job-posts";
+import { jobPostsKeys } from "@/features/job-posts";
 
 /**
  * Centralized query invalidation utilities

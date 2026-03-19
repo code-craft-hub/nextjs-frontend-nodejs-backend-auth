@@ -1,7 +1,7 @@
 import { api } from "@/shared/api/client";
 import type { PaginatedResponse } from "@/shared/types/lib.types";
 import type { RecommendationsResponse } from "@/app/dashboard/(dashboard)/components/recent-activity/types";
-import { JobPost } from "@/modules/job-posts";
+import { JobPost } from "@/features/job-posts";
 
 export const jobsApi = {
   // Get public job posts (no auth required) — used on the landing page

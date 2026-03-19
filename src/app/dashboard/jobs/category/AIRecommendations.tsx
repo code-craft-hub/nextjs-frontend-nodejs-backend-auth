@@ -26,8 +26,8 @@ import { OverviewColumn } from "../components/OverviewColumn";
 import { useJobsTable } from "../_hooks/useJobsTable";
 import { JobsTable } from "../components/JobsTable";
 import { LoadMoreButton } from "../components/LoadMoreButton";
-import MobileOverview from "../../../../modules/job-posts/components/MobileOverview";
-import { JobPost } from "@/modules/job-posts";
+import MobileOverview from "@/features/job-posts/components/MobileOverview";
+import { JobPost } from "@/features/job-posts";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 

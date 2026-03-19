@@ -1,7 +1,7 @@
 // lib/queries/cover-letter.queries.ts
 import { queryOptions } from '@tanstack/react-query';
-import { coverLetterApi, type CoverLetterFilters } from '@/lib/api/cover-letter.api';
-import { queryKeys } from '@/lib/query/keys';
+import { coverLetterApi, type CoverLetterFilters } from '@/features/cover-letter/api/cover-letter.api';
+import { queryKeys } from '@/shared/query/keys';
 
 export const coverLetterQueries = {
   all: (params: CoverLetterFilters = {}, token?: string) =>

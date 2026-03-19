@@ -23,7 +23,7 @@ import {
   useSendEmailApplicationMutation,
   useDeleteEmailApplicationMutation,
   GmailCompose,
-} from "@/modules/email-application";
+} from "@/features/email-application";
 
 interface PreviewProps {
   coverLetterId: string;

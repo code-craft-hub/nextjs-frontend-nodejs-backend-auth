@@ -1,5 +1,5 @@
 "use client";
-import MobileOverview from "@/modules/job-posts/components/MobileOverview";
+import MobileOverview from "@/features/job-posts/components/MobileOverview";
 import { useRouter } from "next/navigation";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -22,7 +22,7 @@ import { formatAppliedDate } from "@/lib/utils/helpers";
 import { useUpdateJobMutation } from "@/features/jobs/mutations/jobs.mutations";
 import { useApplyJob } from "@/features/jobs/hooks/useApplyJob";
 import { useToggleBookmarkByJobMutation } from "@/features/bookmarks/mutations/bookmarks.mutations";
-import type { JobPost } from "@/modules/job-posts";
+import type { JobPost } from "@/features/job-posts";
 
 // ─── Row ──────────────────────────────────────────────────────────────────────
 

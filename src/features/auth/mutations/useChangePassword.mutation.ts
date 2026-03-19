@@ -1,7 +1,7 @@
 "use client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { authApi } from "../api/auth.api";
-import { invalidateUserDetail } from "@/modules/user";
+import { invalidateUserDetail } from "@/features/user";
 import type { ChangePasswordData } from "../api/auth.api.types";
 
 /**

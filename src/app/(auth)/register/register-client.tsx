@@ -23,7 +23,7 @@ import { inputField } from "@/lib/utils/constants";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { api } from "@/shared/api/client";
-import { GoogleButton } from "@/modules/auth";
+import { GoogleButton } from "@/features/auth";
 
 export default function RegisterClient({ referral }: { referral?: string }) {
   const [loading, setLoading] = useState(false);

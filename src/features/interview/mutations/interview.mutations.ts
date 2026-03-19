@@ -1,8 +1,8 @@
 // lib/mutations/interview.mutations.ts
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { interviewQuestionApi, type CreateInterviewQuestionData, type UpdateInterviewQuestionData } from '@/lib/api/interview.api';
-import { queryKeys } from '@/lib/query/keys';
-import type { InterviewQuestion, PaginatedResponse } from '@/lib/types';
+import { interviewQuestionApi, type CreateInterviewQuestionData, type UpdateInterviewQuestionData } from '@/features/interview/api/interview.api';
+import { queryKeys } from '@/shared/query/keys';
+import type { InterviewQuestion, PaginatedResponse } from '@/shared/types/lib.types';
 
 export function useCreateInterviewQuestionMutation() {
   const queryClient = useQueryClient();

@@ -2,7 +2,7 @@
 import { useIntersectionObserver } from "../hooks/useIntersectionObserver";
 import { useCallback } from "react";
 import JobsTable from "./JobsTable";
-import { useInfiniteJobs } from "../query/job-posts.query";
+import { useInfiniteJobs } from "../queries/job-posts.query";
 import { Loader } from "lucide-react";
 import { Button } from "@/components/ui/button";
 

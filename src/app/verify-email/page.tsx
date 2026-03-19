@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { VerifyEmailClient } from "./verify-email-client";
 import { createServerQueryClient } from "@/shared/query/prefetch";
 import { userQueries } from "@features/user";
-import { authQueries } from "@/modules/auth";
+import { authQueries } from "@/features/auth";
 import { HydrationBoundary } from "@/components/hydration-boundary";
 import { dehydrate } from "@tanstack/react-query";
 import { getCookiesToken } from "@/lib/auth.utils";

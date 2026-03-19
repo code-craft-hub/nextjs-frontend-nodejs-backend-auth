@@ -12,7 +12,7 @@ import { JobFilters } from "@/shared/types/jobs.types";
 import { userQueries } from "@features/user";
 import { useQuery } from "@tanstack/react-query";
 import { sendGTMEvent } from "@next/third-parties/google";
-import { useDashboardPrefetch } from "@/lib/react-query/hooks/useDashboardPrefetch";
+import { useDashboardPrefetch } from "@/shared/react-query/hooks/useDashboardPrefetch";
 import InsufficientCreditsModal from "@/components/shared/InsufficientCreditsModal";
 import AuthorizeGoogle from "@/features/email-application/hooks/AuthorizeGoogle";
 

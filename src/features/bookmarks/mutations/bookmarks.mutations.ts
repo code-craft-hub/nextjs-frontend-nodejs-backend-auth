@@ -9,7 +9,7 @@ import {
   invalidateBookmarkLists,
   invalidateBookmarkCheck,
 } from "@/shared/query/query-invalidation";
-import { jobPostsKeys } from "@/modules/job-posts";
+import { jobPostsKeys } from "@/features/job-posts";
 
 // ─── Create ───────────────────────────────────────────────────────────────────
 

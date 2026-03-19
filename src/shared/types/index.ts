@@ -1,5 +1,5 @@
 import { ResumeFormData } from "@/lib/schema-validations/resume.schema";
-import type { JobPost as _JobPost } from "@/modules/job-posts";
+import type { JobPost as _JobPost } from "@/features/job-posts";
 
 /** Re-export JobPost from the job-posts module */
 export type JobPost = _JobPost;

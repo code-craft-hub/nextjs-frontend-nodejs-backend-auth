@@ -19,7 +19,7 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { X } from "lucide-react";
 import { api } from "@/shared/api/client";
-import { useDeleteAccountMutation, useLogoutMutation, authQueries } from "@/modules/auth";
+import { useDeleteAccountMutation, useLogoutMutation, authQueries } from "@/features/auth";
 import { useQuery } from "@tanstack/react-query";
 
 // Server validates exactly 6 numeric digits (auth.validator.ts → otpSchema).

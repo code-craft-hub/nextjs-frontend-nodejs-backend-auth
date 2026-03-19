@@ -2,8 +2,8 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { blogQueries } from '@/lib/queries/blog.queries';
-import { useUpdateBlogMutation, useDeleteBlogMutation, useTogglePublishBlogMutation } from '@/lib/mutations/blog.mutations';
+import { blogQueries } from '@/features/blog/queries/blog.queries';
+import { useUpdateBlogMutation, useDeleteBlogMutation, useTogglePublishBlogMutation } from '@/features/blog/mutations/blog.mutations';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 

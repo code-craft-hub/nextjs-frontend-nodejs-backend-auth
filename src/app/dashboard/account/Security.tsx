@@ -16,8 +16,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { useChangePasswordMutation } from "@/modules/auth";
-import { userQueries } from "@/modules/user";
+import { useChangePasswordMutation } from "@/features/auth";
+import { userQueries } from "@/features/user";
 import { APIError } from "@/shared/api/client";
 
 // ─── Password requirement checker ────────────────────────────────────────────

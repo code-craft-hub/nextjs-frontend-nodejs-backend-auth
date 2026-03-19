@@ -12,7 +12,7 @@ import { OnBoardingForm5 } from "./onboarding-pages/OnBoardingForm5";
 import { OnBoardingForm6 } from "./onboarding-pages/OnBoardingForm6";
 import { OnBoardingForm7 } from "./onboarding-pages/OnBoardingForm7";
 import { useRouter } from "next/navigation";
-import { authApi, useDeleteAccountMutation } from "@/modules/auth";
+import { authApi, useDeleteAccountMutation } from "@/features/auth";
 import { useUserLocation } from "@/shared/hooks/useUserLocation";
 import { OnBoardingForm8 } from "./onboarding-pages/OnBoardingForm8";
 

@@ -2,13 +2,13 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { coverLetterQueries } from '@/lib/queries/cover-letter.queries';
+import { coverLetterQueries } from '@/features/cover-letter/queries/cover-letter.queries';
 import {
   useCreateCoverLetterMutation,
   useUpdateCoverLetterMutation,
   useDeleteCoverLetterMutation,
   useDuplicateCoverLetterMutation,
-} from '@/lib/mutations/cover-letter.mutations';
+} from '@/features/cover-letter/mutations/cover-letter.mutations';
 import { useState } from 'react';
 
 export function CoverLetterManager() {

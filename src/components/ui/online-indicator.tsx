@@ -1,7 +1,7 @@
 // components/ui/online-indicator.tsx - Show online/offline status
 'use client';
 
-import { useOnlineStatus } from '@/hooks/useOnlineStatus';
+import { useOnlineStatus } from '@/shared/hooks/useOnlineStatus';
 import { useIsFetching, useIsMutating } from '@tanstack/react-query';
 
 export function OnlineIndicator() {

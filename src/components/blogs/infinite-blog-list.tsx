@@ -2,8 +2,8 @@
 'use client';
 
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { blogApi } from '@/lib/api/blog.api';
-import { queryKeys } from '@/lib/query/keys';
+import { blogApi } from '@/features/blog/api/blog.api';
+import { queryKeys } from '@/shared/query/keys';
 import { useEffect, useRef } from 'react';
 
 export function InfiniteBlogList() {

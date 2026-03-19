@@ -12,7 +12,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { userQueries } from "@features/user";
-import { useLogoutMutation } from "@/modules/auth";
+import { useLogoutMutation } from "@/features/auth";
 
 export const UserMenu = ({ role }: { role?: string }) => {
   const { data: user } = useQuery(userQueries.detail());

@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { useLogoutMutation } from "@/modules/auth";
+import { useLogoutMutation } from "@/features/auth";
 
 export default function Error({
   error,

@@ -73,4 +73,4 @@ export interface JobStats {
   byLocation: Record<string, number>;
 }
 
-import type { PaginationParams } from './index';
+import type { PaginationParams } from './lib.types';

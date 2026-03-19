@@ -1,6 +1,6 @@
 // lib/queries/resume.queries.ts
 import { queryOptions } from '@tanstack/react-query';
-import { queryKeys } from '@/lib/query/keys';
+import { queryKeys } from '@/shared/query/keys';
 import { AIApplyApi } from '../api/ai-apply.api';
 
 export const aiApplyQueries = {

@@ -1,7 +1,7 @@
 // components/jobs/job-filters-panel.tsx
 'use client';
 
-import type { JobFilters } from '@/lib/types/jobs';
+import type { JobFilters } from '@/shared/types/jobs.types';
 import { useState, useEffect } from 'react';
 
 interface JobFiltersPanelProps {

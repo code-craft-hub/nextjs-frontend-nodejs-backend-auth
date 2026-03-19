@@ -1,7 +1,7 @@
 // lib/queries/interview.queries.ts
 import { queryOptions } from '@tanstack/react-query';
-import { interviewQuestionApi, type InterviewQuestionFilters } from '@/lib/api/interview.api';
-import { queryKeys } from '@/lib/query/keys';
+import { interviewQuestionApi, type InterviewQuestionFilters } from '@/features/interview/api/interview.api';
+import { queryKeys } from '@/shared/query/keys';
 
 export const interviewQuestionQueries = {
   all: (params: InterviewQuestionFilters = {}, token?: string) =>

@@ -2,7 +2,7 @@
 'use client';
 
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { jobsQueries } from '@/lib/queries/jobs.queries';
+import { jobsQueries } from '@/features/jobs/queries/jobs.queries';
 import {
   useCreateJobMutation,
   useUpdateJobMutation,
@@ -10,10 +10,10 @@ import {
   useBulkDeleteJobsMutation,
   useBulkChangeStatusMutation,
   useDuplicateJobMutation,
-} from '@/lib/mutations/jobs.mutations';
+} from '@/features/jobs/mutations/jobs.mutations';
 import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import type { Job, JobFilters } from '@/lib/types/jobs';
+import type { Job, JobFilters } from '@/shared/types/jobs.types';
 import { JobCard } from './job-card';
 import { JobForm } from './job-form';
 import { JobStats } from './job-stats';

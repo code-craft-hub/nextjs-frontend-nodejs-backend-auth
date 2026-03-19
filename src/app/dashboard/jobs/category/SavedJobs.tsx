@@ -14,7 +14,7 @@ import { bookmarksQueries } from "@/features/bookmarks/queries/bookmarks.queries
 import { BookmarkedColumn } from "../components/BookmarkedColumn";
 import { useJobsTable } from "../_hooks/useJobsTable";
 import { JobsTable } from "../components/JobsTable";
-import MobileOverview from "../../../../modules/job-posts/components/MobileOverview";
+import MobileOverview from "@/features/job-posts/components/MobileOverview";
 import { SearchBar, SearchBarRef } from "./JobSearchBar";
 
 export const SavedJobs = ({ children }: { children?: ReactNode }) => {

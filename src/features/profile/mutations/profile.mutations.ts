@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { profileApi } from "../api/profile.api";
 import { userQueries } from "@features/user";
-import { jobsQueries } from "../queries/jobs.queries";
+import { jobsQueries } from "@/features/jobs/queries/jobs.queries";
 
 // Query keys
 export const profileKeys = {

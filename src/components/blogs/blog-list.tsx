@@ -2,7 +2,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { blogQueries } from '@/lib/queries/blog.queries';
+import { blogQueries } from '@/features/blog/queries/blog.queries';
 // import { BlogCard } from './blog-card';
 
 export function BlogList() {

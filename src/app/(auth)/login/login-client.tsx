@@ -15,7 +15,7 @@ import {
 import { api, APIError } from "@/shared/api/client";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { FloatingLabelInput, GoogleButton } from "@/modules/auth";
+import { FloatingLabelInput, GoogleButton } from "@/features/auth";
 
 const LoginSchema = z.object({
   email: z.email({ message: "Please enter a valid email address." }),

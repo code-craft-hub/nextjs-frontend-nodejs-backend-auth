@@ -1,4 +1,4 @@
-import { ProfileData, ProfileResponse } from "../types";
+import { ProfileData, ProfileResponse } from "@/shared/types/lib.types";
 import { api, BACKEND_API_VERSION } from "@/shared/api/client";
 
 // API functions
