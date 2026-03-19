@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { useResumeStream } from "@/hooks/stream-resume-hook";
+import { useResumeStream } from "@/features/resume/hooks/stream-resume-hook";
 import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";

@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { cookies } from "next/headers";
 import { jwtVerify } from "jose";
-import { IUser } from "@/types";
+import { IUser } from "@/shared/types";
 
 const JWT_SECRET = process.env.JWT_SECRET;
 

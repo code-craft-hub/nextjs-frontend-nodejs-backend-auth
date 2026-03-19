@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ResumeField, UpdatePayload, UseResumeDataOptions } from "@/types";
+import { ResumeField, UpdatePayload, UseResumeDataOptions } from "@/shared/types";
 import {
   ContactFormData,
   ResumeFormData,

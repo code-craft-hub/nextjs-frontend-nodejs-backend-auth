@@ -10,7 +10,7 @@
 //   useReactTable,
 // } from "@tanstack/react-table";
 // import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
-// import type { JobPost } from "@/types";
+// import type { JobPost } from "@/shared/types";
 // import { useInfiniteQuery } from "@tanstack/react-query";
 // import {
 //   useEffect,
@@ -20,7 +20,7 @@
 //   useRef,
 // } from "react";
 // import { Button } from "@/components/ui/button";
-// import type { JobFilters } from "@/lib/types/jobs";
+// import type { JobFilters } from "@/shared/types/jobs.types";
 // import { ReportCard } from "@/app/dashboard/jobs/components/ReportCard";
 // import { useRouter } from "next/navigation";
 // import MobileFindJob from "./MobileFindJob";

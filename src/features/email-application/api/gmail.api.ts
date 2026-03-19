@@ -1,4 +1,4 @@
-import { api, BACKEND_API_VERSION } from "./client";
+import { api, BACKEND_API_VERSION } from "@/shared/api/client";
 
 // ─── Types ────────────────────────────────────────────────────────
 

@@ -1,4 +1,4 @@
-import { StreamStatus } from '@/types'
+import { StreamStatus } from '@/shared/types'
 
 const GenerationStatus = ({streamStatus}: {streamStatus: StreamStatus}) => {
   return (

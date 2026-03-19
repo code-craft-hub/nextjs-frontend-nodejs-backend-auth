@@ -1,4 +1,4 @@
-import { IUser } from "@/types";
+import { IUser } from "@/shared/types";
 
 export interface ProfileData {
   jobLevelPreference: string;

@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { CoverLetter, IUser } from "@/types";
+import { CoverLetter, IUser } from "@/shared/types";
 import { EditIcon, Loader } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUpdateCoverLetterMutation } from "@/features/cover-letter/mutations/cover-letter.mutations";

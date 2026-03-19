@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef } from "react";
-import { useResumeStream } from "@/hooks/stream-resume-hook";
+import { useResumeStream } from "@/features/resume/hooks/stream-resume-hook";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
 import { userQueries } from "@features/user";

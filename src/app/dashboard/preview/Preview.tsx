@@ -13,7 +13,7 @@ import { CongratulationModal } from "@/components/shared/CongratulationModal";
 import { Loader, Send, Sparkles, Trash } from "lucide-react";
 import { sendGTMEvent } from "@next/third-parties/google";
 import { useFireworksConfetti } from "@/components/ui/confetti";
-import AuthorizeGoogle from "@/hooks/gmail/AuthorizeGoogle";
+import AuthorizeGoogle from "@/features/email-application/hooks/AuthorizeGoogle";
 import TailorCoverLetterDisplay from "../tailor-cover-letter/TailorCoverLetterDisplay";
 import { ViewResume } from "../tailor-resume/ViewResume";
 import CreateUserResume from "@/app/onboarding/onboarding-pages/create-resume-form/CreateUserResume";

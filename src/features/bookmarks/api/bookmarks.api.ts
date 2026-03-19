@@ -1,5 +1,5 @@
-import { JobApplication } from "@/types";
-import { api } from "./client";
+import { JobApplication } from "@/shared/types";
+import { api } from "@/shared/api/client";
 
 // ─── Entity Types ─────────────────────────────────────────────────────────────
 

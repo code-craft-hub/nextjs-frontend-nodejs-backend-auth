@@ -1,4 +1,4 @@
-import { OnboardingFormProps } from "@/types";
+import { OnboardingFormProps } from "@/shared/types";
 import Progress from "./Progress";
 import { Button } from "@/components/ui/button";
 import { features } from "./constants";

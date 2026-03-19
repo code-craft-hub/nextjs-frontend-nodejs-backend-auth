@@ -1,12 +1,12 @@
 // lib/api/blog.api.ts
-import { api } from "./client";
+import { api } from "@/shared/api/client";
 import type {
   BlogWithViews,
   BlogStats,
   BlogListResponse,
   BlogViewHistory,
   Blog,
-} from "@/lib/types";
+} from "@/shared/types/lib.types";
 
 export interface BlogFilters {
   status?: "publish" | "draft" | "archived";

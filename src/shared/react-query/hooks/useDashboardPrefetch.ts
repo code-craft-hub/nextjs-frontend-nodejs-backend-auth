@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { prefetchDashboardData } from "../prefetch/dashboard.prefetch";
-import { JobFilters } from "@/lib/types/jobs";
+import { JobFilters } from "@/shared/types/jobs.types";
 
 type UseDashboardPrefetchProps = {
   filters: JobFilters;

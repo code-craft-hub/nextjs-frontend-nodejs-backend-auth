@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { jsonrepair } from "jsonrepair";
 import { toast } from "sonner";
 import { isEmpty } from "lodash";
-import { QAItem } from "@/types";
+import { QAItem } from "@/shared/types";
 import { extractCompleteJsonObjects } from "@/lib/utils/helpers";
 import TailorInterviewQuestionEmptyState from "./TailorInterviewQuestionEmptyState";
 import { useQuery, useQueryClient } from "@tanstack/react-query";

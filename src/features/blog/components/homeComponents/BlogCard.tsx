@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Calendar, Clock, Eye } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { BlogWithViews } from "@/lib/types";
+import type { BlogWithViews } from "@/shared/types/lib.types";
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 

@@ -1,10 +1,10 @@
 import { useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { JobType } from "@/types";
+import { JobType } from "@/shared/types";
 import { buildAutoApplyStartUrl } from "@/lib/utils/ai-apply-navigation";
 import { gmailApi } from "@/features/email-application/api/gmail.api";
-import { useDefaultResumeGuard } from "@/hooks/useDefaultResumeGuard";
+import { useDefaultResumeGuard } from "@/features/resume/hooks/useDefaultResumeGuard";
 
 export function useJobActions() {
   const router = useRouter();

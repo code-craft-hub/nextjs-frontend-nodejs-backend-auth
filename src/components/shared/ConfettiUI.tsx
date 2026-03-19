@@ -1,4 +1,4 @@
-import { useConfettiStore } from "@/hooks/useConfetti-store";
+import { useConfettiStore } from "@/shared/stores/useConfetti-store";
 import ReactConfetti from "react-confetti";
 export default function ConfettiUI() {
   const confetti = useConfettiStore();

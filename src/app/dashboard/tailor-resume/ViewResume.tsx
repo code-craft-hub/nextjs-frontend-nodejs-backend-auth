@@ -8,7 +8,7 @@ import {
   normalizeToString,
   parseResponsibilities,
 } from "@/lib/utils/helpers";
-import { PreviewResumeProps } from "@/types";
+import { PreviewResumeProps } from "@/shared/types";
 import { useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { userQueries } from "@features/user";

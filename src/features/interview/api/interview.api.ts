@@ -1,10 +1,10 @@
 // lib/api/interview.api.ts
-import { InterviewQuestion } from "@/types";
-import { api } from "./client";
+import { InterviewQuestion } from "@/shared/types";
+import { api } from "@/shared/api/client";
 import type {
   PaginatedResponse,
   PaginationParams,
-} from "@/lib/types";
+} from "@/shared/types/lib.types";
 
 
 export interface CreateInterviewQuestionData {

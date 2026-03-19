@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { BASEURL } from "@/shared/api/client";
-import { IUser } from "@/types";
+import { IUser } from "@/shared/types";
 import { Button } from "@/components/ui/button";
 import { DownloadIcon, Loader } from "lucide-react";
 

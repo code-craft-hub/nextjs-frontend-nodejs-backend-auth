@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { jobsApi } from "@/features/jobs/api/jobs.api";
 import { queryKeys } from "@/shared/query/keys";
-import type { PaginatedResponse } from "@/lib/types";
+import type { PaginatedResponse } from "@/shared/types/lib.types";
 
 export function useCreateJobMutation() {
   const queryClient = useQueryClient();

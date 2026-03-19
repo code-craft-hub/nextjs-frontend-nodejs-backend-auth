@@ -1,6 +1,6 @@
 import { X } from "lucide-react";
 import { FaCircleCheck } from "react-icons/fa6";
-import { UploadedFile } from "@/types";
+import { UploadedFile } from "@/shared/types";
 import { isEmpty } from "lodash";
 
 export const FileUploadForm = ({

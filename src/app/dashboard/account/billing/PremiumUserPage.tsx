@@ -4,7 +4,7 @@ import { userQueries } from "@features/user";
 import { useQuery } from "@tanstack/react-query";
 import { daysFromToday, formatAppliedDate } from "@/lib/utils/helpers";
 import { cn } from "@/lib/utils";
-import { useConfirm } from "@/hooks/use-confirm";
+import { useConfirm } from "@/shared/hooks/use-confirm";
 import { toast } from "sonner";
 
 export function PremiumUserPage() {

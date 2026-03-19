@@ -2,7 +2,7 @@
 'use client';
 
 import type { Job } from '@/lib/types/jobs';
-import { JobType } from '@/types';
+import { JobType } from '@/shared/types';
 
 interface JobCardProps {
   job: JobType extends Job ? JobType : Job;

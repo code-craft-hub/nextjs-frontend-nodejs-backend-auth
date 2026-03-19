@@ -1,5 +1,5 @@
-import { api } from "./client";
-import type { JobApplication } from "@/types";
+import { api } from "@/shared/api/client";
+import type { JobApplication } from "@/shared/types";
 
 // ─── Request Payloads ─────────────────────────────────────────────────────────
 

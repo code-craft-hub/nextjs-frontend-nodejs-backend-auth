@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { requestAuthUrl } from "@/services/gmail/gmail-authorization-service";
+import { requestAuthUrl } from "@/features/email-application/api/gmail-authorization.service";
 import { useRouter } from "next/navigation";
 import React from "react";
 import { toast } from "sonner";

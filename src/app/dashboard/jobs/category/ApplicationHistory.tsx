@@ -7,7 +7,7 @@ import { sendGTMEvent } from "@next/third-parties/google";
 import { Loader2 } from "lucide-react";
 
 import { userQueries } from "@features/user";
-import { usePrefetchJob } from "@/hooks/usePrefetchJob";
+import { usePrefetchJob } from "@/features/jobs/hooks/usePrefetchJob";
 import jobApplicationQueries from "@/features/analytics/queries/application-history.queries";
 
 import { ApplicationHistoryColumn } from "../components/OverviewColumn";

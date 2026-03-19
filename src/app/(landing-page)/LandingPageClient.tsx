@@ -17,7 +17,7 @@ import { LandingPageInput } from "./components/LandingPageInput";
 import { ActionButton } from "./components/ActionButton";
 import { MeetCverai } from "./components/MeetCverai";
 import { FeatureJobs } from "./components/FeatureJobs";
-import { IUser } from "@/types";
+import { IUser } from "@/shared/types";
 import Pricing from "./components/Pricing";
 import { VideoModal } from "./components/VideoModal";
 import { useRouter } from "next/navigation";

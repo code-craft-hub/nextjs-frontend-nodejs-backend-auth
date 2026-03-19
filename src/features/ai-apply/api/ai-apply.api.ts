@@ -1,9 +1,9 @@
 // lib/api/cover-letter.api.ts
-import { api } from "./client";
+import { api } from "@/shared/api/client";
 import type {
   PaginatedResponse,
   PaginationParams,
-} from "@/lib/types";
+} from "@/shared/types/lib.types";
 
 export interface CreateAIApplyData {
   title: string;

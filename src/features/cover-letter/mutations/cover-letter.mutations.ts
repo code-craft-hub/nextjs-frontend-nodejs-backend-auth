@@ -9,8 +9,8 @@ import {
   invalidateCoverLetterDetail,
   invalidateCoverLetterLists,
 } from "@/shared/query/query-invalidation";
-import type { PaginatedResponse } from "@/lib/types";
-import { CoverLetter } from "@/types";
+import type { PaginatedResponse } from "@/shared/types/lib.types";
+import { CoverLetter } from "@/shared/types";
 
 export function useCreateCoverLetterMutation() {
   const queryClient = useQueryClient();

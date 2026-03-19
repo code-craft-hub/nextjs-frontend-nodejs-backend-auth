@@ -1,4 +1,4 @@
-import type { IUser } from "@/types";
+import type { IUser } from "@/shared/types";
 import { getDaysRemaining, isSubscriptionActive } from "@/lib/utils/helpers";
 
 interface TrialBannerProps {

@@ -1,5 +1,5 @@
 // lib/query/normalize-filters.ts
-import type { JobFilters } from "@/lib/types/jobs";
+import type { JobFilters } from "@/shared/types/jobs.types";
 
 /**
  * Normalizes job filters by removing empty values and ensuring consistent structure
@@ -64,7 +64,7 @@ function isValidFilterValue(value: unknown): boolean {
 }
 
 // // lib/query/normalize-filters.ts
-// import type { JobFilters } from "@/lib/types/jobs";
+// import type { JobFilters } from "@/shared/types/jobs.types";
 
 // export function normalizeJobFilters(filters: JobFilters): JobFilters {
 //   // Remove undefined/null values to ensure consistent keys

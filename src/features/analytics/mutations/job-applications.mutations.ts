@@ -6,7 +6,7 @@ import {
   type UpdateApplicationData,
 } from "@/features/analytics/api/job-applications.api";
 import { jobApplicationKeys } from "@/features/analytics/queries/job-applications.keys";
-import type { JobApplication } from "@/types";
+import type { JobApplication } from "@/shared/types";
 import {
   invalidateApplicationLists,
   invalidateApplicationCheck,

@@ -16,7 +16,7 @@ import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { smoothlyScrollToView } from "@/lib/utils/helpers";
 import { useState } from "react";
-import { IUser } from "@/types";
+import { IUser } from "@/shared/types";
 import { useUserQuery } from "@features/user";
 
 export const Header = ({

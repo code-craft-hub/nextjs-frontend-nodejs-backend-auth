@@ -15,14 +15,14 @@ import {
 } from "@/components/ui/form";
 
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { OnboardingFormProps } from "@/types";
+import { OnboardingFormProps } from "@/shared/types";
 import { FloatingLabelInput } from "./FloatingInput";
 import Progress from "./Progress";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/shared/hooks/use-mobile";
 import { userQueries } from "@features/user";
 import { useQuery } from "@tanstack/react-query";
-import { useUpdateOnboarding } from "@/hooks/mutations";
+import { useUpdateOnboarding } from "@features/user";
 const formSchema = z.object({
   type: z
     .enum([

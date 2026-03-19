@@ -6,7 +6,7 @@ import { ProjectEditForm } from "./ProjectEditForm";
 import { CertificationEditForm } from "./CertificationEditForm";
 import { SkillEditForm } from "./SkillEditForm";
 import { useCallback } from "react";
-import { ResumeField, ResumePreviewProps } from "@/types";
+import { ResumeField, ResumePreviewProps } from "@/shared/types";
 import { ContactEditForm } from "./ContactEditForm";
 
 export const ResumePreview: React.FC<ResumePreviewProps> = ({

@@ -22,7 +22,7 @@ import {
 } from "lucide-react";
 import { PiOfficeChairFill } from "react-icons/pi";
 import { formatAppliedDate } from "@/lib/utils/helpers";
-import { JobApplication } from "@/types";
+import { JobApplication } from "@/shared/types";
 
 // ─── Shared types ─────────────────────────────────────────────────────────────
 

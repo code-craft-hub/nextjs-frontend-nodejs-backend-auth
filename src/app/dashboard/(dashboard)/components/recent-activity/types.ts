@@ -1,4 +1,4 @@
-import { JobType } from "@/types";
+import { JobType } from "@/shared/types";
 
 export interface RecommendationMetrics {
   experimentId: string | null;

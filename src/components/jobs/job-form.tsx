@@ -1,7 +1,7 @@
 // components/jobs/job-form.tsx
 "use client";
 
-import type { Job, CreateJobData } from "@/lib/types/jobs";
+import type { Job, CreateJobData } from "@/shared/types/jobs.types";
 import { useState, useEffect } from "react";
 
 interface JobFormProps {

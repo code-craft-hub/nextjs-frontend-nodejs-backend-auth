@@ -15,15 +15,15 @@ import {
 import "react-phone-number-input/style.css";
 import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
 import { motion } from "framer-motion";
-import { OnboardingFormProps } from "@/types";
+import { OnboardingFormProps } from "@/shared/types";
 import Progress from "./Progress";
 import { FloatingLabelInput } from "./FloatingInput";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/shared/hooks/use-mobile";
 import { userQueries } from "@features/user";
 import { useQuery } from "@tanstack/react-query";
-import { useUpdateOnboarding } from "@/hooks/mutations";
-import { useUserLocation } from "@/hooks/useUserLocation";
+import { useUpdateOnboarding } from "@features/user";
+import { useUserLocation } from "@/shared/hooks/useUserLocation";
 const formSchema = z.object({
   country: z.string({ message: "Please enter a valid country name." }),
   state: z.string({ message: "Please enter a valid state name." }),

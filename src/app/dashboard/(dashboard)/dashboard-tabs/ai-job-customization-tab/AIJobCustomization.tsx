@@ -5,7 +5,7 @@ import { RecentActivityCard } from "../../components/RecentActivityCard";
 import { AIJobCustomizationDatatable } from "./AIJobCustomizationDatatable";
 import { AIJobCustomizationInput } from "./AIJobCustomizationInput";
 import { isEmpty } from "lodash";
-import { JobFilters } from "@/lib/types/jobs";
+import { JobFilters } from "@/shared/types/jobs.types";
 import { useQuery } from "@tanstack/react-query";
 import { resumeQueries } from "@/features/resume/queries/resume.queries";
 import { coverLetterQueries } from "@/features/cover-letter/queries/cover-letter.queries";

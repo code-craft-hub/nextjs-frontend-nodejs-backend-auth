@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { useConfirm } from "@/hooks/use-confirm";
+import { useConfirm } from "@/shared/hooks/use-confirm";
 
 const paymentFormSchema = z.object({
   cardNumber: z

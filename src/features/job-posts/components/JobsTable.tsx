@@ -20,7 +20,7 @@ import {
 import { PiOfficeChairFill } from "react-icons/pi";
 import { formatAppliedDate } from "@/lib/utils/helpers";
 import { useUpdateJobMutation } from "@/features/jobs/mutations/jobs.mutations";
-import { useApplyJob } from "@/hooks/useApplyJob";
+import { useApplyJob } from "@/features/jobs/hooks/useApplyJob";
 import { useToggleBookmarkByJobMutation } from "@/features/bookmarks/mutations/bookmarks.mutations";
 import type { JobPost } from "@/modules/job-posts";
 

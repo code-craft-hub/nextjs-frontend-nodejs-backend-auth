@@ -15,7 +15,7 @@ import {
   MapPin,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useApplyJob } from "@/hooks/useApplyJob";
+import { useApplyJob } from "@/features/jobs/hooks/useApplyJob";
 
 // ─── Referrer → page title mapping ───────────────────────────────────────────
 

@@ -1,5 +1,5 @@
 // lib/api/user-activity.api.ts
-import { api } from "./client";
+import { api } from "@/shared/api/client";
 
 export interface TrackActivityPayload {
   action: string;

@@ -13,7 +13,7 @@ import { sendGTMEvent } from "@next/third-parties/google";
 
 import { userQueries } from "@features/user";
 import { useUpdateJobMutation } from "@/features/jobs/mutations/jobs.mutations";
-import { useApplyJob } from "@/hooks/useApplyJob";
+import { useApplyJob } from "@/features/jobs/hooks/useApplyJob";
 import { queryKeys } from "@/shared/query/keys";
 import { Button } from "@/components/ui/button";
 

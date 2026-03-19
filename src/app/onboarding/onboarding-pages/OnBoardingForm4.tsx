@@ -11,7 +11,7 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
-import { OnboardingFormProps } from "@/types";
+import { OnboardingFormProps } from "@/shared/types";
 import { cn } from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox";
 import { motion } from "framer-motion";
@@ -21,7 +21,7 @@ import { useIsMobile } from "@/shared/hooks/use-mobile";
 import { FloatingLabelInput } from "./FloatingInput";
 import { userQueries } from "@features/user";
 import { useQuery } from "@tanstack/react-query";
-import { useUpdateOnboarding } from "@/hooks/mutations";
+import { useUpdateOnboarding } from "@features/user";
 
 const formSchema = z.object({
   tailoringIssue: z.boolean().default(false).optional(),

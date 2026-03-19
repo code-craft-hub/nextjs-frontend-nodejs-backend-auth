@@ -26,7 +26,7 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { Table } from "@tanstack/react-table";
-import { JobApplication } from "@/types";
+import { JobApplication } from "@/shared/types";
 
 const searchSchema = z.object({
   searchValue: z.string(),

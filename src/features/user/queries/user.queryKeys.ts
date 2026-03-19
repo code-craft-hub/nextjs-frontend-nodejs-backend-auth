@@ -1,5 +1,5 @@
 import { queryKeys } from "@/shared/query/keys";
-import type { PaginationParams } from "@/lib/types";
+import type { PaginationParams } from "@/shared/types/lib.types";
 
 export const userQueryKeys = {
   users: {

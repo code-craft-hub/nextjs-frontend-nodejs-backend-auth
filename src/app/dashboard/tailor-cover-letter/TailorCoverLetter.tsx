@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { useCoverLetterStream } from "@/hooks/useCoverLetterGenerator";
+import { useCoverLetterStream } from "@/features/cover-letter/hooks/useCoverLetterGenerator";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { userQueries } from "@features/user";

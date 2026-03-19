@@ -2,7 +2,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown, Calendar, DollarSign, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FaRegBookmark, FaBookmark } from "react-icons/fa";
-import { JobType } from "@/types";
+import { JobType } from "@/shared/types";
 import { PiOfficeChairFill } from "react-icons/pi";
 
 export const overviewColumns: ColumnDef<JobType>[] = [

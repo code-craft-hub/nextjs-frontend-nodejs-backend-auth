@@ -2,7 +2,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { blogApi, type CreateBlogData, type UpdateBlogData } from "@/features/blog/api/blog.api";
 import { queryKeys } from "@/shared/query/keys";
-import type { Blog, BlogWithViews, BlogListResponse } from "@/lib/types";
+import type { Blog, BlogWithViews, BlogListResponse } from "@/shared/types/lib.types";
 
 export function useCreateBlogMutation() {
   const queryClient = useQueryClient();

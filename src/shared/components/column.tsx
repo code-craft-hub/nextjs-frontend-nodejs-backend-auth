@@ -11,7 +11,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { formatAppliedDate } from "@/lib/utils/helpers";
-import { JobType } from "@/types";
+import { JobType } from "@/shared/types";
 import { Toggle } from "@/components/ui/toggle";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { PiOfficeChairFill } from "react-icons/pi";

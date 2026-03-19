@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { Toggle } from "@/components/ui/toggle";
 import { formatAppliedDate } from "@/lib/utils/helpers";
-import type { JobPost } from "@/types";
+import type { JobPost } from "@/shared/types";
 import { useJobActions } from "./hooks/useJobActions";
 
 const MobileFindJob = memo(({ allJobs }: { allJobs: JobPost[] }) => {

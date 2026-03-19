@@ -27,14 +27,14 @@ import { SelectOptions } from "../../components/SelectOptions";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { useDocumentExtraction } from "@/app/onboarding/onboarding-pages/AnyFormatToText";
-import { UploadedFile } from "@/types";
+import { UploadedFile } from "@/shared/types";
 import { userQueries } from "@features/user";
 import { useQuery } from "@tanstack/react-query";
 import { Separator } from "@/components/ui/separator";
 import { FileUploadForm } from "@/components/FileUploadForm";
 import { isEmpty } from "lodash";
 import JoinOurTelegramGroupAlert from "@/components/shared/JoinOurTelegramGroupAlert";
-import { useDefaultResumeGuard } from "@/hooks/useDefaultResumeGuard";
+import { useDefaultResumeGuard } from "@/features/resume/hooks/useDefaultResumeGuard";
 
 const FORM_SCHEMA = z.object({
   jobDescription: z.string().min(2, {

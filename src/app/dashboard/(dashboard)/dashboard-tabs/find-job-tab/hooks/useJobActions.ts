@@ -3,9 +3,9 @@
 import { useCallback } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useUpdateJobMutation } from "@/features/jobs/mutations/jobs.mutations";
-import type { JobPost } from "@/types";
+import type { JobPost } from "@/shared/types";
 import { BOOKMARK_IDS_QUERY_KEY } from "./useBookmarkedJobIds";
-import { useApplyJob } from "@/hooks/useApplyJob";
+import { useApplyJob } from "@/features/jobs/hooks/useApplyJob";
 
 /**
  * Encapsulates all job interaction side-effects (bookmark, apply).

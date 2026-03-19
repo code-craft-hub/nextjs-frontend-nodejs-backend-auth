@@ -1,6 +1,6 @@
-import type { IUser } from "@/types";
+import type { IUser } from "@/shared/types";
 import { api } from "@/shared/api/client";
-import type { PaginatedResponse, PaginationParams } from "@/lib/types";
+import type { PaginatedResponse, PaginationParams } from "@/shared/types/lib.types";
 import type {
   CreateUserData,
   UpdateUserData,

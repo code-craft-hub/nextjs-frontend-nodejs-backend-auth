@@ -9,7 +9,7 @@ import {
   invalidateResumeDetail,
   invalidateResumeLists,
 } from "@/shared/query/query-invalidation";
-import type { PaginatedResponse } from "@/lib/types";
+import type { PaginatedResponse } from "@/shared/types/lib.types";
 import type {
   WorkExperienceEntry,
   EducationEntry,

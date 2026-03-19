@@ -4,17 +4,17 @@ import { cn } from "@/lib/utils";
 import { memo, useEffect } from "react";
 import { AIApply } from "../(dashboard)/dashboard-tabs/ai-apply-tab/AIApply";
 import { FindJob } from "../(dashboard)/dashboard-tabs/find-job-tab/FindJob";
-import { DashboardTab } from "@/types";
+import { DashboardTab } from "@/shared/types";
 import { TAB_ITEMS } from "../../(landing-page)/constants";
 import { AIJobCustomization } from "../(dashboard)/dashboard-tabs/ai-job-customization-tab/AIJobCustomization";
 import { TopGradient } from "@/components/shared/TopGradient";
-import { JobFilters } from "@/lib/types/jobs";
+import { JobFilters } from "@/shared/types/jobs.types";
 import { userQueries } from "@features/user";
 import { useQuery } from "@tanstack/react-query";
 import { sendGTMEvent } from "@next/third-parties/google";
 import { useDashboardPrefetch } from "@/lib/react-query/hooks/useDashboardPrefetch";
 import InsufficientCreditsModal from "@/components/shared/InsufficientCreditsModal";
-import AuthorizeGoogle from "@/hooks/gmail/AuthorizeGoogle";
+import AuthorizeGoogle from "@/features/email-application/hooks/AuthorizeGoogle";
 
 export const HomeClient = memo(
   ({ tab, jobDescription }: { tab: DashboardTab; jobDescription: string }) => {

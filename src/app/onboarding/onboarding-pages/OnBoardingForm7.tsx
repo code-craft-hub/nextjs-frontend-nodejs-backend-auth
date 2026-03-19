@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { OnboardingFormProps } from "@/types";
+import { OnboardingFormProps } from "@/shared/types";
 import { motion } from "framer-motion";
 
 import Progress from "./Progress";
@@ -15,7 +15,7 @@ import { BASEURL } from "@/shared/api/client";
 import { useQuery } from "@tanstack/react-query";
 import { userQueries } from "@features/user";
 import { toast } from "sonner";
-import { useUpdateOnboarding } from "@/hooks/mutations";
+import { useUpdateOnboarding } from "@features/user";
 
 export const OnBoardingForm7 = ({
   onNext,

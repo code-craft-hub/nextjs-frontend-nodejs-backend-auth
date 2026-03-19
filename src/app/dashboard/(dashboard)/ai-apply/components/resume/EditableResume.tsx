@@ -7,7 +7,7 @@ import {
   normalizeToString,
   parseResponsibilities,
 } from "@/lib/utils/helpers";
-import { PreviewResumeProps, ResumeField } from "@/types";
+import { PreviewResumeProps, ResumeField } from "@/shared/types";
 import { memo, useCallback, useRef } from "react";
 import { ProfileEditForm } from "./form/ProfileEditForm";
 import { EditDialog } from "./form/EditDialog";
@@ -18,7 +18,7 @@ import { SkillEditForm } from "./form/SkillEditForm";
 import { CertificationEditForm } from "./form/CertificationEditForm";
 import { Edit, Loader2 } from "lucide-react";
 import { ContactEditForm } from "./form/ContactEditForm";
-import { useResumeData } from "@/hooks/use-resume-data";
+import { useResumeData } from "@/features/resume/hooks/use-resume-data";
 import { useQuery } from "@tanstack/react-query";
 import { userQueries } from "@features/user";
 

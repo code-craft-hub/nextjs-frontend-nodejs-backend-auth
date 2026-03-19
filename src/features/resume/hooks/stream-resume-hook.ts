@@ -5,7 +5,7 @@ import {
   StreamEvent,
   StreamStatus,
   UseResumeStreamReturn,
-} from "@/types";
+} from "@/shared/types";
 import { jsonrepair } from "jsonrepair";
 import { API_URL } from "@/shared/api/client";
 

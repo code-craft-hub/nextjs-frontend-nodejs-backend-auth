@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/form";
 
 import { cn } from "@/lib/utils";
-import { OnboardingFormProps } from "@/types";
+import { OnboardingFormProps } from "@/shared/types";
 import { Checkbox } from "@/components/ui/checkbox";
 import { motion } from "framer-motion";
 import OnboardingTabs from "./OnBoardingTabs";
@@ -20,7 +20,7 @@ import { useIsMobile } from "@/shared/hooks/use-mobile";
 import Progress from "./Progress";
 import { userQueries } from "@features/user";
 import { useQuery } from "@tanstack/react-query";
-import { useUpdateOnboarding } from "@/hooks/mutations";
+import { useUpdateOnboarding } from "@features/user";
 
 const formSchema = z
   .object({

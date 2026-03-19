@@ -5,8 +5,8 @@ import type {
   ProjectEntry,
   CertificationEntry,
 } from "@/shared/types/resume.types";
-import { api } from "./client";
-import type { PaginatedResponse, PaginationParams } from "@/lib/types";
+import { api } from "@/shared/api/client";
+import type { PaginatedResponse, PaginationParams } from "@/shared/types/lib.types";
 
 // ─── Types ────────────────────────────────────────────────────────
 

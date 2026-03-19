@@ -8,7 +8,7 @@ import { ChevronLeft, Calendar, Clock, Eye } from "lucide-react";
 import { blogQueries } from "@/features/blog/queries/blog.queries";
 import { BlogCard, BlogCardSkeleton } from "./homeComponents/BlogCard";
 import { useBlogMetrics } from "../hooks/useBlogMetrics";
-import type { BlogWithViews } from "@/lib/types";
+import type { BlogWithViews } from "@/shared/types/lib.types";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 

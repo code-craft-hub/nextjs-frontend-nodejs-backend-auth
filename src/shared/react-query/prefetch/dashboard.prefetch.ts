@@ -5,7 +5,7 @@ import { coverLetterQueries } from "@/features/cover-letter/queries/cover-letter
 import { interviewQuestionQueries } from "@/features/interview/queries/interview.queries";
 import recommendationsQueries from "@/features/recommendations/queries/recommendations.queries";
 import { resumeQueries } from "@/features/resume/queries/resume.queries";
-import { JobFilters } from "@/lib/types/jobs";
+import { JobFilters } from "@/shared/types/jobs.types";
 import { jobPostsQueries } from "@/modules/job-posts";
 import { QueryClient } from "@tanstack/react-query";
 

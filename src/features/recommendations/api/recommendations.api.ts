@@ -1,6 +1,6 @@
-import { JobType } from "@/types";
-import { api } from "./client";
-import type { PaginatedResponse } from "@/lib/types";
+import { JobType } from "@/shared/types";
+import { api } from "@/shared/api/client";
+import type { PaginatedResponse } from "@/shared/types/lib.types";
 
 const JOB_RECOMMENDATION_API = `/recommendations`;
 

@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Copy, Info } from "lucide-react";
 import { toast } from "sonner";
-import type { IUser } from "@/types";
+import type { IUser } from "@/shared/types";
 
 interface ReferralCardProps {
   user: Partial<IUser> | undefined;

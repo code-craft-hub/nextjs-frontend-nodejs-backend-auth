@@ -1,7 +1,7 @@
 // lib/api/jobs.api.ts
-import { JobType } from "@/types";
-import { api, BASEURL } from "./client";
-import type { PaginatedResponse } from "@/lib/types";
+import { JobType } from "@/shared/types";
+import { api, BASEURL } from "@/shared/api/client";
+import type { PaginatedResponse } from "@/shared/types/lib.types";
 
 export const onboardingApi = {
   // Get all jobs with advanced filtering

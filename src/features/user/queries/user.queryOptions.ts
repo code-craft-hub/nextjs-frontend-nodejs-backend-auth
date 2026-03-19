@@ -1,7 +1,7 @@
 import { queryOptions, infiniteQueryOptions, type QueryClient } from "@tanstack/react-query";
 import { userApi } from "../api/user.api";
 import { queryKeys } from "@/shared/query/keys";
-import type { PaginationParams } from "@/lib/types";
+import type { PaginationParams } from "@/shared/types/lib.types";
 
 export const userQueries = {
   all: (params: PaginationParams = {}) =>

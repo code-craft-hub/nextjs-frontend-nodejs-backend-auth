@@ -1,6 +1,6 @@
 import { differenceInCalendarDays } from "date-fns";
 import { formatDistanceToNow, isValid } from "date-fns";
-import { ApiError, QAItem } from "@/types";
+import { ApiError, QAItem } from "@/shared/types";
 import { jsonrepair } from "jsonrepair";
 import { MouseEvent } from "react";
 

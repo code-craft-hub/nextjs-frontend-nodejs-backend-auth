@@ -23,7 +23,7 @@ import { PROFILE_OPTIONS } from "../../components/constants";
 import { useRouter } from "next/navigation";
 import { emailRegex } from "@/validation";
 import { FileUploadForm } from "@/components/FileUploadForm";
-import { UploadedFile } from "@/types";
+import { UploadedFile } from "@/shared/types";
 import { cn } from "@/lib/utils";
 import { useDocumentExtraction } from "@/app/onboarding/onboarding-pages/AnyFormatToText";
 import { isEmpty } from "lodash";
@@ -33,7 +33,7 @@ import { useQuery } from "@tanstack/react-query";
 import JoinOurTelegramGroupAlert from "@/components/shared/JoinOurTelegramGroupAlert";
 import { buildAutoApplyStartUrl } from "@/lib/utils/ai-apply-navigation";
 import { gmailApi } from "@/features/email-application/api/gmail.api";
-import { useDefaultResumeGuard } from "@/hooks/useDefaultResumeGuard";
+import { useDefaultResumeGuard } from "@/features/resume/hooks/useDefaultResumeGuard";
 
 const FORM_SCHEMA = z.object({
   jobDescription: z.string().min(2, {

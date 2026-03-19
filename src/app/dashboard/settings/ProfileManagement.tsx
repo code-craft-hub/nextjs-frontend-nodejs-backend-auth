@@ -5,7 +5,7 @@ import AuthorizeGoogle from "../../../hooks/gmail/AuthorizeGoogle";
 import { toast } from "sonner";
 import { FileUploadZone } from "@/app/onboarding/onboarding-pages/AnyFormatToText";
 import { ProfileCard } from "./ProfileCard";
-import { useResumeUploadWithProgress } from "@/hooks/useResumeUploadWithProgress";
+import { useResumeUploadWithProgress } from "@/features/resume/hooks/useResumeUploadWithProgress";
 import { resumeQueries } from "@/features/resume/queries/resume.queries";
 import { queryKeys } from "@/shared/query/keys";
 

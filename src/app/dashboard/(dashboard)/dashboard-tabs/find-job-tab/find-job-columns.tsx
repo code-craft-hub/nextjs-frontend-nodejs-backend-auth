@@ -9,7 +9,7 @@ import { PiOfficeChairFill } from "react-icons/pi";
 import { Button } from "@/components/ui/button";
 import { Toggle } from "@/components/ui/toggle";
 import { formatAppliedDate } from "@/lib/utils/helpers";
-import type { JobPost } from "@/types";
+import type { JobPost } from "@/shared/types";
 
 interface JobColumnCallbacks {
   onBookmark: (job: JobPost) => void;

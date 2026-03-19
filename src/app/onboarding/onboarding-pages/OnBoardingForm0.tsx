@@ -1,7 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { useUserLocation } from "@/hooks/geo-location/ip-geolocation.provider";
-import { OnboardingFormProps } from "@/types";
+import { useUserLocation } from "@/shared/providers/ip-geolocation.provider";
+import { OnboardingFormProps } from "@/shared/types";
 import { motion } from "framer-motion";
 
 export const OnBoardingForm0 = ({ onNext, children }: OnboardingFormProps) => {

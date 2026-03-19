@@ -1,7 +1,7 @@
 "use client";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { OnboardingFormProps } from "@/types";
+import { OnboardingFormProps } from "@/shared/types";
 import { useIsMobile } from "@/shared/hooks/use-mobile";
 import Progress from "./Progress";
 import OnboardingTabs from "./OnBoardingTabs";
@@ -10,7 +10,7 @@ import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { userQueries } from "@features/user";
-import { useResumeUploadWithProgress } from "@/hooks/useResumeUploadWithProgress";
+import { useResumeUploadWithProgress } from "@/features/resume/hooks/useResumeUploadWithProgress";
 import { queryKeys } from "@/shared/query/keys";
 import CreateUserResume from "./create-resume-form/CreateUserResume";
 import { Bot, Edit3 } from "lucide-react";

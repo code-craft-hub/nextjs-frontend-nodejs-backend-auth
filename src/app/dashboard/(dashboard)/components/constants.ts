@@ -4,7 +4,7 @@ import CameraIcon from "@/components/icons/cameraIcon";
 import TailorCoverLetterIcon from "@/components/icons/TailorCoverLetterIcon";
 import TailorInterviewQuestionIcon from "@/components/icons/TailorInterviewQuestionIcon";
 import TailorResumeIcon from "@/components/icons/TailorResumeIcon";
-import { IUser } from "@/types";
+import { IUser } from "@/shared/types";
 import UploadCloudIcon from "@/components/icons/UploadCloudIcon";
 
 export interface ProfileOption {

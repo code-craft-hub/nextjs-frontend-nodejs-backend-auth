@@ -8,7 +8,7 @@ import { Loader2 } from "lucide-react";
 
 import { userQueries } from "@features/user";
 import { useUpdateJobMutation } from "@/features/jobs/mutations/jobs.mutations";
-import { useApplyJob } from "@/hooks/useApplyJob";
+import { useApplyJob } from "@/features/jobs/hooks/useApplyJob";
 import { bookmarksQueries } from "@/features/bookmarks/queries/bookmarks.queries";
 
 import { BookmarkedColumn } from "../components/BookmarkedColumn";
