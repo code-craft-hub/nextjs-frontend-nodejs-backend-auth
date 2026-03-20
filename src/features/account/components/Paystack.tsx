@@ -6,6 +6,7 @@ import { userQueries } from "@features/user";
 import { api } from "@/shared/api/client";
 import { generateIdempotencyKey } from "@/lib/utils/helpers";
 import { toast } from "sonner";
+import { Analytics } from "@/lib/analytics";
 
 interface InitializePaymentResponse {
   status: string;
@@ -106,6 +107,11 @@ export const PaystackPaymentGateway = ({
       );
 
       if (result?.data?.isProUser) {
+        Analytics.paymentSuccess(
+          "pro",
+          parseFloat(process.env.NEXT_PUBLIC_PAYSTACK_AMOUNT || "4999"),
+          "NGN",
+        );
         handleStateChange(true);
         // Refresh user data to reflect new pro status
         queryClient.invalidateQueries({ queryKey: userQueries.detail().queryKey });

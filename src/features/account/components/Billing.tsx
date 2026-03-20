@@ -7,6 +7,7 @@ import { userQueries } from "@features/user";
 import { TrialBanner } from "./TrialBanner";
 import { ReferralCard } from "./ReferralCard";
 import { UpgradeBanner } from "./UpgradeBanner";
+import { Analytics } from "@/lib/analytics";
 
 export const Billing = ({ reference }: { reference: string }) => {
   const { data: user } = useQuery(userQueries.detail());
@@ -49,7 +50,7 @@ export const Billing = ({ reference }: { reference: string }) => {
     <div className="flex flex-col items-center max-w-5xl mx-auto gap-7.5 relative">
       <TrialBanner user={user} />
       <ReferralCard user={user} />
-      <UpgradeBanner onUpgrade={() => setShowUpgradeModal(true)} />
+      <UpgradeBanner onUpgrade={() => { Analytics.trialStart(); setShowUpgradeModal(true); }} />
     </div>
   );
 };

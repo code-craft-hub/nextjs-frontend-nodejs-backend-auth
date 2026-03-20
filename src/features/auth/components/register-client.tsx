@@ -24,6 +24,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { api } from "@/shared/api/client";
 import { GoogleButton } from "@/features/auth";
+import { Analytics } from "@/lib/analytics";
 
 export default function RegisterClient({ referral }: { referral?: string }) {
   const [loading, setLoading] = useState(false);
@@ -56,6 +57,7 @@ export default function RegisterClient({ referral }: { referral?: string }) {
     try {
       setLoading(true);
       await api.post("/auth/register", values, { skipRefresh: true });
+      Analytics.signupComplete("email");
       toast.success("Registration successful! Please check your email.");
 
       router.push("/verify-email");

@@ -3,6 +3,7 @@ import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
 import { api } from "@/shared/api/client";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { Analytics } from "@/lib/analytics";
 
 export const GoogleButton = ({
   handleLoading,
@@ -30,8 +31,12 @@ export const GoogleButton = ({
       const user = result?.data?.user;
 
       if (user && !user.emailVerified) {
+        // New account — email not yet verified
+        Analytics.signupComplete("google");
         router.push("/verify-email");
       } else if (user && !user.onboardingComplete) {
+        // New account — going through onboarding
+        Analytics.signupComplete("google");
         router.push("/onboarding");
       } else {
         router.push("/dashboard/home");

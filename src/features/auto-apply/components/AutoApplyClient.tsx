@@ -13,6 +13,7 @@ import { invalidateDocumentGenerationQueries } from "@/shared/query/query-invali
 import { TailorCoverLetterDisplayStreaming } from "@/features/cover-letter/components/TailorCoverLetterDisplayStreaming";
 import { ResumeLoadingSkeleton } from "@/features/resume/components/resume-loading-skeleton";
 import { aiSettingsQueries } from "@/features/ai-settings/queries/ai-settings.queries";
+import { Analytics } from "@/lib/analytics";
 
 export default function AutoApplyClient() {
   const router = useRouter();
@@ -49,6 +50,7 @@ export default function AutoApplyClient() {
   useEffect(() => {
     if (jobDescription && user && !hasStartedRef.current) {
       hasStartedRef.current = true;
+      Analytics.autoApplyEnable(jobId);
 
       if (useMasterCv) {
         // Only generate cover letter when using master CV
@@ -111,6 +113,7 @@ export default function AutoApplyClient() {
         },
         {
           onSettled: (data) => {
+            Analytics.autoApplyRun(jobId);
             const autoApplyId = data?.data?.id;
             const previewUrl = buildPreviewUrl(
               autoApplyId,

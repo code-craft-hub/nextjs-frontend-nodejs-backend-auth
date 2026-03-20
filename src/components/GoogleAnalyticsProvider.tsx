@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-import { initGA, logPageView } from '@/lib/analytics';
+import { initGA, logPageView, captureUtm } from '@/lib/analytics';
 
 export default function GoogleAnalyticsProvider({
   children,
@@ -11,9 +11,10 @@ export default function GoogleAnalyticsProvider({
 }) {
   const pathname = usePathname();
 
-  // Initialize GA once on mount
+  // Initialize GA and capture UTM params once on mount
   useEffect(() => {
     initGA();
+    captureUtm();
   }, []);
 
   // Track page views on route change

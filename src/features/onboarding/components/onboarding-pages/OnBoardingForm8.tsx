@@ -1,8 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { requestAuthUrl } from "@/features/email-application/api/gmail-authorization.service";
 import { useRouter } from "next/navigation";
-import React from "react";
+import React, { useEffect } from "react";
 import { toast } from "sonner";
+import { Analytics } from "@/lib/analytics";
 
 interface ConnectGmailProps {
   onSkip?: () => void;
@@ -12,11 +13,17 @@ interface ConnectGmailProps {
 export const OnBoardingForm8: React.FC<ConnectGmailProps> = () => {
   const router = useRouter();
 
+  // User is now viewing the Gmail permissions/warning screen
+  useEffect(() => {
+    Analytics.gmailConnectWarningView();
+  }, []);
+
   const handleSkip = () => {
     router.push("/dashboard/home");
   };
 
   const handleConnectGmail = async () => {
+    Analytics.gmailConnectStart("onboarding");
     const { success, data } = await requestAuthUrl();
     if (!success) return toast.error(`Failed to get auth URL`);
 

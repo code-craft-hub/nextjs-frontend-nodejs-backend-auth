@@ -15,6 +15,7 @@ import { useRouter } from "next/navigation";
 import { authApi, useDeleteAccountMutation } from "@/features/auth";
 import { useUserLocation } from "@/shared/hooks/useUserLocation";
 import { OnBoardingForm8 } from "./onboarding-pages/OnBoardingForm8";
+import { Analytics } from "@/lib/analytics";
 
 export default function OnboardingClient() {
   const deleteAccount = useDeleteAccountMutation();
@@ -47,6 +48,11 @@ export default function OnboardingClient() {
 
   const nextStep = () => {
     if (currentStep < totalSteps - 1) {
+      // Step 8 (index 8) is the final Gmail-connect screen — reaching it means
+      // the user has completed all onboarding form steps.
+      if (currentStep === totalSteps - 2) {
+        Analytics.onboardingComplete();
+      }
       setCurrentStep((prev) => prev + 1);
     }
   };

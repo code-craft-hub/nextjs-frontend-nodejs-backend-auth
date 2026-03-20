@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
+import { Analytics } from "@/lib/analytics";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -48,6 +49,7 @@ const AuthorizeGoogle: React.FC<{
 
         const result = await sendAuthorizationCode(code);
         if (result.success) {
+          Analytics.gmailConnectSuccess();
           toast.success("Gmail authorization successful!");
           form.setValue("authorized", true);
           router.push("/dashboard/home");
@@ -94,6 +96,7 @@ const AuthorizeGoogle: React.FC<{
 
     try {
       setIsLoading(true);
+      Analytics.gmailConnectStart("toggle");
       const { success, data } = await requestAuthUrl();
       if (!success) return toast.error(`Failed to get auth URL`);
 

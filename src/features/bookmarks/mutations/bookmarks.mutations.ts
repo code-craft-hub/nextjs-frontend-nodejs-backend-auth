@@ -5,6 +5,7 @@ import {
 import {
   bookmarksApi,
 } from "@/features/bookmarks/api/bookmarks.api";
+import { Analytics } from "@/lib/analytics";
 import {
   invalidateBookmarkLists,
   invalidateBookmarkCheck,
@@ -25,6 +26,10 @@ export function useCreateBookmarkMutation() {
 
   return useMutation({
     mutationFn: (jobId: string) => bookmarksApi.create(jobId),
+
+    onSuccess: (_data, jobId) => {
+      Analytics.jobSave(jobId);
+    },
 
     // onMutate: async (jobId) => {
     //   await qc.cancelQueries({ queryKey: bookmarkKeys.check(jobId) });

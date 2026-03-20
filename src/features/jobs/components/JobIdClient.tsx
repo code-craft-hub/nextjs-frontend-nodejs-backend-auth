@@ -16,6 +16,8 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useApplyJob } from "@/features/jobs/hooks/useApplyJob";
+import { Analytics } from "@/lib/analytics";
+import { useEffect } from "react";
 
 // ─── Referrer → page title mapping ───────────────────────────────────────────
 
@@ -50,6 +52,13 @@ export const JobIdClient = ({
   const { applyToJob } = useApplyJob();
 
   const job = data?.data;
+
+  // Fire job_view once the job data has loaded
+  useEffect(() => {
+    if (job?.id) {
+      Analytics.jobView(job.id, job.title ?? undefined);
+    }
+  }, [job?.id]);
 
   // Derive title and back URL from the referrer — no state needed.
   // const pageTitle = REFERRER_TITLES[referrer] ?? "Job Details";
