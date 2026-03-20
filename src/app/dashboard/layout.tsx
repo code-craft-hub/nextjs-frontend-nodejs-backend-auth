@@ -25,7 +25,7 @@ const DashboardLayout = async ({ children }: DashboardLayoutProps) => {
   const token = await getCookiesToken();
   const queryClient = createServerQueryClient();
   const authUser = await getSessionFromCookies();
-  console.log("DashboardLayout authUser:", authUser);
+
   if (token) {
     await queryClient.fetchQuery(userQueries.detail(token));
   }
