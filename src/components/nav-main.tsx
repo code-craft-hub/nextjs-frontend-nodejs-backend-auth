@@ -46,10 +46,9 @@ export function NavMain({
               defaultOpen={isItemActive}
               className="group/collapsible"
             >
-              <SidebarMenuItem>
+              <SidebarMenuItem id={item.id}>
                 <CollapsibleTrigger asChild>
                   <SidebarMenuButton
-                    id={item.id}
                     tooltip={item.title}
                     isActive={isItemActive}
                     onClick={() => {

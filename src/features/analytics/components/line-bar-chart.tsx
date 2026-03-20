@@ -1,5 +1,6 @@
 "use client";
 import { useState, useCallback, useMemo, JSX } from "react";
+import { useQuery } from "@tanstack/react-query";
 import {
   ComposedChart,
   Line,
@@ -24,11 +25,12 @@ import {
   ChartTooltip,
   CveraiChartTooltipContent,
 } from "@/components/ui/chart";
+import { userAnalyticsQueries } from "../queries/user-analytics.queries";
 
 interface ChartDataPoint {
   month: string;
-  desktop: number;
-  mobile: number;
+  applications: number;
+  tailoredDocuments: number;
 }
 
 interface EnhancedChartDataPoint extends ChartDataPoint {
@@ -39,33 +41,22 @@ interface EnhancedChartDataPoint extends ChartDataPoint {
 }
 
 interface ChartConfig {
-  desktop: {
+  applications: {
     label: string;
     color: string;
   };
-  mobile: {
+  tailoredDocuments: {
     label: string;
     color: string;
   };
 }
 
-const chartData: ChartDataPoint[] = [
-  { month: "Jan", desktop: 186, mobile: 80 },
-  { month: "Feb", desktop: 305, mobile: 200 },
-  { month: "Mar", desktop: 237, mobile: 120 },
-  { month: "Apr", desktop: 73, mobile: 190 },
-  { month: "May", desktop: 209, mobile: 130 },
-  { month: "Jun", desktop: 214, mobile: 140 },
-  { month: "Jul", desktop: 180, mobile: 160 },
-  { month: "Aug", desktop: 290, mobile: 180 },
-];
-
 const chartConfig = {
-  desktop: {
+  applications: {
     label: "Auto Applications",
     color: "#878890",
   },
-  mobile: {
+  tailoredDocuments: {
     label: "Tailored Documents",
     color: "#4680EE",
   },
@@ -73,16 +64,19 @@ const chartConfig = {
 
 export const UsageTrendDashboard = (): JSX.Element => {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const { data: analyticsData } = useQuery(userAnalyticsQueries.trend());
+
+  const chartData: ChartDataPoint[] = analyticsData?.trend ?? [];
 
   // Memoized chart data transformation for performance
   const chartDataWithBars = useMemo((): EnhancedChartDataPoint[] => {
     return chartData.map((item, index) => {
-      const maxValue = Math.max(item.desktop, item.mobile);
-      const minValue = Math.min(item.desktop, item.mobile);
+      const maxValue = Math.max(item.applications, item.tailoredDocuments);
+      const minValue = Math.min(item.applications, item.tailoredDocuments);
       const Total = maxValue + minValue;
 
       // Determine which value is larger to assign colors correctly
-      const isDesktopLarger = item.desktop >= item.mobile;
+      const isApplicationsLarger = item.applications >= item.tailoredDocuments;
 
       return {
         ...item,
@@ -90,15 +84,15 @@ export const UsageTrendDashboard = (): JSX.Element => {
         bottomSection: minValue,
         Total,
         isActive: index === activeIndex,
-        topColor: isDesktopLarger
-          ? chartConfig.desktop.color
-          : chartConfig.mobile.color,
-        bottomColor: isDesktopLarger
-          ? chartConfig.mobile.color
-          : chartConfig.desktop.color,
+        topColor: isApplicationsLarger
+          ? chartConfig.applications.color
+          : chartConfig.tailoredDocuments.color,
+        bottomColor: isApplicationsLarger
+          ? chartConfig.tailoredDocuments.color
+          : chartConfig.applications.color,
       } as EnhancedChartDataPoint & { topColor: string; bottomColor: string };
     });
-  }, [activeIndex]);
+  }, [activeIndex, chartData]);
 
   const handleMouseEnter = useCallback((_data: any, index: number): void => {
     setActiveIndex(index);
@@ -142,7 +136,7 @@ export const UsageTrendDashboard = (): JSX.Element => {
           <div className="flex items-center gap-2">
             <div
               className="size-2 rounded-full shrink-0"
-              style={{ backgroundColor: chartConfig.desktop.color }}
+              style={{ backgroundColor: chartConfig.applications.color }}
             />
             <span className="text-sm font-medium text-gray-700 text-nowrap">
               Auto Applications
@@ -151,7 +145,7 @@ export const UsageTrendDashboard = (): JSX.Element => {
           <div className="flex items-center gap-2">
             <div
               className="size-2 rounded-full shrink-0"
-              style={{ backgroundColor: chartConfig.mobile.color }}
+              style={{ backgroundColor: chartConfig.tailoredDocuments.color }}
             />
             <span className="text-sm font-medium text-gray-700 text-nowrap">
               Tailored Documents
@@ -246,15 +240,15 @@ export const UsageTrendDashboard = (): JSX.Element => {
               />
               <Line
                 type="monotone"
-                dataKey="desktop"
-                stroke={chartConfig.desktop.color}
+                dataKey="applications"
+                stroke={chartConfig.applications.color}
                 stroke-width={3}
                 dot={false}
               />
               <Line
                 type="monotone"
-                dataKey="mobile"
-                stroke={chartConfig.mobile.color}
+                dataKey="tailoredDocuments"
+                stroke={chartConfig.tailoredDocuments.color}
                 stroke-width={3}
                 dot={false}
               />{" "}

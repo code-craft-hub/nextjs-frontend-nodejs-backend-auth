@@ -1,21 +1,9 @@
 "use client";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip } from "recharts";
 import { ChevronDown } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { userAnalyticsQueries } from "../queries/user-analytics.queries";
 
-const data = [
-  { month: "JAN", value: 0 },
-  { month: "FEB", value: 1 },
-  { month: "MAR", value: 2 },
-  { month: "APR", value: 3 },
-  { month: "MAY", value: 4 },
-  { month: "JUN", value: 5 },
-  { month: "JUL", value: 6 },
-  { month: "AUG", value: 7 },
-  { month: "SEP", value: 8 },
-  { month: "OCT", value: 9 },
-  { month: "NOV", value: 16 },
-  { month: "DEC", value: 0 },
-];
 const CustomTooltip = ({ active, payload }: any) => {
   if (active && payload && payload.length) {
     return (
@@ -32,6 +20,9 @@ const CustomTooltip = ({ active, payload }: any) => {
   return null;
 };
 export const AnalyticsBarChart = () => {
+  const { data: analyticsData } = useQuery(userAnalyticsQueries.trend());
+  const data = analyticsData?.matchMetrics ?? [];
+
   return (
     <div className="w-full bg-white rounded-3xl p-8 shadow-sm">
       <div className="flex justify-between items-center mb-8">
