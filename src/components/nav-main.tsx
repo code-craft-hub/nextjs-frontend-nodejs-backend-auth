@@ -18,6 +18,7 @@ export function NavMain({
     url: string;
     icon?: React.ComponentType<{ className?: string }>;
     isActive?: boolean;
+    id?: string;
     items?: {
       title: string;
       url: string;
@@ -48,6 +49,7 @@ export function NavMain({
               <SidebarMenuItem>
                 <CollapsibleTrigger asChild>
                   <SidebarMenuButton
+                    id={item.id}
                     tooltip={item.title}
                     isActive={isItemActive}
                     onClick={() => {

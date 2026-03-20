@@ -13,6 +13,7 @@ import { userQueries } from "@features/user";
 import { HydrationBoundary } from "@/components/hydration-boundary";
 import { dehydrate } from "@tanstack/react-query";
 import { getCookiesToken, getSessionFromCookies } from "@/lib/auth.utils";
+import { DashboardOnboardingProvider } from "@/components/DashboardOnboardingProvider";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -32,6 +33,7 @@ const DashboardLayout = async ({ children }: DashboardLayoutProps) => {
   // await queryClient.prefetchQuery(userQueries.detail(token));
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
+      <DashboardOnboardingProvider>
       <SidebarProvider>
         <AppSidebar />
         <SidebarInset>
@@ -51,6 +53,7 @@ const DashboardLayout = async ({ children }: DashboardLayoutProps) => {
           <div className="w-full min-h-screen bg-[#F5F7FA]">{children}</div>
         </SidebarInset>
       </SidebarProvider>
+      </DashboardOnboardingProvider>
     </HydrationBoundary>
   );
 };

@@ -24,6 +24,7 @@ import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { userQueries } from "@features/user";
 import WhatsappIcon from "./icons/whatsapp";
+import AnalyticIcon from "./icons/analyticIcon";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { data: user } = useQuery(userQueries.detail());
@@ -52,15 +53,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         icon: JobIcon,
         url: "/dashboard/jobs",
       },
-      // {
-      //   title: "Analytics",
-      //   icon: AnalyticIcon,
-      //   url: "/dashboard/analytics",
-      // },
+      {
+        title: "Analytics",
+        icon: AnalyticIcon,
+        url: "/dashboard/analytics",
+      },
       {
         title: "Settings",
         icon: SettingIcon,
         url: "/dashboard/settings",
+        id: "onborda-settings-nav",
       },
       {
         title: "Account",
