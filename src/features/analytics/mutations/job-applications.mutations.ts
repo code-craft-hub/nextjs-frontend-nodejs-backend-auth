@@ -57,6 +57,7 @@ export function useCreateApplicationMutation() {
     onSettled: (_data, _err, { jobId }) => {
       invalidateApplicationCheck(queryClient, jobId);
       invalidateApplicationLists(queryClient);
+      queryClient.invalidateQueries({ queryKey: queryKeys.users.all });
     },
   });
 }
