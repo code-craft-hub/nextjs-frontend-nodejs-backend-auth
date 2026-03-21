@@ -1,8 +1,6 @@
 "use client";
 import { AnalyticsCard } from "./AnalyticsCard";
 import { UsageTrendDashboard } from "./line-bar-chart";
-import { AnalyticsBarChart } from "./AnalyticsBarChart";
-import { ApplicationHistory } from "./ApplicationHistory";
 import { RecentResumes } from "./RecentResumes";
 import { RecentCoverLetters } from "./RecentCoverLetters";
 import { InterviewQuestionMetrics } from "./InterviewQuestionMetrics";
@@ -28,12 +26,6 @@ const AnalyticsClient = () => {
         <InterviewQuestionMetrics />
         <ActivityStats />
       </div>
-
-      {/* Job match metrics bar chart */}
-      <AnalyticsBarChart />
-
-      {/* Full application history with infinite scroll */}
-      <ApplicationHistory />
     </div>
   );
 };
