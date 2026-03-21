@@ -1,100 +1,152 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  Onborda,
-  OnbordaProvider,
-  useOnborda,
-  CardComponentProps,
-} from "onborda";
+import Joyride, {
+  CallBackProps,
+  EVENTS,
+  STATUS,
+  TooltipRenderProps,
+} from "react-joyride";
 import { checkAuthStatus } from "@/features/email-application/api/gmail-authorization.service";
 
-// ── Tour card ──────────────────────────────────────────────────────────────
-const GmailTourCard: React.FC<CardComponentProps> = ({ step, arrow }) => {
-  const { closeOnborda } = useOnborda();
-  const router = useRouter();
+// ── Step 1 tooltip: navigate to settings ──────────────────────────────────
+const NavToSettingsTooltip: React.FC<
+  TooltipRenderProps & { onGoToSettings: () => void }
+> = ({ tooltipProps, step, onGoToSettings }) => (
+  <div
+    {...tooltipProps}
+    className="bg-white rounded-2xl shadow-xl p-5 w-72 font-inter"
+  >
+    <div className="flex items-center gap-2 mb-3">
+      <span className="text-2xl">📧</span>
+      <h3 className="font-semibold text-gray-900 text-base">
+        {step.title as string}
+      </h3>
+    </div>
+    <p className="text-sm text-gray-600 mb-4">{step.content as string}</p>
+    <button
+      onClick={onGoToSettings}
+      className="w-full bg-blue-500 hover:bg-blue-600 transition-colors text-white text-sm font-medium py-2 px-4 rounded-lg"
+    >
+      Go to Settings
+    </button>
+  </div>
+);
 
-  const handleGoToSettings = () => {
-    closeOnborda();
-    router.push("/dashboard/settings");
-  };
+// ── Step 2 tooltip: highlight the toggle ──────────────────────────────────
+const ToggleTooltip: React.FC<
+  TooltipRenderProps & { onClose: () => void }
+> = ({ tooltipProps, step, onClose }) => (
+  <div
+    {...tooltipProps}
+    className="bg-white rounded-2xl shadow-xl p-5 w-72 font-inter"
+  >
+    <div className="flex items-center gap-2 mb-3">
+      <span className="text-2xl">🔗</span>
+      <h3 className="font-semibold text-gray-900 text-base">
+        {step.title as string}
+      </h3>
+    </div>
+    <p className="text-sm text-gray-600 mb-4">{step.content as string}</p>
+    <button
+      onClick={onClose}
+      className="w-full bg-blue-500 hover:bg-blue-600 transition-colors text-white text-sm font-medium py-2 px-4 rounded-lg"
+    >
+      Connect Now
+    </button>
+  </div>
+);
 
-  return (
-    <div className="relative bg-white rounded-2xl shadow-xl p-5 w-72 font-inter">
-      {arrow}
-        <div className="flex items-center gap-2 mb-3">
-          <span className="text-2xl">{step.icon}</span>
-          <h3 className="font-semibold text-gray-900 text-base">
-            {step.title}
-          </h3>
-        </div>
-        <p className="text-sm text-gray-600 mb-4">{step.content}</p>
-        <button
-          onClick={handleGoToSettings}
-          className="w-full bg-blue-500 hover:bg-blue-600 transition-colors text-white text-sm font-medium py-2 px-4 rounded-lg"
-        >
-          Go to Settings
-        </button>
-      </div>
-  );
-};
-
-// ── Tour steps ─────────────────────────────────────────────────────────────
-const GMAIL_TOUR = [
+// ── Steps ──────────────────────────────────────────────────────────────────
+const STEPS = [
   {
-    tour: "gmail-auth",
-    steps: [
-      {
-        icon: "📧",
-        title: "Connect your Gmail",
-        content:
-          "To let Cver AI apply to jobs on your behalf, you need to connect your Gmail account first. Click below to go to Settings.",
-        selector: "#onborda-settings-nav",
-        side: "right" as const,
-        showControls: false,
-        pointerPadding: 8,
-        pointerRadius: 8,
-      },
-    ],
+    target: "#onborda-settings-nav",
+    title: "Connect your Gmail",
+    content:
+      "To let Cver AI apply to jobs on your behalf, you need to connect your Gmail account first.",
+    placement: "right" as const,
+    disableBeacon: true,
+  },
+  {
+    target: "#gmail-authorize-toggle",
+    title: "Enable Gmail",
+    content: "Toggle this switch to connect your Gmail account and start applying automatically.",
+    placement: "left" as const,
+    disableBeacon: true,
   },
 ];
 
-// ── Auto-starter ───────────────────────────────────────────────────────────
-const GmailAuthTourStarter: React.FC = () => {
-  const { startOnborda } = useOnborda();
+// ── Provider ───────────────────────────────────────────────────────────────
+export const DashboardOnboardingProvider: React.FC<{
+  children: React.ReactNode;
+}> = ({ children }) => {
+  const [run, setRun] = useState(false);
+  const [stepIndex, setStepIndex] = useState(0);
+  const router = useRouter();
 
   useEffect(() => {
     const check = async () => {
       try {
         const { authorized } = await checkAuthStatus();
-        if (!authorized) {
-          startOnborda("gmail-auth");
-        }
+        if (!authorized) setRun(true);
       } catch {
-        // silently ignore – don't block if check fails
+        // silently ignore
       }
     };
     check();
   }, []);
 
-  return null;
-};
+  const handleGoToSettings = () => {
+    router.push("/dashboard/settings");
+    // slight delay so the page starts rendering before joyride looks for the next target
+    setTimeout(() => setStepIndex(1), 600);
+  };
 
-// ── Provider ───────────────────────────────────────────────────────────────
-export const DashboardOnboardingProvider: React.FC<{
-  children: React.ReactNode;
-}> = ({ children }) => (
-  <OnbordaProvider>
-    <Onborda
-      steps={GMAIL_TOUR}
-      interact={false}
-      shadowRgb="0,0,0"
-      shadowOpacity="0.6"
-      cardComponent={GmailTourCard}
-    >
+  const handleClose = () => setRun(false);
+
+  const handleCallback = (data: CallBackProps) => {
+    if (data.status === STATUS.FINISHED || data.status === STATUS.SKIPPED) {
+      setRun(false);
+      setStepIndex(0);
+    }
+    if (data.type === EVENTS.TARGET_NOT_FOUND) {
+      // target not in DOM yet — wait for it
+    }
+  };
+
+  const tooltipComponent = (props: TooltipRenderProps) => {
+    if (stepIndex === 0) {
+      return (
+        <NavToSettingsTooltip {...props} onGoToSettings={handleGoToSettings} />
+      );
+    }
+    return <ToggleTooltip {...props} onClose={handleClose} />;
+  };
+
+  return (
+    <>
+      <Joyride
+        run={run}
+        steps={STEPS}
+        stepIndex={stepIndex}
+        tooltipComponent={tooltipComponent}
+        callback={handleCallback}
+        continuous
+        disableOverlayClose
+        disableCloseOnEsc
+        spotlightClicks={stepIndex === 1}
+        styles={{
+          options: {
+            zIndex: 10000,
+            overlayColor: "rgba(0, 0, 0, 0.65)",
+          },
+          spotlight: {
+            borderRadius: 8,
+          },
+        }}
+      />
       {children}
-    </Onborda>
-    <GmailAuthTourStarter />
-  </OnbordaProvider>
-);
+    </>
+  );
+};

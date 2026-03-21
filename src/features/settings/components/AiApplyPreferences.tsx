@@ -335,7 +335,7 @@ export const AiApplyPreferences: React.FC = () => {
                       ) : option.type === "buttons" && option.actions ? (
                         renderButtons(option.actions)
                       ) : option.type === "custom" && option.actions ? (
-                        <div>
+                        <div id="gmail-authorize-toggle">
                           <div className="flex gap-2">
                             <AuthorizeGoogle checkAuth={checkAuth} />
                           </div>

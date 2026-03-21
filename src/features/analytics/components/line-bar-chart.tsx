@@ -66,7 +66,11 @@ export const UsageTrendDashboard = (): JSX.Element => {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const { data: analyticsData } = useQuery(userAnalyticsQueries.trend());
 
-  const chartData: ChartDataPoint[] = analyticsData?.trend ?? [];
+  const chartData: ChartDataPoint[] = (analyticsData?.trend ?? []).map((d) => ({
+    month: d.month,
+    applications: d.applications,
+    tailoredDocuments: d.resumes + d.coverLetters + d.interviewQuestions,
+  }));
 
   // Memoized chart data transformation for performance
   const chartDataWithBars = useMemo((): EnhancedChartDataPoint[] => {
