@@ -2,7 +2,9 @@
 
 import { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-import { initGA, logPageView, captureUtm } from '@/lib/analytics';
+import { captureUtm } from '@/lib/analytics';
+
+const GA_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || 'G-CDMCYEXE2W';
 
 export default function GoogleAnalyticsProvider({
   children,
@@ -11,21 +13,20 @@ export default function GoogleAnalyticsProvider({
 }) {
   const pathname = usePathname();
 
-  // Initialize GA and capture UTM params once on mount
+  // Capture UTM params once on first load
   useEffect(() => {
-    initGA();
     captureUtm();
   }, []);
 
-  // Track page views on route change
+  // Track SPA page views on route change via gtag (already loaded by layout.tsx Script)
   useEffect(() => {
-    if (!pathname) return;
-
-    // Read query string directly from window.location
-    const search = typeof window !== 'undefined' ? window.location.search : '';
-    const url = pathname + search;
-
-    logPageView(url, document.title);
+    if (typeof window === 'undefined' || typeof window.gtag !== 'function') return;
+    const search = window.location.search;
+    window.gtag('event', 'page_view', {
+      page_path: pathname + search,
+      page_title: document.title,
+      send_to: GA_ID,
+    });
   }, [pathname]);
 
   return <>{children}</>;

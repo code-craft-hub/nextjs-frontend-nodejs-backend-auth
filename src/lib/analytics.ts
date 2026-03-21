@@ -5,10 +5,9 @@
  *  - All events call window.gtag() directly (loaded via Script in layout.tsx)
  *  - UTM params are captured on first load and persisted to sessionStorage
  *  - Every event automatically receives: platform, source, utm_* params
+ *  - user_id is set on GA4 via Analytics.identify() once auth resolves
  *  - Conversion events: gmail_connect_success, payment_success (mark in GA4 UI)
  */
-
-import ReactGA from "react-ga4";
 
 // ─── Type declarations ────────────────────────────────────────────────────────
 
@@ -17,48 +16,6 @@ declare global {
     gtag: (...args: unknown[]) => void;
   }
 }
-
-// ─── Legacy react-ga4 exports (kept for backward compatibility) ───────────────
-
-export const initGA = () => {
-  const GA_MEASUREMENT_ID =
-    process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || "G-CDMCYEXE2W";
-
-  if (typeof window !== "undefined" && GA_MEASUREMENT_ID) {
-    ReactGA.initialize(GA_MEASUREMENT_ID, {
-      gaOptions: { siteSpeedSampleRate: 100 },
-    });
-  }
-};
-
-export const logPageView = (url: string, title: string) => {
-  if (typeof window !== "undefined") {
-    ReactGA.send({ hitType: "pageview", page: url, title });
-  }
-};
-
-export const logEvent = (
-  category: string,
-  action: string,
-  label?: string,
-  value?: number,
-) => {
-  if (typeof window !== "undefined") {
-    ReactGA.event({ category, action, label, value });
-  }
-};
-
-export const logUserActivityToGoogle = ({
-  page,
-  userEvent,
-  description,
-}: {
-  page: string;
-  userEvent: string;
-  description: string;
-}) => {
-  logEvent(page, userEvent, description);
-};
 
 // ─── UTM capture & retrieval ──────────────────────────────────────────────────
 
@@ -162,6 +119,18 @@ export function track(
  *   - payment_success
  */
 export const Analytics = {
+  // ── Identity ───────────────────────────────────────────────────────────────
+
+  /**
+   * Associate the authenticated user with their GA4 session.
+   * Call once after login/session restore so GA4 can stitch cross-device data
+   * and you can JOIN ga_sessions to your own user table by user_id.
+   */
+  identify(userId: string) {
+    if (typeof window === "undefined" || typeof window.gtag !== "function") return;
+    window.gtag("config", GA_ID, { user_id: userId });
+  },
+
   // ── Acquisition ────────────────────────────────────────────────────────────
 
   /**
