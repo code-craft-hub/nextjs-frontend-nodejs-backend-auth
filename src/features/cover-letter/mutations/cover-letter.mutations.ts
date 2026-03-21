@@ -60,6 +60,7 @@ export function useCreateCoverLetterMutation() {
     },
     onSettled: () => {
       invalidateCoverLetterLists(queryClient);
+      queryClient.invalidateQueries({ queryKey: queryKeys.users.all });
     },
   });
 }

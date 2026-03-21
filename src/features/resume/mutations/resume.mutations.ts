@@ -67,6 +67,7 @@ export function useCreateResumeMutation() {
     },
     onSettled: () => {
       invalidateResumeLists(queryClient);
+      queryClient.invalidateQueries({ queryKey: queryKeys.users.all });
     },
   });
 }
@@ -182,6 +183,7 @@ export function useCreateNewResumeMutation() {
     mutationFn: (data: CreateResumeData) => resumeApi.createNewResume(data),
     onSettled: () => {
       invalidateResumeLists(queryClient);
+      queryClient.invalidateQueries({ queryKey: queryKeys.users.all });
     },
   });
 }

@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { resumeQueries } from "@/features/resume/queries/resume.queries";
 import { userQueries } from "@features/user";
+import { queryKeys } from "@/shared/query/keys";
 import { ResumeDownloadButton } from "./ResumeDownloadButton";
 import { TrashIcon } from "lucide-react";
 import { sendGTMEvent } from "@next/third-parties/google";
@@ -130,6 +131,7 @@ export const TailorResume = () => {
       const newUrl = buildResumeUpdateUrl(resumeId);
       router.replace(newUrl);
       startConfetti();
+      queryClient.invalidateQueries({ queryKey: queryKeys.users.all });
     }
   }, [resumeId, streamStatus.isComplete, router]);
 

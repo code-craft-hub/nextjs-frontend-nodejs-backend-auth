@@ -47,6 +47,7 @@ export function useCreateInterviewQuestionMutation() {
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.interviewQuestions.lists() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.users.all });
     },
   });
 }
