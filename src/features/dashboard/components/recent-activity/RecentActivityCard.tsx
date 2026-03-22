@@ -10,6 +10,7 @@ import { JobCard } from "./JobCard";
 import { LoadingSkeleton } from "./LoadingSkeleton";
 import { EmptyRecentActivity } from "./EmptyRecentActivity";
 import { isEmpty } from "lodash";
+import { UserFeedbackModal } from "@/shared/components/user-feedback-modal";
 
 export const RecentActivityCard = memo(function RecentActivityCard() {
   const { data: jobs, isLoading } = useQuery(jobsQueries.autoApply());
@@ -43,7 +44,10 @@ export const RecentActivityCard = memo(function RecentActivityCard() {
   return (
     !isBuildingRecommendations && (
       <Card className={cn("p-4 sm:p-7 gap-4")}>
-        <h1 className="font-bold text-xl">Personalized Recommendation</h1>
+        <div className="flex flex-wrap justify-between gap-4">
+          <h1 className="font-bold text-xl">Personalized Recommendation</h1>
+          <UserFeedbackModal />
+        </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-y-4 sm:gap-8">
           {renderContent()}
         </div>

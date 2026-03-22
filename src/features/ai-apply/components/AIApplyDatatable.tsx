@@ -36,9 +36,13 @@ import { Loader2, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { AIApplyColumn } from "./AIApplyColumn";
-import { AutoApplyRecord, autoApplyApi } from "@/features/auto-apply/api/auto-apply.api";
+import {
+  AutoApplyRecord,
+  autoApplyApi,
+} from "@/features/auto-apply/api/auto-apply.api";
 import { queryKeys } from "@/shared/query/keys";
 import { autoApplyKeys } from "@/features/auto-apply/queries/auto-apply.keys";
+import { UserFeedbackModal } from "@/shared/components/user-feedback-modal";
 
 export function AIApplyDatatable({ data }: { data: AutoApplyRecord[] }) {
   const router = useRouter();
@@ -133,24 +137,27 @@ export function AIApplyDatatable({ data }: { data: AutoApplyRecord[] }) {
   return (
     table.getRowModel().rows?.length !== 0 && (
       <Card className="">
-        <div className="flex items-center justify-between">
-          <h1 className="font-bold text-xl px-6 mb-6">Recent Activity</h1>
-          {selectedCount > 0 && (
-            <div className="flex items-center gap-2 px-6">
-              <span className="text-sm text-muted-foreground">
-                {selectedCount} selected
-              </span>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setIsDeleteDialogOpen(true)}
-                disabled={isDeleting}
-                className="text-red-500 hover:text-red-700 hover:bg-red-50"
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            </div>
-          )}
+        <div className="flex flex-wrap gap-4 items-center justify-between px-6">
+          <h1 className="font-bold text-xl">Recent Activity</h1>
+          <div className="flex ">
+            {selectedCount > 0 && (
+              <div className="flex items-center gap-2 px-6">
+                <span className="text-sm text-muted-foreground">
+                  {selectedCount} selected
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setIsDeleteDialogOpen(true)}
+                  disabled={isDeleting}
+                  className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
+            <UserFeedbackModal />
+          </div>
         </div>
         <div className="overflow-hidden grid">
           <Table>
@@ -236,7 +243,9 @@ export function AIApplyDatatable({ data }: { data: AutoApplyRecord[] }) {
               </AlertDialogDescription>
             </AlertDialogHeader>
             <div className="flex justify-end gap-2">
-              <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+              <AlertDialogCancel disabled={isDeleting}>
+                Cancel
+              </AlertDialogCancel>
               <AlertDialogAction
                 onClick={handleBulkDelete}
                 disabled={isDeleting}

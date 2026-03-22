@@ -18,6 +18,8 @@ import { useRouter } from "next/navigation";
 import { useApplyJob } from "@/features/jobs/hooks/useApplyJob";
 import { Analytics } from "@/lib/analytics";
 import { useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { JobQualityFeedbackModal } from "@/shared/components/job-quality-feedback-modal";
 
 // ─── Referrer → page title mapping ───────────────────────────────────────────
 
@@ -77,7 +79,7 @@ export const JobIdClient = ({
         </button>
 
         <h1 className="text-2xl sm:text-4xl font-bold text-center my-8">
-         Job Details
+          Job Details
         </h1>
 
         {/* Company header */}
@@ -179,9 +181,7 @@ export const JobIdClient = ({
                   value={job?.salary ?? "N/A"}
                 />
                 <JobInfoCell
-                  icon={
-                    <img src="/briefcase.svg" className="w-5 h-5" alt="" />
-                  }
+                  icon={<img src="/briefcase.svg" className="w-5 h-5" alt="" />}
                   label="Employment Type"
                   value={job?.employmentType ?? "N/A"}
                 />
@@ -234,6 +234,15 @@ export const JobIdClient = ({
                 </SocialButton>
               </div>
             </div>
+            <JobQualityFeedbackModal>
+              <Button
+                className="w-full border border-red-500 text-red-500 hover:text-red-700"
+                variant={"outline"}
+                type="button"
+              >
+                Flag Job
+              </Button>
+            </JobQualityFeedbackModal>
           </div>
         </div>
       </div>

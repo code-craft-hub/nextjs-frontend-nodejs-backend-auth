@@ -45,6 +45,7 @@ import { resumeApi } from "@/features/resume/api/resume.api";
 import { coverLetterApi } from "@/features/cover-letter/api/cover-letter.api";
 import { interviewQuestionApi } from "@/features/interview/api/interview.api";
 import { queryKeys } from "@/shared/query/keys";
+import { UserFeedbackModal } from "@/shared/components/user-feedback-modal";
 
 export const schema = z.object({
   id: z.number(),
@@ -334,24 +335,34 @@ export function AIJobCustomizationDatatable({
 
   return (
     <Card>
-      <div className="flex items-center justify-between">
-        <h1 className="font-bold text-xl px-6 py-4">Recent Activity</h1>
-        {selectedCount > 0 && (
-          <div className="flex items-center gap-2 px-6">
-            <span className="text-sm text-muted-foreground">
-              {selectedCount} selected
-            </span>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsDeleteDialogOpen(true)}
-              disabled={isDeleting}
-              className="text-red-500 hover:text-red-700 hover:bg-red-50"
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          </div>
-        )}
+      {/* <div className="flex items-center justify-between px-6">
+                <h1 className="font-bold text-xl">Recent Activity</h1>
+                <div className="flex ">
+        <UserFeedbackModal />
+                </div>
+              </div> */}
+      <div className="flex flex-wrap gap-4 items-center justify-between px-6">
+        <h1 className="font-bold text-xl">Recent Activity</h1>
+        <div className="flex ">
+          {" "}
+          {selectedCount > 0 && (
+            <div className="flex items-center gap-2 px-6">
+              <span className="text-sm text-muted-foreground">
+                {selectedCount} selected
+              </span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsDeleteDialogOpen(true)}
+                disabled={isDeleting}
+                className="text-red-500 hover:text-red-700 hover:bg-red-50"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
+          <UserFeedbackModal />
+        </div>
       </div>
       <div className="overflow-hidden grid">
         <Table>
