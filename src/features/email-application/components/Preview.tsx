@@ -55,15 +55,6 @@ const Preview = ({
   const isMasterCv = !!masterCvId;
   const { data: resumeData } = useQuery(resumeQueries.detail(resumeId));
 
-  console.log(
-    coverLetterId,
-    resumeId,
-    recruiterEmail,
-    jobDescription,
-    autoApplyId,
-    masterCvId,
-    resumeData,
-  );
   const { data: masterCvData } = useQuery({
     ...resumeQueries.detail(masterCvId ?? ""),
     enabled: isMasterCv,
