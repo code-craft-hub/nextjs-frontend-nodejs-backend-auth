@@ -1,13 +1,17 @@
 /**
- * GA4 Analytics — Production funnel tracking for Cver AI
+ * Unified Analytics — GA4 + PostHog dual-write for Cver AI
  *
  * Architecture:
- *  - All events call window.gtag() directly (loaded via Script in layout.tsx)
+ *  - GA4: all events call window.gtag() (loaded via Script in layout.tsx)
+ *  - PostHog: all events call posthog.capture() (initialised in PostHogProvider)
  *  - UTM params are captured on first load and persisted to sessionStorage
- *  - Every event automatically receives: platform, source, utm_* params
- *  - user_id is set on GA4 via Analytics.identify() once auth resolves
- *  - Conversion events: gmail_connect_success, payment_success (mark in GA4 UI)
+ *  - Every GA4 event receives: platform, source, utm_* params
+ *  - user_id / PostHog identity is set via AnalyticsIdentifier in query-provider
+ *  - Conversion events: gmail_connect_success, payment_success (mark in GA4 UI
+ *    and set as PostHog actions)
  */
+
+import posthog from "posthog-js";
 
 // ─── Type declarations ────────────────────────────────────────────────────────
 
@@ -108,6 +112,17 @@ export function track(
   window.gtag("event", eventName, { send_to: GA_ID, ...buildBaseParams(params) });
 }
 
+/**
+ * Fire a PostHog event.  posthog-js queues calls made before init() and
+ * no-ops in SSR, so this is safe to call anywhere in the client bundle.
+ */
+function phTrack(
+  eventName: string,
+  params?: Record<string, unknown>,
+): void {
+  posthog.capture(eventName, params);
+}
+
 // ─── Funnel event helpers ─────────────────────────────────────────────────────
 
 /**
@@ -123,8 +138,9 @@ export const Analytics = {
 
   /**
    * Associate the authenticated user with their GA4 session.
-   * Call once after login/session restore so GA4 can stitch cross-device data
-   * and you can JOIN ga_sessions to your own user table by user_id.
+   * PostHog identity (with full traits) is handled separately in
+   * AnalyticsIdentifier inside query-provider so we have access to the full
+   * UserProfile object from React Query.
    */
   identify(userId: string) {
     if (typeof window === "undefined" || typeof window.gtag !== "function") return;
@@ -139,6 +155,7 @@ export const Analytics = {
    */
   signupComplete(method: "email" | "google" = "email") {
     track("signup_complete", { method });
+    phTrack("signup_complete", { method });
   },
 
   // ── Activation ─────────────────────────────────────────────────────────────
@@ -148,6 +165,7 @@ export const Analytics = {
    */
   onboardingComplete() {
     track("onboarding_complete", {});
+    phTrack("onboarding_complete");
   },
 
   // ── Job engagement ─────────────────────────────────────────────────────────
@@ -155,11 +173,13 @@ export const Analytics = {
   /** User opened the full job detail page. */
   jobView(jobId: string, jobTitle?: string) {
     track("job_view", { job_id: jobId, job_title: jobTitle ?? "" });
+    phTrack("job_view", { job_id: jobId, job_title: jobTitle ?? "" });
   },
 
   /** User bookmarked / saved a job. */
   jobSave(jobId: string) {
     track("job_save", { job_id: jobId });
+    phTrack("job_save", { job_id: jobId });
   },
 
   // ── Gmail connect ───────────────────────────────────────────────────────────
@@ -170,6 +190,7 @@ export const Analytics = {
    */
   gmailConnectStart(trigger: "onboarding" | "settings" | "toggle" = "settings") {
     track("gmail_connect_start", { trigger });
+    phTrack("gmail_connect_start", { trigger });
   },
 
   /**
@@ -178,14 +199,17 @@ export const Analytics = {
    */
   gmailConnectWarningView() {
     track("gmail_connect_warning_view", {});
+    phTrack("gmail_connect_warning_view");
   },
 
   /**
    * Gmail OAuth completed successfully.
    * ★ Mark as conversion in GA4 Admin → Events.
+   * ★ Mark as PostHog Action for funnel analysis.
    */
   gmailConnectSuccess() {
     track("gmail_connect_success", {});
+    phTrack("gmail_connect_success");
   },
 
   // ── Auto-apply ─────────────────────────────────────────────────────────────
@@ -195,6 +219,7 @@ export const Analytics = {
    */
   autoApplyEnable(jobId?: string) {
     track("auto_apply_enable", { job_id: jobId ?? "" });
+    phTrack("auto_apply_enable", { job_id: jobId ?? "" });
   },
 
   /**
@@ -202,6 +227,7 @@ export const Analytics = {
    */
   autoApplyRun(jobId?: string) {
     track("auto_apply_run", { job_id: jobId ?? "" });
+    phTrack("auto_apply_run", { job_id: jobId ?? "" });
   },
 
   // ── Monetisation ───────────────────────────────────────────────────────────
@@ -211,21 +237,19 @@ export const Analytics = {
    */
   trialStart() {
     track("trial_start", {});
+    phTrack("trial_start");
   },
 
   /**
    * Paystack payment was verified as successful.
    * ★ Mark as conversion in GA4 Admin → Events.
+   * ★ Mark as PostHog Action for revenue funnel.
    * @param plan      e.g. "pro"
    * @param amount    numeric amount (e.g. 4999)
    * @param currency  ISO 4217 (e.g. "NGN")
    */
   paymentSuccess(plan: string, amount: number, currency: string) {
-    track("payment_success", {
-      plan,
-      // GA4 ecommerce value field
-      value: amount,
-      currency,
-    });
+    track("payment_success", { plan, value: amount, currency });
+    phTrack("payment_success", { plan, amount, currency });
   },
 } as const;

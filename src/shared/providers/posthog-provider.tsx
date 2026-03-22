@@ -18,7 +18,12 @@ import { useEffect } from 'react'
 export function PostHogProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY!, {
-      api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST,
+      // Route through our own domain so ad-blockers can't block PostHog.
+      // The /ingest rewrites in next.config.ts proxy to us.i.posthog.com.
+      api_host: '/ingest',
+      // ui_host points to the PostHog UI so toolbar / session replay links
+      // resolve correctly despite the proxied api_host.
+      ui_host: process.env.NEXT_PUBLIC_POSTHOG_HOST,
       defaults: '2026-01-30',
     })
   }, [])

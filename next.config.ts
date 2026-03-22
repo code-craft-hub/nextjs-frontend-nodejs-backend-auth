@@ -13,18 +13,36 @@ const nextConfig: NextConfig = {
     ],
   },
   async rewrites() {
-    // Only use proxy in development
+    const rules = [];
+
+    // Dev: proxy API calls to the local backend
     if (process.env.NODE_ENV === "development") {
-      return [
-        {
-          source: "/api/:path*",
-          destination: "http://127.0.0.1:8080/api/:path*",
-        },
-      ];
+      rules.push({
+        source: "/api/:path*",
+        destination: "http://127.0.0.1:8080/api/:path*",
+      });
     }
-    // No proxy in production
-    return [];
+
+    // PostHog reverse proxy — routes PostHog traffic through our own domain so
+    // ad-blockers and privacy extensions cannot block analytics collection.
+    // Static assets must be on a separate path to avoid Next.js static file
+    // serving intercepting them before the rewrite fires.
+    rules.push(
+      {
+        source: "/ingest/static/:path*",
+        destination: "https://us-assets.i.posthog.com/static/:path*",
+      },
+      {
+        source: "/ingest/:path*",
+        destination: "https://us.i.posthog.com/:path*",
+      },
+    );
+
+    return rules;
   },
+  // Required so Next.js does not buffer the PostHog ingest response body,
+  // which would prevent events from being forwarded correctly.
+  skipTrailingSlashRedirect: true,
 };
 
 const isDev = process.env.NODE_ENV === "development";

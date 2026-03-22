@@ -9,7 +9,7 @@ import { useHeartbeat } from "@/features/presence";
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { userQueries } from "@features/user";
-import { Analytics } from "@/lib/analytics";
+import { Analytics, getUtm } from "@/lib/analytics";
 import posthog from "posthog-js";
 
 /**
@@ -32,9 +32,51 @@ function AnalyticsIdentifier() {
   const { data: user } = useQuery({ ...userQueries.detail(), retry: false });
   useEffect(() => {
     if (!user?.id) return;
-    // Unified identity: set user_id on both GA4 and PostHog in one place.
+
+    // ── GA4 identity ────────────────────────────────────────────────────────
     Analytics.identify(user.id);
-    posthog.identify(user.id);
+
+    // ── PostHog identity ────────────────────────────────────────────────────
+    // $set     — mutable traits updated on every session (plan, credit, etc.)
+    // $set_once — immutable first-touch traits, never overwritten after first write
+    const utm = getUtm();
+    const signupDate = user.createdAt
+      ? new Date(user.createdAt).toISOString()
+      : undefined;
+
+    posthog.identify(
+      user.id,
+      // mutable person properties — updated every session
+      {
+        email: user.email,
+        name:
+          user.displayName ||
+          `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim() ||
+          undefined,
+        plan: user.isProUser ? "pro" : "free",
+        account_tier: user.accountTier,
+        subscription_status: user.subscriptionStatus || undefined,
+        country: user.country || undefined,
+        state: user.state || undefined,
+        credit_balance: user.creditBalance,
+        onboarding_complete: user.onboardingComplete,
+        onboarding_step: user.onboardingStep,
+        total_applications: user.analytics?.totalApplications,
+        total_resumes: user.analytics?.totalResumes,
+        total_cover_letters: user.analytics?.totalCoverLetters,
+        referral_count: user.referralCount,
+        role: user.role,
+      },
+      // $set_once — written once on the person profile, never overwritten
+      {
+        signup_date: signupDate,
+        first_utm_source: utm.utm_source,
+        first_utm_medium: utm.utm_medium,
+        first_utm_campaign: utm.utm_campaign,
+        first_utm_content: utm.utm_content,
+        first_utm_term: utm.utm_term,
+      },
+    );
   }, [user?.id]);
   return null;
 }
