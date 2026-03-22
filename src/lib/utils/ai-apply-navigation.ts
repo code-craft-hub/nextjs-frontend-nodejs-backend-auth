@@ -4,10 +4,10 @@
  * Manages the complex navigation flow for AI Apply with backend-generated document IDs.
  * The flow is:
  * 1. AIApplyInput → `/dashboard/tailor-cover-letter/pending?jobDescription=...&recruiterEmail=...`
- * 2. TailorCoverLetter generates → `/dashboard/tailor-cover-letter/pending?coverLetterDocId=xxx&jobDescription=...&recruiterEmail=...`
- * 3. TailorCoverLetter → `/dashboard/tailor-resume/pending?coverLetterDocId=xxx&jobDescription=...&recruiterEmail=...`
- * 4. TailorResume generates → `/dashboard/tailor-resume/pending?coverLetterDocId=xxx&resumeDocId=yyy&jobDescription=...&recruiterEmail=...`
- * 5. TailorResume → `/dashboard/preview?coverLetterDocId=xxx&resumeDocId=yyy&jobDescription=...&recruiterEmail=...`
+ * 2. TailorCoverLetter generates → `/dashboard/tailor-cover-letter/pending?coverLetterId=xxx&jobDescription=...&recruiterEmail=...`
+ * 3. TailorCoverLetter → `/dashboard/tailor-resume/pending?coverLetterId=xxx&jobDescription=...&recruiterEmail=...`
+ * 4. TailorResume generates → `/dashboard/tailor-resume/pending?coverLetterId=xxx&resumeDocId=yyy&jobDescription=...&recruiterEmail=...`
+ * 5. TailorResume → `/dashboard/preview?coverLetterId=xxx&resumeDocId=yyy&jobDescription=...&recruiterEmail=...`
  */
 
 export const AI_APPLY_PLACEHOLDER_ID = "pending";
@@ -45,12 +45,12 @@ export function buildAutoApplyStartUrl(
  * Build URL for navigating to resume after cover letter is generated
  */
 export function buildResumeStartUrl(
-  coverLetterDocId: string,
+  coverLetterId: string,
   jobDescription: string,
   recruiterEmail: string,
 ): string {
   const params = new URLSearchParams();
-  params.set("coverLetterDocId", coverLetterDocId);
+  params.set("coverLetterId", coverLetterId);
   params.set("recruiterEmail", recruiterEmail);
   params.set("aiApply", "true");
   params.set("jobDescription", jobDescription);
@@ -60,9 +60,9 @@ export function buildResumeStartUrl(
 /**
  * Build URL for updating cover letter with generated documentId
  */
-export function buildCoverLetterUpdateUrl(coverLetterDocId: string): string {
+export function buildCoverLetterUpdateUrl(coverLetterId: string): string {
   const params = new URLSearchParams();
-  params.set("coverLetterDocId", coverLetterDocId);
+  params.set("coverLetterId", coverLetterId);
   return `/dashboard/tailor-cover-letter?${params.toString()}`;
 }
 
@@ -79,14 +79,14 @@ export function buildResumeUpdateUrl(resumeDocId: string): string {
  */
 export function buildPreviewUrl(
   autoApplyId?: string,
-  coverLetterDocId?: string,
+  coverLetterId?: string,
   resumeDocId?: string,
   recruiterEmail?: string,
   options?: { masterCvId?: string },
 ): string {
   const params = new URLSearchParams();
   if (autoApplyId) params.set("auto-apply-id", autoApplyId);
-  if (coverLetterDocId) params.set("cover-letter-id", coverLetterDocId);
+  if (coverLetterId) params.set("cover-letter-id", coverLetterId);
   if (resumeDocId) params.set("resume-id", resumeDocId);
   if (recruiterEmail) params.set("recruiter-email", recruiterEmail);
   if (options?.masterCvId) {

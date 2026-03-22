@@ -24,20 +24,21 @@ export default function TailorCoverLetter() {
   const { data: user } = useQuery(userQueries.detail());
 
   // Extract IDs and parameters from URL search params
-  const coverLetterDocId = searchParams.get("coverLetterDocId");
+  const coverLetterId = searchParams.get("coverLetterId");
   const jobDescription = searchParams.get("jobDescription") || "";
   const recruiterEmail = searchParams.get("recruiterEmail") || "";
   const aiApply = searchParams.get("aiApply") === "true";
-  const isGeneratorStep = isPlaceholderId(coverLetterDocId);
+  const isGeneratorStep = isPlaceholderId(coverLetterId);
 
   // Fetch existing cover letter if documentId is present (reload case)
   const { data: existingCoverLetter } = useQuery(
-    coverLetterQueries.detail(coverLetterDocId ?? ""),
+    coverLetterQueries.detail(coverLetterId ?? ""),
   );
 
-  const isGenerated = !!coverLetterDocId && !!existingCoverLetter;
+  console.log(existingCoverLetter, coverLetterId);
+  const isGenerated = !!coverLetterId && !!existingCoverLetter;
 
-  // Auto-start generation on first visit (no coverLetterDocId means fresh generation)
+  // Auto-start generation on first visit (no coverLetterId means fresh generation)
   useEffect(() => {
     if (isGeneratorStep && jobDescription && !hasStartedRef.current) {
       hasStartedRef.current = true;

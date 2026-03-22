@@ -8,13 +8,13 @@ import { isPlaceholderId } from "@/lib/utils/ai-apply-navigation";
 
 const TailorCoverLetterPage = async ({ searchParams }: any) => {
   const token = (await getCookiesToken()) ?? "";
-  const { coverLetterDocId } = await searchParams;
+  const { coverLetterId } = await searchParams;
 
   const queryClient = createServerQueryClient();
 
-  if (!isPlaceholderId(coverLetterDocId)) {
+  if (!isPlaceholderId(coverLetterId)) {
     await queryClient.prefetchQuery(
-      coverLetterQueries.detail(coverLetterDocId, token),
+      coverLetterQueries.detail(coverLetterId, token),
     );
   }
 
