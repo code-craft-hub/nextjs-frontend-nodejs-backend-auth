@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useCoverLetterStream } from "@/features/cover-letter/hooks/useCoverLetterGenerator";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
@@ -11,6 +11,7 @@ import {
   isPlaceholderId,
 } from "@/lib/utils/ai-apply-navigation";
 import { TailorCoverLetterDisplayStreaming } from "./TailorCoverLetterDisplayStreaming";
+import { TailorCoverLetterEditForm } from "./TailorCoverLetterEditForm";
 import { useFireworksConfetti } from "@/components/ui/confetti";
 
 export default function TailorCoverLetter() {
@@ -19,6 +20,7 @@ export default function TailorCoverLetter() {
   const hasStartedRef = useRef(false);
   const contentRef = useRef<HTMLDivElement>(null);
   const { start: startConfetti } = useFireworksConfetti();
+  const [isEditing, setIsEditing] = useState(false);
 
   const { state, start } = useCoverLetterStream();
   const { data: user } = useQuery(userQueries.detail());
@@ -35,7 +37,6 @@ export default function TailorCoverLetter() {
     coverLetterQueries.detail(coverLetterId ?? ""),
   );
 
-  console.log(existingCoverLetter, coverLetterId);
   const isGenerated = !!coverLetterId && !!existingCoverLetter;
 
   // Auto-start generation on first visit (no coverLetterId means fresh generation)
@@ -80,6 +81,16 @@ export default function TailorCoverLetter() {
     title: existingCoverLetter?.title ?? state?.title ?? "",
   };
 
+  if (isEditing && existingCoverLetter) {
+    return (
+      <TailorCoverLetterEditForm
+        coverLetter={existingCoverLetter}
+        user={user}
+        onCancel={() => setIsEditing(false)}
+      />
+    );
+  }
+
   return (
     <TailorCoverLetterDisplayStreaming
       aiApply={aiApply}
@@ -87,6 +98,7 @@ export default function TailorCoverLetter() {
       displayUser={displayUser}
       displayContent={displayContent}
       contentRef={contentRef as React.RefObject<HTMLDivElement>}
+      onEdit={existingCoverLetter ? () => setIsEditing(true) : undefined}
     />
   );
 }

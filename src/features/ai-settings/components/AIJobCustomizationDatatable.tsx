@@ -61,13 +61,17 @@ export const schema = z.object({
 const CONTENT_TYPE_ROUTES: Record<string, string> = {
   resume: "/dashboard/tailor-resume",
   "cover-letter": "/dashboard/tailor-cover-letter",
+  cover_letter: "/dashboard/tailor-cover-letter",
   "interview-question": "/dashboard/tailor-interview-question",
+  interview_question: "/dashboard/tailor-interview-question",
 };
 
 const CONTENT_TYPE_ID: Record<string, string> = {
   resume: "resumeId",
   "cover-letter": "coverLetterId",
+  cover_letter: "coverLetterId",
   "interview-question": "interviewQuestionId",
+  interview_question: "interviewQuestionId",
 };
 
 const getColumns = (

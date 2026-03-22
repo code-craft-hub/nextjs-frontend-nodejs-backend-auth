@@ -1,6 +1,7 @@
 "use client";
 
-import { Loader2 } from "lucide-react";
+import { EditIcon, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface TailorCoverLetterDisplayProps {
   aiApply: boolean;
@@ -17,6 +18,7 @@ interface TailorCoverLetterDisplayProps {
   };
   displayContent: string;
   contentRef: React.RefObject<HTMLDivElement>;
+  onEdit?: () => void;
 }
 
 export const TailorCoverLetterDisplayStreaming = ({
@@ -24,11 +26,20 @@ export const TailorCoverLetterDisplayStreaming = ({
   displayUser,
   displayContent,
   contentRef,
+  onEdit,
 }: TailorCoverLetterDisplayProps) => {
+  const canEdit = !state.isStreaming && !!displayContent;
+
   return (
     <div className="grid grid-cols-1 gap-4 sm:gap-6">
       <div className="flex w-full gap-3 items-center p-4 bg-white justify-between">
         <p className="text-xl font-medium font-inter">Tailored Cover Letter</p>
+        {canEdit && onEdit && (
+          <Button variant="outline" size="sm" onClick={onEdit} className="gap-1.5">
+            <EditIcon className="size-4" />
+            Edit
+          </Button>
+        )}
       </div>
 
       <div className="bg-slate-50 border-b border-slate-200 shadow-md rounded-xl flex flex-col items-center justify-between">
