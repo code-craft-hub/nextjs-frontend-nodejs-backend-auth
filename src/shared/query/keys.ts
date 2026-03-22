@@ -152,6 +152,18 @@ export const queryKeys = {
     adminList: (params?: Record<string, any>) =>
       [...queryKeys.jobApplications.all, "admin", "list", params] as const,
   },
+  userFeedback: {
+    all: ["user-feedback"] as const,
+    mine: () => [...queryKeys.userFeedback.all, "me"] as const,
+    lists: () => [...queryKeys.userFeedback.all, "list"] as const,
+    list: (filters: Record<string, any>) =>
+      [...queryKeys.userFeedback.lists(), filters] as const,
+    details: () => [...queryKeys.userFeedback.all, "detail"] as const,
+    detail: (id: string) => [...queryKeys.userFeedback.details(), id] as const,
+    resource: (resourceType: string, resourceId: string) =>
+      [...queryKeys.userFeedback.all, "resource", resourceType, resourceId] as const,
+  },
+
   recommendations: {
     all: ["recommendations"] as const,
     lists: () => [...queryKeys.recommendations.all, "list"] as const,

@@ -54,6 +54,16 @@ const Preview = ({
 
   const isMasterCv = !!masterCvId;
   const { data: resumeData } = useQuery(resumeQueries.detail(resumeId));
+
+  console.log(
+    coverLetterId,
+    resumeId,
+    recruiterEmail,
+    jobDescription,
+    autoApplyId,
+    masterCvId,
+    resumeData,
+  );
   const { data: masterCvData } = useQuery({
     ...resumeQueries.detail(masterCvId ?? ""),
     enabled: isMasterCv,
@@ -211,10 +221,12 @@ const Preview = ({
         />
       ) : (
         <>
-          <ViewResume
-            data={displayResumeData}
-            handleEditClick={handleEditClick}
-          />
+          {resumeId && (
+            <ViewResume
+              data={displayResumeData}
+              handleEditClick={handleEditClick}
+            />
+          )}
         </>
       )}
       <div className="flex items-center justify-center max-sm:fixed w-full h-16 bottom-4 left-0 ">
