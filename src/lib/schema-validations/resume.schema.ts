@@ -11,6 +11,7 @@ export const contactSchema = z.object({
   phoneNumber: z.string().optional(),
   email: z.email("email must be at least 10 characters").optional(),
   portfolio: z.string().optional(),
+  location: z.string().optional(),
 });
 
 export const educationSchema = z.object({

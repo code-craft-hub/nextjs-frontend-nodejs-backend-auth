@@ -33,7 +33,7 @@ export const ViewResume: React.FC<ViewResumeProps> = ({
   const lastName = coalesceString(data?.lastName, user?.lastName);
   const email = coalesceString(data?.email, user?.email);
   const phoneNumber = coalesceString(data?.phoneNumber, user?.phoneNumber);
-  const address = coalesceString(data?.address, user?.address);
+  const address = coalesceString(data?.location, data?.address, user?.address);
   const portfolio = coalesceString(data?.portfolio);
 
   const fullName = `${firstName} ${lastName}`.trim();
