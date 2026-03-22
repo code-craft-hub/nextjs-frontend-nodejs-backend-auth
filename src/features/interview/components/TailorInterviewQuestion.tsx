@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { isEmpty } from "lodash";
 import { QAItem } from "@/shared/types";
 import { extractCompleteJsonObjects } from "@/lib/utils/helpers";
+import { formatPlainText } from "@/lib/utils/format-plain-text";
 import TailorInterviewQuestionEmptyState from "./TailorInterviewQuestionEmptyState";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { interviewQuestionQueries } from "@/features/interview/queries/interview.queries";
@@ -50,7 +51,12 @@ export const TailorInterviewQuestion = ({
   }, [qaData.length, isGenerating]);
 
   useEffect(() => {
-    if (jobDescription?.trim() && !interviewId && !data && !hasGeneratedRef.current) {
+    if (
+      jobDescription?.trim() &&
+      !interviewId &&
+      !data &&
+      !hasGeneratedRef.current
+    ) {
       hasGeneratedRef.current = true;
 
       toast.promise(handleSubmit(), {
@@ -229,6 +235,8 @@ export const TailorInterviewQuestion = ({
                 </span>
               </div>
             )}
+
+            {data?.content && formatPlainText(data.content)}
 
             {generatedEmpty &&
               content?.map((item, index) => (

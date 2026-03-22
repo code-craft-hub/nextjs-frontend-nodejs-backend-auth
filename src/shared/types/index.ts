@@ -308,6 +308,7 @@ export interface UseResumeStreamReturn {
 export interface InterviewQuestion {
   fullContent?: { answer: string; question: string; type: string }[];
   parsedContent?: { answer: string; question: string; type: string }[];
+  content: string;
   firstName: string;
   lastName: string;
   email: string;
