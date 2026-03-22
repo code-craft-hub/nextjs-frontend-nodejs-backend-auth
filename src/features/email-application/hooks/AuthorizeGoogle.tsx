@@ -10,12 +10,11 @@ import { Switch } from "@/components/ui/switch";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import {
   checkAuthStatus,
-  requestAuthUrl,
   sendAuthorizationCode,
 } from "@/features/email-application/api/gmail-authorization.service";
-import { isValidEmail } from "@/validation";
 import { useQuery } from "@tanstack/react-query";
 import { userQueries } from "@features/user";
+import { useAuthorizeGmail } from "./useAuthorizeGmail";
 
 const FormSchema = z.object({
   authorized: z.boolean().default(false).optional(),
@@ -31,6 +30,7 @@ const AuthorizeGoogle: React.FC<{
   const pathname = usePathname();
 
   const { data: user } = useQuery(userQueries.detail());
+  const { authorizeGmail } = useAuthorizeGmail();
 
   const userEmail = user?.email || "";
 
@@ -87,30 +87,6 @@ const AuthorizeGoogle: React.FC<{
     };
     callCheckAuthOnce();
   }, []);
-
-  const authorizeGmail = async () => {
-    if (!userEmail || !isValidEmail(userEmail)) {
-      toast.error("Please enter a valid email.");
-      return;
-    }
-
-    try {
-      setIsLoading(true);
-      Analytics.gmailConnectStart("toggle");
-      const { success, data } = await requestAuthUrl();
-      if (!success) return toast.error(`Failed to get auth URL`);
-
-      // ✅ Start Google OAuth
-      const authUrl = (data as any)?.authUrl ?? data?.data?.authUrl;
-      if (!authUrl) return toast.error(`Failed to get auth URL`);
-      window.location.href = authUrl;
-    } catch (err: any) {
-      // toast.error(`Error: ${err.message}`);
-      console.error("Authorization error:", err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),

@@ -10,6 +10,7 @@ import Joyride, {
   TooltipRenderProps,
 } from "react-joyride";
 import { checkAuthStatus } from "@/features/email-application/api/gmail-authorization.service";
+import { useAuthorizeGmail } from "@/features/email-application/hooks/useAuthorizeGmail";
 
 // ── Step 1 tooltip: navigate to settings ──────────────────────────────────
 const NavToSettingsTooltip: React.FC<
@@ -36,33 +37,28 @@ const NavToSettingsTooltip: React.FC<
 );
 
 // ── Step 2 tooltip: highlight the toggle ──────────────────────────────────
-const ToggleTooltip: React.FC<TooltipRenderProps & { onClose: () => void }> = ({
-  tooltipProps,
-  step,
-  onClose,
-}) => {
-  
-  return (
-    <div
-      {...tooltipProps}
-      className="bg-white rounded-2xl shadow-xl p-5 w-72 font-inter"
-    >
-      <div className="flex items-center gap-2 mb-3">
-        <span className="text-2xl">🔗</span>
-        <h3 className="font-semibold text-gray-900 text-base">
-          {step.title as string}
-        </h3>
-      </div>
-      <p className="text-sm text-gray-600 mb-4">{step.content as string}</p>
-      <button
-        onClick={onClose}
-        className="w-full bg-blue-500 hover:bg-blue-600 transition-colors text-white text-sm font-medium py-2 px-4 rounded-lg"
-      >
-        Connect Now
-      </button>
+const ToggleTooltip: React.FC<
+  TooltipRenderProps & { onClose: () => void; onConnect: () => void }
+> = ({ tooltipProps, step, onClose, onConnect }) => (
+  <div
+    {...tooltipProps}
+    className="bg-white rounded-2xl shadow-xl p-5 w-72 font-inter"
+  >
+    <div className="flex items-center gap-2 mb-3">
+      <span className="text-2xl">🔗</span>
+      <h3 className="font-semibold text-gray-900 text-base">
+        {step.title as string}
+      </h3>
     </div>
-  );
-};
+    <p className="text-sm text-gray-600 mb-4">{step.content as string}</p>
+    <button
+      onClick={() => { onClose(); onConnect(); }}
+      className="w-full bg-blue-500 hover:bg-blue-600 transition-colors text-white text-sm font-medium py-2 px-4 rounded-lg"
+    >
+      Connect Now
+    </button>
+  </div>
+);
 
 // ── Steps ──────────────────────────────────────────────────────────────────
 const STEPS = [
@@ -94,6 +90,7 @@ export const DashboardOnboardingProvider: React.FC<{
   const router = useRouter();
   const pathname = usePathname();
   const { isMobile } = useSidebar();
+  const { authorizeGmail } = useAuthorizeGmail();
 
   // Poll for #gmail-authorize-toggle once we've navigated to settings
   useEffect(() => {
@@ -166,7 +163,7 @@ export const DashboardOnboardingProvider: React.FC<{
         <NavToSettingsTooltip {...props} onGoToSettings={handleGoToSettings} />
       );
     }
-    return <ToggleTooltip {...props} onClose={handleClose} />;
+    return <ToggleTooltip {...props} onClose={handleClose} onConnect={authorizeGmail} />;
   };
 
   return (
