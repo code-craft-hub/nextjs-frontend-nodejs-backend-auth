@@ -94,6 +94,7 @@ export default function TailorCoverLetter() {
   return (
     <TailorCoverLetterDisplayStreaming
       aiApply={aiApply}
+      coverLetterId={state.documentId ?? (!isGeneratorStep ? coverLetterId : null) ?? ""}
       state={state}
       displayUser={displayUser}
       displayContent={displayContent}

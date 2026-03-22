@@ -64,7 +64,7 @@ type FormValues = z.infer<typeof formSchema>;
 export function UserFeedbackModal() {
   const [open, setOpen] = useState(false);
 
-  const { mutate: submitFeedback, isPending } = useSubmitFeedback({
+  const { mutateAsync: submitFeedback, isPending } = useSubmitFeedback({
     onSuccess: () => {
       setOpen(false);
       form.reset();
@@ -79,8 +79,8 @@ export function UserFeedbackModal() {
     },
   });
 
-  function onSubmit(values: FormValues) {
-    submitFeedback({
+  async function onSubmit(values: FormValues) {
+    await submitFeedback({
       feedbackType: values.feedbackType,
       details: values.details || undefined,
     });

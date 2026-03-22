@@ -234,7 +234,7 @@ export const JobIdClient = ({
                 </SocialButton>
               </div>
             </div>
-            <JobQualityFeedbackModal>
+            <JobQualityFeedbackModal resourceId={jobId}>
               <Button
                 className="w-full border border-red-500 text-red-500 hover:text-red-700"
                 variant={"outline"}

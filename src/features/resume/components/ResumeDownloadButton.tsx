@@ -1,12 +1,12 @@
 import { useState } from "react";
 import axios from "axios";
-import { BASEURL } from "@/shared/api/client";
+import { API_URL } from "@/shared/api/client";
 import { IUser } from "@/shared/types";
 import { Button } from "@/components/ui/button";
 import { DownloadIcon, Loader } from "lucide-react";
 
 interface ResumeDownloadButtonProps {
-  resumeData: Partial<IUser>;
+  resumeData: Partial<IUser> & { id: string };
   className?: string;
 }
 
@@ -22,15 +22,11 @@ export const ResumeDownloadButton: React.FC<ResumeDownloadButtonProps> = ({
       setIsDownloading(true);
       setError(null);
 
-      const response = await axios.post(
-        BASEURL + "/download-generated-resume",
-        resumeData,
+      const response = await axios.get(
+        `${API_URL}/resumes/${resumeData.id}/download`,
         {
-          responseType: "blob", // Important: tells axios to expect binary data
-          headers: {
-            "Content-Type": "application/json",
-          },
-          withCredentials: true, // Include cookies for authentication if needed
+          responseType: "blob",
+          withCredentials: true,
         },
       );
 

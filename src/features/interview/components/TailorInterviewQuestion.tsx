@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { jsonrepair } from "jsonrepair";
 import { toast } from "sonner";
-import { isEmpty } from "lodash";
+import { capitalize, isEmpty } from "lodash";
 import { QAItem } from "@/shared/types";
 import { extractCompleteJsonObjects } from "@/lib/utils/helpers";
 import { formatPlainText } from "@/lib/utils/format-plain-text";
@@ -15,6 +15,7 @@ import { userQueries } from "@features/user";
 import { sendGTMEvent } from "@next/third-parties/google";
 import { API_URL } from "@/shared/api/client";
 import { useFireworksConfetti } from "@/components/ui/confetti";
+import { DocTypeFeedbackModal } from "@/shared/components/doc-type-feedback-modal";
 
 export const TailorInterviewQuestion = ({
   jobDescription,
@@ -216,13 +217,18 @@ export const TailorInterviewQuestion = ({
   const content = data?.fullContent || data?.parsedContent || [];
   return (
     <div className="min-h-screen h-full p-8">
+      <div className="flex flex-wrap w-full gap-3 items-center p-4 bg-white justify-between">
+        <p className="text-xl font-medium font-inter">
+          Job Interview Questions & Answers
+        </p>
+        <div className="flex gap-4">
+          <DocTypeFeedbackModal docType="interview-question" resourceId={interviewId ?? ""} />
+        </div>
+      </div>
       <div className="max-w-5xl mx-auto">
-        <div className="text-center mb-12">
-          <h1 className="text-3xl  text-slate-800 mb-3">
-            Job Interview Questions & Answers
-          </h1>
+        <div className="text-center mb-12 mt-4">
           <p className="text-2xl font-bold text-slate-800 mb-3">
-            {documentTitle ? `Title: ${documentTitle}` : ""}
+            {documentTitle ? `Title: ${capitalize(documentTitle)}` : ""}
           </p>
         </div>
         {!allEmpty ? (

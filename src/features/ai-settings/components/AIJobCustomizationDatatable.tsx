@@ -65,6 +65,7 @@ const CONTENT_TYPE_ROUTES: Record<string, string> = {
   cover_letter: "/dashboard/tailor-cover-letter",
   "interview-question": "/dashboard/tailor-interview-question",
   interview_question: "/dashboard/tailor-interview-question",
+  interview_questions: "/dashboard/tailor-interview-question",
 };
 
 const CONTENT_TYPE_ID: Record<string, string> = {
@@ -73,6 +74,7 @@ const CONTENT_TYPE_ID: Record<string, string> = {
   cover_letter: "coverLetterId",
   "interview-question": "interviewQuestionId",
   interview_question: "interviewQuestionId",
+  interview_questions: "interviewQuestionId",
 };
 
 const getColumns = (

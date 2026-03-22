@@ -10,6 +10,7 @@ export const FEEDBACK_TYPES = [
   "other",
   "job_review",
   "cv_quality",
+  "resume_quality"
 ] as const;
 
 export type FeedbackType = (typeof FEEDBACK_TYPES)[number];
@@ -23,6 +24,7 @@ export const FEEDBACK_TYPE_LABELS: Record<FeedbackType, string> = {
   other: "Other",
   job_review: "Job Review",
   cv_quality: "CV Quality",
+  resume_quality: "Resume Quality",
 };
 
 // ─── Request payloads ─────────────────────────────────────────────────────────

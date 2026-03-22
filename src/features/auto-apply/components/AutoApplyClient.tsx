@@ -161,6 +161,7 @@ export default function AutoApplyClient() {
     <div className="flex flex-col gap-8 p-4 sm:p-8">
       <TailorCoverLetterDisplayStreaming
         aiApply={aiApply}
+        coverLetterId={coverLetterState.documentId ?? ""}
         state={coverLetterState}
         displayUser={displayUser}
         displayContent={displayContent}

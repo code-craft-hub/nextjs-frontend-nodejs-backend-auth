@@ -2,9 +2,11 @@
 
 import { EditIcon, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { DocTypeFeedbackModal } from "@/shared/components/doc-type-feedback-modal";
 
 interface TailorCoverLetterDisplayProps {
   aiApply: boolean;
+  coverLetterId?: string;
   state: {
     isStreaming: boolean;
     content: string;
@@ -23,6 +25,7 @@ interface TailorCoverLetterDisplayProps {
 
 export const TailorCoverLetterDisplayStreaming = ({
   state,
+  coverLetterId,
   displayUser,
   displayContent,
   contentRef,
@@ -34,12 +37,20 @@ export const TailorCoverLetterDisplayStreaming = ({
     <div className="grid grid-cols-1 gap-4 sm:gap-6">
       <div className="flex w-full gap-3 items-center p-4 bg-white justify-between">
         <p className="text-xl font-medium font-inter">Tailored Cover Letter</p>
-        {canEdit && onEdit && (
-          <Button variant="outline" size="sm" onClick={onEdit} className="gap-1.5">
-            <EditIcon className="size-4" />
-            Edit
-          </Button>
-        )}
+        <div className="flex gap-4">
+          <DocTypeFeedbackModal docType="cover-letter" resourceId={coverLetterId ?? ""} />
+          {canEdit && onEdit && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onEdit}
+              className="gap-1.5"
+            >
+              <EditIcon className="size-4" />
+              Edit
+            </Button>
+          )}
+        </div>
       </div>
 
       <div className="bg-slate-50 border-b border-slate-200 shadow-md rounded-xl flex flex-col items-center justify-between">
@@ -81,7 +92,7 @@ export const TailorCoverLetterDisplayStreaming = ({
           <div className="text-red-500 p-4 shadow-xl w-full">
             Error: {state.error}
           </div>
-        )}      
+        )}
       </div>
     </div>
   );
