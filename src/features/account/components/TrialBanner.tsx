@@ -10,7 +10,7 @@ export function TrialBanner({ user }: TrialBannerProps) {
   const hasActiveSubscription = isSubscriptionActive(user?.currentPeriodEnd);
 
   const heading =
-    user?.accountTier === "none" || !user?.accountTier
+    user?.accountTier === "free" || !user?.accountTier
       ? "You're on a Free Trial"
       : `You're on the ${user.accountTier} plan`;
 
