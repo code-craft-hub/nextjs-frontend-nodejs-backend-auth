@@ -22,8 +22,8 @@ import { normalizeResumeData } from "@/lib/utils/resume-normalizer";
 import {
   useSendEmailApplicationMutation,
   useDeleteEmailApplicationMutation,
-  GmailCompose,
 } from "@/features/email-application";
+import { DocTypeFeedbackModal } from "@/shared/components/doc-type-feedback-modal";
 
 interface PreviewProps {
   coverLetterId: string;
@@ -176,12 +176,7 @@ const Preview = ({
         </p>
 
         <div className="flex gap-2">
-          <GmailCompose
-            coverLetterData={coverLetterData!}
-            recruiterEmail={
-              coverLetterData?.recruiterEmail || recruiterEmail || ""
-            }
-          />
+         <DocTypeFeedbackModal docType="resume" resourceId={resumeId ?? ""} />
           <Button
             className="text-2xs"
             variant="destructive"
