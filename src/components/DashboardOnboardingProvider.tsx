@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
+import { useSidebar } from "@/components/ui/sidebar";
 import Joyride, {
   CallBackProps,
   EVENTS,
@@ -35,28 +36,33 @@ const NavToSettingsTooltip: React.FC<
 );
 
 // ── Step 2 tooltip: highlight the toggle ──────────────────────────────────
-const ToggleTooltip: React.FC<
-  TooltipRenderProps & { onClose: () => void }
-> = ({ tooltipProps, step, onClose }) => (
-  <div
-    {...tooltipProps}
-    className="bg-white rounded-2xl shadow-xl p-5 w-72 font-inter"
-  >
-    <div className="flex items-center gap-2 mb-3">
-      <span className="text-2xl">🔗</span>
-      <h3 className="font-semibold text-gray-900 text-base">
-        {step.title as string}
-      </h3>
-    </div>
-    <p className="text-sm text-gray-600 mb-4">{step.content as string}</p>
-    <button
-      onClick={onClose}
-      className="w-full bg-blue-500 hover:bg-blue-600 transition-colors text-white text-sm font-medium py-2 px-4 rounded-lg"
+const ToggleTooltip: React.FC<TooltipRenderProps & { onClose: () => void }> = ({
+  tooltipProps,
+  step,
+  onClose,
+}) => {
+  
+  return (
+    <div
+      {...tooltipProps}
+      className="bg-white rounded-2xl shadow-xl p-5 w-72 font-inter"
     >
-      Connect Now
-    </button>
-  </div>
-);
+      <div className="flex items-center gap-2 mb-3">
+        <span className="text-2xl">🔗</span>
+        <h3 className="font-semibold text-gray-900 text-base">
+          {step.title as string}
+        </h3>
+      </div>
+      <p className="text-sm text-gray-600 mb-4">{step.content as string}</p>
+      <button
+        onClick={onClose}
+        className="w-full bg-blue-500 hover:bg-blue-600 transition-colors text-white text-sm font-medium py-2 px-4 rounded-lg"
+      >
+        Connect Now
+      </button>
+    </div>
+  );
+};
 
 // ── Steps ──────────────────────────────────────────────────────────────────
 const STEPS = [
@@ -71,7 +77,8 @@ const STEPS = [
   {
     target: "#gmail-authorize-toggle",
     title: "Enable Gmail",
-    content: "Toggle this switch to connect your Gmail account and start applying automatically.",
+    content:
+      "Toggle this switch to connect your Gmail account and start applying automatically.",
     placement: "left" as const,
     disableBeacon: true,
   },
@@ -83,24 +90,62 @@ export const DashboardOnboardingProvider: React.FC<{
 }> = ({ children }) => {
   const [run, setRun] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
+  const [awaitingSettings, setAwaitingSettings] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
+  const { isMobile } = useSidebar();
+
+  // Poll for #gmail-authorize-toggle once we've navigated to settings
+  useEffect(() => {
+    if (!awaitingSettings || pathname !== "/dashboard/settings") return;
+
+    const interval = setInterval(() => {
+      if (document.querySelector("#gmail-authorize-toggle")) {
+        clearInterval(interval);
+        clearTimeout(giveUp);
+        setAwaitingSettings(false);
+        setStepIndex(1);
+        setRun(true);
+      }
+    }, 100);
+
+    // Give up after 8 seconds to avoid polling forever
+    const giveUp = setTimeout(() => {
+      clearInterval(interval);
+      setAwaitingSettings(false);
+    }, 8000);
+
+    return () => {
+      clearInterval(interval);
+      clearTimeout(giveUp);
+    };
+  }, [awaitingSettings, pathname]);
 
   useEffect(() => {
     const check = async () => {
       try {
         const { authorized } = await checkAuthStatus();
-        if (!authorized) setRun(true);
+        if (!authorized) {
+          if (isMobile) {
+            // On mobile, skip step 1 (sidebar spotlight doesn't work inside Sheet portal).
+            // Navigate to settings and poll for the toggle element.
+            router.push("/dashboard/settings");
+            setAwaitingSettings(true);
+          } else {
+            setRun(true);
+          }
+        }
       } catch {
         // silently ignore
       }
     };
     check();
-  }, []);
+  }, [isMobile, router]);
 
   const handleGoToSettings = () => {
+    setRun(false);
     router.push("/dashboard/settings");
-    // slight delay so the page starts rendering before joyride looks for the next target
-    setTimeout(() => setStepIndex(1), 600);
+    setAwaitingSettings(true);
   };
 
   const handleClose = () => setRun(false);

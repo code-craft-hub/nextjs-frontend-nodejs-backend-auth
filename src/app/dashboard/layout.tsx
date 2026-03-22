@@ -33,7 +33,6 @@ const DashboardLayout = async ({ children }: DashboardLayoutProps) => {
   // await queryClient.prefetchQuery(userQueries.detail(token));
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <DashboardOnboardingProvider>
       <SidebarProvider>
         <AppSidebar />
         <SidebarInset>
@@ -50,10 +49,13 @@ const DashboardLayout = async ({ children }: DashboardLayoutProps) => {
               <UserMenu role={authUser?.role} />
             </div>
           </header>
-          <div className="w-full min-h-screen bg-[#F5F7FA]">{children}</div>
+          <div className="w-full min-h-screen bg-[#F5F7FA]">
+            <DashboardOnboardingProvider>
+              {children}
+            </DashboardOnboardingProvider>
+          </div>
         </SidebarInset>
       </SidebarProvider>
-      </DashboardOnboardingProvider>
     </HydrationBoundary>
   );
 };
