@@ -92,6 +92,8 @@
     "openai": "^6.15.0",
     "pdfjs-dist": "5.4.530",
     "pnpm": "^10.27.0",
+    "posthog-js": "^1.363.1",
+    "posthog-node": "^5.28.5",
     "radix-ui": "^1.4.3",
     "react": "19.2.3",
     "react-confetti": "^6.4.0",

@@ -10,6 +10,7 @@ import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { userQueries } from "@features/user";
 import { Analytics } from "@/lib/analytics";
+import posthog from "posthog-js";
 
 /**
  * Mounts the presence heartbeat for any authenticated user.
@@ -30,7 +31,10 @@ function HeartbeatRunner() {
 function AnalyticsIdentifier() {
   const { data: user } = useQuery({ ...userQueries.detail(), retry: false });
   useEffect(() => {
-    if (user?.id) Analytics.identify(user.id);
+    if (!user?.id) return;
+    // Unified identity: set user_id on both GA4 and PostHog in one place.
+    Analytics.identify(user.id);
+    posthog.identify(user.id);
   }, [user?.id]);
   return null;
 }

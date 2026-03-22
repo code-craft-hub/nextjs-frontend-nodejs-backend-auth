@@ -47,7 +47,7 @@ export const jobsApi = {
   createJob: (data: any) => api.post<JobPost>("/job-recommendations", data),
 
   // Update job
-  updateJob: (id: string, data: any) => api.patch<JobPost>(`/jobs/${id}`, data),
+  updateJob: (id: string, data: any) => api.patch<JobPost>(`/job-posts/${id}`, data),
 
   // Update job application history
   updateJobApplicationHistory: (id: string, data: any) =>

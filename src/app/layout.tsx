@@ -1,4 +1,5 @@
 import { Providers } from "@/shared/providers/query-provider";
+import { PostHogProvider } from "@/shared/providers/posthog-provider";
 import "./globals.css";
 import {
   EB_Garamond,
@@ -105,7 +106,9 @@ export default function RootLayout({
             />
           </>
         )}
-        <Providers>{children}</Providers>
+        <PostHogProvider>
+          <Providers>{children}</Providers>
+        </PostHogProvider>
       </body>
 
       <Script
