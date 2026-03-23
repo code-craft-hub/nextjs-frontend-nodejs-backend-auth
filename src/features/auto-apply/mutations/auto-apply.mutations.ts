@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   autoApplyApi,
+  autoApplyProcessorApi,
   type CreateAutoApplyData,
   type UpdateAutoApplyData,
 } from "@/features/auto-apply/api/auto-apply.api";
@@ -9,6 +10,7 @@ import {
   invalidateAutoApplyDetail,
   invalidateAutoApplyCount,
 } from "@/shared/query/query-invalidation";
+import { autoApplyKeys } from "@/features/auto-apply/queries/auto-apply.keys";
 
 export function useCreateAutoApplyMutation() {
   const queryClient = useQueryClient();
@@ -43,6 +45,17 @@ export function useDeleteAutoApplyMutation() {
     onSettled: () => {
       invalidateAutoApplyLists(queryClient);
       invalidateAutoApplyCount(queryClient);
+    },
+  });
+}
+
+export function useTriggerAutoApplyMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: () => autoApplyProcessorApi.trigger(),
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: autoApplyKeys.quota() });
     },
   });
 }

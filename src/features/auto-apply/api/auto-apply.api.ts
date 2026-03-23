@@ -67,9 +67,27 @@ interface ApiResponse<T> {
   data: T;
 }
 
+export interface QuotaStatus {
+  autoApplyEnabled: boolean;
+  tierLimit: number;
+  settingsLimit: number;
+  effectiveLimit: number;
+  usedToday: number;
+  remaining: number;
+  accountTier: string;
+}
+
+export interface TriggerResult {
+  queued: boolean;
+  jobId?: string;
+  message: string;
+  quota: QuotaStatus;
+}
+
 // ─── API Client ───────────────────────────────────────────────────
 
 const AUTO_APPLY_BASE = `/auto-applies`;
+const PROCESSOR_BASE = `/auto-apply-processor`;
 
 export const autoApplyApi = {
   create: (data: CreateAutoApplyData, token?: string) =>
@@ -127,4 +145,10 @@ export const autoApplyApi = {
       `${AUTO_APPLY_BASE}/bulk-delete`,
       { body: { ids }, token },
     ),
+};
+
+export const autoApplyProcessorApi = {
+  getQuota: () => api.get<ApiResponse<QuotaStatus>>(`${PROCESSOR_BASE}/quota`),
+  trigger: () =>
+    api.post<ApiResponse<TriggerResult>>(`${PROCESSOR_BASE}/trigger`, {}),
 };

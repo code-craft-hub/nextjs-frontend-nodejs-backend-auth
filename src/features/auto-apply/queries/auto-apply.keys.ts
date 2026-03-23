@@ -14,4 +14,5 @@ export const autoApplyKeys = {
     [...autoApplyKeys.all, "resume", resumeId] as const,
   byCoverLetter: (coverLetterId: string) =>
     [...autoApplyKeys.all, "cover-letter", coverLetterId] as const,
+  quota: () => [...autoApplyKeys.all, "quota"] as const,
 } as const;

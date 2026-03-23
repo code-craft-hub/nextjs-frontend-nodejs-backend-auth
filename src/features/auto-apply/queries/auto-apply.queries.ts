@@ -1,5 +1,5 @@
 import { queryOptions } from "@tanstack/react-query";
-import { autoApplyApi } from "@/features/auto-apply/api/auto-apply.api";
+import { autoApplyApi, autoApplyProcessorApi } from "@/features/auto-apply/api/auto-apply.api";
 import { autoApplyKeys } from "@/features/auto-apply/queries/auto-apply.keys";
 
 export const autoApplyQueries = {
@@ -54,5 +54,12 @@ export const autoApplyQueries = {
       queryFn: () => autoApplyApi.getByCoverLetterId(coverLetterId, token),
       staleTime: 5 * 60 * 1000,
       enabled: !!coverLetterId,
+    }),
+
+  quota: () =>
+    queryOptions({
+      queryKey: autoApplyKeys.quota(),
+      queryFn: () => autoApplyProcessorApi.getQuota(),
+      staleTime: 60 * 1000,
     }),
 };

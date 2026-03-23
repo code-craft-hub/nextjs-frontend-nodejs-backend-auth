@@ -7,6 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useUpdateAISettingsMutation } from "@/features/ai-settings/mutations/ai-settings.mutations";
 import { Switch, Label } from "./Switch";
 import { AutoSendConfigPanel, AutoSendConfig } from "./AutoSendConfigPanel";
+import { autoApplyQueries, useTriggerAutoApplyMutation } from "@/features/auto-apply";
 
 // ─── Tier daily application caps (mirrors server TIER_DAILY_LIMITS) ───────────
 const TIER_DAILY_LIMITS: Record<string, number> = {
@@ -53,6 +54,11 @@ export const AiApplyPreferences: React.FC = () => {
   const updateSettings = useUpdateAISettingsMutation();
   const { data: user } = useQuery(userQueries.detail());
   const { data: settings } = useQuery(aiSettingsQueries.detail());
+  const { data: quotaData } = useQuery(autoApplyQueries.quota());
+  const triggerAutoApply = useTriggerAutoApplyMutation();
+  const [triggerMessage, setTriggerMessage] = useState<string | null>(null);
+
+  const quota = quotaData?.data;
 
   const accountTier = user?.accountTier ?? "basic";
   const tierCap = TIER_DAILY_LIMITS[accountTier] ?? DEFAULT_TIER_LIMIT;
@@ -212,6 +218,16 @@ export const AiApplyPreferences: React.FC = () => {
     }
   };
 
+  const handleTriggerNow = async () => {
+    setTriggerMessage(null);
+    try {
+      const result = await triggerAutoApply.mutateAsync();
+      setTriggerMessage(result.data.message);
+    } catch {
+      setTriggerMessage("Failed to trigger auto-apply. Please try again.");
+    }
+  };
+
   // Handle button clicks
   const handleButtonClick = (_action: string): void => {};
 
@@ -301,15 +317,58 @@ export const AiApplyPreferences: React.FC = () => {
               ))}
 
               {setting.section === "Auto Apply Configuration" && switchStates.autoApplyEnabled && (
-                <AutoSendConfigPanel
-                  accountTier={accountTier}
-                  tierCap={tierCap}
-                  config={autoSendConfig}
-                  onConfigChange={(patch) =>
-                    setAutoSendConfig((prev) => ({ ...prev, ...patch }))
-                  }
-                  onSave={saveAutoSendConfig}
-                />
+                <>
+                  <AutoSendConfigPanel
+                    accountTier={accountTier}
+                    tierCap={tierCap}
+                    config={autoSendConfig}
+                    onConfigChange={(patch) =>
+                      setAutoSendConfig((prev) => ({ ...prev, ...patch }))
+                    }
+                    onSave={saveAutoSendConfig}
+                  />
+
+                  {/* ── Quota status & manual trigger ─────────────────── */}
+                  <div className="mt-4 pt-4 border-t flex items-center justify-between gap-4">
+                    <div>
+                      <p className="font-medium text-sm">Today's usage</p>
+                      {quota ? (
+                        <p className="text-gray-500 text-sm mt-0.5">
+                          {quota.usedToday} / {quota.effectiveLimit} applications used
+                          {quota.remaining > 0 && (
+                            <span className="ml-1 text-green-600">
+                              ({quota.remaining} remaining)
+                            </span>
+                          )}
+                          {quota.remaining === 0 && (
+                            <span className="ml-1 text-orange-500">(limit reached)</span>
+                          )}
+                        </p>
+                      ) : (
+                        <p className="text-gray-400 text-sm mt-0.5">Loading quota…</p>
+                      )}
+                      {triggerMessage && (
+                        <p className="text-sm mt-1 text-blue-600">{triggerMessage}</p>
+                      )}
+                    </div>
+                    <button
+                      onClick={handleTriggerNow}
+                      disabled={
+                        triggerAutoApply.isPending ||
+                        !quota ||
+                        quota.remaining === 0
+                      }
+                      className={cn(
+                        "px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap",
+                        quota && quota.remaining > 0
+                          ? "bg-blue-500 text-white hover:bg-blue-600"
+                          : "bg-gray-100 text-gray-400 cursor-not-allowed",
+                      )}
+                    >
+                      {triggerAutoApply.isPending ? "Running…" : "Run Now"}
+                    </button>
+                  </div>
+                </>
               )}
             </div>
           </div>
