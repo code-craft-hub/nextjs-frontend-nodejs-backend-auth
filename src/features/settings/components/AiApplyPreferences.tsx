@@ -213,7 +213,6 @@ export const AiApplyPreferences: React.FC = () => {
         },
       ],
     },
-
     {
       section: "WhatsApp Integration",
       img: "/message.svg",
@@ -342,7 +341,7 @@ export const AiApplyPreferences: React.FC = () => {
             key={setting.section || `child-${settingIndex}`}
             className="bg-white rounded-xl p-4 sm:p-6 shadow-sm border"
           >
-            {!setting.child && setting.section && (
+            {setting.section && (
               <div className="flex items-center gap-3 mb-2">
                 {setting.img && <img src={setting.img} alt={setting.section} />}
                 <h2 className="text-md font-medium ">{setting.section}</h2>
@@ -399,7 +398,8 @@ export const AiApplyPreferences: React.FC = () => {
               )}
 
               {/* ── Auto-send configuration panel ─────────────────────────── */}
-              {setting.child && switchStates.autoSendApplications && (
+              {setting.section === "Auto Apply Configuration" &&
+                switchStates.autoApplyEnabled && (
                 <div className="mt-2 pt-4 border-t border-gray-100 space-y-5">
                   {/* Applications per day */}
                   <div className="space-y-1.5">
