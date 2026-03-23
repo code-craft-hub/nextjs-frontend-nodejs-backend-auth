@@ -1,10 +1,32 @@
 import { cn } from "@/lib/utils";
-import { JSX, useState } from "react";
+import { JSX, useEffect, useRef, useState } from "react";
 import AuthorizeGoogle from "@/features/email-application/hooks/AuthorizeGoogle";
 import { userQueries } from "@features/user";
 import { aiSettingsQueries } from "@/features/ai-settings/queries/ai-settings.queries";
 import { useQuery } from "@tanstack/react-query";
 import { useUpdateAISettingsMutation } from "@/features/ai-settings/mutations/ai-settings.mutations";
+
+// ─── Tier daily application caps (mirrors server TIER_DAILY_LIMITS) ───────────
+const TIER_DAILY_LIMITS: Record<string, number> = {
+  free: 0,
+  basic: 1,
+  starter: 3,
+  pro: 5,
+  professional: 5,
+  enterprise: 10,
+  custom: 10,
+};
+const DEFAULT_TIER_LIMIT = 1;
+
+const JOB_TYPE_OPTIONS = [
+  { value: "full-time", label: "Full-time" },
+  { value: "part-time", label: "Part-time" },
+  { value: "contract", label: "Contract" },
+  { value: "freelance", label: "Freelance" },
+  { value: "internship", label: "Internship" },
+  { value: "remote", label: "Remote" },
+  { value: "hybrid", label: "Hybrid" },
+];
 interface SettingOption {
   label: string;
   description: string;
@@ -76,17 +98,62 @@ const Label: React.FC<LabelProps> = ({ htmlFor, className = "", children }) => (
   </label>
 );
 
+interface AutoSendConfig {
+  maxApplicationsPerDay: number;
+  minMatchScore: number;
+  preferredJobTypes: string[];
+  excludedCompanies: string[];
+}
+
 export const AiApplyPreferences: React.FC = () => {
   const updateSettings = useUpdateAISettingsMutation();
   const { data: user } = useQuery(userQueries.detail());
   const { data: settings } = useQuery(aiSettingsQueries.detail());
 
+  const accountTier = user?.accountTier ?? "basic";
+  const tierCap = TIER_DAILY_LIMITS[accountTier] ?? DEFAULT_TIER_LIMIT;
 
   const [oauthState, setOauthState] = useState(false);
 
-  const checkAuth = async (value: boolean ): Promise<void> => {
+  // ── Auto-send configuration state ────────────────────────────────────────
+  const [autoSendConfig, setAutoSendConfig] = useState<AutoSendConfig>(() => ({
+    maxApplicationsPerDay: Math.min(
+      settings?.maxApplicationsPerDay ?? tierCap,
+      tierCap,
+    ),
+    minMatchScore: settings?.minMatchScore ?? 70,
+    preferredJobTypes: (settings?.preferredJobTypes as string[]) ?? [],
+    excludedCompanies: (settings?.excludedCompanies as string[]) ?? [],
+  }));
+
+  // Sync when settings load from the server
+  useEffect(() => {
+    if (!settings) return;
+    setAutoSendConfig({
+      maxApplicationsPerDay: Math.min(
+        settings.maxApplicationsPerDay ?? tierCap,
+        tierCap,
+      ),
+      minMatchScore: settings.minMatchScore ?? 70,
+      preferredJobTypes: (settings.preferredJobTypes as string[]) ?? [],
+      excludedCompanies: (settings.excludedCompanies as string[]) ?? [],
+    });
+  }, [settings]);
+
+  // Excluded company input state
+  const [companyInput, setCompanyInput] = useState("");
+  const companyInputRef = useRef<HTMLInputElement>(null);
+
+  const saveAutoSendConfig = async (patch: Partial<AutoSendConfig>) => {
+    try {
+      await updateSettings.mutateAsync(patch);
+    } catch (error) {
+      console.error("Error saving auto-send config:", error);
+    }
+  };
+
+  const checkAuth = async (value: boolean): Promise<void> => {
     setOauthState(value);
-   
   };
 
   const settingsConfig: Setting[] = [
@@ -284,7 +351,6 @@ export const AiApplyPreferences: React.FC = () => {
             {setting.subTitle && (
               <div className="mb-4">
                 <p className="text-gray-600 text-md">{setting.subTitle}</p>
-               
               </div>
             )}
 
@@ -330,6 +396,267 @@ export const AiApplyPreferences: React.FC = () => {
                     </div>
                   </div>
                 ),
+              )}
+
+              {/* ── Auto-send configuration panel ─────────────────────────── */}
+              {setting.child && switchStates.autoSendApplications && (
+                <div className="mt-2 pt-4 border-t border-gray-100 space-y-5">
+                  {/* Applications per day */}
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium text-sm text-gray-800">
+                          Applications per day
+                        </p>
+                        <p className="text-xs text-gray-500 mt-0.5">
+                          Your <span className="capitalize">{accountTier}</span>{" "}
+                          plan allows up to <strong>{tierCap}</strong> per day
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <input
+                          type="number"
+                          min={1}
+                          max={tierCap}
+                          value={autoSendConfig.maxApplicationsPerDay}
+                          disabled={tierCap === 0}
+                          onChange={(e) => {
+                            const val = Math.min(
+                              Math.max(1, Number(e.target.value)),
+                              tierCap,
+                            );
+                            setAutoSendConfig((prev) => ({
+                              ...prev,
+                              maxApplicationsPerDay: val,
+                            }));
+                          }}
+                          onBlur={() =>
+                            saveAutoSendConfig({
+                              maxApplicationsPerDay:
+                                autoSendConfig.maxApplicationsPerDay,
+                            })
+                          }
+                          className="w-16 text-center border border-gray-300 rounded-lg py-1.5 px-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                        />
+                        <span className="text-xs text-gray-500">/ day</span>
+                      </div>
+                    </div>
+                    {tierCap === 0 && (
+                      <p className="text-xs text-amber-600 bg-amber-50 rounded-lg px-3 py-2">
+                        Upgrade your plan to enable auto-send applications.
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Minimum match score */}
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium text-sm text-gray-800">
+                          Minimum match score
+                        </p>
+                        <p className="text-xs text-gray-500 mt-0.5">
+                          Only apply to jobs above this score
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <input
+                          type="number"
+                          min={0}
+                          max={100}
+                          value={autoSendConfig.minMatchScore}
+                          onChange={(e) => {
+                            const val = Math.min(
+                              100,
+                              Math.max(0, Number(e.target.value)),
+                            );
+                            setAutoSendConfig((prev) => ({
+                              ...prev,
+                              minMatchScore: val,
+                            }));
+                          }}
+                          onBlur={() =>
+                            saveAutoSendConfig({
+                              minMatchScore: autoSendConfig.minMatchScore,
+                            })
+                          }
+                          className="w-16 text-center border border-gray-300 rounded-lg py-1.5 px-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                        <span className="text-xs text-gray-500">%</span>
+                      </div>
+                    </div>
+                    <input
+                      type="range"
+                      min={0}
+                      max={100}
+                      value={autoSendConfig.minMatchScore}
+                      onChange={(e) =>
+                        setAutoSendConfig((prev) => ({
+                          ...prev,
+                          minMatchScore: Number(e.target.value),
+                        }))
+                      }
+                      onMouseUp={() =>
+                        saveAutoSendConfig({
+                          minMatchScore: autoSendConfig.minMatchScore,
+                        })
+                      }
+                      onTouchEnd={() =>
+                        saveAutoSendConfig({
+                          minMatchScore: autoSendConfig.minMatchScore,
+                        })
+                      }
+                      className="w-full accent-blue-600"
+                    />
+                  </div>
+
+                  {/* Preferred job types */}
+                  <div className="space-y-1.5">
+                    <p className="font-medium text-sm text-gray-800">
+                      Preferred job types
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      Leave empty to match all types
+                    </p>
+                    <div className="flex flex-wrap gap-2 pt-1">
+                      {JOB_TYPE_OPTIONS.map((opt) => {
+                        const selected =
+                          autoSendConfig.preferredJobTypes.includes(opt.value);
+                        return (
+                          <button
+                            key={opt.value}
+                            onClick={async () => {
+                              const updated = selected
+                                ? autoSendConfig.preferredJobTypes.filter(
+                                    (t) => t !== opt.value,
+                                  )
+                                : [
+                                    ...autoSendConfig.preferredJobTypes,
+                                    opt.value,
+                                  ];
+                              setAutoSendConfig((prev) => ({
+                                ...prev,
+                                preferredJobTypes: updated,
+                              }));
+                              await saveAutoSendConfig({
+                                preferredJobTypes: updated,
+                              });
+                            }}
+                            className={cn(
+                              "px-3 py-1 rounded-full text-xs font-medium border transition-colors",
+                              selected
+                                ? "bg-blue-600 text-white border-blue-600"
+                                : "bg-white text-gray-600 border-gray-300 hover:border-blue-400",
+                            )}
+                          >
+                            {opt.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Excluded companies */}
+                  <div className="space-y-1.5">
+                    <p className="font-medium text-sm text-gray-800">
+                      Excluded companies
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      Skip applications to these companies
+                    </p>
+                    {autoSendConfig.excludedCompanies.length > 0 && (
+                      <div className="flex flex-wrap gap-2 pt-1">
+                        {autoSendConfig.excludedCompanies.map((company) => (
+                          <span
+                            key={company}
+                            className="inline-flex items-center gap-1 bg-gray-100 text-gray-700 text-xs rounded-full px-3 py-1"
+                          >
+                            {company}
+                            <button
+                              onClick={async () => {
+                                const updated =
+                                  autoSendConfig.excludedCompanies.filter(
+                                    (c) => c !== company,
+                                  );
+                                setAutoSendConfig((prev) => ({
+                                  ...prev,
+                                  excludedCompanies: updated,
+                                }));
+                                await saveAutoSendConfig({
+                                  excludedCompanies: updated,
+                                });
+                              }}
+                              className="ml-0.5 text-gray-400 hover:text-red-500 transition-colors leading-none"
+                              aria-label={`Remove ${company}`}
+                            >
+                              ×
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                    <div className="flex gap-2 pt-1">
+                      <input
+                        ref={companyInputRef}
+                        type="text"
+                        value={companyInput}
+                        onChange={(e) => setCompanyInput(e.target.value)}
+                        onKeyDown={async (e) => {
+                          if (
+                            (e.key === "Enter" || e.key === ",") &&
+                            companyInput.trim()
+                          ) {
+                            e.preventDefault();
+                            const name = companyInput.trim().replace(/,$/, "");
+                            if (
+                              !autoSendConfig.excludedCompanies.includes(name)
+                            ) {
+                              const updated = [
+                                ...autoSendConfig.excludedCompanies,
+                                name,
+                              ];
+                              setAutoSendConfig((prev) => ({
+                                ...prev,
+                                excludedCompanies: updated,
+                              }));
+                              await saveAutoSendConfig({
+                                excludedCompanies: updated,
+                              });
+                            }
+                            setCompanyInput("");
+                          }
+                        }}
+                        placeholder="Company name, then Enter"
+                        className="flex-1 border border-gray-300 rounded-lg py-1.5 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                      <button
+                        onClick={async () => {
+                          const name = companyInput.trim();
+                          if (
+                            name &&
+                            !autoSendConfig.excludedCompanies.includes(name)
+                          ) {
+                            const updated = [
+                              ...autoSendConfig.excludedCompanies,
+                              name,
+                            ];
+                            setAutoSendConfig((prev) => ({
+                              ...prev,
+                              excludedCompanies: updated,
+                            }));
+                            await saveAutoSendConfig({
+                              excludedCompanies: updated,
+                            });
+                          }
+                          setCompanyInput("");
+                        }}
+                        className="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition-colors"
+                      >
+                        Add
+                      </button>
+                    </div>
+                  </div>
+                </div>
               )}
             </div>
           </div>
