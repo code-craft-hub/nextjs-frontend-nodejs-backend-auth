@@ -17,7 +17,6 @@ import { LandingPageInput } from "./LandingPageInput";
 import { ActionButton } from "./ActionButton";
 import { MeetCverai } from "./MeetCverai";
 import { FeatureJobs } from "./FeatureJobs";
-import { IUser } from "@/shared/types";
 import Pricing from "./Pricing";
 import { VideoModal } from "./VideoModal";
 import { useRouter } from "next/navigation";
@@ -27,11 +26,7 @@ import {
   BlogCardSkeleton,
 } from "@/features/blog/components/homeComponents/BlogCard";
 
-export const LandingPageClient = ({
-  user,
-}: {
-  user: Partial<IUser> | null;
-}) => {
+export const LandingPageClient = () => {
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const router = useRouter();
 
@@ -51,7 +46,7 @@ export const LandingPageClient = ({
           backgroundPosition: "center center",
         }}
       >
-        <Header user={user} />
+        <Header />
         <div className="pt-32 mx-auto">
           <h1 className="text-4xl text-center font-medium s:text-red-900 mb-12 font-instrument!">
             AI Assist To Apply

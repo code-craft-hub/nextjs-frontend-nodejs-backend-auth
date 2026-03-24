@@ -16,20 +16,15 @@ import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { smoothlyScrollToView } from "@/lib/utils/helpers";
 import { useState } from "react";
-import { IUser } from "@/shared/types";
 import { useUserQuery } from "@features/user";
 
-export const Header = ({
-  user,
-}: {
-  user?: Partial<IUser> | null;
-}) => {
+export const Header = () => {
   const router = useRouter();
   const pathname = usePathname();
   const [modal, setModal] = useState(false);
   const { data: currentUser } = useUserQuery();
 
-  const isAuthenticated = !!currentUser || !!user;
+  const isAuthenticated = !!currentUser;
 
   // Handle navigation: if not on homepage, go to homepage first then scroll to anchor
   const handleNavClick = (

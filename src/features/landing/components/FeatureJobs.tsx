@@ -11,12 +11,14 @@ import { cn } from "@/lib/utils";
 import { gmailApi } from "@/features/email-application/api/gmail.api";
 
 export const FeatureJobs = () => {
-  const { data: jobs } = useQuery(jobsQueries.featured());
+  const { data: jobs, isLoading } = useQuery(jobsQueries.featured());
 
   const router = useRouter();
-  if (!jobs || jobs.data?.length === 0) {
+
+  if (!isLoading && (!jobs || jobs.data?.length === 0)) {
     return null;
   }
+
   return (
     <section id="feature-jobs" className="pt-6 md:pt-20 pb-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -30,6 +32,26 @@ export const FeatureJobs = () => {
           </Button>
         </div>
 
+        {isLoading ? (
+          <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div
+                key={i}
+                className="bg-white rounded-lg border border-gray-100 p-4 space-y-4 animate-pulse"
+              >
+                <div className="h-4 bg-gray-200 rounded w-3/4" />
+                <div className="h-4 bg-gray-200 rounded w-1/4" />
+                <div className="flex items-center gap-4">
+                  <div className="size-12 bg-gray-200 rounded" />
+                  <div className="space-y-2 flex-1">
+                    <div className="h-3 bg-gray-200 rounded w-1/2" />
+                    <div className="h-3 bg-gray-200 rounded w-1/3" />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
         <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
           {jobs?.data?.map((job, index) => (
             <div
@@ -138,6 +160,7 @@ export const FeatureJobs = () => {
             </div>
           ))}
         </div>
+        )}
       </div>
     </section>
   );
