@@ -21,7 +21,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { CoverLetter, IUser } from "@/shared/types";
 import { EditIcon, Loader } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, formatEmail } from "@/lib/utils";
 import { useUpdateCoverLetterMutation } from "@/features/cover-letter/mutations/cover-letter.mutations";
 
 // Validation schema
@@ -70,7 +70,7 @@ const TailorCoverLetterDisplay = ({
       firstName: currentData?.firstName || user?.firstName || "",
       lastName: currentData?.lastName || user?.lastName || "",
       phoneNumber: currentData?.phoneNumber || user?.phoneNumber || "",
-      recruiterEmail: currentData?.recruiterEmail || recruiterEmail || "",
+      recruiterEmail: formatEmail(currentData?.recruiterEmail || recruiterEmail || ""),
       salutation: currentData?.salutation || "",
     },
   });
@@ -84,7 +84,7 @@ const TailorCoverLetterDisplay = ({
         firstName: currentData.firstName || user?.firstName || "",
         lastName: currentData.lastName || user?.lastName || "",
         phoneNumber: currentData.phoneNumber || user?.phoneNumber || "",
-        recruiterEmail: currentData?.recruiterEmail || recruiterEmail || "",
+        recruiterEmail: formatEmail(currentData?.recruiterEmail || recruiterEmail || ""),
         salutation: currentData.salutation || "Dear Hiring Manager,",
       });
     }
@@ -152,9 +152,9 @@ const TailorCoverLetterDisplay = ({
               <div className="mb-4">
                 <p className="text-sm text-gray-500 font-medium font-inter">
                   To:{" "}
-                  {currentData?.recruiterEmail ||
+                  {formatEmail(currentData?.recruiterEmail ||
                     recruiterEmail ||
-                    ""}
+                    "")}
                 </p>
                 <p className="text-md font-inter">
                   Subject: {currentData?.title || ""}

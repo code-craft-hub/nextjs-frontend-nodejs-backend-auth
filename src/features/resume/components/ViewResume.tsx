@@ -12,6 +12,7 @@ import { PreviewResumeProps } from "@/shared/types";
 import { useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { userQueries } from "@features/user";
+import { formatEmail } from "@/lib/utils";
 
 const StreamingSkeleton = ({ className = "" }: { className?: string }) => (
   <div className={`animate-pulse bg-gray-200 rounded ${className}`} />
@@ -31,7 +32,7 @@ export const ViewResume: React.FC<ViewResumeProps> = ({
 
   const firstName = coalesceString(data?.firstName, user?.firstName);
   const lastName = coalesceString(data?.lastName, user?.lastName);
-  const email = coalesceString(data?.email, user?.email);
+  const email = formatEmail(coalesceString(data?.email, user?.email));
   const phoneNumber = coalesceString(data?.phoneNumber, user?.phoneNumber);
   const address = coalesceString(data?.location, data?.address, user?.address);
   const portfolio = coalesceString(data?.portfolio);

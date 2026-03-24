@@ -19,7 +19,8 @@ const PreviewPage = async ({ searchParams }: any) => {
   const params = await searchParams;
   const coverLetterId = params["cover-letter-id"] ?? params["coverLetterId"];
   const resumeId = params["resume-id"] ?? params["resumeId"];
-  const recruiterEmail = params["recruiter-email"] ?? params["recruiterEmail"];
+  const rawRecruiterEmail = params["recruiter-email"] ?? params["recruiterEmail"] ?? "";
+  const recruiterEmail = decodeURIComponent(decodeURIComponent(rawRecruiterEmail));
   const jobDescription = params["job-description"] ?? params["jobDescription"];
   const autoApplyId = params["auto-apply-id"] ?? params["autoApplyId"];
   const masterCvId = params["master-cv-id"] ?? params["masterCvId"];

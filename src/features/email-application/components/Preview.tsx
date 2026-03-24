@@ -69,6 +69,12 @@ const Preview = ({
 
   const displayResumeData = normalizeResumeData(resumeData);
 
+  const destinationEmail = decodeURIComponent(
+    decodeURIComponent(coverLetterData?.recruiterEmail || recruiterEmail || ""),
+  );
+
+  console.log("Decoded recruiter email:", destinationEmail);
+
   const handleOpenModal = (value: boolean) => {
     setOpenModal(value);
   };
@@ -95,7 +101,7 @@ const Preview = ({
         autoApplyId,
         coverLetterId,
         resumeId,
-        recruiterEmail: coverLetterData?.recruiterEmail || recruiterEmail || "",
+        recruiterEmail: destinationEmail,
         jobDescription,
       });
       setActiveStep(4);
@@ -167,7 +173,7 @@ const Preview = ({
         </p>
 
         <div className="flex gap-2">
-         <DocTypeFeedbackModal docType="resume" resourceId={resumeId ?? ""} />
+          <DocTypeFeedbackModal docType="resume" resourceId={resumeId ?? ""} />
           <Button
             className="text-2xs"
             variant="destructive"
@@ -189,7 +195,7 @@ const Preview = ({
       <TailorCoverLetterDisplay
         user={user}
         data={coverLetterData}
-        recruiterEmail={coverLetterData?.recruiterEmail || recruiterEmail || ""}
+        recruiterEmail={destinationEmail}
       />
       {settings?.useMasterCv && viewerSrc ? (
         <div className="h-[80svh] overflow-hidden">
