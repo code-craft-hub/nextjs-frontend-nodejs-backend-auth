@@ -45,4 +45,5 @@ export interface JobBadgesProps {
 export interface JobCardDropdownProps {
   onAutoApply: () => void;
   onPreview: () => void;
+  job: JobType;
 }

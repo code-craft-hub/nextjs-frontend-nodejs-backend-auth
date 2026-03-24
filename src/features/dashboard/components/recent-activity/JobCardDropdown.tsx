@@ -15,27 +15,32 @@ import { JobCardDropdownProps } from "./types";
 export const JobCardDropdown = memo(function JobCardDropdown({
   onAutoApply,
   onPreview,
+  job,
 }: JobCardDropdownProps) {
   return (
     <div onClick={(e) => e.stopPropagation()}>
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild className="absolute top-4 right-4">
-        <Button variant="ghost">
-          <MoreHorizontal className="w-4 h-4" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56" align="start">
-        <DropdownMenuItem onClick={onAutoApply}>
-          <img src="/cube.svg" className="size-4" alt="" />
-          Auto apply
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={onPreview}>
-          <img src="/preview.svg" className="size-4" alt="" />
-          Preview
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild className="absolute top-4 right-4">
+          <Button variant="ghost">
+            <MoreHorizontal className="w-4 h-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="w-56" align="start">
+          {job?.emailApply && (
+            <>
+              <DropdownMenuItem onClick={onAutoApply}>
+                <img src="/cube.svg" className="size-4" alt="" />
+                Auto apply
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+            </>
+          )}
+          <DropdownMenuItem onClick={onPreview}>
+            <img src="/preview.svg" className="size-4" alt="" />
+            Preview
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   );
 });

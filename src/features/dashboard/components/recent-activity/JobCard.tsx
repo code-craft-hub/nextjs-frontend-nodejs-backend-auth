@@ -47,6 +47,7 @@ export const JobCard = memo(function JobCard({
         <JobCardDropdown
           onAutoApply={handleAutoApply}
           onPreview={handlePreview}
+          job={job}
         />
         <p className="font-poppins text-cverai-brown text-xs">
           <span className="max-w-sm overflow-hidden capitalize">
