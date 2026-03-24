@@ -1,25 +1,25 @@
 import { cn } from "@/lib/utils";
-import { JSX, useEffect, useState } from "react";
+import { JSX, useState } from "react";
 import AuthorizeGoogle from "@/features/email-application/hooks/AuthorizeGoogle";
 import { userQueries } from "@features/user";
 import { aiSettingsQueries } from "@/features/ai-settings/queries/ai-settings.queries";
 import { useQuery } from "@tanstack/react-query";
 import { useUpdateAISettingsMutation } from "@/features/ai-settings/mutations/ai-settings.mutations";
 import { Switch, Label } from "./Switch";
-import { AutoSendConfigPanel, AutoSendConfig } from "./AutoSendConfigPanel";
-import { autoApplyQueries, useTriggerAutoApplyMutation } from "@/features/auto-apply";
+// import { AutoSendConfigPanel, AutoSendConfig } from "./AutoSendConfigPanel";
+// import { autoApplyQueries, useTriggerAutoApplyMutation } from "@/features/auto-apply";
 
 // ─── Tier daily application caps (mirrors server TIER_DAILY_LIMITS) ───────────
-const TIER_DAILY_LIMITS: Record<string, number> = {
-  free: 0,
-  basic: 1,
-  starter: 3,
-  pro: 5,
-  professional: 5,
-  enterprise: 10,
-  custom: 10,
-};
-const DEFAULT_TIER_LIMIT = 1;
+// const TIER_DAILY_LIMITS: Record<string, number> = {
+//   free: 0,
+//   basic: 1,
+//   starter: 3,
+//   pro: 5,
+//   professional: 5,
+//   enterprise: 10,
+//   custom: 10,
+// };
+// const DEFAULT_TIER_LIMIT = 1;
 
 interface SettingOption {
   label: string;
@@ -54,43 +54,43 @@ export const AiApplyPreferences: React.FC = () => {
   const updateSettings = useUpdateAISettingsMutation();
   const { data: user } = useQuery(userQueries.detail());
   const { data: settings } = useQuery(aiSettingsQueries.detail());
-  const { data: quotaData } = useQuery(autoApplyQueries.quota());
-  const triggerAutoApply = useTriggerAutoApplyMutation();
-  const [triggerMessage, setTriggerMessage] = useState<string | null>(null);
+  // const { data: quotaData } = useQuery(autoApplyQueries.quota());
+  // const triggerAutoApply = useTriggerAutoApplyMutation();
+  // const [triggerMessage, setTriggerMessage] = useState<string | null>(null);
 
-  const quota = quotaData?.data;
+  // const quota = quotaData?.data;
 
-  const accountTier = user?.accountTier ?? "basic";
-  const tierCap = TIER_DAILY_LIMITS[accountTier] ?? DEFAULT_TIER_LIMIT;
+  // const accountTier = user?.accountTier ?? "basic";
+  // const tierCap = TIER_DAILY_LIMITS[accountTier] ?? DEFAULT_TIER_LIMIT;
 
   const [oauthState, setOauthState] = useState(false);
 
   // ── Auto-send configuration state ────────────────────────────────────────
-  const [autoSendConfig, setAutoSendConfig] = useState<AutoSendConfig>(() => ({
-    maxApplicationsPerDay: Math.min(settings?.maxApplicationsPerDay ?? tierCap, tierCap),
-    minMatchScore: settings?.minMatchScore ?? 70,
-    preferredJobTypes: (settings?.preferredJobTypes as string[]) ?? [],
-    excludedCompanies: (settings?.excludedCompanies as string[]) ?? [],
-  }));
+  // const [autoSendConfig, setAutoSendConfig] = useState<AutoSendConfig>(() => ({
+  //   maxApplicationsPerDay: Math.min(settings?.maxApplicationsPerDay ?? tierCap, tierCap),
+  //   minMatchScore: settings?.minMatchScore ?? 70,
+  //   preferredJobTypes: (settings?.preferredJobTypes as string[]) ?? [],
+  //   excludedCompanies: (settings?.excludedCompanies as string[]) ?? [],
+  // }));
 
   // Sync when settings load from the server
-  useEffect(() => {
-    if (!settings) return;
-    setAutoSendConfig({
-      maxApplicationsPerDay: Math.min(settings.maxApplicationsPerDay ?? tierCap, tierCap),
-      minMatchScore: settings.minMatchScore ?? 70,
-      preferredJobTypes: (settings.preferredJobTypes as string[]) ?? [],
-      excludedCompanies: (settings.excludedCompanies as string[]) ?? [],
-    });
-  }, [settings]);
+  // useEffect(() => {
+  //   if (!settings) return;
+  //   setAutoSendConfig({
+  //     maxApplicationsPerDay: Math.min(settings.maxApplicationsPerDay ?? tierCap, tierCap),
+  //     minMatchScore: settings.minMatchScore ?? 70,
+  //     preferredJobTypes: (settings.preferredJobTypes as string[]) ?? [],
+  //     excludedCompanies: (settings.excludedCompanies as string[]) ?? [],
+  //   });
+  // }, [settings]);
 
-  const saveAutoSendConfig = async (patch: Partial<AutoSendConfig>) => {
-    try {
-      await updateSettings.mutateAsync(patch);
-    } catch (error) {
-      console.error("Error saving auto-send config:", error);
-    }
-  };
+  // const saveAutoSendConfig = async (patch: Partial<AutoSendConfig>) => {
+  //   try {
+  //     await updateSettings.mutateAsync(patch);
+  //   } catch (error) {
+  //     console.error("Error saving auto-send config:", error);
+  //   }
+  // };
 
   const checkAuth = async (value: boolean): Promise<void> => {
     setOauthState(value);
@@ -218,15 +218,15 @@ export const AiApplyPreferences: React.FC = () => {
     }
   };
 
-  const handleTriggerNow = async () => {
-    setTriggerMessage(null);
-    try {
-      const result = await triggerAutoApply.mutateAsync();
-      setTriggerMessage(result.data.message);
-    } catch {
-      setTriggerMessage("Failed to trigger auto-apply. Please try again.");
-    }
-  };
+  // const handleTriggerNow = async () => {
+  //   setTriggerMessage(null);
+  //   try {
+  //     const result = await triggerAutoApply.mutateAsync();
+  //     setTriggerMessage(result.data.message);
+  //   } catch {
+  //     setTriggerMessage("Failed to trigger auto-apply. Please try again.");
+  //   }
+  // };
 
   // Handle button clicks
   const handleButtonClick = (_action: string): void => {};
@@ -318,7 +318,7 @@ export const AiApplyPreferences: React.FC = () => {
 
               {setting.section === "Auto Apply Configuration" && switchStates.autoApplyEnabled && (
                 <>
-                  <AutoSendConfigPanel
+                  {/* <AutoSendConfigPanel
                     accountTier={accountTier}
                     tierCap={tierCap}
                     config={autoSendConfig}
@@ -326,10 +326,10 @@ export const AiApplyPreferences: React.FC = () => {
                       setAutoSendConfig((prev) => ({ ...prev, ...patch }))
                     }
                     onSave={saveAutoSendConfig}
-                  />
+                  /> */}
 
                   {/* ── Quota status & manual trigger ─────────────────── */}
-                  <div className="mt-4 pt-4 border-t flex items-center justify-between gap-4">
+                  {/* <div className="mt-4 pt-4 border-t flex items-center justify-between gap-4">
                     <div>
                       <p className="font-medium text-sm">Today's usage</p>
                       {quota ? (
@@ -367,7 +367,7 @@ export const AiApplyPreferences: React.FC = () => {
                     >
                       {triggerAutoApply.isPending ? "Running…" : "Run Now"}
                     </button>
-                  </div>
+                  </div> */}
                 </>
               )}
             </div>
