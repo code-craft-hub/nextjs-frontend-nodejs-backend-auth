@@ -10,16 +10,14 @@ import { userQueries } from "@features/user";
 import { sendGTMEvent } from "@next/third-parties/google";
 import { useFireworksConfetti } from "@/components/ui/confetti";
 import { Button } from "@/components/ui/button";
-import { CompletedPaymentModal } from "@/components/shared/CompletedPaymentModal";
 import { useDeleteAccountMutation } from "@features/auth";
-
 
 export const AccountClient = ({
   tab,
   event,
   reference,
   phoneNumber,
-  referrer
+  referrer,
 }: {
   tab: string;
   event: string;
@@ -29,11 +27,8 @@ export const AccountClient = ({
 }) => {
   const [currentTab, setCurrentTab] = useState(tab || "account");
   const { data: user } = useQuery(userQueries.detail());
-  const [open, setOpen] = useState(false);
 
   const { start: startConfetti } = useFireworksConfetti();
-
- 
 
   const isDevMode = process.env.NODE_ENV === "development";
   const deleteAccount = useDeleteAccountMutation();
@@ -50,7 +45,6 @@ export const AccountClient = ({
   useEffect(() => {
     if (event === "subscription_success") {
       startConfetti();
-      setOpen(true);
     }
   }, [event]);
 
@@ -99,8 +93,6 @@ export const AccountClient = ({
           Delete Account
         </Button>
       )}
-
-      <CompletedPaymentModal open={open} onOpenChange={setOpen} />
     </div>
   );
 };
