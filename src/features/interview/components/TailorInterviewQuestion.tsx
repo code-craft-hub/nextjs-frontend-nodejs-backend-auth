@@ -7,7 +7,6 @@ import { toast } from "sonner";
 import { capitalize, isEmpty } from "lodash";
 import { QAItem } from "@/shared/types";
 import { extractCompleteJsonObjects } from "@/lib/utils/helpers";
-import { formatPlainText } from "@/lib/utils/format-plain-text";
 import TailorInterviewQuestionEmptyState from "./TailorInterviewQuestionEmptyState";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { interviewQuestionQueries } from "@/features/interview/queries/interview.queries";
@@ -16,6 +15,7 @@ import { sendGTMEvent } from "@next/third-parties/google";
 import { API_URL } from "@/shared/api/client";
 import { useFireworksConfetti } from "@/components/ui/confetti";
 import { DocTypeFeedbackModal } from "@/shared/components/doc-type-feedback-modal";
+import InterviewQuestionsDisplay from "./InterviewQuestionsDisplay";
 
 export const TailorInterviewQuestion = ({
   jobDescription,
@@ -33,6 +33,8 @@ export const TailorInterviewQuestion = ({
   const { data, status, isFetched } = useQuery(
     interviewQuestionQueries.detail(interviewId ?? ""),
   );
+
+  console.log(data);
   const [qaData, setQaData] = useState<QAItem[]>([]);
   const [documentTitle, setDocumentTitle] = useState<string>(data?.title || "");
 
@@ -215,6 +217,9 @@ export const TailorInterviewQuestion = ({
   const allEmpty = generatedEmpty && dataEmpty;
 
   const content = data?.fullContent || data?.parsedContent || [];
+
+  const isJsonText = data?.content.includes("qa");
+
   return (
     <div className="min-h-screen h-full p-8">
       <div className="flex flex-wrap w-full gap-3 items-center p-4 bg-white justify-between">
@@ -222,15 +227,21 @@ export const TailorInterviewQuestion = ({
           Job Interview Questions & Answers
         </p>
         <div className="flex gap-4">
-          <DocTypeFeedbackModal docType="interview-question" resourceId={interviewId ?? ""} />
+          <DocTypeFeedbackModal
+            docType="interview-question"
+            resourceId={interviewId ?? ""}
+          />
         </div>
       </div>
       <div className="max-w-5xl mx-auto">
-        <div className="text-center mb-12 mt-4">
-          <p className="text-2xl font-bold text-slate-800 mb-3">
-            {documentTitle ? `Title: ${capitalize(documentTitle)}` : ""}
-          </p>
-        </div>
+        {isJsonText && (
+          <div className="text-center mb-12 mt-4">
+            <p className="text-2xl font-bold text-slate-800 mb-3">
+              {documentTitle ? `Title: ${capitalize(documentTitle)}` : ""}
+            </p>
+          </div>
+        )}
+
         {!allEmpty ? (
           <div className="space-y-6">
             {!generatedEmpty && (
@@ -242,7 +253,12 @@ export const TailorInterviewQuestion = ({
               </div>
             )}
 
-            {data?.content && formatPlainText(data.content)}
+            {!isJsonText && (
+              <InterviewQuestionsDisplay
+                rawText={data?.content ?? ""}
+                defaultExpandAll={true}
+              />
+            )}
 
             {generatedEmpty &&
               content?.map((item, index) => (
