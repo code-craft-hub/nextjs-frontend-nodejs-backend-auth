@@ -84,7 +84,7 @@ export interface IUser {
   photoURL?: string;
   providerId?: string;
   provider?: string;
-
+  hasDefaultResume?: boolean;
   // ─── Profile ───────────────────────────────────────────────
   firstName?: string;
   lastName?: string;
