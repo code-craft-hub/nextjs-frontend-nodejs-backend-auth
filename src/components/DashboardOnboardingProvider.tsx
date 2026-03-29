@@ -14,15 +14,17 @@ import { useAuthorizeGmail } from "@/features/email-application/hooks/useAuthori
 import { isSubscriptionActive } from "@/lib/utils/helpers";
 import { useQuery } from "@tanstack/react-query";
 import { userQueries } from "@/features/user";
+import { X } from "lucide-react";
 
 // ── Step 1 tooltip: navigate to settings ──────────────────────────────────
 const NavToSettingsTooltip: React.FC<
-  TooltipRenderProps & { onGoToSettings: () => void }
-> = ({ tooltipProps, step, onGoToSettings }) => (
+  TooltipRenderProps & { onGoToSettings: () => void; onClose: () => void }
+> = ({ tooltipProps, step, onGoToSettings, onClose }) => (
   <div
     {...tooltipProps}
     className="bg-white rounded-2xl shadow-xl p-5 w-72 font-inter"
   >
+    <X className="absolute top-3 right-4 cursor-pointer" onClick={onClose} />
     <div className="flex items-center gap-2 mb-3">
       <span className="text-2xl">📧</span>
       <h3 className="font-semibold text-gray-900 text-base">
@@ -47,6 +49,7 @@ const ToggleTooltip: React.FC<
     {...tooltipProps}
     className="bg-white rounded-2xl shadow-xl p-5 w-72 font-inter"
   >
+    <X className="absolute top-3 right-6 cursor-pointer" onClick={onClose} />
     <div className="flex items-center gap-2 mb-3">
       <span className="text-2xl">🔗</span>
       <h3 className="font-semibold text-gray-900 text-base">
@@ -170,7 +173,7 @@ export const DashboardOnboardingProvider: React.FC<{
   const tooltipComponent = (props: TooltipRenderProps) => {
     if (stepIndex === 0) {
       return (
-        <NavToSettingsTooltip {...props} onGoToSettings={handleGoToSettings} />
+        <NavToSettingsTooltip {...props} onGoToSettings={handleGoToSettings} onClose={handleClose}/>
       );
     }
     return (
