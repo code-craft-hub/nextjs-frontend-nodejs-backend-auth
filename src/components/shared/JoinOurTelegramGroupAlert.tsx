@@ -11,7 +11,7 @@ const JoinOurTelegramGroupAlert = () => {
           className="flex w-full items-center justify-center gap-4"
         >
           <Alert className="flex gap-4 w-full! items-center justify-center">
-            <div className="size-8 ">
+            <div className="size-8 shrink-0">
               <img src="/telegram.svg" alt="" />
             </div>
             <AlertTitle>

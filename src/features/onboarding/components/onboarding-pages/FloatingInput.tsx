@@ -32,7 +32,7 @@ export function FloatingLabelInput({
           className={`
               sm:h-12 max-sm:text-2xs px-3 pr-${showPasswordToggle ? "12" : "3"}
               transition-colors duration-200 font-poppins
-              border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-[4px]
+              border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-lg
               ${className}
             `}
           {...props}

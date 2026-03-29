@@ -200,7 +200,7 @@ export const AIApplyInput = memo(
                       <div className="relative w-full">
                         {!field.value && (
                           <span
-                            className="pointer-events-none absolute left-4 top-4 text-xs font-medium text-muted-foreground transition-opacity duration-400 select-none"
+                            className="pointer-events-none absolute left-4 top-4 max-sm:text-2xs text-xs font-medium text-muted-foreground transition-opacity duration-400 select-none"
                             style={{ opacity: placeholderVisible ? 1 : 0 }}
                           >
                             {PLACEHOLDERS[placeholderIndex]}

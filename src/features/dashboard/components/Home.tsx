@@ -15,6 +15,7 @@ import { sendGTMEvent } from "@next/third-parties/google";
 import { useDashboardPrefetch } from "@/shared/react-query/hooks/useDashboardPrefetch";
 import InsufficientCreditsModal from "@/components/shared/InsufficientCreditsModal";
 import AuthorizeGoogle from "@/features/email-application/hooks/AuthorizeGoogle";
+import { NoResumeAlertDialog } from "./no-resume-alert-dialog";
 
 export const HomeClient = memo(
   ({ tab, jobDescription }: { tab: DashboardTab; jobDescription: string }) => {
@@ -45,7 +46,7 @@ export const HomeClient = memo(
     return (
       <>
         <TopGradient />
-        <div className="container">
+        <div className="container relative">
           <div className="w-full mt-4"></div>
           <Tabs
             defaultValue={tab ?? "ai-apply"}
@@ -89,6 +90,7 @@ export const HomeClient = memo(
         </div>
         <InsufficientCreditsModal />
         <AuthorizeGoogle hidden={true} />
+        <NoResumeAlertDialog />
       </>
     );
   },
