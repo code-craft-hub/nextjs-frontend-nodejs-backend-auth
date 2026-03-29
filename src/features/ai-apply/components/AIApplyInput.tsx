@@ -7,7 +7,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { memo, useCallback, useState } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { useForm } from "react-hook-form";
@@ -53,6 +53,34 @@ export const AIApplyInput = memo(
 
     const router = useRouter();
     const isSelectedFile = !isEmpty(uploadedFiles);
+
+    const PLACEHOLDERS = [
+      "Create the email application for a Product Manager role and send it to example@email.com",
+      "Tailor my CV for a Marketing Assistant role and send the application email to hr@company.com",
+      "Check this screenshot for a Virtual Assistant role, the email is in there, and apply",
+      "Review this Software Engineer role, tailor my CV, and send the application email to hr@company.com",
+    ];
+    const [placeholderIndex, setPlaceholderIndex] = useState(0);
+    const [placeholderVisible, setPlaceholderVisible] = useState(true);
+    const placeholderTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    useEffect(() => {
+      const cycle = () => {
+        // fade out
+        setPlaceholderVisible(false);
+        placeholderTimerRef.current = setTimeout(() => {
+          setPlaceholderIndex((i) => (i + 1) % PLACEHOLDERS.length);
+          // fade in
+          setPlaceholderVisible(true);
+        }, 400);
+      };
+      const interval = setInterval(cycle, 5000);
+      return () => {
+        clearInterval(interval);
+        if (placeholderTimerRef.current) clearTimeout(placeholderTimerRef.current);
+      };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const form = useForm<z.infer<typeof FORM_SCHEMA>>({
       defaultValues: {
@@ -151,7 +179,7 @@ export const AIApplyInput = memo(
       <div>
         <div
           className={cn(
-            "relative shadow-blue-200 border-blue-500 rounded-2xl border-r shadow-xl  flex flex-col justify-between",
+            "relative shadow-blue-200 border-blue-100 rounded-2xl border shadow-xl  flex flex-col justify-between",
             isSelectedFile ? "" : "h-38",
           )}
         >
@@ -169,14 +197,23 @@ export const AIApplyInput = memo(
                 render={({ field }) => (
                   <FormItem className="w-full">
                     <FormControl>
-                      <textarea
-                        placeholder="Let's get started"
-                        className={cn(
-                          "w-full outline-none focus:outline-none focus:border-none p-2 resize-none pl-4 pt-2 border-none placeholder:font-medium focus-visible:border-none  text-xs",
-                          isSelectedFile ? "" : "h-26",
+                      <div className="relative w-full">
+                        {!field.value && (
+                          <span
+                            className="pointer-events-none absolute left-4 top-4 text-xs font-medium text-muted-foreground transition-opacity duration-400 select-none"
+                            style={{ opacity: placeholderVisible ? 1 : 0 }}
+                          >
+                            {PLACEHOLDERS[placeholderIndex]}
+                          </span>
                         )}
-                        {...field}
-                      />
+                        <textarea
+                          className={cn(
+                            "w-full outline-none focus:outline-none focus:border-none p-2 resize-none pl-4 pt-2 border-none focus-visible:border-none text-xs bg-transparent",
+                            isSelectedFile ? "" : "h-26",
+                          )}
+                          {...field}
+                        />
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>

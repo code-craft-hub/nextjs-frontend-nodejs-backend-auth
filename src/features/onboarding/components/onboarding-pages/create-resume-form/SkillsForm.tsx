@@ -55,7 +55,7 @@ function SkillTagInput({
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
+    if (e.key === "Enter" || e.key === "," || e.key === " ") {
       e.preventDefault();
       addSkill();
     }

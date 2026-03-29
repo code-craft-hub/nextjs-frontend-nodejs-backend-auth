@@ -6,7 +6,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { memo, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { useForm } from "react-hook-form";
@@ -56,6 +56,32 @@ export const AIJobCustomizationInput = memo(() => {
 
   const isSelectedFile = !isEmpty(uploadedFiles);
 
+  const PLACEHOLDERS = [
+    "Create the email application for a Product Manager role and send it to example@email.com",
+    "Tailor my CV for a Marketing Assistant role and send the application email to hr@company.com",
+    "Check this screenshot for a Virtual Assistant role, the email is in there, and apply",
+    "Review this Software Engineer role, tailor my CV, and send the application email to hr@company.com",
+  ];
+  const [placeholderIndex, setPlaceholderIndex] = useState(0);
+  const [placeholderVisible, setPlaceholderVisible] = useState(true);
+  const placeholderTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    const cycle = () => {
+      setPlaceholderVisible(false);
+      placeholderTimerRef.current = setTimeout(() => {
+        setPlaceholderIndex((i) => (i + 1) % PLACEHOLDERS.length);
+        setPlaceholderVisible(true);
+      }, 400);
+    };
+    const interval = setInterval(cycle, 5000);
+    return () => {
+      clearInterval(interval);
+      if (placeholderTimerRef.current) clearTimeout(placeholderTimerRef.current);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const form = useForm<z.infer<typeof FORM_SCHEMA>>({
     // resolver: zodResolver(FORM_SCHEMA),
     defaultValues: {
@@ -74,7 +100,7 @@ export const AIJobCustomizationInput = memo(() => {
     router.push(
       `/dashboard/${docsInput}?jobDescription=${jobDescription + extractedText}`,
     );
-    
+
     // router.push(
     //   `/dashboard/${docsInput}/${uuidv4()}?profile=${userProfile}&jobDescription=${
     //     jobDescription + extractedText
@@ -121,9 +147,8 @@ export const AIJobCustomizationInput = memo(() => {
     <div>
       <div className="relative! h-36">
         <div
-          // className="relative shadow-blue-200 border-blue-500 rounded-2xl border-r shadow-xl h-38"
           className={cn(
-            "relative shadow-blue-200 border-blue-500 rounded-2xl border-r shadow-xl  flex flex-col justify-between",
+            "relative shadow-blue-200 border-blue-100 rounded-2xl border shadow-xl  flex flex-col justify-between",
             isSelectedFile ? "" : "h-38",
           )}
         >
@@ -140,15 +165,23 @@ export const AIJobCustomizationInput = memo(() => {
                 render={({ field }) => (
                   <FormItem className="w-full">
                     <FormControl>
-                      <textarea
-                        placeholder="Let's get started"
-                        // className="w-full outline-none focus:outline-none text-xs focus:border-none p-2 resize-none pl-4 pt-2 border-none placeholder:font-medium focus-visible:border-none h-26"
-                        className={cn(
-                          "w-full outline-none focus:outline-none focus:border-none p-2 resize-none pl-4 pt-2 border-none placeholder:font-medium focus-visible:border-none  text-xs",
-                          isSelectedFile ? "" : "h-26",
+                      <div className="relative w-full">
+                        {!field.value && (
+                          <span
+                            className="pointer-events-none absolute left-4 top-4 text-xs font-medium text-muted-foreground transition-opacity duration-400 select-none"
+                            style={{ opacity: placeholderVisible ? 1 : 0 }}
+                          >
+                            {PLACEHOLDERS[placeholderIndex]}
+                          </span>
                         )}
-                        {...field}
-                      />
+                        <textarea
+                          className={cn(
+                            "w-full outline-none focus:outline-none focus:border-none p-2 resize-none pl-4 pt-2 border-none focus-visible:border-none text-xs bg-transparent",
+                            isSelectedFile ? "" : "h-26",
+                          )}
+                          {...field}
+                        />
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -215,20 +248,6 @@ export const AIJobCustomizationInput = memo(() => {
                   </div>
                 </div>
                 <div className="flex gap-2 px-3">
-                  {/* <div className="hover:cursor-pointer ">
-                    <SelectProfile
-                      options={profile ?? []} // TODO: fix this any type
-                      value={userProfile}
-                      onValueChange={(value) => {
-                        setUserProfile(value);
-                      }}
-                      placeholder="Tailor Resume"
-                      triggerClassName={
-                        " border-2 border-primary/70 rounded-xl text-primary hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 [&_svg]:!text-primary  text-2xs"
-                      }
-                      contentClassName="text-xs"
-                    />
-                  </div> */}
                   <button
                     type="submit"
                     className="rounded-full border-blue-500 border-2 p-1 hover:cursor-pointer "

@@ -46,7 +46,7 @@ export const ProfileManagement: React.FC = () => {
         </p>
         <div className="mt-2">
           <h2 className="font-medium text-gray-900">
-            {/* Active Profiles ({uploadedResumes?.length ?? 0}) */}
+            Active Profiles ({uploadedResumes?.length ?? 0})
           </h2>
         </div>
       </div>

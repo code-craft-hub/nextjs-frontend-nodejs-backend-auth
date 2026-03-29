@@ -6,7 +6,10 @@ import type {
   CertificationEntry,
 } from "@/shared/types/resume.types";
 import { api } from "@/shared/api/client";
-import type { PaginatedResponse, PaginationParams } from "@/shared/types/lib.types";
+import type {
+  PaginatedResponse,
+  PaginationParams,
+} from "@/shared/types/lib.types";
 
 // ─── Types ────────────────────────────────────────────────────────
 
@@ -111,6 +114,9 @@ export const resumeApi = {
     api.patch<ApiResponse<ResumeAggregate>>(`${RESUME_BASE}/${id}`, data, {
       token,
     }),
+
+  fetchResumePdf: (resumeId: string, token?: string) =>
+    api.get<Blob>(`${RESUME_BASE}/${resumeId}/download`, { token }),
 
   deleteResume: (id: string, token?: string) =>
     api.delete<void>(`${RESUME_BASE}/${id}`, { token }),
