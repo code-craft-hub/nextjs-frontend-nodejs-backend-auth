@@ -7,7 +7,8 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { memo, useCallback, useEffect, useRef, useState } from "react";
+import Typewriter from "typewriter-effect";
+import { memo, useCallback, useState } from "react";
 import { toast } from "sonner";
 
 import { useForm } from "react-hook-form";
@@ -60,27 +61,6 @@ export const AIApplyInput = memo(
       "Check this screenshot for a Virtual Assistant role, the email is in there, and apply",
       "Review this Software Engineer role, tailor my CV, and send the application email to hr@company.com",
     ];
-    const [placeholderIndex, setPlaceholderIndex] = useState(0);
-    const [placeholderVisible, setPlaceholderVisible] = useState(true);
-    const placeholderTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-    useEffect(() => {
-      const cycle = () => {
-        // fade out
-        setPlaceholderVisible(false);
-        placeholderTimerRef.current = setTimeout(() => {
-          setPlaceholderIndex((i) => (i + 1) % PLACEHOLDERS.length);
-          // fade in
-          setPlaceholderVisible(true);
-        }, 400);
-      };
-      const interval = setInterval(cycle, 5000);
-      return () => {
-        clearInterval(interval);
-        if (placeholderTimerRef.current) clearTimeout(placeholderTimerRef.current);
-      };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
 
     const form = useForm<z.infer<typeof FORM_SCHEMA>>({
       defaultValues: {
@@ -199,11 +179,16 @@ export const AIApplyInput = memo(
                     <FormControl>
                       <div className="relative w-full">
                         {!field.value && (
-                          <span
-                            className="pointer-events-none absolute left-4 top-4 max-sm:text-2xs text-xs font-medium text-muted-foreground transition-opacity duration-400 select-none"
-                            style={{ opacity: placeholderVisible ? 1 : 0 }}
-                          >
-                            {PLACEHOLDERS[placeholderIndex]}
+                          <span className="pointer-events-none absolute left-4 top-4 max-sm:text-2xs text-xs font-medium text-muted-foreground select-none">
+                            <Typewriter
+                              options={{
+                                strings: PLACEHOLDERS,
+                                autoStart: true,
+                                loop: true,
+                                delay: 40,
+                                deleteSpeed: 20,
+                              }}
+                            />
                           </span>
                         )}
                         <textarea
