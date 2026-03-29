@@ -6,6 +6,7 @@ import { createServerQueryClient } from "@/shared/query/prefetch";
 import { getCookiesToken } from "@/lib/auth.utils";
 import { jobsQueries } from "@/features/jobs/queries/jobs.queries";
 import { autoApplyQueries } from "@/features/auto-apply/queries/auto-apply.queries";
+import { userQueries } from "@/features/user";
 
 export const metadata: Metadata = {
   title: "Cver AI - Never Miss a Job Again",
@@ -25,7 +26,8 @@ export default async function HomePage({
   const queryClient = createServerQueryClient();
   await queryClient.prefetchQuery(jobsQueries.autoApply(token));
   await queryClient.prefetchQuery(autoApplyQueries.all(token));
-
+  await queryClient.fetchQuery(userQueries.detail(token));
+  // console.log("USER", user);
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <HomeClient tab={tab} jobDescription={jobDescription} />

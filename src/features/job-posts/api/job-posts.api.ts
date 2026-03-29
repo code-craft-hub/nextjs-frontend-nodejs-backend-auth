@@ -10,7 +10,7 @@ export const jobPostsApi = {
   search: (params?: any, token?: string) =>
     api.get<PaginatedResponse<JobPost>>("/job-posts/search", { params, token }),
 
-  query: (params?: any, token?: string) =>
+  query: (params?: { query?: string; cursor?: string; location?: string; limit?: number }, token?: string) =>
     api.get<InfiniteJobsResponse>("/job-posts/query", { params, token }),
 
   fullTextSearch: (q: string, page = 1, limit = 20, token?: string) =>

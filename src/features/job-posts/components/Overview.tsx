@@ -13,10 +13,14 @@ import LeftMenu from "./LeftMenu";
 
 export default function Overview() {
   const [query, setQuery] = useState<string | undefined>(undefined);
+  const [location, setLocation] = useState<string | undefined>(undefined);
   const { data: user } = useQuery(userQueries.detail());
   const handleSearch = useCallback((value: string) => {
     const trimmed = value.trim();
     setQuery(trimmed.length ? trimmed : undefined);
+  }, []);
+  const handleLocationChange = useCallback((value: string) => {
+    setLocation(value.length ? value : undefined);
   }, []);
 
   useEffect(() => {
@@ -37,8 +41,8 @@ export default function Overview() {
       </div>
       <div className="grid grid-cols-1 gap-4 pb-16">
         <ReportCard matchPercentage={0} />
-        <JobSearchForm onSubmit={handleSearch} />
-        <JobList query={query} />
+        <JobSearchForm onSubmit={handleSearch} onLocationChange={handleLocationChange} />
+        <JobList query={query} location={location} />
       </div>
     </div>
   );

@@ -149,7 +149,12 @@ export const ProfileCard: React.FC<{
                       <Eye className="w-4 h-4" />
                     )}
                   </Button>
-                  <ChevronRight className="size-6 text-blue-500 max-sm:hidden" />
+                  <ChevronRight
+                    onClick={() => {
+                      handleEditClick(true);
+                    }}
+                    className="size-6 text-blue-500 max-sm:hidden"
+                  />
                 </div>
               </div>
             </div>

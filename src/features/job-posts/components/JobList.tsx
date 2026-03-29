@@ -6,14 +6,14 @@ import { useInfiniteJobs } from "../queries/job-posts.query";
 import { Loader } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-export function JobList({ query }: { query?: string }) {
+export function JobList({ query, location }: { query?: string; location?: string }) {
   const {
     data,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
     isPlaceholderData,
-  } = useInfiniteJobs(query);
+  } = useInfiniteJobs(query, location);
 
   const handleIntersect = useCallback(() => {
     if (!isFetchingNextPage && hasNextPage) {
