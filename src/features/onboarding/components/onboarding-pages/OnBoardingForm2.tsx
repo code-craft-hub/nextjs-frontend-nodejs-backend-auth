@@ -13,12 +13,30 @@ import { userQueries } from "@features/user";
 import { useResumeUploadWithProgress } from "@/features/resume/hooks/useResumeUploadWithProgress";
 import { queryKeys } from "@/shared/query/keys";
 import CreateUserResume from "./create-resume-form/CreateUserResume";
-import { Bot, Edit3 } from "lucide-react";
+import { Edit3, Loader2, Mic } from "lucide-react";
 import { AutoGenerateTitleDialog } from "./get-title-dialog";
+import { SpeechToTextInput } from "./speech-to-text";
+import { resumeApi } from "@/features/resume/api/resume.api";
 
 export const OnBoardingForm2 = ({ onNext, children }: OnboardingFormProps) => {
   const queryClient = useQueryClient();
   const [editResume, setEditResume] = useState(false);
+  const [speechText, setSpeechText] = useState("");
+  const [isSpeechSubmitting, setIsSpeechSubmitting] = useState(false);
+
+  const handleSpeechSubmit = async () => {
+    if (!speechText.trim()) return;
+    setIsSpeechSubmitting(true);
+    try {
+      await resumeApi.autoNewResume(speechText.trim());
+      toast.success("Your resume is being generated!");
+      onNext();
+    } catch {
+      toast.error("Failed to generate resume. Please try again.");
+    } finally {
+      setIsSpeechSubmitting(false);
+    }
+  };
   const handleEditClick = (value: boolean) => {
     setEditResume(value);
   };
@@ -125,19 +143,35 @@ export const OnBoardingForm2 = ({ onNext, children }: OnboardingFormProps) => {
                   </div>
                 </label>
               </div>
-              <AutoGenerateTitleDialog onNext={onNext}>
-                <div className=" border bg-blue-50 border-blue-100 w-full p-2 sm:p-4 rounded-md">
-                  <label
-                    htmlFor="create-resume-checkbox"
-                    className="flex w-full justify-between items-center "
-                  >
-                    <div className="flex gap-2 items-center">
-                      <Bot className="size" />
-                      <p className="max-sm:text-xs">Let AI create for me</p>
-                    </div>
-                  </label>
-                </div>
-              </AutoGenerateTitleDialog>
+             
+             <div className="border bg-blue-50 border-blue-100 w-full p-2 sm:p-4 rounded-md flex flex-col gap-3">
+               <div className="flex gap-2 items-center text-blue-700">
+                 <Mic className="size-4" />
+                 <p className="max-sm:text-xs font-medium">Dictate your CV</p>
+               </div>
+               <SpeechToTextInput
+                 value={speechText}
+                 onChange={setSpeechText}
+                 placeholder="Start speaking to describe your experience..."
+               />
+               {speechText.trim() && (
+                 <button
+                   type="button"
+                   onClick={handleSpeechSubmit}
+                   disabled={isSpeechSubmitting}
+                   className="flex items-center justify-center gap-2 w-full py-2 px-4 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                 >
+                   {isSpeechSubmitting ? (
+                     <>
+                       <Loader2 className="size-4 animate-spin" />
+                       Generating…
+                     </>
+                   ) : (
+                     "Generate My Resume"
+                   )}
+                 </button>
+               )}
+             </div>
             </div>
             <div className="space-y-6 w-full">
               {(error || uploadError) && (

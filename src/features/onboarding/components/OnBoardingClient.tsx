@@ -24,16 +24,15 @@ export default function OnboardingClient() {
 
   const [currentStep, setCurrentStep] = useState(0);
   const steps = [
+    OnBoardingForm2,
     OnBoardingForm0,
     OnBoardingForm1,
-    OnBoardingForm2,
     OnBoardingForm3,
     OnBoardingForm4,
     OnBoardingForm5,
     OnBoardingForm6,
     OnBoardingForm7,
     OnBoardingForm8,
-
   ];
   const totalSteps = steps.length;
 
@@ -78,15 +77,17 @@ export default function OnboardingClient() {
           onPrev={prevStep}
           fromDataSourceStep={fromDataSourceStep}
         >
-          <div className="">
-            <Button
-              className=""
-              variant={"ghost"}
-              onClick={handleDeleteAccount}
-            >
-              <X />
-            </Button>
-          </div>
+          {isDev && (
+            <div className="">
+              <Button
+                className=""
+                variant={"ghost"}
+                onClick={handleDeleteAccount}
+              >
+                <X />
+              </Button>
+            </div>
+          )}
         </CurrentStepComponent>
       </AnimatePresence>{" "}
     </div>
