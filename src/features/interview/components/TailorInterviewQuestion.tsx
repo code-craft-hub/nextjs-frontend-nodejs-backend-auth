@@ -34,7 +34,6 @@ export const TailorInterviewQuestion = ({
     interviewQuestionQueries.detail(interviewId ?? ""),
   );
 
-  console.log(data);
   const [qaData, setQaData] = useState<QAItem[]>([]);
   const [documentTitle, setDocumentTitle] = useState<string>(data?.title || "");
 

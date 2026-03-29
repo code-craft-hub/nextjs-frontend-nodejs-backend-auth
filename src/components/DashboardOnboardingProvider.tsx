@@ -132,7 +132,6 @@ export const DashboardOnboardingProvider: React.FC<{
 
   useEffect(() => {
     const check = async () => {
-      console.log("hasActiveSubscription : ", hasActiveSubscription);
       try {
         const { authorized } = await checkAuthStatus();
         if (!authorized) {

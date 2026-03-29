@@ -73,7 +73,6 @@ const Preview = ({
     decodeURIComponent(coverLetterData?.recruiterEmail || recruiterEmail || ""),
   );
 
-  console.log("Decoded recruiter email:", destinationEmail);
 
   const handleOpenModal = (value: boolean) => {
     setOpenModal(value);
