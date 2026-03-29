@@ -111,7 +111,12 @@ export const ProfileCard: React.FC<{
             </div>
             <div className="border-t p-4">
               <div className="flex gap-4 justify-between items-center">
-                <button className="flex items-center justify-between text-blue-600 text-sm font-medium hover:text-blue-700 transition-colors">
+                <button
+                  onClick={() => {
+                    handleEditClick(true);
+                  }}
+                  className="flex items-center justify-between text-blue-600 text-sm font-medium hover:text-blue-700 transition-colors"
+                >
                   <span>Edit Profile</span>
                 </button>
                 <div className="flex gap-2">
