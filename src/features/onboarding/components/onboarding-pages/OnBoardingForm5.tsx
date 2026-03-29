@@ -92,7 +92,7 @@ export const OnBoardingForm5 = ({
           <img src="/cverai-logo.png" alt="" className="w-28 h-8" />
           <Progress min={5} max={7} progress={70} />
         </div>
-        <div className="onboarding-card">
+        <div className="onboarding-card  max-sm:mt-16">
           <div className="space-y-6">
             <div>
               <h1 className="onboarding-h1">
@@ -116,7 +116,7 @@ export const OnBoardingForm5 = ({
                       <RadioGroup
                         onValueChange={field.onChange}
                         defaultValue={field.value}
-                        className="grid grid-cols-2 gap-4"
+                        className="grid sm:grid-cols-2 gap-4"
                       >
                         <FormItem className="flex flex-row items-center border p-4 rounded-sm gap-3">
                           <FormControl>
@@ -265,6 +265,7 @@ export const OnBoardingForm5 = ({
                       <FormControl>
                         <FloatingLabelInput
                           label="Input other reason"
+                          className="h-12"
                           {...field}
                         />
                       </FormControl>

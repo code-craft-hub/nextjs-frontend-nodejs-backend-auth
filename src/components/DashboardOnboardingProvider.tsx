@@ -125,12 +125,10 @@ export const DashboardOnboardingProvider: React.FC<{
     };
   }, [awaitingSettings, pathname]);
 
+  const hasActiveSubscription = isSubscriptionActive(user?.currentPeriodEnd);
+
   useEffect(() => {
     const check = async () => {
-      const hasActiveSubscription = isSubscriptionActive(
-        user?.currentPeriodEnd,
-      );
-
       console.log("hasActiveSubscription : ", hasActiveSubscription);
       try {
         const { authorized } = await checkAuthStatus();
@@ -149,7 +147,7 @@ export const DashboardOnboardingProvider: React.FC<{
       }
     };
     check();
-  }, [isMobile, router]);
+  }, [isMobile, router, hasActiveSubscription]);
 
   const handleGoToSettings = () => {
     setRun(false);

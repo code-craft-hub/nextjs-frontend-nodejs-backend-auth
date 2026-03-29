@@ -66,18 +66,6 @@ export const OnBoardingForm3 = ({
     },
   });
 
-  // useEffect(() => {
-  //   if (user?.dataSource) {
-  //     form.setValue("partTime", data?.partTime || false);
-  //     form.setValue("fullTime", data?.fullTime || false);
-  //     form.setValue("intership", data?.intership || false);
-  //     form.setValue("contract", data?.contract || false);
-  //     form.setValue("hybrid", data?.hybrid || false);
-  //     form.setValue("remote", data?.remote || false);
-  //     form.setValue("onsite", data?.onsite || false);
-  //   }
-  // }, [user, form, continent]);
-
   const updateOnboarding = useUpdateOnboarding({
     userFirstName: user?.firstName,
   });
@@ -126,7 +114,7 @@ export const OnBoardingForm3 = ({
               onSubmit={form.handleSubmit(onSubmit)}
             >
               <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid sm:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
                     name="partTime"
@@ -182,7 +170,7 @@ export const OnBoardingForm3 = ({
                     )}
                   />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid sm:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
                     name="intership"
@@ -240,7 +228,7 @@ export const OnBoardingForm3 = ({
                 </div>
               </div>
               <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid sm:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
                     name="hybrid"
@@ -296,7 +284,7 @@ export const OnBoardingForm3 = ({
                     )}
                   />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid sm:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
                     name="onsite"
