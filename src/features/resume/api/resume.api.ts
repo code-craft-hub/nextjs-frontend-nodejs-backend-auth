@@ -66,10 +66,10 @@ export const resumeApi = {
       token,
     }),
 
-  autoNewResume: (title: string, token?: string) =>
+  autoNewResume: (content: string, token?: string) =>
     api.post<ApiResponse<ResumeAggregate>>(
       RESUME_BASE + "/generate",
-      { title },
+      { content },
       {
         token,
       },

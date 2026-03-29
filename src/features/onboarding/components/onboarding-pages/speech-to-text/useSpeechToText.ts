@@ -85,19 +85,27 @@ export function useSpeechToText(options: SpeechToTextOptions = {}) {
 
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   const finalTranscriptRef = useRef<string>("");
+  // Refs for callbacks so the effect never re-runs due to them changing
+  const onResultRef = useRef(onResult);
+  const onErrorRef = useRef(onError);
+  // Ref to track listening state without it being an effect dependency
+  const isListeningRef = useRef(false);
+
+  useEffect(() => { onResultRef.current = onResult; }, [onResult]);
+  useEffect(() => { onErrorRef.current = onError; }, [onError]);
 
   useEffect(() => {
-    const SpeechRecognition =
+    const SpeechRecognitionCtor =
       window.SpeechRecognition || window.webkitSpeechRecognition;
 
-    if (!SpeechRecognition) {
+    if (!SpeechRecognitionCtor) {
       setState((prev) => ({ ...prev, isSupported: false }));
       return;
     }
 
     setState((prev) => ({ ...prev, isSupported: true }));
 
-    const recognition = new SpeechRecognition();
+    const recognition = new SpeechRecognitionCtor();
     recognition.lang = lang;
     recognition.continuous = continuous;
     recognition.interimResults = interimResults;
@@ -124,46 +132,50 @@ export function useSpeechToText(options: SpeechToTextOptions = {}) {
         error: null,
       }));
 
-      onResult?.(final + interim);
+      onResultRef.current?.(final + interim);
     };
 
     recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
+      // Ignore aborted — it fires when we call stop() intentionally
+      if (event.error === "aborted") return;
       const errorMessages: Record<string, string> = {
         "no-speech": "No speech detected. Please try again.",
         "audio-capture": "Microphone not found or not accessible.",
         "not-allowed": "Microphone access denied. Please allow microphone access.",
         "network": "Network error occurred.",
-        aborted: "Recording was stopped.",
       };
       const message = errorMessages[event.error] ?? `Speech error: ${event.error}`;
+      isListeningRef.current = false;
       setState((prev) => ({ ...prev, error: message, isListening: false }));
-      onError?.(message);
+      onErrorRef.current?.(message);
     };
 
     recognition.onend = () => {
-      setState((prev) => {
-        if (prev.isListening) {
-          // Auto-restart if still supposed to be listening (e.g. browser cut it off)
-          try {
-            recognition.start();
-          } catch {
-            return { ...prev, isListening: false };
-          }
+      if (isListeningRef.current) {
+        // Browser ended the session (e.g. silence timeout) — restart
+        try {
+          recognition.start();
+        } catch {
+          isListeningRef.current = false;
+          setState((prev) => ({ ...prev, isListening: false }));
         }
-        return prev;
-      });
+      } else {
+        setState((prev) => ({ ...prev, interimTranscript: "" }));
+      }
     };
 
     recognitionRef.current = recognition;
 
     return () => {
+      isListeningRef.current = false;
       recognition.abort();
     };
-  }, [lang, continuous, interimResults, onResult, onError]);
+  }, [lang, continuous, interimResults]);
 
   const startListening = useCallback(() => {
     if (!recognitionRef.current) return;
     finalTranscriptRef.current = "";
+    isListeningRef.current = true;
     setState((prev) => ({
       ...prev,
       isListening: true,
@@ -180,6 +192,7 @@ export function useSpeechToText(options: SpeechToTextOptions = {}) {
 
   const stopListening = useCallback(() => {
     if (!recognitionRef.current) return;
+    isListeningRef.current = false;
     setState((prev) => ({ ...prev, isListening: false, interimTranscript: "" }));
     recognitionRef.current.stop();
   }, []);

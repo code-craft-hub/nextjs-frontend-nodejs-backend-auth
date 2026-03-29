@@ -23,23 +23,26 @@ import { useIsMobile } from "@/shared/hooks/use-mobile";
 import { userQueries } from "@features/user";
 import { useQuery } from "@tanstack/react-query";
 import { useUpdateOnboarding } from "@features/user";
-const formSchema = z.object({
-  type: z
-    .enum([
-      "linkedin",
-      "instagram",
-      "tiktok",
-      "google",
-      "friend",
-      "whatsapp",
-      "twitter",
-      "telegram",
-    ])
-    .refine((val) => !!val, {
-      message: "You need to select a notification type.",
-    }),
-  others: z.string().optional(),
-});
+const formSchema = z
+  .object({
+    type: z
+      .enum([
+        "linkedin",
+        "instagram",
+        "tiktok",
+        "google",
+        "friend",
+        "whatsapp",
+        "twitter",
+        "telegram",
+      ])
+      .optional(),
+    others: z.string().optional(),
+  })
+  .refine((data) => data.type !== undefined || (data.others?.trim() ?? "") !== "", {
+    message: "Please select an option or describe how you heard about us.",
+    path: ["others"],
+  });
 
 export const OnBoardingForm5 = ({
   onNext,

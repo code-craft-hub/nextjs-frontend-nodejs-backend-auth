@@ -11,6 +11,9 @@ import Joyride, {
 } from "react-joyride";
 import { checkAuthStatus } from "@/features/email-application/api/gmail-authorization.service";
 import { useAuthorizeGmail } from "@/features/email-application/hooks/useAuthorizeGmail";
+import { isSubscriptionActive } from "@/lib/utils/helpers";
+import { useQuery } from "@tanstack/react-query";
+import { userQueries } from "@/features/user";
 
 // ── Step 1 tooltip: navigate to settings ──────────────────────────────────
 const NavToSettingsTooltip: React.FC<
@@ -52,7 +55,10 @@ const ToggleTooltip: React.FC<
     </div>
     <p className="text-sm text-gray-600 mb-4">{step.content as string}</p>
     <button
-      onClick={() => { onClose(); onConnect(); }}
+      onClick={() => {
+        onClose();
+        onConnect();
+      }}
       className="w-full bg-blue-500 hover:bg-blue-600 transition-colors text-white text-sm font-medium py-2 px-4 rounded-lg"
     >
       Connect Now
@@ -91,6 +97,7 @@ export const DashboardOnboardingProvider: React.FC<{
   const pathname = usePathname();
   const { isMobile } = useSidebar();
   const { authorizeGmail } = useAuthorizeGmail();
+  const { data: user } = useQuery(userQueries.detail());
 
   // Poll for #gmail-authorize-toggle once we've navigated to settings
   useEffect(() => {
@@ -120,6 +127,11 @@ export const DashboardOnboardingProvider: React.FC<{
 
   useEffect(() => {
     const check = async () => {
+      const hasActiveSubscription = isSubscriptionActive(
+        user?.currentPeriodEnd,
+      );
+
+      console.log("hasActiveSubscription : ", hasActiveSubscription);
       try {
         const { authorized } = await checkAuthStatus();
         if (!authorized) {
@@ -129,7 +141,7 @@ export const DashboardOnboardingProvider: React.FC<{
             router.push("/dashboard/settings");
             setAwaitingSettings(true);
           } else {
-            setRun(true);
+            if (hasActiveSubscription) setRun(true);
           }
         }
       } catch {
@@ -163,7 +175,13 @@ export const DashboardOnboardingProvider: React.FC<{
         <NavToSettingsTooltip {...props} onGoToSettings={handleGoToSettings} />
       );
     }
-    return <ToggleTooltip {...props} onClose={handleClose} onConnect={authorizeGmail} />;
+    return (
+      <ToggleTooltip
+        {...props}
+        onClose={handleClose}
+        onConnect={authorizeGmail}
+      />
+    );
   };
 
   return (

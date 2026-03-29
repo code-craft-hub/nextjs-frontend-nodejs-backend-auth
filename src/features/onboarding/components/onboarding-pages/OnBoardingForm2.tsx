@@ -14,7 +14,6 @@ import { useResumeUploadWithProgress } from "@/features/resume/hooks/useResumeUp
 import { queryKeys } from "@/shared/query/keys";
 import CreateUserResume from "./create-resume-form/CreateUserResume";
 import { Edit3, Loader2, Mic } from "lucide-react";
-import { AutoGenerateTitleDialog } from "./get-title-dialog";
 import { SpeechToTextInput } from "./speech-to-text";
 import { resumeApi } from "@/features/resume/api/resume.api";
 
@@ -28,9 +27,9 @@ export const OnBoardingForm2 = ({ onNext, children }: OnboardingFormProps) => {
     if (!speechText.trim()) return;
     setIsSpeechSubmitting(true);
     try {
+      onNext();
       await resumeApi.autoNewResume(speechText.trim());
       toast.success("Your resume is being generated!");
-      onNext();
     } catch {
       toast.error("Failed to generate resume. Please try again.");
     } finally {
@@ -100,6 +99,7 @@ export const OnBoardingForm2 = ({ onNext, children }: OnboardingFormProps) => {
             <div className="space-y-6">
               <div className="">
                 <h1 className="onboarding-h1">Do you have CV?</h1>
+                <p className="text-gray-400 text-xs">Upload your existing CV or create a new one or Dictate your experience to generate a resume.</p>
               </div>
             </div>
 
@@ -130,7 +130,7 @@ export const OnBoardingForm2 = ({ onNext, children }: OnboardingFormProps) => {
               </div>
             )}
 
-            <div className="grid grid-cols-2 gap-4 w-full">
+            <div className="flex flex-col gap-4 w-full">
               <div className=" border bg-green-50 border-green-100 w-full p-2 sm:p-4 rounded-md">
                 <label
                   htmlFor="create-resume-checkbox"
