@@ -40,7 +40,6 @@ export const InterviewQuestionsDisplay: React.FC<
     try {
       return formatInterviewData(rawText);
     } catch (error) {
-      console.error("Error parsing interview data:", error);
       return null;
     }
   }, [rawText]);

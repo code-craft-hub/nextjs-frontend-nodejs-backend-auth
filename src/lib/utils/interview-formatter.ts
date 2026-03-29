@@ -35,16 +35,90 @@ function extractMetadata(text: string): { company: string; role: string } {
 }
 
 /**
+ * Detects whether the input is NDJSON format (newline-delimited JSON objects)
+ */
+function isNdjsonFormat(text: string): boolean {
+  const firstLine = text.trimStart().split("\n")[0].trim();
+  try {
+    const parsed = JSON.parse(firstLine);
+    return (
+      typeof parsed === "object" &&
+      parsed !== null &&
+      "question" in parsed &&
+      "answer" in parsed
+    );
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Extracts a company name from question text heuristics
+ * e.g. "Given SyncTech's focus..." → "SyncTech"
+ */
+function extractCompanyFromQuestions(questions: string[]): string {
+  for (const q of questions) {
+    // "Given Acme's focus" / "Acme requires" / "at Acme"
+    const match = q.match(
+      /\bat\s+([A-Z][A-Za-z0-9]+(?:\s[A-Z][A-Za-z0-9]+)?)'s?\b/
+    ) || q.match(/\b([A-Z][A-Za-z0-9]+(?:\s[A-Z][A-Za-z0-9]+)?)'s\s+focus\b/);
+    if (match) return match[1].trim();
+  }
+  return "Unknown Company";
+}
+
+/**
+ * Parses NDJSON-formatted interview data
+ * Each line is a JSON object: { type: "qa", question: string, answer: string }
+ */
+function parseNdjsonQuestions(text: string): {
+  questions: InterviewQuestion[];
+  company: string;
+  role: string;
+} {
+  const lines = text
+    .split("\n")
+    .map((l) => l.trim())
+    .filter(Boolean);
+
+  const questions: InterviewQuestion[] = [];
+
+  for (const line of lines) {
+    try {
+      const obj = JSON.parse(line);
+      if (
+        obj &&
+        typeof obj.question === "string" &&
+        typeof obj.answer === "string"
+      ) {
+        questions.push({
+          number: questions.length + 1,
+          question: obj.question.trim(),
+          exemplaryAnswer: obj.answer.trim(),
+        });
+      }
+    } catch {
+      // Skip malformed lines
+    }
+  }
+
+  const company = extractCompanyFromQuestions(questions.map((q) => q.question));
+
+  return { questions, company, role: "Software Engineer" };
+}
+
+/**
  * Parses interview questions from formatted text
  * Expected format: numbered questions with "Exemplary Answer:" prefix
  */
 function parseQuestions(text: string): InterviewQuestion[] {
   const questions: InterviewQuestion[] = [];
 
-  // Match pattern: number. question text ... Exemplary Answer: "answer text"
+  // Match pattern: number. question text ... Exemplary Answer: [optional "]answer text[optional "]
   const questionPattern =
     /(\d+)\.\s+([^]*?)(?=Exemplary Answer:|(?:\n\d+\.|$))/gi;
-  const answerPattern = /Exemplary Answer:\s*"([^]*?)(?="\n\n|\n\d+\.|\n$)/gi;
+  const answerPattern =
+    /Exemplary Answer:\s*"?([^]*?)(?="?\s*\n\n\d+\.|"?\s*\n\d+\.|"?\s*\n\n$|"?\s*$)/gi;
 
   const questionMatches = Array.from(text.matchAll(questionPattern));
   const answerMatches = Array.from(text.matchAll(answerPattern));
@@ -77,6 +151,14 @@ function parseQuestions(text: string): InterviewQuestion[] {
 export function formatInterviewData(rawText: string): ParsedInterviewData {
   if (!rawText || typeof rawText !== "string") {
     throw new Error("Invalid input: expected non-empty string");
+  }
+
+  if (isNdjsonFormat(rawText)) {
+    const { questions, company, role } = parseNdjsonQuestions(rawText);
+    if (questions.length === 0) {
+      throw new Error("No interview questions found in provided text");
+    }
+    return { questions, totalQuestions: questions.length, company, role };
   }
 
   const metadata = extractMetadata(rawText);

@@ -233,9 +233,9 @@ export const TailorInterviewQuestion = ({
           />
         </div>
       </div>
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-5xl mx-auto mt-4">
         {isJsonText && (
-          <div className="text-center mb-12 mt-4">
+          <div className="text-center mb-12">
             <p className="text-2xl font-bold text-slate-800 mb-3">
               {documentTitle ? `Title: ${capitalize(documentTitle)}` : ""}
             </p>
