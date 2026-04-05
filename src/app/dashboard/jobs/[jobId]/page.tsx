@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: JobIdPageProps): Promise<Meta
     const token = (await getCookiesToken()) ?? "";
     const queryClient = createServerQueryClient();
     const job = await queryClient.fetchQuery(jobsQueries.detail(jobId, token));
-    const title = job?.title && job?.company ? `${job.title} at ${job.company}` : "Job Details";
+    const title = job?.data?.title ? `${job.data.title}${job.data.companyName ? ` at ${job.data.companyName}` : ""}` : "Job Details";
     return { title };
   } catch {
     return { title: "Job Details" };
