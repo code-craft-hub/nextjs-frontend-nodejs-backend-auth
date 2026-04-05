@@ -18,34 +18,31 @@ const BASE_ITEMS = [
     id: "ai-recommendations",
     label: "AI Recommendations",
     icon: "/bell.svg",
-    bgColor: "bg-green-100",
+    bgColor: "bg-[#E7F6EA]",
     url: "/dashboard/jobs/category?tab=ai-recommendations",
   },
   {
     id: "saved-jobs",
     label: "Saved Jobs",
     icon: "/save.svg",
-    bgColor: "bg-yellow-100",
+    bgColor: "bg-[#FFF6E6]",
     url: "/dashboard/jobs/category?tab=saved-jobs",
   },
   {
     id: "application-history",
     label: "Application History",
     icon: "/briefcase-dasboard.svg",
-    bgColor: "bg-blue-100",
+    bgColor: "bg-[#E7F0FA]",
     url: "/dashboard/jobs/category?tab=application-history",
   },
 ] as const;
 function CountBadge({ count }: { count: number | undefined }) {
-
   if (count === undefined) {
     // Skeleton pulse while loading
-    return (
-      <span className="ml-2 inline-block h-5 w-7 rounded-full bg-white/60 animate-pulse" />
-    );
+    return null;
   }
   return (
-    <span className="ml-2 inline-flex items-center justify-center min-w-[1.5rem] h-6 px-1.5 rounded-full bg-white/80 text-xs font-semibold tabular-nums">
+    <span className=" items-center justify-center rounded-full text-2xl font-bold tabular-nums">
       {count > 9999 ? "9999+" : count}
     </span>
   );
@@ -66,9 +63,9 @@ function CardItem({
       )}
       onClick={onClick}
     >
-      <div className="flex items-center">
+      <div className="ml-1 items-center">
         <CountBadge count={item.count} />
-        <h1 className="font-bold font-inter">{item.label}</h1>
+        <h1 className="font-poppins">{item.label}</h1>
       </div>
       <div className="bg-white p-3 size-fit rounded-sm">
         <img src={item.icon} alt={item.label} className="size-4" />
