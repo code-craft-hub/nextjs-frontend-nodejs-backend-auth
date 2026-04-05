@@ -4,7 +4,7 @@ import { aiSettingsKeys } from "@/features/ai-settings/queries/ai-settings.keys"
 import { autoApplyKeys } from "@/features/auto-apply/queries/auto-apply.keys";
 import { bookmarkKeys } from "@/features/bookmarks/queries/bookmarks.keys";
 import { jobApplicationKeys } from "@/features/analytics/queries/job-applications.keys";
-import { invalidateUserQueries } from "@features/user";
+import { invalidateUserQueries, userQueries } from "@features/user";
 import { jobPostsKeys } from "@/features/job-posts";
 
 /**
@@ -362,6 +362,7 @@ export const invalidateBookmarkLists = (queryClient: QueryClient) => {
   return Promise.all([
     queryClient.invalidateQueries({ queryKey: bookmarkKeys.lists() }),
     queryClient.invalidateQueries({ queryKey: bookmarkKeys.infinite() }),
+    queryClient.invalidateQueries({queryKey: userQueries.detail().queryKey})
   ]);
 };
 

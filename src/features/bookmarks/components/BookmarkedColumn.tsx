@@ -20,12 +20,9 @@ export type ApplyHandler = (job: JobApplication, e?: React.MouseEvent) => void;
 
 /** Minimum interface required for the bookmark-toggle mutation. */
 
-/** Minimum interface required for the bookmark-toggle mutation. */
+/** Minimum interface required for the bookmark-remove mutation. */
 export interface JobUpdateMutation {
-  mutate: (variables: {
-    id: string;
-    data: Partial<Pick<JobApplication, "isBookmarked" | "isApplied">>;
-  }) => void;
+  mutate: (bookmarkId: string) => void;
 }
 
 
@@ -109,15 +106,12 @@ export const BookmarkedColumn = ({
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
-            updateJobs?.mutate({
-              id: String(row.original.id),
-              data: { isBookmarked: !row.original.id },
-            });
+            updateJobs?.mutate(String(row.original.id));
           }}
           className="flex justify-end"
         >
           <Toggle
-            pressed={!!row.original.id}
+            pressed={true}
             aria-label="Toggle bookmark"
             size="sm"
             variant="outline"

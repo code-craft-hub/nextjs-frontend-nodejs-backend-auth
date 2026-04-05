@@ -7,7 +7,7 @@ import { sendGTMEvent } from "@next/third-parties/google";
 import { Loader2 } from "lucide-react";
 
 import { userQueries } from "@features/user";
-import { useUpdateJobMutation } from "@/features/jobs/mutations/jobs.mutations";
+import { useRemoveBookmarkMutation } from "@/features/bookmarks/mutations/bookmarks.mutations";
 import { useApplyJob } from "@/features/jobs/hooks/useApplyJob";
 import { bookmarksQueries } from "@/features/bookmarks/queries/bookmarks.queries";
 
@@ -34,7 +34,9 @@ export const SavedJobs = ({ children }: { children?: ReactNode }) => {
     }
   }, [user?.firstName]);
 
-  const updateJobs = useUpdateJobMutation();
+  const removeBookmark = useRemoveBookmarkMutation();
+  // Adapter: MobileOverview expects { id, data } shape but bookmark removal only needs the id
+  const updateJobs = { mutate: ({ id }: { id: string; data: unknown }) => removeBookmark.mutate(id) };
   const { applyToJob: handleApply } = useApplyJob();
 
   const {
@@ -67,7 +69,7 @@ export const SavedJobs = ({ children }: { children?: ReactNode }) => {
     return () => observer.disconnect();
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  const columns = BookmarkedColumn({ router, updateJobs, handleApply });
+  const columns = BookmarkedColumn({ router, updateJobs: removeBookmark, handleApply });
   const table = useJobsTable(allJobs ?? [], columns);
 
   function resetSearch() {
