@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import TailorCoverLetter from "@/features/cover-letter/components/TailorCoverLetter";
 import { createServerQueryClient } from "@/shared/query/prefetch";
 import { coverLetterQueries } from "@/features/cover-letter/queries/cover-letter.queries";
@@ -5,6 +6,10 @@ import { getCookiesToken } from "@/lib/auth.utils";
 import { HydrationBoundary } from "@/components/hydration-boundary";
 import { dehydrate } from "@tanstack/react-query";
 import { isPlaceholderId } from "@/lib/utils/ai-apply-navigation";
+
+export const metadata: Metadata = {
+  title: "Tailor Cover Letter",
+};
 
 const TailorCoverLetterPage = async ({ searchParams }: any) => {
   const token = (await getCookiesToken()) ?? "";

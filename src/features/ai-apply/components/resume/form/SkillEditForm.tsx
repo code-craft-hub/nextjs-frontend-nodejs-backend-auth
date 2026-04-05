@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { useForm } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
 import {
   Form,
   FormControl,
@@ -34,6 +34,8 @@ export const SkillEditForm: React.FC<SkillEditFormProps> = ({
     defaultValues: { skills: initialData },
   });
 
+  const { append, fields } = useFieldArray({ control: form.control, name: "skills" });
+
   const handleSubmit = (data: { skills: SkillFormData[] }) => {
     onSave(data.skills);
   };
@@ -56,7 +58,16 @@ export const SkillEditForm: React.FC<SkillEditFormProps> = ({
                     <FormItem>
                       <FormLabel>{title}</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder={placeholder} />
+                        <Input
+                          {...field}
+                          placeholder={placeholder}
+                          onBlur={(e) => {
+                            field.onBlur();
+                            if (e.target.value.trim() && index === fields.length - 1) {
+                              append({ label: "", value: "" });
+                            }
+                          }}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

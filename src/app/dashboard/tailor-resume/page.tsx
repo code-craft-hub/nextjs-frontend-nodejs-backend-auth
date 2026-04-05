@@ -1,9 +1,14 @@
+import type { Metadata } from "next";
 import { TailorResume } from "@/features/resume/components/TailorResume";
 import { createServerQueryClient } from "@/shared/query/prefetch";
 import { resumeQueries } from "@/features/resume/queries/resume.queries";
 import { HydrationBoundary } from "@/components/hydration-boundary";
 import { dehydrate } from "@tanstack/react-query";
 import { getCookiesToken } from "@/lib/auth.utils";
+
+export const metadata: Metadata = {
+  title: "Tailor Resume",
+};
 
 const TailorResumePage = async ({ searchParams }: any) => {
   const { resumeId } = await searchParams;

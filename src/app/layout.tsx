@@ -47,8 +47,27 @@ const poppins = Poppins({
 const roboto = Roboto({ subsets: ["latin"], variable: "--font-roboto" });
 
 export const metadata: Metadata = {
-  title: "Cver AI - Never Miss a Job Again",
-  description: "Manage your career documents and interview prep",
+  metadataBase: new URL("https://www.cverai.com"),
+  title: {
+    default: "Cver AI - Never Miss a Job Again",
+    template: "%s | Cver AI",
+  },
+  description:
+    "AI-powered job search platform. Auto-apply to jobs, tailor your resume and cover letter, and prepare for interviews — all in one place.",
+  openGraph: {
+    type: "website",
+    siteName: "Cver AI",
+    title: "Cver AI - Never Miss a Job Again",
+    description:
+      "AI-powered job search platform. Auto-apply to jobs, tailor your resume and cover letter, and prepare for interviews — all in one place.",
+    images: [{ url: "/assets/images/dashboard.png", width: 1200, height: 630, alt: "Cver AI Dashboard" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Cver AI - Never Miss a Job Again",
+    description:
+      "AI-powered job search platform. Auto-apply to jobs, tailor your resume and cover letter, and prepare for interviews — all in one place.",
+  },
 };
 export default function RootLayout({
   children,

@@ -1,4 +1,9 @@
+import type { Metadata } from "next";
 import { Category } from "@/features/jobs/components/CategoryClient";
+
+export const metadata: Metadata = {
+  title: "Job Categories",
+};
 
 const CategoryPage = async ({ searchParams }: any) => {
   const tab = (await searchParams)?.tab;

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Preview from "@/features/email-application/components/Preview";
 import { HydrationBoundary } from "@/components/hydration-boundary";
 import { dehydrate } from "@tanstack/react-query";
@@ -8,6 +9,10 @@ import { resumeQueries } from "@/features/resume/queries/resume.queries";
 import { coverLetterQueries } from "@/features/cover-letter/queries/cover-letter.queries";
 import { getCookiesToken } from "@/lib/auth.utils";
 import { aiSettingsQueries } from "@/features/ai-settings/queries/ai-settings.queries";
+
+export const metadata: Metadata = {
+  title: "Email Preview",
+};
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;

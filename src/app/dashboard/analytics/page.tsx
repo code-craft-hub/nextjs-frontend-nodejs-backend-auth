@@ -1,9 +1,14 @@
+import type { Metadata } from "next";
 import { createServerQueryClient } from "@/shared/query/prefetch";
 import { userQueries } from "@features/user";
 import { HydrationBoundary } from "@/components/hydration-boundary";
 import { dehydrate } from "@tanstack/react-query";
 import AnalyticsClient from "@/features/analytics/components/AnalyticsClient";
 import { getCookiesToken } from "@/lib/auth.utils";
+
+export const metadata: Metadata = {
+  title: "Analytics",
+};
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;

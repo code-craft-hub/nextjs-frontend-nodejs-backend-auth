@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { getCookiesToken } from "@/lib/auth.utils";
 import Settings from "@/features/settings/components/Settings";
 import { createServerQueryClient } from "@/shared/query/prefetch";
@@ -5,6 +6,10 @@ import { aiSettingsQueries } from "@/features/ai-settings/queries/ai-settings.qu
 import { HydrationBoundary } from "@/components/hydration-boundary";
 import { dehydrate } from "@tanstack/react-query";
 import { resumeQueries } from "@/features/resume/queries/resume.queries";
+
+export const metadata: Metadata = {
+  title: "Settings",
+};
 
 const SettingsPage = async ({
   searchParams,

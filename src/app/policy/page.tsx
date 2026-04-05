@@ -1,7 +1,11 @@
-"use client";
-
+import type { Metadata } from "next";
 import { Footer } from "@/components/landing-page/Footer";
 import { Header } from "@/features/landing/components/Header";
+
+export const metadata: Metadata = {
+  title: "Privacy Policy",
+  description: "Privacy Policy for Cver Job Applications LTD — how we collect, use, and protect your personal data.",
+};
 
 const Policy = () => {
   return (

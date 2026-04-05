@@ -68,6 +68,9 @@ function SkillTagInput({
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
           onKeyDown={handleKeyDown}
+          onBlur={() => {
+            addSkill();
+          }}
           placeholder={placeholder}
           className="h-12 flex-1 rounded-xl border-gray-200 bg-white placeholder:text-gray-300 text-gray-800 text-sm focus-visible:ring-indigo-400 focus-visible:ring-1 focus-visible:border-indigo-400"
         />
@@ -117,7 +120,13 @@ export default function SkillsForm({
   onBack,
   handleEditClick,
 }: SkillsFormProps) {
-  const { resumeId, resumeData, updateResumeField, createNewResume, isCreating } = useResumeForm();
+  const {
+    resumeId,
+    resumeData,
+    updateResumeField,
+    createNewResume,
+    isCreating,
+  } = useResumeForm();
   const addSkillsMutation = useAddSkillsMutation();
 
   const form = useForm<SkillsFormValues>({
@@ -271,7 +280,9 @@ export default function SkillsForm({
               disabled={addSkillsMutation.isPending || isCreating}
               className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-8 h-12 rounded-xl text-sm transition-colors"
             >
-              {addSkillsMutation.isPending || isCreating ? "Saving..." : "Save & Continue"}
+              {addSkillsMutation.isPending || isCreating
+                ? "Saving..."
+                : "Save & Continue"}
             </Button>
           </div>
         </form>

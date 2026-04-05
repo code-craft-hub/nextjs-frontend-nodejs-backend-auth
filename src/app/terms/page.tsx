@@ -1,7 +1,11 @@
-"use client";
-
+import type { Metadata } from "next";
 import { Footer } from "@/components/landing-page/Footer";
 import { Header } from "@/features/landing/components/Header";
+
+export const metadata: Metadata = {
+  title: "Terms of Use",
+  description: "Terms of Use for Cver Job Applications LTD — the rules governing your use of the Cver AI platform.",
+};
 
 const Terms = () => {
   return (

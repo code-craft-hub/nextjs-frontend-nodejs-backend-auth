@@ -1,9 +1,14 @@
+import type { Metadata } from "next";
 import { TailorInterviewQuestion } from "@/features/interview/components/TailorInterviewQuestion";
 import { createServerQueryClient } from "@/shared/query/prefetch";
 import { interviewQuestionQueries } from "@/features/interview/queries/interview.queries";
 import { HydrationBoundary } from "@/components/hydration-boundary";
 import { dehydrate } from "@tanstack/react-query";
 import { getCookiesToken } from "@/lib/auth.utils";
+export const metadata: Metadata = {
+  title: "Interview Prep",
+};
+
 const TailorInterviewQuestionPage = async ({ searchParams }: any) => {
   const { jobDescription } = await searchParams;
   const { interviewQuestionId } = await searchParams;

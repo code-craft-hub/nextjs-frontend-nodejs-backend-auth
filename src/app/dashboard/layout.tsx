@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { AppSidebar } from "@/components/app-sidebar";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -14,6 +15,10 @@ import { HydrationBoundary } from "@/components/hydration-boundary";
 import { dehydrate } from "@tanstack/react-query";
 import { getCookiesToken, getSessionFromCookies } from "@/lib/auth.utils";
 import { DashboardOnboardingProvider } from "@/components/DashboardOnboardingProvider";
+
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
 
 interface DashboardLayoutProps {
   children: React.ReactNode;

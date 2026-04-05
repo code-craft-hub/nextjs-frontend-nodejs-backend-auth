@@ -1,4 +1,10 @@
+import type { Metadata } from "next";
 import { requireAuth } from "@/lib/server-auth";
+
+export const metadata: Metadata = {
+  title: "Verify Email",
+  robots: { index: false, follow: false },
+};
 import { redirect } from "next/navigation";
 import { VerifyEmailClient } from "@/features/auth/components/verify-email-client";
 import { createServerQueryClient } from "@/shared/query/prefetch";

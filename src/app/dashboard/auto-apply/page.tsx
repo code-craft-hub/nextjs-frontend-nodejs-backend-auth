@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { HydrationBoundary } from "@/components/hydration-boundary";
 import { dehydrate } from "@tanstack/react-query";
 import { createServerQueryClient } from "@/shared/query/prefetch";
@@ -6,6 +7,10 @@ import { prefetchWithPriority } from "@/shared/query/parallel-prefetch";
 import { getCookiesToken } from "@/lib/auth.utils";
 import { aiSettingsQueries } from "@/features/ai-settings/queries/ai-settings.queries";
 import AutoApplyClient from "@/features/auto-apply/components/AutoApplyClient";
+
+export const metadata: Metadata = {
+  title: "Auto Apply",
+};
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;

@@ -1,9 +1,14 @@
+import type { Metadata } from "next";
 import { dehydrate } from "@tanstack/react-query";
 import Overview from "@/features/job-posts/components/Overview";
 import { createServerQueryClient } from "@/shared/query/prefetch";
 import { HydrationBoundary } from "@/components/hydration-boundary";
 import { getCookiesToken } from "@/lib/auth.utils";
 import { jobPostsQueries } from "@/features/job-posts";
+
+export const metadata: Metadata = {
+  title: "Job Listings",
+};
 
 const JobListingsPage = async () => {
   const token = (await getCookiesToken()) ?? "";

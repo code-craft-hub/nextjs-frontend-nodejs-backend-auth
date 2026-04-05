@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { createServerQueryClient } from "@/shared/query/prefetch";
 import { dehydrate } from "@tanstack/react-query";
 import { HydrationBoundary } from "@/components/hydration-boundary";
@@ -5,6 +6,10 @@ import { api } from "@/shared/api/client";
 import { redirect } from "next/navigation";
 import { AccountClient } from "@/features/account/components/Account";
 import { getCookiesToken } from "@/lib/auth.utils";
+
+export const metadata: Metadata = {
+  title: "Account",
+};
 
 interface VerifyPaymentData {
   status: string;
