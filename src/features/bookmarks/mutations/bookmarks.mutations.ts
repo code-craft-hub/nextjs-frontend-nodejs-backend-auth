@@ -1,16 +1,19 @@
 import {
+  InfiniteData,
   useMutation,
   useQueryClient,
 } from "@tanstack/react-query";
 import {
   bookmarksApi,
+  BookmarkListResponse,
 } from "@/features/bookmarks/api/bookmarks.api";
+import { bookmarkKeys } from "@/features/bookmarks/queries/bookmarks.keys";
 import { Analytics } from "@/lib/analytics";
 import {
   invalidateBookmarkLists,
   invalidateBookmarkCheck,
 } from "@/shared/query/query-invalidation";
-import { jobPostsKeys } from "@/features/job-posts";
+import { jobPostsKeys, InfiniteJobsResponse } from "@/features/job-posts";
 
 // ─── Create ───────────────────────────────────────────────────────────────────
 
@@ -75,42 +78,39 @@ export function useRemoveBookmarkMutation() {
   return useMutation({
     mutationFn: (bookmarkId: string) => bookmarksApi.removeById(bookmarkId),
 
-    // onMutate: async (bookmarkId) => {
-    //   await qc.cancelQueries({ queryKey: bookmarkKeys.infinite() });
+    onMutate: async (bookmarkId) => {
+      await qc.cancelQueries({ queryKey: bookmarkKeys.infinite() });
 
-    //   const previousInfinite = qc.getQueryData<
-    //     InfiniteData<BookmarkListResponse>
-    //   >(bookmarkKeys.infinite());
+      const previousInfinite = qc.getQueryData<InfiniteData<BookmarkListResponse>>(
+        bookmarkKeys.infinite(),
+      );
 
-    //   qc.setQueryData<InfiniteData<BookmarkListResponse>>(
-    //     bookmarkKeys.infinite(),
-    //     (old) => {
-    //       if (!old) return old;
-    //       return {
-    //         ...old,
-    //         pages: old.pages.map((page) => ({
-    //           ...page,
-    //           data: page.data.filter((b: Bookmark) => b.id !== bookmarkId),
-    //           pagination: {
-    //             ...page.pagination,
-    //             count: Math.max(0, page.pagination.count - 1),
-    //           },
-    //         })),
-    //       };
-    //     },
-    //   );
+      qc.setQueryData<InfiniteData<BookmarkListResponse>>(
+        bookmarkKeys.infinite(),
+        (old) => {
+          if (!old) return old;
+          return {
+            ...old,
+            pages: old.pages.map((page) => ({
+              ...page,
+              data: page.data.filter((b) => b.id !== bookmarkId),
+              pagination: {
+                ...page.pagination,
+                count: Math.max(0, page.pagination.count - 1),
+              },
+            })),
+          };
+        },
+      );
 
-    //   return { previousInfinite, bookmarkId };
-    // },
+      return { previousInfinite };
+    },
 
-    // onError: (_err, _bookmarkId, context) => {
-    //   if (context?.previousInfinite !== undefined) {
-    //     qc.setQueryData(
-    //       bookmarkKeys.infinite(),
-    //       context.previousInfinite,
-    //     );
-    //   }
-    // },
+    onError: (_err, _bookmarkId, context) => {
+      if (context?.previousInfinite !== undefined) {
+        qc.setQueryData(bookmarkKeys.infinite(), context.previousInfinite);
+      }
+    },
 
     onSettled: () => {
       invalidateBookmarkLists(qc);
@@ -187,6 +187,7 @@ export function useRemoveBookmarkByJobMutation() {
 }
 
 export function useToggleBookmarkByJobMutation() {
+  const qc = useQueryClient();
   const createBookmark = useCreateBookmarkMutation();
   const removeBookmarkByJob = useRemoveBookmarkByJobMutation();
 
@@ -203,6 +204,41 @@ export function useToggleBookmarkByJobMutation() {
       } else {
         await createBookmark.mutateAsync(jobId);
       }
+    },
+
+    onMutate: async ({ jobId, isBookmarked }) => {
+      // Cancel in-flight fetches so they don't overwrite the optimistic update
+      await qc.cancelQueries({ queryKey: jobPostsKeys.jobPosts.all });
+
+      // Snapshot every cached job-posts page for rollback
+      const previousPages = qc.getQueriesData<InfiniteData<InfiniteJobsResponse>>({
+        queryKey: jobPostsKeys.jobPosts.all,
+      });
+
+      // Immediately flip isBookmarked for this job across all cached filter variants
+      qc.setQueriesData<InfiniteData<InfiniteJobsResponse>>(
+        { queryKey: jobPostsKeys.jobPosts.all },
+        (old) => {
+          if (!old?.pages) return old;
+          return {
+            ...old,
+            pages: old.pages.map((page) => ({
+              ...page,
+              items: page.items.map((job) =>
+                job.id === jobId ? { ...job, isBookmarked: !isBookmarked } : job,
+              ),
+            })),
+          };
+        },
+      );
+
+      return { previousPages };
+    },
+
+    onError: (_err, _vars, context) => {
+      context?.previousPages?.forEach(([queryKey, data]) => {
+        qc.setQueryData(queryKey, data);
+      });
     },
   });
 }
