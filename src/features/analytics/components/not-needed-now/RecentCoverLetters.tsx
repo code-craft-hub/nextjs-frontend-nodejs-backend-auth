@@ -1,6 +1,6 @@
 "use client";
 import { useQuery } from "@tanstack/react-query";
-import { coverLetterMetricsQueries } from "../queries/cover-letter-metrics.queries";
+import { coverLetterMetricsQueries } from "../../queries/cover-letter-metrics.queries";
 import { Mail, Sparkles } from "lucide-react";
 
 function formatDate(date: string | Date | null | undefined): string {

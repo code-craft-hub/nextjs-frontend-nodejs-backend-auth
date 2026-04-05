@@ -1,6 +1,6 @@
 "use client";
 import { useQuery } from "@tanstack/react-query";
-import { interviewQuestionMetricsQueries } from "../queries/interview-question-metrics.queries";
+import { interviewQuestionMetricsQueries } from "../../queries/interview-question-metrics.queries";
 import { MessageSquare, Trophy } from "lucide-react";
 
 function formatDate(date: string | Date | null | undefined): string {

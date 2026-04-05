@@ -2,7 +2,7 @@
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip } from "recharts";
 import { ChevronDown } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { userAnalyticsQueries } from "../queries/user-analytics.queries";
+import { userAnalyticsQueries } from "../../queries/user-analytics.queries";
 
 const CustomTooltip = ({ active, payload }: any) => {
   if (active && payload && payload.length) {

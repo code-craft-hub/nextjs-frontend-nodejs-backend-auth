@@ -1,6 +1,6 @@
 "use client";
 import { useQuery } from "@tanstack/react-query";
-import { resumeMetricsQueries } from "../queries/resume-metrics.queries";
+import { resumeMetricsQueries } from "../../queries/resume-metrics.queries";
 import { FileText, Sparkles, Upload } from "lucide-react";
 
 function formatDate(date: string | Date | null | undefined): string {

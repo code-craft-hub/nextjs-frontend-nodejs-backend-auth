@@ -25,7 +25,7 @@ import {
   ChartTooltip,
   CveraiChartTooltipContent,
 } from "@/components/ui/chart";
-import { userAnalyticsQueries } from "../queries/user-analytics.queries";
+import { userAnalyticsQueries } from "../../queries/user-analytics.queries";
 
 interface ChartDataPoint {
   month: string;

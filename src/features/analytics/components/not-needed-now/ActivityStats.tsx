@@ -1,6 +1,6 @@
 "use client";
 import { useQuery } from "@tanstack/react-query";
-import { activityStatsQueries } from "../queries/activity-stats.queries";
+import { activityStatsQueries } from "../../queries/activity-stats.queries";
 import { Activity, Clock, Layers, MousePointerClick } from "lucide-react";
 
 function formatAction(action: string): string {

@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 
 import { AIRecommendations } from "@/features/recommendations/components/AIRecommendations";
 import { SavedJobs } from "@/features/bookmarks/components/SavedJobs";
-import { ApplicationHistory } from "@/features/analytics/components/ApplicationHistory";
+import { ApplicationHistory } from "@/features/analytics/components/not-needed-now/ApplicationHistory";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
