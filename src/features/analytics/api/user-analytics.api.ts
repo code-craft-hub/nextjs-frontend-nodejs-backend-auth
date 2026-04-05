@@ -3,6 +3,7 @@ import { api } from "@/shared/api/client";
 export interface TrendDataPoint {
   month: string;
   applications: number;
+  autoApplications: number;
   resumes: number;
   coverLetters: number;
   interviewQuestions: number;

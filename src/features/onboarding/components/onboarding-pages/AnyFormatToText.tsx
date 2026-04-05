@@ -32,6 +32,12 @@ const SUPPORTED_FILE_TYPES = {
   PLAINTEXT: ["text/plain"],
 } as const;
 
+const ALLOWED_UPLOAD_TYPES: string[] = [
+  "application/pdf",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/msword",
+];
+
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
 type ExtractedResult = {
@@ -311,6 +317,7 @@ export const FileUploadZone: React.FC<FileUploadZoneProps> = ({
   profile,
 }) => {
   const [isDragging, setIsDragging] = useState(false);
+  const [dropError, setDropError] = useState<string | null>(null);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -326,12 +333,19 @@ export const FileUploadZone: React.FC<FileUploadZoneProps> = ({
     (e: React.DragEvent) => {
       e.preventDefault();
       setIsDragging(false);
+      setDropError(null);
       if (disabled) return;
 
       const files = Array.from(e.dataTransfer.files);
-      if (files.length > 0) {
-        onFileSelect(files[0]);
+      if (files.length === 0) return;
+
+      const file = files[0];
+      if (!ALLOWED_UPLOAD_TYPES.includes(file.type)) {
+        setDropError("Only PDF, DOC, and DOCX files are allowed.");
+        return;
       }
+
+      onFileSelect(file);
     },
     [disabled, onFileSelect],
   );
@@ -377,13 +391,14 @@ export const FileUploadZone: React.FC<FileUploadZoneProps> = ({
   }
 
   return (
+    <>
     <div
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
       className={cn(
         `
-        !border-blue-500 border-2 border-dashed rounded-lg w-full text-center transition-colors
+        border-blue-500! border-2 border-dashed rounded-lg w-full text-center transition-colors
         ${isDragging ? "border-blue-400 bg-blue-50" : "border-slate-300"}
         ${
           disabled
@@ -400,7 +415,6 @@ export const FileUploadZone: React.FC<FileUploadZoneProps> = ({
         className="hidden"
         onChange={handleFileInput}
         accept=".pdf,.doc,.docx"
-        // .jpg,.jpeg,.png,.gif,.webp,.bmp,
         disabled={disabled}
       />
       <label
@@ -452,6 +466,10 @@ export const FileUploadZone: React.FC<FileUploadZoneProps> = ({
         )}
       </label>
     </div>
+    {dropError && (
+      <p className="text-xs text-red-500 mt-1">{dropError}</p>
+    )}
+    </>
   );
 };
 
