@@ -10,9 +10,10 @@ interface ReportCardItem {
   icon: string;
   bgColor: string;
   url: string;
+  count: number | undefined;
 }
 
-const MENU_ITEMS: ReportCardItem[] = [
+const BASE_ITEMS = [
   {
     id: "ai-recommendations",
     label: "AI Recommendations",
@@ -34,7 +35,21 @@ const MENU_ITEMS: ReportCardItem[] = [
     bgColor: "bg-blue-100",
     url: "/dashboard/jobs/category?tab=application-history",
   },
-];
+] as const;
+function CountBadge({ count }: { count: number | undefined }) {
+
+  if (count === undefined) {
+    // Skeleton pulse while loading
+    return (
+      <span className="ml-2 inline-block h-5 w-7 rounded-full bg-white/60 animate-pulse" />
+    );
+  }
+  return (
+    <span className="ml-2 inline-flex items-center justify-center min-w-[1.5rem] h-6 px-1.5 rounded-full bg-white/80 text-xs font-semibold tabular-nums">
+      {count > 9999 ? "9999+" : count}
+    </span>
+  );
+}
 
 function CardItem({
   item,
@@ -51,7 +66,10 @@ function CardItem({
       )}
       onClick={onClick}
     >
-      <h1 className="font-bold font-inter mb-1">{item.label}</h1>
+      <div className="flex items-center">
+        <CountBadge count={item.count} />
+        <h1 className="font-bold font-inter">{item.label}</h1>
+      </div>
       <div className="bg-white p-3 size-fit rounded-sm">
         <img src={item.icon} alt={item.label} className="size-4" />
       </div>
@@ -59,31 +77,31 @@ function CardItem({
   );
 }
 
-export const ReportCard = ({
-  matchPercentage,
-}: {
-  /**
-   * Count of high-scoring AI match jobs calculated in the parent.
-   * Shown as the AI Recommendations badge count.
-   * Pass 0 (not a random number) when the value is unavailable.
-   */
-  matchPercentage?: number;
-}) => {
+export const ReportCard = () => {
   const router = useRouter();
   const { data: user } = useQuery(userQueries.detail());
 
-  // Intentionally unused — the counts were removed from the card UI
-  // to avoid showing stale/random data. The label alone is sufficient.
-  void matchPercentage;
-  void user?.bookmarkedJobs;
-  void user?.appliedJobs;
+  const menuItems: ReportCardItem[] = [
+    {
+      ...BASE_ITEMS[0],
+      count: user?.aiRecommendationsCount,
+    },
+    {
+      ...BASE_ITEMS[1],
+      count: user?.savedJobsCount,
+    },
+    {
+      ...BASE_ITEMS[2],
+      count: user?.applicationHistoryCount,
+    },
+  ];
 
   return (
     <div>
       {/* Desktop: horizontal scrollable strip */}
       <ScrollArea className="hidden md:grid grid-cols-1">
         <div className="flex flex-row gap-4 py-4 mx-auto w-fit">
-          {MENU_ITEMS.map((item) => (
+          {menuItems.map((item) => (
             <div key={item.id} className="w-64">
               <CardItem item={item} onClick={() => router.push(item.url)} />
             </div>
@@ -94,7 +112,7 @@ export const ReportCard = ({
 
       {/* Mobile: stacked */}
       <div className="md:hidden flex flex-col w-full gap-4 py-4 mx-auto">
-        {MENU_ITEMS.map((item) => (
+        {menuItems.map((item) => (
           <CardItem
             key={item.id}
             item={item}

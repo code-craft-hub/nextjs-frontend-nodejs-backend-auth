@@ -151,6 +151,14 @@ export interface IUser {
   createdAt?: string | Date;
   updatedAt?: string | Date;
 
+  // ─── Dashboard aggregates (live counts from the server) ───────
+  /** Total job_applications + auto_apply rows for the user. */
+  applicationHistoryCount?: number;
+  /** Active (non-deleted) bookmarked jobs. */
+  savedJobsCount?: number;
+  /** Total AI-generated job recommendations. */
+  aiRecommendationsCount?: number;
+
   // ─── Extended / legacy fields ──────────────────────────────
   name?: string;
   analytics?: {

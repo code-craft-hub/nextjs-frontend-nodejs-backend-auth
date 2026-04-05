@@ -23,9 +23,11 @@ import { useForm } from "react-hook-form";
 const SearchBox = ({
   onSubmit,
   onLocationChange,
+  onClassificationChange,
 }: {
   onSubmit: (data: any) => void;
   onLocationChange?: (location: string) => void;
+  onClassificationChange?: (classification: string) => void;
 }) => {
   const form = useForm<any>({
     defaultValues: {
@@ -45,7 +47,7 @@ const SearchBox = ({
   }, [watched, onSubmit]);
 
   return (
-    <div className="bg-white shadow-lg px-2 flex gap-4 justify-between rounded-lg items-center">
+    <div className="bg-white shadow-lg px-2 grid grid-cols-1 sm:flex max-sm:pb-4 gap-4 justify-between rounded-lg items-center">
       <div className="flex items-center gap-2 w-full">
         <div className="ml-2">
           <img src="/search-icon.svg" alt="search icon" className="size-5" />
@@ -89,11 +91,26 @@ const SearchBox = ({
       </div>
 
       <FilterLocation onValueChange={onLocationChange} />
+      <FilterClassification onValueChange={onClassificationChange} />
     </div>
   );
 };
 
 export default SearchBox;
+
+// Canonical names — must match the scraper's localizedTo values exactly.
+const SUPPORTED_COUNTRIES = [
+  "Australia",
+  "Canada",
+  "Germany",
+  "Ireland",
+  "Netherlands",
+  "New Zealand",
+  "Nigeria",
+  "Singapore",
+  "United Kingdom",
+  "United States",
+] as const;
 
 export function FilterLocation({
   onValueChange,
@@ -102,22 +119,40 @@ export function FilterLocation({
 }) {
   return (
     <Select onValueChange={(val) => onValueChange?.(val === "all" ? "" : val)}>
-      <SelectTrigger className="w-full max-w-48 border-0 shadow-none">
-        <SelectValue placeholder="Select Location" />
+      <SelectTrigger className="w-full sm:max-w-48 sm:border-0 sm:shadow-none">
+        <SelectValue placeholder="Country" />
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>
-          <SelectLabel>Select Location</SelectLabel>
-          <SelectItem value="all">All Locations</SelectItem>
-          <SelectItem value="nigeria">Nigeria</SelectItem>
-          <SelectItem value="lagos">Lagos</SelectItem>
-          <SelectItem value="abuja">Abuja</SelectItem>
-          <SelectItem value="usa">USA</SelectItem>
-          <SelectItem value="london">London</SelectItem>
-          <SelectItem value="europe">Europe</SelectItem>
-          <SelectItem value="asia">Asia</SelectItem>
-          <SelectItem value="australia">Australia</SelectItem>
+          <SelectLabel>Country</SelectLabel>
+          <SelectItem value="all">All Countries</SelectItem>
+          {SUPPORTED_COUNTRIES.map((country) => (
+            <SelectItem key={country} value={country}>
+              {country}
+            </SelectItem>
+          ))}
+        </SelectGroup>
+      </SelectContent>
+    </Select>
+  );
+}
+
+export function FilterClassification({
+  onValueChange,
+}: {
+  onValueChange?: (value: string) => void;
+}) {
+  return (
+    <Select onValueChange={(val) => onValueChange?.(val === "all" ? "" : val)}>
+      <SelectTrigger className="w-full sm:max-w-40 sm:border-0 sm:shadow-none">
+        <SelectValue placeholder="Type" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectGroup>
+          <SelectLabel>Job Type</SelectLabel>
+          <SelectItem value="all">All Types</SelectItem>
           <SelectItem value="remote">Remote</SelectItem>
+          <SelectItem value="relocate">Relocate</SelectItem>
         </SelectGroup>
       </SelectContent>
     </Select>

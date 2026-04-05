@@ -10,8 +10,19 @@ export const jobPostsApi = {
   search: (params?: any, token?: string) =>
     api.get<PaginatedResponse<JobPost>>("/job-posts/search", { params, token }),
 
-  query: (params?: { query?: string; cursor?: string; location?: string; limit?: number }, token?: string) =>
-    api.get<InfiniteJobsResponse>("/job-posts/query", { params, token }),
+  query: (
+    params?: {
+      query?: string;
+      cursor?: string;
+      location?: string;
+      /** Canonical country name to filter by, e.g. "Nigeria", "United States". */
+      localizedTo?: string;
+      /** Scraper classification: "remote" | "relocate". */
+      classification?: string;
+      limit?: number;
+    },
+    token?: string,
+  ) => api.get<InfiniteJobsResponse>("/job-posts/query", { params, token }),
 
   fullTextSearch: (q: string, page = 1, limit = 20, token?: string) =>
     api.get<PaginatedResponse<JobPost>>("/job-posts/fts", {

@@ -11,7 +11,13 @@ export const jobPostsQueries = {
       staleTime: 10 * 60 * 1000,
     }),
 
-  infinite: (query?: string, location?: string, token?: string) =>
+  infinite: (
+    query?: string,
+    location?: string,
+    localizedTo?: string,
+    classification?: string,
+    token?: string,
+  ) =>
     infiniteQueryOptions<
       InfiniteJobsResponse,
       Error,
@@ -19,8 +25,12 @@ export const jobPostsQueries = {
       ReturnType<typeof jobPostsKeys.jobPosts.infinite>,
       string | undefined
     >({
-      queryKey: jobPostsKeys.jobPosts.infinite(query, location),
-      queryFn: ({ pageParam }) => jobPostsApi.query({ query, cursor: pageParam, location }, token),
+      queryKey: jobPostsKeys.jobPosts.infinite(query, location, localizedTo, classification),
+      queryFn: ({ pageParam }) =>
+        jobPostsApi.query(
+          { query, cursor: pageParam, location, localizedTo, classification },
+          token,
+        ),
       initialPageParam: undefined,
       getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
       staleTime: 1000 * 60 * 5,
@@ -120,6 +130,13 @@ export const jobPostsQueries = {
   }),
 };
 
-export function useInfiniteJobs(query?: string, location?: string) {
-  return useInfiniteQuery(jobPostsQueries.infinite(query, location));
+export function useInfiniteJobs(
+  query?: string,
+  location?: string,
+  localizedTo?: string,
+  classification?: string,
+) {
+  return useInfiniteQuery(
+    jobPostsQueries.infinite(query, location, localizedTo, classification),
+  );
 }

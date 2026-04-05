@@ -79,7 +79,7 @@ export default function DisplayTable({
 
   return (
     <div className="w-full flex flex-col gap-6">
-      <ReportCard matchPercentage={totalScore} />
+      <ReportCard />
 
       <div className="hidden lg:grid grid-cols-1">
         <Table>

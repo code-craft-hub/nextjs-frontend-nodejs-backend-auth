@@ -4,12 +4,14 @@ export const jobPostsKeys = {
     lists: () => [...jobPostsKeys.jobPosts.all, "list"] as const,
     list: (filters: Record<string, any>) =>
       [...jobPostsKeys.jobPosts.lists(), filters] as const,
-    infinite: (query?: string, location?: string) =>
+    infinite: (query?: string, location?: string, localizedTo?: string, classification?: string) =>
       [
         ...jobPostsKeys.jobPosts.all,
         "infinite",
         ...(query ? [query] : []),
         ...(location ? [location] : []),
+        ...(localizedTo ? [localizedTo] : []),
+        ...(classification ? [classification] : []),
       ] as const,
     details: () => [...jobPostsKeys.jobPosts.all, "detail"] as const,
     detail: (id: string) => [...jobPostsKeys.jobPosts.details(), id] as const,
