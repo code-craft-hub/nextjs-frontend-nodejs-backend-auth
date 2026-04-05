@@ -27,7 +27,7 @@ export default function DisplayTable({
   isFetching,
   isRefetching,
   isFetchingNextPage,
-  totalScore = 0,
+  totalScore: _totalScore = 0,
 }: {
   allJobs: any[];
   fetchNextPage?: () => void;
