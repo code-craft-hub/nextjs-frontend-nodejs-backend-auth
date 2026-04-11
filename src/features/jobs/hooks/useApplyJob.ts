@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { useUpdateJobApplicationHistoryMutation } from "@/features/jobs/mutations/jobs.mutations";
 import { gmailApi } from "@/features/email-application/api/gmail.api";
 import { buildAutoApplyStartUrl } from "@/lib/utils/ai-apply-navigation";
+import { useSubmitBrowserApplicationMutation } from "@/features/browser-automation";
 
 /**
  * Minimal shape required to apply to a job.
@@ -22,18 +23,28 @@ export interface ApplicableJob {
 /**
  * Single source of truth for the "apply to job" side-effect.
  *
- * Handles:
- *  - Regular apply  → records application + opens link in new tab
- *  - Email/AI apply → checks Gmail auth, records application, navigates to
- *                     the tailor-cover-letter flow with aiApply=true
+ * Handles three cases:
+ *
+ * 1. **Browser-automation apply** (no emailApply, has applyUrl/link)
+ *    → Enqueues a BullMQ job that navigates to the URL, fills the form with
+ *      the user's profile, and submits it — all in the background.
+ *      Records the application and surfaces a toast immediately so the user
+ *      can keep browsing.
+ *
+ * 2. **Email / AI apply** (emailApply present)
+ *    → Checks Gmail auth, records application, then navigates to the
+ *      tailor-cover-letter flow with aiApply=true.
+ *
+ * 3. **No URL, no email** — surfaces an error toast; nothing is recorded.
  *
  * All errors are caught and surfaced as toast notifications so callers
  * never need their own try/catch.
  */
 export function useApplyJob() {
   const router = useRouter();
-  const { mutate: recordApplication } =
-    useUpdateJobApplicationHistoryMutation();
+  const { mutate: recordApplication } = useUpdateJobApplicationHistoryMutation();
+  const { mutateAsync: submitBrowserApplication } =
+    useSubmitBrowserApplicationMutation();
 
   const applyToJob = useCallback(
     async (job: ApplicableJob, e?: React.MouseEvent) => {
@@ -43,13 +54,29 @@ export function useApplyJob() {
       try {
         const link = job.applyUrl || job.link;
 
-        // ── Regular apply (no email) ───────────────────────────────────────
+        // ── Browser-automation apply (no email, URL present) ───────────────
         if (!job.emailApply) {
+          if (!link) {
+            toast.error("No application URL found for this job.");
+            return;
+          }
+
+          const { data } = await submitBrowserApplication({ jobId: job.id });
+
+          // Record in the user's applied-jobs history so the dashboard count
+          // stays accurate without waiting for the background job to finish.
           recordApplication({
             id: String(job.id),
             data: { appliedJobs: job.id },
           });
-          window.open(link ?? "", "_blank", "noopener,noreferrer");
+
+          toast.success(
+            data.deduplicated
+              ? "Your application is already being processed in the background."
+              : "Applying automatically in the background — we'll handle the form for you.",
+            { duration: 5000 },
+          );
+
           return;
         }
 
@@ -94,7 +121,7 @@ export function useApplyJob() {
         toast.error("Something went wrong. Please try again.");
       }
     },
-    [router, recordApplication],
+    [router, recordApplication, submitBrowserApplication],
   );
 
   return { applyToJob };

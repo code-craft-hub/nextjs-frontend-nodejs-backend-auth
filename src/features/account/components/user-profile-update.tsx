@@ -298,7 +298,6 @@ export const UserProfileForm: React.FC<{
                     <FormControl>
                       <Input
                         type="email"
-                        disabled={true}
                         placeholder="Enter email address"
                         {...field}
                         className="box-border flex flex-row items-start w-full h-11 px-3.5 py-2.5 bg-[#F9FAFB] border border-[#D0D5DD] rounded-lg text-xs leading-6 text-[#667085] placeholder:text-[#667085] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"

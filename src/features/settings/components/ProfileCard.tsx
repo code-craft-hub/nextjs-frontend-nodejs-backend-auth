@@ -4,6 +4,7 @@ import {
   Download,
   Edit,
   Eye,
+  FileDown,
   Loader,
   Sparkles,
 } from "lucide-react";
@@ -22,8 +23,17 @@ export const ProfileCard: React.FC<{
   const handleEditClick = (value: boolean) => {
     setEditResume(value);
   };
-  const { download, preview, isDownloading, isPreviewing, error } =
-    useResumeDownload();
+  const {
+    download,
+    preview,
+    downloadOriginal,
+    previewOriginal,
+    isDownloading,
+    isPreviewing,
+    isDownloadingOriginal,
+    isPreviewingOriginal,
+    error,
+  } = useResumeDownload();
 
   return (
     <div
@@ -70,7 +80,40 @@ export const ProfileCard: React.FC<{
               </p>
             </div>
 
-            <div className="hidden sm:absolute sm:top-4 sm:grid grid-cols-3 gap-2 right-2 mr-2">
+            <div className={`hidden sm:absolute sm:top-4 sm:grid gap-2 right-2 mr-2 ${resume.gcsPath ? "grid-cols-5" : "grid-cols-3"}`}>
+              {resume.gcsPath && (
+                <>
+                  <Button
+                    onClick={() => previewOriginal(resume.id)}
+                    variant={"ghost"}
+                    title="Preview original resume"
+                    className=""
+                  >
+                    {isPreviewingOriginal ? (
+                      <Loader className="size-4 animate-spin" />
+                    ) : (
+                      <Eye className="w-4 h-4 text-muted-foreground" />
+                    )}
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      downloadOriginal(
+                        resume.id,
+                        resume.originalName ?? resume.fileName ?? resume.title ?? "original-resume",
+                      );
+                    }}
+                    variant={"ghost"}
+                    title="Download original resume"
+                    className=""
+                  >
+                    {isDownloadingOriginal ? (
+                      <Loader className="size-4 animate-spin" />
+                    ) : (
+                      <FileDown className="w-4 h-4" />
+                    )}
+                  </Button>
+                </>
+              )}
               <Button
                 onClick={() => {
                   download(
@@ -120,6 +163,37 @@ export const ProfileCard: React.FC<{
                   <span>Edit Profile</span>
                 </button>
                 <div className="flex gap-2">
+                  {resume.gcsPath && (
+                    <>
+                      <Button
+                        onClick={() => previewOriginal(resume.id)}
+                        title="Preview original resume"
+                        className="sm:hidden"
+                      >
+                        {isPreviewingOriginal ? (
+                          <Loader className="size-4 animate-spin" />
+                        ) : (
+                          <Eye className="w-4 h-4" />
+                        )}
+                      </Button>
+                      <Button
+                        onClick={() => {
+                          downloadOriginal(
+                            resume.id,
+                            resume.originalName ?? resume.fileName ?? resume.title ?? "original-resume",
+                          );
+                        }}
+                        title="Download original resume"
+                        className="sm:hidden"
+                      >
+                        {isDownloadingOriginal ? (
+                          <Loader className="size-4 animate-spin" />
+                        ) : (
+                          <FileDown className="w-4 h-4" />
+                        )}
+                      </Button>
+                    </>
+                  )}
                   <Button
                     onClick={() => {
                       download(

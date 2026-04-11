@@ -3,7 +3,7 @@
 import { resumeApi } from "@/features/resume";
 import { useState } from "react";
 
-type ActionState = "idle" | "downloading" | "previewing";
+type ActionState = "idle" | "downloading" | "previewing" | "downloading-original" | "previewing-original";
 
 // async function fetchResumePdf(resumeId: string): Promise<Blob> {
 //   const res = await fetch(`/api/admin/resumes/${resumeId}/download`);
@@ -64,11 +64,58 @@ export function useResumeDownload() {
     }
   };
 
+  const downloadOriginal = async (resumeId: string, filename: string) => {
+    setState("downloading-original");
+    setError(null);
+
+    try {
+      const blob = await resumeApi.fetchOriginalResume(resumeId);
+      const url = window.URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Failed to download original resume",
+      );
+    } finally {
+      setState("idle");
+    }
+  };
+
+  const previewOriginal = async (resumeId: string) => {
+    setState("previewing-original");
+    setError(null);
+
+    try {
+      const blob = await resumeApi.fetchOriginalResume(resumeId);
+      const url = window.URL.createObjectURL(blob);
+
+      window.open(url, "_blank");
+
+      setTimeout(() => window.URL.revokeObjectURL(url), 60_000);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to preview original resume");
+    } finally {
+      setState("idle");
+    }
+  };
+
   return {
     download,
     preview,
+    downloadOriginal,
+    previewOriginal,
     isDownloading: state === "downloading",
     isPreviewing: state === "previewing",
+    isDownloadingOriginal: state === "downloading-original",
+    isPreviewingOriginal: state === "previewing-original",
     isBusy: state !== "idle",
     error,
   };

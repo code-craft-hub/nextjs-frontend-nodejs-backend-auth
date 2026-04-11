@@ -118,6 +118,9 @@ export const resumeApi = {
   fetchResumePdf: (resumeId: string, token?: string) =>
     api.get<Blob>(`${RESUME_BASE}/${resumeId}/download`, { token }),
 
+  fetchOriginalResume: (resumeId: string, token?: string) =>
+    api.get<Blob>(`${RESUME_BASE}/${resumeId}/download-original`, { token }),
+
   deleteResume: (id: string, token?: string) =>
     api.delete<void>(`${RESUME_BASE}/${id}`, { token }),
 
