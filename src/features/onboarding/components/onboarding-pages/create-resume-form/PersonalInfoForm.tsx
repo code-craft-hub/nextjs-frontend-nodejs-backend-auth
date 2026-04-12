@@ -103,7 +103,7 @@ export default function PersonalInfoForm({
     }
 
     // Update the resume with personal info
-    updateResume.mutate(
+    await updateResume.mutateAsync(
       { id: activeResumeId, data: values },
       {
         onSuccess: () => {

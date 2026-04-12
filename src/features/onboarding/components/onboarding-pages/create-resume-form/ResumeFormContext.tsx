@@ -9,6 +9,8 @@ import {
 } from "react";
 import type { ResumeAggregate } from "@/shared/types/resume.types";
 import { useCreateNewResumeMutation } from "@/features/resume/mutations/resume.mutations";
+import { useQueryClient } from "@tanstack/react-query";
+import { resumeQueries } from "@/features/resume";
 
 interface ResumeFormContextValue {
   resumeId: string | null;
@@ -42,19 +44,23 @@ export function ResumeFormProvider({
   );
   const [isLoading] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
-  const [currentResumeId, setCurrentResumeId] = useState<string | null>(resumeId || null);
+  const [currentResumeId, setCurrentResumeId] = useState<string | null>(
+    resumeId || null,
+  );
+  const queryClient = useQueryClient();
+
   const createResumeMutation = useCreateNewResumeMutation();
 
   const isEditMode = !!currentResumeId && !!resumeData;
 
   const updateResumeField = useCallback(
-    <K extends keyof ResumeAggregate>(
-      field: K,
-      value: ResumeAggregate[K],
-    ) => {
+    <K extends keyof ResumeAggregate>(field: K, value: ResumeAggregate[K]) => {
       setResumeData((prev) => {
         if (!prev) return prev;
         return { ...prev, [field]: value };
+      });
+      queryClient.invalidateQueries({
+        queryKey: resumeQueries.uploaded().queryKey,
       });
     },
     [],
@@ -102,7 +108,15 @@ export function ResumeFormProvider({
       updateResumeField,
       createNewResume,
     }),
-    [currentResumeId, resumeData, isEditMode, isLoading, isCreating, updateResumeField, createNewResume],
+    [
+      currentResumeId,
+      resumeData,
+      isEditMode,
+      isLoading,
+      isCreating,
+      updateResumeField,
+      createNewResume,
+    ],
   );
 
   return (
