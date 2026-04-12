@@ -44,7 +44,11 @@ export interface ApplicationListResponse {
   pagination: {
     limit: number;
     count: number;
-    nextCursor: string | null;
+    /**
+     * Composite cursor. `id` is always present; `appliedAt` is null when the
+     * last item has no applied date (common for auto-applied draft records).
+     */
+    nextCursor: { appliedAt: string | null; id: string } | null;
   };
 }
 
@@ -93,9 +97,17 @@ export const jobApplicationsApi = {
    * Retrieve the authenticated user's applications — cursor-based.
    * Pass `cursor` (ISO string from a previous response's `nextCursor`) for subsequent pages.
    */
-  list: (cursor?: string, limit = 20, token?: string) =>
+  list: (cursor?: { appliedAt: string | null; id: string }, limit = 20, token?: string) =>
     api.get<ApplicationListResponse>("/job-applications", {
-      params: cursor !== undefined ? { cursor, limit } : { limit },
+      params:
+        cursor !== undefined
+          ? {
+              // Only send `cursor` (timestamp) when appliedAt is non-null.
+              ...(cursor.appliedAt !== null ? { cursor: cursor.appliedAt } : {}),
+              cursor_id: cursor.id,
+              limit,
+            }
+          : { limit },
       token,
     }),
 

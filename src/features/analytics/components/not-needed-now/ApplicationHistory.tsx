@@ -58,7 +58,7 @@ export const ApplicationHistory = ({ children }: { children?: ReactNode }) => {
           fetchNextPage();
         }
       },
-      { threshold: 0.1 },
+      { threshold: 0, rootMargin: "0px 0px 600px 0px" },
     );
 
     observer.observe(el);

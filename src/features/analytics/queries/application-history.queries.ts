@@ -26,7 +26,7 @@ export const jobApplicationQueries = {
         jobApplicationsApi.list(pageParam ?? undefined, limit, token),
       getNextPageParam: (lastPage) =>
         lastPage.pagination.nextCursor ?? undefined,
-      initialPageParam: undefined as string | undefined,
+      initialPageParam: undefined as { appliedAt: string | null; id: string } | undefined,
       staleTime: 10 * 60 * 1000,
     }),
 
