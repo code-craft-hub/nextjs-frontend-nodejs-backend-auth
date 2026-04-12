@@ -52,7 +52,8 @@ function isManualApplyUrl(url: string): boolean {
  */
 export function useApplyJob() {
   const router = useRouter();
-  const { mutate: recordApplication } = useUpdateJobApplicationHistoryMutation();
+  const { mutate: recordApplication } =
+    useUpdateJobApplicationHistoryMutation();
   const { mutateAsync: submitBrowserApplication } =
     useSubmitBrowserApplicationMutation();
 
@@ -81,6 +82,10 @@ export function useApplyJob() {
             return;
           }
 
+          toast.success(
+            "Applying automatically in the background — we'll handle the form for you.",
+            { duration: 5000 },
+          );
           const { data } = await submitBrowserApplication({ jobId: job.id });
 
           // Record in the user's applied-jobs history so the dashboard count
@@ -90,12 +95,12 @@ export function useApplyJob() {
             data: { appliedJobs: job.id },
           });
 
-          toast.success(
-            data.deduplicated
-              ? "Your application is already being processed in the background."
-              : "Applying automatically in the background — we'll handle the form for you.",
-            { duration: 5000 },
-          );
+          if (data.deduplicated) {
+            toast.success(
+              "Your application is already being processed in the background.",
+              { duration: 5000 },
+            );
+          }
 
           return;
         }
