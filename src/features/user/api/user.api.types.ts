@@ -13,6 +13,7 @@ export interface UpdateUserData {
   displayName?: string;
   photoUrl?: string;
   phoneNumber?: string;
+  email?: string;
   countryCode?: string;
   country?: string;
   state?: string;

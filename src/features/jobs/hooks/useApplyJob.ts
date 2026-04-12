@@ -20,22 +20,32 @@ export interface ApplicableJob {
   descriptionText?: string | null;
 }
 
+const MANUAL_APPLY_DOMAINS = ["linkedin.com", "glassdoor.com", "indeed.com"];
+
+function isManualApplyUrl(url: string): boolean {
+  return MANUAL_APPLY_DOMAINS.some((domain) => url.includes(domain));
+}
+
 /**
  * Single source of truth for the "apply to job" side-effect.
  *
- * Handles three cases:
+ * Handles four cases:
  *
- * 1. **Browser-automation apply** (no emailApply, has applyUrl/link)
+ * 1. **Manual apply** (no emailApply, URL is LinkedIn / Glassdoor / Indeed)
+ *    → Opens the job URL in a new tab so the user can apply manually.
+ *      Records the application immediately.
+ *
+ * 2. **Browser-automation apply** (no emailApply, other URL)
  *    → Enqueues a BullMQ job that navigates to the URL, fills the form with
  *      the user's profile, and submits it — all in the background.
  *      Records the application and surfaces a toast immediately so the user
  *      can keep browsing.
  *
- * 2. **Email / AI apply** (emailApply present)
+ * 3. **Email / AI apply** (emailApply present)
  *    → Checks Gmail auth, records application, then navigates to the
  *      tailor-cover-letter flow with aiApply=true.
  *
- * 3. **No URL, no email** — surfaces an error toast; nothing is recorded.
+ * 4. **No URL, no email** — surfaces an error toast; nothing is recorded.
  *
  * All errors are caught and surfaced as toast notifications so callers
  * never need their own try/catch.
@@ -58,6 +68,16 @@ export function useApplyJob() {
         if (!job.emailApply) {
           if (!link) {
             toast.error("No application URL found for this job.");
+            return;
+          }
+
+          // LinkedIn, Glassdoor, and Indeed require manual application.
+          if (isManualApplyUrl(link)) {
+            window.open(link, "_blank", "noopener,noreferrer");
+            recordApplication({
+              id: String(job.id),
+              data: { appliedJobs: job.id },
+            });
             return;
           }
 

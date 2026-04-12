@@ -22,13 +22,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 const CVERAI_NUMBER = process.env.NEXT_PUBLIC_CVERAI_NUMBER || "+436767391022";
 const E164_REGEX = /^\+?[1-9]\d{6,14}$/;
 
-export const e164PhoneNumberSchema = z
-  .string()
-  .trim()
-  .regex(E164_REGEX, {
-    message:
-      "Invalid phone number. Must be in E.164 format (e.g. 14155552671)",
-  });
+export const e164PhoneNumberSchema = z.string().trim().regex(E164_REGEX, {
+  message: "Invalid phone number. Must be in E.164 format (e.g. 14155552671)",
+});
 
 // Zod validation schema
 const profileSchema = z.object({
@@ -78,7 +74,7 @@ export const UserProfileForm: React.FC<{
     }
   }, [user, phoneNumber, form]);
 
-  const updateUserPassword = async () => {
+  const updateUserPhoneNumber = async () => {
     if (phoneNumber && user?.phoneNumber !== phoneNumber) {
       const normalizedPhoneNumber = phoneNumber.replace(/\s+/g, "");
       await updateUser.mutateAsync({
@@ -103,12 +99,13 @@ export const UserProfileForm: React.FC<{
 
   // Auto-sync phone number if provided via URL
   useEffect(() => {
-    updateUserPassword();
+    updateUserPhoneNumber();
   }, [phoneNumber, user?.phoneNumber]);
 
   const onSubmit = ({
     firstName,
     lastName,
+    email,
     state,
     country,
     countryCode,
@@ -120,6 +117,7 @@ export const UserProfileForm: React.FC<{
       data: {
         firstName,
         lastName,
+        email,
         state,
         country,
         countryCode,
