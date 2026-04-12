@@ -21,6 +21,8 @@ export interface JobPost {
     period?: string;
   } | null;
   postedAt: string;
+  localizedTo: string;
+  classification?: string | null;
   descriptionHtml?: string | null;
   descriptionText?: string | null;
   applyUrl?: string | null;

@@ -18,7 +18,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { PiOfficeChairFill } from "react-icons/pi";
-import { formatAppliedDate } from "@/lib/utils/helpers";
+import { formatAppliedDate, stripUrlProtocol } from "@/lib/utils/helpers";
 import { useUpdateJobMutation } from "@/features/jobs/mutations/jobs.mutations";
 import { useApplyJob } from "@/features/jobs/hooks/useApplyJob";
 import { useToggleBookmarkByJobMutation } from "@/features/bookmarks/mutations/bookmarks.mutations";
@@ -38,6 +38,8 @@ function JobRow({
   onRowClick: () => void;
 }) {
   const isBookmarked = job?.isBookmarked ?? false;
+
+  const link = job?.link || job?.applyUrl || job?.emailApply;
 
   return (
     <TableRow
@@ -77,7 +79,12 @@ function JobRow({
 
             <div className="bg-blue-50 rounded text-blue-600 px-2 py-1 shrink-0">
               <span className="text-2xs whitespace-nowrap">
-                {job?.jobType || job?.employmentType}
+                {job?.jobType || job?.employmentType || job?.classification || job?.localizedTo}
+              </span>
+            </div>
+            <div className="bg-blue-50 rounded text-blue-600 px-2 py-1 shrink-0">
+              <span className="text-2xs whitespace-nowrap">
+                {stripUrlProtocol(link ?? "")?.split("/")[0]}
               </span>
             </div>
           </div>

@@ -195,7 +195,14 @@ export const expireNextThreeDays = () => {
   return nextMinute;
 };
 
+export const stripUrlProtocol = (url: string): string => {
+  if (!url) return "";
 
+  return url
+    .trim()
+    .replace(/^(?:https?:)?\/\/?/i, "") // remove http://, https://, // 
+    .replace(/^www\./i, ""); // remove leading www.
+};
 
 export const postedDate = (dateString?: string): string => {
   return new Date(dateString || "")?.toLocaleDateString("en-US", {
@@ -536,142 +543,6 @@ export const formatStreamContent = (content: string): string => {
   return formatted;
 };
 
-/**
- * Calculate reading metrics
- */
-export const getReadingMetrics = (content: string) => {
-  const words = content.trim().split(/\s+/).length;
-  const chars = content.length;
-  const readingTime = Math.ceil(words / 200); // Assuming 200 words per minute
-
-  return {
-    words,
-    chars,
-    readingTime,
-  };
-};
-
-/**
- * Syntax highlighting helper for code detection
- */
-export const detectCodeBlocks = (content: string): boolean => {
-  return /```[\s\S]*?```/.test(content);
-};
-
-/**
- * Extract title from content (first header)
- */
-export const extractTitle = (content: string): string | null => {
-  const match = content.match(/^#\s+(.+)$/m);
-  return match ? match[1] : null;
-};
-export const processWorkExperience = (workExp: any) => {
-  if (!workExp) return [];
-
-  if (Array.isArray(workExp)) {
-    return workExp;
-  }
-
-  if (typeof workExp === "object" && workExp.experience) {
-    return workExp.experience;
-  }
-
-  if (typeof workExp === "object") {
-    return [workExp];
-  }
-
-  return [];
-};
-
-export const processEducation = (education: any) => {
-  if (!education) return [];
-
-  if (Array.isArray(education)) {
-    return education;
-  }
-
-  if (typeof education === "object" && education.degrees) {
-    return education.degrees;
-  }
-
-  if (typeof education === "object") {
-    return [education];
-  }
-
-  return [];
-};
-
-export const processSkills = (skills: any) => {
-  if (!skills) return [];
-
-  if (Array.isArray(skills)) {
-    return skills;
-  }
-
-  if (typeof skills === "object") {
-    // Handle different skill structures
-    if (skills.hardSkill || skills.softSkill) {
-      return [...(skills.hardSkill || []), ...(skills.softSkill || [])];
-    }
-    if (skills.technical || skills.soft) {
-      return [...(skills.technical || []), ...(skills.soft || [])];
-    }
-  }
-
-  return [];
-};
-
-export const processCertifications = (certification: any) => {
-  if (!certification) return [];
-
-  if (Array.isArray(certification)) {
-    return certification;
-  }
-
-  if (typeof certification === "object" && certification.certification) {
-    return certification.certification;
-  }
-
-  if (typeof certification === "object") {
-    return [certification];
-  }
-
-  return [];
-};
-
-export const processProjects = (project: any) => {
-  if (!project) return [];
-
-  if (Array.isArray(project)) {
-    return project;
-  }
-
-  if (typeof project === "object" && project.project) {
-    return project.project;
-  }
-
-  if (typeof project === "object") {
-    return [project];
-  }
-
-  return [];
-};
-
-export const createCoverLetterOrderedParams = (
-  docId: string,
-  jobDesc: string,
-) => {
-  const params = new URLSearchParams();
-  params.set("coverLetterId", docId);
-  params.set("jobDescription", jobDesc);
-  return params;
-};
-export const createResumeOrderedParams = (docId: string, jobDesc: string) => {
-  const params = new URLSearchParams();
-  params.set("documentId", docId);
-  params.set("jobDescription", jobDesc);
-  return params;
-};
 
 export const isValidArray = (arr: any): arr is any[] => {
   return Array.isArray(arr) && arr.length > 0;
