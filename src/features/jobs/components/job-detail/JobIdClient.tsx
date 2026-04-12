@@ -23,6 +23,7 @@ import { JobInfoCell } from "./JobInfoCell";
 import { ContactRow } from "./ContactRow";
 import { SocialButton } from "./SocialButton";
 import { JobDescriptionSkeleton, JobTitleSkeleton } from "./JobSkeletons";
+import { ApplicationSnapshot } from "./ApplicationSnapshot";
 
 const REFERRER_URLS: Record<string, string> = {
   dashboard: "/dashboard/home",
@@ -233,6 +234,8 @@ export function JobIdClient({
             </JobQualityFeedbackModal>
           </div>
         </div>
+
+        <ApplicationSnapshot jobId={jobId} />
       </div>
     </div>
   );
