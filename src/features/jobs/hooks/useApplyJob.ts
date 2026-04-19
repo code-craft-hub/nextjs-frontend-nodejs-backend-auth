@@ -58,7 +58,7 @@ export function useApplyJob() {
     useSubmitBrowserApplicationMutation();
 
   const applyToJob = useCallback(
-    async (job: ApplicableJob, e?: React.MouseEvent) => {
+    async (job: ApplicableJob, e?: React.MouseEvent, onApplied?: (jobId: string) => void) => {
       e?.preventDefault();
       e?.stopPropagation();
 
@@ -79,6 +79,7 @@ export function useApplyJob() {
               id: String(job.id),
               data: { appliedJobs: job.id },
             });
+            onApplied?.(job.id);
             return;
           }
 
@@ -86,6 +87,8 @@ export function useApplyJob() {
             "Applying automatically in the background — we'll handle the form for you.",
             { duration: 5000 },
           );
+          onApplied?.(job.id);
+
           const { data } = await submitBrowserApplication({ jobId: job.id });
 
           // Record in the user's applied-jobs history so the dashboard count
@@ -131,6 +134,7 @@ export function useApplyJob() {
           id: String(job.id),
           data: { appliedJobs: job.id },
         });
+        onApplied?.(job.id);
 
         const params = {
           jobDescription: JSON.stringify(job.descriptionText ?? ""),

@@ -1,5 +1,6 @@
 "use client";
 import MobileOverview from "@/features/job-posts/components/MobileOverview";
+import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -166,14 +167,27 @@ export default function JobsTable({
   const router = useRouter();
   const updateJobs = useUpdateJobMutation();
   const toggleBookmark = useToggleBookmarkByJobMutation();
-  const { applyToJob: handleApply } = useApplyJob();
+  const { applyToJob } = useApplyJob();
+
+  const [appliedJobIds, setAppliedJobIds] = useState<Set<string>>(new Set());
+
+  const removeJob = useCallback((jobId: string) => {
+    setAppliedJobIds((prev) => new Set([...prev, jobId]));
+  }, []);
+
+  const handleApply = useCallback(
+    (job: JobPost, e?: React.MouseEvent) => applyToJob(job, e, removeJob),
+    [applyToJob, removeJob],
+  );
+
+  const visibleJobs = allJobs.filter((job) => !appliedJobIds.has(job.id));
 
   return (
     <div className="w-full flex flex-col gap-6">
       <div className="hidden lg:block overflow-x-auto">
         <Table>
           <TableBody>
-            {allJobs.map((job) => (
+            {visibleJobs.map((job) => (
               <JobRow
                 key={job?.id}
                 job={job}
@@ -198,7 +212,7 @@ export default function JobsTable({
       {/* Mobile (MobileOverview has lg:hidden internally; this wrapper cuts it at md) */}
       <div className="lg:hidden mt-4">
         <MobileOverview
-          allJobs={allJobs}
+          allJobs={visibleJobs}
           updateJobs={updateJobs}
           handleApply={handleApply}
         />
