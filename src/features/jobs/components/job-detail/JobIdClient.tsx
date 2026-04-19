@@ -25,6 +25,13 @@ import { SocialButton } from "./SocialButton";
 import { JobDescriptionSkeleton, JobTitleSkeleton } from "./JobSkeletons";
 import { ApplicationSnapshot } from "./ApplicationSnapshot";
 
+function decodeHtml(encoded: string): string {
+  if (typeof window === "undefined") return encoded;
+  const el = document.createElement("textarea");
+  el.innerHTML = encoded;
+  return el.value;
+}
+
 const REFERRER_URLS: Record<string, string> = {
   dashboard: "/dashboard/home",
   "ai-recommendations": "/dashboard/jobs/category?tab=ai-recommendations",
@@ -46,12 +53,13 @@ export function JobIdClient({
   const job = data?.data;
   const backUrl = REFERRER_URLS[referrer] ?? "/dashboard/jobs";
 
+
   useEffect(() => {
     if (job?.id) {
       Analytics.jobView(job.id, job.title ?? undefined);
     }
   }, [job?.id]);
-
+  
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-6xl mx-auto px-4 sm:px-8 py-8">
@@ -119,7 +127,7 @@ export function JobIdClient({
                 <div className="text-gray-600 leading-relaxed space-y-3">
                   {job?.descriptionHtml ? (
                     <div
-                      dangerouslySetInnerHTML={{ __html: job.descriptionHtml }}
+                      dangerouslySetInnerHTML={{ __html: decodeHtml(job.descriptionHtml) }}
                     />
                   ) : (
                     <div>{job?.descriptionText}</div>
