@@ -31,6 +31,7 @@ export type AutoApplyStatus =
   | "resuming"
   | "completed"
   | "failed"
+  | "recruiter_email_found"
   | "not_found";
 
 export interface BotStatusEvent {
@@ -40,6 +41,7 @@ export interface BotStatusEvent {
   lastStepSummary?: string;
   screenshotUrl?: string;
   applicationQA?: Array<{ question: string; answer: string }>;
+  recruiterEmail?: string;
   updatedAt?: string;
 }
 

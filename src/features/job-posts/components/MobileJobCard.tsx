@@ -20,6 +20,7 @@ interface Props {
   onApply: (job: JobPost, e?: React.MouseEvent) => void;
   onResume: (applicationId: string) => void;
   onViewQA: (jobId: string) => void;
+  onEmailApply: (recruiterEmail: string) => void;
   onBookmark: () => void;
   onRowClick: () => void;
 }
@@ -34,6 +35,7 @@ export default function MobileJobCard({
   onApply,
   onResume,
   onViewQA,
+  onEmailApply,
   onBookmark,
   onRowClick,
 }: Props) {
@@ -205,6 +207,26 @@ export default function MobileJobCard({
             className="w-full py-2 rounded-xl text-xs font-medium text-gray-600 bg-gray-100 active:bg-gray-200"
           >
             Retry
+          </button>
+        </div>
+      )}
+
+      {/* ── State 5c: Recruiter email found — no form on site ── */}
+      {s?.status === "recruiter_email_found" && (
+        <div className="flex flex-col gap-2">
+          <div className="w-full py-2.5 rounded-xl text-sm font-semibold bg-blue-50 text-blue-700 text-center border border-blue-200">
+            Recruiter email found
+          </div>
+          {s.recruiterEmail && (
+            <p className="text-xs text-blue-600 bg-blue-50 rounded-xl px-3 py-2 leading-relaxed font-mono">
+              {s.recruiterEmail}
+            </p>
+          )}
+          <button
+            onClick={(e) => { e.stopPropagation(); s.recruiterEmail && onEmailApply(s.recruiterEmail); }}
+            className="w-full py-2.5 rounded-xl text-sm font-semibold bg-indigo-600 text-white active:bg-indigo-700"
+          >
+            Send Email Application ✦
           </button>
         </div>
       )}

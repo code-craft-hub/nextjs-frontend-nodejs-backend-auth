@@ -48,12 +48,14 @@ export function ApplyButton({
   onApply,
   onResume,
   onViewQA,
+  onEmailApply,
 }: {
   job: JobPost;
   session: BotSession | undefined;
   onApply: (job: JobPost, e?: React.MouseEvent) => void;
   onResume: (applicationId: string) => void;
   onViewQA: (jobId: string) => void;
+  onEmailApply: (recruiterEmail: string) => void;
 }) {
   const s = session;
 
@@ -160,19 +162,39 @@ export function ApplyButton({
   }
 
   // ── 5b: Failed ──
-  return (
-    <div className="flex flex-col gap-1.5 min-w-[130px]">
-      <div className="w-full py-2 px-3 rounded-xl text-xs font-semibold bg-red-50 text-red-600 text-center border border-red-200 whitespace-nowrap">
-        Application failed
+  if (s.status === "failed") {
+    return (
+      <div className="flex flex-col gap-1.5 min-w-[130px]">
+        <div className="w-full py-2 px-3 rounded-xl text-xs font-semibold bg-red-50 text-red-600 text-center border border-red-200 whitespace-nowrap">
+          Application failed
+        </div>
+        {s.stuckReason && (
+          <p className="text-2xs text-red-500 line-clamp-1 text-right">{s.stuckReason}</p>
+        )}
+        <button
+          onClick={(e) => { e.stopPropagation(); onApply(job, e); }}
+          className="w-full py-1.5 px-3 rounded-xl text-2xs font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 whitespace-nowrap"
+        >
+          Retry
+        </button>
       </div>
-      {s.stuckReason && (
-        <p className="text-2xs text-red-500 line-clamp-1 text-right">{s.stuckReason}</p>
+    );
+  }
+
+  // ── 5c: Recruiter email found — no form on site ──
+  return (
+    <div className="flex flex-col gap-1.5 min-w-[140px]">
+      <div className="w-full py-2 px-3 rounded-xl text-xs font-semibold bg-blue-50 text-blue-700 text-center border border-blue-200 whitespace-nowrap">
+        Recruiter email found
+      </div>
+      {s.recruiterEmail && (
+        <p className="text-2xs text-blue-600 font-mono truncate text-right">{s.recruiterEmail}</p>
       )}
       <button
-        onClick={(e) => { e.stopPropagation(); onApply(job, e); }}
-        className="w-full py-1.5 px-3 rounded-xl text-2xs font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 whitespace-nowrap"
+        onClick={(e) => { e.stopPropagation(); s.recruiterEmail && onEmailApply(s.recruiterEmail); }}
+        className="w-full py-1.5 px-3 rounded-xl text-2xs font-medium bg-indigo-600 text-white hover:bg-indigo-700 whitespace-nowrap"
       >
-        Retry
+        Send Email Application ✦
       </button>
     </div>
   );
@@ -186,6 +208,7 @@ function JobRow({
   handleApply,
   handleResume,
   handleViewQA,
+  handleEmailApply,
   handleBookmark,
   onRowClick,
 }: {
@@ -194,6 +217,7 @@ function JobRow({
   handleApply: (job: JobPost, e?: React.MouseEvent) => void;
   handleResume: (applicationId: string) => void;
   handleViewQA: (jobId: string) => void;
+  handleEmailApply: (recruiterEmail: string) => void;
   handleBookmark: () => void;
   onRowClick: () => void;
 }) {
@@ -289,6 +313,7 @@ function JobRow({
             onApply={handleApply}
             onResume={handleResume}
             onViewQA={handleViewQA}
+            onEmailApply={handleEmailApply}
           />
         </div>
       </TableCell>
@@ -383,12 +408,20 @@ export default function JobsTable({
     [resumeApplication],
   );
 
+  const handleEmailApply = useCallback(
+    (recruiterEmail: string) => {
+      applyToJob({ id: "", emailApply: recruiterEmail });
+    },
+    [applyToJob],
+  );
+
   // Only open SSE for sessions that have an applicationId and are not terminal
   const activePollers = Object.entries(botSessions).filter(
     ([, s]) =>
       s.applicationId &&
       s.status !== "completed" &&
       s.status !== "failed" &&
+      s.status !== "recruiter_email_found" &&
       s.status !== "starting",
   );
 
@@ -419,6 +452,7 @@ export default function JobsTable({
                 handleApply={handleApply}
                 handleResume={handleResume}
                 handleViewQA={setQaJobId}
+                handleEmailApply={handleEmailApply}
                 handleBookmark={() =>
                   toggleBookmark.mutate({
                     jobId: job?.id,
@@ -447,6 +481,7 @@ export default function JobsTable({
               onApply={handleApply}
               onResume={handleResume}
               onViewQA={setQaJobId}
+              onEmailApply={handleEmailApply}
               onBookmark={() =>
                 updateJobs.mutate({
                   id: String(job.id),

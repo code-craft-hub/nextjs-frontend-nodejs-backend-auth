@@ -8,21 +8,23 @@ export interface BotSession {
   /** job_applications.id — needed to call the resume endpoint */
   applicationId: string;
   liveUrl: string;
-  status: "starting" | "running" | "awaiting_human" | "resuming" | "completed" | "failed";
+  status: "starting" | "running" | "awaiting_human" | "resuming" | "completed" | "failed" | "recruiter_email_found";
   stuckReason?: string;
   lastStepSummary?: string;
   applicationQA?: Array<{ question: string; answer: string }>;
+  recruiterEmail?: string;
 }
 
-const TERMINAL = new Set<BotSession["status"]>(["completed", "failed"]);
+const TERMINAL = new Set<BotSession["status"]>(["completed", "failed", "recruiter_email_found"]);
 
 /** Map server status → display status. */
 function mapStatus(s: string): BotSession["status"] {
-  if (s === "awaiting_human") return "awaiting_human";
-  if (s === "resuming")       return "resuming";
-  if (s === "completed")      return "completed";
+  if (s === "awaiting_human")       return "awaiting_human";
+  if (s === "resuming")             return "resuming";
+  if (s === "completed")            return "completed";
+  if (s === "recruiter_email_found") return "recruiter_email_found";
   if (s === "failed" || s === "not_found") return "failed";
-  if (s === "initializing")   return "starting";
+  if (s === "initializing")         return "starting";
   return "running";
 }
 
@@ -58,6 +60,7 @@ export function useBotStatus(
           stuckReason:     data.stuckReason      ?? undefined,
           lastStepSummary: data.lastStepSummary  ?? undefined,
           applicationQA:   data.applicationQA    ?? undefined,
+          recruiterEmail:  data.recruiterEmail   ?? undefined,
         });
         if (TERMINAL.has(status)) es.close();
       } catch {
