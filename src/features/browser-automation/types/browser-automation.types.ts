@@ -8,16 +8,11 @@ export interface SubmitApplicationPayload {
 // ─── Response ─────────────────────────────────────────────────────
 
 export interface SubmitApplicationData {
-  /** BullMQ job ID — equals idempotencyKey for queue-level deduplication. */
-  jobId: string;
-  /** ID of the job_applications record created with status "applying". */
+  /** ID of the job_applications record created for this submission. */
   jobApplicationId: string;
-  /** SHA-256 hash of `userId:job_application_submit:jobId`. */
-  idempotencyKey: string;
-  /**
-   * True when a prior identical submission is already queued.
-   * The caller should surface a softer message in this case.
-   */
+  /** Interactive Browser-Use live URL — empty string until the browser is ready. */
+  liveUrl: string;
+  /** True when a prior identical submission is already running. */
   deduplicated: boolean;
 }
 
@@ -25,4 +20,31 @@ export interface SubmitApplicationResponse {
   success: boolean;
   message: string;
   data: SubmitApplicationData;
+}
+
+// ─── Bot status (SSE stream payload) ──────────────────────────────
+
+export type AutoApplyStatus =
+  | "initializing"
+  | "running"
+  | "awaiting_human"
+  | "resuming"
+  | "completed"
+  | "failed"
+  | "not_found";
+
+export interface BotStatusEvent {
+  status: AutoApplyStatus;
+  liveUrl?: string;
+  stuckReason?: string;
+  lastStepSummary?: string;
+  screenshotUrl?: string;
+  applicationQA?: Array<{ question: string; answer: string }>;
+  updatedAt?: string;
+}
+
+// ─── Resume ───────────────────────────────────────────────────────
+
+export interface ResumeApplicationPayload {
+  jobApplicationId: string;
 }
