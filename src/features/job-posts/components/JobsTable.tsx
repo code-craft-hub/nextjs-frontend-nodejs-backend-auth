@@ -14,7 +14,6 @@ import {
 import { BotStatusDrawer } from "@/features/jobs/components/BotStatusDrawer";
 import MobileJobCard from "@/features/job-posts/components/MobileJobCard";
 import { useExtension } from "@/features/job-posts/hooks/useExtension";
-// import { ExtensionInstallBanner } from "@/features/job-posts/components/ExtensionInstallBanner";
 import { JobsTableBotPoller } from "@/features/job-posts/components/JobsTableBotPoller";
 import { JobsTableRow } from "@/features/job-posts/components/JobsTableRow";
 
@@ -31,13 +30,12 @@ export default function JobsTable({
   const { applyToJob } = useApplyJob();
   const { mutate: resumeApplication } = useResumeBrowserApplicationMutation();
 
-  // Extension detection — drives desktop vs mobile apply path
-  const { state: extState, applyViaExtension } = useExtension();
+  // Extension detection — drives desktop vs mobile apply path.
+  // extJobStatuses tracks the hidden-tab automation status per jobId.
+  const { state: extState, extJobStatuses, applyViaExtension, focusExtTab } = useExtension();
 
-  // jobId → BotSession (backend automation sessions)
+  // jobId → BotSession (backend / cloud-bot sessions — mobile + email path)
   const [botSessions, setBotSessions] = useState<Record<string, BotSession>>({});
-  // jobIds dispatched to the extension (no backend session, sidepanel owns status)
-  const [extDispatchedJobs, setExtDispatchedJobs] = useState<Set<string>>(new Set());
   // jobId whose QA drawer is open
   const [qaJobId, setQaJobId] = useState<string | null>(null);
 
@@ -59,7 +57,6 @@ export default function JobsTable({
   const handleBotStarted = useCallback(
     (jobId: string, applicationId: string, liveUrl: string) => {
       if (!applicationId) {
-        // API failed — clear optimistic spinner
         setBotSessions((prev) => {
           const next = { ...prev };
           delete next[jobId];
@@ -77,16 +74,13 @@ export default function JobsTable({
 
   // ── Apply handlers ───────────────────────────────────────────────────────
 
-  /** Desktop + extension installed path */
+  /** Desktop + extension installed: dispatches job to hidden-tab automation. */
   const handleExtApply = useCallback(
-    (job: JobPost) => {
-      applyViaExtension(job);
-      setExtDispatchedJobs((prev) => new Set(prev).add(job.id));
-    },
+    (job: JobPost) => applyViaExtension(job),
     [applyViaExtension],
   );
 
-  /** Mobile / no-extension / email path — existing backend automation */
+  /** Mobile / no-extension / email jobs: existing backend cloud-bot path. */
   const handleApply = useCallback(
     (job: JobPost, e?: React.MouseEvent) =>
       applyToJob(job, e, handleBotStarting, handleBotStarted),
@@ -113,7 +107,7 @@ export default function JobsTable({
     [resumeApplication],
   );
 
-  /** Email-based apply — untouched from original implementation */
+  /** Email-based apply — untouched from original implementation. */
   const handleEmailApply = useCallback(
     (recruiterEmail: string) => {
       applyToJob({ id: "", emailApply: recruiterEmail });
@@ -137,7 +131,7 @@ export default function JobsTable({
 
   return (
     <div className="w-full flex flex-col gap-4">
-      {/* Invisible SSE pollers */}
+      {/* Invisible SSE pollers (backend path only) */}
       {activePollers.map(([jobId, s]) => (
         <JobsTableBotPoller
           key={s.applicationId}
@@ -147,10 +141,7 @@ export default function JobsTable({
         />
       ))}
 
-      {/* Extension install prompt — Chromium desktop only, dismissible */}
-      {/* {extState === "not_installed" && <ExtensionInstallBanner />} */}
-
-      {/* ── Desktop table (lg+) ──────────────────────────────────────────── */}
+      {/* ── Desktop table (lg+) ─────────────────────────────────────────── */}
       <div className="hidden lg:block overflow-x-auto">
         <Table>
           <TableBody>
@@ -160,12 +151,13 @@ export default function JobsTable({
                 job={job}
                 session={botSessions[job.id]}
                 extState={extState}
-                extDispatched={extDispatchedJobs.has(job.id)}
+                extJobStatus={extJobStatuses[job.id]}
                 onApply={handleApply}
                 onResume={handleResume}
                 onViewQA={setQaJobId}
                 onEmailApply={handleEmailApply}
                 onExtApply={handleExtApply}
+                onFocusExtTab={focusExtTab}
                 onBookmark={() =>
                   toggleBookmark.mutate({
                     jobId: job?.id,
@@ -183,7 +175,7 @@ export default function JobsTable({
         </Table>
       </div>
 
-      {/* ── Mobile cards (< lg) — always uses backend automation ────────── */}
+      {/* ── Mobile cards (< lg) — always uses backend cloud-bot ─────────── */}
       <div className="lg:hidden mt-4">
         <div className="space-y-4">
           {allJobs.map((job) => (

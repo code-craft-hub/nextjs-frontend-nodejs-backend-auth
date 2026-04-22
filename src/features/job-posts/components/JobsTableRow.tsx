@@ -13,19 +13,20 @@ import { PiOfficeChairFill } from "react-icons/pi";
 import { formatAppliedDate, stripUrlProtocol } from "@/lib/utils/helpers";
 import type { JobPost } from "@/features/job-posts";
 import type { BotSession } from "@/features/browser-automation";
-import type { ExtensionState } from "@/features/job-posts/hooks/useExtension";
+import type { ExtensionState, ExtJobUpdate } from "@/features/job-posts/hooks/useExtension";
 import { JobsTableApplyButton } from "./JobsTableApplyButton";
 
 interface Props {
   job: JobPost;
   session: BotSession | undefined;
   extState: ExtensionState;
-  extDispatched: boolean;
+  extJobStatus: ExtJobUpdate | undefined;
   onApply: (job: JobPost, e?: React.MouseEvent) => void;
   onResume: (applicationId: string) => void;
   onViewQA: (jobId: string) => void;
   onEmailApply: (recruiterEmail: string) => void;
   onExtApply: (job: JobPost) => void;
+  onFocusExtTab: (jobId: string) => void;
   onBookmark: () => void;
   onRowClick: () => void;
 }
@@ -34,12 +35,13 @@ export function JobsTableRow({
   job,
   session,
   extState,
-  extDispatched,
+  extJobStatus,
   onApply,
   onResume,
   onViewQA,
   onEmailApply,
   onExtApply,
+  onFocusExtTab,
   onBookmark,
   onRowClick,
 }: Props) {
@@ -136,12 +138,13 @@ export function JobsTableRow({
             job={job}
             session={session}
             extState={extState}
-            extDispatched={extDispatched}
+            extJobStatus={extJobStatus}
             onApply={onApply}
             onResume={onResume}
             onViewQA={onViewQA}
             onEmailApply={onEmailApply}
             onExtApply={onExtApply}
+            onFocusExtTab={onFocusExtTab}
           />
         </div>
       </TableCell>

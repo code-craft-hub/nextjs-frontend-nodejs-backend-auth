@@ -1,62 +1,178 @@
 "use client";
 
+import { useState } from "react";
 import type { JobPost } from "@/features/job-posts";
 import type { BotSession } from "@/features/browser-automation";
-import type { ExtensionState } from "@/features/job-posts/hooks/useExtension";
+import type { ExtensionState, ExtJobUpdate } from "@/features/job-posts/hooks/useExtension";
 
 interface Props {
   job: JobPost;
+  /** Active backend bot session (mobile / no-extension path). */
   session: BotSession | undefined;
-  /** Whether this browser can have the extension installed. */
+  /** Whether the extension is installed on this Chromium desktop. */
   extState: ExtensionState;
-  /** True after the user clicked "Apply Now" and we dispatched to the extension. */
-  extDispatched: boolean;
+  /** Latest status pushed by the extension for this specific job, if any. */
+  extJobStatus: ExtJobUpdate | undefined;
   onApply: (job: JobPost, e?: React.MouseEvent) => void;
   onResume: (applicationId: string) => void;
   onViewQA: (jobId: string) => void;
   onEmailApply: (recruiterEmail: string) => void;
   onExtApply: (job: JobPost) => void;
+  /** Brings the hidden automation tab to the foreground. */
+  onFocusExtTab: (jobId: string) => void;
 }
 
-/**
- * Desktop apply button — three top-level paths:
- *  1. Extension installed (non-email job)  → delegates to extension sidepanel
- *  2. Backend bot session active           → shows 5-state bot UI
- *  3. Mobile / no extension / email job   → uses existing backend/email flow
- */
+// ─── Extension job in-progress states ────────────────────────────────────────
+
+function ExtInProgressButton({ label, color }: { label: string; color: string }) {
+  return (
+    <button
+      disabled
+      className={`w-full py-2 px-3 rounded-xl text-xs font-semibold text-white flex items-center justify-center gap-2 whitespace-nowrap opacity-90 ${color}`}
+    >
+      <span className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin shrink-0" />
+      {label}
+    </button>
+  );
+}
+
+// ─── Main component ───────────────────────────────────────────────────────────
+
 export function JobsTableApplyButton({
   job,
   session: s,
   extState,
-  extDispatched,
+  extJobStatus: ext,
   onApply,
   onResume,
   onViewQA,
   onEmailApply,
   onExtApply,
+  onFocusExtTab,
 }: Props) {
-  // ── Extension already dispatched — waiting for sidepanel ─────────────────
-  if (extDispatched && !s) {
-    return (
-      <div className="w-full py-2 px-3 rounded-xl text-xs font-semibold bg-indigo-50 text-indigo-700 text-center border border-indigo-200 whitespace-nowrap">
-        Check extension panel →
-      </div>
-    );
-  }
+  // Local "dispatched" flag — gives instant feedback before the background responds.
+  const [extDispatched, setExtDispatched] = useState(false);
 
-  // ── No active session ─────────────────────────────────────────────────────
-  if (!s) {
-    if (extState === "installed" && !job.emailApply) {
+  // ════════════════════════════════════════════════════════════════════════════
+  // EXTENSION PATH — only for non-email jobs on Chromium desktop
+  // ════════════════════════════════════════════════════════════════════════════
+
+  if (extState === "installed" && !job.emailApply) {
+    // ── Navigating to job application page ──────────────────────────────
+    if (ext?.status === "navigating") {
+      return <ExtInProgressButton label="Opening page…" color="bg-indigo-500" />;
+    }
+
+    // ── Gemini is reading the page ───────────────────────────────────────
+    if (ext?.status === "analyzing") {
+      return <ExtInProgressButton label="Analyzing form…" color="bg-violet-600" />;
+    }
+
+    // ── Bot is typing into form fields ───────────────────────────────────
+    if (ext?.status === "filling") {
+      return <ExtInProgressButton label="Filling form…" color="bg-cyan-600" />;
+    }
+
+    // ── Bot is stuck — needs human help ──────────────────────────────────
+    if (ext?.status === "stuck") {
       return (
-        <button
-          onClick={(e) => { e.stopPropagation(); onExtApply(job); }}
-          className="w-full py-2 px-3 rounded-xl text-xs font-semibold bg-indigo-600 text-white hover:bg-indigo-700 active:bg-indigo-800 transition-colors whitespace-nowrap flex items-center justify-center gap-1.5"
-        >
-          <span>🧩</span> Apply Now
+        <div className="flex flex-col gap-1.5 min-w-[140px]">
+          <button
+            onClick={(e) => { e.stopPropagation(); onFocusExtTab(job.id); }}
+            className="w-full py-2 px-3 rounded-xl text-xs font-semibold bg-amber-500 text-white hover:bg-amber-600 transition-colors flex items-center justify-center gap-1.5 whitespace-nowrap"
+          >
+            <span className="w-2 h-2 rounded-full bg-white animate-pulse shrink-0" />
+            Help bot finish →
+          </button>
+          {ext.stuckReason && (
+            <p className="text-2xs text-amber-600 bg-amber-50 rounded-xl px-2 py-1 leading-relaxed line-clamp-2">
+              {ext.stuckReason}
+            </p>
+          )}
+        </div>
+      );
+    }
+
+    // ── Applied successfully ─────────────────────────────────────────────
+    if (ext?.status === "applied") {
+      return (
+        <div className="w-full py-2 px-3 rounded-xl text-xs font-semibold bg-green-600 text-white text-center whitespace-nowrap">
+          Applied via extension ✓
+        </div>
+      );
+    }
+
+    // ── Failed (below threshold or error) ────────────────────────────────
+    if (ext?.status === "failed") {
+      return (
+        <div className="flex flex-col gap-1.5 min-w-[130px]">
+          <div className="w-full py-2 px-3 rounded-xl text-xs font-semibold bg-red-50 text-red-600 text-center border border-red-200 whitespace-nowrap">
+            Extension apply failed
+          </div>
+          {ext.stuckReason && (
+            <p className="text-2xs text-red-500 line-clamp-2 text-right">{ext.stuckReason}</p>
+          )}
+          <button
+            onClick={(e) => { e.stopPropagation(); onExtApply(job); }}
+            className="w-full py-1.5 px-3 rounded-xl text-2xs font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 whitespace-nowrap"
+          >
+            Retry
+          </button>
+        </div>
+      );
+    }
+
+    // ── Dispatched but no update from background yet ──────────────────────
+    if (extDispatched) {
+      return (
+        <button disabled className="w-full py-2 px-3 rounded-xl text-xs font-semibold bg-indigo-500 text-white flex items-center justify-center gap-2 opacity-90 whitespace-nowrap">
+          <span className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin shrink-0" />
+          Sending to bot…
         </button>
       );
     }
 
+    // ── Default: not yet dispatched ──────────────────────────────────────
+    return (
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          setExtDispatched(true);
+          onExtApply(job);
+        }}
+        className="w-full py-2 px-3 rounded-xl text-xs font-semibold bg-indigo-600 text-white hover:bg-indigo-700 active:bg-indigo-800 transition-colors whitespace-nowrap flex items-center justify-center gap-1.5"
+      >
+        <span className="relative flex size-2 shrink-0">
+          <span className="absolute inline-flex size-full rounded-full bg-green-400 opacity-75 animate-ping" />
+          <span className="relative inline-flex size-2 rounded-full bg-green-400" />
+        </span>
+        <span className="text-sm">🧩</span> Apply Now
+      </button>
+    );
+  }
+
+  // ── Chromium but extension not yet installed ──────────────────────────────
+  if (extState === "not_installed" && !job.emailApply) {
+    return (
+      <button
+        onClick={(e) => { e.stopPropagation(); onApply(job, e); }}
+        className="w-full py-2 px-3 rounded-xl text-xs font-semibold bg-indigo-600 text-white hover:bg-indigo-700 active:bg-indigo-800 transition-colors whitespace-nowrap flex items-center justify-center gap-1.5"
+        title="Install CverAI extension for faster automation"
+      >
+        <span className="relative flex size-2 shrink-0">
+          <span className="relative inline-flex size-2 rounded-full bg-gray-300" />
+        </span>
+        Apply Now
+      </button>
+    );
+  }
+
+  // ════════════════════════════════════════════════════════════════════════════
+  // BACKEND / MOBILE PATH — existing cloud-bot states
+  // ════════════════════════════════════════════════════════════════════════════
+
+  // ── No session ────────────────────────────────────────────────────────────
+  if (!s) {
     return (
       <button
         onClick={(e) => { e.stopPropagation(); onApply(job, e); }}
@@ -67,7 +183,7 @@ export function JobsTableApplyButton({
     );
   }
 
-  // ── Starting bot ──────────────────────────────────────────────────────────
+  // ── Starting bot ─────────────────────────────────────────────────────────
   if (s.status === "starting") {
     return (
       <button
@@ -90,9 +206,7 @@ export function JobsTableApplyButton({
           rel="noopener noreferrer"
           onClick={(e) => e.stopPropagation()}
           className={`w-full py-2 px-3 rounded-xl text-xs font-semibold text-white text-center flex items-center justify-center gap-2 whitespace-nowrap ${
-            s.liveUrl
-              ? "bg-indigo-600 hover:bg-indigo-700"
-              : "bg-indigo-400 pointer-events-none"
+            s.liveUrl ? "bg-indigo-600 hover:bg-indigo-700" : "bg-indigo-400 pointer-events-none"
           }`}
         >
           <span className="w-2 h-2 rounded-full bg-indigo-300 animate-pulse shrink-0" />
