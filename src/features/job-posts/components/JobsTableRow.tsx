@@ -12,21 +12,22 @@ import {
 import { PiOfficeChairFill } from "react-icons/pi";
 import { formatAppliedDate, stripUrlProtocol } from "@/lib/utils/helpers";
 import type { JobPost } from "@/features/job-posts";
-import type { BotSession } from "@/features/browser-automation";
-import type { ExtensionState, ExtJobUpdate } from "@/features/job-posts/hooks/useExtension";
+import type { ExtensionState } from "@/features/job-posts/hooks/useExtension";
+import type { ApplySession } from "@/features/job-posts/types/apply-session.types";
 import { JobsTableApplyButton } from "./JobsTableApplyButton";
 
 interface Props {
   job: JobPost;
-  session: BotSession | undefined;
+  /** Current apply session for this job, if any. */
+  session: ApplySession | undefined;
+  /** Extension detection state — determines which apply path is offered. */
   extState: ExtensionState;
-  extJobStatus: ExtJobUpdate | undefined;
-  onApply: (job: JobPost, e?: React.MouseEvent) => void;
-  onResume: (applicationId: string) => void;
-  onViewQA: (jobId: string) => void;
+  /** All callbacks are pre-bound to this specific job by the parent. */
+  onApply: () => void;
+  onResume: () => void;
+  onViewQA: () => void;
   onEmailApply: (recruiterEmail: string) => void;
-  onExtApply: (job: JobPost) => void;
-  onFocusExtTab: (jobId: string) => void;
+  onFocusExtTab: () => void;
   onBookmark: () => void;
   onRowClick: () => void;
 }
@@ -35,12 +36,10 @@ export function JobsTableRow({
   job,
   session,
   extState,
-  extJobStatus,
   onApply,
   onResume,
   onViewQA,
   onEmailApply,
-  onExtApply,
   onFocusExtTab,
   onBookmark,
   onRowClick,
@@ -138,12 +137,10 @@ export function JobsTableRow({
             job={job}
             session={session}
             extState={extState}
-            extJobStatus={extJobStatus}
             onApply={onApply}
             onResume={onResume}
             onViewQA={onViewQA}
             onEmailApply={onEmailApply}
-            onExtApply={onExtApply}
             onFocusExtTab={onFocusExtTab}
           />
         </div>

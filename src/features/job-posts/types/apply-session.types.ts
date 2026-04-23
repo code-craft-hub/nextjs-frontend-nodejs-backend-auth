@@ -1,0 +1,92 @@
+// ─── Strategy ─────────────────────────────────────────────────────────────────
+
+/** The automation path chosen by the strategy router at click time. */
+export type ApplyStrategy = "extension" | "cloud_bot" | "manual" | "email";
+
+// ─── Status (unified FSM) ─────────────────────────────────────────────────────
+
+/**
+ * Every possible state across all apply strategies, collapsed into one type.
+ *
+ * Namespace prefixes:
+ *   ext:   — Chrome extension hidden-tab automation
+ *   cloud: — Browser-Use Cloud backend bot
+ *   (none) — strategy-agnostic states (routing, terminal)
+ *
+ * State machine (happy path):
+ *
+ *   Extension:  routing → ext:queued → ext:navigating → ext:analyzing
+ *               → ext:filling → [ext:reviewing] → applied
+ *
+ *   Cloud bot:  routing → cloud:starting → cloud:running
+ *               → [cloud:paused → cloud:resuming] → applied
+ *
+ *   Manual:     routing → applied  (fire-and-forget tab open)
+ *   Email:      routing → applied  (navigate to AI email compose)
+ *
+ * Fallback: ext:navigating --[form not found after all steps]-→ cloud:starting
+ */
+export type ApplyStatus =
+  // Pre-routing: milliseconds between click and strategy selection
+  | "routing"
+  // ── Extension path (chrome-extension hidden-tab) ──────────────────────────
+  | "ext:queued"     // dispatched to extension; awaiting tab-creation acknowledgement
+  | "ext:navigating" // tab open; LLM agent navigating to the application form
+  | "ext:analyzing"  // form found; Gemini generating answers + match score
+  | "ext:filling"    // bot typing Gemini answers into form fields
+  | "ext:reviewing"  // autoSubmit=false; user must confirm in sidepanel
+  | "ext:stuck"      // form open but submit failed; needs human help
+  // ── Cloud-bot path (browser-use cloud) ───────────────────────────────────
+  | "cloud:starting"  // POST /submit-application in flight
+  | "cloud:running"   // cloud session active; bot navigating + filling
+  | "cloud:paused"    // awaiting_human: captcha / login / 2FA
+  | "cloud:resuming"  // user hit "Resume"; bot re-entering the form
+  // ── Terminal states (shared across all strategies) ────────────────────────
+  | "applied"          // form submitted successfully
+  | "failed"           // unrecoverable error (any strategy)
+  | "skipped"          // below match threshold or user opted out
+  | "recruiter_email"; // no public form; recruiter email discovered instead
+
+/** Status values that close the apply session. A retry re-creates the session. */
+export const TERMINAL_STATUSES = new Set<ApplyStatus>([
+  "applied",
+  "failed",
+  "skipped",
+  "recruiter_email",
+]);
+
+// ─── Session ──────────────────────────────────────────────────────────────────
+
+/**
+ * Unified per-job apply session.
+ *
+ * Single source of truth for every job row's apply UI — replaces the
+ * previous split between BotSession (cloud) and ExtJobUpdate (extension).
+ * The orchestrator owns one Map<jobId, ApplySession> and all rendering
+ * derives from it.
+ */
+export interface ApplySession {
+  jobId: string;
+  strategy: ApplyStrategy;
+  status: ApplyStatus;
+  /**
+   * UUID generated at click-time.
+   * Flows through: window event → extension background → server POST body.
+   * Enables end-to-end correlation in logs and fallback handoff.
+   */
+  correlationId: string;
+  startedAt: number;
+
+  // ── Cloud-bot fields (populated after POST /submit-application succeeds) ──
+  applicationId?: string; // job_applications.id — needed for SSE + resume endpoint
+  liveUrl?: string;       // Browser-Use Cloud live view URL
+
+  // ── Progress detail ───────────────────────────────────────────────────────
+  stuckReason?: string;
+  lastStepSummary?: string;
+  screenshotUrl?: string;
+
+  // ── Terminal-state payload ────────────────────────────────────────────────
+  applicationQA?: Array<{ question: string; answer: string }>;
+  recruiterEmail?: string;
+}

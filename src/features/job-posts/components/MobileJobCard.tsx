@@ -3,7 +3,7 @@
 import { BookmarkIcon } from "lucide-react";
 import { Toggle } from "@/components/ui/toggle";
 import type { JobPost } from "@/features/job-posts";
-import type { BotSession } from "@/features/browser-automation";
+import type { ApplySession } from "@/features/job-posts/types/apply-session.types";
 
 function extractDomain(url: string | null | undefined): string | null {
   if (!url) return null;
@@ -16,19 +16,23 @@ function extractDomain(url: string | null | undefined): string | null {
 
 interface Props {
   job: JobPost;
-  session: BotSession | undefined;
-  onApply: (job: JobPost, e?: React.MouseEvent) => void;
-  onResume: (applicationId: string) => void;
-  onViewQA: (jobId: string) => void;
+  /** Current apply session for this job, if any. */
+  session: ApplySession | undefined;
+  /** All callbacks are pre-bound to this specific job by the parent. */
+  onApply: () => void;
+  onResume: () => void;
+  onViewQA: () => void;
   onEmailApply: (recruiterEmail: string) => void;
   onBookmark: () => void;
   onRowClick: () => void;
 }
 
-/**
- * Mobile job card — exact replica of the reference JobCard component.
- * Shows all 5 bot states: default, starting, running, awaiting_human, completed, failed.
- */
+function Spinner() {
+  return (
+    <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+  );
+}
+
 export default function MobileJobCard({
   job,
   session: s,
@@ -65,7 +69,6 @@ export default function MobileJobCard({
           </h3>
           <p className="text-gray-500 text-xs mt-0.5">{job.companyName}</p>
         </div>
-        {/* Bookmark */}
         <div
           onClick={(e) => { e.stopPropagation(); onBookmark(); }}
           className="shrink-0 -mt-1 -mr-1"
@@ -105,29 +108,84 @@ export default function MobileJobCard({
         )}
       </div>
 
-      {/* ── State 1: No session ── */}
-      {!s && (
-        <button
-          onClick={(e) => { e.stopPropagation(); onApply(job, e); }}
-          className="w-full py-2.5 rounded-xl text-sm font-semibold bg-indigo-600 text-white active:bg-indigo-700 transition-colors"
-        >
-          {job.emailApply ? "Auto Apply ✦" : "Apply Now"}
-        </button>
-      )}
+      {/* ── Apply CTA — derives from session.status ── */}
+      <MobileApplyArea
+        job={job}
+        session={s}
+        onApply={onApply}
+        onResume={onResume}
+        onViewQA={onViewQA}
+        onEmailApply={onEmailApply}
+      />
+    </div>
+  );
+}
 
-      {/* ── State 2: Starting bot ── */}
-      {s?.status === "starting" && (
+// ─── Extracted apply area (keeps the card JSX clean) ─────────────────────────
+
+interface ApplyAreaProps {
+  job: JobPost;
+  session: ApplySession | undefined;
+  onApply: () => void;
+  onResume: () => void;
+  onViewQA: () => void;
+  onEmailApply: (recruiterEmail: string) => void;
+}
+
+function MobileApplyArea({ job, session: s, onApply, onResume, onViewQA, onEmailApply }: ApplyAreaProps) {
+  // No session — default CTA
+  if (!s) {
+    return (
+      <button
+        onClick={(e) => { e.stopPropagation(); onApply(); }}
+        className="w-full py-2.5 rounded-xl text-sm font-semibold bg-indigo-600 text-white active:bg-indigo-700 transition-colors"
+      >
+        {job.emailApply ? "Auto Apply ✦" : "Apply Now"}
+      </button>
+    );
+  }
+
+  switch (s.status) {
+    // ── Any pre-flight / extension spinner ──────────────────────────────────
+    case "routing":
+    case "ext:queued":
+    case "ext:navigating":
+    case "ext:analyzing":
+    case "ext:filling":
+    case "ext:reviewing":
+    case "cloud:starting":
+      return (
         <button
           disabled
           className="w-full py-2.5 rounded-xl text-sm font-semibold bg-indigo-500 text-white flex items-center justify-center gap-2 opacity-80"
         >
-          <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-          Starting bot…
+          <Spinner />
+          {s.status === "cloud:starting" ? "Starting bot…" : "Working…"}
         </button>
-      )}
+      );
 
-      {/* ── State 3: Running — Watch Live ── */}
-      {(s?.status === "running" || s?.status === "resuming") && (
+    // ── Extension stuck ─────────────────────────────────────────────────────
+    case "ext:stuck":
+      return (
+        <div className="flex flex-col gap-2">
+          {s.stuckReason && (
+            <p className="text-xs text-amber-600 bg-amber-50 rounded-xl px-3 py-2 leading-relaxed">
+              {s.stuckReason}
+            </p>
+          )}
+          <button
+            onClick={(e) => { e.stopPropagation(); onApply(); }}
+            className="w-full py-2.5 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 active:bg-gray-200"
+          >
+            Retry with cloud bot
+          </button>
+        </div>
+      );
+
+    // ── Cloud running / resuming ────────────────────────────────────────────
+    case "cloud:running":
+    case "cloud:resuming":
+      return (
         <div className="flex flex-col gap-1.5">
           <a
             href={s.liveUrl || undefined}
@@ -145,10 +203,11 @@ export default function MobileJobCard({
             <p className="text-xs text-gray-400 px-1 line-clamp-2">{s.lastStepSummary}</p>
           )}
         </div>
-      )}
+      );
 
-      {/* ── State 4: Stuck — Action needed ── */}
-      {s?.status === "awaiting_human" && (
+    // ── Cloud paused — human needed ─────────────────────────────────────────
+    case "cloud:paused":
+      return (
         <div className="flex flex-col gap-2">
           {s.liveUrl && (
             <a
@@ -168,33 +227,35 @@ export default function MobileJobCard({
             </p>
           )}
           <button
-            onClick={(e) => { e.stopPropagation(); onResume(s.applicationId); }}
+            onClick={(e) => { e.stopPropagation(); onResume(); }}
             className="w-full py-2.5 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 active:bg-gray-200"
           >
             Done — let the bot continue
           </button>
         </div>
-      )}
+      );
 
-      {/* ── State 5a: Completed ── */}
-      {s?.status === "completed" && (
+    // ── Success ─────────────────────────────────────────────────────────────
+    case "applied":
+      return (
         <div className="flex flex-col gap-1.5">
           <div className="w-full py-2.5 rounded-xl text-sm font-semibold bg-green-600 text-white text-center">
-            Application submitted ✓
+            {s.strategy === "extension" ? "Applied via extension ✓" : "Application submitted ✓"}
           </div>
           {s.applicationQA && s.applicationQA.length > 0 && (
             <button
-              onClick={(e) => { e.stopPropagation(); onViewQA(job.id); }}
+              onClick={(e) => { e.stopPropagation(); onViewQA(); }}
               className="w-full py-2 rounded-xl text-xs font-medium text-green-700 bg-green-50 active:bg-green-100"
             >
               View questions &amp; answers →
             </button>
           )}
         </div>
-      )}
+      );
 
-      {/* ── State 5b: Failed ── */}
-      {s?.status === "failed" && (
+    // ── Failure ─────────────────────────────────────────────────────────────
+    case "failed":
+      return (
         <div className="flex flex-col gap-1.5">
           <div className="w-full py-2.5 rounded-xl text-sm font-semibold bg-red-50 text-red-600 text-center border border-red-200">
             Application failed
@@ -203,16 +264,17 @@ export default function MobileJobCard({
             <p className="text-xs text-red-500 px-1 line-clamp-2">{s.stuckReason}</p>
           )}
           <button
-            onClick={(e) => { e.stopPropagation(); onApply(job, e); }}
+            onClick={(e) => { e.stopPropagation(); onApply(); }}
             className="w-full py-2 rounded-xl text-xs font-medium text-gray-600 bg-gray-100 active:bg-gray-200"
           >
             Retry
           </button>
         </div>
-      )}
+      );
 
-      {/* ── State 5c: Recruiter email found — no form on site ── */}
-      {s?.status === "recruiter_email_found" && (
+    // ── Recruiter email found ────────────────────────────────────────────────
+    case "recruiter_email":
+      return (
         <div className="flex flex-col gap-2">
           <div className="w-full py-2.5 rounded-xl text-sm font-semibold bg-blue-50 text-blue-700 text-center border border-blue-200">
             Recruiter email found
@@ -229,7 +291,22 @@ export default function MobileJobCard({
             Send Email Application ✦
           </button>
         </div>
-      )}
-    </div>
-  );
+      );
+
+    // ── Skipped ─────────────────────────────────────────────────────────────
+    case "skipped":
+      return (
+        <div className="flex flex-col gap-1.5">
+          <div className="w-full py-2.5 rounded-xl text-sm font-semibold bg-gray-50 text-gray-500 text-center border border-gray-200">
+            Skipped
+          </div>
+          <button
+            onClick={(e) => { e.stopPropagation(); onApply(); }}
+            className="w-full py-2 rounded-xl text-xs font-medium text-gray-600 bg-gray-100 active:bg-gray-200"
+          >
+            Try anyway
+          </button>
+        </div>
+      );
+  }
 }

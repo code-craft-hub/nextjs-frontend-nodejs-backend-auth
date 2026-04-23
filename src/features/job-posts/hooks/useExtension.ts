@@ -15,7 +15,8 @@ export type ExtQuickJobStatus =
   | "filling"
   | "stuck"
   | "applied"
-  | "failed";
+  | "failed"
+  | "fallback_to_cloud"; // extension gave up; orchestrator should switch to cloud bot
 
 export interface ExtJobUpdate {
   status: ExtQuickJobStatus;
@@ -34,6 +35,8 @@ export interface ExtensionJob {
   link?: string | null;
   descriptionText?: string | null;
   employmentType?: string | null;
+  /** Correlation ID from the orchestrator — flows into extension logs + fallback. */
+  correlationId?: string;
 }
 
 // ─── Browser capability detection ─────────────────────────────────────────────
@@ -143,6 +146,7 @@ export function useExtension() {
           jobUrl: job.applyUrl ?? job.link ?? "",
           requirementsSnippet: job.descriptionText?.slice(0, 200) ?? undefined,
           employmentType: job.employmentType ?? undefined,
+          correlationId: job.correlationId,
         },
       }),
     );
