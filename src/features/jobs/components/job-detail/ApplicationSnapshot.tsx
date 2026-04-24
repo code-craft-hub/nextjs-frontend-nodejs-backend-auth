@@ -8,6 +8,7 @@ import {
   ListChecks,
   ChevronDown,
   ChevronUp,
+  ClipboardList,
 } from "lucide-react";
 import { useState } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -31,6 +32,10 @@ interface ApplicationSnapshotData {
   stepsCompleted?: number;
   automationRunId?: string;
   confirmationText?: string;
+  formFieldsTotal?: number;
+  formFieldsFilled?: number;
+  /** Legacy flat map — converted to qaPairs if qaPairs is absent */
+  answersMap?: Record<string, string>;
 }
 
 interface ApplicationWithSnapshot {
@@ -114,7 +119,16 @@ export function ApplicationSnapshot({ jobId }: { jobId: string }) {
 
   if (!application || !snapshot) return null;
 
-  const qaPairs = snapshot.qaPairs ?? [];
+  // Fall back to answersMap for older records that pre-date qaPairs
+  const SENTINEL = new Set(["UPLOAD_RESUME", "SKIP_FILE_UPLOAD"]);
+  const qaPairs =
+    snapshot.qaPairs ??
+    (snapshot.answersMap
+      ? Object.entries(snapshot.answersMap)
+          .filter(([, v]) => v && !SENTINEL.has(v))
+          .map(([question, answer]) => ({ question, answer }))
+      : []);
+
   const visiblePairs = expanded ? qaPairs : qaPairs.slice(0, 3);
 
   return (
@@ -138,10 +152,14 @@ export function ApplicationSnapshot({ jobId }: { jobId: string }) {
               </div>
               <div>
                 <h3 className="font-semibold text-gray-900 text-base leading-tight">
-                  Application Submitted
+                  {application.status === "in_progress"
+                    ? "Application In Progress"
+                    : "Application Submitted"}
                 </h3>
                 <p className="text-xs text-[var(--cverai-brown)] mt-0.5">
-                  We applied to this job on your behalf
+                  {application.status === "in_progress"
+                    ? "The bot is currently filling this form"
+                    : "We applied to this job on your behalf"}
                 </p>
               </div>
             </div>
@@ -162,8 +180,20 @@ export function ApplicationSnapshot({ jobId }: { jobId: string }) {
         <CardContent className="px-6 py-5 space-y-6">
           {/* Stats row */}
           {(snapshot.durationMs !== undefined ||
-            snapshot.stepsCompleted !== undefined) && (
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            snapshot.stepsCompleted !== undefined ||
+            snapshot.formFieldsFilled !== undefined) && (
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {snapshot.formFieldsFilled !== undefined && (
+                <StatPill
+                  icon={<ClipboardList className="size-4" />}
+                  label="Fields filled"
+                  value={
+                    snapshot.formFieldsTotal
+                      ? `${snapshot.formFieldsFilled} / ${snapshot.formFieldsTotal}`
+                      : `${snapshot.formFieldsFilled}`
+                  }
+                />
+              )}
               {snapshot.durationMs !== undefined && (
                 <StatPill
                   icon={<Clock className="size-4" />}

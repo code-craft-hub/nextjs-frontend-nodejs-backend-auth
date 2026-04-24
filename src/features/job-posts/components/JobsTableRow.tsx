@@ -90,7 +90,7 @@ export function JobsTableRow({
           <div className="flex flex-wrap gap-x-3 gap-y-1 mt-1">
             <p className="flex gap-1 text-gray-400 items-center min-w-0">
               <MapPin className="size-3 shrink-0" />
-              <span className="text-2xs truncate">{job?.location}</span>
+              <span className="text-2xs max-w-sm line-clamp-4">{job?.location}</span>
             </p>
             <p className="flex gap-1 text-gray-400 items-center min-w-0">
               <PiOfficeChairFill className="size-3 shrink-0" />
