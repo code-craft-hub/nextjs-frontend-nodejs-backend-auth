@@ -3,11 +3,13 @@ export function ContactRow({
   label,
   value,
   bordered,
+  href,
 }: {
   icon: string;
   label: string;
   value: string;
   bordered?: boolean;
+  href?: string;
 }) {
   return (
     <div className={`flex items-start ${bordered ? "border-t pt-4" : ""}`}>
@@ -16,7 +18,18 @@ export function ContactRow({
       </div>
       <div>
         <p className="text-xs text-gray-500 uppercase mb-1">{label}</p>
-        <p className="text-sm text-gray-900 break-all">{value}</p>
+        {href && value !== "N/A" ? (
+          <a
+            href={href}
+            target={href.startsWith("mailto:") ? undefined : "_blank"}
+            rel="noopener noreferrer"
+            className="text-sm text-blue-600 hover:underline break-all"
+          >
+            {value}
+          </a>
+        ) : (
+          <p className="text-sm text-gray-900 break-all">{value}</p>
+        )}
       </div>
     </div>
   );

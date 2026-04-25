@@ -36,6 +36,7 @@ export interface JobPost {
   qualityScore?: number | null;
   createdAt: string;
   updatedAt: string;
+  recruiterEmail?: string | null;
   /** Populated by the backend when the request is authenticated. */
   isBookmarked?: boolean;
 }

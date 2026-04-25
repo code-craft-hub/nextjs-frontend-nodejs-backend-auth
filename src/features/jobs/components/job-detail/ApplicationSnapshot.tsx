@@ -9,6 +9,7 @@ import {
   ChevronDown,
   ChevronUp,
   ClipboardList,
+  Loader2,
 } from "lucide-react";
 import { useState } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -110,12 +111,25 @@ function QAPairRow({ pair, index }: { pair: QAPair; index: number }) {
 export function ApplicationSnapshot({ jobId }: { jobId: string }) {
   const [expanded, setExpanded] = useState(false);
 
-  const { data, isLoading } = useQuery(jobApplicationQueries.byJob(jobId));
+  const { data, isLoading } = useQuery({
+    ...jobApplicationQueries.byJob(jobId),
+    // Poll every 3 s while the bot is actively filling this form.
+    // refetchInterval receives the query so we can read the current status
+    // without a separate state variable (avoids stale-closure issues).
+    refetchInterval: (query) => {
+      const app = (query.state.data as { data?: ApplicationWithSnapshot[] } | undefined)?.data?.[0];
+      return app?.status === "in_progress" ? 3000 : false;
+    },
+    // When polling is active, data must be considered fresh immediately so
+    // React Query actually re-fetches instead of serving the cache.
+    staleTime: 0,
+  });
 
   if (isLoading) return null;
 
   const application = data?.data?.[0] as ApplicationWithSnapshot | undefined;
   const snapshot = application?.snapshot;
+  const isInProgress = application?.status === "in_progress";
 
   if (!application || !snapshot) return null;
 
@@ -144,26 +158,35 @@ export function ApplicationSnapshot({ jobId }: { jobId: string }) {
 
       <Card className="overflow-hidden border-0 shadow-md bg-white rounded-2xl">
         {/* Header band */}
-        <CardHeader className="bg-gradient-to-r from-[color-mix(in_oklch,var(--cverai-green)_12%,white)] to-[color-mix(in_oklch,var(--cverai-blue)_8%,white)] px-6 py-5 border-b border-gray-100">
+        <CardHeader className={`px-6 py-5 border-b border-gray-100 bg-gradient-to-r ${isInProgress ? "from-[color-mix(in_oklch,var(--cverai-blue)_10%,white)] to-[color-mix(in_oklch,var(--cverai-blue)_5%,white)]" : "from-[color-mix(in_oklch,var(--cverai-green)_12%,white)] to-[color-mix(in_oklch,var(--cverai-blue)_8%,white)]"}`}>
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex items-center gap-3">
-              <div className="flex items-center justify-center size-10 rounded-full bg-[color-mix(in_oklch,var(--cverai-green)_20%,white)] border border-[color-mix(in_oklch,var(--cverai-green)_30%,transparent)]">
-                <CheckCircle2 className="size-5 text-[var(--cverai-green)]" />
+              <div className={`flex items-center justify-center size-10 rounded-full border ${isInProgress ? "bg-[color-mix(in_oklch,var(--cverai-blue)_15%,white)] border-[color-mix(in_oklch,var(--cverai-blue)_25%,transparent)]" : "bg-[color-mix(in_oklch,var(--cverai-green)_20%,white)] border-[color-mix(in_oklch,var(--cverai-green)_30%,transparent)]"}`}>
+                {isInProgress
+                  ? <Loader2 className="size-5 text-[var(--cverai-blue)] animate-spin" />
+                  : <CheckCircle2 className="size-5 text-[var(--cverai-green)]" />}
               </div>
               <div>
                 <h3 className="font-semibold text-gray-900 text-base leading-tight">
-                  {application.status === "in_progress"
-                    ? "Application In Progress"
-                    : "Application Submitted"}
+                  {isInProgress ? "Application In Progress" : "Application Submitted"}
                 </h3>
                 <p className="text-xs text-[var(--cverai-brown)] mt-0.5">
-                  {application.status === "in_progress"
-                    ? "The bot is currently filling this form"
+                  {isInProgress
+                    ? "Bot is actively filling this form — updating live…"
                     : "We applied to this job on your behalf"}
                 </p>
               </div>
             </div>
             <div className="flex items-center gap-2">
+              {isInProgress && (
+                <Badge className="bg-[color-mix(in_oklch,var(--cverai-blue)_12%,white)] text-[var(--cverai-blue)] border border-[color-mix(in_oklch,var(--cverai-blue)_25%,transparent)] text-xs font-medium px-2.5 gap-1.5">
+                  <span className="relative flex size-2">
+                    <span className="animate-ping absolute inline-flex size-full rounded-full bg-[var(--cverai-blue)] opacity-75" />
+                    <span className="relative inline-flex size-2 rounded-full bg-[var(--cverai-blue)]" />
+                  </span>
+                  Live
+                </Badge>
+              )}
               {snapshot.confirmed && (
                 <Badge className="bg-[color-mix(in_oklch,var(--cverai-green)_15%,white)] text-[var(--cverai-green)] border border-[color-mix(in_oklch,var(--cverai-green)_30%,transparent)] hover:bg-[color-mix(in_oklch,var(--cverai-green)_20%,white)] text-xs font-medium px-2.5">
                   Confirmed

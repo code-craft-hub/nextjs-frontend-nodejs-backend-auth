@@ -192,19 +192,15 @@ export function JobIdClient({
               <div className="space-y-4">
                 <ContactRow
                   icon="/GlobeSimple.svg"
-                  label="Job Link / Website"
-                  value={job?.companyLogo?.split("/")[2] ?? "N/A"}
-                />
-                <ContactRow
-                  icon="/phone-call-duotone.svg"
-                  label="Phone"
-                  value="N/A"
-                  bordered
+                  label="Job Link"
+                  value={job?.link ?? job?.applyUrl ?? "N/A"}
+                  href={job?.link ?? job?.applyUrl ?? undefined}
                 />
                 <ContactRow
                   icon="/Envelope.svg"
-                  label="Email address"
-                  value={job?.companyLogo?.split("/")[2] ?? "N/A"}
+                  label="Recruiter Email"
+                  value={job?.recruiterEmail ?? "N/A"}
+                  href={job?.recruiterEmail ? `mailto:${job.recruiterEmail}` : undefined}
                   bordered
                 />
               </div>

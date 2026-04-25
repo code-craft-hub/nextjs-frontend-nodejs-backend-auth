@@ -114,7 +114,7 @@ export function JobsTableApplyButton({
             Help bot finish →
           </button>
           {s.stuckReason && (
-            <p className="text-2xs text-amber-600 bg-amber-50 rounded-xl px-2 py-1 leading-relaxed line-clamp-2">
+            <p className="text-3xs text-amber-600 bg-amber-50 rounded-xl px-2 py-1 leading-relaxed max-w-sm break-all">
               {s.stuckReason}
             </p>
           )}
