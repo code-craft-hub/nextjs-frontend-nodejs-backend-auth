@@ -44,7 +44,7 @@ export function JobsTableRow({
   onBookmark,
   onRowClick,
 }: Props) {
-  const link = job?.link || job?.applyUrl || job?.emailApply;
+  const link = job?.applyUrl || job?.link || job?.emailApply;
 
   console.log("Job Link : ", link);
 
@@ -70,17 +70,25 @@ export function JobsTableRow({
           <div className="flex gap-3 items-center min-w-0">
             <TooltipProvider>
               <Tooltip>
-                <TooltipTrigger className="inline-flex cursor-help" type="button">
+                <TooltipTrigger
+                  className="inline-flex cursor-help"
+                  type="button"
+                >
                   <div className="capitalize font-medium text-xs truncate min-w-0 max-w-xs">
                     {job?.title}
                   </div>
                 </TooltipTrigger>
-                <TooltipContent className="capitalize">{job?.title}</TooltipContent>
+                <TooltipContent className="capitalize">
+                  {job?.title}
+                </TooltipContent>
               </Tooltip>
             </TooltipProvider>
             <div className="bg-blue-50 rounded text-blue-600 px-2 py-1 shrink-0">
               <span className="text-2xs whitespace-nowrap">
-                {job?.jobType || job?.employmentType || job?.classification || job?.localizedTo}
+                {job?.jobType ||
+                  job?.employmentType ||
+                  job?.classification ||
+                  job?.localizedTo}
               </span>
             </div>
             <div className="bg-blue-50 rounded text-blue-600 px-2 py-1 shrink-0">
@@ -92,7 +100,9 @@ export function JobsTableRow({
           <div className="flex flex-wrap gap-x-3 gap-y-1 mt-1">
             <p className="flex gap-1 text-gray-400 items-center min-w-0">
               <MapPin className="size-3 shrink-0" />
-              <span className="text-2xs max-w-sm line-clamp-4">{job?.location}</span>
+              <span className="text-2xs max-w-sm line-clamp-4">
+                {job?.location}
+              </span>
             </p>
             <p className="flex gap-1 text-gray-400 items-center min-w-0">
               <PiOfficeChairFill className="size-3 shrink-0" />
@@ -117,7 +127,11 @@ export function JobsTableRow({
       {/* Bookmark */}
       <TableCell className="w-12">
         <div
-          onClick={(e) => { e.preventDefault(); e.stopPropagation(); onBookmark(); }}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onBookmark();
+          }}
           className="flex justify-end"
         >
           <Toggle
