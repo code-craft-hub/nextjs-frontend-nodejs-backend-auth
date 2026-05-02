@@ -2,6 +2,22 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { ActiveRun } from "../types/apply-session.types";
+import type { ExtensionProfile } from "./useExtension";
+
+// ─── Popup-host list ─────────────────────────────────────────────────────────
+// Hosts where iframe rendering is broken even with iframe-bust.js.
+// Keep empty unless a specific host is confirmed to fail — iframe-bust handles
+// all major ATSes (Greenhouse, Lever, Ashby, Workable, etc.) natively.
+const POPUP_HOSTS: string[] = [];
+
+export function shouldUsePopup(url: string): boolean {
+  try {
+    const host = new URL(url).host.toLowerCase();
+    return POPUP_HOSTS.some((h) => host === h || host.endsWith("." + h));
+  } catch {
+    return false;
+  }
+}
 
 // ─── CSS helpers (module-level, no React deps) ────────────────────────────────
 
@@ -57,13 +73,31 @@ export interface UseRunManager {
    * Create an iframe on the page, load the job URL, then send
    * auto_apply to the extension with useIframe:true.
    */
-  startIframeApply: (job: {
-    id: string;
-    title?: string | null;
-    company?: string | null;
-    location?: string | null;
-    applyUrl?: string | null;
-  }) => Promise<void>;
+  startIframeApply: (
+    job: {
+      id: string;
+      title?: string | null;
+      company?: string | null;
+      location?: string | null;
+      applyUrl?: string | null;
+    },
+    profile?: ExtensionProfile | null,
+  ) => Promise<void>;
+  /**
+   * Skip the iframe entirely — send auto_apply with useIframe:false so the
+   * extension opens a real Chrome window at left:-10000 (truly offscreen).
+   * Use for hosts that refuse to render inside an iframe.
+   */
+  startPopupApply: (
+    job: {
+      id: string;
+      title?: string | null;
+      company?: string | null;
+      location?: string | null;
+      applyUrl?: string | null;
+    },
+    profile?: ExtensionProfile | null,
+  ) => void;
   /** Show the iframe for runId in the modal overlay. */
   openRunModal: (runId: string) => void;
   /** Hide the modal and return the iframe to its hidden state. */
@@ -187,13 +221,16 @@ export function useRunManager(): UseRunManager {
   // ── startIframeApply ──────────────────────────────────────────────────────
 
   const startIframeApply = useCallback(
-    async (job: {
-      id: string;
-      title?: string | null;
-      company?: string | null;
-      location?: string | null;
-      applyUrl?: string | null;
-    }) => {
+    async (
+      job: {
+        id: string;
+        title?: string | null;
+        company?: string | null;
+        location?: string | null;
+        applyUrl?: string | null;
+      },
+      profile?: ExtensionProfile | null,
+    ) => {
       const stage = iframeStageRef.current;
       if (!stage) {
         console.warn("[RunManager] iframe stage not yet mounted — apply ignored");
@@ -274,6 +311,75 @@ export function useRunManager(): UseRunManager {
             },
             jobUrl,
             useIframe: true,
+            // Profile so the Gemini agent can fill contact/professional fields
+            // without deferring them. Falls back to chrome.storage if omitted.
+            ...(profile && { profile }),
+          },
+        },
+        "*",
+      );
+    },
+    [setRuns],
+  );
+
+  // ── startPopupApply ──────────────────────────────────────────────────────
+  // Opens an offscreen Chrome popup window (left: -10000, focused: false)
+  // instead of embedding an iframe. Used for sites that block iframing.
+
+  const startPopupApply = useCallback(
+    (
+      job: {
+        id: string;
+        title?: string | null;
+        company?: string | null;
+        location?: string | null;
+        applyUrl?: string | null;
+      },
+      profile?: ExtensionProfile | null,
+    ) => {
+      const token = "tok-" + crypto.randomUUID();
+      const jobUrl = job.applyUrl ?? "";
+
+      setRuns((prev) => {
+        const next = new Map(prev);
+        next.set(token, {
+          id: token,
+          job: {
+            id: job.id,
+            title: job.title ?? "Job",
+            company: job.company ?? "",
+            location: job.location ?? undefined,
+          },
+          status: "loading",
+          openMode: "window",
+          log: [
+            {
+              t: Date.now(),
+              level: "info",
+              text: `Opening ${jobUrl} in offscreen popup — site doesn't render in iframe.`,
+            },
+          ],
+          provisional: true,
+          createdAt: Date.now(),
+        });
+        return next;
+      });
+
+      window.postMessage(
+        {
+          source: "cverai",
+          type: "auto_apply",
+          token,
+          payload: {
+            job: {
+              id: job.id,
+              title: job.title ?? "Job",
+              company: job.company ?? "",
+              location: job.location ?? "",
+            },
+            jobUrl,
+            useIframe: false,
+            ...(profile && { profile }),
           },
         },
         "*",
@@ -351,6 +457,7 @@ export function useRunManager(): UseRunManager {
     modalRunId,
     iframeStageRef,
     startIframeApply,
+    startPopupApply,
     openRunModal,
     closeRunModal,
     repositionIframe,

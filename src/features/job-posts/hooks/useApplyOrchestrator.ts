@@ -39,7 +39,7 @@ const MANUAL_DOMAINS = ["linkedin.com", "glassdoor.com", "indeed.com"];
  * user's data sources and would need a separate fetch; for now the agent
  * uses whatever the user has stored in the extension side panel for those.
  */
-function buildExtensionProfile(user: Partial<IUser>): ExtensionProfile {
+export function buildExtensionProfile(user: Partial<IUser>): ExtensionProfile {
   const name =
     [user.firstName, user.lastName].filter(Boolean).join(" ") ||
     user.displayName ||
