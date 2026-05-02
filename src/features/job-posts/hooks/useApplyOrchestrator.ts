@@ -2,8 +2,11 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { API_URL } from "@/shared/api/client";
+import type { IUser } from "@/shared/types";
+import { queryKeys } from "@/shared/query/keys";
 import type { JobPost } from "@/features/job-posts";
 import {
   useSubmitBrowserApplicationMutation,
@@ -13,7 +16,7 @@ import {
 import { useUpdateJobApplicationHistoryMutation } from "@/features/jobs/mutations/jobs.mutations";
 import { gmailApi } from "@/features/email-application/api/gmail.api";
 import { buildAutoApplyStartUrl } from "@/lib/utils/ai-apply-navigation";
-import { useExtension, type ExtensionState } from "./useExtension";
+import { useExtension, type ExtensionState, type ExtensionProfile } from "./useExtension";
 import {
   TERMINAL_STATUSES,
   type ApplySession,
@@ -26,6 +29,37 @@ import {
 const MANUAL_DOMAINS = ["linkedin.com", "glassdoor.com", "indeed.com"];
 
 // ─── Pure utilities (no hooks) ────────────────────────────────────────────────
+
+/**
+ * Converts the React app's cached IUser into the slim profile object the
+ * Gemini agent reads to fill contact and professional fields.
+ *
+ * Only includes fields the agent can act on — name, contact, title, and a
+ * summary. The richer CV data (work experience, education) lives in the
+ * user's data sources and would need a separate fetch; for now the agent
+ * uses whatever the user has stored in the extension side panel for those.
+ */
+function buildExtensionProfile(user: Partial<IUser>): ExtensionProfile {
+  const name =
+    [user.firstName, user.lastName].filter(Boolean).join(" ") ||
+    user.displayName ||
+    user.name ||
+    "";
+  const address = [user.address, user.state, user.country]
+    .filter(Boolean)
+    .join(", ");
+  return {
+    name,
+    email: user.email ?? "",
+    phone: user.phoneNumber ?? "",
+    ...(address && { address }),
+    ...(user.cvJobTitle && { title: user.cvJobTitle }),
+    ...(user.website && { website: user.website }),
+    ...(user.portfolio && { website: user.portfolio }),
+    // profile is the user's professional summary stored on the IUser record.
+    ...(user.profile && { profileSummary: user.profile }),
+  };
+}
 
 function isChromiumDesktop(): boolean {
   if (typeof navigator === "undefined") return false;
@@ -146,6 +180,7 @@ export interface UseApplyOrchestrator {
 
 export function useApplyOrchestrator(): UseApplyOrchestrator {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { state: extState, applyViaExtension, focusExtTab } = useExtension();
 
   const { mutateAsync: submitBrowserApplication } =
@@ -457,15 +492,27 @@ export function useApplyOrchestrator(): UseApplyOrchestrator {
         return;
       }
 
-      // ── Extension: fire window event and wait for background updates ───────
+      // ── Extension: postMessage to content-trigger.js → background ───────────
       if (strategy === "extension") {
         setSessions((prev) => ({
           ...prev,
           [job.id]: { jobId: job.id, strategy, status: "ext:queued", correlationId, startedAt: Date.now() },
         }));
-        // Extension path is fire-and-forget; inflightRef stays clear so the
-        // fallback handler can acquire the lock if needed.
-        applyViaExtension({ ...job, correlationId });
+
+        // Read the user from the React Query cache (already fetched since the
+        // user is on the dashboard). Build a profile object so the agent can
+        // fill contact fields without deferring them to the user.
+        const cachedUser = queryClient.getQueryData<Partial<IUser>>(
+          queryKeys.users.detail(),
+        );
+        const profile = cachedUser ? buildExtensionProfile(cachedUser) : null;
+        if (!profile) {
+          console.warn("[CverAI] apply: no cached user — agent will use chrome.storage profile");
+        }
+
+        // Fire-and-forget: inflightRef stays clear so the fallback handler can
+        // acquire the lock if the extension reports fallback_to_cloud.
+        applyViaExtension({ ...job, correlationId, profile });
         return;
       }
 

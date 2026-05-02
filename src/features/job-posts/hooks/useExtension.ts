@@ -24,6 +24,29 @@ export interface ExtJobUpdate {
 }
 
 /**
+ * Agent-facing profile passed with every trigger payload.
+ *
+ * Built by the orchestrator from the React app's cached IUser so the Gemini
+ * agent can fill contact/professional fields without asking the user. Only
+ * fields the agent can act on are included — nothing sensitive beyond what
+ * the user already entered in the app.
+ *
+ * The background falls back to the profile stored in chrome.storage (side
+ * panel settings) when this is absent.
+ */
+export interface ExtensionProfile {
+  name?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  title?: string;
+  website?: string;
+  profileSummary?: string;
+  /** Direct URL to the user's CV/resume file. Used by the agent's upload tool. */
+  cv_url?: string | null;
+}
+
+/**
  * Minimal shape needed for applyViaExtension. Compatible with JobPost so the
  * orchestrator can spread a full job object here without a cast.
  */
@@ -40,6 +63,12 @@ export interface ExtensionJob {
   employmentType?: string | null;
   /** Correlation ID from the orchestrator — flows into extension logs + fallback. */
   correlationId?: string;
+  /**
+   * Profile built from the React app's user data. Passed to the Gemini agent
+   * so it can fill contact/experience fields without deferring them.
+   * Omit to let the background use the chrome.storage profile instead.
+   */
+  profile?: ExtensionProfile | null;
 }
 
 // ─── Browser capability detection ─────────────────────────────────────────────
@@ -269,6 +298,8 @@ export function useExtension() {
       // detection in background.findIframeFrameId).
       useIframe: false,
       correlationId: job.correlationId,
+      // If null/undefined the background falls back to chrome.storage profile.
+      profile: job.profile ?? null,
     };
 
     console.log(
