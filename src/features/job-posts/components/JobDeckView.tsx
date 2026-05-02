@@ -66,13 +66,13 @@ function JobDeckCard({ job, stackIndex, onSkip, onApply }: JobDeckCardProps) {
       <Card className="w-full rounded-[60px] bg-white shadow-2xl border-0 px-17.5 pt-13.75 pb-17.5">
         {/* Header */}
         <div className="flex items-start justify-between">
-          <h1 className="text-[56px] leading-[1.05] font-black text-black tracking-[-1px]">
+          <h1 className="text-2xl capitalize leading-[1.05] font-bold font-poppins">
             {job.title}
           </h1>
 
-          <div className="flex items-center gap-6 pt-3">
-            <div className="flex items-center gap-3 text-[#7a7a7a] font-medium text-[30px]">
-              <Clock className="w-8.5 h-8.5" strokeWidth={2} />
+          <div className="flex ml-8 items-center gap-2 pt-3">
+            <div className="flex items-center gap-2 text-[#7a7a7a] font-medium text-[30px]">
+              <Clock className="w-6 h-6" strokeWidth={2} />
               <span>{timeAgo(job.postedAt ?? job.createdAt)}</span>
             </div>
 
@@ -84,7 +84,7 @@ function JobDeckCard({ job, stackIndex, onSkip, onApply }: JobDeckCardProps) {
                 onClick={(e) => e.stopPropagation()}
               >
                 <ExternalLink
-                  className="w-8.5 h-8.5 text-[#7a7a7a]"
+                  className="w-6 h-6 text-[#7a7a7a]"
                   strokeWidth={2}
                 />
               </a>
@@ -98,31 +98,31 @@ function JobDeckCard({ job, stackIndex, onSkip, onApply }: JobDeckCardProps) {
         </div>
 
         {/* Pills */}
-        <div className="mt-10 flex items-center gap-6 flex-wrap">
+        <div className="mt flex items-center gap-6 flex-wrap">
           {salaryLabel && (
-            <div className="rounded-full bg-[#f2f2f2] px-10 py-5 text-[28px] font-semibold text-black">
+            <div className="rounded-full bg-[#f2f2f2] px-4 py-2 text-md font-semibold text-black">
               {salaryLabel}
             </div>
           )}
           {job.location && (
-            <div className="rounded-full bg-[#f2f2f2] px-10 py-5 text-[28px] font-semibold text-black">
+            <div className="rounded-full bg-[#f2f2f2] px-4 py-2 text-md font-semibold text-black">
               {job.location}
             </div>
           )}
           {job.employmentType && (
-            <div className="rounded-full bg-[#f2f2f2] px-10 py-5 text-[28px] font-semibold text-black">
+            <div className="rounded-full bg-[#f2f2f2] px-4 py-2 text-md font-semibold text-black">
               {job.employmentType}
             </div>
           )}
           {job.jobType && !job.employmentType && (
-            <div className="rounded-full bg-[#f2f2f2] px-10 py-5 text-[28px] font-semibold text-black">
+            <div className="rounded-full bg-[#f2f2f2] px-10 py-5 text-md font-semibold text-black">
               {job.jobType}
             </div>
           )}
         </div>
 
         {/* Company */}
-        <div className="mt-12 flex items-center gap-7">
+        <div className=" flex items-center gap-7">
           <div className="w-19.5 h-19.5 rounded-full overflow-hidden bg-gray-200 shrink-0">
             {job.companyLogo ?? job.companyIcon ? (
               <img
@@ -131,20 +131,20 @@ function JobDeckCard({ job, stackIndex, onSkip, onApply }: JobDeckCardProps) {
                 className="w-full h-full object-cover"
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-[28px] font-black text-gray-400">
+              <div className="w-full h-full flex items-center justify-center text-xl font-black text-gray-400">
                 {(job.companyName ?? job.company ?? "?")[0]}
               </div>
             )}
           </div>
 
           <div className="flex flex-col">
-            <div className="text-[44px] font-normal text-black leading-none">
+            <div className="text-xl font-normal text-black leading-none">
               {job.companyName ?? job.company ?? "Unknown Company"}
             </div>
 
             {job.location && (
-              <div className="mt-3 flex items-center gap-3 text-[#8a8a8a] text-[26px] font-medium">
-                <MapPin className="w-7 h-7" strokeWidth={2} />
+              <div className="mt-3 flex items-center gap-3 text-[#8a8a8a] text-md font-medium">
+                <MapPin className="size-5" strokeWidth={2} />
                 <span>{job.location}</span>
               </div>
             )}
@@ -152,43 +152,43 @@ function JobDeckCard({ job, stackIndex, onSkip, onApply }: JobDeckCardProps) {
         </div>
 
         {/* Description */}
-        <div className="mt-14">
-          <div className="text-[#9a9a9a] text-[26px] font-medium">
+        <div className="mt-4">
+          <div className="text-[#9a9a9a] text-2xl font-medium">
             Description
           </div>
 
-          <p className="mt-6 text-[26px] leading-[1.8] text-[#2b2b2b] font-medium max-w-215">
+          <p className="mt-4 text-xl leading-[1.8] text-[#2b2b2b] font-medium max-w-215">
             {preview}
           </p>
 
-          <button className="mt-8 text-[28px] font-semibold text-[#2f6df6]">
+          <button className="mt-4 text-xl font-semibold text-[#2f6df6]">
             See full description
           </button>
         </div>
 
         {/* Actions — only interactive on the top card */}
         {stackIndex === 0 && (
-          <div className="mt-20 flex items-end justify-between px-15">
+          <div className="mt-8 flex items-end justify-between px-15">
             <div className="flex flex-col items-center gap-6">
               <button
                 onClick={onSkip}
-                className="w-30 h-30 rounded-full bg-white shadow-[0px_18px_40px_rgba(0,0,0,0.12)] flex items-center justify-center active:scale-95 transition-transform"
+                className="size-30 rounded-full bg-white shadow-[0px_18px_40px_rgba(0,0,0,0.12)] flex items-center justify-center active:scale-95 transition-transform"
                 aria-label="Skip"
               >
                 <X className="w-13.5 h-13.5 text-[#ef4444]" strokeWidth={3} />
               </button>
-              <div className="text-[40px] font-black text-black">Ignore</div>
+              <div className="text-2xl font-black text-black">Ignore</div>
             </div>
 
             <div className="flex flex-col items-center gap-6">
               <button
                 onClick={onApply}
-                className="w-30 h-30 rounded-full bg-white shadow-[0px_18px_40px_rgba(0,0,0,0.12)] flex items-center justify-center active:scale-95 transition-transform"
+                className="size-30 rounded-full bg-white shadow-[0px_18px_40px_rgba(0,0,0,0.12)] flex items-center justify-center active:scale-95 transition-transform"
                 aria-label="Auto Apply"
               >
                 <Check className="w-13.5 h-13.5 text-[#22c55e]" strokeWidth={3} />
               </button>
-              <div className="text-[40px] font-black text-black">Auto-Apply</div>
+              <div className="text-2xl font-black text-black">Auto-Apply</div>
             </div>
           </div>
         )}
@@ -217,7 +217,10 @@ export function JobDeckView({
   const [swipeDir, setSwipeDir] = useState<SwipeDir>(null);
 
   const deck = allJobs.filter(
-    (j) => !appliedIds.has(j.id) && !skippedIds.has(j.id),
+    (j) =>
+      !appliedIds.has(j.id) &&
+      !skippedIds.has(j.id) &&
+      !j.emailApply,
   );
 
   const handleApply = useCallback(() => {
