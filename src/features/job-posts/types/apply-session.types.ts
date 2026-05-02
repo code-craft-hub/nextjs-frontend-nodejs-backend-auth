@@ -1,3 +1,33 @@
+// ─── Run log & active run (iframe-mode deck UI) ───────────────────────────────
+
+export interface RunLogEntry {
+  t: number;
+  level: "info" | "action" | "thought" | "error" | "warn" | "debug";
+  text: string;
+}
+
+/**
+ * Full run state pushed from the extension background to the page.
+ *
+ * Used by useRunManager (deck view / iframe mode). Independent from
+ * ApplySession — the deck view tracks runs here rather than in sessions.
+ */
+export interface ActiveRun {
+  id: string;
+  job?: { id: string; title: string; company: string; location?: string };
+  /** Raw status string from background.js: "loading" | "running" | "awaiting_user_input" |
+   *  "awaiting_submit_approval" | "submitted" | "complete" | "stopped" | "blocked" | "error" */
+  status: string;
+  /** "iframe" = embedded in this page; "window" = off-screen popup */
+  openMode?: "iframe" | "window";
+  log?: RunLogEntry[];
+  blockedMessage?: string;
+  /** True while we haven't yet received the real runId from background. */
+  provisional?: boolean;
+  dismissed?: boolean;
+  createdAt?: number;
+}
+
 // ─── Strategy ─────────────────────────────────────────────────────────────────
 
 /** The automation path chosen by the strategy router at click time. */

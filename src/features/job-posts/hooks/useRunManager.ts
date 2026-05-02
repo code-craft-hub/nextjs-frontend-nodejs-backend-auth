@@ -1,0 +1,360 @@
+"use client";
+
+import { useCallback, useEffect, useRef, useState } from "react";
+import type { ActiveRun } from "../types/apply-session.types";
+
+// ─── CSS helpers (module-level, no React deps) ────────────────────────────────
+
+function hideIframe(iframe: HTMLIFrameElement): void {
+  Object.assign(iframe.style, {
+    position: "fixed",
+    top: "0",
+    left: "0",
+    transform: "none",
+    width: "1280px",
+    height: "900px",
+    // Keep visible (not display:none) so Chrome doesn't throttle the frame.
+    visibility: "visible",
+    opacity: "0",
+    pointerEvents: "none",
+    zIndex: "-100",
+    boxShadow: "none",
+    border: "none",
+  });
+}
+
+function showIframe(iframe: HTMLIFrameElement, withLogs = false): void {
+  Object.assign(iframe.style, {
+    position: "fixed",
+    top: "72px",
+    left: withLogs ? "24px" : "50%",
+    transform: withLogs ? "none" : "translateX(-50%)",
+    width: withLogs
+      ? "calc(100vw - 24px - min(420px, 40vw))"
+      : "min(1100px, calc(100vw - 48px))",
+    height: "calc(100vh - 96px)",
+    border: "none",
+    background: "white",
+    visibility: "visible",
+    opacity: "1",
+    pointerEvents: "auto",
+    zIndex: "200",
+    borderRadius: "0 0 16px 16px",
+    boxShadow: "0 20px 60px rgba(0,0,0,0.18)",
+  });
+}
+
+// ─── Types ─────────────────────────────────────────────────────────────────────
+
+export interface UseRunManager {
+  /** All active runs (not dismissed). */
+  runs: Map<string, ActiveRun>;
+  /** runId of the run whose iframe is currently shown in the modal, or null. */
+  modalRunId: string | null;
+  /** Ref for the hidden iframe stage <div>. Attach to <IframeStage>. */
+  iframeStageRef: React.MutableRefObject<HTMLDivElement | null>;
+  /**
+   * Create an iframe on the page, load the job URL, then send
+   * auto_apply to the extension with useIframe:true.
+   */
+  startIframeApply: (job: {
+    id: string;
+    title?: string | null;
+    company?: string | null;
+    location?: string | null;
+    applyUrl?: string | null;
+  }) => Promise<void>;
+  /** Show the iframe for runId in the modal overlay. */
+  openRunModal: (runId: string) => void;
+  /** Hide the modal and return the iframe to its hidden state. */
+  closeRunModal: () => void;
+  /** Reposition the active modal iframe (call when log panel is toggled). */
+  repositionIframe: (showLogs: boolean) => void;
+  /** Mark a run as dismissed (hidden from bell list). */
+  dismissRun: (runId: string) => void;
+  /** Stop an in-flight run and close its modal. */
+  stopRun: (runId: string) => void;
+}
+
+// ─── Hook ─────────────────────────────────────────────────────────────────────
+
+export function useRunManager(): UseRunManager {
+  const [runsState, setRunsState] = useState<Map<string, ActiveRun>>(new Map());
+  const [modalRunId, setModalRunId] = useState<string | null>(null);
+
+  // Imperative refs — DOM elements and token maps that must not trigger
+  // re-renders and must be accessible synchronously in event handlers.
+  const iframeStageRef = useRef<HTMLDivElement | null>(null);
+  const iframesRef = useRef<Map<string, HTMLIFrameElement>>(new Map());
+  const tokenToRunIdRef = useRef<Map<string, string>>(new Map());
+
+  // Always-current mirror of React state for use inside event listeners
+  // (avoids stale closures without adding `runsState` to effect deps).
+  const runsRef = useRef<Map<string, ActiveRun>>(new Map());
+  // Same pattern for modalRunId.
+  const modalRunIdRef = useRef<string | null>(null);
+  modalRunIdRef.current = modalRunId;
+
+  /** Updater that keeps runsRef in sync with state atomically. */
+  const setRuns = useCallback(
+    (updater: (prev: Map<string, ActiveRun>) => Map<string, ActiveRun>) => {
+      setRunsState((prev) => {
+        const next = updater(prev);
+        runsRef.current = next;
+        return next;
+      });
+    },
+    [],
+  );
+
+  // ── Extension message listener ────────────────────────────────────────────
+
+  useEffect(() => {
+    const handler = (e: MessageEvent) => {
+      const data = e.data as Record<string, unknown> | null;
+      if (!data || data.source !== "cverai-extension") return;
+
+      // ── auto_apply_response: background acknowledged the trigger ──────────
+      if (data.type === "auto_apply_response") {
+        const { token, ok, runId, error } = data as {
+          token?: string;
+          ok?: boolean;
+          runId?: string;
+          error?: string;
+        };
+
+        if (ok && token && runId) {
+          tokenToRunIdRef.current.set(token, runId);
+
+          // Race-safe merge: a run_update for this runId may have arrived
+          // BEFORE this response (background broadcasts initial "running"
+          // state immediately). Whichever has live data wins; provisional
+          // contributes only job info if missing.
+          setRuns((prev) => {
+            const next = new Map(prev);
+            const prov = next.get(token);
+            const fromBackground = next.get(runId);
+            if (fromBackground) {
+              next.set(runId, { ...(prov ?? {}), ...fromBackground, id: runId });
+            } else if (prov) {
+              next.set(runId, { ...prov, id: runId });
+            }
+            if (prov) next.delete(token);
+            return next;
+          });
+
+          // Rebind iframe from token key → runId key.
+          const iframe = iframesRef.current.get(token);
+          if (iframe) {
+            iframesRef.current.set(runId, iframe);
+            iframesRef.current.delete(token);
+          }
+        } else if (!ok && token) {
+          // Trigger was rejected — surface error on the provisional run.
+          setRuns((prev) => {
+            const next = new Map(prev);
+            const prov = next.get(token);
+            if (prov) {
+              next.set(token, {
+                ...prov,
+                status: "error",
+                blockedMessage:
+                  (error as string | undefined) ??
+                  "Failed to start agent. Check extension settings.",
+              });
+            }
+            return next;
+          });
+        }
+      }
+
+      // ── run_update: agent progress broadcast ──────────────────────────────
+      if (data.type === "run_update" && data.run) {
+        const run = data.run as ActiveRun;
+        setRuns((prev) => {
+          const next = new Map(prev);
+          const existing = next.get(run.id) ?? {};
+          next.set(run.id, { ...existing, ...run });
+          return next;
+        });
+      }
+    };
+
+    window.addEventListener("message", handler);
+    return () => window.removeEventListener("message", handler);
+  }, [setRuns]);
+
+  // ── startIframeApply ──────────────────────────────────────────────────────
+
+  const startIframeApply = useCallback(
+    async (job: {
+      id: string;
+      title?: string | null;
+      company?: string | null;
+      location?: string | null;
+      applyUrl?: string | null;
+    }) => {
+      const stage = iframeStageRef.current;
+      if (!stage) {
+        console.warn("[RunManager] iframe stage not yet mounted — apply ignored");
+        return;
+      }
+
+      const token = "tok-" + crypto.randomUUID();
+      const jobUrl = job.applyUrl ?? "";
+
+      // Create iframe immediately (before load) so it appears hidden right
+      // away and Chrome doesn't delay its network request.
+      const iframe = document.createElement("iframe");
+      iframe.allow =
+        "clipboard-read; clipboard-write; geolocation; microphone; camera";
+      // Strips our origin from ancestorOrigins inside nested frames (helps
+      // reCAPTCHA Enterprise on Greenhouse-embedded pages).
+      iframe.referrerPolicy = "no-referrer";
+      hideIframe(iframe);
+      stage.appendChild(iframe);
+      iframesRef.current.set(token, iframe);
+
+      // Provisional run so the bell popover shows something immediately.
+      setRuns((prev) => {
+        const next = new Map(prev);
+        next.set(token, {
+          id: token,
+          job: {
+            id: job.id,
+            title: job.title ?? "Job",
+            company: job.company ?? "",
+            location: job.location ?? undefined,
+          },
+          status: "loading",
+          openMode: "iframe",
+          log: [{ t: Date.now(), level: "info", text: `Loading ${jobUrl}…` }],
+          provisional: true,
+          createdAt: Date.now(),
+        });
+        return next;
+      });
+
+      // Wait for the iframe to load so background.findIframeFrameId can
+      // resolve the frameId. Resolve after 30 s regardless (let agent try).
+      await new Promise<void>((resolve) => {
+        let done = false;
+        iframe.addEventListener(
+          "load",
+          () => {
+            if (!done) {
+              done = true;
+              resolve();
+            }
+          },
+          { once: true },
+        );
+        iframe.src = jobUrl;
+        setTimeout(() => {
+          if (!done) {
+            done = true;
+            console.warn("[RunManager] iframe load timeout for", jobUrl);
+            resolve();
+          }
+        }, 30_000);
+      });
+
+      // Send trigger to content-trigger.js → background.
+      window.postMessage(
+        {
+          source: "cverai",
+          type: "auto_apply",
+          token,
+          payload: {
+            job: {
+              id: job.id,
+              title: job.title ?? "Job",
+              company: job.company ?? "",
+              location: job.location ?? "",
+            },
+            jobUrl,
+            useIframe: true,
+          },
+        },
+        "*",
+      );
+    },
+    [setRuns],
+  );
+
+  // ── openRunModal / closeRunModal ──────────────────────────────────────────
+
+  const openRunModal = useCallback((runId: string) => {
+    const run = runsRef.current.get(runId);
+    if (!run) return;
+
+    // Popup-mode runs live in a separate browser window — focus it instead.
+    if (run.openMode === "window") {
+      window.postMessage(
+        { source: "cverai", type: "focus_run_window", runId },
+        "*",
+      );
+      return;
+    }
+
+    const iframe = iframesRef.current.get(runId);
+    if (!iframe) return;
+
+    // Hide every other iframe so only this one is interactive.
+    for (const [id, f] of iframesRef.current) {
+      if (id !== runId) hideIframe(f);
+    }
+    showIframe(iframe, false);
+    setModalRunId(runId);
+  }, []); // runsRef + iframesRef are stable refs
+
+  const closeRunModal = useCallback(() => {
+    const runId = modalRunIdRef.current;
+    if (runId) {
+      const iframe = iframesRef.current.get(runId);
+      if (iframe) hideIframe(iframe);
+    }
+    setModalRunId(null);
+  }, []);
+
+  const repositionIframe = useCallback((withLogs: boolean) => {
+    const runId = modalRunIdRef.current;
+    if (!runId) return;
+    const iframe = iframesRef.current.get(runId);
+    if (iframe) showIframe(iframe, withLogs);
+  }, []);
+
+  // ── dismissRun / stopRun ──────────────────────────────────────────────────
+
+  const dismissRun = useCallback(
+    (runId: string) => {
+      setRuns((prev) => {
+        const next = new Map(prev);
+        const run = next.get(runId);
+        if (run) next.set(runId, { ...run, dismissed: true });
+        return next;
+      });
+    },
+    [setRuns],
+  );
+
+  const stopRun = useCallback(
+    (runId: string) => {
+      window.postMessage({ source: "cverai", type: "stop_run", runId }, "*");
+      if (modalRunIdRef.current === runId) closeRunModal();
+    },
+    [closeRunModal],
+  );
+
+  return {
+    runs: runsState,
+    modalRunId,
+    iframeStageRef,
+    startIframeApply,
+    openRunModal,
+    closeRunModal,
+    repositionIframe,
+    dismissRun,
+    stopRun,
+  };
+}
