@@ -399,16 +399,38 @@ export function useApplyOrchestrator(): UseApplyOrchestrator {
         return;
       }
 
-      // Regular status update — map to unified status and patch session
+      // Regular status update — map to unified status and patch session.
+      // Read the current session first (from the always-fresh ref) so we can
+      // run side-effects outside the state updater (toast, etc.).
+      const currentSession = sessionsRef.current[jobId];
+      if (!currentSession || currentSession.strategy !== "extension") return;
+
+      const status = mapExtStatus(rawStatus);
+
       setSessions((prev) => {
         const s = prev[jobId];
         if (!s || s.strategy !== "extension") return prev;
-        const status = mapExtStatus(rawStatus);
         return {
           ...prev,
           [jobId]: { ...s, status, stuckReason: stuckReason ?? undefined },
         };
       });
+
+      // Show an actionable toast for terminal extension failures.
+      // Soft statuses (navigating, filling…) are silent — only terminal "failed"
+      // gets a toast so the user knows to take action.
+      if (status === "failed" && stuckReason) {
+        const isConfigError = /api\s*key|side\s*panel|settings|gemini/i.test(stuckReason);
+        toast.error(
+          isConfigError ? "Extension not configured" : "Extension automation failed",
+          {
+            description: isConfigError
+              ? `${stuckReason} Click the extension icon to open it.`
+              : stuckReason,
+            duration: 8000,
+          },
+        );
+      }
     };
 
     window.addEventListener("cverai:ext-update", onExtUpdate);
