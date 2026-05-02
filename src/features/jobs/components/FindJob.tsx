@@ -2,6 +2,10 @@
 
 import { memo } from "react";
 import FindJobClient from "./FindJobClient";
+// import SwipeJobCard from "./SwipeJobCard";
+// import JobPreferenceCustomization from "./JobPreferenceCustomization";
+// import ApprovalQueue from "./ApprovalQueue";
+// import ApplicationReview from "./ApplicationReview";
 
 export const FindJob = memo(() => {
   return (

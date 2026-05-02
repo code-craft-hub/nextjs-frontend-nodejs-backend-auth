@@ -3,7 +3,8 @@
 import { useState, useCallback } from "react";
 import { useInfiniteJobs } from "../queries/job-posts.query";
 import type { JobPost } from "@/features/job-posts";
-import { JobCard } from "./JobCard";
+import { Card } from "@/components/ui/card";
+import { Clock, ExternalLink, MapPin, X, Check } from "lucide-react";
 
 interface JobDeckViewProps {
   query?: string;
@@ -14,6 +15,187 @@ interface JobDeckViewProps {
 }
 
 type SwipeDir = "left" | "right" | null;
+
+function timeAgo(dateStr: string): string {
+  const diffMs = Date.now() - new Date(dateStr).getTime();
+  const h = Math.floor(diffMs / 3_600_000);
+  if (h < 24) return `${h}h`;
+  const d = Math.floor(h / 24);
+  return `${d}d`;
+}
+
+interface JobDeckCardProps {
+  job: JobPost;
+  stackIndex: 0 | 1 | 2;
+  onSkip: () => void;
+  onApply: () => void;
+}
+
+function JobDeckCard({ job, stackIndex, onSkip, onApply }: JobDeckCardProps) {
+  const scale = stackIndex === 0 ? 1 : stackIndex === 1 ? 0.96 : 0.92;
+  const translateY = stackIndex === 0 ? 0 : stackIndex === 1 ? 12 : 24;
+  const opacity = stackIndex === 0 ? 1 : stackIndex === 1 ? 0.85 : 0.7;
+  const zIndex = 3 - stackIndex;
+
+  const salaryLabel =
+    job.salary ??
+    (job.salaryInfo
+      ? [
+          job.salaryInfo.currency,
+          job.salaryInfo.min && job.salaryInfo.max
+            ? `${job.salaryInfo.min}–${job.salaryInfo.max}`
+            : job.salaryInfo.min ?? job.salaryInfo.max,
+          job.salaryInfo.period ? `/${job.salaryInfo.period}` : "",
+        ]
+          .filter(Boolean)
+          .join("")
+      : null);
+
+  const descriptionText =
+    job.descriptionText ?? job.companyText ?? "No description available.";
+  const preview =
+    descriptionText.length > 200
+      ? descriptionText.slice(0, 200) + "...."
+      : descriptionText;
+
+  return (
+    <div
+      className="absolute inset-0 transition-all duration-300"
+      style={{ transform: `scale(${scale}) translateY(${translateY}px)`, opacity, zIndex }}
+    >
+      <Card className="w-full rounded-[60px] bg-white shadow-2xl border-0 px-17.5 pt-13.75 pb-17.5">
+        {/* Header */}
+        <div className="flex items-start justify-between">
+          <h1 className="text-[56px] leading-[1.05] font-black text-black tracking-[-1px]">
+            {job.title}
+          </h1>
+
+          <div className="flex items-center gap-6 pt-3">
+            <div className="flex items-center gap-3 text-[#7a7a7a] font-medium text-[30px]">
+              <Clock className="w-8.5 h-8.5" strokeWidth={2} />
+              <span>{timeAgo(job.postedAt ?? job.createdAt)}</span>
+            </div>
+
+            {job.link || job.applyUrl ? (
+              <a
+                href={job.link ?? job.applyUrl ?? "#"}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <ExternalLink
+                  className="w-8.5 h-8.5 text-[#7a7a7a]"
+                  strokeWidth={2}
+                />
+              </a>
+            ) : (
+              <ExternalLink
+                className="w-8.5 h-8.5 text-[#7a7a7a]"
+                strokeWidth={2}
+              />
+            )}
+          </div>
+        </div>
+
+        {/* Pills */}
+        <div className="mt-10 flex items-center gap-6 flex-wrap">
+          {salaryLabel && (
+            <div className="rounded-full bg-[#f2f2f2] px-10 py-5 text-[28px] font-semibold text-black">
+              {salaryLabel}
+            </div>
+          )}
+          {job.location && (
+            <div className="rounded-full bg-[#f2f2f2] px-10 py-5 text-[28px] font-semibold text-black">
+              {job.location}
+            </div>
+          )}
+          {job.employmentType && (
+            <div className="rounded-full bg-[#f2f2f2] px-10 py-5 text-[28px] font-semibold text-black">
+              {job.employmentType}
+            </div>
+          )}
+          {job.jobType && !job.employmentType && (
+            <div className="rounded-full bg-[#f2f2f2] px-10 py-5 text-[28px] font-semibold text-black">
+              {job.jobType}
+            </div>
+          )}
+        </div>
+
+        {/* Company */}
+        <div className="mt-12 flex items-center gap-7">
+          <div className="w-19.5 h-19.5 rounded-full overflow-hidden bg-gray-200 shrink-0">
+            {job.companyLogo ?? job.companyIcon ? (
+              <img
+                src={job.companyLogo ?? job.companyIcon ?? ""}
+                alt={job.companyName ?? job.company ?? ""}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-[28px] font-black text-gray-400">
+                {(job.companyName ?? job.company ?? "?")[0]}
+              </div>
+            )}
+          </div>
+
+          <div className="flex flex-col">
+            <div className="text-[44px] font-normal text-black leading-none">
+              {job.companyName ?? job.company ?? "Unknown Company"}
+            </div>
+
+            {job.location && (
+              <div className="mt-3 flex items-center gap-3 text-[#8a8a8a] text-[26px] font-medium">
+                <MapPin className="w-7 h-7" strokeWidth={2} />
+                <span>{job.location}</span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Description */}
+        <div className="mt-14">
+          <div className="text-[#9a9a9a] text-[26px] font-medium">
+            Description
+          </div>
+
+          <p className="mt-6 text-[26px] leading-[1.8] text-[#2b2b2b] font-medium max-w-215">
+            {preview}
+          </p>
+
+          <button className="mt-8 text-[28px] font-semibold text-[#2f6df6]">
+            See full description
+          </button>
+        </div>
+
+        {/* Actions — only interactive on the top card */}
+        {stackIndex === 0 && (
+          <div className="mt-20 flex items-end justify-between px-15">
+            <div className="flex flex-col items-center gap-6">
+              <button
+                onClick={onSkip}
+                className="w-30 h-30 rounded-full bg-white shadow-[0px_18px_40px_rgba(0,0,0,0.12)] flex items-center justify-center active:scale-95 transition-transform"
+                aria-label="Skip"
+              >
+                <X className="w-13.5 h-13.5 text-[#ef4444]" strokeWidth={3} />
+              </button>
+              <div className="text-[40px] font-black text-black">Ignore</div>
+            </div>
+
+            <div className="flex flex-col items-center gap-6">
+              <button
+                onClick={onApply}
+                className="w-30 h-30 rounded-full bg-white shadow-[0px_18px_40px_rgba(0,0,0,0.12)] flex items-center justify-center active:scale-95 transition-transform"
+                aria-label="Auto Apply"
+              >
+                <Check className="w-13.5 h-13.5 text-[#22c55e]" strokeWidth={3} />
+              </button>
+              <div className="text-[40px] font-black text-black">Auto-Apply</div>
+            </div>
+          </div>
+        )}
+      </Card>
+    </div>
+  );
+}
 
 export function JobDeckView({
   query,
@@ -69,7 +251,7 @@ export function JobDeckView({
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-24 gap-3">
-        <div className="w-full max-w-md h-[360px] bg-gray-100 rounded-2xl animate-pulse" />
+        <div className="w-full max-w-245 h-90 bg-gray-100 rounded-[60px] animate-pulse" />
         <p className="text-sm text-gray-400 animate-pulse">Loading jobs…</p>
       </div>
     );
@@ -107,7 +289,6 @@ export function JobDeckView({
   // ── Deck ────────────────────────────────────────────────────────────────
   const visibleCards = deck.slice(0, 3);
 
-  // Swipe classes for the top card
   const topSwipeClass =
     swipeDir === "right"
       ? "translate-x-full opacity-0 rotate-6"
@@ -129,8 +310,7 @@ export function JobDeckView({
       </div>
 
       {/* Card stack */}
-      <div className="relative w-full max-w-sm" style={{ height: 400 }}>
-        {/* Render from back to front so top card is on top of DOM */}
+      <div className="relative w-full max-w-245" style={{ height: 900 }}>
         {[...visibleCards]
           .reverse()
           .map((job, reversedIdx) => {
@@ -147,34 +327,16 @@ export function JobDeckView({
                   isTop ? topSwipeClass : "",
                 ].join(" ")}
               >
-                <JobCard job={job} stackIndex={stackIndex} />
+                <JobDeckCard
+                  job={job}
+                  stackIndex={stackIndex}
+                  onSkip={handleSkip}
+                  onApply={handleApply}
+                />
               </div>
             );
           })}
       </div>
-
-      {/* Action buttons */}
-      <div className="flex items-center gap-5">
-        <button
-          onClick={handleSkip}
-          className="flex items-center justify-center w-14 h-14 rounded-full bg-white border-2 border-gray-200 text-gray-400 text-lg hover:border-red-300 hover:text-red-400 hover:shadow-md active:scale-95 transition-all shadow-sm"
-          title="Skip this job"
-          aria-label="Skip"
-        >
-          ✕
-        </button>
-
-        <button
-          onClick={handleApply}
-          className="flex items-center justify-center w-16 h-16 rounded-full bg-indigo-600 text-white text-xl hover:bg-indigo-700 hover:shadow-xl active:scale-95 transition-all shadow-lg"
-          title="Auto-apply to this job"
-          aria-label="Auto Apply"
-        >
-          🤖
-        </button>
-      </div>
-
-      <p className="text-xs text-gray-400">← Skip · Apply 🤖</p>
     </div>
   );
 }
