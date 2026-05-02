@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useInfiniteJobs } from "../queries/job-posts.query";
 import type { JobPost } from "@/features/job-posts";
 import { Card } from "@/components/ui/card";
@@ -203,11 +203,18 @@ export function JobDeckView({
   classification,
   onApply,
 }: JobDeckViewProps) {
-  const { data, isLoading } = useInfiniteJobs(
+  const {
+    data,
+    isLoading,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteJobs(
     query,
     undefined,
     localizedTo,
     classification,
+    true,
   );
 
   const allJobs: JobPost[] = data?.pages ?? [];
@@ -222,6 +229,12 @@ export function JobDeckView({
       !skippedIds.has(j.id) &&
       !j.emailApply,
   );
+
+  useEffect(() => {
+    if (deck.length < 20 && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [deck.length, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const handleApply = useCallback(() => {
     const top = deck[0];
