@@ -46,8 +46,6 @@ export function JobsTableRow({
 }: Props) {
   const link = job?.applyUrl || job?.link || job?.emailApply;
 
-  console.log("Job Link : ", link);
-
   return (
     <TableRow
       onClick={onRowClick}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -23,7 +23,10 @@ export interface ExtJobUpdate {
   stuckReason?: string;
 }
 
-/** Minimal shape needed for cverai:apply dispatch. Compatible with JobPost. */
+/**
+ * Minimal shape needed for applyViaExtension. Compatible with JobPost so the
+ * orchestrator can spread a full job object here without a cast.
+ */
 export interface ExtensionJob {
   id: string;
   title?: string | null;
@@ -47,7 +50,6 @@ export interface ExtensionJob {
  * Requires:
  *  - Chromium-based (Chrome, Edge, Brave, Arc, …) — NOT Opera/Samsung/UC
  *  - Not a mobile user-agent
- *  - Primary pointer is "fine" (mouse), not touch
  */
 function isExtensionCapable(): boolean {
   if (typeof navigator === "undefined") return false;
@@ -63,8 +65,12 @@ function isExtensionCapable(): boolean {
 
 export function useExtension() {
   const [state, setState] = useState<ExtensionState>("not_capable");
-  // jobId → latest status pushed by the extension background
   const [extJobStatuses, setExtJobStatuses] = useState<Record<string, ExtJobUpdate>>({});
+
+  // jobId → extension runId. Populated when the background acknowledges the
+  // auto_apply_trigger (via auto_apply_response). focusExtTab reads it to
+  // bring the hidden automation popup to the foreground.
+  const jobRunIdsRef = useRef<Record<string, string>>({});
 
   useEffect(() => {
     const capable = isExtensionCapable();
@@ -76,6 +82,9 @@ export function useExtension() {
     }
 
     // ── Install detection via DOM marker ──────────────────────────────────
+    // content-trigger.js sets data-cverai-ext on <html> the moment it boots.
+    // We watch for it via MutationObserver so the button UI reacts live even
+    // if the script loads after this hook mounts.
     const checkInstalled = () => {
       const marker = document.documentElement.getAttribute("data-cverai-ext");
       console.log("[CverAI] DOM marker check → data-cverai-ext:", marker);
@@ -90,34 +99,123 @@ export function useExtension() {
       attributeFilter: ["data-cverai-ext"],
     });
 
-    // ── Extension job status updates ──────────────────────────────────────
+    // ── Custom-event listeners from the extension ──────────────────────────
+
+    // Forwarded by content-trigger.js (see its chrome.runtime.onMessage listener)
+    // for legacy code paths that still dispatch cverai:ext-update directly.
     const onExtUpdate = (e: Event) => {
       const { jobId, status, stuckReason } = (e as CustomEvent<{
         jobId: string;
         status: ExtQuickJobStatus;
         stuckReason?: string;
       }>).detail;
-      console.log("[CverAI] ext-update received:", { jobId, status, stuckReason });
+      console.log("[CverAI] cverai:ext-update received:", { jobId, status, stuckReason });
       setExtJobStatuses((prev) => ({ ...prev, [jobId]: { status, stuckReason } }));
     };
 
     window.addEventListener("cverai:ext-update", onExtUpdate);
 
-    // Ping-pong detection: page asks → content script answers → we mark installed.
+    // Ping-pong: page dispatches cverai:ping → content-trigger.js replies with
+    // cverai:ready. Guards against the case where data-cverai-ext is set after
+    // the MutationObserver check on mount.
     const onExtReady = () => {
       console.log("[CverAI] cverai:ready received → state = installed");
       setState("installed");
     };
     window.addEventListener("cverai:ready", onExtReady);
 
-    // If the content script's chrome.runtime dies (extension reloaded without page refresh),
-    // drop back to not_installed so the button shows the backend fallback path.
+    // If the extension reloads while the page is open, content-trigger.js
+    // removes data-cverai-ext and dispatches this so we fall back to
+    // "not_installed" immediately (the MutationObserver catches the removal,
+    // this event is an explicit belt-and-suspenders signal).
     const onExtInvalidated = () => {
       console.warn("[CverAI] extension context invalidated — resetting to not_installed");
       setState("not_installed");
     };
     window.addEventListener("cverai:ext-invalidated", onExtInvalidated);
 
+    // ── postMessage bridge: extension → React ─────────────────────────────
+    //
+    // content-trigger.js can't dispatch CustomEvents directly back into the
+    // React world (isolated-world → main-world custom event dispatch is not
+    // guaranteed across all Chrome versions). Instead it uses window.postMessage
+    // and we bridge here into CustomEvents that the orchestrator already listens
+    // for, keeping the orchestrator decoupled from the extension plumbing.
+    //
+    // Two message types we care about:
+    //
+    //   auto_apply_response  — background acknowledged the trigger; token = jobId,
+    //                          runId = UUID assigned by the background. We store
+    //                          jobId → runId for focusExtTab.
+    //
+    //   run_update           — background is broadcasting a status change as the
+    //                          agent works. We re-dispatch it as cverai:ext-update
+    //                          so useApplyOrchestrator.ts can map and store it.
+    const onExtMessage = (e: MessageEvent) => {
+      if (!e.data || e.data.source !== "cverai-extension") return;
+
+      const { type } = e.data;
+
+      if (type === "auto_apply_response") {
+        const { token: jobId, ok, runId, error } = e.data as {
+          token: string;
+          ok: boolean;
+          runId?: string;
+          error?: string;
+        };
+        console.log(
+          `[CverAI] auto_apply_response | jobId=${jobId} ok=${ok} runId=${runId ?? "—"}`,
+        );
+        if (ok && runId) {
+          // Keep the jobId → runId map so focusExtTab can use it later.
+          jobRunIdsRef.current[jobId] = runId;
+        } else {
+          console.warn("[CverAI] Extension rejected trigger:", error);
+          // Surface the error to the orchestrator so the row shows a failure badge.
+          window.dispatchEvent(
+            new CustomEvent("cverai:ext-update", {
+              detail: {
+                jobId,
+                status: "failed",
+                stuckReason: error ?? "Extension rejected the apply trigger",
+              },
+            }),
+          );
+        }
+        return;
+      }
+
+      if (type === "run_update") {
+        const run = (e.data as { run: Record<string, unknown> }).run;
+        const jobId = (run?.job as { id?: string } | undefined)?.id;
+        if (!jobId) return;
+
+        // Extract a human-readable reason from the last log entry on errors.
+        const log = run.log as Array<{ level: string; text: string }> | undefined;
+        const lastLog = log?.[log.length - 1];
+        const stuckReason =
+          run.status === "error" ? (lastLog?.text ?? "Unknown error") : undefined;
+
+        console.log(
+          `[CverAI] run_update | jobId=${jobId} status=${run.status}`,
+          stuckReason ?? "",
+        );
+
+        // Re-dispatch as cverai:ext-update so the orchestrator's existing
+        // listener picks it up without caring about the postMessage layer.
+        window.dispatchEvent(
+          new CustomEvent("cverai:ext-update", {
+            detail: { jobId, status: run.status, stuckReason },
+          }),
+        );
+      }
+    };
+
+    window.addEventListener("message", onExtMessage);
+
+    // Ping the content script. If it's already loaded it replies immediately
+    // with cverai:ready → onExtReady above sets state=installed. If it loads
+    // later, the MutationObserver catches data-cverai-ext being set.
     console.log("[CverAI] dispatching cverai:ping…");
     window.dispatchEvent(new CustomEvent("cverai:ping", { bubbles: false }));
 
@@ -126,40 +224,84 @@ export function useExtension() {
       window.removeEventListener("cverai:ext-update", onExtUpdate);
       window.removeEventListener("cverai:ready", onExtReady);
       window.removeEventListener("cverai:ext-invalidated", onExtInvalidated);
+      window.removeEventListener("message", onExtMessage);
     };
   }, []);
 
   /**
-   * Dispatches a job to the extension for hidden-tab automation.
-   * The content script picks it up and forwards to the background.
+   * Triggers the extension's hidden-tab automation for a job.
+   *
+   * Sends a postMessage to the window. The extension's content-trigger.js picks
+   * it up (via its own window "message" listener in the isolated world) and
+   * forwards it to the background service worker as "auto_apply_trigger".
+   *
+   * The background:
+   *   1. Opens a hidden popup at payload.jobUrl
+   *   2. Injects content-target.js into every frame
+   *   3. Starts the Gemini agent loop
+   *
+   * Status flows back: background → broadcastToSidePanel (trigger tabs) →
+   * content-trigger.js → window.postMessage → onExtMessage above →
+   * cverai:ext-update CustomEvent → useApplyOrchestrator.ts onExtUpdate.
+   *
+   * Profile note: profile is intentionally omitted from the payload. The
+   * background reads it from chrome.storage (configured in the side panel).
+   * If no profile is stored, the agent defers every unknown field to the user.
    */
   const applyViaExtension = useCallback((job: ExtensionJob) => {
-    window.dispatchEvent(
-      new CustomEvent("cverai:apply", {
-        bubbles: false,
-        detail: {
-          jobId: job.id,
-          title: job.title ?? "Untitled",
-          company: job.companyName ?? job.company ?? "",
-          location: job.location ?? "",
-          salary: job.salary ?? undefined,
-          jobUrl: job.applyUrl ?? job.link ?? "",
-          requirementsSnippet: job.descriptionText?.slice(0, 200) ?? undefined,
-          employmentType: job.employmentType ?? undefined,
-          correlationId: job.correlationId,
-        },
-      }),
+    const payload = {
+      // job is the context object the Gemini agent reads for form answers.
+      job: {
+        id: job.id,
+        title: job.title ?? "Untitled",
+        company: job.companyName ?? job.company ?? "",
+        location: job.location ?? "",
+        ...(job.salary != null && { salary: job.salary }),
+        ...(job.descriptionText && {
+          requirementsSnippet: job.descriptionText.slice(0, 200),
+        }),
+        ...(job.employmentType != null && { employmentType: job.employmentType }),
+      },
+      // URL the background opens in the hidden popup.
+      jobUrl: job.applyUrl ?? job.link ?? "",
+      // useIframe: false → popup mode. Set to true only when the apply form is
+      // embedded as an iframe inside the current tab (rare; requires special ATS
+      // detection in background.findIframeFrameId).
+      useIframe: false,
+      correlationId: job.correlationId,
+    };
+
+    console.log(
+      `[CverAI] applyViaExtension | jobId=${job.id} url=${payload.jobUrl} correlationId=${job.correlationId}`,
+    );
+
+    // token = job.id so that the auto_apply_response message can be mapped back
+    // to a React session (content-trigger.js echoes the token in the response).
+    window.postMessage(
+      { source: "cverai", type: "auto_apply", payload, token: job.id },
+      "*",
     );
   }, []);
 
   /**
-   * Asks the background to bring the hidden automation tab to the foreground.
-   * Used when the bot is stuck and needs human assistance.
+   * Asks the background to bring the hidden automation popup to the foreground.
+   *
+   * Requires the jobId → runId mapping to have been recorded in jobRunIdsRef
+   * when the background acknowledged the trigger (auto_apply_response).
+   * If the mapping isn't there yet, logs a warning and is a no-op.
    */
   const focusExtTab = useCallback((jobId: string) => {
-    window.dispatchEvent(
-      new CustomEvent("cverai:focus-tab", { bubbles: false, detail: { jobId } }),
-    );
+    const runId = jobRunIdsRef.current[jobId];
+    if (!runId) {
+      console.warn(
+        `[CverAI] focusExtTab: no runId for jobId=${jobId} — trigger not yet acknowledged`,
+      );
+      return;
+    }
+    console.log(`[CverAI] focusExtTab | jobId=${jobId} runId=${runId}`);
+    // content-trigger.js handles "focus_run_window" and forwards it to background
+    // as "page_focus_run_window", which calls chrome.windows.update(focused:true).
+    window.postMessage({ source: "cverai", type: "focus_run_window", runId }, "*");
   }, []);
 
   return { state, extJobStatuses, applyViaExtension, focusExtTab };

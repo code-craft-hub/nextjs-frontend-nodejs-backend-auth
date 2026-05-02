@@ -47,13 +47,16 @@ function isManualDomain(url: string): boolean {
  * Priority (highest → fallback):
  *   1. email      — job.emailApply is set (recruiter-direct compose)
  *   2. manual     — apply URL is LinkedIn / Glassdoor / Indeed (must open in browser)
- *   3. extension  — Chromium desktop + extension installed
+ *   3. extension  — Chromium desktop AND extension confirmed installed
  *   4. cloud_bot  — default: backend browser-use cloud session
  */
 function selectStrategy(job: JobPost, extState: ExtensionState): ApplyStrategy {
   if (job.emailApply) return "email";
   const link = job.applyUrl ?? job.link;
   if (link && isManualDomain(link)) return "manual";
+  // Both conditions required: Chromium desktop (capability) AND extension
+  // detected via data-cverai-ext marker (actually installed). Without the
+  // second check we'd queue jobs to "ext:queued" with no listener to pick them up.
   if (isChromiumDesktop() && extState === "installed") return "extension";
   return "cloud_bot";
 }
@@ -77,11 +80,31 @@ function mapCloudStatus(raw: string): ApplyStatus {
 }
 
 /**
- * Maps extension background status strings to unified ApplyStatus values.
- * "fallback_to_cloud" is handled separately — it never reaches this mapper.
+ * Maps extension status strings to unified ApplyStatus values.
+ *
+ * Two vocabularies are handled:
+ *
+ *   background run statuses  — set by background.js on run.status; forwarded
+ *                              via page_run_update → window.postMessage →
+ *                              cverai:ext-update by useExtension.ts.
+ *
+ *   legacy content-script    — older strings kept for backward compatibility.
+ *
+ * "fallback_to_cloud" is handled separately in the onExtUpdate handler and
+ * never reaches this mapper.
  */
 function mapExtStatus(raw: string): ApplyStatus {
   switch (raw) {
+    // ── Background service-worker run statuses (background.js serialiseRun) ──
+    case "running":                  return "ext:filling";
+    // awaiting_user_input: agent deferred questions — user must answer in the
+    // extension side panel. Show ext:reviewing so the row signals user action needed.
+    case "awaiting_user_input":      return "ext:reviewing";
+    // awaiting_submit_approval: agent filled all fields; user must approve submit.
+    case "awaiting_submit_approval": return "ext:reviewing";
+    case "complete":                 return "applied";
+    case "error":                    return "failed";
+    // ── Legacy / content-script status strings ──────────────────────────────
     case "navigating": return "ext:navigating";
     case "analyzing":  return "ext:analyzing";
     case "filling":    return "ext:filling";
