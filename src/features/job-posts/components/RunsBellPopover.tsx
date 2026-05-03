@@ -1,6 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { Briefcase, MapPin, X } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import type { ActiveRun, RunLogEntry } from "../types/apply-session.types";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -8,39 +12,56 @@ import type { ActiveRun, RunLogEntry } from "../types/apply-session.types";
 function prettyStatus(s: string): string {
   switch (s) {
     case "loading":
-      return "Loading…";
+      return "Queued";
     case "running":
-      return "Processing…";
+      return "Processing";
     case "awaiting_user_input":
-      return "Attention needed";
+      return "Attention";
     case "awaiting_submit_approval":
-      return "Ready to submit";
+      return "Attention";
     case "submitted":
     case "complete":
-      return "Done";
+      return "Applied";
     case "stopped":
       return "Stopped";
     case "blocked":
-      return "Blocked";
+      return "Attention";
     case "error":
       return "Error";
     default:
-      return s ?? "Queued";
+      return "Queued";
+  }
+}
+
+function statusLabel(s: string): string {
+  switch (s) {
+    case "loading":
+      return "Queued";
+    case "running":
+      return "Processing...";
+    case "awaiting_user_input":
+    case "awaiting_submit_approval":
+    case "blocked":
+      return "Attention needed";
+    case "submitted":
+    case "complete":
+      return "Applied";
+    case "stopped":
+      return "Stopped";
+    case "error":
+      return "Error";
+    default:
+      return "Queued";
   }
 }
 
 function statusPillClass(s: string): string {
-  if (s === "submitted" || s === "complete")
-    return "bg-green-100 text-green-700";
-  if (s === "running" || s === "loading") return "bg-blue-100 text-blue-700";
-  if (
-    s === "awaiting_user_input" ||
-    s === "awaiting_submit_approval" ||
-    s === "blocked"
-  )
-    return "bg-amber-100 text-amber-700";
-  if (s === "error") return "bg-red-100 text-red-600";
-  return "bg-gray-100 text-gray-600";
+  const key = prettyStatus(s);
+  if (key === "Applied") return "bg-green-100 text-green-700";
+  if (key === "Processing") return "bg-yellow-100 text-yellow-700";
+  if (key === "Attention") return "bg-red-100 text-red-600";
+  if (key === "Error") return "bg-red-100 text-red-600";
+  return "bg-gray-200 text-gray-600";
 }
 
 function lastInterestingAction(run: ActiveRun): string | null {
@@ -50,6 +71,15 @@ function lastInterestingAction(run: ActiveRun): string | null {
     if (e.level === "action" || e.level === "info") return e.text;
   }
   return null;
+}
+
+function CompanyAvatar({ company }: { company: string }) {
+  const letter = company?.charAt(0)?.toUpperCase() || "?";
+  return (
+    <div className="w-10 h-10 rounded-full bg-black flex items-center justify-center text-yellow-400 font-bold shrink-0 text-sm">
+      {letter}
+    </div>
+  );
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -66,12 +96,16 @@ export function RunsBellPopover({
   onDismissRun,
 }: RunsBellPopoverProps) {
   const [open, setOpen] = useState(false);
+  const [showAll, setShowAll] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const activeBadgeCount = runs.filter((r) =>
-    ["loading", "running", "awaiting_user_input", "awaiting_submit_approval"].includes(
-      r.status,
-    ),
+    [
+      "loading",
+      "running",
+      "awaiting_user_input",
+      "awaiting_submit_approval",
+    ].includes(r.status),
   ).length;
 
   const completedCount = runs.filter((r) =>
@@ -79,6 +113,12 @@ export function RunsBellPopover({
   ).length;
   const pct =
     runs.length === 0 ? 0 : Math.round((completedCount / runs.length) * 100);
+
+  const pendingApprovals = runs.filter(
+    (r) => r.status === "awaiting_submit_approval",
+  ).length;
+
+  const visibleRuns = showAll ? runs : runs.slice(0, 6);
 
   // Close popover on outside click
   useEffect(() => {
@@ -95,6 +135,11 @@ export function RunsBellPopover({
     return () => document.removeEventListener("mousedown", handler);
   }, [open]);
 
+  // Reset showAll when closed
+  useEffect(() => {
+    if (!open) setShowAll(false);
+  }, [open]);
+
   return (
     <div className="relative" ref={containerRef}>
       {/* Bell button */}
@@ -104,7 +149,6 @@ export function RunsBellPopover({
         title={`${runs.length} auto-apply runs`}
         aria-label="Auto-apply runs"
       >
-        {/* Bell icon */}
         <svg
           className="w-4 h-4"
           fill="none"
@@ -118,8 +162,6 @@ export function RunsBellPopover({
             d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
           />
         </svg>
-
-        {/* Active badge */}
         {activeBadgeCount > 0 && (
           <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] bg-indigo-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1 leading-none">
             {activeBadgeCount}
@@ -129,98 +171,137 @@ export function RunsBellPopover({
 
       {/* Popover */}
       {open && (
-        <div className="absolute right-0 top-11 w-80 bg-white border border-gray-200 rounded-2xl shadow-2xl z-50 overflow-hidden">
-          {/* Header */}
-          <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
-            <div>
-              <h3 className="text-sm font-semibold text-gray-900">
-                Auto-apply runs
-              </h3>
-              <p className="text-xs text-gray-400 mt-0.5">
-                {runs.length} total · {pct}% complete
-              </p>
-            </div>
-          </div>
-
-          {/* Run list */}
-          <div className="max-h-80 overflow-y-auto">
-            {runs.length === 0 ? (
-              <div className="py-8 text-center text-sm text-gray-400 px-4">
-                Nothing yet. Switch to Deck view and apply to a job to start.
+        <div className="absolute right-0 top-11 w-120 z-50">
+          <Card className="rounded-2xl shadow-xl border border-gray-100">
+            <CardContent className="p-6">
+              {/* Header */}
+              <div className="flex items-center justify-between mb-5">
+                <h2 className="text-base font-semibold text-gray-900">
+                  Active ({runs.length})
+                </h2>
+                <span className="text-sm text-gray-400">{pct}% completion</span>
               </div>
-            ) : (
-              <ul className="divide-y divide-gray-50">
-                {runs.map((run) => {
-                  const title = run.job?.title ?? "Job";
-                  const company = run.job?.company ?? "";
-                  const isActive = [
-                    "loading",
-                    "running",
-                    "awaiting_user_input",
-                  ].includes(run.status);
-                  const liveAction =
-                    isActive && !run.blockedMessage
-                      ? lastInterestingAction(run)
-                      : null;
 
-                  return (
-                    <li
-                      key={run.id}
-                      className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 cursor-pointer group transition-colors"
-                      onClick={() => {
-                        onOpenRun(run.id);
-                        setOpen(false);
-                      }}
-                    >
-                      {/* Text */}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-1 flex-wrap">
-                          <span className="text-sm font-medium text-gray-800 truncate">
-                            {title}
-                          </span>
-                          {company && (
-                            <span className="text-xs text-gray-400 truncate">
-                              @{company}
-                            </span>
-                          )}
-                        </div>
-                        {liveAction && (
-                          <p className="text-xs text-gray-500 truncate mt-0.5">
-                            {liveAction}
-                          </p>
-                        )}
-                        {run.blockedMessage && (
-                          <p className="text-xs text-red-500 truncate mt-0.5">
-                            {run.blockedMessage}
-                          </p>
-                        )}
-                      </div>
+              {/* Run list */}
+              {runs.length === 0 ? (
+                <p className="text-sm text-gray-400 text-center py-6">
+                  No runs yet. Apply to a job to get started.
+                </p>
+              ) : (
+                <div>
+                  {visibleRuns.map((run) => {
+                    const title = run.job?.title ?? "Job";
+                    const company = run.job?.company ?? "";
+                    console.log(run);
+                    const isActive = [
+                      "loading",
+                      "running",
+                      "awaiting_user_input",
+                    ].includes(run.status);
+                    const liveAction =
+                      isActive && !run.blockedMessage
+                        ? lastInterestingAction(run)
+                        : null;
+                    const isAutoApply =
+                      run.openMode === "window" || run.openMode === "iframe";
 
-                      {/* Status pill */}
-                      <span
-                        className={`shrink-0 text-xs font-medium px-2 py-0.5 rounded-lg ${statusPillClass(run.status)}`}
-                      >
-                        {prettyStatus(run.status)}
-                      </span>
-
-                      {/* Dismiss */}
-                      <button
-                        className="shrink-0 opacity-0 group-hover:opacity-100 text-gray-300 hover:text-gray-500 text-xs transition-opacity p-0.5"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onDismissRun(run.id);
+                    return (
+                      <div
+                        key={run.id}
+                        className="flex items-center justify-between py-3.5 border-b last:border-none cursor-pointer hover:bg-gray-50 -mx-2 px-2 rounded-xl transition-colors group"
+                        onClick={() => {
+                          onOpenRun(run.id);
+                          setOpen(false);
                         }}
-                        title="Dismiss"
-                        aria-label="Dismiss run"
                       >
-                        ✕
-                      </button>
-                    </li>
-                  );
-                })}
-              </ul>
-            )}
-          </div>
+                        {/* Left: avatar + title */}
+                        <div className="flex items-center gap-3 min-w-0">
+                          <CompanyAvatar company={company} />
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="text-sm font-medium text-gray-800 truncate capitalize">
+                                {title}
+                                {company ? ` @${company}` : ""}
+                              </span>
+                              {isAutoApply && (
+                                <div className="flex items-center gap-1 bg-indigo-100 text-indigo-600 px-2.5 py-0.5 rounded-full text-xs font-medium shrink-0">
+                                  <span>⚡</span>
+                                  Auto-apply
+                                </div>
+                              )}
+                              {run?.jobUrl && (
+                                <div className="flex items-center gap-1 bg-indigo-100 text-indigo-600 px-2.5 py-0.5 rounded-full text-xs font-medium shrink-0">
+                                  <Briefcase className="size-4" />
+                                  <a
+                                    href={run.jobUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    onClick={(e) => e.stopPropagation()}
+                                    className="underline"
+                                  >
+                                    View job
+                                  </a>
+                                </div>
+                              )}
+                            </div>
+                            {liveAction && (
+                              <p className="text-xs text-gray-400 truncate mt-0.5">
+                                {liveAction}
+                              </p>
+                            )}
+                            {run.blockedMessage && (
+                              <p className="text-xs text-red-400 truncate mt-0.5">
+                                {run.blockedMessage}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Right: status + dismiss */}
+                        <div className="flex items-center gap-3 shrink-0 ml-3">
+                          <Badge
+                            className={`rounded-full px-3.5 py-1 text-xs font-medium border-0 ${statusPillClass(run.status)}`}
+                          >
+                            {statusLabel(run.status)}
+                          </Badge>
+                          <button
+                            className="text-gray-300 hover:text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onDismissRun(run.id);
+                            }}
+                            title="Dismiss"
+                            aria-label="Dismiss run"
+                          >
+                            <X size={15} />
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* Footer button */}
+              {runs.length > 6 && (
+                <Button
+                  className="w-full mt-4 rounded-xl bg-gray-100 text-gray-700 hover:bg-gray-200 border-0 shadow-none font-medium text-sm"
+                  onClick={() => setShowAll((v) => !v)}
+                >
+                  {showAll ? "Show less" : `See all ${runs.length} runs`}
+                </Button>
+              )}
+              {pendingApprovals > 0 && (
+                <Button
+                  className="w-full mt-2 rounded-xl bg-amber-50 text-amber-700 hover:bg-amber-100 border-0 shadow-none font-medium text-sm"
+                  onClick={() => setOpen(false)}
+                >
+                  {pendingApprovals} pending approval
+                  {pendingApprovals > 1 ? "s" : ""}
+                </Button>
+              )}
+            </CardContent>
+          </Card>
         </div>
       )}
     </div>
