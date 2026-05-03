@@ -14,7 +14,7 @@ import { JobDeckView } from "./JobDeckView";
 import { RunsBellPopover } from "./RunsBellPopover";
 import { RunModal } from "./RunModal";
 import { IframeStage } from "./IframeStage";
-import { useRunManager, shouldUsePopup } from "../hooks/useRunManager";
+import { useRunManager } from "../hooks/useRunManager";
 import { useExtension } from "../hooks/useExtension";
 import { buildExtensionProfile } from "../hooks/useApplyOrchestrator";
 import type { JobPost } from "@/features/job-posts";
@@ -93,8 +93,6 @@ export default function Overview() {
     runs,
     modalRunId,
     iframeStageRef,
-    startIframeApply,
-    startPopupApply,
     openRunModal,
     closeRunModal,
     repositionIframe,
@@ -102,9 +100,9 @@ export default function Overview() {
     stopRun,
   } = useRunManager();
 
-  // ── Extension state (table applies managed by JobsTable's own hook) ────────
+  // ── Extension state + apply trigger (same path as the list view) ──────────
 
-  const { state: extState } = useExtension();
+  const { state: extState, applyViaExtension } = useExtension();
 
   // ── Sync profile to DOM so content-trigger.js can attach it ──────────────
   // content-trigger.js reads document.body.dataset.cverProfile and adds it
@@ -124,32 +122,29 @@ export default function Overview() {
   }, [user]);
 
   // ── Deck apply handler ────────────────────────────────────────────────────
-  // Extension installed → iframe mode by default (run tracked in bell + modal).
-  // If the apply URL is on a host that blocks iframing → popup mode instead.
+  // Uses the same popup-window path as the list view so clicking the bell
+  // entry focuses the live window (no blank iframe problem).
   // Not installed → open the apply URL in a new tab (manual fallback).
   const handleDeckApply = useCallback(
     (job: JobPost) => {
       if (extState === "installed") {
-        const applyUrl = job.applyUrl ?? job.link ?? "";
         const profile = user ? buildExtensionProfile(user) : null;
-        const jobArg = {
+        applyViaExtension({
           id: job.id,
           title: job.title,
-          company: job.companyName ?? job.company,
+          companyName: job.companyName,
+          company: job.company,
           location: job.location,
-          applyUrl,
-        };
-        if (shouldUsePopup(applyUrl)) {
-          startPopupApply(jobArg, profile);
-        } else {
-          startIframeApply(jobArg, profile).catch(console.error);
-        }
+          applyUrl: job.applyUrl,
+          link: job.link,
+          profile,
+        });
       } else {
         const url = job.applyUrl ?? job.link;
         if (url) window.open(url, "_blank", "noopener,noreferrer");
       }
     },
-    [extState, user, startIframeApply, startPopupApply],
+    [extState, user, applyViaExtension],
   );
 
   // ── Active runs for bell popover (not dismissed) ──────────────────────────

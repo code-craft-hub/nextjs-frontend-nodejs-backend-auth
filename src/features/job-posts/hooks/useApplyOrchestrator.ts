@@ -56,6 +56,7 @@ export function buildExtensionProfile(user: Partial<IUser>): ExtensionProfile {
     ...(user.cvJobTitle && { title: user.cvJobTitle }),
     ...(user.website && { website: user.website }),
     ...(user.portfolio && { website: user.portfolio }),
+    ...(user.linkedin && { linkedin: user.linkedin }),
     // profile is the user's professional summary stored on the IUser record.
     ...(user.profile && { profileSummary: user.profile }),
   };

@@ -41,6 +41,7 @@ export interface ExtensionProfile {
   address?: string;
   title?: string;
   website?: string;
+  linkedin?: string;
   profileSummary?: string;
   /** Direct URL to the user's CV/resume file. Used by the agent's upload tool. */
   cv_url?: string | null;

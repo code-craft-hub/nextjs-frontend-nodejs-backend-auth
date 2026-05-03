@@ -146,6 +146,7 @@ export interface IUser {
   cvJobTitle?: string;
   website?: string;
   portfolio?: string;
+  linkedin?: string;
   profile: string;
   recommendationsData?: any[];
   createdAt?: string | Date;
