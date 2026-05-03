@@ -171,9 +171,15 @@ export default function Overview() {
     // Extension runs (dismissed ones are already removed from the map by dismissRun)
     const extRuns = Array.from(runs.values());
 
-    // Cloud bot sessions — convert ApplySession → ActiveRun shape
+    // Job IDs already covered by an extension run — used to deduplicate below.
+    const extJobIds = new Set(extRuns.map((r) => r.job?.id).filter(Boolean));
+
+    // Cloud bot sessions — convert ApplySession → ActiveRun shape.
+    // Skip any session whose jobId is already tracked by an extension run to
+    // prevent the same job appearing twice in the bell popover.
     const sessionRuns: ActiveRun[] = Object.values(orchestrator.sessions)
       .filter((s) => !["applied", "failed", "skipped", "recruiter_email"].includes(s.status))
+      .filter((s) => !extJobIds.has(s.jobId))
       .map((s) => ({
         id: s.jobId,
         job: { id: s.jobId, title: s.jobTitle ?? "Job", company: s.jobCompany ?? "" },

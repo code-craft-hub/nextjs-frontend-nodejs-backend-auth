@@ -34,7 +34,7 @@ export interface ActiveRun {
   /** Agent is blocked waiting for user answers to these questions. */
   pendingBatch?: { questions: RunBatchQuestion[] } | null;
   /** Agent is ready to submit and waiting for user approval. */
-  pendingSubmit?: { summary: string } | null;
+  pendingSubmit?: { summary: Array<{ field: string; value: string }> | string } | null;
   /** job_applications.id created after a successful submit — used to link to the details page. */
   applicationId?: string | null;
   /** True while we haven't yet received the real runId from background. */

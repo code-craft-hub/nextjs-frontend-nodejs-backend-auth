@@ -1,67 +1,51 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Briefcase, X } from "lucide-react";
+import { Briefcase, X, Send, CheckCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import type { ActiveRun, RunLogEntry } from "../types/apply-session.types";
+import { Textarea } from "@/components/ui/textarea";
+import type { ActiveRun, RunLogEntry, RunBatchQuestion } from "../types/apply-session.types";
 import { useRouter } from "next/navigation";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function prettyStatus(s: string): string {
   switch (s) {
-    case "loading":
-      return "Queued";
-    case "running":
-      return "Processing";
+    case "loading":               return "Queued";
+    case "running":               return "Processing";
     case "awaiting_user_input":
-      return "Attention";
     case "awaiting_submit_approval":
-      return "Attention";
+    case "blocked":               return "Attention";
     case "submitted":
-    case "complete":
-      return "Applied";
-    case "stopped":
-      return "Stopped";
-    case "blocked":
-      return "Attention";
-    case "error":
-      return "Error";
-    default:
-      return "Queued";
+    case "complete":              return "Applied";
+    case "stopped":               return "Stopped";
+    case "error":                 return "Error";
+    default:                      return "Queued";
   }
 }
 
 function statusLabel(s: string): string {
   switch (s) {
-    case "loading":
-      return "Queued";
-    case "running":
-      return "Processing...";
-    case "awaiting_user_input":
-    case "awaiting_submit_approval":
-    case "blocked":
-      return "Attention needed";
-    case "submitted":
-    case "complete":
-      return "Applied";
-    case "stopped":
-      return "Stopped";
-    case "error":
-      return "Error";
-    default:
-      return "Queued";
+    case "loading":                             return "Queued";
+    case "running":                             return "Processing...";
+    case "awaiting_user_input":                 return "Needs answers";
+    case "awaiting_submit_approval":            return "Ready to submit";
+    case "blocked":                             return "Attention needed";
+    case "submitted": case "complete":          return "Applied";
+    case "stopped":                             return "Stopped";
+    case "error":                               return "Error";
+    default:                                    return "Queued";
   }
 }
 
 function statusPillClass(s: string): string {
   const key = prettyStatus(s);
-  if (key === "Applied") return "bg-green-100 text-green-700";
-  if (key === "Processing") return "bg-yellow-100 text-yellow-700";
-  if (key === "Attention") return "bg-red-100 text-red-600";
-  if (key === "Error") return "bg-red-100 text-red-600";
+  if (key === "Applied")     return "bg-green-100 text-green-700";
+  if (key === "Processing")  return "bg-yellow-100 text-yellow-700";
+  if (key === "Attention")   return "bg-red-100 text-red-600";
+  if (key === "Error")       return "bg-red-100 text-red-600";
   return "bg-gray-200 text-gray-600";
 }
 
@@ -83,6 +67,203 @@ function CompanyAvatar({ company }: { company: string }) {
   );
 }
 
+// ─── postMessage helpers (page → content-trigger.js → background) ─────────────
+
+function sendAnswerBatch(runId: string, answers: Record<string, string>) {
+  window.postMessage(
+    { source: "cverai", type: "answer_batch", runId, answers },
+    "*",
+  );
+}
+
+function sendApproveSubmit(runId: string) {
+  window.postMessage(
+    { source: "cverai", type: "approve_submit", runId },
+    "*",
+  );
+}
+
+function sendStopRun(runId: string) {
+  window.postMessage(
+    { source: "cverai", type: "stop_run", runId },
+    "*",
+  );
+}
+
+// ─── Batch-question panel (inline inside popover row) ─────────────────────────
+
+function BatchQuestionsPanel({
+  run,
+  onClose,
+}: {
+  run: ActiveRun;
+  onClose: () => void;
+}) {
+  const questions: RunBatchQuestion[] = run.pendingBatch?.questions ?? [];
+  const [answers, setAnswers] = useState<Record<string, string>>(() =>
+    Object.fromEntries(questions.map((q) => [q.id, ""])),
+  );
+  const [sending, setSending] = useState(false);
+  const [sent, setSent] = useState(false);
+
+  // Listen for ack from content-trigger so we can confirm delivery
+  useEffect(() => {
+    const handler = (e: MessageEvent) => {
+      const d = e.data as Record<string, unknown> | null;
+      if (!d || d.source !== "cverai-extension") return;
+      if (d.type === "answer_batch_ack" && d.runId === run.id) {
+        setSending(false);
+        setSent(true);
+        setTimeout(onClose, 1200);
+      }
+    };
+    window.addEventListener("message", handler);
+    return () => window.removeEventListener("message", handler);
+  }, [run.id, onClose]);
+
+  function handleSend() {
+    setSending(true);
+    sendAnswerBatch(run.id, answers);
+    // Fallback: if no ack within 3 s, close anyway
+    setTimeout(() => {
+      setSending(false);
+      onClose();
+    }, 3000);
+  }
+
+  const allFilled = questions.every((q) => answers[q.id]?.trim());
+
+  if (sent) {
+    return (
+      <div className="flex items-center gap-2 py-3 text-green-600 text-sm font-medium">
+        <CheckCircle className="w-4 h-4" />
+        Answers sent — agent resuming…
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-2 space-y-3" onClick={(e) => e.stopPropagation()}>
+      <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">
+        The bot needs your answers to continue
+      </p>
+      {questions.map((q) => (
+        <div key={q.id} className="space-y-1">
+          <label className="text-xs font-medium text-gray-700 block">
+            {q.field_label ?? q.question}
+          </label>
+          {q.why && (
+            <p className="text-xs text-gray-400 italic">{q.why}</p>
+          )}
+          <Textarea
+            className="text-sm min-h-[60px] resize-none rounded-lg"
+            placeholder="Your answer…"
+            value={answers[q.id] ?? ""}
+            onChange={(e) =>
+              setAnswers((prev) => ({ ...prev, [q.id]: e.target.value }))
+            }
+          />
+        </div>
+      ))}
+      <Button
+        size="sm"
+        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg gap-2"
+        disabled={!allFilled || sending}
+        onClick={handleSend}
+      >
+        <Send className="w-3.5 h-3.5" />
+        {sending ? "Sending…" : "Send answers"}
+      </Button>
+    </div>
+  );
+}
+
+// ─── Submit-approval panel ────────────────────────────────────────────────────
+
+function SubmitApprovalPanel({
+  run,
+  onClose,
+}: {
+  run: ActiveRun;
+  onClose: () => void;
+}) {
+  const summary: Array<{ field: string; value: string }> | string | undefined =
+    run.pendingSubmit?.summary;
+  const [approving, setApproving] = useState(false);
+
+  function handleApprove() {
+    setApproving(true);
+    sendApproveSubmit(run.id);
+    setTimeout(onClose, 800);
+  }
+
+  function handleStop() {
+    sendStopRun(run.id);
+    onClose();
+  }
+
+  // summary may be an array of { field, value } objects, a JSON string, or a plain string
+  let summaryItems: Array<{ field: string; value: string }> | null = null;
+  if (Array.isArray(summary)) {
+    summaryItems = summary as Array<{ field: string; value: string }>;
+  } else if (typeof summary === "string") {
+    try {
+      const parsed = JSON.parse(summary);
+      if (Array.isArray(parsed)) summaryItems = parsed;
+    } catch {
+      // plain string — render as-is below
+    }
+  }
+
+  return (
+    <div className="mt-2 space-y-3" onClick={(e) => e.stopPropagation()}>
+      <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">
+        Form filled — approve to submit
+      </p>
+      {summaryItems ? (
+        <div className="max-h-40 overflow-y-auto space-y-1 rounded-lg border border-gray-100 p-2 bg-gray-50">
+          {summaryItems.slice(0, 12).map((item, i) => (
+            <div key={i} className="flex gap-2 text-xs">
+              <span className="text-gray-500 min-w-0 truncate shrink-0 max-w-[45%]">
+                {item.field}
+              </span>
+              <span className="text-gray-800 truncate">{item.value}</span>
+            </div>
+          ))}
+          {summaryItems.length > 12 && (
+            <p className="text-xs text-gray-400 text-center pt-1">
+              +{summaryItems.length - 12} more fields
+            </p>
+          )}
+        </div>
+      ) : typeof summary === "string" && summary ? (
+        <p className="text-xs text-gray-600 bg-gray-50 rounded-lg p-2 max-h-28 overflow-y-auto whitespace-pre-line">
+          {summary}
+        </p>
+      ) : null}
+      <div className="flex gap-2">
+        <Button
+          size="sm"
+          variant="outline"
+          className="flex-1 border-red-200 text-red-600 hover:bg-red-50 rounded-lg"
+          onClick={handleStop}
+        >
+          Stop
+        </Button>
+        <Button
+          size="sm"
+          className="flex-1 bg-green-600 hover:bg-green-700 text-white rounded-lg gap-1.5"
+          disabled={approving}
+          onClick={handleApprove}
+        >
+          <CheckCircle className="w-3.5 h-3.5" />
+          {approving ? "Submitting…" : "Approve & Submit"}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 // ─── Component ────────────────────────────────────────────────────────────────
 
 interface RunsBellPopoverProps {
@@ -98,38 +279,47 @@ export function RunsBellPopover({
 }: RunsBellPopoverProps) {
   const [open, setOpen] = useState(false);
   const [showAll, setShowAll] = useState(false);
+  // Track which run has its inline panel expanded (batch questions or submit approval)
+  const [expandedRunId, setExpandedRunId] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
   const activeBadgeCount = runs.filter((r) =>
-    [
-      "loading",
-      "running",
-      "awaiting_user_input",
-      "awaiting_submit_approval",
-    ].includes(r.status),
+    ["loading", "running", "awaiting_user_input", "awaiting_submit_approval"].includes(r.status),
   ).length;
 
   const completedCount = runs.filter((r) =>
     ["submitted", "complete", "stopped", "error", "blocked"].includes(r.status),
   ).length;
-  const pct =
-    runs.length === 0 ? 0 : Math.round((completedCount / runs.length) * 100);
+  const pct = runs.length === 0 ? 0 : Math.round((completedCount / runs.length) * 100);
 
-  const pendingApprovals = runs.filter(
-    (r) => r.status === "awaiting_submit_approval",
-  ).length;
+  const needsAttentionRuns = runs.filter(
+    (r) => r.status === "awaiting_user_input" || r.status === "awaiting_submit_approval",
+  );
 
   const visibleRuns = showAll ? runs : runs.slice(0, 6);
+
+  // Auto-expand the first run that needs attention when the popover opens
+  useEffect(() => {
+    if (!open) return;
+    if (needsAttentionRuns.length > 0 && !expandedRunId) {
+      setExpandedRunId(needsAttentionRuns[0].id);
+    }
+  }, [open, needsAttentionRuns, expandedRunId]);
+
+  // Auto-open popover when a run transitions to needing attention
+  useEffect(() => {
+    if (needsAttentionRuns.length > 0) {
+      setOpen(true);
+      setExpandedRunId((prev) => prev ?? needsAttentionRuns[0].id);
+    }
+  }, [needsAttentionRuns.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Close popover on outside click
   useEffect(() => {
     if (!open) return;
     const handler = (e: MouseEvent) => {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(e.target as Node)
-      ) {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
         setOpen(false);
       }
     };
@@ -137,9 +327,12 @@ export function RunsBellPopover({
     return () => document.removeEventListener("mousedown", handler);
   }, [open]);
 
-  // Reset showAll when closed
+  // Reset state when closed
   useEffect(() => {
-    if (!open) setShowAll(false);
+    if (!open) {
+      setShowAll(false);
+      setExpandedRunId(null);
+    }
   }, [open]);
 
   return (
@@ -169,11 +362,15 @@ export function RunsBellPopover({
             {activeBadgeCount}
           </span>
         )}
+        {/* Pulsing red dot when attention is needed */}
+        {needsAttentionRuns.length > 0 && (
+          <span className="absolute -bottom-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse border-2 border-white" />
+        )}
       </button>
 
       {/* Popover */}
       {open && (
-        <div className="absolute right-0 top-11 w-120 z-50">
+        <div className="absolute right-0 top-11 w-[480px] z-50">
           <Card className="rounded-2xl shadow-xl border border-gray-100">
             <CardContent className="p-6">
               {/* Header */}
@@ -194,25 +391,26 @@ export function RunsBellPopover({
                   {visibleRuns.map((run) => {
                     const title = run.job?.title ?? "Job";
                     const company = run.job?.company ?? "";
-                    const isActive = [
-                      "loading",
-                      "running",
-                      "awaiting_user_input",
-                    ].includes(run.status);
-                    const liveAction =
-                      isActive && !run.blockedMessage
-                        ? lastInterestingAction(run)
-                        : null;
-                    const isAutoApply =
-                      run.openMode === "window" || run.openMode === "iframe";
-
+                    const isActive = ["loading", "running", "awaiting_user_input"].includes(run.status);
+                    const liveAction = isActive && !run.blockedMessage ? lastInterestingAction(run) : null;
+                    const isAutoApply = run.openMode === "window" || run.openMode === "iframe";
                     const isTerminal = ["submitted", "complete", "applied"].includes(run.status);
+                    const needsAttention =
+                      run.status === "awaiting_user_input" ||
+                      run.status === "awaiting_submit_approval";
+                    const isExpanded = expandedRunId === run.id;
 
                     return (
                       <div
                         key={run.id}
-                        className="flex items-center justify-between py-3.5 border-b last:border-none cursor-pointer hover:bg-gray-50 -mx-2 px-2 rounded-xl transition-colors group"
+                        className={`py-3.5 border-b last:border-none -mx-2 px-2 rounded-xl transition-colors ${
+                          needsAttention ? "bg-amber-50/60" : "hover:bg-gray-50 cursor-pointer"
+                        } group`}
                         onClick={() => {
+                          if (needsAttention) {
+                            setExpandedRunId((prev) => (prev === run.id ? null : run.id));
+                            return;
+                          }
                           setOpen(false);
                           if (isTerminal && run.applicationId) {
                             router.push(`/dashboard/jobs/${run.applicationId}/application-details`);
@@ -221,90 +419,99 @@ export function RunsBellPopover({
                           }
                         }}
                       >
-                        {/* Left: avatar + title */}
-                        <div className="flex items-center gap-3 min-w-0">
-                          <CompanyAvatar company={company} />
-                          <div className="min-w-0">
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <span className="text-sm font-medium text-gray-800 truncate capitalize">
-                                {title}
-                                {company ? ` @${company}` : ""}
-                              </span>
-                              {isAutoApply && (
-                                <div className="flex items-center gap-1 bg-indigo-100 text-indigo-600 px-2.5 py-0.5 rounded-full text-xs font-medium shrink-0">
-                                  <span>⚡</span>
-                                  Auto-apply
-                                </div>
+                        {/* Row: avatar + title + status + dismiss */}
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3 min-w-0">
+                            <CompanyAvatar company={company} />
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <span className="text-sm font-medium text-gray-800 truncate capitalize">
+                                  {title}
+                                  {company ? ` @${company}` : ""}
+                                </span>
+                                {isAutoApply && (
+                                  <div className="flex items-center gap-1 bg-indigo-100 text-indigo-600 px-2.5 py-0.5 rounded-full text-xs font-medium shrink-0">
+                                    <span>⚡</span>
+                                    Auto-apply
+                                  </div>
+                                )}
+                                {run?.jobUrl && (
+                                  <div className="flex items-center gap-1 bg-indigo-100 text-indigo-600 px-2.5 py-0.5 rounded-full text-xs font-medium shrink-0">
+                                    <Briefcase className="size-4" />
+                                    <a
+                                      href={run.jobUrl}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      onClick={(e) => e.stopPropagation()}
+                                      className="underline"
+                                    >
+                                      View job
+                                    </a>
+                                  </div>
+                                )}
+                              </div>
+                              {liveAction && (
+                                <p className="text-xs text-gray-400 truncate mt-0.5">{liveAction}</p>
                               )}
-                              {run?.jobUrl && (
-                                <div className="flex items-center gap-1 bg-indigo-100 text-indigo-600 px-2.5 py-0.5 rounded-full text-xs font-medium shrink-0">
-                                  <Briefcase className="size-4" />
-                                  <a
-                                    href={run.jobUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    onClick={(e) => e.stopPropagation()}
-                                    className="underline"
-                                  >
-                                    View job
-                                  </a>
-                                </div>
+                              {run.blockedMessage && (
+                                <p className="text-xs text-red-400 truncate mt-0.5">{run.blockedMessage}</p>
+                              )}
+                              {needsAttention && !isExpanded && (
+                                <p className="text-xs text-amber-600 font-medium mt-0.5">
+                                  {run.status === "awaiting_user_input"
+                                    ? `${run.pendingBatch?.questions?.length ?? 0} question(s) need your answer — tap to expand`
+                                    : "Form filled and ready — tap to review & approve"}
+                                </p>
                               )}
                             </div>
-                            {liveAction && (
-                              <p className="text-xs text-gray-400 truncate mt-0.5">
-                                {liveAction}
-                              </p>
-                            )}
-                            {run.blockedMessage && (
-                              <p className="text-xs text-red-400 truncate mt-0.5">
-                                {run.blockedMessage}
-                              </p>
-                            )}
+                          </div>
+
+                          <div className="flex items-center gap-3 shrink-0 ml-3">
+                            <Badge
+                              className={`rounded-full px-3.5 py-1 text-xs font-medium border-0 ${statusPillClass(run.status)}`}
+                            >
+                              {statusLabel(run.status)}
+                            </Badge>
+                            <button
+                              className="text-gray-300 hover:text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onDismissRun(run.id);
+                              }}
+                              title="Dismiss"
+                              aria-label="Dismiss run"
+                            >
+                              <X size={15} />
+                            </button>
                           </div>
                         </div>
 
-                        {/* Right: status + dismiss */}
-                        <div className="flex items-center gap-3 shrink-0 ml-3">
-                          <Badge
-                            className={`rounded-full px-3.5 py-1 text-xs font-medium border-0 ${statusPillClass(run.status)}`}
-                          >
-                            {statusLabel(run.status)}
-                          </Badge>
-                          <button
-                            className="text-gray-300 hover:text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onDismissRun(run.id);
-                            }}
-                            title="Dismiss"
-                            aria-label="Dismiss run"
-                          >
-                            <X size={15} />
-                          </button>
-                        </div>
+                        {/* Inline interaction panel */}
+                        {isExpanded && run.status === "awaiting_user_input" && run.pendingBatch && (
+                          <BatchQuestionsPanel
+                            run={run}
+                            onClose={() => setExpandedRunId(null)}
+                          />
+                        )}
+                        {isExpanded && run.status === "awaiting_submit_approval" && run.pendingSubmit && (
+                          <SubmitApprovalPanel
+                            run={run}
+                            onClose={() => setExpandedRunId(null)}
+                          />
+                        )}
                       </div>
                     );
                   })}
                 </div>
               )}
 
-              {/* Footer button */}
+              {/* Footer */}
               {runs.length > 6 && (
                 <Button
                   className="w-full mt-4 rounded-xl bg-gray-100 text-gray-700 hover:bg-gray-200 border-0 shadow-none font-medium text-sm"
                   onClick={() => setShowAll((v) => !v)}
                 >
                   {showAll ? "Show less" : `See all ${runs.length} runs`}
-                </Button>
-              )}
-              {pendingApprovals > 0 && (
-                <Button
-                  className="w-full mt-2 rounded-xl bg-amber-50 text-amber-700 hover:bg-amber-100 border-0 shadow-none font-medium text-sm"
-                  onClick={() => setOpen(false)}
-                >
-                  {pendingApprovals} pending approval
-                  {pendingApprovals > 1 ? "s" : ""}
                 </Button>
               )}
               <Button
