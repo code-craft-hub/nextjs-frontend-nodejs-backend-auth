@@ -20,8 +20,6 @@ export const jobPostsApi = {
       /** Scraper classification: "remote" | "relocate". */
       classification?: string;
       limit?: number;
-      /** When true, excludes jobs with an emailApply address (deck view only). */
-      excludeEmailApply?: boolean;
     },
     token?: string,
   ) => api.get<InfiniteJobsResponse>("/job-posts/query", { params, token }),

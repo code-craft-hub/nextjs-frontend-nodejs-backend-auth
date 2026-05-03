@@ -214,7 +214,6 @@ export function JobDeckView({
     undefined,
     localizedTo,
     classification,
-    true,
   );
 
   const allJobs: JobPost[] = data?.pages ?? [];
@@ -231,7 +230,7 @@ export function JobDeckView({
   );
 
   useEffect(() => {
-    if (deck.length < 20 && hasNextPage && !isFetchingNextPage) {
+    if (deck.length < 10 && hasNextPage && !isFetchingNextPage) {
       fetchNextPage();
     }
   }, [deck.length, hasNextPage, isFetchingNextPage, fetchNextPage]);
@@ -283,7 +282,17 @@ export function JobDeckView({
     );
   }
 
-  // ── Deck exhausted ──────────────────────────────────────────────────────
+  // ── Deck empty but more pages incoming — show skeleton, not "done" ──────
+  if (deck.length === 0 && (isFetchingNextPage || hasNextPage)) {
+    return (
+      <div className="flex flex-col items-center justify-center py-24 gap-3">
+        <div className="w-full max-w-245 h-90 bg-gray-100 rounded-[60px] animate-pulse" />
+        <p className="text-sm text-gray-400 animate-pulse">Loading more jobs…</p>
+      </div>
+    );
+  }
+
+  // ── Deck truly exhausted ────────────────────────────────────────────────
   if (deck.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-24 gap-3">

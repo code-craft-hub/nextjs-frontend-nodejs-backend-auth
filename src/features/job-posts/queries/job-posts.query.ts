@@ -16,7 +16,6 @@ export const jobPostsQueries = {
     location?: string,
     localizedTo?: string,
     classification?: string,
-    excludeEmailApply?: boolean,
     token?: string,
   ) =>
     infiniteQueryOptions<
@@ -29,7 +28,7 @@ export const jobPostsQueries = {
       queryKey: jobPostsKeys.jobPosts.infinite(query, location, localizedTo, classification),
       queryFn: ({ pageParam }) =>
         jobPostsApi.query(
-          { query, cursor: pageParam, location, localizedTo, classification, excludeEmailApply },
+          { query, cursor: pageParam, location, localizedTo, classification },
           token,
         ),
       initialPageParam: undefined,
@@ -136,9 +135,8 @@ export function useInfiniteJobs(
   location?: string,
   localizedTo?: string,
   classification?: string,
-  excludeEmailApply?: boolean,
 ) {
   return useInfiniteQuery(
-    jobPostsQueries.infinite(query, location, localizedTo, classification, excludeEmailApply),
+    jobPostsQueries.infinite(query, location, localizedTo, classification),
   );
 }
