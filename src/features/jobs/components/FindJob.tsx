@@ -2,11 +2,7 @@
 
 import { memo } from "react";
 import FindJobClient from "./FindJobClient";
-import SwipeJobCard from "./SwipeJobCard";
 import JobPreferenceCustomization from "./JobPreferenceCustomization";
-import ApprovalQueue from "./ApprovalQueue";
-import ApplicationReview from "./ApplicationReview";
-import ActiveJobsPanel from "./ActiveJobsPanel";
 
 export const FindJob = memo(() => {
   return (
@@ -15,7 +11,7 @@ export const FindJob = memo(() => {
         AI Job Recommendation
       </h1>
       <div className="grid pb-16">
-        <ActiveJobsPanel />
+        <JobPreferenceCustomization />
       </div>
     </div>
   );

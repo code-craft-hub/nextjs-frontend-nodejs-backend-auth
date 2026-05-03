@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Briefcase, MapPin, X } from "lucide-react";
+import { Briefcase, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import type { ActiveRun, RunLogEntry } from "../types/apply-session.types";
+import { useRouter } from "next/navigation";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -98,6 +99,7 @@ export function RunsBellPopover({
   const [open, setOpen] = useState(false);
   const [showAll, setShowAll] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   const activeBadgeCount = runs.filter((r) =>
     [
@@ -300,6 +302,15 @@ export function RunsBellPopover({
                   {pendingApprovals > 1 ? "s" : ""}
                 </Button>
               )}
+              <Button
+                className="w-full mt-2 rounded-xl bg-gray-50 text-gray-700 hover:bg-gray-100 border-0 shadow-none font-medium text-sm"
+                onClick={() => {
+                  setOpen(false);
+                  router.push("/dashboard/jobs/job-queue");
+                }}
+              >
+                See all approvals
+              </Button>
             </CardContent>
           </Card>
         </div>

@@ -2,6 +2,7 @@ import React from "react"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Card } from "@/components/ui/card"
+import Link from "next/link"
 
 export default function ApprovalQueue() {
   return (
@@ -75,7 +76,7 @@ export default function ApprovalQueue() {
 
 function ApprovalRow() {
   return (
-    <div className="grid grid-cols-[60px_1.6fr_1.2fr_1.3fr_1fr] items-center h-[92px] border-b border-[#eeeeee] bg-white px-5">
+    <Link href={`/dashboard/jobs/${123}/application-details`} className="grid grid-cols-[60px_1.6fr_1.2fr_1.3fr_1fr] items-center h-[92px] border-b border-[#eeeeee] bg-white px-5">
       {/* Checkbox */}
       <div className="flex items-center justify-center">
         <Checkbox className="h-[18px] w-[18px] rounded-[4px] border-[#c7c7c7]" />
@@ -103,6 +104,6 @@ function ApprovalRow() {
           Completed
         </span>
       </div>
-    </div>
+    </Link>
   )
 }
