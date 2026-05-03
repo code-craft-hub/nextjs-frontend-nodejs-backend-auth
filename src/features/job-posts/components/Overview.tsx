@@ -168,8 +168,8 @@ export default function Overview() {
   // Merge extension runs (popup/iframe) + cloud bot sessions so the bell
   // shows ALL in-progress applications, not just extension-mode ones.
   const activeRuns = useMemo<ActiveRun[]>(() => {
-    // Extension runs
-    const extRuns = Array.from(runs.values()).filter((r) => !r.dismissed);
+    // Extension runs (dismissed ones are already removed from the map by dismissRun)
+    const extRuns = Array.from(runs.values());
 
     // Cloud bot sessions — convert ApplySession → ActiveRun shape
     const sessionRuns: ActiveRun[] = Object.values(orchestrator.sessions)
@@ -268,8 +268,11 @@ export default function Overview() {
                 }
               }}
               onDismissRun={(runId) => {
-                if (runs.has(runId)) dismissRun(runId);
-                // Cloud bot sessions don't have a dismiss — just ignore
+                if (runs.has(runId)) {
+                  dismissRun(runId);
+                } else {
+                  orchestrator.dismissSession(runId);
+                }
               }}
             />
           </div>

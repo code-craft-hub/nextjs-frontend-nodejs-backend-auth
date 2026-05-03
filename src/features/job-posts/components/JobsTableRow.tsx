@@ -46,6 +46,16 @@ export function JobsTableRow({
 }: Props) {
   const link = job?.applyUrl || job?.link || job?.emailApply;
 
+  const domain = new URL(link ?? "http://example.com").hostname.replace(
+    "www.",
+    "",
+  );
+
+  const blockList = ["linkedin.com", "glassdoor.com", "indeed.com", "simplyhired.com", "pinpointhq.com", "marriott.com", "successfactors.eu", "seek.com"];
+  const isBlockList = blockList.some((blocked) => domain.includes(blocked));
+
+  if (isBlockList) return null;
+
   return (
     <TableRow
       onClick={onRowClick}

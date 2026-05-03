@@ -116,6 +116,11 @@ export function useRunManager(): UseRunManager {
   const [runsState, setRunsState] = useState<Map<string, ActiveRun>>(new Map());
   const [modalRunId, setModalRunId] = useState<string | null>(null);
 
+  // Dismissed run IDs — kept in a ref so run_update broadcasts can't overwrite
+  // the dismissed state (run_update spreads incoming data over existing, which
+  // would silently clear dismissed:true on every background broadcast).
+  const dismissedRunIds = useRef<Set<string>>(new Set());
+
   // Imperative refs — DOM elements and token maps that must not trigger
   // re-renders and must be accessible synchronously in event handlers.
   const iframeStageRef = useRef<HTMLDivElement | null>(null);
@@ -205,6 +210,9 @@ export function useRunManager(): UseRunManager {
       // ── run_update: agent progress broadcast ──────────────────────────────
       if (data.type === "run_update" && data.run) {
         const run = data.run as ActiveRun;
+        // Skip updates for runs the user has explicitly dismissed — background
+        // broadcasts have no dismissed field so a naive merge would clear it.
+        if (dismissedRunIds.current.has(run.id)) return;
         setRuns((prev) => {
           const next = new Map(prev);
           const existing = next.get(run.id) ?? {};
@@ -464,10 +472,11 @@ export function useRunManager(): UseRunManager {
 
   const dismissRun = useCallback(
     (runId: string) => {
+      // Record in the ref FIRST so any in-flight run_update is ignored.
+      dismissedRunIds.current.add(runId);
       setRuns((prev) => {
         const next = new Map(prev);
-        const run = next.get(runId);
-        if (run) next.set(runId, { ...run, dismissed: true });
+        next.delete(runId);
         return next;
       });
     },

@@ -173,6 +173,8 @@ export interface UseApplyOrchestrator {
   viewQA: (jobId: string) => void;
   /** Close the Q&A drawer. */
   dismissQA: () => void;
+  /** Remove a session from the bell (hide it without stopping the bot). */
+  dismissSession: (jobId: string) => void;
   /** Bring the extension's hidden automation tab to the foreground. */
   focusExtTab: (jobId: string) => void;
   /**
@@ -600,6 +602,14 @@ export function useApplyOrchestrator(): UseApplyOrchestrator {
   const viewQA = useCallback((jobId: string) => setQaJobId(jobId), []);
   const dismissQA = useCallback(() => setQaJobId(null), []);
 
+  const dismissSession = useCallback((jobId: string) => {
+    setSessions((prev) => {
+      const next = { ...prev };
+      delete next[jobId];
+      return next;
+    });
+  }, []);
+
   // ── Public: handleEmailApply (cloud-bot discovered recruiter email) ────────
 
   const handleEmailApply = useCallback(
@@ -621,6 +631,7 @@ export function useApplyOrchestrator(): UseApplyOrchestrator {
     resume,
     viewQA,
     dismissQA,
+    dismissSession,
     focusExtTab,
     handleEmailApply,
   };
