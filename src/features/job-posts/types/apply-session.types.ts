@@ -12,9 +12,18 @@ export interface RunLogEntry {
  * Used by useRunManager (deck view / iframe mode). Independent from
  * ApplySession — the deck view tracks runs here rather than in sessions.
  */
+export interface RunBatchQuestion {
+  id: string;
+  question: string;
+  field_label?: string;
+  why?: string;
+}
+
 export interface ActiveRun {
   id: string;
   job?: { id: string; title: string; company: string; location?: string };
+  /** The job application URL — used to recreate the iframe if missing. */
+  jobUrl?: string;
   /** Raw status string from background.js: "loading" | "running" | "awaiting_user_input" |
    *  "awaiting_submit_approval" | "submitted" | "complete" | "stopped" | "blocked" | "error" */
   status: string;
@@ -22,6 +31,10 @@ export interface ActiveRun {
   openMode?: "iframe" | "window";
   log?: RunLogEntry[];
   blockedMessage?: string;
+  /** Agent is blocked waiting for user answers to these questions. */
+  pendingBatch?: { questions: RunBatchQuestion[] } | null;
+  /** Agent is ready to submit and waiting for user approval. */
+  pendingSubmit?: { summary: string } | null;
   /** True while we haven't yet received the real runId from background. */
   provisional?: boolean;
   dismissed?: boolean;

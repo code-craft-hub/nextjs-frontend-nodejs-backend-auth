@@ -68,7 +68,7 @@ export interface UseRunManager {
   /** runId of the run whose iframe is currently shown in the modal, or null. */
   modalRunId: string | null;
   /** Ref for the hidden iframe stage <div>. Attach to <IframeStage>. */
-  iframeStageRef: React.MutableRefObject<HTMLDivElement | null>;
+  iframeStageRef: React.RefObject<HTMLDivElement | null>;
   /**
    * Create an iframe on the page, load the job URL, then send
    * auto_apply to the extension with useIframe:true.
@@ -408,16 +408,32 @@ export function useRunManager(): UseRunManager {
       return;
     }
 
-    const iframe = iframesRef.current.get(runId);
-    if (!iframe) return;
+    let iframe = iframesRef.current.get(runId);
 
-    // Hide every other iframe so only this one is interactive.
+    // If this run arrived via resync (page reload / new session) there is no
+    // iframe in the DOM yet. Recreate it so the user can see the job form.
+    if (!iframe && run.jobUrl && iframeStageRef.current) {
+      iframe = document.createElement("iframe");
+      iframe.allow =
+        "clipboard-read; clipboard-write; geolocation; microphone; camera";
+      iframe.referrerPolicy = "no-referrer";
+      iframe.src = run.jobUrl;
+      hideIframe(iframe);
+      iframeStageRef.current.appendChild(iframe);
+      iframesRef.current.set(runId, iframe);
+    }
+
+    // Hide every other iframe so only the active one is interactive.
     for (const [id, f] of iframesRef.current) {
       if (id !== runId) hideIframe(f);
     }
-    showIframe(iframe, false);
+
+    if (iframe) {
+      showIframe(iframe, false);
+    }
+    // Always show the modal overlay (status/logs/stop) even when no iframe exists.
     setModalRunId(runId);
-  }, []); // runsRef + iframesRef are stable refs
+  }, []); // runsRef + iframesRef + iframeStageRef are stable refs
 
   const closeRunModal = useCallback(() => {
     const runId = modalRunIdRef.current;

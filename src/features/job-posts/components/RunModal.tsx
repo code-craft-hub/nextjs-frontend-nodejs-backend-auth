@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import type { ActiveRun, RunLogEntry } from "../types/apply-session.types";
+import { useEffect, useRef, useState } from "react";
+import type { ActiveRun, RunBatchQuestion, RunLogEntry } from "../types/apply-session.types";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -56,6 +56,124 @@ function logLevelClass(level: RunLogEntry["level"]): string {
   }
 }
 
+// ─── Pending-batch question panel ─────────────────────────────────────────────
+
+function BatchPanel({
+  runId,
+  questions,
+}: {
+  runId: string;
+  questions: RunBatchQuestion[];
+}) {
+  const [answers, setAnswers] = useState<Record<string, string>>(() =>
+    Object.fromEntries(questions.map((q) => [q.id, ""])),
+  );
+
+  // Reset answers when the question set changes (different batch).
+  const sigRef = useRef(questions.map((q) => q.id).join("|"));
+  useEffect(() => {
+    const sig = questions.map((q) => q.id).join("|");
+    if (sig !== sigRef.current) {
+      sigRef.current = sig;
+      setAnswers(Object.fromEntries(questions.map((q) => [q.id, ""])));
+    }
+  }, [questions]);
+
+  function sendAnswers() {
+    window.postMessage(
+      { source: "cverai", type: "answer_batch", runId, answers },
+      "*",
+    );
+  }
+
+  const allFilled = questions.every((q) => (answers[q.id] ?? "").trim() !== "");
+
+  return (
+    <div
+      className="fixed bottom-0 left-0 right-0 bg-white border-t border-amber-200 shadow-2xl"
+      style={{ zIndex: 270, maxHeight: "50vh", overflowY: "auto" }}
+    >
+      <div className="px-6 py-4 max-w-2xl mx-auto">
+        <p className="text-sm font-semibold text-amber-700 mb-3">
+          Agent needs your input — answer all to continue
+        </p>
+        <div className="space-y-4">
+          {questions.map((q) => (
+            <div key={q.id}>
+              <label className="block text-sm font-medium text-gray-800 mb-1">
+                {q.question}
+              </label>
+              {q.why && (
+                <p className="text-xs text-gray-400 mb-1">{q.why}</p>
+              )}
+              <input
+                type="text"
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-400"
+                placeholder={q.field_label ?? "Your answer…"}
+                value={answers[q.id] ?? ""}
+                onChange={(e) =>
+                  setAnswers((prev) => ({ ...prev, [q.id]: e.target.value }))
+                }
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && allFilled) sendAnswers();
+                }}
+              />
+            </div>
+          ))}
+        </div>
+        <button
+          onClick={sendAnswers}
+          disabled={!allFilled}
+          className="mt-4 w-full py-2.5 rounded-xl text-sm font-semibold bg-amber-500 text-white hover:bg-amber-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        >
+          Send all answers
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Submit-approval panel ────────────────────────────────────────────────────
+
+function SubmitPanel({
+  runId,
+  summary,
+}: {
+  runId: string;
+  summary: string;
+}) {
+  function approve() {
+    window.postMessage(
+      { source: "cverai", type: "approve_submit", runId },
+      "*",
+    );
+  }
+
+  return (
+    <div
+      className="fixed bottom-0 left-0 right-0 bg-white border-t border-green-200 shadow-2xl"
+      style={{ zIndex: 270 }}
+    >
+      <div className="px-6 py-4 max-w-2xl mx-auto">
+        <p className="text-sm font-semibold text-green-700 mb-2">
+          Ready to submit — review and confirm
+        </p>
+        {summary && (
+          <p className="text-xs text-gray-600 mb-4 whitespace-pre-wrap leading-relaxed">
+            {summary}
+          </p>
+        )}
+        <button
+          onClick={approve}
+          className="w-full py-2.5 rounded-xl text-sm font-semibold bg-green-600 text-white hover:bg-green-700 transition-colors"
+        >
+          Confirm &amp; Submit
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // ─── Component ────────────────────────────────────────────────────────────────
 
 interface RunModalProps {
@@ -104,6 +222,9 @@ export function RunModal({ run, onClose, onStop, onLogsToggle }: RunModalProps) 
   const isTerminal = ["submitted", "complete", "stopped", "error", "blocked"].includes(
     run.status,
   );
+
+  const pendingQuestions = run.pendingBatch?.questions ?? [];
+  const pendingSubmit = run.pendingSubmit ?? null;
 
   return (
     <>
@@ -217,6 +338,16 @@ export function RunModal({ run, onClose, onStop, onLogsToggle }: RunModalProps) 
             )}
           </ul>
         </div>
+      )}
+
+      {/* Agent question panel — shown when bot needs user input */}
+      {pendingQuestions.length > 0 && (
+        <BatchPanel runId={run.id} questions={pendingQuestions} />
+      )}
+
+      {/* Submit approval panel — shown when bot is ready to submit */}
+      {pendingSubmit && pendingQuestions.length === 0 && (
+        <SubmitPanel runId={run.id} summary={pendingSubmit.summary} />
       )}
     </>
   );
