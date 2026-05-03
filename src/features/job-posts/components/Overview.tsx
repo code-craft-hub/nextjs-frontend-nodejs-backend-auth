@@ -17,6 +17,8 @@ import { IframeStage } from "./IframeStage";
 import { useRunManager } from "../hooks/useRunManager";
 import { useExtension } from "../hooks/useExtension";
 import { buildExtensionProfile } from "../hooks/useApplyOrchestrator";
+import { resumeApi } from "@/features/resume/api/resume.api";
+import { queryKeys } from "@/shared/query/keys";
 import type { JobPost } from "@/features/job-posts";
 
 // Canonical country names — must match the scraper's localizedTo values exactly.
@@ -51,6 +53,14 @@ export default function Overview() {
   const [isDeckView, setIsDeckView] = useState(false);
 
   const { data: user } = useQuery(userQueries.detail());
+
+  const { data: defaultResumeData } = useQuery({
+    queryKey: queryKeys.resumes.myDefault(),
+    queryFn: () => resumeApi.getMyDefaultResume(),
+    staleTime: 5 * 60 * 1000,
+    retry: false,
+  });
+  const defaultResumeFileUrl = defaultResumeData?.data?.fileUrl ?? null;
 
   const defaultCountry = useMemo(
     () => resolveCountry(user?.country),
@@ -110,7 +120,7 @@ export default function Overview() {
   // the Gemini agent even when the postMessage payload omits it.
   useEffect(() => {
     if (!user) return;
-    const profile = buildExtensionProfile(user);
+    const profile = { ...buildExtensionProfile(user), cv_url: defaultResumeFileUrl };
     try {
       document.body.dataset.cverProfile = JSON.stringify(profile);
     } catch {
@@ -119,7 +129,7 @@ export default function Overview() {
     return () => {
       delete document.body.dataset.cverProfile;
     };
-  }, [user]);
+  }, [user, defaultResumeFileUrl]);
 
   // ── Deck apply handler ────────────────────────────────────────────────────
   // Uses the same popup-window path as the list view so clicking the bell
@@ -128,7 +138,9 @@ export default function Overview() {
   const handleDeckApply = useCallback(
     (job: JobPost) => {
       if (extState === "installed") {
-        const profile = user ? buildExtensionProfile(user) : null;
+        const profile = user
+          ? { ...buildExtensionProfile(user), cv_url: defaultResumeFileUrl }
+          : null;
         applyViaExtension({
           id: job.id,
           title: job.title,
@@ -144,7 +156,7 @@ export default function Overview() {
         if (url) window.open(url, "_blank", "noopener,noreferrer");
       }
     },
-    [extState, user, applyViaExtension],
+    [extState, user, defaultResumeFileUrl, applyViaExtension],
   );
 
   // ── Active runs for bell popover (not dismissed) ──────────────────────────

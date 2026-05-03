@@ -2,11 +2,12 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { API_URL } from "@/shared/api/client";
 import type { IUser } from "@/shared/types";
 import { queryKeys } from "@/shared/query/keys";
+import { resumeApi } from "@/features/resume/api/resume.api";
 import type { JobPost } from "@/features/job-posts";
 import {
   useSubmitBrowserApplicationMutation,
@@ -189,6 +190,17 @@ export function useApplyOrchestrator(): UseApplyOrchestrator {
   const { mutate: resumeApplication } = useResumeBrowserApplicationMutation();
   const { mutate: recordApplication } =
     useUpdateJobApplicationHistoryMutation();
+
+  // ── Default resume for cv_url ────────────────────────────────────────────
+  // Fetched once on mount; staleTime prevents redundant network calls.
+  // On 404 (user has no resume yet) the query settles to null — no error toast.
+  const { data: defaultResumeData } = useQuery({
+    queryKey: queryKeys.resumes.myDefault(),
+    queryFn: () => resumeApi.getMyDefaultResume(),
+    staleTime: 5 * 60 * 1000,
+    retry: false,
+  });
+  const defaultResumeFileUrl = defaultResumeData?.data?.fileUrl ?? null;
 
   // ── Core state ───────────────────────────────────────────────────────────
 
@@ -528,9 +540,14 @@ export function useApplyOrchestrator(): UseApplyOrchestrator {
         const cachedUser = queryClient.getQueryData<Partial<IUser>>(
           queryKeys.users.detail(),
         );
-        const profile = cachedUser ? buildExtensionProfile(cachedUser) : null;
+        const profile = cachedUser
+          ? { ...buildExtensionProfile(cachedUser), cv_url: defaultResumeFileUrl }
+          : null;
         if (!profile) {
           console.warn("[CverAI] apply: no cached user — agent will use chrome.storage profile");
+        }
+        if (profile && !profile.cv_url) {
+          console.warn("[CverAI] apply: no resume fileUrl found — agent will use bundled cv.pdf");
         }
 
         // Fire-and-forget: inflightRef stays clear so the fallback handler can

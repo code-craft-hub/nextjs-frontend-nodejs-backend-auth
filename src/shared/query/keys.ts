@@ -64,6 +64,7 @@ export const queryKeys = {
       [...queryKeys.resumes.all, "uploaded", filters] as const,
     details: () => [...queryKeys.resumes.all, "detail"] as const,
     detail: (id: string) => [...queryKeys.resumes.details(), id] as const,
+    myDefault: () => [...queryKeys.resumes.all, "me", "default"] as const,
   },
 
   // AI Apply keys

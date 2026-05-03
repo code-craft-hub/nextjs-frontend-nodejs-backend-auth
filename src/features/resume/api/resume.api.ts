@@ -54,12 +54,32 @@ interface ApiResponse<T> {
   data: T;
 }
 
+export interface DefaultResumeForApply {
+  id: string;
+  fileName: string | null;
+  originalName: string | null;
+  fileUrl: string | null;
+  gcsPath: string | null;
+  isDefault: boolean;
+  title: string | null;
+  createdAt: string | null;
+}
+
 // ─── API Client ───────────────────────────────────────────────────
 
 export const RESUME_BASE = `/resumes`;
 
 export const resumeApi = {
   // ─── Resume CRUD ──────────────────────────────────────────────
+
+  /**
+   * GET /resumes/me/default
+   * Returns the best resume for auto-apply for the authenticated user:
+   * default resume → most-recent uploaded → most-recent of any kind.
+   * Returns null (404) when the user has no resumes.
+   */
+  getMyDefaultResume: () =>
+    api.get<ApiResponse<DefaultResumeForApply>>(`${RESUME_BASE}/me/default`),
 
   createResume: (data: CreateResumeData, token?: string) =>
     api.post<ApiResponse<ResumeAggregate>>(RESUME_BASE, data, { token }),

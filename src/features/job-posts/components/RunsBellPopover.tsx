@@ -194,7 +194,6 @@ export function RunsBellPopover({
                   {visibleRuns.map((run) => {
                     const title = run.job?.title ?? "Job";
                     const company = run.job?.company ?? "";
-                    console.log(run);
                     const isActive = [
                       "loading",
                       "running",
@@ -207,13 +206,19 @@ export function RunsBellPopover({
                     const isAutoApply =
                       run.openMode === "window" || run.openMode === "iframe";
 
+                    const isTerminal = ["submitted", "complete", "applied"].includes(run.status);
+
                     return (
                       <div
                         key={run.id}
                         className="flex items-center justify-between py-3.5 border-b last:border-none cursor-pointer hover:bg-gray-50 -mx-2 px-2 rounded-xl transition-colors group"
                         onClick={() => {
-                          onOpenRun(run.id);
                           setOpen(false);
+                          if (isTerminal && run.applicationId) {
+                            router.push(`/dashboard/jobs/${run.applicationId}/application-details`);
+                          } else {
+                            onOpenRun(run.id);
+                          }
                         }}
                       >
                         {/* Left: avatar + title */}
