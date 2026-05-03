@@ -68,6 +68,8 @@ function BatchPanel({
   const [answers, setAnswers] = useState<Record<string, string>>(() =>
     Object.fromEntries(questions.map((q) => [q.id, ""])),
   );
+  const [sending, setSending] = useState(false);
+  const [sendError, setSendError] = useState<string | null>(null);
 
   // Reset answers when the question set changes (different batch).
   const sigRef = useRef(questions.map((q) => q.id).join("|"));
@@ -76,10 +78,34 @@ function BatchPanel({
     if (sig !== sigRef.current) {
       sigRef.current = sig;
       setAnswers(Object.fromEntries(questions.map((q) => [q.id, ""])));
+      setSending(false);
+      setSendError(null);
     }
   }, [questions]);
 
+  // Listen for ack from content-trigger that the message reached background.
+  useEffect(() => {
+    const handler = (e: MessageEvent) => {
+      const d = e.data as Record<string, unknown> | null;
+      if (!d || d.source !== "cverai-extension") return;
+      if (d.type === "answer_batch_ack" && d.runId === runId) {
+        if (!d.ok) {
+          setSending(false);
+          setSendError(
+            "Could not reach extension background. Try clicking again.",
+          );
+        }
+        // If ok=true the run status will flip to "running" via run_update —
+        // the BatchPanel will unmount naturally.
+      }
+    };
+    window.addEventListener("message", handler);
+    return () => window.removeEventListener("message", handler);
+  }, [runId]);
+
   function sendAnswers() {
+    setSending(true);
+    setSendError(null);
     window.postMessage(
       { source: "cverai", type: "answer_batch", runId, answers },
       "*",
@@ -115,18 +141,22 @@ function BatchPanel({
                   setAnswers((prev) => ({ ...prev, [q.id]: e.target.value }))
                 }
                 onKeyDown={(e) => {
-                  if (e.key === "Enter" && allFilled) sendAnswers();
+                  if (e.key === "Enter" && allFilled && !sending) sendAnswers();
                 }}
+                disabled={sending}
               />
             </div>
           ))}
         </div>
+        {sendError && (
+          <p className="mt-2 text-xs text-red-600">{sendError}</p>
+        )}
         <button
           onClick={sendAnswers}
-          disabled={!allFilled}
+          disabled={!allFilled || sending}
           className="mt-4 w-full py-2.5 rounded-xl text-sm font-semibold bg-amber-500 text-white hover:bg-amber-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
         >
-          Send all answers
+          {sending ? "Sending…" : "Send all answers"}
         </button>
       </div>
     </div>
