@@ -220,11 +220,16 @@ export function useExtension() {
         const jobId = (run?.job as { id?: string } | undefined)?.id;
         if (!jobId) return;
 
-        // Extract a human-readable reason from the last log entry on errors.
+        // Extract a human-readable reason for terminal/stuck statuses.
         const log = run.log as Array<{ level: string; text: string }> | undefined;
         const lastLog = log?.[log.length - 1];
+        const blockedMessage = run.blockedMessage as string | undefined;
         const stuckReason =
-          run.status === "error" ? (lastLog?.text ?? "Unknown error") : undefined;
+          run.status === "stopped" ? (blockedMessage ?? "Window closed by user") :
+          run.status === "blocked" ? (blockedMessage ?? "Bot could not complete the application") :
+          run.status === "max_turns" ? (blockedMessage ?? "Agent hit the turn limit") :
+          run.status === "error" ? (blockedMessage ?? lastLog?.text ?? "Unknown error") :
+          undefined;
 
         console.log(
           `[CverAI] run_update | jobId=${jobId} status=${run.status}`,

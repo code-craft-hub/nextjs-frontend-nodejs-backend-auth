@@ -133,16 +133,18 @@ function mapExtStatus(raw: string): ApplyStatus {
   switch (raw) {
     // ── Background service-worker run statuses (background.js serialiseRun) ──
     case "running":                  return "ext:filling";
-    // awaiting_user_input: agent deferred questions — user must answer in the
-    // extension side panel. Show ext:reviewing so the row signals user action needed.
     case "awaiting_user_input":      return "ext:reviewing";
-    // awaiting_submit_approval: agent filled all fields; user must approve submit.
     case "awaiting_submit_approval": return "ext:reviewing";
+    case "submitted":                return "applied";
     case "complete":                 return "applied";
+    case "stopped":                  return "failed";
+    case "blocked":                  return "ext:stuck";
+    case "max_turns":                return "ext:stuck";
     case "error":                    return "failed";
     // ── Legacy / content-script status strings ──────────────────────────────
     case "navigating": return "ext:navigating";
     case "analyzing":  return "ext:analyzing";
+    case "loading":    return "ext:navigating";
     case "filling":    return "ext:filling";
     case "applied":    return "applied";
     case "stuck":      return "ext:stuck";
