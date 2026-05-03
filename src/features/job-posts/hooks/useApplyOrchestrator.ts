@@ -473,7 +473,7 @@ export function useApplyOrchestrator(): UseApplyOrchestrator {
         const link = job.applyUrl ?? job.link ?? "";
         setSessions((prev) => ({
           ...prev,
-          [job.id]: { jobId: job.id, strategy, status: "applied", correlationId, startedAt: Date.now() },
+          [job.id]: { jobId: job.id, strategy, status: "applied", correlationId, startedAt: Date.now(), jobTitle: job.title ?? undefined, jobCompany: job.companyName ?? job.company ?? undefined },
         }));
         window.open(link, "_blank", "noopener,noreferrer");
         recordApplication({ id: String(job.id), data: { appliedJobs: job.id } });
@@ -484,7 +484,7 @@ export function useApplyOrchestrator(): UseApplyOrchestrator {
       if (strategy === "email") {
         setSessions((prev) => ({
           ...prev,
-          [job.id]: { jobId: job.id, strategy, status: "routing", correlationId, startedAt: Date.now() },
+          [job.id]: { jobId: job.id, strategy, status: "routing", correlationId, startedAt: Date.now(), jobTitle: job.title ?? undefined, jobCompany: job.companyName ?? job.company ?? undefined },
         }));
         inflightRef.current.add(job.id);
 
@@ -533,7 +533,7 @@ export function useApplyOrchestrator(): UseApplyOrchestrator {
       if (strategy === "extension") {
         setSessions((prev) => ({
           ...prev,
-          [job.id]: { jobId: job.id, strategy, status: "ext:queued", correlationId, startedAt: Date.now() },
+          [job.id]: { jobId: job.id, strategy, status: "ext:queued", correlationId, startedAt: Date.now(), jobTitle: job.title ?? undefined, jobCompany: job.companyName ?? job.company ?? undefined },
         }));
 
         // Read the user from the React Query cache (already fetched since the
@@ -562,7 +562,7 @@ export function useApplyOrchestrator(): UseApplyOrchestrator {
       inflightRef.current.add(job.id);
       setSessions((prev) => ({
         ...prev,
-        [job.id]: { jobId: job.id, strategy: "cloud_bot", status: "cloud:starting", correlationId, startedAt: Date.now() },
+        [job.id]: { jobId: job.id, strategy: "cloud_bot", status: "cloud:starting", correlationId, startedAt: Date.now(), jobTitle: job.title ?? undefined, jobCompany: job.companyName ?? job.company ?? undefined },
       }));
       // triggerCloudBot owns the API call, SSE open, and inflightRef cleanup.
       triggerCloudBot(job.id);

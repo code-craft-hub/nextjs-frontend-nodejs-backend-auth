@@ -8,14 +8,16 @@ import type { JobPost } from "@/features/job-posts";
 import { BotStatusDrawer } from "@/features/jobs/components/BotStatusDrawer";
 import MobileJobCard from "@/features/job-posts/components/MobileJobCard";
 import { JobsTableRow } from "@/features/job-posts/components/JobsTableRow";
-import { useApplyOrchestrator } from "@/features/job-posts/hooks/useApplyOrchestrator";
+import type { UseApplyOrchestrator } from "@/features/job-posts/hooks/useApplyOrchestrator";
 
 export default function JobsTable({
   allJobs,
   referrer,
+  orchestrator,
 }: {
   allJobs: JobPost[];
   referrer: string;
+  orchestrator: UseApplyOrchestrator;
 }) {
   const router = useRouter();
   const toggleBookmark = useToggleBookmarkByJobMutation();
@@ -31,7 +33,7 @@ export default function JobsTable({
     dismissQA,
     focusExtTab,
     handleEmailApply,
-  } = useApplyOrchestrator();
+  } = orchestrator;
 
   const qaSession = qaJobId ? sessions[qaJobId] : null;
   const qaJob = qaJobId ? allJobs.find((j) => j.id === qaJobId) : null;

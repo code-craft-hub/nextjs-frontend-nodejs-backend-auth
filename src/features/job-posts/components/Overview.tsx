@@ -16,10 +16,11 @@ import { RunModal } from "./RunModal";
 import { IframeStage } from "./IframeStage";
 import { useRunManager } from "../hooks/useRunManager";
 import { useExtension } from "../hooks/useExtension";
-import { buildExtensionProfile } from "../hooks/useApplyOrchestrator";
+import { buildExtensionProfile, useApplyOrchestrator } from "../hooks/useApplyOrchestrator";
 import { resumeApi } from "@/features/resume/api/resume.api";
 import { queryKeys } from "@/shared/query/keys";
 import type { JobPost } from "@/features/job-posts";
+import type { ActiveRun } from "../types/apply-session.types";
 
 // Canonical country names — must match the scraper's localizedTo values exactly.
 const SUPPORTED_COUNTRIES = [
@@ -110,6 +111,10 @@ export default function Overview() {
     stopRun,
   } = useRunManager();
 
+  // ── Apply orchestrator (cloud bot + extension sessions for the list view) ──
+  // Lifted here so Overview can merge sessions into the bell popover.
+  const orchestrator = useApplyOrchestrator();
+
   // ── Extension state + apply trigger (same path as the list view) ──────────
 
   const { state: extState, applyViaExtension } = useExtension();
@@ -159,11 +164,42 @@ export default function Overview() {
     [extState, user, defaultResumeFileUrl, applyViaExtension],
   );
 
-  // ── Active runs for bell popover (not dismissed) ──────────────────────────
-  const activeRuns = useMemo(
-    () => Array.from(runs.values()).filter((r) => !r.dismissed),
-    [runs],
-  );
+  // ── Active runs for bell popover ─────────────────────────────────────────
+  // Merge extension runs (popup/iframe) + cloud bot sessions so the bell
+  // shows ALL in-progress applications, not just extension-mode ones.
+  const activeRuns = useMemo<ActiveRun[]>(() => {
+    // Extension runs
+    const extRuns = Array.from(runs.values()).filter((r) => !r.dismissed);
+
+    // Cloud bot sessions — convert ApplySession → ActiveRun shape
+    const sessionRuns: ActiveRun[] = Object.values(orchestrator.sessions)
+      .filter((s) => !["applied", "failed", "skipped", "recruiter_email"].includes(s.status))
+      .map((s) => ({
+        id: s.jobId,
+        job: { id: s.jobId, title: s.jobTitle ?? "Job", company: s.jobCompany ?? "" },
+        jobUrl: s.liveUrl ?? undefined,
+        status: (() => {
+          switch (s.status) {
+            case "routing":
+            case "cloud:starting":
+            case "ext:queued":    return "loading";
+            case "cloud:running":
+            case "cloud:resuming":
+            case "ext:navigating":
+            case "ext:analyzing":
+            case "ext:filling":   return "running";
+            case "ext:reviewing":
+            case "cloud:paused":  return "awaiting_user_input";
+            default:              return "running";
+          }
+        })(),
+        openMode: s.strategy === "extension" ? "window" : undefined,
+        applicationId: s.applicationId ?? null,
+        log: [],
+      }));
+
+    return [...extRuns, ...sessionRuns];
+  }, [runs, orchestrator.sessions]);
 
   // ── Modal run ─────────────────────────────────────────────────────────────
   const modalRun = modalRunId ? runs.get(modalRunId) ?? null : null;
@@ -218,11 +254,23 @@ export default function Overview() {
               </button>
             </div>
 
-            {/* Bell popover for active iframe runs */}
+            {/* Bell popover — shows both extension runs and cloud bot sessions */}
             <RunsBellPopover
               runs={activeRuns}
-              onOpenRun={openRunModal}
-              onDismissRun={dismissRun}
+              onOpenRun={(runId) => {
+                // Extension runs have a real UUID runId in the runs map;
+                // cloud bot session entries use jobId as id — open live URL.
+                if (runs.has(runId)) {
+                  openRunModal(runId);
+                } else {
+                  const session = orchestrator.sessions[runId];
+                  if (session?.liveUrl) window.open(session.liveUrl, "_blank", "noopener,noreferrer");
+                }
+              }}
+              onDismissRun={(runId) => {
+                if (runs.has(runId)) dismissRun(runId);
+                // Cloud bot sessions don't have a dismiss — just ignore
+              }}
             />
           </div>
         </div>
@@ -240,6 +288,7 @@ export default function Overview() {
             query={query}
             localizedTo={localizedTo}
             classification={classification}
+            orchestrator={orchestrator}
           />
         )}
       </div>

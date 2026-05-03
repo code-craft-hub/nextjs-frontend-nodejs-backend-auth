@@ -121,6 +121,9 @@ export interface ApplySession {
    */
   correlationId: string;
   startedAt: number;
+  /** Job metadata captured at click-time so the bell can show title/company. */
+  jobTitle?: string;
+  jobCompany?: string;
 
   // ── Cloud-bot fields (populated after POST /submit-application succeeds) ──
   applicationId?: string; // job_applications.id — needed for SSE + resume endpoint

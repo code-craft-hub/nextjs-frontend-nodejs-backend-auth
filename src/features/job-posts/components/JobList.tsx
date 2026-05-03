@@ -5,17 +5,20 @@ import JobsTable from "./JobsTable";
 import { useInfiniteJobs } from "../queries/job-posts.query";
 import { Loader } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import type { UseApplyOrchestrator } from "@/features/job-posts/hooks/useApplyOrchestrator";
 
 export function JobList({
   query,
   location,
   localizedTo,
   classification,
+  orchestrator,
 }: {
   query?: string;
   location?: string;
   localizedTo?: string;
   classification?: string;
+  orchestrator: UseApplyOrchestrator;
 }) {
   const {
     data,
@@ -45,7 +48,7 @@ export function JobList({
         transition: "opacity 0.2s",
       }}
     >
-      <JobsTable allJobs={allJobs} referrer="jobs" />
+      <JobsTable allJobs={allJobs} referrer="jobs" orchestrator={orchestrator} />
 
       <div ref={sentinelRef} />
 
