@@ -77,6 +77,43 @@ export interface ApplicationDeleteResponse {
   message: string;
 }
 
+export interface ApplicationDetail {
+  id: string;
+  userId: string;
+  status: string;
+  appliedAt: string | null;
+  aiGenerated: boolean;
+  autoApplied: boolean;
+  notes: string | null;
+  applicationUrl: string | null;
+  snapshot: unknown;
+  // job
+  jobId: string | null;
+  jobTitle: string | null;
+  companyName: string | null;
+  location: string | null;
+  classification: string | null;
+  employmentType: string | null;
+  companyLogo: string | null;
+  applyUrl: string | null;
+  // resume
+  resumeId: string | null;
+  resumeFileName: string | null;
+  resumeFileUrl: string | null;
+  resumeFileSize: number | null;
+  resumeTitle: string | null;
+  resumeCreatedAt: string | null;
+  // cover letter
+  coverLetterId: string | null;
+  coverLetterContent: string | null;
+  coverLetterTitle: string | null;
+}
+
+export interface ApplicationDetailEnvelope {
+  success: boolean;
+  data: ApplicationDetail;
+}
+
 export interface ApplicationsByJobResponse {
   success: boolean;
   data: JobApplication[];
@@ -179,6 +216,16 @@ export const jobApplicationsApi = {
     api.patch<ApplicationResponse>(
       `/job-applications/${applicationId}`,
       data,
+      { token },
+    ),
+
+  /**
+   * GET /job-applications/:applicationId/details
+   * Retrieve a single application with job post, resume, and cover letter joined.
+   */
+  getDetails: (applicationId: string, token?: string) =>
+    api.get<ApplicationDetailEnvelope>(
+      `/job-applications/${applicationId}/details`,
       { token },
     ),
 
