@@ -27,7 +27,10 @@ function humanStatus(status: string): string {
     draft: "Draft",
     awaiting_human: "Needs Attention",
   };
-  return map[status] ?? status.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  return (
+    map[status] ??
+    status.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
+  );
 }
 
 function statusBadgeClass(status: string): string {
@@ -66,7 +69,9 @@ function ApprovalRow({ app, selected, onSelect }: RowProps) {
 
   const subtitle = [employmentType, classification]
     .filter(Boolean)
-    .map((s) => s.replace(/_/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase()))
+    .map((s) =>
+      s.replace(/_/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase()),
+    )
     .join(" · ");
 
   return (
@@ -134,18 +139,24 @@ function ApprovalRow({ app, selected, onSelect }: RowProps) {
 export default function ApprovalQueue() {
   const [selected, setSelected] = useState<Set<string>>(new Set());
 
-  const { data, isPending, isError, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useInfiniteQuery({
-      queryKey: queryKeys.jobApplications.lists(),
-      queryFn: ({ pageParam }) =>
-        jobApplicationsApi.list(
-          pageParam as { appliedAt: string | null; id: string } | undefined,
-        ),
-      initialPageParam: undefined as
-        | { appliedAt: string | null; id: string }
-        | undefined,
-      getNextPageParam: (lastPage) => lastPage.pagination.nextCursor ?? undefined,
-    });
+  const {
+    data,
+    isPending,
+    isError,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
+    queryKey: queryKeys.jobApplications.lists(),
+    queryFn: ({ pageParam }) =>
+      jobApplicationsApi.list(
+        pageParam as { appliedAt: string | null; id: string } | undefined,
+      ),
+    initialPageParam: undefined as
+      | { appliedAt: string | null; id: string }
+      | undefined,
+    getNextPageParam: (lastPage) => lastPage.pagination.nextCursor ?? undefined,
+  });
 
   const applications = data?.pages.flatMap((p) => p.data) ?? [];
 
@@ -173,12 +184,6 @@ export default function ApprovalQueue() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <div className="mb-5 text-black">
-            <div className="w-6 h-6 border-2 border-black rounded-[4px] flex items-center justify-center">
-              <div className="w-[8px] h-[14px] border-r-2 border-black" />
-            </div>
-          </div>
-
           <h1 className="text-[48px] font-normal text-black leading-none">
             Approval Queue
           </h1>

@@ -216,11 +216,20 @@ export function useRunManager(): UseRunManager {
 
     window.addEventListener("message", handler);
 
-    // Listener is now live — ask the content script to replay all active runs.
-    // This races nothing: the handler is already registered above.
+    // Listener is now live — prune orphaned runs first so any windows the
+    // user closed while away are stopped, then replay all active runs.
     window.postMessage({ source: "cverai", type: "resync_runs" }, "*");
 
-    return () => window.removeEventListener("message", handler);
+    // Second resync after a short delay catches the case where the extension
+    // service worker was waking up and missed the first resync_runs message.
+    const resyncTimer = setTimeout(() => {
+      window.postMessage({ source: "cverai", type: "resync_runs" }, "*");
+    }, 2000);
+
+    return () => {
+      window.removeEventListener("message", handler);
+      clearTimeout(resyncTimer);
+    };
   }, [setRuns]);
 
   // ── startIframeApply ──────────────────────────────────────────────────────
