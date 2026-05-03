@@ -215,6 +215,11 @@ export function useRunManager(): UseRunManager {
     };
 
     window.addEventListener("message", handler);
+
+    // Listener is now live — ask the content script to replay all active runs.
+    // This races nothing: the handler is already registered above.
+    window.postMessage({ source: "cverai", type: "resync_runs" }, "*");
+
     return () => window.removeEventListener("message", handler);
   }, [setRuns]);
 
