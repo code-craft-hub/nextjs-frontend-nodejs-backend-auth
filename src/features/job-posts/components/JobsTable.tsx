@@ -379,12 +379,12 @@ export default function JobsTable({
 
   const handleApply = useCallback(
     (job: JobPost, e?: React.MouseEvent) =>
-      applyToJob(
-        job,
-        e,
-        handleBotStarting,
-        handleBotStarted,
-      ),
+      {   window.open(
+        job?.applyUrl ?? job.link ?? "",
+        "_blank",
+        "noopener,noreferrer",
+      );
+      return;},
     [applyToJob, handleBotStarting, handleBotStarted],
   );
 
