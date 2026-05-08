@@ -3,8 +3,10 @@ import { useCallback, useState } from "react";
 import { JobSearchForm } from "@/features/job-posts/components/JobSearchForm";
 import { JobList } from "@/features/job-posts/components/JobList";
 import { ReportCard } from "@/features/jobs/components/ReportCard";
+import { useApplyOrchestrator } from "@/features/job-posts/hooks/useApplyOrchestrator";
 
 export default function JobsPage() {
+  const orchestrator = useApplyOrchestrator();
   const [query, setQuery] = useState<string | undefined>(undefined);
   const [localizedTo, setLocalizedTo] = useState<string | undefined>(undefined);
   const [classification, setClassification] = useState<string | undefined>(undefined);
@@ -30,7 +32,7 @@ export default function JobsPage() {
         onLocationChange={handleCountryChange}
         onClassificationChange={handleClassificationChange}
       />
-      <JobList query={query} localizedTo={localizedTo} classification={classification} />
+      <JobList query={query} localizedTo={localizedTo} classification={classification} orchestrator={orchestrator} />
     </div>
   );
 }

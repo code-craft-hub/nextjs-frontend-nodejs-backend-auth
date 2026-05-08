@@ -17,7 +17,11 @@ import {
 import { useUpdateJobApplicationHistoryMutation } from "@/features/jobs/mutations/jobs.mutations";
 import { gmailApi } from "@/features/email-application/api/gmail.api";
 import { buildAutoApplyStartUrl } from "@/lib/utils/ai-apply-navigation";
-import { useExtension, type ExtensionState, type ExtensionProfile } from "./useExtension";
+import {
+  useExtension,
+  type ExtensionState,
+  type ExtensionProfile,
+} from "./useExtension";
 import {
   TERMINAL_STATUSES,
   type ApplySession,
@@ -103,15 +107,23 @@ function selectStrategy(job: JobPost, extState: ExtensionState): ApplyStrategy {
  */
 function mapCloudStatus(raw: string): ApplyStatus {
   switch (raw) {
-    case "initializing":          return "cloud:starting";
-    case "running":               return "cloud:running";
-    case "awaiting_human":        return "cloud:paused";
-    case "resuming":              return "cloud:resuming";
-    case "completed":             return "applied";
-    case "recruiter_email_found": return "recruiter_email";
+    case "initializing":
+      return "cloud:starting";
+    case "running":
+      return "cloud:running";
+    case "awaiting_human":
+      return "cloud:paused";
+    case "resuming":
+      return "cloud:resuming";
+    case "completed":
+      return "applied";
+    case "recruiter_email_found":
+      return "recruiter_email";
     case "failed":
-    case "not_found":             return "failed";
-    default:                      return "cloud:running";
+    case "not_found":
+      return "failed";
+    default:
+      return "cloud:running";
   }
 }
 
@@ -132,24 +144,41 @@ function mapCloudStatus(raw: string): ApplyStatus {
 function mapExtStatus(raw: string): ApplyStatus {
   switch (raw) {
     // ── Background service-worker run statuses (background.js serialiseRun) ──
-    case "running":                  return "ext:filling";
-    case "awaiting_user_input":      return "ext:reviewing";
-    case "awaiting_submit_approval": return "ext:reviewing";
-    case "submitted":                return "applied";
-    case "complete":                 return "applied";
-    case "stopped":                  return "failed";
-    case "blocked":                  return "ext:stuck";
-    case "max_turns":                return "ext:stuck";
-    case "error":                    return "failed";
+    case "running":
+      return "ext:filling";
+    case "awaiting_user_input":
+      return "ext:reviewing";
+    case "awaiting_submit_approval":
+      return "ext:reviewing";
+    case "submitted":
+      return "applied";
+    case "complete":
+      return "applied";
+    case "stopped":
+      return "failed";
+    case "blocked":
+      return "ext:stuck";
+    case "max_turns":
+      return "ext:stuck";
+    case "error":
+      return "failed";
     // ── Legacy / content-script status strings ──────────────────────────────
-    case "navigating": return "ext:navigating";
-    case "analyzing":  return "ext:analyzing";
-    case "loading":    return "ext:navigating";
-    case "filling":    return "ext:filling";
-    case "applied":    return "applied";
-    case "stuck":      return "ext:stuck";
-    case "failed":     return "failed";
-    default:           return "ext:queued";
+    case "navigating":
+      return "ext:navigating";
+    case "analyzing":
+      return "ext:analyzing";
+    case "loading":
+      return "ext:navigating";
+    case "filling":
+      return "ext:filling";
+    case "applied":
+      return "applied";
+    case "stuck":
+      return "ext:stuck";
+    case "failed":
+      return "failed";
+    default:
+      return "ext:queued";
   }
 }
 
@@ -237,7 +266,12 @@ export function useApplyOrchestrator(): UseApplyOrchestrator {
   // ── Session helpers ──────────────────────────────────────────────────────
 
   const patchSession = useCallback(
-    (jobId: string, patch: Partial<Omit<ApplySession, "jobId" | "correlationId" | "startedAt">>) => {
+    (
+      jobId: string,
+      patch: Partial<
+        Omit<ApplySession, "jobId" | "correlationId" | "startedAt">
+      >,
+    ) => {
       setSessions((prev) => {
         const s = prev[jobId];
         if (!s) return prev;
@@ -249,55 +283,52 @@ export function useApplyOrchestrator(): UseApplyOrchestrator {
 
   // ── SSE management ───────────────────────────────────────────────────────
 
-  const openCloudSSE = useCallback(
-    (jobId: string, applicationId: string) => {
-      if (eventSourcesRef.current.has(applicationId)) return;
+  const openCloudSSE = useCallback((jobId: string, applicationId: string) => {
+    if (eventSourcesRef.current.has(applicationId)) return;
 
-      const es = new EventSource(
-        `${API_URL}/browser-automation/status/${applicationId}`,
-        { withCredentials: true },
-      );
+    const es = new EventSource(
+      `${API_URL}/browser-automation/status/${applicationId}`,
+      { withCredentials: true },
+    );
 
-      es.onmessage = (event) => {
-        try {
-          const data = JSON.parse(event.data) as BotStatusEvent;
-          const status = mapCloudStatus(data.status);
+    es.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data) as BotStatusEvent;
+        const status = mapCloudStatus(data.status);
 
-          setSessions((prev) => {
-            const s = prev[jobId];
-            if (!s) return prev;
-            return {
-              ...prev,
-              [jobId]: {
-                ...s,
-                status,
-                liveUrl:         data.liveUrl         ?? s.liveUrl,
-                stuckReason:     data.stuckReason      ?? undefined,
-                lastStepSummary: data.lastStepSummary  ?? undefined,
-                applicationQA:   data.applicationQA    ?? undefined,
-                recruiterEmail:  data.recruiterEmail   ?? undefined,
-              },
-            };
-          });
+        setSessions((prev) => {
+          const s = prev[jobId];
+          if (!s) return prev;
+          return {
+            ...prev,
+            [jobId]: {
+              ...s,
+              status,
+              liveUrl: data.liveUrl ?? s.liveUrl,
+              stuckReason: data.stuckReason ?? undefined,
+              lastStepSummary: data.lastStepSummary ?? undefined,
+              applicationQA: data.applicationQA ?? undefined,
+              recruiterEmail: data.recruiterEmail ?? undefined,
+            },
+          };
+        });
 
-          if (TERMINAL_STATUSES.has(status)) {
-            es.close();
-            eventSourcesRef.current.delete(applicationId);
-          }
-        } catch {
-          // ignore malformed SSE frames
+        if (TERMINAL_STATUSES.has(status)) {
+          es.close();
+          eventSourcesRef.current.delete(applicationId);
         }
-      };
+      } catch {
+        // ignore malformed SSE frames
+      }
+    };
 
-      es.onerror = () => {
-        es.close();
-        eventSourcesRef.current.delete(applicationId);
-      };
+    es.onerror = () => {
+      es.close();
+      eventSourcesRef.current.delete(applicationId);
+    };
 
-      eventSourcesRef.current.set(applicationId, es);
-    },
-    [],
-  );
+    eventSourcesRef.current.set(applicationId, es);
+  }, []);
 
   // ── Cloud-bot apply (shared between direct apply + fallback) ─────────────
 
@@ -320,9 +351,13 @@ export function useApplyOrchestrator(): UseApplyOrchestrator {
         recordApplication({ id: String(jobId), data: { appliedJobs: jobId } });
 
         if (deduplicated) {
-          toast.success("Your application is already being processed.", { duration: 4000 });
+          toast.success("Your application is already being processed.", {
+            duration: 4000,
+          });
         } else {
-          toast.success("Bot started — watch it apply live.", { duration: 4000 });
+          toast.success("Bot started — watch it apply live.", {
+            duration: 4000,
+          });
         }
 
         patchSession(jobId, {
@@ -350,11 +385,13 @@ export function useApplyOrchestrator(): UseApplyOrchestrator {
   useEffect(() => {
     // Regular status updates from extension background → content script → page
     const onExtUpdate = (e: Event) => {
-      const detail = (e as CustomEvent<{
-        jobId: string;
-        status: string;
-        stuckReason?: string;
-      }>).detail;
+      const detail = (
+        e as CustomEvent<{
+          jobId: string;
+          status: string;
+          stuckReason?: string;
+        }>
+      ).detail;
 
       const { jobId, status: rawStatus, stuckReason } = detail;
 
@@ -376,7 +413,12 @@ export function useApplyOrchestrator(): UseApplyOrchestrator {
           if (!sess) return prev;
           return {
             ...prev,
-            [jobId]: { ...sess, strategy: "cloud_bot", status: "cloud:starting", stuckReason: undefined },
+            [jobId]: {
+              ...sess,
+              strategy: "cloud_bot",
+              status: "cloud:starting",
+              stuckReason: undefined,
+            },
           };
         });
 
@@ -388,17 +430,35 @@ export function useApplyOrchestrator(): UseApplyOrchestrator {
               setSessions((p) => {
                 const sess = p[jobId];
                 if (!sess) return p;
-                return { ...p, [jobId]: { ...sess, status: "failed", stuckReason: "Cloud bot failed to start." } };
+                return {
+                  ...p,
+                  [jobId]: {
+                    ...sess,
+                    status: "failed",
+                    stuckReason: "Cloud bot failed to start.",
+                  },
+                };
               });
               return;
             }
             if (!deduplicated) {
-              toast.info("Extension couldn't reach the form — switched to cloud bot.", { duration: 5000 });
+              toast.info(
+                "Extension couldn't reach the form — switched to cloud bot.",
+                { duration: 5000 },
+              );
             }
             setSessions((p) => {
               const sess = p[jobId];
               if (!sess) return p;
-              return { ...p, [jobId]: { ...sess, status: "cloud:running", applicationId: jobApplicationId, liveUrl } };
+              return {
+                ...p,
+                [jobId]: {
+                  ...sess,
+                  status: "cloud:running",
+                  applicationId: jobApplicationId,
+                  liveUrl,
+                },
+              };
             });
             openCloudSSE(jobId, jobApplicationId);
           })
@@ -406,7 +466,15 @@ export function useApplyOrchestrator(): UseApplyOrchestrator {
             setSessions((p) => {
               const sess = p[jobId];
               if (!sess) return p;
-              return { ...p, [jobId]: { ...sess, status: "failed", stuckReason: "Cloud bot unavailable after extension fallback." } };
+              return {
+                ...p,
+                [jobId]: {
+                  ...sess,
+                  status: "failed",
+                  stuckReason:
+                    "Cloud bot unavailable after extension fallback.",
+                },
+              };
             });
           })
           .finally(() => {
@@ -437,9 +505,13 @@ export function useApplyOrchestrator(): UseApplyOrchestrator {
       // Soft statuses (navigating, filling…) are silent — only terminal "failed"
       // gets a toast so the user knows to take action.
       if (status === "failed" && stuckReason) {
-        const isConfigError = /api\s*key|side\s*panel|settings|gemini/i.test(stuckReason);
+        const isConfigError = /api\s*key|side\s*panel|settings|gemini/i.test(
+          stuckReason,
+        );
         toast.error(
-          isConfigError ? "Extension not configured" : "Extension automation failed",
+          isConfigError
+            ? "Extension not configured"
+            : "Extension automation failed",
           {
             description: isConfigError
               ? `${stuckReason} Click the extension icon to open it.`
@@ -475,10 +547,21 @@ export function useApplyOrchestrator(): UseApplyOrchestrator {
         const link = job.applyUrl ?? job.link ?? "";
         setSessions((prev) => ({
           ...prev,
-          [job.id]: { jobId: job.id, strategy, status: "applied", correlationId, startedAt: Date.now(), jobTitle: job.title ?? undefined, jobCompany: job.companyName ?? job.company ?? undefined },
+          [job.id]: {
+            jobId: job.id,
+            strategy,
+            status: "applied",
+            correlationId,
+            startedAt: Date.now(),
+            jobTitle: job.title ?? undefined,
+            jobCompany: job.companyName ?? job.company ?? undefined,
+          },
         }));
         window.open(link, "_blank", "noopener,noreferrer");
-        recordApplication({ id: String(job.id), data: { appliedJobs: job.id } });
+        recordApplication({
+          id: String(job.id),
+          data: { appliedJobs: job.id },
+        });
         return;
       }
 
@@ -486,47 +569,73 @@ export function useApplyOrchestrator(): UseApplyOrchestrator {
       if (strategy === "email") {
         setSessions((prev) => ({
           ...prev,
-          [job.id]: { jobId: job.id, strategy, status: "routing", correlationId, startedAt: Date.now(), jobTitle: job.title ?? undefined, jobCompany: job.companyName ?? job.company ?? undefined },
+          [job.id]: {
+            jobId: job.id,
+            strategy,
+            status: "routing",
+            correlationId,
+            startedAt: Date.now(),
+            jobTitle: job.title ?? undefined,
+            jobCompany: job.companyName ?? job.company ?? undefined,
+          },
         }));
         inflightRef.current.add(job.id);
 
-        gmailApi.checkAuthStatus().then(({ authorized }) => {
-          if (!authorized) {
+        gmailApi
+          .checkAuthStatus()
+          .then(({ authorized }) => {
+            if (!authorized) {
+              setSessions((prev) => {
+                const s = prev[job.id];
+                if (!s) return prev;
+                return {
+                  ...prev,
+                  [job.id]: {
+                    ...s,
+                    status: "failed",
+                    stuckReason: "Gmail not authorized",
+                  },
+                };
+              });
+              toast.error("Authorize Gmail in Settings first.", {
+                action: {
+                  label: "Open Settings",
+                  onClick: () =>
+                    router.push("/dashboard/settings?tab=ai-applypreference"),
+                },
+                classNames: {
+                  actionButton:
+                    "!bg-blue-600 hover:!bg-blue-700 !text-white !h-8",
+                },
+              });
+              return;
+            }
+            recordApplication({
+              id: String(job.id),
+              data: { appliedJobs: job.id },
+            });
             setSessions((prev) => {
               const s = prev[job.id];
               if (!s) return prev;
-              return { ...prev, [job.id]: { ...s, status: "failed", stuckReason: "Gmail not authorized" } };
+              return { ...prev, [job.id]: { ...s, status: "applied" } };
             });
-            toast.error("Authorize Gmail in Settings first.", {
-              action: {
-                label: "Open Settings",
-                onClick: () => router.push("/dashboard/settings?tab=ai-applypreference"),
-              },
-              classNames: { actionButton: "!bg-blue-600 hover:!bg-blue-700 !text-white !h-8" },
+            const startUrl = buildAutoApplyStartUrl(
+              JSON.stringify(job.descriptionText ?? ""),
+              encodeURIComponent(job.emailApply!),
+            );
+            router.push(startUrl);
+          })
+          .catch(() => {
+            setSessions((prev) => {
+              const s = prev[job.id];
+              if (!s) return prev;
+              return { ...prev, [job.id]: { ...s, status: "failed" } };
             });
-            return;
-          }
-          recordApplication({ id: String(job.id), data: { appliedJobs: job.id } });
-          setSessions((prev) => {
-            const s = prev[job.id];
-            if (!s) return prev;
-            return { ...prev, [job.id]: { ...s, status: "applied" } };
+            toast.error("Something went wrong. Please try again.");
+          })
+          .finally(() => {
+            inflightRef.current.delete(job.id);
           });
-          const startUrl = buildAutoApplyStartUrl(
-            JSON.stringify(job.descriptionText ?? ""),
-            encodeURIComponent(job.emailApply!),
-          );
-          router.push(startUrl);
-        }).catch(() => {
-          setSessions((prev) => {
-            const s = prev[job.id];
-            if (!s) return prev;
-            return { ...prev, [job.id]: { ...s, status: "failed" } };
-          });
-          toast.error("Something went wrong. Please try again.");
-        }).finally(() => {
-          inflightRef.current.delete(job.id);
-        });
 
         return;
       }
@@ -535,7 +644,15 @@ export function useApplyOrchestrator(): UseApplyOrchestrator {
       if (strategy === "extension") {
         setSessions((prev) => ({
           ...prev,
-          [job.id]: { jobId: job.id, strategy, status: "ext:queued", correlationId, startedAt: Date.now(), jobTitle: job.title ?? undefined, jobCompany: job.companyName ?? job.company ?? undefined },
+          [job.id]: {
+            jobId: job.id,
+            strategy,
+            status: "ext:queued",
+            correlationId,
+            startedAt: Date.now(),
+            jobTitle: job.title ?? undefined,
+            jobCompany: job.companyName ?? job.company ?? undefined,
+          },
         }));
 
         // Read the user from the React Query cache (already fetched since the
@@ -545,13 +662,20 @@ export function useApplyOrchestrator(): UseApplyOrchestrator {
           queryKeys.users.detail(),
         );
         const profile = cachedUser
-          ? { ...buildExtensionProfile(cachedUser), cv_url: defaultResumeFileUrl }
+          ? {
+              ...buildExtensionProfile(cachedUser),
+              cv_url: defaultResumeFileUrl,
+            }
           : null;
         if (!profile) {
-          console.warn("[CverAI] apply: no cached user — agent will use chrome.storage profile");
+          console.warn(
+            "[CverAI] apply: no cached user — agent will use chrome.storage profile",
+          );
         }
         if (profile && !profile.cv_url) {
-          console.warn("[CverAI] apply: no resume fileUrl found — agent will use bundled cv.pdf");
+          console.warn(
+            "[CverAI] apply: no resume fileUrl found — agent will use bundled cv.pdf",
+          );
         }
 
         // Fire-and-forget: inflightRef stays clear so the fallback handler can
@@ -560,11 +684,27 @@ export function useApplyOrchestrator(): UseApplyOrchestrator {
         return;
       }
 
+      console.log("final fallback to cloud bot for job", job);
+      window.open(
+        job?.applyUrl ?? job.link ?? "",
+        "_blank",
+        "noopener,noreferrer",
+      );
+      return;
+
       // ── Cloud bot: POST to server, then open SSE stream ───────────────────
       inflightRef.current.add(job.id);
       setSessions((prev) => ({
         ...prev,
-        [job.id]: { jobId: job.id, strategy: "cloud_bot", status: "cloud:starting", correlationId, startedAt: Date.now(), jobTitle: job.title ?? undefined, jobCompany: job.companyName ?? job.company ?? undefined },
+        [job.id]: {
+          jobId: job.id,
+          strategy: "cloud_bot",
+          status: "cloud:starting",
+          correlationId,
+          startedAt: Date.now(),
+          jobTitle: job.title ?? undefined,
+          jobCompany: job.companyName ?? job.company ?? undefined,
+        },
       }));
       // triggerCloudBot owns the API call, SSE open, and inflightRef cleanup.
       triggerCloudBot(job.id);

@@ -2,7 +2,7 @@
 
 import { memo } from "react";
 import FindJobClient from "./FindJobClient";
-import JobPreferenceCustomization from "./JobPreferenceCustomization";
+// import JobPreferenceCustomization from "./JobPreferenceCustomization";
 
 export const FindJob = memo(() => {
   return (
@@ -11,7 +11,7 @@ export const FindJob = memo(() => {
         AI Job Recommendation
       </h1>
       <div className="grid pb-16">
-        <JobPreferenceCustomization />
+        <FindJobClient />
       </div>
     </div>
   );

@@ -46,12 +46,32 @@ export function JobsTableRow({
 }: Props) {
   const link = job?.applyUrl || job?.link || job?.emailApply;
 
-  const domain = new URL(link ?? "http://example.com").hostname.replace(
-    "www.",
-    "",
-  );
+  function extractDomain(link?: string | null): string | null {
+    if (!link || typeof link !== "string") return null;
 
-  const blockList = ["linkedin.com", "glassdoor.com", "indeed.com", "simplyhired.com", "pinpointhq.com", "marriott.com", "successfactors.eu", "seek.com"];
+    try {
+      // Provide a base to support relative URLs
+      const url = new URL(link, "http://example.com");
+
+      const hostname = url.hostname || "";
+      return hostname.replace(/^www\./i, "");
+    } catch {
+      return null;
+    }
+  }
+
+  const domain = extractDomain(link ?? "") ?? "";
+
+  const blockList = [
+    "linkedin.com",
+    "glassdoor.com",
+    "indeed.com",
+    "simplyhired.com",
+    "pinpointhq.com",
+    "marriott.com",
+    "successfactors.eu",
+    "seek.com",
+  ];
   const isBlockList = blockList.some((blocked) => domain.includes(blocked));
 
   if (isBlockList) return null;
