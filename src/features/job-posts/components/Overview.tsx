@@ -14,8 +14,7 @@ import { JobDeckView } from "./JobDeckView";
 import { RunsBellPopover } from "./RunsBellPopover";
 import { RunModal } from "./RunModal";
 import { IframeStage } from "./IframeStage";
-import { useRunManager } from "../hooks/useRunManager";
-import { useExtension } from "../hooks/useExtension";
+import { useRunManager, shouldUsePopup } from "../hooks/useRunManager";
 import { buildExtensionProfile, useApplyOrchestrator } from "../hooks/useApplyOrchestrator";
 import { resumeApi } from "@/features/resume/api/resume.api";
 import { queryKeys } from "@/shared/query/keys";
@@ -104,6 +103,8 @@ export default function Overview() {
     runs,
     modalRunId,
     iframeStageRef,
+    startIframeApply,
+    startPopupApply,
     openRunModal,
     closeRunModal,
     repositionIframe,
@@ -113,11 +114,10 @@ export default function Overview() {
 
   // ── Apply orchestrator (cloud bot + extension sessions for the list view) ──
   // Lifted here so Overview can merge sessions into the bell popover.
-  const orchestrator = useApplyOrchestrator();
-
-  // ── Extension state + apply trigger (same path as the list view) ──────────
-
-  const { state: extState, applyViaExtension } = useExtension();
+  // Pass startIframeApply/startPopupApply so the extension strategy uses
+  // embedded iframes instead of opening offscreen Chrome windows.
+  const orchestrator = useApplyOrchestrator({ startIframeApply, startPopupApply });
+  const { extState } = orchestrator;
 
   // ── Sync profile to DOM so content-trigger.js can attach it ──────────────
   // content-trigger.js reads document.body.dataset.cverProfile and adds it
@@ -137,32 +137,43 @@ export default function Overview() {
   }, [user, defaultResumeFileUrl]);
 
   // ── Deck apply handler ────────────────────────────────────────────────────
-  // Uses the same popup-window path as the list view so clicking the bell
-  // entry focuses the live window (no blank iframe problem).
+  // Uses iframe mode via useRunManager — no new Chrome windows opened.
   // Not installed → open the apply URL in a new tab (manual fallback).
   const handleDeckApply = useCallback(
-    (job: JobPost) => {
+    async (job: JobPost) => {
       if (extState === "installed") {
         const profile = user
           ? { ...buildExtensionProfile(user), cv_url: defaultResumeFileUrl }
           : null;
-        applyViaExtension({
-          id: job.id,
-          title: job.title,
-          companyName: job.companyName,
-          company: job.company,
-          location: job.location,
-          applyUrl: job.applyUrl,
-          link: job.link,
-          profile,
-        });
+        const jobUrl = job.applyUrl ?? job.link ?? "";
+        if (shouldUsePopup(jobUrl)) {
+          startPopupApply(job, profile);
+        } else {
+          await startIframeApply(job, profile);
+        }
       } else {
         const url = job.applyUrl ?? job.link;
         if (url) window.open(url, "_blank", "noopener,noreferrer");
       }
     },
-    [extState, user, defaultResumeFileUrl, applyViaExtension],
+    [extState, user, defaultResumeFileUrl, startIframeApply, startPopupApply],
   );
+
+  // ── Enhanced orchestrator for the list view ──────────────────────────────
+  // Override focusExtTab so that when the agent is stuck in iframe mode the
+  // "Help bot finish →" button opens the run modal rather than trying to
+  // focus an offscreen window (which doesn't exist for iframe runs).
+  const enhancedOrchestrator = {
+    ...orchestrator,
+    focusExtTab: (jobId: string) => {
+      const iframeRun = Array.from(runs.values()).find((r) => r.job?.id === jobId);
+      if (iframeRun) {
+        openRunModal(iframeRun.id);
+      } else {
+        orchestrator.focusExtTab(jobId);
+      }
+    },
+  };
 
   // ── Active runs for bell popover ─────────────────────────────────────────
   // Merge extension runs (popup/iframe) + cloud bot sessions so the bell
@@ -275,7 +286,11 @@ export default function Overview() {
               }}
               onDismissRun={(runId) => {
                 if (runs.has(runId)) {
+                  // Also clean up the orchestrator session so it doesn't
+                  // reappear in the bell after the run is removed from runs.
+                  const run = runs.get(runId);
                   dismissRun(runId);
+                  if (run?.job?.id) orchestrator.dismissSession(run.job.id);
                 } else {
                   orchestrator.dismissSession(runId);
                 }
@@ -297,7 +312,7 @@ export default function Overview() {
             query={query}
             localizedTo={localizedTo}
             classification={classification}
-            orchestrator={orchestrator}
+            orchestrator={enhancedOrchestrator}
           />
         )}
       </div>

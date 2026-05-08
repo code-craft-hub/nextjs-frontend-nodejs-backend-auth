@@ -2,11 +2,14 @@
 import { useCallback, useState } from "react";
 import { JobSearchForm } from "@/features/job-posts/components/JobSearchForm";
 import { JobList } from "@/features/job-posts/components/JobList";
+import { IframeStage } from "@/features/job-posts/components/IframeStage";
 import { ReportCard } from "@/features/jobs/components/ReportCard";
 import { useApplyOrchestrator } from "@/features/job-posts/hooks/useApplyOrchestrator";
+import { useRunManager } from "@/features/job-posts/hooks/useRunManager";
 
 export default function JobsPage() {
-  const orchestrator = useApplyOrchestrator();
+  const { iframeStageRef, startIframeApply, startPopupApply } = useRunManager();
+  const orchestrator = useApplyOrchestrator({ startIframeApply, startPopupApply });
   const [query, setQuery] = useState<string | undefined>(undefined);
   const [localizedTo, setLocalizedTo] = useState<string | undefined>(undefined);
   const [classification, setClassification] = useState<string | undefined>(undefined);
@@ -33,6 +36,7 @@ export default function JobsPage() {
         onClassificationChange={handleClassificationChange}
       />
       <JobList query={query} localizedTo={localizedTo} classification={classification} orchestrator={orchestrator} />
+      <IframeStage stageRef={iframeStageRef} />
     </div>
   );
 }

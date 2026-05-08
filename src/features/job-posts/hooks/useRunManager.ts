@@ -259,7 +259,7 @@ export function useRunManager(): UseRunManager {
         return;
       }
 
-      const token = "tok-" + crypto.randomUUID();
+      const token = job.id;
       const jobUrl = job.applyUrl ?? "";
 
       // Create iframe immediately (before load) so it appears hidden right
@@ -359,7 +359,7 @@ export function useRunManager(): UseRunManager {
       },
       profile?: ExtensionProfile | null,
     ) => {
-      const token = "tok-" + crypto.randomUUID();
+      const token = job.id;
       const jobUrl = job.applyUrl ?? "";
 
       setRuns((prev) => {
