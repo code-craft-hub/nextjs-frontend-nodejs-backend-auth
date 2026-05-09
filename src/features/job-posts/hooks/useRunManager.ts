@@ -270,6 +270,24 @@ export function useRunManager(): UseRunManager {
       // Strips our origin from ancestorOrigins inside nested frames (helps
       // reCAPTCHA Enterprise on Greenhouse-embedded pages).
       iframe.referrerPolicy = "no-referrer";
+      // CRITICAL: sandbox without allow-top-navigation prevents the job site
+      // from running frame-busting JS that navigates the parent (cverai.com)
+      // tab to itself. This is a browser-enforced boundary — no JS trick can
+      // bypass it, unlike the window.top spoof in iframe-bust.js which Chrome
+      // sometimes blocks as non-configurable.
+      // allow-same-origin keeps cookies/storage for authenticated ATS forms.
+      // allow-popups-to-escape-sandbox lets OAuth flows open real windows.
+      // Chrome extensions can still inject into sandboxed frames via the
+      // privileged scripting API regardless of sandbox tokens.
+      iframe.sandbox.add(
+        "allow-scripts",
+        "allow-forms",
+        "allow-same-origin",
+        "allow-popups",
+        "allow-popups-to-escape-sandbox",
+        "allow-downloads",
+        "allow-modals",
+      );
       hideIframe(iframe);
       stage.appendChild(iframe);
       iframesRef.current.set(token, iframe);
@@ -434,6 +452,15 @@ export function useRunManager(): UseRunManager {
       iframe.allow =
         "clipboard-read; clipboard-write; geolocation; microphone; camera";
       iframe.referrerPolicy = "no-referrer";
+      iframe.sandbox.add(
+        "allow-scripts",
+        "allow-forms",
+        "allow-same-origin",
+        "allow-popups",
+        "allow-popups-to-escape-sandbox",
+        "allow-downloads",
+        "allow-modals",
+      );
       iframe.src = run.jobUrl;
       hideIframe(iframe);
       iframeStageRef.current.appendChild(iframe);
