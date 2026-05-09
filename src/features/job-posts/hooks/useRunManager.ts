@@ -181,10 +181,10 @@ export function useRunManager(): UseRunManager {
     [],
   );
 
-  // True while a job is actively being processed (not yet at terminal status).
-  const isProcessingRef = useRef(false);
-  // job.id of the currently active run — used to detect when it finishes.
-  const activeJobIdRef = useRef<string | null>(null);
+  // Maximum number of simultaneous automation runs.
+  const MAX_CONCURRENT = 2;
+  // Set of job IDs currently being processed. New jobs start when size < MAX_CONCURRENT.
+  const activeJobIdsRef = useRef<Set<string>>(new Set());
 
   // Stable ref so the message handler (registered once) can always call the
   // latest version of _tryProcessNext without being added to useEffect deps.
@@ -248,13 +248,11 @@ export function useRunManager(): UseRunManager {
             }
             return next;
           });
-          // If the rejected trigger was for the currently active queued job
-          // (e.g. the tab was killed before background setup completed), no
-          // run_update terminal status will ever arrive — release the lock
-          // manually so the next queued job can start.
-          if (token === activeJobIdRef.current) {
-            activeJobIdRef.current = null;
-            isProcessingRef.current = false;
+          // If the rejected trigger was for an active queued job (e.g. the tab
+          // was killed before background setup completed), no run_update terminal
+          // status will ever arrive — release the slot so the next queued job can start.
+          if (activeJobIdsRef.current.has(token)) {
+            activeJobIdsRef.current.delete(token);
             setTimeout(() => tryProcessNextRef.current(), 1000);
           }
         }
@@ -273,13 +271,14 @@ export function useRunManager(): UseRunManager {
           return next;
         });
 
-        // When the active job finishes (any terminal status), advance queue.
+        // When an active job finishes (any terminal status), free its slot and
+        // try to start the next queued job.
         if (
           EXT_TERMINAL.has(run.status) &&
-          run.job?.id === activeJobIdRef.current
+          run.job?.id &&
+          activeJobIdsRef.current.has(run.job.id)
         ) {
-          activeJobIdRef.current = null;
-          isProcessingRef.current = false;
+          activeJobIdsRef.current.delete(run.job.id);
           // Brief pause so the user can see the terminal status before
           // the next job's "Loading…" replaces it in the bell.
           setTimeout(() => tryProcessNextRef.current(), 1500);
@@ -559,11 +558,11 @@ export function useRunManager(): UseRunManager {
   // (registered once in useEffect) always calls the latest closure without
   // needing to be in the effect's dependency array.
 
-  const _tryProcessNext = useCallback(async () => {
-    if (isProcessingRef.current) return;
+  const _tryProcessNext = useCallback(() => {
+    // Stop if we're already at the concurrency limit or the queue is empty.
+    if (activeJobIdsRef.current.size >= MAX_CONCURRENT) return;
     if (queueRef.current.length === 0) return;
 
-    isProcessingRef.current = true;
     const item = queueRef.current[0];
 
     // Remove from queue state.
@@ -581,13 +580,46 @@ export function useRunManager(): UseRunManager {
       return prev;
     });
 
-    activeJobIdRef.current = item.id;
+    activeJobIdsRef.current.add(item.id);
 
     const jobUrl = item.job.applyUrl ?? "";
     if (shouldUsePopup(jobUrl)) {
       startPopupApply(item.job, item.profile);
     } else {
-      await startIframeApply(item.job, item.profile);
+      // Fire without awaiting so a second concurrent job can start immediately.
+      void startIframeApply(item.job, item.profile);
+    }
+
+    // Watchdog: if the extension never acknowledges the trigger (service worker
+    // suspended, content script missing, tab crash, etc.) the provisional
+    // "loading" run would block this slot forever.  After 30 s with no progress
+    // past "loading", surface an error and release the slot.
+    const watchedJobId = item.id;
+    setTimeout(() => {
+      if (!activeJobIdsRef.current.has(watchedJobId)) return; // already cleared
+      const stuck = runsRef.current.get(watchedJobId);
+      if (!stuck || stuck.status !== "loading") return; // progressed — OK
+      console.warn(`[RunManager] trigger timeout for job ${watchedJobId} — releasing slot`);
+      setRuns((prev) => {
+        const next = new Map(prev);
+        const r = next.get(watchedJobId);
+        if (r?.status === "loading") {
+          next.set(watchedJobId, {
+            ...r,
+            status: "error",
+            blockedMessage:
+              "Extension did not respond in time. The service worker may have been suspended — click Apply to retry.",
+          });
+        }
+        return next;
+      });
+      activeJobIdsRef.current.delete(watchedJobId);
+      setTimeout(() => tryProcessNextRef.current(), 1000);
+    }, 30_000);
+
+    // If there is still room for another concurrent run, start it immediately.
+    if (activeJobIdsRef.current.size < MAX_CONCURRENT && queueRef.current.length > 0) {
+      setTimeout(() => tryProcessNextRef.current(), 300);
     }
   }, [setQueue, setRuns, startIframeApply, startPopupApply]);
 
@@ -665,7 +697,32 @@ export function useRunManager(): UseRunManager {
 
   const dismissRun = useCallback(
     (runId: string) => {
-      // Record in the ref FIRST so any in-flight run_update is ignored.
+      const run = runsRef.current.get(runId);
+
+      // Stop the agent loop if it's still running — prevents orphaned loops
+      // that keep burning quota after the user dismisses the run from the bell.
+      if (run && !EXT_TERMINAL.has(run.status)) {
+        window.postMessage({ source: "cverai", type: "stop_run", runId }, "*");
+      }
+
+      // For popup-mode runs, close the background Chrome window so it doesn't
+      // stay open consuming memory after the user dismisses from the bell.
+      if (run?.openMode === "window") {
+        window.postMessage({ source: "cverai", type: "close_run_window", runId }, "*");
+      }
+
+      // For iframe-mode runs, remove the DOM element from the stage.
+      if (run?.openMode === "iframe") {
+        const iframe = iframesRef.current.get(runId);
+        if (iframe) {
+          iframe.remove();
+          iframesRef.current.delete(runId);
+        }
+        // If this iframe was in the modal overlay, close the modal.
+        if (modalRunIdRef.current === runId) closeRunModal();
+      }
+
+      // Record dismissed FIRST so any in-flight run_update is ignored.
       dismissedRunIds.current.add(runId);
       setRuns((prev) => {
         const next = new Map(prev);
@@ -673,7 +730,7 @@ export function useRunManager(): UseRunManager {
         return next;
       });
     },
-    [setRuns],
+    [setRuns, closeRunModal],
   );
 
   const stopRun = useCallback(
