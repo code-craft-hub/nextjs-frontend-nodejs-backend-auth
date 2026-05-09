@@ -12,6 +12,9 @@ import type { ExtensionProfile } from "./useExtension";
 // the host here avoids creating the iframe in the first place.
 const POPUP_HOSTS: string[] = [
   "careers.opecfund.org",
+  // Job aggregators that embed synchronous frame-busting loops — their listing
+  // pages work fine in a popup window (window.top === window → loop never runs).
+  "myjobmag.com",
 ];
 
 export function shouldUsePopup(url: string): boolean {
@@ -245,6 +248,15 @@ export function useRunManager(): UseRunManager {
             }
             return next;
           });
+          // If the rejected trigger was for the currently active queued job
+          // (e.g. the tab was killed before background setup completed), no
+          // run_update terminal status will ever arrive — release the lock
+          // manually so the next queued job can start.
+          if (token === activeJobIdRef.current) {
+            activeJobIdRef.current = null;
+            isProcessingRef.current = false;
+            setTimeout(() => tryProcessNextRef.current(), 1000);
+          }
         }
       }
 
