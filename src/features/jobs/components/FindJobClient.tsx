@@ -8,8 +8,8 @@ import { useApplyOrchestrator } from "@/features/job-posts/hooks/useApplyOrchest
 import { useRunManager } from "@/features/job-posts/hooks/useRunManager";
 
 export default function JobsPage() {
-  const { iframeStageRef, startIframeApply, startPopupApply } = useRunManager();
-  const orchestrator = useApplyOrchestrator({ startIframeApply, startPopupApply });
+  const { iframeStageRef, enqueueJob } = useRunManager();
+  const orchestrator = useApplyOrchestrator({ enqueueJob });
   const [query, setQuery] = useState<string | undefined>(undefined);
   const [localizedTo, setLocalizedTo] = useState<string | undefined>(undefined);
   const [classification, setClassification] = useState<string | undefined>(undefined);

@@ -14,7 +14,7 @@ import { JobDeckView } from "./JobDeckView";
 import { RunsBellPopover } from "./RunsBellPopover";
 import { RunModal } from "./RunModal";
 import { IframeStage } from "./IframeStage";
-import { useRunManager, shouldUsePopup } from "../hooks/useRunManager";
+import { useRunManager } from "../hooks/useRunManager";
 import { buildExtensionProfile, useApplyOrchestrator } from "../hooks/useApplyOrchestrator";
 import { resumeApi } from "@/features/resume/api/resume.api";
 import { queryKeys } from "@/shared/query/keys";
@@ -101,10 +101,11 @@ export default function Overview() {
 
   const {
     runs,
+    queue,
     modalRunId,
     iframeStageRef,
-    startIframeApply,
-    startPopupApply,
+    enqueueJob,
+    dequeueJob,
     openRunModal,
     closeRunModal,
     repositionIframe,
@@ -113,16 +114,12 @@ export default function Overview() {
   } = useRunManager();
 
   // ── Apply orchestrator (cloud bot + extension sessions for the list view) ──
-  // Lifted here so Overview can merge sessions into the bell popover.
-  // Pass startIframeApply/startPopupApply so the extension strategy uses
-  // embedded iframes instead of opening offscreen Chrome windows.
-  const orchestrator = useApplyOrchestrator({ startIframeApply, startPopupApply });
+  // Pass enqueueJob so the extension strategy routes through the serial queue
+  // instead of spawning multiple simultaneous iframes/windows.
+  const orchestrator = useApplyOrchestrator({ enqueueJob });
   const { extState } = orchestrator;
 
   // ── Sync profile to DOM so content-trigger.js can attach it ──────────────
-  // content-trigger.js reads document.body.dataset.cverProfile and adds it
-  // to the auto_apply_trigger payload, making the full profile available to
-  // the Gemini agent even when the postMessage payload omits it.
   useEffect(() => {
     if (!user) return;
     const profile = { ...buildExtensionProfile(user), cv_url: defaultResumeFileUrl };
@@ -137,26 +134,20 @@ export default function Overview() {
   }, [user, defaultResumeFileUrl]);
 
   // ── Deck apply handler ────────────────────────────────────────────────────
-  // Uses iframe mode via useRunManager — no new Chrome windows opened.
-  // Not installed → open the apply URL in a new tab (manual fallback).
+  // Routes through the same serial queue as the list view — no popup windows.
   const handleDeckApply = useCallback(
-    async (job: JobPost) => {
+    (job: JobPost) => {
       if (extState === "installed") {
         const profile = user
           ? { ...buildExtensionProfile(user), cv_url: defaultResumeFileUrl }
           : null;
-        const jobUrl = job.applyUrl ?? job.link ?? "";
-        if (shouldUsePopup(jobUrl)) {
-          startPopupApply(job, profile);
-        } else {
-          await startIframeApply(job, profile);
-        }
+        enqueueJob(job, profile);
       } else {
         const url = job.applyUrl ?? job.link;
         if (url) window.open(url, "_blank", "noopener,noreferrer");
       }
     },
-    [extState, user, defaultResumeFileUrl, startIframeApply, startPopupApply],
+    [extState, user, defaultResumeFileUrl, enqueueJob],
   );
 
   // ── Enhanced orchestrator for the list view ──────────────────────────────
@@ -176,21 +167,31 @@ export default function Overview() {
   };
 
   // ── Active runs for bell popover ─────────────────────────────────────────
-  // Merge extension runs (popup/iframe) + cloud bot sessions so the bell
-  // shows ALL in-progress applications, not just extension-mode ones.
+  // Merges: active/terminal extension runs + queued-but-not-started jobs
+  // + cloud bot sessions. Each source is deduplicated by job ID.
   const activeRuns = useMemo<ActiveRun[]>(() => {
-    // Extension runs (dismissed ones are already removed from the map by dismissRun)
     const extRuns = Array.from(runs.values());
-
-    // Job IDs already covered by an extension run — used to deduplicate below.
     const extJobIds = new Set(extRuns.map((r) => r.job?.id).filter(Boolean));
 
-    // Cloud bot sessions — convert ApplySession → ActiveRun shape.
-    // Skip any session whose jobId is already tracked by an extension run to
-    // prevent the same job appearing twice in the bell popover.
+    // Jobs waiting in the serial queue — shown as "In queue" in the bell.
+    // Filtered to exclude any job that's already in extRuns (already started).
+    const queueRuns: ActiveRun[] = queue
+      .filter((item) => !extJobIds.has(item.id))
+      .map((item, index) => ({
+        id: item.id,
+        job: { id: item.id, title: item.job.title ?? "Job", company: item.job.company ?? "" },
+        status: "queued",
+        openMode: "iframe" as const,
+        log: [{ t: item.queuedAt, level: "info" as const, text: `Position ${index + 1} in queue` }],
+        createdAt: item.queuedAt,
+      }));
+
+    const allExtJobIds = new Set([...extJobIds, ...queueRuns.map((q) => q.id)]);
+
+    // Cloud bot sessions not already tracked by an extension run or queue item.
     const sessionRuns: ActiveRun[] = Object.values(orchestrator.sessions)
       .filter((s) => !["applied", "failed", "skipped", "recruiter_email"].includes(s.status))
-      .filter((s) => !extJobIds.has(s.jobId))
+      .filter((s) => !allExtJobIds.has(s.jobId))
       .map((s) => ({
         id: s.jobId,
         job: { id: s.jobId, title: s.jobTitle ?? "Job", company: s.jobCompany ?? "" },
@@ -215,8 +216,8 @@ export default function Overview() {
         log: [],
       }));
 
-    return [...extRuns, ...sessionRuns];
-  }, [runs, orchestrator.sessions]);
+    return [...extRuns, ...queueRuns, ...sessionRuns];
+  }, [runs, queue, orchestrator.sessions]);
 
   // ── Modal run ─────────────────────────────────────────────────────────────
   const modalRun = modalRunId ? runs.get(modalRunId) ?? null : null;
@@ -286,11 +287,13 @@ export default function Overview() {
               }}
               onDismissRun={(runId) => {
                 if (runs.has(runId)) {
-                  // Also clean up the orchestrator session so it doesn't
-                  // reappear in the bell after the run is removed from runs.
                   const run = runs.get(runId);
                   dismissRun(runId);
                   if (run?.job?.id) orchestrator.dismissSession(run.job.id);
+                } else if (queue.some((q) => q.id === runId)) {
+                  // Job is still waiting — remove it from the queue.
+                  dequeueJob(runId);
+                  orchestrator.dismissSession(runId);
                 } else {
                   orchestrator.dismissSession(runId);
                 }

@@ -71,6 +71,7 @@ export function JobsTableRow({
     "marriott.com",
     "successfactors.eu",
     "seek.com",
+    "careerone.com.au"
   ];
   const isBlockList = blockList.some((blocked) => domain.includes(blocked));
 

@@ -22,7 +22,6 @@ import {
   type ExtensionState,
   type ExtensionProfile,
 } from "./useExtension";
-import { shouldUsePopup } from "./useRunManager";
 import {
   TERMINAL_STATUSES,
   type ApplySession,
@@ -187,15 +186,11 @@ function mapExtStatus(raw: string): ApplyStatus {
 
 /**
  * Optional overrides supplied by the parent component.
- * When provided, the extension strategy uses iframe/popup mode via useRunManager
- * instead of opening a new Chrome window.
+ * When provided, the extension strategy routes through useRunManager's serial
+ * queue instead of opening a new Chrome window directly.
  */
 export interface UseApplyOrchestratorOptions {
-  startIframeApply?: (
-    job: { id: string; title?: string | null; company?: string | null; location?: string | null; applyUrl?: string | null },
-    profile?: ExtensionProfile | null,
-  ) => Promise<void>;
-  startPopupApply?: (
+  enqueueJob?: (
     job: { id: string; title?: string | null; company?: string | null; location?: string | null; applyUrl?: string | null },
     profile?: ExtensionProfile | null,
   ) => void;
@@ -233,7 +228,7 @@ export interface UseApplyOrchestrator {
 export function useApplyOrchestrator(
   options: UseApplyOrchestratorOptions = {},
 ): UseApplyOrchestrator {
-  const { startIframeApply, startPopupApply } = options;
+  const { enqueueJob } = options;
   const router = useRouter();
   const queryClient = useQueryClient();
   const { state: extState, applyViaExtension, focusExtTab } = useExtension();
@@ -698,13 +693,10 @@ export function useApplyOrchestrator(
           );
         }
 
-        // Fire-and-forget: inflightRef stays clear so the fallback handler can
-        // acquire the lock if the extension reports fallback_to_cloud.
-        const jobUrl = job.applyUrl ?? job.link ?? "";
-        if (startIframeApply && !shouldUsePopup(jobUrl)) {
-          startIframeApply(job, profile).catch(console.error);
-        } else if (startPopupApply) {
-          startPopupApply(job, profile);
+        // Route through the serial queue if available; fall back to the
+        // legacy direct-apply path (opens a Chrome window) if not.
+        if (enqueueJob) {
+          enqueueJob(job, profile);
         } else {
           applyViaExtension({ ...job, correlationId, profile });
         }
@@ -739,7 +731,7 @@ export function useApplyOrchestrator(
     // `sessions` intentionally excluded — we read from sessionsRef instead,
     // keeping `apply` stable across SSE-driven re-renders.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [extState, applyViaExtension, startIframeApply, startPopupApply, triggerCloudBot, recordApplication, router],
+    [extState, applyViaExtension, enqueueJob, triggerCloudBot, recordApplication, router],
   );
 
   // ── Public: resume ────────────────────────────────────────────────────────

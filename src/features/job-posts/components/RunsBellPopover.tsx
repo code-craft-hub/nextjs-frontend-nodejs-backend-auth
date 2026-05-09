@@ -13,7 +13,8 @@ import { useRouter } from "next/navigation";
 
 function prettyStatus(s: string): string {
   switch (s) {
-    case "loading":               return "Queued";
+    case "queued":                return "In queue";
+    case "loading":               return "Starting";
     case "running":               return "Processing";
     case "awaiting_user_input":
     case "awaiting_submit_approval":
@@ -28,7 +29,8 @@ function prettyStatus(s: string): string {
 
 function statusLabel(s: string): string {
   switch (s) {
-    case "loading":                             return "Queued";
+    case "queued":                              return "In queue";
+    case "loading":                             return "Starting…";
     case "running":                             return "Processing...";
     case "awaiting_user_input":                 return "Needs answers";
     case "awaiting_submit_approval":            return "Ready to submit";
@@ -285,7 +287,7 @@ export function RunsBellPopover({
   const router = useRouter();
 
   const activeBadgeCount = runs.filter((r) =>
-    ["loading", "running", "awaiting_user_input", "awaiting_submit_approval"].includes(r.status),
+    ["queued", "loading", "running", "awaiting_user_input", "awaiting_submit_approval"].includes(r.status),
   ).length;
 
   const completedCount = runs.filter((r) =>

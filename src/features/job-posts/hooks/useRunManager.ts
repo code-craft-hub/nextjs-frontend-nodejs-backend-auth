@@ -66,33 +66,41 @@ function showIframe(iframe: HTMLIFrameElement, withLogs = false): void {
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
+/** A job waiting in the sequential automation queue. */
+export interface QueueItem {
+  /** job.id — used as queue key and bell display id. */
+  id: string;
+  job: {
+    id: string;
+    title?: string | null;
+    company?: string | null;
+    location?: string | null;
+    applyUrl?: string | null;
+  };
+  profile?: ExtensionProfile | null;
+  queuedAt: number;
+}
+
+// Run statuses that mean the agent is done (success or failure).
+const EXT_TERMINAL = new Set([
+  "submitted", "complete", "stopped", "error", "blocked", "max_turns",
+]);
+
 export interface UseRunManager {
-  /** All active runs (not dismissed). */
+  /** All active / recently completed runs (not dismissed). */
   runs: Map<string, ActiveRun>;
+  /** Jobs waiting to be processed — shown in bell as "In queue". */
+  queue: QueueItem[];
   /** runId of the run whose iframe is currently shown in the modal, or null. */
   modalRunId: string | null;
   /** Ref for the hidden iframe stage <div>. Attach to <IframeStage>. */
   iframeStageRef: React.RefObject<HTMLDivElement | null>;
   /**
-   * Create an iframe on the page, load the job URL, then send
-   * auto_apply to the extension with useIframe:true.
+   * Add a job to the sequential automation queue.
+   * If no job is currently being processed the bot starts immediately;
+   * otherwise the job waits its turn and shows as "In queue" in the bell.
    */
-  startIframeApply: (
-    job: {
-      id: string;
-      title?: string | null;
-      company?: string | null;
-      location?: string | null;
-      applyUrl?: string | null;
-    },
-    profile?: ExtensionProfile | null,
-  ) => Promise<void>;
-  /**
-   * Skip the iframe entirely — send auto_apply with useIframe:false so the
-   * extension opens a real Chrome window at left:-10000 (truly offscreen).
-   * Use for hosts that refuse to render inside an iframe.
-   */
-  startPopupApply: (
+  enqueueJob: (
     job: {
       id: string;
       title?: string | null;
@@ -102,6 +110,8 @@ export interface UseRunManager {
     },
     profile?: ExtensionProfile | null,
   ) => void;
+  /** Remove a not-yet-started job from the queue (e.g. user dismisses it). */
+  dequeueJob: (jobId: string) => void;
   /** Show the iframe for runId in the modal overlay. */
   openRunModal: (runId: string) => void;
   /** Hide the modal and return the iframe to its hidden state. */
@@ -149,6 +159,33 @@ export function useRunManager(): UseRunManager {
     },
     [],
   );
+
+  // ── Job queue ─────────────────────────────────────────────────────────────
+  // Jobs are processed one at a time. enqueueJob adds to the waiting list;
+  // _tryProcessNext dequeues and starts the next job when the current one
+  // reaches a terminal status.
+
+  const [queueState, setQueueState] = useState<QueueItem[]>([]);
+  const queueRef = useRef<QueueItem[]>([]);
+  const setQueue = useCallback(
+    (updater: (prev: QueueItem[]) => QueueItem[]) => {
+      setQueueState((prev) => {
+        const next = updater(prev);
+        queueRef.current = next;
+        return next;
+      });
+    },
+    [],
+  );
+
+  // True while a job is actively being processed (not yet at terminal status).
+  const isProcessingRef = useRef(false);
+  // job.id of the currently active run — used to detect when it finishes.
+  const activeJobIdRef = useRef<string | null>(null);
+
+  // Stable ref so the message handler (registered once) can always call the
+  // latest version of _tryProcessNext without being added to useEffect deps.
+  const tryProcessNextRef = useRef<() => void>(() => {});
 
   // ── Extension message listener ────────────────────────────────────────────
 
@@ -223,6 +260,18 @@ export function useRunManager(): UseRunManager {
           next.set(run.id, { ...existing, ...run });
           return next;
         });
+
+        // When the active job finishes (any terminal status), advance queue.
+        if (
+          EXT_TERMINAL.has(run.status) &&
+          run.job?.id === activeJobIdRef.current
+        ) {
+          activeJobIdRef.current = null;
+          isProcessingRef.current = false;
+          // Brief pause so the user can see the terminal status before
+          // the next job's "Loading…" replaces it in the bell.
+          setTimeout(() => tryProcessNextRef.current(), 1500);
+        }
       }
     };
 
@@ -243,6 +292,67 @@ export function useRunManager(): UseRunManager {
       clearTimeout(resyncTimer);
     };
   }, [setRuns]);
+
+  // ── Queue management ─────────────────────────────────────────────────────
+
+  const enqueueJob = useCallback(
+    (
+      job: {
+        id: string;
+        title?: string | null;
+        company?: string | null;
+        location?: string | null;
+        applyUrl?: string | null;
+      },
+      profile?: ExtensionProfile | null,
+    ) => {
+      const item: QueueItem = { id: job.id, job, profile: profile ?? null, queuedAt: Date.now() };
+
+      // Add a provisional "queued" entry in runs so the bell shows it immediately.
+      setRuns((prev) => {
+        const next = new Map(prev);
+        if (!next.has(job.id)) {
+          next.set(job.id, {
+            id: job.id,
+            job: { id: job.id, title: job.title ?? "Job", company: job.company ?? "" },
+            status: "queued",
+            openMode: "iframe",
+            log: [{ t: Date.now(), level: "info", text: "Waiting in queue…" }],
+            provisional: true,
+            createdAt: Date.now(),
+          });
+        }
+        return next;
+      });
+
+      setQueue((prev) => {
+        const next = [...prev, item];
+        queueRef.current = next;
+        return next;
+      });
+
+      // Start immediately if nothing is running.
+      setTimeout(() => tryProcessNextRef.current(), 0);
+    },
+    [setRuns, setQueue],
+  );
+
+  const dequeueJob = useCallback(
+    (jobId: string) => {
+      setQueue((prev) => prev.filter((item) => item.id !== jobId));
+      // Also remove the "queued" provisional run from the bell.
+      setRuns((prev) => {
+        const run = prev.get(jobId);
+        if (run?.status === "queued") {
+          const next = new Map(prev);
+          next.delete(jobId);
+          return next;
+        }
+        return prev;
+      });
+    },
+    [setQueue, setRuns],
+  );
 
   // ── startIframeApply ──────────────────────────────────────────────────────
 
@@ -432,6 +542,46 @@ export function useRunManager(): UseRunManager {
     [setRuns],
   );
 
+  // ── Queue processor ──────────────────────────────────────────────────────
+  // _tryProcessNext is assigned to tryProcessNextRef so the message handler
+  // (registered once in useEffect) always calls the latest closure without
+  // needing to be in the effect's dependency array.
+
+  const _tryProcessNext = useCallback(async () => {
+    if (isProcessingRef.current) return;
+    if (queueRef.current.length === 0) return;
+
+    isProcessingRef.current = true;
+    const item = queueRef.current[0];
+
+    // Remove from queue state.
+    setQueue((prev) => prev.slice(1));
+
+    // Remove the provisional "queued" run — startIframeApply/startPopupApply
+    // will create their own "loading" entry with the correct openMode.
+    setRuns((prev) => {
+      const run = prev.get(item.id);
+      if (run?.status === "queued") {
+        const next = new Map(prev);
+        next.delete(item.id);
+        return next;
+      }
+      return prev;
+    });
+
+    activeJobIdRef.current = item.id;
+
+    const jobUrl = item.job.applyUrl ?? "";
+    if (shouldUsePopup(jobUrl)) {
+      startPopupApply(item.job, item.profile);
+    } else {
+      await startIframeApply(item.job, item.profile);
+    }
+  }, [setQueue, setRuns, startIframeApply, startPopupApply]);
+
+  // Keep the ref in sync every render so the message-handler closure is fresh.
+  tryProcessNextRef.current = _tryProcessNext;
+
   // ── openRunModal / closeRunModal ──────────────────────────────────────────
 
   const openRunModal = useCallback((runId: string) => {
@@ -524,10 +674,11 @@ export function useRunManager(): UseRunManager {
 
   return {
     runs: runsState,
+    queue: queueState,
     modalRunId,
     iframeStageRef,
-    startIframeApply,
-    startPopupApply,
+    enqueueJob,
+    dequeueJob,
     openRunModal,
     closeRunModal,
     repositionIframe,
