@@ -5,10 +5,14 @@ import type { ActiveRun } from "../types/apply-session.types";
 import type { ExtensionProfile } from "./useExtension";
 
 // ─── Popup-host list ─────────────────────────────────────────────────────────
-// Hosts where iframe rendering is broken even with iframe-bust.js.
-// Keep empty unless a specific host is confirmed to fail — iframe-bust handles
-// all major ATSes (Greenhouse, Lever, Ashby, Workable, etc.) natively.
-const POPUP_HOSTS: string[] = [];
+// Hosts where iframe rendering is confirmed broken: the page runs a synchronous
+// frame-busting loop (while(top!==self){}) that cannot be suppressed by our
+// iframe-bust.js patches, hanging the tab's JS thread.  Background auto-
+// switches at first capture failure too (switchIframeToPopup), but listing
+// the host here avoids creating the iframe in the first place.
+const POPUP_HOSTS: string[] = [
+  "careers.opecfund.org",
+];
 
 export function shouldUsePopup(url: string): boolean {
   try {
@@ -333,7 +337,7 @@ export function useRunManager(): UseRunManager {
             console.warn("[RunManager] iframe load timeout for", jobUrl);
             resolve();
           }
-        }, 30_000);
+        }, 8_000);
       });
 
       // Send trigger to content-trigger.js → background.
