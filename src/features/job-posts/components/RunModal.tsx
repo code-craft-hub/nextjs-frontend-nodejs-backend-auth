@@ -218,6 +218,14 @@ interface RunModalProps {
 export function RunModal({ run, onClose, onStop, onLogsToggle }: RunModalProps) {
   const [showLogs, setShowLogs] = useState(false);
 
+  // Add body class while modal is open so underlying content doesn't
+  // bleed through gaps in the iframe coverage (mirrors test-site pattern).
+  useEffect(() => {
+    if (!run) return;
+    document.body.classList.add("modal-open");
+    return () => document.body.classList.remove("modal-open");
+  }, [run?.id]);
+
   // Close on Escape
   useEffect(() => {
     if (!run) return;

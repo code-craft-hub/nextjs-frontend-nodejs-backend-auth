@@ -202,3 +202,13 @@
     animation: fadeIn 0.5s ease-in-out;
   }
 }
+
+/* ── Run modal: hide underlying dashboard content while iframe overlay is open.
+   Mirrors the test-site body.modal-open pattern so page content can't bleed
+   through gaps in the iframe / backdrop. The iframe itself is always visible
+   (opacity:0 → 1 via showIframe inline styles in useRunManager). ---------- */
+body.modal-open .sidebar,
+body.modal-open [data-sidebar],
+body.modal-open nav {
+  z-index: 0 !important;
+}

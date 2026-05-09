@@ -18,14 +18,12 @@ export function IframeStage({
       id="cverai-iframe-stage"
       aria-hidden="true"
       style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        width: 0,
-        height: 0,
-        overflow: "visible",
+        // CRITICAL: no position, no z-index. Any positioned element with a
+        // z-index creates a stacking context that traps child iframe z-indexes —
+        // the modal backdrop (z 150) would end up visually ABOVE the iframe
+        // (z 200) and intercept all clicks/render. Static positioning (default)
+        // lets each iframe escape to the root stacking context.
         pointerEvents: "none",
-        zIndex: -200,
       }}
     />
   );
