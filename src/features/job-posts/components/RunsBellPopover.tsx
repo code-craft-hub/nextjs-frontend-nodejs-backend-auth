@@ -266,6 +266,48 @@ function SubmitApprovalPanel({
   );
 }
 
+// ─── Log panel (inline inside popover row) ───────────────────────────────────
+
+function RunLogPanel({ run }: { run: ActiveRun }) {
+  const entries = run.log ?? [];
+  const reversed = [...entries].reverse(); // newest first
+
+  function levelColor(level: string) {
+    if (level === "error") return "text-red-500";
+    if (level === "warn")  return "text-amber-500";
+    if (level === "action") return "text-indigo-500";
+    return "text-gray-500";
+  }
+
+  return (
+    <div className="mt-2" onClick={(e) => e.stopPropagation()}>
+      <p className="text-xs text-gray-400 font-medium uppercase tracking-wide mb-2">
+        Run log
+      </p>
+      {reversed.length === 0 ? (
+        <p className="text-xs text-gray-400 italic">No log entries.</p>
+      ) : (
+        <div className="max-h-52 overflow-y-auto rounded-lg border border-gray-100 bg-gray-50 p-2 space-y-0.5">
+          {reversed.map((entry, i) => (
+            <div key={i} className="flex gap-2 text-xs leading-relaxed">
+              <span className="text-gray-300 shrink-0 tabular-nums">
+                {new Date(entry.t).toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  second: "2-digit",
+                })}
+              </span>
+              <span className={`break-words min-w-0 ${levelColor(entry.level)}`}>
+                {entry.text}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── Component ────────────────────────────────────────────────────────────────
 
 interface RunsBellPopoverProps {
@@ -396,11 +438,17 @@ export function RunsBellPopover({
                     const isActive = ["loading", "running", "awaiting_user_input"].includes(run.status);
                     const liveAction = isActive && !run.blockedMessage ? lastInterestingAction(run) : null;
                     const isAutoApply = run.openMode === "window" || run.openMode === "iframe";
+                    const isPopupMode = run.openMode === "window";
                     const isTerminal = ["submitted", "complete", "applied"].includes(run.status);
+                    // Runs that are done but need the user to see why (error, blocked, stopped)
+                    const isDead = ["error", "blocked", "stopped", "max_turns"].includes(run.status);
                     const needsAttention =
                       run.status === "awaiting_user_input" ||
                       run.status === "awaiting_submit_approval";
                     const isExpanded = expandedRunId === run.id;
+                    // Popup-mode runs that are dead should expand logs inline —
+                    // their window is closed so there is nothing to focus.
+                    const expandsLogs = isPopupMode && isDead;
 
                     return (
                       <div
@@ -409,7 +457,7 @@ export function RunsBellPopover({
                           needsAttention ? "bg-amber-50/60" : "hover:bg-gray-50 cursor-pointer"
                         } group`}
                         onClick={() => {
-                          if (needsAttention) {
+                          if (needsAttention || expandsLogs) {
                             setExpandedRunId((prev) => (prev === run.id ? null : run.id));
                             return;
                           }
@@ -465,6 +513,11 @@ export function RunsBellPopover({
                                     : "Form filled and ready — tap to review & approve"}
                                 </p>
                               )}
+                              {expandsLogs && !isExpanded && (
+                                <p className="text-xs text-gray-400 mt-0.5">
+                                  Tap to see full log
+                                </p>
+                              )}
                             </div>
                           </div>
 
@@ -500,6 +553,10 @@ export function RunsBellPopover({
                             run={run}
                             onClose={() => setExpandedRunId(null)}
                           />
+                        )}
+                        {/* Log panel for popup-mode dead runs — window is closed, show logs inline */}
+                        {isExpanded && expandsLogs && (
+                          <RunLogPanel run={run} />
                         )}
                       </div>
                     );

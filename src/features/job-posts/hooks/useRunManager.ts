@@ -4,20 +4,24 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { ActiveRun } from "../types/apply-session.types";
 import type { ExtensionProfile } from "./useExtension";
 
+// ─── Run mode ─────────────────────────────────────────────────────────────────
+// Change USE_IFRAME to true to embed job sites in a hidden iframe on this page.
+// false (default) opens each job in a minimised offscreen popup window instead.
+//
+// Popup  → more reliable, works on every job board, no X-Frame-Options issues.
+// Iframe → faster startup, no extra Chrome window, but blocked by some sites.
+const USE_IFRAME = false;
+
 // ─── Popup-host list ─────────────────────────────────────────────────────────
-// Hosts where iframe rendering is confirmed broken: the page runs a synchronous
-// frame-busting loop (while(top!==self){}) that cannot be suppressed by our
-// iframe-bust.js patches, hanging the tab's JS thread.  Background auto-
-// switches at first capture failure too (switchIframeToPopup), but listing
-// the host here avoids creating the iframe in the first place.
+// Hosts that are always forced to popup regardless of USE_IFRAME — they run
+// synchronous frame-busting loops that hang the browser when iframed.
 const POPUP_HOSTS: string[] = [
   "careers.opecfund.org",
-  // Job aggregators that embed synchronous frame-busting loops — their listing
-  // pages work fine in a popup window (window.top === window → loop never runs).
   "myjobmag.com",
 ];
 
 export function shouldUsePopup(url: string): boolean {
+  if (!USE_IFRAME) return true; // global override: always use popup
   try {
     const host = new URL(url).host.toLowerCase();
     return POPUP_HOSTS.some((h) => host === h || host.endsWith("." + h));
@@ -327,7 +331,7 @@ export function useRunManager(): UseRunManager {
             id: job.id,
             job: { id: job.id, title: job.title ?? "Job", company: job.company ?? "" },
             status: "queued",
-            openMode: "iframe",
+            openMode: shouldUsePopup(job.applyUrl ?? "") ? "window" : "iframe",
             log: [{ t: Date.now(), level: "info", text: "Waiting in queue…" }],
             provisional: true,
             createdAt: Date.now(),
