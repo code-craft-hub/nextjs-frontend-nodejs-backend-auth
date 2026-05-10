@@ -82,28 +82,32 @@ export const HomeClient = memo(
                 </TabsTrigger>
               ))}
             </TabsList>
-            {isDeckView ? (
-              <JobDeckView
-                onApply={handleDeckApply}
+            <TabsContent value="ai-apply">
+              {isDeckView ? (
+                <JobDeckView
+                  onApply={handleDeckApply}
+                  handleViewChange={handleViewChange}
+                  runs={runs}
+                  onOpenRun={openRunModal}
+                  onDismissRun={dismissRun}
+                  extState={extState}
+                />
+              ) : (
+                <AIApply
+                  jobDescription={jobDescription}
+                  handleViewChange={handleViewChange}
+                />
+              )}
+            </TabsContent>
+            <TabsContent value="tailor-cv">
+              <AIJobCustomization
+                filters={autoApplyFilters}
                 handleViewChange={handleViewChange}
-                runs={runs}
-                onOpenRun={openRunModal}
-                onDismissRun={dismissRun}
-                extState={extState}
               />
-            ) : (
-              <>
-                <TabsContent value="ai-apply">
-                  <AIApply jobDescription={jobDescription} handleViewChange={handleViewChange} />
-                </TabsContent>
-                <TabsContent value="tailor-cv">
-                  <AIJobCustomization filters={autoApplyFilters} handleViewChange={handleViewChange}/>
-                </TabsContent>
-                <TabsContent value="find-jobs">
-                  <FindJob />
-                </TabsContent>
-              </>
-            )}
+            </TabsContent>
+            <TabsContent value="find-jobs">
+              <FindJob />
+            </TabsContent>
           </Tabs>
         </div>
         <InsufficientCreditsModal />

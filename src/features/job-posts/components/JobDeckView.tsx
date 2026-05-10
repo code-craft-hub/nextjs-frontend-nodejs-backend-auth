@@ -14,6 +14,12 @@ import {
   X,
   Check,
 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import recommendationsQueries from "@/features/recommendations/queries/recommendations.queries";
 import { jobPreferencesQueries } from "@/features/job-preferences/queries/job-preferences.queries";
@@ -133,6 +139,54 @@ function decodeHtml(html: string): string {
     .replace(/&nbsp;/g, " ");
 }
 
+/**
+ * Converts a raw (possibly plain-text) job description into readable HTML.
+ * If the text already contains block-level HTML it is returned unchanged.
+ * Otherwise it detects "Section header:" patterns and comma-separated action
+ * lists and emits <h3> + <ul>/<p> blocks.
+ */
+function formatJobDescription(raw: string): string {
+  if (/<(p|ul|ol|h[1-6]|li|div)\b/i.test(raw)) return raw;
+
+  // Split on "Capitalized phrase:" — these become section headers.
+  const parts = raw.split(/\b([A-Z][A-Za-z &/(),''’-]{2,60}:)/);
+
+  const renderBody = (text: string): string => {
+    const trimmed = text.trim();
+    if (!trimmed) return "";
+    // Heuristic: if splitting on ", " (comma + space before lowercase) yields
+    // ≥4 short items, treat as a bullet list.
+    const items = trimmed
+      .split(/,\s+(?=[a-z])/)
+      .map((s) => s.trim())
+      .filter(Boolean);
+    if (items.length >= 4 && items.every((s) => s.length < 140)) {
+      return `<ul>${items.map((item) => `<li>${item}</li>`).join("")}</ul>`;
+    }
+    // Split into individual sentences then group every 2 into a <p> so the
+    // reader gets a natural breathing point instead of one solid wall of text.
+    const sentences = trimmed
+      .split(/(?<=[.!?])\s+(?=[A-Z"'])/)
+      .map((s) => s.trim())
+      .filter(Boolean);
+    const chunks: string[] = [];
+    for (let i = 0; i < sentences.length; i += 2) {
+      chunks.push(sentences.slice(i, i + 2).join(" "));
+    }
+    return (chunks.length ? chunks : [trimmed])
+      .map((chunk) => `<p>${chunk}</p>`)
+      .join("");
+  };
+
+  let html = "";
+  if (parts[0].trim()) html += renderBody(parts[0]);
+  for (let i = 1; i < parts.length - 1; i += 2) {
+    html += `<h3>${parts[i]}</h3>`;
+    html += renderBody(parts[i + 1] ?? "");
+  }
+  return html;
+}
+
 function timeAgo(dateStr: string): string {
   const diffMs = Date.now() - new Date(dateStr).getTime();
   const h = Math.floor(diffMs / 3_600_000);
@@ -154,6 +208,8 @@ function JobDeckCard({
   onSkip,
   onApply,
 }: JobDeckCardProps) {
+  const [descOpen, setDescOpen] = useState(false);
+
   const scale = stackIndex === 0 ? 1 : stackIndex === 1 ? 0.96 : 0.92;
   const translateY = stackIndex === 0 ? 0 : stackIndex === 1 ? 12 : 24;
   const opacity = stackIndex === 0 ? 1 : stackIndex === 1 ? 0.85 : 0.7;
@@ -193,16 +249,16 @@ function JobDeckCard({
         pointerEvents,
       }}
     >
-      <Card className="relative w-full rounded-[40px] bg-white shadow-xl border-0 p-4 gap-2 sm:p-8 max-w-2xl">
+      <Card className="relative w-full rounded-[30px] bg-white shadow-xl border-0  gap-2 p-8 max-w-2xl">
         {/* Header */}
-        <div className="flex items-start justify-between">
-          <h1 className="text-xl capitalize  font-bold font-poppins">
+        <div className="flex items-center justify-between">
+          <h1 className="text-lg capitalize  font-bold font-poppins">
             {job.title}
           </h1>
 
-          <div className="flex ml-8 items-center gap-2 pt-3">
-            <div className="flex items-center gap-2 text-[#7a7a7a] font-medium text-xl">
-              <Clock className="size-6" strokeWidth={2} />
+          <div className="flex ml-8 items-center gap-2">
+            <div className="flex items-center gap-2 text-[#7a7a7a] font-medium text-sm">
+              <Clock className="size-4" strokeWidth={2} />
               <span>{timeAgo(job.postedAt ?? job.createdAt)}</span>
             </div>
 
@@ -214,13 +270,13 @@ function JobDeckCard({
                 onClick={(e) => e.stopPropagation()}
               >
                 <ExternalLink
-                  className="size-6 text-[#7a7a7a]"
+                  className="size-4 text-[#7a7a7a]"
                   strokeWidth={2}
                 />
               </a>
             ) : (
               <ExternalLink
-                className="w-8.5 h-8.5 text-[#7a7a7a]"
+                className="size-4 text-[#7a7a7a]"
                 strokeWidth={2}
               />
             )}
@@ -299,14 +355,45 @@ function JobDeckCard({
             dangerouslySetInnerHTML={{ __html: decodeHtml(preview) }}
           />
 
-          <button className="mt-2 text-xs font-semibold text-[#2f6df6]">
+          <button
+            className="mt-2 text-xs font-semibold text-[#2f6df6]"
+            onClick={(e) => { e.stopPropagation(); setDescOpen(true); }}
+          >
             See full description
           </button>
         </div>
 
+        {/* Full description modal */}
+        <Dialog open={descOpen} onOpenChange={setDescOpen}>
+          <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col">
+            <DialogHeader>
+              <DialogTitle className="text-lg font-bold font-poppins capitalize">
+                {job.title}
+              </DialogTitle>
+              <p className="text-sm text-[#7a7a7a] font-medium">
+                {job.companyName ?? job.company ?? "Unknown Company"}
+                {job.location ? ` · ${job.location}` : ""}
+              </p>
+            </DialogHeader>
+            <div className="overflow-y-auto flex-1 pr-1">
+              <div
+                className="text-[#2b2b2b]
+                  [&_h3]:font-semibold [&_h3]:text-sm [&_h3]:text-gray-900 [&_h3]:mt-5 [&_h3]:mb-1.5 [&_h3:first-child]:mt-0
+                  [&_p]:text-xs [&_p]:leading-relaxed [&_p]:mt-3 [&_p:first-child]:mt-0
+                  [&_ul]:mt-1 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:space-y-1
+                  [&_li]:text-xs [&_li]:leading-relaxed
+                  [&_strong]:font-bold [&_br]:block"
+                dangerouslySetInnerHTML={{
+                  __html: formatJobDescription(decodeHtml(descriptionText)),
+                }}
+              />
+            </div>
+          </DialogContent>
+        </Dialog>
+
         {/* Actions — only interactive on the top card */}
         {stackIndex === 0 && (
-          <div className="mt-2 flex items-end justify-between px-15">
+          <div className="mt-2 flex items-end justify-between ">
             <div className="flex flex-col items-center gap-3">
               <button
                 onClick={onSkip}
@@ -799,7 +886,7 @@ export function JobDeckView({
           onClick={() => {
             handleViewChange("list");
           }}
-          className="font-poppins rounded-[50px] text-xl p-8"
+          className="font-poppins rounded-[50px] text-md p-6"
         >
           Bring your job
         </Button>

@@ -1,15 +1,17 @@
 "use client";
 import { memo } from "react";
 import { AIApplyInput } from "./AIApplyInput";
-import { PersonalizedRecommendation } from "@/features/dashboard/components/RecentActivityCard";
-import { AIApplyDatatable } from "./AIApplyDatatable";
-import { useQuery } from "@tanstack/react-query";
-import { autoApplyQueries } from "@/features/auto-apply/queries/auto-apply.queries";
 import { ViewType } from "@/features/dashboard/components/Home";
+import { Button } from "@/components/ui/button";
 
 export const AIApply = memo(
-  ({ jobDescription, handleViewChange }: { jobDescription: string; handleViewChange: (value: ViewType) => void }) => {
-    const { data: aiApply } = useQuery(autoApplyQueries.all());
+  ({
+    jobDescription,
+    handleViewChange,
+  }: {
+    jobDescription: string;
+    handleViewChange: (value: ViewType) => void;
+  }) => {
 
     return (
       <div className="flex flex-col font-poppins relative">
@@ -20,8 +22,18 @@ export const AIApply = memo(
         </div>
         <div className="grid gap-y-8">
           <AIApplyInput jobDescription={jobDescription} />
-          <AIApplyDatatable data={aiApply?.data ?? []} />
-          <PersonalizedRecommendation handleViewChange={handleViewChange} />
+          <div className="w-full flex items-center justify-center">
+            <Button
+              onClick={() => {
+                handleViewChange("deck");
+              }}
+              className="font-poppins rounded-[50px] text-md p-6"
+            >
+              Swipe jobs
+            </Button>
+          </div>
+          {/* <AIApplyDatatable data={aiApply?.data ?? []} /> */}
+          {/* <PersonalizedRecommendation handleViewChange={handleViewChange} /> */}
         </div>
       </div>
     );
