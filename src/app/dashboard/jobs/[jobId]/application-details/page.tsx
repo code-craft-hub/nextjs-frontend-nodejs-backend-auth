@@ -4,6 +4,7 @@ import { use } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { jobApplicationsApi } from "@/features/analytics/api/job-applications.api";
 import { queryKeys } from "@/shared/query/keys";
+import { API_URL } from "@/shared/api/client";
 import { format } from "date-fns";
 
 import { Card, CardContent } from "@/components/ui/card";
@@ -38,6 +39,12 @@ export default function ApplicationReview({ params }: PageProps) {
   )
     ? (app.snapshot as any).qa
     : [];
+
+  // If the resume was AI-generated it won't have a stored fileUrl — fall back
+  // to the on-demand PDF generation endpoint which regenerates it from DB data.
+  const resumePreviewUrl =
+    app.resumeFileUrl ??
+    (app.resumeId ? `${API_URL}/resumes/${app.resumeId}/download` : null);
 
   const resumeUploadedDate = app.resumeCreatedAt
     ? format(new Date(app.resumeCreatedAt), "MMMM d, yyyy")
@@ -86,8 +93,8 @@ export default function ApplicationReview({ params }: PageProps) {
               variant="outline"
               size="sm"
               className="flex items-center gap-2"
-              onClick={() => app.resumeFileUrl && window.open(app.resumeFileUrl, "_blank")}
-              disabled={!app.resumeFileUrl}
+              onClick={() => resumePreviewUrl && window.open(resumePreviewUrl, "_blank")}
+              disabled={!resumePreviewUrl}
             >
               <Eye className="w-4 h-4" /> preview
             </Button>
