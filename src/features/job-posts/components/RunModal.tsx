@@ -385,7 +385,7 @@ export function RunModal({ run, onClose, onStop, onLogsToggle }: RunModalProps) 
 
       {/* Submit approval panel — shown when bot is ready to submit */}
       {pendingSubmit && pendingQuestions.length === 0 && (
-        <SubmitPanel runId={run.id} summary={pendingSubmit.summary} />
+        <SubmitPanel runId={run.id} summary={pendingSubmit.summary as any} />
       )}
     </>
   );

@@ -29,9 +29,9 @@ export default function ApplicationReview({ params }: PageProps) {
 
   const app = data.data;
   const companyInitial = (app.companyName ?? "?").charAt(0).toUpperCase();
-  const appliedDate = app.appliedAt
-    ? format(new Date(app.appliedAt), "MMMM d, yyyy")
-    : null;
+  // const appliedDate = app.appliedAt
+  //   ? format(new Date(app.appliedAt), "MMMM d, yyyy")
+  //   : null;
 
   // snapshot may contain Q&A saved by the bot
   const snapshotQA: Array<{ question: string; answer: string }> = Array.isArray(
