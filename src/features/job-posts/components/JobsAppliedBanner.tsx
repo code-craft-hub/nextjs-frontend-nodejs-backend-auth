@@ -1,9 +1,24 @@
 import { RunsBellPopover } from "./RunsBellPopover";
+import type { ActiveRun } from "../types/apply-session.types";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import RecommendationPreferences from "@/features/jobs/components/JobPreferenceCustomization";
 
 export default function JobsAppliedBanner({
   appliedSize,
+  runs,
+  onOpenRun,
+  onDismissRun,
 }: {
   appliedSize: number;
+  runs: ActiveRun[];
+  onOpenRun: (runId: string) => void;
+  onDismissRun: (runId: string) => void;
 }) {
   return (
     <div className="w-full">
@@ -27,34 +42,48 @@ export default function JobsAppliedBanner({
           </div>
 
           {/* Notification button */}
-          <RunsBellPopover />
+          <RunsBellPopover
+            runs={runs}
+            onOpenRun={onOpenRun}
+            onDismissRun={onDismissRun}
+          />
         </div>
 
-        {/* Filter icon */}
-        <button
-          className="flex items-center justify-center"
-          aria-label="Filters"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="black"
-            strokeWidth="1.8"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="size-8"
-          >
-            <line x1="4" y1="6" x2="20" y2="6" />
-            <circle cx="15" cy="6" r="2" fill="white" />
+        {/* Filter icon — opens recommendation preferences dialog */}
+        <Dialog>
+          <DialogTrigger asChild>
+            <button
+              className="flex items-center justify-center"
+              aria-label="Filters"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="black"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="size-8"
+              >
+                <line x1="4" y1="6" x2="20" y2="6" />
+                <circle cx="15" cy="6" r="2" fill="white" />
 
-            <line x1="4" y1="12" x2="20" y2="12" />
-            <circle cx="9" cy="12" r="2" fill="white" />
+                <line x1="4" y1="12" x2="20" y2="12" />
+                <circle cx="9" cy="12" r="2" fill="white" />
 
-            <line x1="4" y1="18" x2="20" y2="18" />
-            <circle cx="14" cy="18" r="2" fill="white" />
-          </svg>
-        </button>
+                <line x1="4" y1="18" x2="20" y2="18" />
+                <circle cx="14" cy="18" r="2" fill="white" />
+              </svg>
+            </button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-xl p-0 overflow-y-auto max-h-[90svh]">
+            <DialogHeader className="sr-only">
+              <DialogTitle>Recommendation Preferences</DialogTitle>
+            </DialogHeader>
+            <RecommendationPreferences />
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

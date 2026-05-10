@@ -20,7 +20,6 @@ import { JobDeckView } from "@/features/job-posts/components/JobDeckView";
 import { useRunManager } from "@/features/job-posts/hooks/useRunManager";
 import { useApplyOrchestrator } from "@/features/job-posts/hooks/useApplyOrchestrator";
 import { useDeckApply } from "@/features/job-posts/hooks/useDeckApply";
-import RecommendationPreferences from "@/features/jobs/components/JobPreferenceCustomization";
 
 export type ViewType = "deck" | "list";
 export const HomeClient = memo(
@@ -35,7 +34,7 @@ export const HomeClient = memo(
     const filters: JobFilters = { page: 1, limit: 20 };
     const autoApplyFilters: JobFilters = { page: 1, limit: 30 };
 
-    const { enqueueJob } = useRunManager();
+    const { enqueueJob, runs, openRunModal, dismissRun } = useRunManager();
     const { extState } = useApplyOrchestrator({ enqueueJob });
     const handleDeckApply = useDeckApply({ enqueueJob, extState });
 
@@ -87,6 +86,9 @@ export const HomeClient = memo(
               <JobDeckView
                 onApply={handleDeckApply}
                 handleViewChange={handleViewChange}
+                runs={runs}
+                onOpenRun={openRunModal}
+                onDismissRun={dismissRun}
               />
             ) : (
               <>
@@ -103,7 +105,6 @@ export const HomeClient = memo(
             )}
           </Tabs>
         </div>
-        <RecommendationPreferences />
         <InsufficientCreditsModal />
         <AuthorizeGoogle hidden={true} />
         <NoResumeAlertDialog />

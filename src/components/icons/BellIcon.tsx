@@ -19,7 +19,7 @@ export default function BellIcon({ className = "" }: { className?: string }) {
       <path
         d="M5.83105 14.9062C6.00205 15.6503 6.37905 16.3082 6.90305 16.7762C7.42705 17.2462 8.06905 17.5002 8.72905 17.5002C9.38905 17.5002 10.0311 17.2463 10.5551 16.7773C11.0791 16.3073 11.4551 15.6503 11.6271 14.9062"
         stroke="black"
-        stroke-linecap="round"
+        strokeLinecap="round"
       />
     </svg>
   );

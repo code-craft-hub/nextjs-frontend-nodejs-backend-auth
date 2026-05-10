@@ -15,6 +15,7 @@ import { resumeApi } from "@/features/resume/api/resume.api";
 import { autoApplyApi } from "@/features/auto-apply/api/auto-apply.api";
 import { aiSettingsQueries } from "@/features/ai-settings/queries/ai-settings.queries";
 import { buildPreviewUrl } from "@/lib/utils/ai-apply-navigation";
+import type { ActiveRun } from "../types/apply-session.types";
 export type ViewType = "deck" | "list";
 
 interface JobDeckViewProps {
@@ -22,6 +23,9 @@ interface JobDeckViewProps {
   onApply: (job: JobPost) => void;
   /** Called when the user switches between deck and list views. */
   handleViewChange: (value: ViewType) => void;
+  runs: Map<string, ActiveRun>;
+  onOpenRun: (runId: string) => void;
+  onDismissRun: (runId: string) => void;
 }
 
 function toJobRow(rec: JobRecommendation): JobPost & {
@@ -274,7 +278,7 @@ function JobDeckCard({ job, stackIndex, onSkip, onApply, isApplying }: JobDeckCa
   );
 }
 
-export function JobDeckView({ onApply, handleViewChange }: JobDeckViewProps) {
+export function JobDeckView({ onApply, handleViewChange, runs, onOpenRun, onDismissRun }: JobDeckViewProps) {
   const router = useRouter();
   const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useInfiniteQuery({
@@ -497,17 +501,13 @@ export function JobDeckView({ onApply, handleViewChange }: JobDeckViewProps) {
         <GeneratingBanner message={generatingMessage} />
       )}
       {/* Stats bar */}
-      <JobsAppliedBanner appliedSize={appliedIds.size} />
-      {/* <div className="flex items-center gap-3 text-sm text-gray-500">
-        <span>
-          <strong className="text-green-600">{appliedIds.size}</strong> applied
-        </span>
-        <span className="text-gray-300">·</span>
-        <span>
-          <strong>{deck.length}</strong> remaining
-        </span>
-      </div> */}
-
+      <JobsAppliedBanner
+        appliedSize={appliedIds.size}
+        runs={[...runs.values()]}
+        onOpenRun={onOpenRun}
+        onDismissRun={onDismissRun}
+      />
+     
       {/* Card stack */}
       <div className="relative w-full max-w-245" style={{ height: 600 }}>
         {[...visibleCards].reverse().map((job, reversedIdx) => {

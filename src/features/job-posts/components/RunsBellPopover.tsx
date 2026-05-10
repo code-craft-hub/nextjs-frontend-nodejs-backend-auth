@@ -346,7 +346,7 @@ export function RunsBellPopover({
   const containerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
-  const activeBadgeCount = runs.filter((r) =>
+  const activeBadgeCount = runs?.filter((r) =>
     [
       "queued",
       "loading",
