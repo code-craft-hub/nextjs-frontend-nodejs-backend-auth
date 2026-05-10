@@ -21,19 +21,97 @@ export default function JobsTable({
 }) {
   const router = useRouter();
   const toggleBookmark = useToggleBookmarkByJobMutation();
-  const updateJobs = useUpdateJobMutation();
+  const { applyToJob } = useApplyJob();
+  const { mutate: resumeApplication } = useResumeBrowserApplicationMutation();
 
-  const {
-    sessions,
-    extState,
-    qaJobId,
-    apply,
-    resume,
-    viewQA,
-    dismissQA,
-    focusExtTab,
-    handleEmailApply,
-  } = orchestrator;
+  // jobId → flat BotSession (same shape as reference)
+  const [botSessions, setBotSessions] = useState<Record<string, BotSession>>({});
+  // jobId whose QA drawer is open
+  const [qaJobId, setQaJobId] = useState<string | null>(null);
+  // jobs hidden after manual / email apply
+
+  // Stable patch — used by BotPoller onUpdate
+  const patchSession = useCallback((jobId: string, patch: Partial<BotSession>) => {
+    setBotSessions((prev) =>
+      prev[jobId] ? { ...prev, [jobId]: { ...prev[jobId], ...patch } } : prev,
+    );
+  }, []);
+
+  // ── Called BEFORE the API request → shows spinner immediately ──
+  const handleBotStarting = useCallback((jobId: string) => {
+    setBotSessions((prev) => ({
+      ...prev,
+      [jobId]: { applicationId: "", liveUrl: "", status: "starting" },
+    }));
+  }, []);
+
+  // ── Called AFTER API returns → transitions to "running", poller mounts ──
+  const handleBotStarted = useCallback(
+    (jobId: string, applicationId: string, liveUrl: string) => {
+      if (!applicationId) {
+        // API failed — clear the starting state
+        setBotSessions((prev) => {
+          const next = { ...prev };
+          delete next[jobId];
+          return next;
+        });
+        return;
+      }
+      setBotSessions((prev) => ({
+        ...prev,
+        [jobId]: { applicationId, liveUrl, status: "running" },
+      }));
+    },
+    [],
+  );
+
+  const handleApply = useCallback(
+    (job: JobPost, e?: React.MouseEvent) =>
+      {   window.open(
+        job?.applyUrl ?? job.link ?? "",
+        "_blank",
+        "noopener,noreferrer",
+      );
+      return;},
+    [applyToJob, handleBotStarting, handleBotStarted],
+  );
+
+  const handleResume = useCallback(
+    (applicationId: string) => {
+      resumeApplication(
+        { jobApplicationId: applicationId },
+        {
+          onSuccess: () => {
+            setBotSessions((prev) => {
+              const entry = Object.entries(prev).find(
+                ([, s]) => s.applicationId === applicationId,
+              );
+              if (!entry) return prev;
+              return { ...prev, [entry[0]]: { ...entry[1], status: "resuming" } };
+            });
+          },
+        },
+      );
+    },
+    [resumeApplication],
+  );
+
+  const handleEmailApply = useCallback(
+    (recruiterEmail: string) => {
+      applyToJob({ id: "", emailApply: recruiterEmail });
+    },
+    [applyToJob],
+  );
+
+  // Only open SSE for sessions that have an applicationId and are not terminal
+  const activePollers = Object.entries(botSessions).filter(
+    ([, s]) =>
+      s.applicationId &&
+      s.status !== "completed" &&
+      s.status !== "failed" &&
+      s.status !== "recruiter_email_found" &&
+      s.status !== "starting",
+  );
 
   const qaSession = qaJobId ? sessions[qaJobId] : null;
   const qaJob = qaJobId ? allJobs.find((j) => j.id === qaJobId) : null;
