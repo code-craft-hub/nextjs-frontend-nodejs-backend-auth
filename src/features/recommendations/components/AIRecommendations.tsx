@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useEffect, useMemo } from "react";
+import { ReactNode, useEffect, useMemo, useState } from "react";
 import {
   useInfiniteQuery,
   useMutation,
@@ -28,6 +28,17 @@ import { JobsTable } from "@/features/jobs/components/JobsTable";
 import { LoadMoreButton } from "@/features/jobs/components/LoadMoreButton";
 import MobileOverview from "@/features/job-posts/components/MobileOverview";
 import { JobPost } from "@/features/job-posts";
+import { JobDeckView } from "@/features/job-posts/components/JobDeckView";
+import { useRunManager } from "@/features/job-posts/hooks/useRunManager";
+import { useDeckApply } from "@/features/job-posts/hooks/useDeckApply";
+import { useApplyOrchestrator } from "@/features/job-posts/hooks/useApplyOrchestrator";
+import { ViewType } from "@/features/dashboard/components/Home";
+
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -156,8 +167,9 @@ export const AIRecommendations = ({ children }: { children?: ReactNode }) => {
   // ── Flatten pages → job rows ─────────────────────────────────────────────
   const allJobs = useMemo(
     () =>
-      data?.pages.flatMap((page) => (page as any)?.data?.recommendations.map(toJobRow)) ??
-      [],
+      data?.pages.flatMap((page) =>
+        (page as any)?.data?.recommendations.map(toJobRow),
+      ) ?? [],
     [data],
   );
 
@@ -173,14 +185,32 @@ export const AIRecommendations = ({ children }: { children?: ReactNode }) => {
   const hasNoResults =
     !isLoading && !isPipelineActive && !isIncomplete && !hasRecommendations;
 
+  const [isDeckView, setIsDeckView] = useState(true);
+  const { enqueueJob, runs, openRunModal, dismissRun } = useRunManager();
+  const { extState } = useApplyOrchestrator({ enqueueJob });
+
+  const handleDeckApply = useDeckApply({ enqueueJob, extState });
+  const handleViewChange = (value: ViewType) => {
+    setIsDeckView(value === "deck");
+  };
+
   // ── Render ───────────────────────────────────────────────────────────────
   return (
     <div className="font-inter grid grid-cols-1 w-full overflow-hidden gap-4 xl:gap-8">
       <div className="space-y-4 w-full">
-        <h1 className="text-3xl text-center mb-4 font-medium font-inter">
-          AI Recommendations
-        </h1>
-
+        <Tooltip>
+          <TooltipTrigger
+            className="w-full"
+            onClick={() => {
+              setIsDeckView(!isDeckView);
+            }}
+          >
+            <p className="text-3xl text-center mb-4 font-medium font-inter">
+              AI Recommendations{" "}
+            </p>
+          </TooltipTrigger>
+          <TooltipContent>Click to swipe</TooltipContent>
+        </Tooltip>
         {children}
 
         {/* Status banners */}
@@ -191,78 +221,89 @@ export const AIRecommendations = ({ children }: { children?: ReactNode }) => {
           <IncompleteProfileBanner missingFields={missingFields} />
         )}
 
-        <div className="w-full flex flex-col gap-6">
-          {/* Desktop table */}
-          <JobsTable
-            table={table}
-            isLoading={isLoading}
-            hasNoResults={hasNoResults}
-            skeletonCount={8}
-            onRowClick={(row) => {
-              const job = row.original as any & {
-                id?: string;
-                title?: string;
-              };
-              router.push(
-                `/dashboard/jobs/${job.id}?referrer=ai-recommendations&title=${encodeURIComponent(job.title ?? "")}`,
-              );
-            }}
+        {isDeckView ? (
+          <JobDeckView
+            onApply={handleDeckApply}
+            handleViewChange={handleViewChange}
+            runs={runs}
+            onOpenRun={openRunModal}
+            onDismissRun={dismissRun}
+            extState={extState}
           />
+        ) : (
+          <div className="w-full flex flex-col gap-6">
+            {/* Desktop table */}
+            <JobsTable
+              table={table}
+              isLoading={isLoading}
+              hasNoResults={hasNoResults}
+              skeletonCount={8}
+              onRowClick={(row) => {
+                const job = row.original as any & {
+                  id?: string;
+                  title?: string;
+                };
+                router.push(
+                  `/dashboard/jobs/${job.id}?referrer=ai-recommendations&title=${encodeURIComponent(job.title ?? "")}`,
+                );
+              }}
+            />
 
-          {/* Mobile list */}
-          <MobileOverview
-            allJobs={allJobs}
-            updateJobs={updateJobs}
-            handleApply={handleApply}
-            referrer="ai-recommendations"
-          />
+            {/* Mobile list */}
+            <MobileOverview
+              allJobs={allJobs}
+              updateJobs={updateJobs}
+              handleApply={handleApply}
+              referrer="ai-recommendations"
+            />
 
-          {/* Pagination */}
-          <LoadMoreButton
-            hasNextPage={hasNextPage ?? false}
-            isFetchingNextPage={isFetchingNextPage}
-            onLoadMore={() => fetchNextPage()}
-            label="Load more"
-          />
+            {/* Pagination */}
+            <LoadMoreButton
+              hasNextPage={hasNextPage ?? false}
+              isFetchingNextPage={isFetchingNextPage}
+              onLoadMore={() => fetchNextPage()}
+              label="Load more"
+            />
 
-          {/* Recommend more — idle pipeline, recs exist */}
-          {pipelineStatus === "ready" && hasRecommendations && (
-            <div className="flex flex-col items-center gap-2 pt-4">
-              {totalCount > 0 && (
-                <p className="text-xs text-muted-foreground">
-                  {totalCount} recommendation
-                  {totalCount !== 1 ? "s" : ""} saved
-                </p>
-              )}
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={
-                  generateMoreMutation.isPending || isGenerating || isFetching
-                }
-                onClick={() => generateMoreMutation.mutate()}
-                className="gap-2"
-              >
-                {generateMoreMutation.isPending || isGenerating ? (
-                  <>
-                    <Loader2 className="size-4 animate-spin" />
-                    Finding more jobs…
-                  </>
-                ) : (
-                  <>
-                    <RefreshCw className="size-4" />
-                    Recommend more jobs
-                  </>
+            {/* Recommend more — idle pipeline, recs exist */}
+            {pipelineStatus === "ready" && hasRecommendations && (
+              <div className="flex flex-col items-center gap-2 pt-4">
+                {totalCount > 0 && (
+                  <p className="text-xs text-muted-foreground">
+                    {totalCount} recommendation
+                    {totalCount !== 1 ? "s" : ""} saved
+                  </p>
                 )}
-              </Button>
-              {generateMoreMutation.isError && (
-                <p className="text-xs text-destructive">
-                  Failed to queue generation. Please try again.
-                </p>
-              )}
-            </div>
-          )}
-        </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={
+                    generateMoreMutation.isPending || isGenerating || isFetching
+                  }
+                  onClick={() => generateMoreMutation.mutate()}
+                  className="gap-2"
+                >
+                  {generateMoreMutation.isPending || isGenerating ? (
+                    <>
+                      <Loader2 className="size-4 animate-spin" />
+                      Finding more jobs…
+                    </>
+                  ) : (
+                    <>
+                      <RefreshCw className="size-4" />
+                      Recommend more jobs
+                    </>
+                  )}
+                </Button>
+                {generateMoreMutation.isError && (
+                  <p className="text-xs text-destructive">
+                    Failed to queue generation. Please try again.
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

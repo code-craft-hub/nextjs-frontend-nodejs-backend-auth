@@ -34,8 +34,8 @@ import type { ActiveRun, RunLogEntry } from "../types/apply-session.types";
 import type { ExtensionState } from "../hooks/useExtension";
 export type ViewType = "deck" | "list";
 
-const CWS_URL =
-  "https://chrome.google.com/webstore/detail/cverai-auto-apply/EXTENSION_ID_PLACEHOLDER";
+// const CWS_URL =
+//   "https://chrome.google.com/webstore/detail/cverai-auto-apply/EXTENSION_ID_PLACEHOLDER";
 
 interface JobDeckViewProps {
   /** Called when the user swipes/taps Apply on a card. */
@@ -551,13 +551,13 @@ export function JobDeckView({
       toast("Install the cverai extension to auto-apply on external sites.", {
         description:
           "Our bot will fill and submit the application on your behalf — no manual work needed.",
-        action: {
-          label: "Get extension",
-          onClick: () => window.open(CWS_URL, "_blank"),
-        },
-        duration: 8000,
+        // action: {
+        //   label: "Get extension",
+        //   onClick: () => window.open(CWS_URL, "_blank"),
+        // },
+        // duration: 8000,
       });
-      return;
+      // return;
     }
 
     setSwipeDir("right");

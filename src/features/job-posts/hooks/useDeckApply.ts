@@ -53,7 +53,10 @@ export function useDeckApply({
         enqueueJob(job, profile);
       } else {
         const url = job.applyUrl ?? job.link;
-        if (url) window.open(url, "_blank", "noopener,noreferrer");
+        if (url) {
+          const w = window.open(url, "_blank");
+          if (w) { w.blur(); window.focus(); }
+        }
       }
     },
     [extState, user, defaultResumeFileUrl, enqueueJob],
