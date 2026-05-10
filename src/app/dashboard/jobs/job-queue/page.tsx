@@ -104,7 +104,7 @@ function ApprovalRow({ app, selected, onSelect }: RowProps) {
 
       {/* Job title */}
       <div className="flex flex-col gap-1 min-w-0">
-        <span className="text-[15px] font-semibold text-black truncate">
+        <span className="text-[15px] font-semibold text-black truncate capitalize">
           {title}
         </span>
         {subtitle && (
@@ -192,10 +192,9 @@ export default function ApprovalQueue() {
           </p>
         </div>
 
-        {selected.size > 0 && (
           <div className="flex items-center gap-4 mt-8">
             <Button className="h-[44px] px-8 rounded-md bg-[#3b82f6] hover:bg-[#3b82f6]/90 text-white text-[16px] font-medium shadow-none">
-              Approve selected ({selected.size})
+              Approve all 
             </Button>
             <Button
               variant="outline"
@@ -204,7 +203,7 @@ export default function ApprovalQueue() {
               Decline selected
             </Button>
           </div>
-        )}
+      
       </div>
 
       {/* States */}

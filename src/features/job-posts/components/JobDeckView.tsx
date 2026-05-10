@@ -30,7 +30,7 @@ import {
 } from "@/shared/query/query-invalidation";
 import { invalidateUserQueries } from "@features/user";
 import { queryKeys } from "@/shared/query/keys";
-import type { ActiveRun } from "../types/apply-session.types";
+import type { ActiveRun, RunLogEntry } from "../types/apply-session.types";
 import type { ExtensionState } from "../hooks/useExtension";
 export type ViewType = "deck" | "list";
 
@@ -362,6 +362,27 @@ export function JobDeckView({
   const [skippedIds, setSkippedIds] = useState<Set<string>>(new Set());
   const [swipeDir, setSwipeDir] = useState<SwipeDir>(null);
 
+  // Local tracker for in-progress email apply runs — merged into the bell popover
+  const [emailRuns, setEmailRuns] = useState<Map<string, ActiveRun>>(new Map());
+
+  const patchEmailRun = useCallback((id: string, patch: Partial<ActiveRun>) => {
+    setEmailRuns((prev) => {
+      const next = new Map(prev);
+      const existing = next.get(id);
+      if (!existing) return prev;
+      next.set(id, { ...existing, ...patch });
+      return next;
+    });
+  }, []);
+
+  const removeEmailRun = useCallback((id: string) => {
+    setEmailRuns((prev) => {
+      const next = new Map(prev);
+      next.delete(id);
+      return next;
+    });
+  }, []);
+
   const deck = allJobs.filter(
     (j) => !appliedIds.has(j.id) && !skippedIds.has(j.id),
   );
@@ -378,6 +399,27 @@ export function JobDeckView({
         (job as any).descriptionText ?? (job as any).companyText ?? "";
       const recruiterEmail = (job as any).emailApply ?? "";
       const jobId = job.id;
+      const runId = `email-${job.id}-${Date.now()}`;
+
+      // Register in the bell immediately so the user sees it while it runs
+      const log: RunLogEntry[] = [
+        { t: Date.now(), level: "info", text: "Generating cover letter and resume…" },
+      ];
+      setEmailRuns((prev) => {
+        const next = new Map(prev);
+        next.set(runId, {
+          id: runId,
+          job: {
+            id: job.id,
+            title: (job as any).title ?? "Job",
+            company: (job as any).companyName ?? (job as any).company ?? "",
+          },
+          status: "running",
+          createdAt: Date.now(),
+          log,
+        });
+        return next;
+      });
 
       const run = async () => {
         let coverLetterId: string;
@@ -407,6 +449,13 @@ export function JobDeckView({
           resumeId = (resumeResponse as any).data.id;
         }
 
+        patchEmailRun(runId, {
+          log: [
+            ...log,
+            { t: Date.now(), level: "action", text: "Sending email application…" },
+          ],
+        });
+
         const autoApplyResponse = await autoApplyApi.create({
           id: crypto.randomUUID(),
           resumeId,
@@ -430,10 +479,23 @@ export function JobDeckView({
           jobId,
         });
 
+        // Mark bell entry as done, then auto-dismiss after 6 s
+        patchEmailRun(runId, {
+          status: "complete",
+          log: [
+            ...log,
+            {
+              t: Date.now(),
+              level: "action",
+              text: recruiterEmail
+                ? `Application sent to ${recruiterEmail}`
+                : "Application sent!",
+            },
+          ],
+        });
+        setTimeout(() => removeEmailRun(runId), 6000);
+
         await Promise.all([
-          // Invalidate recommendations so the sent job (now status='sent' on server)
-          // is excluded from future fetches. Safe: sort order is deterministic
-          // (matchScore DESC) and appliedIds already keeps the card hidden locally.
           queryClient.invalidateQueries({ queryKey: queryKeys.recommendations.user() }),
           invalidateEmailApplicationQueries(queryClient),
           invalidateResumeQueries(queryClient),
@@ -443,15 +505,24 @@ export function JobDeckView({
         ]);
       };
 
-      toast.promise(run(), {
-        loading: "Sending your application…",
-        success: recruiterEmail
-          ? `Application sent to ${recruiterEmail}`
-          : "Application sent!",
-        error: "Failed to send application. Please try again.",
-      });
+      toast.promise(
+        run().catch((err) => {
+          patchEmailRun(runId, {
+            status: "error",
+            blockedMessage: "Failed to send. Please try again.",
+          });
+          throw err;
+        }),
+        {
+          loading: "Sending your application…",
+          success: recruiterEmail
+            ? `Application sent to ${recruiterEmail}`
+            : "Application sent!",
+          error: "Failed to send application. Please try again.",
+        },
+      );
     },
-    [useMasterCv, settings, queryClient],
+    [useMasterCv, settings, queryClient, patchEmailRun, removeEmailRun],
   );
 
   const handleApply = useCallback(() => {
@@ -512,6 +583,25 @@ export function JobDeckView({
     setSkippedIds(new Set());
     setSwipeDir(null);
   }, []);
+
+  const handleOpenRun = useCallback(
+    (runId: string) => {
+      if (emailRuns.has(runId)) return; // email runs have no drawer to open
+      onOpenRun(runId);
+    },
+    [emailRuns, onOpenRun],
+  );
+
+  const handleDismissRun = useCallback(
+    (runId: string) => {
+      if (emailRuns.has(runId)) {
+        removeEmailRun(runId);
+      } else {
+        onDismissRun(runId);
+      }
+    },
+    [emailRuns, removeEmailRun, onDismissRun],
+  );
 
   // ── Loading skeleton ────────────────────────────────────────────────────
   if (isLoading) {
@@ -608,9 +698,9 @@ export function JobDeckView({
       {/* Stats bar */}
       <JobsAppliedBanner
         appliedSize={appliedIds.size}
-        runs={[...runs.values()]}
-        onOpenRun={onOpenRun}
-        onDismissRun={onDismissRun}
+        runs={[...runs.values(), ...emailRuns.values()]}
+        onOpenRun={handleOpenRun}
+        onDismissRun={handleDismissRun}
       />
 
       {/* Card stack — CSS grid stacking: all cards share [grid-area:1/1] so the
