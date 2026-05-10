@@ -1,8 +1,7 @@
 "use client";
 import JobsAppliedBanner from "./JobsAppliedBanner";
 import { useState, useCallback, useEffect, useMemo } from "react";
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
+import { useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { JobPost } from "@/features/job-posts";
 import { Card } from "@/components/ui/card";
@@ -21,10 +20,21 @@ import type { JobRecommendation } from "@/features/recommendations/api/recommend
 import { coverLetterApi } from "@/features/cover-letter/api/cover-letter.api";
 import { resumeApi } from "@/features/resume/api/resume.api";
 import { autoApplyApi } from "@/features/auto-apply/api/auto-apply.api";
+import { emailApplicationApi } from "@/features/email-application/api/email-application.api";
 import { aiSettingsQueries } from "@/features/ai-settings/queries/ai-settings.queries";
-import { buildPreviewUrl } from "@/lib/utils/ai-apply-navigation";
+import { invalidateEmailApplicationQueries } from "@/features/email-application/queries/email-application.invalidation";
+import {
+  invalidateResumeQueries,
+  invalidateCoverLetterQueries,
+  invalidateAIApplyQueries,
+} from "@/shared/query/query-invalidation";
+import { invalidateUserQueries } from "@features/user";
 import type { ActiveRun } from "../types/apply-session.types";
+import type { ExtensionState } from "../hooks/useExtension";
 export type ViewType = "deck" | "list";
+
+const CWS_URL =
+  "https://chrome.google.com/webstore/detail/cverai-auto-apply/EXTENSION_ID_PLACEHOLDER";
 
 interface JobDeckViewProps {
   /** Called when the user swipes/taps Apply on a card. */
@@ -34,6 +44,7 @@ interface JobDeckViewProps {
   runs: Map<string, ActiveRun>;
   onOpenRun: (runId: string) => void;
   onDismissRun: (runId: string) => void;
+  extState: ExtensionState;
 }
 
 function toJobRow(rec: JobRecommendation): JobPost & {
@@ -124,7 +135,6 @@ interface JobDeckCardProps {
   stackIndex: 0 | 1 | 2;
   onSkip: () => void;
   onApply: () => void;
-  isApplying?: boolean;
 }
 
 function JobDeckCard({
@@ -132,12 +142,14 @@ function JobDeckCard({
   stackIndex,
   onSkip,
   onApply,
-  isApplying,
 }: JobDeckCardProps) {
   const scale = stackIndex === 0 ? 1 : stackIndex === 1 ? 0.96 : 0.92;
   const translateY = stackIndex === 0 ? 0 : stackIndex === 1 ? 12 : 24;
   const opacity = stackIndex === 0 ? 1 : stackIndex === 1 ? 0.85 : 0.7;
   const zIndex = 3 - stackIndex;
+
+  // pointer-events only on the top card so back cards don't intercept clicks
+  const pointerEvents = stackIndex === 0 ? "auto" : "none";
 
   const salaryLabel =
     job.salary ??
@@ -162,11 +174,12 @@ function JobDeckCard({
 
   return (
     <div
-      className="absolute inset-0 transition-all duration-300"
+      className="transition-all duration-300"
       style={{
         transform: `scale(${scale}) translateY(${translateY}px)`,
         opacity,
         zIndex,
+        pointerEvents,
       }}
     >
       <Card className="relative w-full rounded-[40px] bg-white shadow-2xl border-0 p-4 lg:p-8 max-w-2xl">
@@ -286,8 +299,7 @@ function JobDeckCard({
             <div className="flex flex-col items-center gap-6">
               <button
                 onClick={onSkip}
-                disabled={isApplying}
-                className="size-20 rounded-full bg-white shadow-[0px_18px_40px_rgba(0,0,0,0.12)] flex items-center justify-center active:scale-95 transition-transform disabled:opacity-40 disabled:cursor-not-allowed"
+                className="size-20 rounded-full bg-white shadow-[0px_18px_40px_rgba(0,0,0,0.12)] flex items-center justify-center active:scale-95 transition-transform"
                 aria-label="Skip"
               >
                 <X className="size-10 text-[#ef4444]" strokeWidth={3} />
@@ -298,25 +310,12 @@ function JobDeckCard({
             <div className="flex flex-col items-center gap-6">
               <button
                 onClick={onApply}
-                disabled={isApplying}
-                className="size-20 rounded-full bg-white shadow-[0px_18px_40px_rgba(0,0,0,0.12)] flex items-center justify-center active:scale-95 transition-transform disabled:opacity-40 disabled:cursor-not-allowed"
+                className="size-20 rounded-full bg-white shadow-[0px_18px_40px_rgba(0,0,0,0.12)] flex items-center justify-center active:scale-95 transition-transform"
                 aria-label="Auto Apply"
               >
                 <Check className="size-10 text-[#22c55e]" strokeWidth={3} />
               </button>
               <div className="text-xl font-black text-black">Auto-Apply</div>
-            </div>
-          </div>
-        )}
-
-        {/* Email-apply generation loading overlay */}
-        {isApplying && (
-          <div className="absolute inset-0 flex items-center justify-center bg-white/85 rounded-[40px] z-10">
-            <div className="flex flex-col items-center gap-3">
-              <Loader2 className="size-9 animate-spin text-blue-600" />
-              <p className="text-sm font-semibold text-gray-700">
-                Generating your application…
-              </p>
             </div>
           </div>
         )}
@@ -331,8 +330,8 @@ export function JobDeckView({
   runs,
   onOpenRun,
   onDismissRun,
+  extState,
 }: JobDeckViewProps) {
-  const router = useRouter();
   const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useInfiniteQuery({
       ...recommendationsQueries.userRecommendations(),
@@ -356,10 +355,11 @@ export function JobDeckView({
     [data],
   );
 
+  const queryClient = useQueryClient();
+
   const [appliedIds, setAppliedIds] = useState<Set<string>>(new Set());
   const [skippedIds, setSkippedIds] = useState<Set<string>>(new Set());
   const [swipeDir, setSwipeDir] = useState<SwipeDir>(null);
-  const [emailApplyingId, setEmailApplyingId] = useState<string | null>(null);
 
   const deck = allJobs.filter(
     (j) => !appliedIds.has(j.id) && !skippedIds.has(j.id),
@@ -372,17 +372,15 @@ export function JobDeckView({
   }, [deck.length, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const handleEmailApply = useCallback(
-    async (job: JobPost) => {
-      setEmailApplyingId(job.id);
-      try {
-        const jobDescription =
-          (job as any).descriptionText ?? (job as any).companyText ?? "";
-        const recruiterEmail = (job as any).emailApply ?? "";
-        const jobId = job.id;
+    (job: JobPost) => {
+      const jobDescription =
+        (job as any).descriptionText ?? (job as any).companyText ?? "";
+      const recruiterEmail = (job as any).emailApply ?? "";
+      const jobId = job.id;
 
+      const run = async () => {
         let coverLetterId: string;
         let resumeId: string;
-
         let coverLetterTitle = "Auto Apply";
 
         if (useMasterCv) {
@@ -422,30 +420,66 @@ export function JobDeckView({
 
         const autoApplyId = (autoApplyResponse as any)?.data?.id;
 
-        const previewUrl = buildPreviewUrl(
+        await emailApplicationApi.sendApplication({
           autoApplyId,
           coverLetterId,
           resumeId,
           recruiterEmail,
-          useMasterCv ? { masterCvId: settings!.masterCvId! } : undefined,
-        );
+          jobDescription,
+        });
 
-        setAppliedIds((prev) => new Set([...prev, job.id]));
-        router.push(previewUrl);
-      } catch {
-        toast.error("Failed to generate application. Please try again.");
-        setEmailApplyingId(null);
-      }
+        await Promise.all([
+          invalidateEmailApplicationQueries(queryClient),
+          invalidateResumeQueries(queryClient),
+          invalidateCoverLetterQueries(queryClient),
+          invalidateAIApplyQueries(queryClient),
+          invalidateUserQueries(queryClient),
+        ]);
+      };
+
+      toast.promise(run(), {
+        loading: "Sending your application…",
+        success: recruiterEmail
+          ? `Application sent to ${recruiterEmail}`
+          : "Application sent!",
+        error: "Failed to send application. Please try again.",
+      });
     },
-    [useMasterCv, settings, router],
+    [useMasterCv, settings, queryClient],
   );
 
   const handleApply = useCallback(() => {
     const top = deck[0];
-    if (!top || emailApplyingId) return;
+    if (!top) return;
 
     if ((top as any).emailApply) {
+      // Email-apply: always allowed, fires in background
+      setSwipeDir("right");
       handleEmailApply(top);
+      setTimeout(() => {
+        setAppliedIds((prev) => new Set([...prev, top.id]));
+        setSwipeDir(null);
+      }, 360);
+      return;
+    }
+
+    // External-apply: requires the cverai Chrome extension
+    if (extState === "not_capable") {
+      toast.info(
+        "Auto-apply via browser extension requires Chrome or Edge on desktop.",
+      );
+      return;
+    }
+    if (extState !== "installed") {
+      toast("Install the cverai extension to auto-apply on external sites.", {
+        description:
+          "Our bot will fill and submit the application on your behalf — no manual work needed.",
+        action: {
+          label: "Get extension",
+          onClick: () => window.open(CWS_URL, "_blank"),
+        },
+        duration: 8000,
+      });
       return;
     }
 
@@ -455,17 +489,17 @@ export function JobDeckView({
       setAppliedIds((prev) => new Set([...prev, top.id]));
       setSwipeDir(null);
     }, 360);
-  }, [deck, onApply, emailApplyingId, handleEmailApply]);
+  }, [deck, onApply, handleEmailApply, extState]);
 
   const handleSkip = useCallback(() => {
     const top = deck[0];
-    if (!top || emailApplyingId) return;
+    if (!top) return;
     setSwipeDir("left");
     setTimeout(() => {
       setSkippedIds((prev) => new Set([...prev, top.id]));
       setSwipeDir(null);
     }, 360);
-  }, [deck, emailApplyingId]);
+  }, [deck]);
 
   const handleReset = useCallback(() => {
     setAppliedIds(new Set());
@@ -573,8 +607,10 @@ export function JobDeckView({
         onDismissRun={onDismissRun}
       />
 
-      {/* Card stack */}
-      <div className="relative w-full max-w-245" style={{ height: 600 }}>
+      {/* Card stack — CSS grid stacking: all cards share [grid-area:1/1] so the
+           container height matches the top card's content on every screen size.
+           pb-8 absorbs the 24px translateY peek of back cards. */}
+      <div className="grid w-full max-w-245 pb-8">
         {[...visibleCards].reverse().map((job, reversedIdx) => {
           const stackIndex = (visibleCards.length - 1 - reversedIdx) as
             | 0
@@ -585,7 +621,7 @@ export function JobDeckView({
             <div
               key={job.id}
               className={[
-                "absolute inset-0 transition-all duration-300",
+                "[grid-area:1/1] transition-all duration-300",
                 isTop ? topSwipeClass : "",
               ].join(" ")}
             >
@@ -594,7 +630,6 @@ export function JobDeckView({
                 stackIndex={stackIndex}
                 onSkip={handleSkip}
                 onApply={handleApply}
-                isApplying={isTop && emailApplyingId === job.id}
               />
             </div>
           );

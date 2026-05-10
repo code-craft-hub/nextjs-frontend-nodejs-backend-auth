@@ -89,6 +89,7 @@ export const HomeClient = memo(
                 runs={runs}
                 onOpenRun={openRunModal}
                 onDismissRun={dismissRun}
+                extState={extState}
               />
             ) : (
               <>
