@@ -13,6 +13,12 @@ export interface CreateCoverLetterData {
   company?: string;
 }
 
+export interface GenerateCoverLetterData {
+  jobDescription: string;
+  recruiterEmail?: string;
+  jobId?: string;
+}
+
 export interface UpdateCoverLetterData {
   title?: string;
   content?: string;
@@ -57,6 +63,9 @@ export const coverLetterApi = {
 
   generateCoverLetter: (data: CreateCoverLetterData, token?: string) =>
     api.post<CoverLetter>(`/cover-letters/stream`, data, { token }),
+
+  generateCoverLetterSync: (data: GenerateCoverLetterData, token?: string) =>
+    api.post<{ success: boolean; data: CoverLetter }>(`/cover-letters/generate`, data, { token }),
 
   // Update cover letter
   updateCoverLetter: (id: string, data: UpdateCoverLetterData, token?: string) =>

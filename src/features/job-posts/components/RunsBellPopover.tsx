@@ -6,48 +6,72 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import type { ActiveRun, RunLogEntry, RunBatchQuestion } from "../types/apply-session.types";
+import type {
+  ActiveRun,
+  RunLogEntry,
+  RunBatchQuestion,
+} from "../types/apply-session.types";
 import { useRouter } from "next/navigation";
+import BellIcon from "@/components/icons/BellIcon";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function prettyStatus(s: string): string {
   switch (s) {
-    case "queued":                return "In queue";
-    case "loading":               return "Starting";
-    case "running":               return "Processing";
+    case "queued":
+      return "In queue";
+    case "loading":
+      return "Starting";
+    case "running":
+      return "Processing";
     case "awaiting_user_input":
     case "awaiting_submit_approval":
-    case "blocked":               return "Attention";
+    case "blocked":
+      return "Attention";
     case "submitted":
-    case "complete":              return "Applied";
-    case "stopped":               return "Stopped";
-    case "error":                 return "Error";
-    default:                      return "Queued";
+    case "complete":
+      return "Applied";
+    case "stopped":
+      return "Stopped";
+    case "error":
+      return "Error";
+    default:
+      return "Queued";
   }
 }
 
 function statusLabel(s: string): string {
   switch (s) {
-    case "queued":                              return "In queue";
-    case "loading":                             return "Starting…";
-    case "running":                             return "Processing...";
-    case "awaiting_user_input":                 return "Needs answers";
-    case "awaiting_submit_approval":            return "Ready to submit";
-    case "blocked":                             return "Attention needed";
-    case "submitted": case "complete":          return "Applied";
-    case "stopped":                             return "Stopped";
-    case "error":                               return "Error";
-    default:                                    return "Queued";
+    case "queued":
+      return "In queue";
+    case "loading":
+      return "Starting…";
+    case "running":
+      return "Processing...";
+    case "awaiting_user_input":
+      return "Needs answers";
+    case "awaiting_submit_approval":
+      return "Ready to submit";
+    case "blocked":
+      return "Attention needed";
+    case "submitted":
+    case "complete":
+      return "Applied";
+    case "stopped":
+      return "Stopped";
+    case "error":
+      return "Error";
+    default:
+      return "Queued";
   }
 }
 
 function statusPillClass(s: string): string {
   const key = prettyStatus(s);
-  if (key === "Applied")     return "bg-green-100 text-green-700";
-  if (key === "Processing")  return "bg-yellow-100 text-yellow-700";
-  if (key === "Attention")   return "bg-red-100 text-red-600";
-  if (key === "Error")       return "bg-red-100 text-red-600";
+  if (key === "Applied") return "bg-green-100 text-green-700";
+  if (key === "Processing") return "bg-yellow-100 text-yellow-700";
+  if (key === "Attention") return "bg-red-100 text-red-600";
+  if (key === "Error") return "bg-red-100 text-red-600";
   return "bg-gray-200 text-gray-600";
 }
 
@@ -79,17 +103,11 @@ function sendAnswerBatch(runId: string, answers: Record<string, string>) {
 }
 
 function sendApproveSubmit(runId: string) {
-  window.postMessage(
-    { source: "cverai", type: "approve_submit", runId },
-    "*",
-  );
+  window.postMessage({ source: "cverai", type: "approve_submit", runId }, "*");
 }
 
 function sendStopRun(runId: string) {
-  window.postMessage(
-    { source: "cverai", type: "stop_run", runId },
-    "*",
-  );
+  window.postMessage({ source: "cverai", type: "stop_run", runId }, "*");
 }
 
 // ─── Batch-question panel (inline inside popover row) ─────────────────────────
@@ -154,9 +172,7 @@ function BatchQuestionsPanel({
           <label className="text-xs font-medium text-gray-700 block">
             {q.field_label ?? q.question}
           </label>
-          {q.why && (
-            <p className="text-xs text-gray-400 italic">{q.why}</p>
-          )}
+          {q.why && <p className="text-xs text-gray-400 italic">{q.why}</p>}
           <Textarea
             className="text-sm min-h-[60px] resize-none rounded-lg"
             placeholder="Your answer…"
@@ -274,7 +290,7 @@ function RunLogPanel({ run }: { run: ActiveRun }) {
 
   function levelColor(level: string) {
     if (level === "error") return "text-red-500";
-    if (level === "warn")  return "text-amber-500";
+    if (level === "warn") return "text-amber-500";
     if (level === "action") return "text-indigo-500";
     return "text-gray-500";
   }
@@ -297,7 +313,9 @@ function RunLogPanel({ run }: { run: ActiveRun }) {
                   second: "2-digit",
                 })}
               </span>
-              <span className={`break-words min-w-0 ${levelColor(entry.level)}`}>
+              <span
+                className={`break-words min-w-0 ${levelColor(entry.level)}`}
+              >
                 {entry.text}
               </span>
             </div>
@@ -329,16 +347,25 @@ export function RunsBellPopover({
   const router = useRouter();
 
   const activeBadgeCount = runs.filter((r) =>
-    ["queued", "loading", "running", "awaiting_user_input", "awaiting_submit_approval"].includes(r.status),
+    [
+      "queued",
+      "loading",
+      "running",
+      "awaiting_user_input",
+      "awaiting_submit_approval",
+    ].includes(r.status),
   ).length;
 
   const completedCount = runs.filter((r) =>
     ["submitted", "complete", "stopped", "error", "blocked"].includes(r.status),
   ).length;
-  const pct = runs.length === 0 ? 0 : Math.round((completedCount / runs.length) * 100);
+  const pct =
+    runs.length === 0 ? 0 : Math.round((completedCount / runs.length) * 100);
 
   const needsAttentionRuns = runs.filter(
-    (r) => r.status === "awaiting_user_input" || r.status === "awaiting_submit_approval",
+    (r) =>
+      r.status === "awaiting_user_input" ||
+      r.status === "awaiting_submit_approval",
   );
 
   const visibleRuns = showAll ? runs : runs.slice(0, 6);
@@ -363,7 +390,10 @@ export function RunsBellPopover({
   useEffect(() => {
     if (!open) return;
     const handler = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(e.target as Node)
+      ) {
         setOpen(false);
       }
     };
@@ -384,23 +414,11 @@ export function RunsBellPopover({
       {/* Bell button */}
       <button
         onClick={() => setOpen((v) => !v)}
-        className="relative flex items-center justify-center w-9 h-9 rounded-xl bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300 transition-colors shadow-sm"
+        className="relative flex items-center justify-center w-9 h-9 rounded-xl bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300 transition-colors shadow-sm size-10 "
         title={`${runs.length} auto-apply runs`}
         aria-label="Auto-apply runs"
       >
-        <svg
-          className="w-4 h-4"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth={2}
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-          />
-        </svg>
+        <BellIcon className="size-5" />
         {activeBadgeCount > 0 && (
           <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] bg-indigo-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1 leading-none">
             {activeBadgeCount}
@@ -435,13 +453,30 @@ export function RunsBellPopover({
                   {visibleRuns.map((run) => {
                     const title = run.job?.title ?? "Job";
                     const company = run.job?.company ?? "";
-                    const isActive = ["loading", "running", "awaiting_user_input"].includes(run.status);
-                    const liveAction = isActive && !run.blockedMessage ? lastInterestingAction(run) : null;
-                    const isAutoApply = run.openMode === "window" || run.openMode === "iframe";
+                    const isActive = [
+                      "loading",
+                      "running",
+                      "awaiting_user_input",
+                    ].includes(run.status);
+                    const liveAction =
+                      isActive && !run.blockedMessage
+                        ? lastInterestingAction(run)
+                        : null;
+                    const isAutoApply =
+                      run.openMode === "window" || run.openMode === "iframe";
                     const isPopupMode = run.openMode === "window";
-                    const isTerminal = ["submitted", "complete", "applied"].includes(run.status);
+                    const isTerminal = [
+                      "submitted",
+                      "complete",
+                      "applied",
+                    ].includes(run.status);
                     // Runs that are done but need the user to see why (error, blocked, stopped)
-                    const isDead = ["error", "blocked", "stopped", "max_turns"].includes(run.status);
+                    const isDead = [
+                      "error",
+                      "blocked",
+                      "stopped",
+                      "max_turns",
+                    ].includes(run.status);
                     const needsAttention =
                       run.status === "awaiting_user_input" ||
                       run.status === "awaiting_submit_approval";
@@ -454,16 +489,22 @@ export function RunsBellPopover({
                       <div
                         key={run.id}
                         className={`py-3.5 border-b last:border-none -mx-2 px-2 rounded-xl transition-colors ${
-                          needsAttention ? "bg-amber-50/60" : "hover:bg-gray-50 cursor-pointer"
+                          needsAttention
+                            ? "bg-amber-50/60"
+                            : "hover:bg-gray-50 cursor-pointer"
                         } group`}
                         onClick={() => {
                           if (needsAttention || expandsLogs) {
-                            setExpandedRunId((prev) => (prev === run.id ? null : run.id));
+                            setExpandedRunId((prev) =>
+                              prev === run.id ? null : run.id,
+                            );
                             return;
                           }
                           setOpen(false);
                           if (isTerminal && run.applicationId) {
-                            router.push(`/dashboard/jobs/${run.applicationId}/application-details`);
+                            router.push(
+                              `/dashboard/jobs/${run.applicationId}/application-details`,
+                            );
                           } else {
                             onOpenRun(run.id);
                           }
@@ -501,10 +542,14 @@ export function RunsBellPopover({
                                 )}
                               </div>
                               {liveAction && (
-                                <p className="text-xs text-gray-400 truncate mt-0.5">{liveAction}</p>
+                                <p className="text-xs text-gray-400 truncate mt-0.5">
+                                  {liveAction}
+                                </p>
                               )}
                               {run.blockedMessage && (
-                                <p className="text-xs text-red-400 truncate mt-0.5">{run.blockedMessage}</p>
+                                <p className="text-xs text-red-400 truncate mt-0.5">
+                                  {run.blockedMessage}
+                                </p>
                               )}
                               {needsAttention && !isExpanded && (
                                 <p className="text-xs text-amber-600 font-medium mt-0.5">
@@ -542,22 +587,24 @@ export function RunsBellPopover({
                         </div>
 
                         {/* Inline interaction panel */}
-                        {isExpanded && run.status === "awaiting_user_input" && run.pendingBatch && (
-                          <BatchQuestionsPanel
-                            run={run}
-                            onClose={() => setExpandedRunId(null)}
-                          />
-                        )}
-                        {isExpanded && run.status === "awaiting_submit_approval" && run.pendingSubmit && (
-                          <SubmitApprovalPanel
-                            run={run}
-                            onClose={() => setExpandedRunId(null)}
-                          />
-                        )}
+                        {isExpanded &&
+                          run.status === "awaiting_user_input" &&
+                          run.pendingBatch && (
+                            <BatchQuestionsPanel
+                              run={run}
+                              onClose={() => setExpandedRunId(null)}
+                            />
+                          )}
+                        {isExpanded &&
+                          run.status === "awaiting_submit_approval" &&
+                          run.pendingSubmit && (
+                            <SubmitApprovalPanel
+                              run={run}
+                              onClose={() => setExpandedRunId(null)}
+                            />
+                          )}
                         {/* Log panel for popup-mode dead runs — window is closed, show logs inline */}
-                        {isExpanded && expandsLogs && (
-                          <RunLogPanel run={run} />
-                        )}
+                        {isExpanded && expandsLogs && <RunLogPanel run={run} />}
                       </div>
                     );
                   })}

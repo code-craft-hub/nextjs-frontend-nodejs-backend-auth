@@ -24,6 +24,7 @@ import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { userQueries } from "@features/user";
 import WhatsappIcon from "./icons/whatsapp";
+import BellIcon from "./icons/BellIcon";
 // import AnalyticIcon from "./icons/analyticIcon";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -60,7 +61,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       // },
       {
         title: "Settings",
-        icon: SettingIcon,
+        icon: BellIcon,
         url: "/dashboard/settings",
         id: "onborda-settings-nav",
       },
