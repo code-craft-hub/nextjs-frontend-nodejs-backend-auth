@@ -26,13 +26,6 @@ export const HomeClient = memo(
   ({ tab, jobDescription }: { tab: DashboardTab; jobDescription: string }) => {
     const { data: user } = useQuery(userQueries.detail());
     const [isDeckView, setIsDeckView] = useState(true);
-    const [query, setQuery] = useState<string | undefined>(undefined);
-    const [localizedTo, setLocalizedTo] = useState<string | undefined>(
-      undefined,
-    );
-    const [classification, setClassification] = useState<string | undefined>(
-      undefined,
-    );
 
     const handleViewChange = (value: ViewType) => {
       setIsDeckView(value === "deck");
@@ -91,9 +84,6 @@ export const HomeClient = memo(
             </TabsList>
             {isDeckView ? (
               <JobDeckView
-                query={query}
-                localizedTo={localizedTo}
-                classification={classification}
                 onApply={handleDeckApply}
                 handleViewChange={handleViewChange}
               />
