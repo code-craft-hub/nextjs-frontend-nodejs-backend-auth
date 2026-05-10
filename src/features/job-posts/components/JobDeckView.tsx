@@ -29,6 +29,7 @@ import {
   invalidateAIApplyQueries,
 } from "@/shared/query/query-invalidation";
 import { invalidateUserQueries } from "@features/user";
+import { queryKeys } from "@/shared/query/keys";
 import type { ActiveRun } from "../types/apply-session.types";
 import type { ExtensionState } from "../hooks/useExtension";
 export type ViewType = "deck" | "list";
@@ -426,9 +427,14 @@ export function JobDeckView({
           resumeId,
           recruiterEmail,
           jobDescription,
+          jobId,
         });
 
         await Promise.all([
+          // Invalidate recommendations so the sent job (now status='sent' on server)
+          // is excluded from future fetches. Safe: sort order is deterministic
+          // (matchScore DESC) and appliedIds already keeps the card hidden locally.
+          queryClient.invalidateQueries({ queryKey: queryKeys.recommendations.user() }),
           invalidateEmailApplicationQueries(queryClient),
           invalidateResumeQueries(queryClient),
           invalidateCoverLetterQueries(queryClient),

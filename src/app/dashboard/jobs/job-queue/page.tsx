@@ -77,7 +77,7 @@ function ApprovalRow({ app, selected, onSelect }: RowProps) {
   return (
     <Link
       href={`/dashboard/jobs/${app.id}/application-details`}
-      className="grid grid-cols-[60px_1.6fr_1.2fr_1.3fr_1fr] items-center h-[92px] border-b border-[#eeeeee] bg-white px-5 hover:bg-gray-50 transition-colors"
+      className="grid grid-cols-[60px_1.6fr_1.2fr_1.3fr_1fr] items-center h-23 border-b border-[#eeeeee] bg-white px-5 hover:bg-gray-50 transition-colors"
       onClick={(e) => {
         // prevent navigation when clicking the checkbox
         if ((e.target as HTMLElement).closest("[data-checkbox]")) {

@@ -9,6 +9,7 @@ export interface SendEmailApplicationPayload {
   resumeId: string;
   recruiterEmail: string;
   jobDescription: string;
+  jobId?: string;
 }
 
 export interface SendEmailApplicationResponse {

@@ -10,16 +10,15 @@ import { JobList } from "@/features/job-posts";
 import { JobSearchForm } from "@/features/job-posts/components/JobSearchForm";
 import { useSidebar } from "@/components/ui/sidebar";
 import LeftMenu from "./LeftMenu";
-import { JobDeckView } from "./JobDeckView";
-import { RunsBellPopover } from "./RunsBellPopover";
 import { RunModal } from "./RunModal";
 import { IframeStage } from "./IframeStage";
 import { useRunManager } from "../hooks/useRunManager";
-import { buildExtensionProfile, useApplyOrchestrator } from "../hooks/useApplyOrchestrator";
-import { useDeckApply } from "../hooks/useDeckApply";
+import {
+  buildExtensionProfile,
+  useApplyOrchestrator,
+} from "../hooks/useApplyOrchestrator";
 import { resumeApi } from "@/features/resume/api/resume.api";
 import { queryKeys } from "@/shared/query/keys";
-import type { ActiveRun } from "../types/apply-session.types";
 
 // Canonical country names — must match the scraper's localizedTo values exactly.
 const SUPPORTED_COUNTRIES = [
@@ -50,7 +49,6 @@ export default function Overview() {
     undefined,
   );
   const [countryInitialized, setCountryInitialized] = useState(false);
-  const [isDeckView, setIsDeckView] = useState(false);
 
   const { data: user } = useQuery(userQueries.detail());
 
@@ -101,15 +99,12 @@ export default function Overview() {
 
   const {
     runs,
-    queue,
     modalRunId,
     iframeStageRef,
     enqueueJob,
-    dequeueJob,
     openRunModal,
     closeRunModal,
     repositionIframe,
-    dismissRun,
     stopRun,
   } = useRunManager();
 
@@ -117,12 +112,14 @@ export default function Overview() {
   // Pass enqueueJob so the extension strategy routes through the serial queue
   // instead of spawning multiple simultaneous iframes/windows.
   const orchestrator = useApplyOrchestrator({ enqueueJob });
-  const { extState } = orchestrator;
 
   // ── Sync profile to DOM so content-trigger.js can attach it ──────────────
   useEffect(() => {
     if (!user) return;
-    const profile = { ...buildExtensionProfile(user), cv_url: defaultResumeFileUrl };
+    const profile = {
+      ...buildExtensionProfile(user),
+      cv_url: defaultResumeFileUrl,
+    };
     try {
       document.body.dataset.cverProfile = JSON.stringify(profile);
     } catch {
@@ -133,9 +130,6 @@ export default function Overview() {
     };
   }, [user, defaultResumeFileUrl]);
 
-  // ── Deck apply handler ────────────────────────────────────────────────────
-  const handleDeckApply = useDeckApply({ enqueueJob, extState });
-
   // ── Enhanced orchestrator for the list view ──────────────────────────────
   // Override focusExtTab so that when the agent is stuck in iframe mode the
   // "Help bot finish →" button opens the run modal rather than trying to
@@ -143,7 +137,9 @@ export default function Overview() {
   const enhancedOrchestrator = {
     ...orchestrator,
     focusExtTab: (jobId: string) => {
-      const iframeRun = Array.from(runs.values()).find((r) => r.job?.id === jobId);
+      const iframeRun = Array.from(runs.values()).find(
+        (r) => r.job?.id === jobId,
+      );
       if (iframeRun) {
         openRunModal(iframeRun.id);
       } else {
@@ -152,61 +148,8 @@ export default function Overview() {
     },
   };
 
-  // ── Active runs for bell popover ─────────────────────────────────────────
-  // Merges: active/terminal extension runs + queued-but-not-started jobs
-  // + cloud bot sessions. Each source is deduplicated by job ID.
-  const activeRuns = useMemo<ActiveRun[]>(() => {
-    const extRuns = Array.from(runs.values());
-    const extJobIds = new Set(extRuns.map((r) => r.job?.id).filter(Boolean));
-
-    // Jobs waiting in the serial queue — shown as "In queue" in the bell.
-    // Filtered to exclude any job that's already in extRuns (already started).
-    const queueRuns: ActiveRun[] = queue
-      .filter((item) => !extJobIds.has(item.id))
-      .map((item, index) => ({
-        id: item.id,
-        job: { id: item.id, title: item.job.title ?? "Job", company: item.job.company ?? "" },
-        status: "queued",
-        openMode: "iframe" as const,
-        log: [{ t: item.queuedAt, level: "info" as const, text: `Position ${index + 1} in queue` }],
-        createdAt: item.queuedAt,
-      }));
-
-    const allExtJobIds = new Set([...extJobIds, ...queueRuns.map((q) => q.id)]);
-
-    // Cloud bot sessions not already tracked by an extension run or queue item.
-    const sessionRuns: ActiveRun[] = Object.values(orchestrator.sessions)
-      .filter((s) => !["applied", "failed", "skipped", "recruiter_email"].includes(s.status))
-      .filter((s) => !allExtJobIds.has(s.jobId))
-      .map((s) => ({
-        id: s.jobId,
-        job: { id: s.jobId, title: s.jobTitle ?? "Job", company: s.jobCompany ?? "" },
-        jobUrl: s.liveUrl ?? undefined,
-        status: (() => {
-          switch (s.status) {
-            case "routing":
-            case "cloud:starting":
-            case "ext:queued":    return "loading";
-            case "cloud:running":
-            case "cloud:resuming":
-            case "ext:navigating":
-            case "ext:analyzing":
-            case "ext:filling":   return "running";
-            case "ext:reviewing":
-            case "cloud:paused":  return "awaiting_user_input";
-            default:              return "running";
-          }
-        })(),
-        openMode: s.strategy === "extension" ? "window" : undefined,
-        applicationId: s.applicationId ?? null,
-        log: [],
-      }));
-
-    return [...extRuns, ...queueRuns, ...sessionRuns];
-  }, [runs, queue, orchestrator.sessions]);
-
   // ── Modal run ─────────────────────────────────────────────────────────────
-  const modalRun = modalRunId ? runs.get(modalRunId) ?? null : null;
+  const modalRun = modalRunId ? (runs.get(modalRunId) ?? null) : null;
 
   const { open } = useSidebar();
 
@@ -228,82 +171,14 @@ export default function Overview() {
               onClassificationChange={handleClassificationChange}
             />
           </div>
-
-          <div className="flex items-center gap-2 shrink-0 pb-0.5">
-            {/* View toggle */}
-            <div className="flex items-center rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
-              <button
-                onClick={() => setIsDeckView(false)}
-                className={cn(
-                  "px-3 py-1.5 text-xs font-medium transition-colors",
-                  !isDeckView
-                    ? "bg-indigo-600 text-white"
-                    : "text-gray-500 hover:text-gray-700 hover:bg-gray-50",
-                )}
-                title="Table view"
-              >
-                ≡ List
-              </button>
-              <button
-                onClick={() => setIsDeckView(true)}
-                className={cn(
-                  "px-3 py-1.5 text-xs font-medium transition-colors",
-                  isDeckView
-                    ? "bg-indigo-600 text-white"
-                    : "text-gray-500 hover:text-gray-700 hover:bg-gray-50",
-                )}
-                title="Deck / swipe view"
-              >
-                ☰ Deck
-              </button>
-            </div>
-
-            {/* Bell popover — shows both extension runs and cloud bot sessions */}
-            <RunsBellPopover
-              runs={activeRuns}
-              onOpenRun={(runId) => {
-                // Extension runs have a real UUID runId in the runs map;
-                // cloud bot session entries use jobId as id — open live URL.
-                if (runs.has(runId)) {
-                  openRunModal(runId);
-                } else {
-                  const session = orchestrator.sessions[runId];
-                  if (session?.liveUrl) window.open(session.liveUrl, "_blank", "noopener,noreferrer");
-                }
-              }}
-              onDismissRun={(runId) => {
-                if (runs.has(runId)) {
-                  const run = runs.get(runId);
-                  dismissRun(runId);
-                  if (run?.job?.id) orchestrator.dismissSession(run.job.id);
-                } else if (queue.some((q) => q.id === runId)) {
-                  // Job is still waiting — remove it from the queue.
-                  dequeueJob(runId);
-                  orchestrator.dismissSession(runId);
-                } else {
-                  orchestrator.dismissSession(runId);
-                }
-              }}
-            />
-          </div>
         </div>
 
-        {/* Main content */}
-        {isDeckView ? (
-          <JobDeckView
-            query={query}
-            localizedTo={localizedTo}
-            classification={classification}
-            onApply={handleDeckApply}
-          />
-        ) : (
-          <JobList
-            query={query}
-            localizedTo={localizedTo}
-            classification={classification}
-            orchestrator={enhancedOrchestrator}
-          />
-        )}
+        <JobList
+          query={query}
+          localizedTo={localizedTo}
+          classification={classification}
+          orchestrator={enhancedOrchestrator}
+        />
       </div>
 
       {/* Hidden iframe stage — iframes appended here imperatively by useRunManager */}
