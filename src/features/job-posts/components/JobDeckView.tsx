@@ -1,10 +1,11 @@
 "use client";
-
+import JobsAppliedBanner from "./JobsAppliedBanner";
 import { useState, useCallback, useEffect } from "react";
 import { useInfiniteJobs } from "../queries/job-posts.query";
 import type { JobPost } from "@/features/job-posts";
 import { Card } from "@/components/ui/card";
 import { Clock, ExternalLink, MapPin, X, Check } from "lucide-react";
+
 
 interface JobDeckViewProps {
   query?: string;
@@ -63,16 +64,16 @@ function JobDeckCard({ job, stackIndex, onSkip, onApply }: JobDeckCardProps) {
       className="absolute inset-0 transition-all duration-300"
       style={{ transform: `scale(${scale}) translateY(${translateY}px)`, opacity, zIndex }}
     >
-      <Card className="w-full rounded-[60px] bg-white shadow-2xl border-0 px-17.5 pt-13.75 pb-17.5">
+      <Card className="w-full rounded-[40px] bg-white shadow-2xl border-0 p-4 lg:p-8 max-w-2xl">
         {/* Header */}
         <div className="flex items-start justify-between">
-          <h1 className="text-2xl capitalize leading-[1.05] font-bold font-poppins">
+          <h1 className="text-xl capitalize leading-[1.05] font-bold font-poppins">
             {job.title}
           </h1>
 
           <div className="flex ml-8 items-center gap-2 pt-3">
-            <div className="flex items-center gap-2 text-[#7a7a7a] font-medium text-[30px]">
-              <Clock className="w-6 h-6" strokeWidth={2} />
+            <div className="flex items-center gap-2 text-[#7a7a7a] font-medium text-xl">
+              <Clock className="size-6" strokeWidth={2} />
               <span>{timeAgo(job.postedAt ?? job.createdAt)}</span>
             </div>
 
@@ -84,7 +85,7 @@ function JobDeckCard({ job, stackIndex, onSkip, onApply }: JobDeckCardProps) {
                 onClick={(e) => e.stopPropagation()}
               >
                 <ExternalLink
-                  className="w-6 h-6 text-[#7a7a7a]"
+                  className="size-6 text-[#7a7a7a]"
                   strokeWidth={2}
                 />
               </a>
@@ -98,7 +99,7 @@ function JobDeckCard({ job, stackIndex, onSkip, onApply }: JobDeckCardProps) {
         </div>
 
         {/* Pills */}
-        <div className="mt flex items-center gap-6 flex-wrap">
+        <div className=" flex items-center gap-6 flex-wrap">
           {salaryLabel && (
             <div className="rounded-full bg-[#f2f2f2] px-4 py-2 text-md font-semibold text-black">
               {salaryLabel}
@@ -152,16 +153,16 @@ function JobDeckCard({ job, stackIndex, onSkip, onApply }: JobDeckCardProps) {
         </div>
 
         {/* Description */}
-        <div className="mt-4">
-          <div className="text-[#9a9a9a] text-2xl font-medium">
+        <div className="mt-2">
+          <div className="text-[#9a9a9a] text-lg font-medium">
             Description
           </div>
 
-          <p className="mt-4 text-xl leading-[1.8] text-[#2b2b2b] font-medium max-w-215">
+          <p className="mt-2  text-[#2b2b2b] font-medium max-w-215">
             {preview}
           </p>
 
-          <button className="mt-4 text-xl font-semibold text-[#2f6df6]">
+          <button className="mt-2 font-semibold text-[#2f6df6]">
             See full description
           </button>
         </div>
@@ -172,23 +173,23 @@ function JobDeckCard({ job, stackIndex, onSkip, onApply }: JobDeckCardProps) {
             <div className="flex flex-col items-center gap-6">
               <button
                 onClick={onSkip}
-                className="size-30 rounded-full bg-white shadow-[0px_18px_40px_rgba(0,0,0,0.12)] flex items-center justify-center active:scale-95 transition-transform"
+                className="size-20 rounded-full bg-white shadow-[0px_18px_40px_rgba(0,0,0,0.12)] flex items-center justify-center active:scale-95 transition-transform"
                 aria-label="Skip"
               >
-                <X className="w-13.5 h-13.5 text-[#ef4444]" strokeWidth={3} />
+                <X className="size-10 text-[#ef4444]" strokeWidth={3} />
               </button>
-              <div className="text-2xl font-black text-black">Ignore</div>
+              <div className="text-xl font-black text-black">Ignore</div>
             </div>
 
             <div className="flex flex-col items-center gap-6">
               <button
                 onClick={onApply}
-                className="size-30 rounded-full bg-white shadow-[0px_18px_40px_rgba(0,0,0,0.12)] flex items-center justify-center active:scale-95 transition-transform"
+                className="size-20 rounded-full bg-white shadow-[0px_18px_40px_rgba(0,0,0,0.12)] flex items-center justify-center active:scale-95 transition-transform"
                 aria-label="Auto Apply"
               >
-                <Check className="w-13.5 h-13.5 text-[#22c55e]" strokeWidth={3} />
+                <Check className="size-10 text-[#22c55e]" strokeWidth={3} />
               </button>
-              <div className="text-2xl font-black text-black">Auto-Apply</div>
+              <div className="text-xl font-black text-black">Auto-Apply</div>
             </div>
           </div>
         )}
@@ -322,9 +323,10 @@ export function JobDeckView({
         : "";
 
   return (
-    <div className="flex flex-col items-center gap-6 pt-2 pb-8">
+    <div className="max-w-2xl mx-auto flex flex-col gap-4 w-full">
       {/* Stats bar */}
-      <div className="flex items-center gap-3 text-sm text-gray-500">
+      <JobsAppliedBanner appliedSize={appliedIds.size} />
+      {/* <div className="flex items-center gap-3 text-sm text-gray-500">
         <span>
           <strong className="text-green-600">{appliedIds.size}</strong> applied
         </span>
@@ -332,7 +334,7 @@ export function JobDeckView({
         <span>
           <strong>{deck.length}</strong> remaining
         </span>
-      </div>
+      </div> */}
 
       {/* Card stack */}
       <div className="relative w-full max-w-245" style={{ height: 900 }}>
