@@ -169,8 +169,8 @@ function JobDeckCard({
   const descriptionText =
     job.descriptionText ?? job.companyText ?? "No description available.";
   const preview =
-    descriptionText.length > 500
-      ? descriptionText.slice(0, 500) + "...."
+    descriptionText.length > 300
+      ? descriptionText.slice(0, 300) + "...."
       : descriptionText;
 
   return (
@@ -183,7 +183,7 @@ function JobDeckCard({
         pointerEvents,
       }}
     >
-      <Card className="relative w-full rounded-[40px] bg-white shadow-2xl border-0 p-4 lg:p-8 max-w-2xl">
+      <Card className="relative w-full rounded-[40px] bg-white shadow-xl border-0 p-4 gap-2 sm:p-8 max-w-2xl">
         {/* Header */}
         <div className="flex items-start justify-between">
           <h1 className="text-xl capitalize  font-bold font-poppins">
@@ -220,39 +220,39 @@ function JobDeckCard({
         {/* Pills */}
         <div className=" flex items-center gap-2 flex-wrap">
           {salaryLabel && (
-            <div className="rounded-full bg-[#f2f2f2] px-4 py-2 text-md font-semibold text-black">
+            <div className="rounded-full bg-[#f2f2f2] px-3 py-2 text-2xs font-semibold text-black">
               {salaryLabel}
             </div>
           )}
           {job.location && (
-            <div className="rounded-full bg-[#f2f2f2] px-4 py-2 text-md font-semibold text-black">
+            <div className="rounded-full bg-[#f2f2f2] px-3 py-2 text-2xs font-semibold text-black">
               {job.location}
             </div>
           )}
           {job.emailApply ? (
-            <div className="rounded-full bg-[#f2f2f2] px-4 py-2 text-md font-semibold text-black">
+            <div className="rounded-full bg-[#f2f2f2] px-3 py-2 text-2xs font-semibold text-black">
               Email Apply
             </div>
           ) : (
-            <div className="rounded-full bg-[#f2f2f2] px-4 py-2 text-md font-semibold text-black">
+            <div className="rounded-full bg-[#f2f2f2] px-3 py-2 text-2xs font-semibold text-black">
               External Apply
             </div>
           )}
           {job.employmentType && (
-            <div className="rounded-full bg-[#f2f2f2] px-4 py-2 text-md font-semibold text-black">
+            <div className="rounded-full bg-[#f2f2f2] px-3 py-2 text-2xs font-semibold text-black">
               {job.employmentType}
             </div>
           )}
           {job.jobType && !job.employmentType && (
-            <div className="rounded-full bg-[#f2f2f2] px-10 py-5 text-md font-semibold text-black">
+            <div className="rounded-full bg-[#f2f2f2] px-3 py-2 text-2xs font-semibold text-black">
               {job.jobType}
             </div>
           )}
         </div>
 
         {/* Company */}
-        <div className=" flex items-center gap-7">
-          <div className="w-19.5 h-19.5 rounded-full overflow-hidden bg-gray-200 shrink-0">
+        <div className=" flex items-center gap-3 my-2">
+          <div className="size-14 rounded-full overflow-hidden bg-gray-200 shrink-0">
             {(job.companyLogo ?? job.companyIcon) ? (
               <img
                 src={job.companyLogo ?? job.companyIcon ?? ""}
@@ -260,7 +260,7 @@ function JobDeckCard({
                 className="w-full h-full object-cover"
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-xl font-black text-gray-400">
+              <div className="w-full h-full flex items-center justify-center text-md font-black text-gray-400">
                 {(job.companyName ?? job.company ?? "?")[0]}
               </div>
             )}
@@ -272,51 +272,51 @@ function JobDeckCard({
             </div>
 
             {job.location && (
-              <div className="mt-3 flex items-center gap-3 text-[#8a8a8a] text-md font-medium">
-                <MapPin className="size-5" strokeWidth={2} />
-                <span>{job.location}</span>
+              <div className="mt- flex items-center gap-1 text-[#8a8a8a] text-md font-medium">
+                <MapPin className="size-3" strokeWidth={2} />
+                <span className="text-xs">{job.location}</span>
               </div>
             )}
           </div>
         </div>
 
         {/* Description */}
-        <div className="mt-2">
-          <div className="text-[#9a9a9a] text-lg font-medium">Description</div>
+        <div className="mb-1">
+          <div className="text-[#9a9a9a] text-md font-medium">Description</div>
 
           <div
-            className="mt-2 text-[#2b2b2b] font-medium max-w-215 [&_strong]:font-bold [&_br]:block [&_p]:mt-1"
+            className=" text-[#2b2b2b] text-xs max-w-215 [&_strong]:font-bold [&_br]:block [&_p]:mt-1"
             dangerouslySetInnerHTML={{ __html: decodeHtml(preview) }}
           />
 
-          <button className="mt-2 font-semibold text-[#2f6df6]">
+          <button className="mt-2 text-xs font-semibold text-[#2f6df6]">
             See full description
           </button>
         </div>
 
         {/* Actions — only interactive on the top card */}
         {stackIndex === 0 && (
-          <div className="mt-8 flex items-end justify-between px-15">
-            <div className="flex flex-col items-center gap-6">
+          <div className="mt-2 flex items-end justify-between px-15">
+            <div className="flex flex-col items-center gap-3">
               <button
                 onClick={onSkip}
-                className="size-20 rounded-full bg-white shadow-[0px_18px_40px_rgba(0,0,0,0.12)] flex items-center justify-center active:scale-95 transition-transform"
+                className="size-16 rounded-full bg-white shadow-[0px_18px_40px_rgba(0,0,0,0.12)] flex items-center justify-center active:scale-95 transition-transform"
                 aria-label="Skip"
               >
-                <X className="size-10 text-[#ef4444]" strokeWidth={3} />
+                <X className="size-8 text-[#ef4444]" strokeWidth={3} />
               </button>
-              <div className="text-xl font-black text-black">Ignore</div>
+              <div className="text-sm font-black text-black">Ignore</div>
             </div>
 
-            <div className="flex flex-col items-center gap-6">
+            <div className="flex flex-col items-center gap-3">
               <button
                 onClick={onApply}
-                className="size-20 rounded-full bg-white shadow-[0px_18px_40px_rgba(0,0,0,0.12)] flex items-center justify-center active:scale-95 transition-transform"
+                className="size-16 rounded-full bg-white shadow-[0px_18px_40px_rgba(0,0,0,0.12)] flex items-center justify-center active:scale-95 transition-transform"
                 aria-label="Auto Apply"
               >
-                <Check className="size-10 text-[#22c55e]" strokeWidth={3} />
+                <Check className="size-8 text-[#22c55e]" strokeWidth={3} />
               </button>
-              <div className="text-xl font-black text-black">Auto-Apply</div>
+              <div className="text-sm font-black text-black">Auto-Apply</div>
             </div>
           </div>
         )}

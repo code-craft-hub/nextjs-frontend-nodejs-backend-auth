@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { jobPreferencesApi } from "@/features/job-preferences/api/job-preferences.api";
 import { jobPreferencesQueries, JOB_PREFERENCES_KEY } from "@/features/job-preferences/queries/job-preferences.queries";
 import type { JobPreferences } from "@/features/job-preferences/api/job-preferences.api.types";
+import { queryKeys } from "@/shared/query/keys";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -61,7 +62,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 export default function RecommendationPreferences() {
   const queryClient = useQueryClient();
-  const { data, isPending } = useQuery(jobPreferencesQueries.detail());
+  const { data } = useQuery(jobPreferencesQueries.detail());
 
   const [form, setForm] = useState<JobPreferences>(EMPTY);
   const [locationInput, setLocationInput] = useState("");
@@ -79,6 +80,7 @@ export default function RecommendationPreferences() {
     onSuccess: (res) => {
       if (res?.data) setForm(res.data);
       queryClient.invalidateQueries({ queryKey: JOB_PREFERENCES_KEY });
+      queryClient.invalidateQueries({ queryKey: queryKeys.recommendations.user() });
       toast.success("Preferences saved");
     },
     onError: () => toast.error("Failed to save preferences"),
@@ -89,6 +91,7 @@ export default function RecommendationPreferences() {
     onSuccess: () => {
       setForm(EMPTY);
       queryClient.invalidateQueries({ queryKey: JOB_PREFERENCES_KEY });
+      queryClient.invalidateQueries({ queryKey: queryKeys.recommendations.user() });
       toast.success("Preferences cleared");
     },
     onError: () => toast.error("Failed to clear preferences"),
@@ -123,14 +126,6 @@ export default function RecommendationPreferences() {
   // ── Render ─────────────────────────────────────────────────────────────────
 
   const isBusy = saveMutation.isPending || clearMutation.isPending;
-
-  if (isPending) {
-    return (
-      <div className="flex items-center justify-center p-12">
-        <Loader2 className="size-5 animate-spin text-gray-400" />
-      </div>
-    );
-  }
 
   return (
     <div className="p-4 bg-white">
