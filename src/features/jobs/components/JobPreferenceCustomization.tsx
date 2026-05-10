@@ -68,12 +68,29 @@ export default function RecommendationPreferences() {
   const [locationInput, setLocationInput] = useState("");
   const locationRef = useRef<HTMLInputElement>(null);
 
+  const isHydrated = useRef(false);
+  const skipNextKeywordEffect = useRef(false);
+  const formRef = useRef(form);
+  formRef.current = form;
+
   // Hydrate form from server data once loaded
   useEffect(() => {
-    if (data?.data) setForm(data.data);
+    if (data?.data) {
+      skipNextKeywordEffect.current = true;
+      setForm(data.data);
+      isHydrated.current = true;
+    }
   }, [data]);
 
   // ── Mutations ──────────────────────────────────────────────────────────────
+
+  // Silent auto-save: no toast, no form resync — only refreshes recommendations
+  const autoSaveMutation = useMutation({
+    mutationFn: (payload: JobPreferences) => jobPreferencesApi.save(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.recommendations.user() });
+    },
+  });
 
   const saveMutation = useMutation({
     mutationFn: (payload: JobPreferences) => jobPreferencesApi.save(payload),
@@ -97,6 +114,19 @@ export default function RecommendationPreferences() {
     onError: () => toast.error("Failed to clear preferences"),
   });
 
+  // Auto-save keywords 700ms after the user stops typing
+  useEffect(() => {
+    if (!isHydrated.current || skipNextKeywordEffect.current) {
+      skipNextKeywordEffect.current = false;
+      return;
+    }
+    const timer = setTimeout(() => {
+      autoSaveMutation.mutate(formRef.current);
+    }, 700);
+    return () => clearTimeout(timer);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form.keywords]);
+
   // ── Helpers ────────────────────────────────────────────────────────────────
 
   function toggleArr<T extends string>(arr: T[], value: T): T[] {
@@ -114,13 +144,17 @@ export default function RecommendationPreferences() {
   function addLocation() {
     const trimmed = locationInput.trim();
     if (!trimmed || form.preferredLocations.includes(trimmed)) return;
-    setForm((f) => ({ ...f, preferredLocations: [...f.preferredLocations, trimmed] }));
+    const newForm = { ...form, preferredLocations: [...form.preferredLocations, trimmed] };
+    setForm(newForm);
     setLocationInput("");
     locationRef.current?.focus();
+    autoSaveMutation.mutate(newForm);
   }
 
   function removeLocation(loc: string) {
-    setForm((f) => ({ ...f, preferredLocations: f.preferredLocations.filter((l) => l !== loc) }));
+    const newForm = { ...form, preferredLocations: form.preferredLocations.filter((l) => l !== loc) };
+    setForm(newForm);
+    autoSaveMutation.mutate(newForm);
   }
 
   // ── Render ─────────────────────────────────────────────────────────────────
