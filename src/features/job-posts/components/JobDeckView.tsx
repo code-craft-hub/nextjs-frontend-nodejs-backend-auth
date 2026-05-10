@@ -6,7 +6,15 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import type { JobPost } from "@/features/job-posts";
 import { Card } from "@/components/ui/card";
-import { Clock, ExternalLink, Loader2, MapPin, UserCircle, X, Check } from "lucide-react";
+import {
+  Clock,
+  ExternalLink,
+  Loader2,
+  MapPin,
+  UserCircle,
+  X,
+  Check,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import recommendationsQueries from "@/features/recommendations/queries/recommendations.queries";
 import type { JobRecommendation } from "@/features/recommendations/api/recommendations.api";
@@ -37,7 +45,8 @@ function toJobRow(rec: JobRecommendation): JobPost & {
   return {
     ...(job as JobPost),
     id: job.id ?? rec.id,
-    matchPercentage: rec.matchScore != null ? String(rec.matchScore) : undefined,
+    matchPercentage:
+      rec.matchScore != null ? String(rec.matchScore) : undefined,
     recommendationId: rec.id,
     rankPosition: rec.rankPosition,
   };
@@ -48,15 +57,25 @@ function GeneratingBanner({ message }: { message?: string }) {
     <div className="flex items-center gap-3 rounded-xl border border-blue-100 bg-blue-50 px-5 py-4 text-blue-700">
       <Loader2 className="size-4 shrink-0 animate-spin" />
       <p className="text-sm">
-        {message ?? "Finding the best job matches for you. New recommendations will appear shortly…"}
+        {message ??
+          "Finding the best job matches for you. New recommendations will appear shortly…"}
       </p>
     </div>
   );
 }
 
-function IncompleteProfileBanner({ missingFields }: { missingFields?: string[] }) {
-  const FIELD_LABELS: Record<string, string> = { job_title: "job title", skills: "skills" };
-  const missing = (missingFields ?? []).map((f) => FIELD_LABELS[f] ?? f).join(" and ");
+function IncompleteProfileBanner({
+  missingFields,
+}: {
+  missingFields?: string[];
+}) {
+  const FIELD_LABELS: Record<string, string> = {
+    job_title: "job title",
+    skills: "skills",
+  };
+  const missing = (missingFields ?? [])
+    .map((f) => FIELD_LABELS[f] ?? f)
+    .join(" and ");
   return (
     <div className="flex flex-col items-center gap-4 rounded-xl border border-orange-100 bg-orange-50 px-6 py-8 text-center text-orange-700">
       <UserCircle className="size-10 opacity-70" />
@@ -82,6 +101,16 @@ function IncompleteProfileBanner({ missingFields }: { missingFields?: string[] }
 
 type SwipeDir = "left" | "right" | null;
 
+function decodeHtml(html: string): string {
+  return html
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#039;/g, "'")
+    .replace(/&nbsp;/g, " ");
+}
+
 function timeAgo(dateStr: string): string {
   const diffMs = Date.now() - new Date(dateStr).getTime();
   const h = Math.floor(diffMs / 3_600_000);
@@ -98,7 +127,13 @@ interface JobDeckCardProps {
   isApplying?: boolean;
 }
 
-function JobDeckCard({ job, stackIndex, onSkip, onApply, isApplying }: JobDeckCardProps) {
+function JobDeckCard({
+  job,
+  stackIndex,
+  onSkip,
+  onApply,
+  isApplying,
+}: JobDeckCardProps) {
   const scale = stackIndex === 0 ? 1 : stackIndex === 1 ? 0.96 : 0.92;
   const translateY = stackIndex === 0 ? 0 : stackIndex === 1 ? 12 : 24;
   const opacity = stackIndex === 0 ? 1 : stackIndex === 1 ? 0.85 : 0.7;
@@ -121,8 +156,8 @@ function JobDeckCard({ job, stackIndex, onSkip, onApply, isApplying }: JobDeckCa
   const descriptionText =
     job.descriptionText ?? job.companyText ?? "No description available.";
   const preview =
-    descriptionText.length > 200
-      ? descriptionText.slice(0, 200) + "...."
+    descriptionText.length > 500
+      ? descriptionText.slice(0, 500) + "...."
       : descriptionText;
 
   return (
@@ -137,7 +172,7 @@ function JobDeckCard({ job, stackIndex, onSkip, onApply, isApplying }: JobDeckCa
       <Card className="relative w-full rounded-[40px] bg-white shadow-2xl border-0 p-4 lg:p-8 max-w-2xl">
         {/* Header */}
         <div className="flex items-start justify-between">
-          <h1 className="text-xl capitalize leading-[1.05] font-bold font-poppins">
+          <h1 className="text-xl capitalize  font-bold font-poppins">
             {job.title}
           </h1>
 
@@ -169,7 +204,7 @@ function JobDeckCard({ job, stackIndex, onSkip, onApply, isApplying }: JobDeckCa
         </div>
 
         {/* Pills */}
-        <div className=" flex items-center gap-6 flex-wrap">
+        <div className=" flex items-center gap-2 flex-wrap">
           {salaryLabel && (
             <div className="rounded-full bg-[#f2f2f2] px-4 py-2 text-md font-semibold text-black">
               {salaryLabel}
@@ -178,6 +213,15 @@ function JobDeckCard({ job, stackIndex, onSkip, onApply, isApplying }: JobDeckCa
           {job.location && (
             <div className="rounded-full bg-[#f2f2f2] px-4 py-2 text-md font-semibold text-black">
               {job.location}
+            </div>
+          )}
+          {job.emailApply ? (
+            <div className="rounded-full bg-[#f2f2f2] px-4 py-2 text-md font-semibold text-black">
+              Email Apply
+            </div>
+          ) : (
+            <div className="rounded-full bg-[#f2f2f2] px-4 py-2 text-md font-semibold text-black">
+              External Apply
             </div>
           )}
           {job.employmentType && (
@@ -209,7 +253,7 @@ function JobDeckCard({ job, stackIndex, onSkip, onApply, isApplying }: JobDeckCa
           </div>
 
           <div className="flex flex-col">
-            <div className="text-xl font-normal text-black leading-none">
+            <div className="text-xl font-semibold text-black leading-none">
               {job.companyName ?? job.company ?? "Unknown Company"}
             </div>
 
@@ -226,9 +270,10 @@ function JobDeckCard({ job, stackIndex, onSkip, onApply, isApplying }: JobDeckCa
         <div className="mt-2">
           <div className="text-[#9a9a9a] text-lg font-medium">Description</div>
 
-          <p className="mt-2  text-[#2b2b2b] font-medium max-w-215">
-            {preview}
-          </p>
+          <div
+            className="mt-2 text-[#2b2b2b] font-medium max-w-215 [&_strong]:font-bold [&_br]:block [&_p]:mt-1"
+            dangerouslySetInnerHTML={{ __html: decodeHtml(preview) }}
+          />
 
           <button className="mt-2 font-semibold text-[#2f6df6]">
             See full description
@@ -269,7 +314,9 @@ function JobDeckCard({ job, stackIndex, onSkip, onApply, isApplying }: JobDeckCa
           <div className="absolute inset-0 flex items-center justify-center bg-white/85 rounded-[40px] z-10">
             <div className="flex flex-col items-center gap-3">
               <Loader2 className="size-9 animate-spin text-blue-600" />
-              <p className="text-sm font-semibold text-gray-700">Generating your application…</p>
+              <p className="text-sm font-semibold text-gray-700">
+                Generating your application…
+              </p>
             </div>
           </div>
         )}
@@ -278,7 +325,13 @@ function JobDeckCard({ job, stackIndex, onSkip, onApply, isApplying }: JobDeckCa
   );
 }
 
-export function JobDeckView({ onApply, handleViewChange, runs, onOpenRun, onDismissRun }: JobDeckViewProps) {
+export function JobDeckView({
+  onApply,
+  handleViewChange,
+  runs,
+  onOpenRun,
+  onDismissRun,
+}: JobDeckViewProps) {
   const router = useRouter();
   const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useInfiniteQuery({
@@ -322,7 +375,8 @@ export function JobDeckView({ onApply, handleViewChange, runs, onOpenRun, onDism
     async (job: JobPost) => {
       setEmailApplyingId(job.id);
       try {
-        const jobDescription = (job as any).descriptionText ?? (job as any).companyText ?? "";
+        const jobDescription =
+          (job as any).descriptionText ?? (job as any).companyText ?? "";
         const recruiterEmail = (job as any).emailApply ?? "";
         const jobId = job.id;
 
@@ -342,7 +396,11 @@ export function JobDeckView({ onApply, handleViewChange, runs, onOpenRun, onDism
           resumeId = settings!.masterCvId!;
         } else {
           const [clResponse, resumeResponse] = await Promise.all([
-            coverLetterApi.generateCoverLetterSync({ jobDescription, recruiterEmail, jobId }),
+            coverLetterApi.generateCoverLetterSync({
+              jobDescription,
+              recruiterEmail,
+              jobId,
+            }),
             resumeApi.autoNewResume(jobDescription),
           ]);
           coverLetterId = (clResponse as any).data.id;
@@ -435,7 +493,12 @@ export function JobDeckView({ onApply, handleViewChange, runs, onOpenRun, onDism
   }
 
   // ── Pipeline active or generating — no recs yet ─────────────────────────
-  if ((pipelineStatus === "queued" || pipelineStatus === "processing" || isGenerating) && allJobs.length === 0) {
+  if (
+    (pipelineStatus === "queued" ||
+      pipelineStatus === "processing" ||
+      isGenerating) &&
+    allJobs.length === 0
+  ) {
     return (
       <div className="max-w-2xl mx-auto w-full py-12">
         <GeneratingBanner message={generatingMessage} />
@@ -497,7 +560,9 @@ export function JobDeckView({ onApply, handleViewChange, runs, onOpenRun, onDism
   return (
     <div className="max-w-2xl mx-auto flex flex-col gap-4 w-full">
       {/* Generating more — show inline banner while recs are already visible */}
-      {(isGenerating || pipelineStatus === "queued" || pipelineStatus === "processing") && (
+      {(isGenerating ||
+        pipelineStatus === "queued" ||
+        pipelineStatus === "processing") && (
         <GeneratingBanner message={generatingMessage} />
       )}
       {/* Stats bar */}
@@ -507,7 +572,7 @@ export function JobDeckView({ onApply, handleViewChange, runs, onOpenRun, onDism
         onOpenRun={onOpenRun}
         onDismissRun={onDismissRun}
       />
-     
+
       {/* Card stack */}
       <div className="relative w-full max-w-245" style={{ height: 600 }}>
         {[...visibleCards].reverse().map((job, reversedIdx) => {
