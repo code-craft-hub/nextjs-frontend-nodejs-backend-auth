@@ -256,7 +256,7 @@ function JobDeckCard({
             {job.title}
           </h1>
 
-          <div className="flex ml-8 items-center gap-2">
+          <div className="hidden sm:flex ml-8 items-center gap-2">
             <div className="flex items-center gap-2 text-[#7a7a7a] font-medium text-sm">
               <Clock className="size-4" strokeWidth={2} />
               <span>{timeAgo(job.postedAt ?? job.createdAt)}</span>

@@ -5,6 +5,14 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card } from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Loader2, AlertCircle } from "lucide-react";
 import Link from "next/link";
 import { jobApplicationsApi } from "@/features/analytics/api/job-applications.api";
@@ -88,71 +96,75 @@ function ApprovalRow({ app, selected, onSelect }: RowProps) {
     .join(" · ");
 
   return (
-    <Link
-      href={`/dashboard/jobs/${app.id}/application-details`}
-      className="grid grid-cols-[60px_1.6fr_1.2fr_1fr_1.3fr_1fr] items-center h-23 border-b border-[#eeeeee] bg-white px-5 hover:bg-gray-50 transition-colors"
+    <TableRow
+      className="cursor-pointer hover:bg-gray-50 transition-colors"
       onClick={(e) => {
-        // prevent navigation when clicking the checkbox
-        if ((e.target as HTMLElement).closest("[data-checkbox]")) {
-          e.preventDefault();
-        }
+        if ((e.target as HTMLElement).closest("[data-checkbox]")) return;
+        window.location.href = `/dashboard/jobs/${app.id}/application-details`;
       }}
     >
       {/* Checkbox */}
-      <div
-        className="flex items-center justify-center"
-        data-checkbox
-        onClick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          onSelect(app.id, !selected);
-        }}
-      >
-        <Checkbox
-          checked={selected}
-          className="h-[18px] w-[18px] rounded-[4px] border-[#c7c7c7]"
-          onCheckedChange={(v) => onSelect(app.id, !!v)}
-        />
-      </div>
+      <TableCell className="w-[52px]">
+        <div
+          className="flex items-center justify-center"
+          data-checkbox
+          onClick={(e) => {
+            e.stopPropagation();
+            onSelect(app.id, !selected);
+          }}
+        >
+          <Checkbox
+            checked={selected}
+            className="h-[18px] w-[18px] rounded-[4px] border-[#c7c7c7]"
+            onCheckedChange={(v) => onSelect(app.id, !!v)}
+          />
+        </div>
+      </TableCell>
 
       {/* Job title */}
-      <div className="flex flex-col gap-1 min-w-0">
-        <span className="text-[15px] font-semibold text-black truncate capitalize">
-          {title}
-        </span>
-        {subtitle && (
-          <span className="text-[13px] text-[#6b7280]">{subtitle}</span>
-        )}
-      </div>
+      <TableCell>
+        <div className="flex flex-col gap-0.5 min-w-0">
+          <Link
+            href={`/dashboard/jobs/${app.id}/application-details`}
+            className="text-[15px] font-semibold text-black truncate capitalize hover:underline max-w-xs"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {title}
+          </Link>
+          {subtitle && (
+            <span className="text-[13px] text-[#6b7280]">{subtitle}</span>
+          )}
+        </div>
+      </TableCell>
 
-      {/* Company */}
-      <div className="text-[15px] text-black font-normal truncate">
+      {/* Company — hidden on small screens */}
+      <TableCell className="text-[15px] text-black font-normal truncate max-w-[160px]">
         {company}
-      </div>
+      </TableCell>
 
-      {/* Type */}
-      <div>
+      {/* Type — hidden on xs screens */}
+      <TableCell className="">
         <span
-          className={`inline-flex items-center justify-center px-3 py-[5px] rounded-full text-[12px] font-medium ${applicationTypeBadgeClass(applicationType)}`}
+          className={`inline-flex items-center justify-center px-3 py-[5px] rounded-full text-[12px] font-medium whitespace-nowrap ${applicationTypeBadgeClass(applicationType)}`}
         >
           {applicationTypeLabel(applicationType)}
         </span>
-      </div>
+      </TableCell>
 
-      {/* Submitted */}
-      <div className="text-[15px] text-[#6b7280] font-normal">
+      {/* Submitted — hidden on small screens */}
+      <TableCell className=" text-[15px] text-[#6b7280] font-normal whitespace-nowrap">
         {relativeTime(app.appliedAt ?? null)}
-      </div>
+      </TableCell>
 
       {/* Status */}
-      <div>
+      <TableCell>
         <span
-          className={`inline-flex items-center justify-center px-4 py-[6px] rounded-full text-[13px] font-medium ${statusBadgeClass(app.status)}`}
+          className={`inline-flex items-center justify-center px-3 py-[5px] rounded-full text-[12px] font-medium whitespace-nowrap ${statusBadgeClass(app.status)}`}
         >
           {humanStatus(app.status)}
         </span>
-      </div>
-    </Link>
+      </TableCell>
+    </TableRow>
   );
 }
 
@@ -202,30 +214,29 @@ export default function ApprovalQueue() {
   }
 
   return (
-    <div className="w-full min-h-screen bg-white px-10 py-8">
+    <div className="w-full min-h-screen bg-white px-4 sm:px-6 lg:px-10 py-8">
       {/* Header */}
-      <div className="flex items-start justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-6">
         <div>
-          <h1 className="text-[48px] font-normal text-black leading-none">
+          <h1 className="text-[32px] sm:text-[40px] lg:text-[48px] font-normal text-black leading-none">
             Approval Queue
           </h1>
-          <p className="mt-3 text-[18px] text-[#6b7280]">
+          <p className="mt-3 text-[15px] sm:text-[18px] text-[#6b7280]">
             Review and approve AI-generated applications before they are sent.
           </p>
         </div>
 
-          <div className="flex items-center gap-4 mt-8">
-            <Button className="h-[44px] px-8 rounded-md bg-[#3b82f6] hover:bg-[#3b82f6]/90 text-white text-[16px] font-medium shadow-none">
-              Approve all 
-            </Button>
-            <Button
-              variant="outline"
-              className="h-[44px] px-8 rounded-md border border-[#ef4444] text-[#ef4444] hover:bg-transparent hover:text-[#ef4444] text-[16px] font-medium shadow-none"
-            >
-              Decline selected
-            </Button>
-          </div>
-      
+        <div className="flex items-center gap-3 shrink-0">
+          <Button className="h-[40px] sm:h-[44px] px-5 sm:px-8 rounded-md bg-[#3b82f6] hover:bg-[#3b82f6]/90 text-white text-[14px] sm:text-[16px] font-medium shadow-none">
+            Approve all
+          </Button>
+          <Button
+            variant="outline"
+            className="h-[40px] sm:h-[44px] px-5 sm:px-8 rounded-md border border-[#ef4444] text-[#ef4444] hover:bg-transparent hover:text-[#ef4444] text-[14px] sm:text-[16px] font-medium shadow-none"
+          >
+            Decline selected
+          </Button>
+        </div>
       </div>
 
       {/* States */}
@@ -244,48 +255,61 @@ export default function ApprovalQueue() {
 
       {!isPending && !isError && (
         <>
-          <Card className="mt-10 border border-[#e5e7eb] rounded-lg shadow-none overflow-hidden">
-            {/* Header Row */}
-            <div className="grid grid-cols-[60px_1.6fr_1.2fr_1fr_1.3fr_1fr] items-center h-[56px] border-b border-[#e5e7eb] bg-white px-5">
-              <div className="flex items-center justify-center">
-                <Checkbox
-                  className="h-[18px] w-[18px] rounded-[4px] border-[#c7c7c7]"
-                  checked={allSelected}
-                  onCheckedChange={(v) => toggleAll(!!v)}
-                />
-              </div>
-              <div className="text-[13px] font-medium tracking-widest text-[#374151]">
-                JOB TITLE
-              </div>
-              <div className="text-[13px] font-medium tracking-widest text-[#374151]">
-                COMPANY
-              </div>
-              <div className="text-[13px] font-medium tracking-widest text-[#374151]">
-                TYPE
-              </div>
-              <div className="text-[13px] font-medium tracking-widest text-[#374151]">
-                SUBMITTED
-              </div>
-              <div className="text-[13px] font-medium tracking-widest text-[#374151]">
-                STATUS
-              </div>
-            </div>
+          <Card className="mt-8 border border-[#e5e7eb] rounded-lg shadow-none overflow-hidden">
+            <div className="grid grid-cols-1">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-white hover:bg-white border-b border-[#e5e7eb]">
+                    <TableHead className="w-[52px]">
+                      <div className="flex items-center justify-center">
+                        <Checkbox
+                          className="h-[18px] w-[18px] rounded-[4px] border-[#c7c7c7]"
+                          checked={allSelected}
+                          onCheckedChange={(v) => toggleAll(!!v)}
+                        />
+                      </div>
+                    </TableHead>
+                    <TableHead className="text-[13px] font-medium tracking-widest text-[#374151] uppercase">
+                      Job Title
+                    </TableHead>
+                    <TableHead className=" text-[13px] font-medium tracking-widest text-[#374151] uppercase">
+                      Company
+                    </TableHead>
+                    <TableHead className=" text-[13px] font-medium tracking-widest text-[#374151] uppercase">
+                      Type
+                    </TableHead>
+                    <TableHead className="text-[13px] font-medium tracking-widest text-[#374151] uppercase">
+                      Submitted
+                    </TableHead>
+                    <TableHead className="text-[13px] font-medium tracking-widest text-[#374151] uppercase">
+                      Status
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
 
-            {/* Rows */}
-            {applications.length === 0 ? (
-              <div className="py-16 text-center text-[#6b7280] text-sm">
-                No applications yet.
-              </div>
-            ) : (
-              applications.map((app) => (
-                <ApprovalRow
-                  key={app.id}
-                  app={app as any}
-                  selected={selected.has(app.id)}
-                  onSelect={toggleOne}
-                />
-              ))
-            )}
+                <TableBody>
+                  {applications.length === 0 ? (
+                    <TableRow>
+                      <TableCell
+                        colSpan={6}
+                        className="py-16 text-center text-[#6b7280] text-sm"
+                      >
+                        No applications yet.
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    applications.map((app) => (
+                      <ApprovalRow
+                        key={app.id}
+                        app={app as any}
+                        selected={selected.has(app.id)}
+                        onSelect={toggleOne}
+                      />
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </div>
           </Card>
 
           {/* Load more */}
