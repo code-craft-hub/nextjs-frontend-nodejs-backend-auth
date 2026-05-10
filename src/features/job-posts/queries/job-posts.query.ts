@@ -1,4 +1,4 @@
-import { useInfiniteQuery, queryOptions, infiniteQueryOptions } from "@tanstack/react-query";
+import { useInfiniteQuery, queryOptions, infiniteQueryOptions, type InfiniteData } from "@tanstack/react-query";
 import { jobPostsKeys } from "./job-post.keys";
 import jobPostsApi from "../api/job-posts.api";
 import type { InfiniteJobsResponse } from "../types";
@@ -110,6 +110,36 @@ export const jobPostsQueries = {
       queryFn: () => jobPostsApi.getById(id, token),
       staleTime: 5 * 60 * 1000,
       enabled: !!id,
+    }),
+
+  preferenceSearch: (params: {
+    q?: string;
+    employmentTypes?: string;
+    workArrangements?: string;
+    preferredLocations?: string;
+  }) =>
+    infiniteQueryOptions<
+      InfiniteJobsResponse,
+      Error,
+      InfiniteData<InfiniteJobsResponse>,
+      ReturnType<typeof jobPostsKeys.jobPosts.preferenceSearch>,
+      string | undefined
+    >({
+      queryKey: jobPostsKeys.jobPosts.preferenceSearch(params),
+      queryFn: ({ pageParam }) =>
+        jobPostsApi.query({
+          query: params.q,
+          cursor: pageParam,
+          employmentTypes: params.employmentTypes,
+          workArrangements: params.workArrangements,
+          preferredLocations: params.preferredLocations,
+        }),
+      initialPageParam: undefined,
+      getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+      enabled: !!(params.q || params.employmentTypes || params.workArrangements || params.preferredLocations),
+      staleTime: 2 * 60 * 1000,
+      gcTime: 5 * 60 * 1000,
+      placeholderData: (prev) => prev,
     }),
 
   // Mutation helpers (to be used with useMutation)

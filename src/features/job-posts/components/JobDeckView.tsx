@@ -16,6 +16,8 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import recommendationsQueries from "@/features/recommendations/queries/recommendations.queries";
+import { jobPreferencesQueries } from "@/features/job-preferences/queries/job-preferences.queries";
+import { jobPostsQueries } from "@/features/job-posts/queries/job-posts.query";
 import type { JobRecommendation } from "@/features/recommendations/api/recommendations.api";
 import { coverLetterApi } from "@/features/cover-letter/api/cover-letter.api";
 import { resumeApi } from "@/features/resume/api/resume.api";
@@ -62,6 +64,14 @@ function toJobRow(rec: JobRecommendation): JobPost & {
     recommendationId: rec.id,
     rankPosition: rec.rankPosition,
   };
+}
+
+function toJobRowFromPost(post: JobPost): JobPost & {
+  matchPercentage?: string;
+  recommendationId: string;
+  rankPosition: null;
+} {
+  return { ...post, matchPercentage: undefined, recommendationId: post.id, rankPosition: null };
 }
 
 function GeneratingBanner({ message }: { message?: string }) {
@@ -333,28 +343,71 @@ export function JobDeckView({
   onDismissRun,
   extState,
 }: JobDeckViewProps) {
-  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useInfiniteQuery({
-      ...recommendationsQueries.userRecommendations(),
-      initialPageParam: 1,
-    });
+  // ── Preferences — determine which data source to use ────────────────────
+  const { data: prefsData } = useQuery(jobPreferencesQueries.detail());
+  const prefs = prefsData?.data;
+
+  const hasFilters = prefs !== undefined && !!(
+    prefs.keywords?.trim() ||
+    prefs.employmentTypes?.length ||
+    prefs.workArrangements?.length ||
+    prefs.preferredLocations?.length
+  );
+
+  const searchParams = useMemo(() => ({
+    q: prefs?.keywords?.trim() || undefined,
+    employmentTypes: prefs?.employmentTypes?.length ? prefs.employmentTypes.join(",") : undefined,
+    workArrangements: prefs?.workArrangements?.length ? prefs.workArrangements.join(",") : undefined,
+    preferredLocations: prefs?.preferredLocations?.length ? prefs.preferredLocations.join(",") : undefined,
+  }), [prefs]);
+
+  // ── Recommendations query (active when no filters) ───────────────────────
+  const {
+    data: recsData,
+    isLoading: recsLoading,
+    fetchNextPage: recsFetchNext,
+    hasNextPage: recsHasNext,
+    isFetchingNextPage: recsFetchingNext,
+  } = useInfiniteQuery({
+    ...recommendationsQueries.userRecommendations(),
+    enabled: !hasFilters,
+    initialPageParam: 1,
+  });
+
+  // ── Preference job search (active when filters are set) ──────────────────
+  const {
+    data: searchData,
+    isLoading: searchLoading,
+    fetchNextPage: searchFetchNext,
+    hasNextPage: searchHasNext,
+    isFetchingNextPage: searchFetchingNext,
+  } = useInfiniteQuery(jobPostsQueries.preferenceSearch(searchParams));
 
   const { data: settings } = useQuery(aiSettingsQueries.detail());
   const useMasterCv = !!(settings?.useMasterCv && settings?.masterCvId);
 
-  const lastPage = (data?.pages[data.pages.length - 1] as any)?.data;
-  const pipelineStatus = lastPage?.status;
-  const isGenerating = lastPage?.isGenerating ?? false;
-  const missingFields = lastPage?.missingFields;
-  const generatingMessage = lastPage?.message;
+  // ── Unified derived state ────────────────────────────────────────────────
+  const isLoading = hasFilters ? searchLoading : recsLoading;
+  const fetchNextPage = hasFilters ? searchFetchNext : recsFetchNext;
+  const hasNextPage = hasFilters ? searchHasNext : recsHasNext;
+  const isFetchingNextPage = hasFilters ? searchFetchingNext : recsFetchingNext;
 
-  const allJobs = useMemo(
-    () =>
-      data?.pages.flatMap((page) =>
+  const lastRecsPage = (recsData?.pages?.[recsData.pages.length - 1] as any)?.data;
+  const pipelineStatus = hasFilters ? undefined : lastRecsPage?.status;
+  const isGenerating = hasFilters ? false : (lastRecsPage?.isGenerating ?? false);
+  const missingFields = hasFilters ? undefined : lastRecsPage?.missingFields;
+  const generatingMessage = hasFilters ? undefined : lastRecsPage?.message;
+
+  const allJobs = useMemo(() => {
+    if (hasFilters) {
+      return searchData?.pages.flatMap((page) => page.items.map(toJobRowFromPost)) ?? [];
+    }
+    return (
+      recsData?.pages.flatMap((page) =>
         ((page as any)?.data?.recommendations ?? []).map(toJobRow),
-      ) ?? [],
-    [data],
-  );
+      ) ?? []
+    );
+  }, [hasFilters, searchData, recsData]);
 
   const queryClient = useQueryClient();
 
@@ -630,18 +683,28 @@ export function JobDeckView({
     allJobs.length === 0
   ) {
     return (
-      <div className="max-w-2xl mx-auto w-full py-12">
+      <div className="max-w-2xl mx-auto w-full py-12 flex flex-col gap-4">
+        <JobsAppliedBanner
+          appliedSize={appliedIds.size}
+          runs={[...runs.values(), ...emailRuns.values()]}
+          onOpenRun={handleOpenRun}
+          onDismissRun={handleDismissRun}
+        />
         <GeneratingBanner message={generatingMessage} />
       </div>
     );
   }
 
-  // ── Empty — recs generated but none returned ─────────────────────────────
+  // ── Empty — no results ───────────────────────────────────────────────────
   if (allJobs.length === 0 && !isLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-24 text-gray-400 gap-2">
         <span className="text-4xl">📭</span>
-        <p className="text-sm">No recommendations yet. Check back soon.</p>
+        <p className="text-sm">
+          {hasFilters
+            ? "No jobs match your current filters. Try adjusting your preferences."
+            : "No recommendations yet. Check back soon."}
+        </p>
       </div>
     );
   }

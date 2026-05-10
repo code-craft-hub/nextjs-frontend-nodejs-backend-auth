@@ -24,5 +24,7 @@ export const jobPostsKeys = {
       [...jobPostsKeys.jobPosts.all, "company", companyName, params] as const,
     location: (location: string, params?: Record<string, any>) =>
       [...jobPostsKeys.jobPosts.all, "location", location, params] as const,
+    preferenceSearch: (params: Record<string, any>) =>
+      [...jobPostsKeys.jobPosts.all, "preference-search", params] as const,
   },
 };

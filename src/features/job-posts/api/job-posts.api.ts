@@ -19,6 +19,12 @@ export const jobPostsApi = {
       localizedTo?: string;
       /** Scraper classification: "remote" | "relocate". */
       classification?: string;
+      /** Comma-separated employment types, e.g. "full_time,contract". */
+      employmentTypes?: string;
+      /** Comma-separated work arrangements, e.g. "remote,hybrid". */
+      workArrangements?: string;
+      /** Comma-separated preferred locations, e.g. "Lagos,London". */
+      preferredLocations?: string;
       limit?: number;
     },
     token?: string,
