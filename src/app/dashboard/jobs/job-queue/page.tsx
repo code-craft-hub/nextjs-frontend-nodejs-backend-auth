@@ -33,6 +33,18 @@ function humanStatus(status: string): string {
   );
 }
 
+function applicationTypeLabel(type: string | null | undefined): string {
+  if (type === "email") return "Email";
+  if (type === "company_website" || type === "form") return "External";
+  if (type === "in_person") return "In Person";
+  return "External";
+}
+
+function applicationTypeBadgeClass(type: string | null | undefined): string {
+  if (type === "email") return "bg-blue-100 text-blue-700";
+  return "bg-violet-100 text-violet-700";
+}
+
 function statusBadgeClass(status: string): string {
   if (["submitted", "accepted", "offered"].includes(status))
     return "bg-[#dcfce7] text-[#15803d]";
@@ -66,6 +78,7 @@ function ApprovalRow({ app, selected, onSelect }: RowProps) {
   const company = (app as any).companyName ?? "—";
   const employmentType = (app as any).employmentType ?? "";
   const classification = (app as any).classification ?? "";
+  const applicationType = (app as any).applicationType ?? null;
 
   const subtitle = [employmentType, classification]
     .filter(Boolean)
@@ -77,7 +90,7 @@ function ApprovalRow({ app, selected, onSelect }: RowProps) {
   return (
     <Link
       href={`/dashboard/jobs/${app.id}/application-details`}
-      className="grid grid-cols-[60px_1.6fr_1.2fr_1.3fr_1fr] items-center h-23 border-b border-[#eeeeee] bg-white px-5 hover:bg-gray-50 transition-colors"
+      className="grid grid-cols-[60px_1.6fr_1.2fr_1fr_1.3fr_1fr] items-center h-23 border-b border-[#eeeeee] bg-white px-5 hover:bg-gray-50 transition-colors"
       onClick={(e) => {
         // prevent navigation when clicking the checkbox
         if ((e.target as HTMLElement).closest("[data-checkbox]")) {
@@ -115,6 +128,15 @@ function ApprovalRow({ app, selected, onSelect }: RowProps) {
       {/* Company */}
       <div className="text-[15px] text-black font-normal truncate">
         {company}
+      </div>
+
+      {/* Type */}
+      <div>
+        <span
+          className={`inline-flex items-center justify-center px-3 py-[5px] rounded-full text-[12px] font-medium ${applicationTypeBadgeClass(applicationType)}`}
+        >
+          {applicationTypeLabel(applicationType)}
+        </span>
       </div>
 
       {/* Submitted */}
@@ -224,7 +246,7 @@ export default function ApprovalQueue() {
         <>
           <Card className="mt-10 border border-[#e5e7eb] rounded-lg shadow-none overflow-hidden">
             {/* Header Row */}
-            <div className="grid grid-cols-[60px_1.6fr_1.2fr_1.3fr_1fr] items-center h-[56px] border-b border-[#e5e7eb] bg-white px-5">
+            <div className="grid grid-cols-[60px_1.6fr_1.2fr_1fr_1.3fr_1fr] items-center h-[56px] border-b border-[#e5e7eb] bg-white px-5">
               <div className="flex items-center justify-center">
                 <Checkbox
                   className="h-[18px] w-[18px] rounded-[4px] border-[#c7c7c7]"
@@ -237,6 +259,9 @@ export default function ApprovalQueue() {
               </div>
               <div className="text-[13px] font-medium tracking-widest text-[#374151]">
                 COMPANY
+              </div>
+              <div className="text-[13px] font-medium tracking-widest text-[#374151]">
+                TYPE
               </div>
               <div className="text-[13px] font-medium tracking-widest text-[#374151]">
                 SUBMITTED
