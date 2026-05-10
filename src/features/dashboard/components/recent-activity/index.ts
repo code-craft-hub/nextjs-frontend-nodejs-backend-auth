@@ -1,4 +1,4 @@
-export { RecentActivityCard } from "./RecentActivityCard";
+export { PersonalizedRecommendation } from "./PersonalizedRecommendation";
 export { JobCard } from "./JobCard";
 export { JobBadges } from "./JobBadges";
 export { JobCardDropdown } from "./JobCardDropdown";

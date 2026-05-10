@@ -1,13 +1,14 @@
 "use client";
 import { memo } from "react";
 import { AIApplyInput } from "./AIApplyInput";
-import { RecentActivityCard } from "@/features/dashboard/components/RecentActivityCard";
+import { PersonalizedRecommendation } from "@/features/dashboard/components/RecentActivityCard";
 import { AIApplyDatatable } from "./AIApplyDatatable";
 import { useQuery } from "@tanstack/react-query";
 import { autoApplyQueries } from "@/features/auto-apply/queries/auto-apply.queries";
+import { ViewType } from "@/features/dashboard/components/Home";
 
 export const AIApply = memo(
-  ({ jobDescription }: { jobDescription: string }) => {
+  ({ jobDescription, handleViewChange }: { jobDescription: string; handleViewChange: (value: ViewType) => void }) => {
     const { data: aiApply } = useQuery(autoApplyQueries.all());
 
     return (
@@ -20,7 +21,7 @@ export const AIApply = memo(
         <div className="grid gap-y-8">
           <AIApplyInput jobDescription={jobDescription} />
           <AIApplyDatatable data={aiApply?.data ?? []} />
-          <RecentActivityCard />
+          <PersonalizedRecommendation handleViewChange={handleViewChange} />
         </div>
       </div>
     );

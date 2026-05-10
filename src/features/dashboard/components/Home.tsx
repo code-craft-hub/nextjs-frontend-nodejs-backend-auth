@@ -1,7 +1,7 @@
 "use client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
-import { memo, useEffect } from "react";
+import { memo, useEffect, useState } from "react";
 import { AIApply } from "@/features/ai-apply/components/AIApply";
 import { FindJob } from "@/features/jobs/components/FindJob";
 import { DashboardTab } from "@/shared/types";
@@ -16,20 +16,34 @@ import { useDashboardPrefetch } from "@/shared/react-query/hooks/useDashboardPre
 import InsufficientCreditsModal from "@/components/shared/InsufficientCreditsModal";
 import AuthorizeGoogle from "@/features/email-application/hooks/AuthorizeGoogle";
 import { NoResumeAlertDialog } from "./no-resume-alert-dialog";
+import { JobDeckView } from "@/features/job-posts/components/JobDeckView";
+import { useRunManager } from "@/features/job-posts/hooks/useRunManager";
+import { useApplyOrchestrator } from "@/features/job-posts/hooks/useApplyOrchestrator";
+import { useDeckApply } from "@/features/job-posts/hooks/useDeckApply";
 
+export type ViewType = "deck" | "list";
 export const HomeClient = memo(
   ({ tab, jobDescription }: { tab: DashboardTab; jobDescription: string }) => {
     const { data: user } = useQuery(userQueries.detail());
+    const [isDeckView, setIsDeckView] = useState(true);
+    const [query, setQuery] = useState<string | undefined>(undefined);
+    const [localizedTo, setLocalizedTo] = useState<string | undefined>(
+      undefined,
+    );
+    const [classification, setClassification] = useState<string | undefined>(
+      undefined,
+    );
 
-    const filters: JobFilters = {
-      page: 1,
-      limit: 20,
+    const handleViewChange = (value: ViewType) => {
+      setIsDeckView(value === "deck");
     };
 
-    const autoApplyFilters: JobFilters = {
-      page: 1,
-      limit: 30,
-    };
+    const filters: JobFilters = { page: 1, limit: 20 };
+    const autoApplyFilters: JobFilters = { page: 1, limit: 30 };
+
+    const { enqueueJob } = useRunManager();
+    const { extState } = useApplyOrchestrator({ enqueueJob });
+    const handleDeckApply = useDeckApply({ enqueueJob, extState });
 
     useEffect(() => {
       if (user?.firstName)
@@ -39,9 +53,7 @@ export const HomeClient = memo(
         });
     }, [user?.firstName]);
 
-    useDashboardPrefetch({
-      filters,
-    });
+    useDashboardPrefetch({ filters });
 
     return (
       <>
@@ -77,15 +89,27 @@ export const HomeClient = memo(
                 </TabsTrigger>
               ))}
             </TabsList>
-            <TabsContent value="ai-apply">
-              <AIApply jobDescription={jobDescription} />
-            </TabsContent>
-            <TabsContent value="tailor-cv">
-              <AIJobCustomization filters={autoApplyFilters} />
-            </TabsContent>
-            <TabsContent value="find-jobs">
-              <FindJob />
-            </TabsContent>
+            {isDeckView ? (
+              <JobDeckView
+                query={query}
+                localizedTo={localizedTo}
+                classification={classification}
+                onApply={handleDeckApply}
+                handleViewChange={handleViewChange}
+              />
+            ) : (
+              <>
+                <TabsContent value="ai-apply">
+                  <AIApply jobDescription={jobDescription} handleViewChange={handleViewChange} />
+                </TabsContent>
+                <TabsContent value="tailor-cv">
+                  <AIJobCustomization filters={autoApplyFilters} handleViewChange={handleViewChange}/>
+                </TabsContent>
+                <TabsContent value="find-jobs">
+                  <FindJob />
+                </TabsContent>
+              </>
+            )}
           </Tabs>
         </div>
         <InsufficientCreditsModal />

@@ -5,7 +5,8 @@ import { useInfiniteJobs } from "../queries/job-posts.query";
 import type { JobPost } from "@/features/job-posts";
 import { Card } from "@/components/ui/card";
 import { Clock, ExternalLink, MapPin, X, Check } from "lucide-react";
-
+import { Button } from "@/components/ui/button";
+export type ViewType = "deck" | "list";
 
 interface JobDeckViewProps {
   query?: string;
@@ -13,6 +14,8 @@ interface JobDeckViewProps {
   classification?: string;
   /** Called when the user swipes/taps Apply on a card. */
   onApply: (job: JobPost) => void;
+  /** Called when the user switches between deck and list views. */
+  handleViewChange: (value: ViewType) => void;
 }
 
 type SwipeDir = "left" | "right" | null;
@@ -45,7 +48,7 @@ function JobDeckCard({ job, stackIndex, onSkip, onApply }: JobDeckCardProps) {
           job.salaryInfo.currency,
           job.salaryInfo.min && job.salaryInfo.max
             ? `${job.salaryInfo.min}–${job.salaryInfo.max}`
-            : job.salaryInfo.min ?? job.salaryInfo.max,
+            : (job.salaryInfo.min ?? job.salaryInfo.max),
           job.salaryInfo.period ? `/${job.salaryInfo.period}` : "",
         ]
           .filter(Boolean)
@@ -62,7 +65,11 @@ function JobDeckCard({ job, stackIndex, onSkip, onApply }: JobDeckCardProps) {
   return (
     <div
       className="absolute inset-0 transition-all duration-300"
-      style={{ transform: `scale(${scale}) translateY(${translateY}px)`, opacity, zIndex }}
+      style={{
+        transform: `scale(${scale}) translateY(${translateY}px)`,
+        opacity,
+        zIndex,
+      }}
     >
       <Card className="w-full rounded-[40px] bg-white shadow-2xl border-0 p-4 lg:p-8 max-w-2xl">
         {/* Header */}
@@ -125,7 +132,7 @@ function JobDeckCard({ job, stackIndex, onSkip, onApply }: JobDeckCardProps) {
         {/* Company */}
         <div className=" flex items-center gap-7">
           <div className="w-19.5 h-19.5 rounded-full overflow-hidden bg-gray-200 shrink-0">
-            {job.companyLogo ?? job.companyIcon ? (
+            {(job.companyLogo ?? job.companyIcon) ? (
               <img
                 src={job.companyLogo ?? job.companyIcon ?? ""}
                 alt={job.companyName ?? job.company ?? ""}
@@ -154,9 +161,7 @@ function JobDeckCard({ job, stackIndex, onSkip, onApply }: JobDeckCardProps) {
 
         {/* Description */}
         <div className="mt-2">
-          <div className="text-[#9a9a9a] text-lg font-medium">
-            Description
-          </div>
+          <div className="text-[#9a9a9a] text-lg font-medium">Description</div>
 
           <p className="mt-2  text-[#2b2b2b] font-medium max-w-215">
             {preview}
@@ -203,19 +208,10 @@ export function JobDeckView({
   localizedTo,
   classification,
   onApply,
+  handleViewChange,
 }: JobDeckViewProps) {
-  const {
-    data,
-    isLoading,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = useInfiniteJobs(
-    query,
-    undefined,
-    localizedTo,
-    classification,
-  );
+  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useInfiniteJobs(query, undefined, localizedTo, classification);
 
   const allJobs: JobPost[] = data?.pages ?? [];
 
@@ -224,10 +220,7 @@ export function JobDeckView({
   const [swipeDir, setSwipeDir] = useState<SwipeDir>(null);
 
   const deck = allJobs.filter(
-    (j) =>
-      !appliedIds.has(j.id) &&
-      !skippedIds.has(j.id) &&
-      !j.emailApply,
+    (j) => !appliedIds.has(j.id) && !skippedIds.has(j.id) && !j.emailApply,
   );
 
   useEffect(() => {
@@ -288,7 +281,9 @@ export function JobDeckView({
     return (
       <div className="flex flex-col items-center justify-center py-24 gap-3">
         <div className="w-full max-w-245 h-90 bg-gray-100 rounded-[60px] animate-pulse" />
-        <p className="text-sm text-gray-400 animate-pulse">Loading more jobs…</p>
+        <p className="text-sm text-gray-400 animate-pulse">
+          Loading more jobs…
+        </p>
       </div>
     );
   }
@@ -337,32 +332,40 @@ export function JobDeckView({
       </div> */}
 
       {/* Card stack */}
-      <div className="relative w-full max-w-245" style={{ height: 900 }}>
-        {[...visibleCards]
-          .reverse()
-          .map((job, reversedIdx) => {
-            const stackIndex = (visibleCards.length - 1 - reversedIdx) as
-              | 0
-              | 1
-              | 2;
-            const isTop = stackIndex === 0;
-            return (
-              <div
-                key={job.id}
-                className={[
-                  "absolute inset-0 transition-all duration-300",
-                  isTop ? topSwipeClass : "",
-                ].join(" ")}
-              >
-                <JobDeckCard
-                  job={job}
-                  stackIndex={stackIndex}
-                  onSkip={handleSkip}
-                  onApply={handleApply}
-                />
-              </div>
-            );
-          })}
+      <div className="relative w-full max-w-245" style={{ height: 600 }}>
+        {[...visibleCards].reverse().map((job, reversedIdx) => {
+          const stackIndex = (visibleCards.length - 1 - reversedIdx) as
+            | 0
+            | 1
+            | 2;
+          const isTop = stackIndex === 0;
+          return (
+            <div
+              key={job.id}
+              className={[
+                "absolute inset-0 transition-all duration-300",
+                isTop ? topSwipeClass : "",
+              ].join(" ")}
+            >
+              <JobDeckCard
+                job={job}
+                stackIndex={stackIndex}
+                onSkip={handleSkip}
+                onApply={handleApply}
+              />
+            </div>
+          );
+        })}
+      </div>
+      <div className="w-full flex items-center justify-center">
+        <Button
+          onClick={() => {
+            handleViewChange("list");
+          }}
+          className="font-poppins rounded-[50px] text-xl p-8"
+        >
+          Bring your job
+        </Button>
       </div>
     </div>
   );

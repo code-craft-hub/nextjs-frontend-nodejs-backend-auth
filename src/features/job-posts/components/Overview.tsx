@@ -16,9 +16,9 @@ import { RunModal } from "./RunModal";
 import { IframeStage } from "./IframeStage";
 import { useRunManager } from "../hooks/useRunManager";
 import { buildExtensionProfile, useApplyOrchestrator } from "../hooks/useApplyOrchestrator";
+import { useDeckApply } from "../hooks/useDeckApply";
 import { resumeApi } from "@/features/resume/api/resume.api";
 import { queryKeys } from "@/shared/query/keys";
-import type { JobPost } from "@/features/job-posts";
 import type { ActiveRun } from "../types/apply-session.types";
 
 // Canonical country names — must match the scraper's localizedTo values exactly.
@@ -134,21 +134,7 @@ export default function Overview() {
   }, [user, defaultResumeFileUrl]);
 
   // ── Deck apply handler ────────────────────────────────────────────────────
-  // Routes through the same serial queue as the list view — no popup windows.
-  const handleDeckApply = useCallback(
-    (job: JobPost) => {
-      if (extState === "installed") {
-        const profile = user
-          ? { ...buildExtensionProfile(user), cv_url: defaultResumeFileUrl }
-          : null;
-        enqueueJob(job, profile);
-      } else {
-        const url = job.applyUrl ?? job.link;
-        if (url) window.open(url, "_blank", "noopener,noreferrer");
-      }
-    },
-    [extState, user, defaultResumeFileUrl, enqueueJob],
-  );
+  const handleDeckApply = useDeckApply({ enqueueJob, extState });
 
   // ── Enhanced orchestrator for the list view ──────────────────────────────
   // Override focusExtTab so that when the agent is stuck in iframe mode the

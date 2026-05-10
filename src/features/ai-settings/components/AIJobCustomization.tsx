@@ -1,7 +1,7 @@
 "use client";
 
 import { memo, useMemo } from "react";
-import { RecentActivityCard } from "@/features/dashboard/components/RecentActivityCard";
+import { PersonalizedRecommendation } from "@/features/dashboard/components/RecentActivityCard";
 import { AIJobCustomizationDatatable } from "./AIJobCustomizationDatatable";
 import { AIJobCustomizationInput } from "./AIJobCustomizationInput";
 import { isEmpty } from "lodash";
@@ -11,9 +11,16 @@ import { resumeQueries } from "@/features/resume/queries/resume.queries";
 import { coverLetterQueries } from "@/features/cover-letter/queries/cover-letter.queries";
 import { interviewQuestionQueries } from "@/features/interview/queries/interview.queries";
 import { shuffleArray } from "@/lib/utils/helpers";
+import { ViewType } from "@/features/dashboard/components/Home";
 
 export const AIJobCustomization = memo(
-  ({ filters }: { filters: JobFilters }) => {
+  ({
+    filters,
+    handleViewChange,
+  }: {
+    filters: JobFilters;
+    handleViewChange: (value: ViewType) => void;
+  }) => {
     const { data: resumes } = useQuery(resumeQueries.all(filters));
     const { data: coverLetter } = useQuery(coverLetterQueries.all(filters));
     const { data: interviewQuestion } = useQuery(
@@ -41,7 +48,7 @@ export const AIJobCustomization = memo(
           {isEmpty(data) ? null : (
             <AIJobCustomizationDatatable data={data ?? []} />
           )}
-          <RecentActivityCard />
+          <PersonalizedRecommendation handleViewChange={handleViewChange} />
         </div>
       </div>
     );

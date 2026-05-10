@@ -1,1 +1,1 @@
-export { RecentActivityCard } from "./recent-activity";
+export { PersonalizedRecommendation } from "./recent-activity";
