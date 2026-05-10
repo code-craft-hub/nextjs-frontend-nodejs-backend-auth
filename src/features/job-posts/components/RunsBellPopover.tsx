@@ -1,10 +1,16 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Briefcase, X, Send, CheckCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import type {
   ActiveRun,
@@ -341,9 +347,7 @@ export function RunsBellPopover({
 }: RunsBellPopoverProps) {
   const [open, setOpen] = useState(false);
   const [showAll, setShowAll] = useState(false);
-  // Track which run has its inline panel expanded (batch questions or submit approval)
   const [expandedRunId, setExpandedRunId] = useState<string | null>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
   const activeBadgeCount = runs?.filter((r) =>
@@ -370,7 +374,7 @@ export function RunsBellPopover({
 
   const visibleRuns = showAll ? runs : runs.slice(0, 6);
 
-  // Auto-expand the first run that needs attention when the popover opens
+  // Auto-expand the first run that needs attention when the dialog opens
   useEffect(() => {
     if (!open) return;
     if (needsAttentionRuns.length > 0 && !expandedRunId) {
@@ -378,28 +382,13 @@ export function RunsBellPopover({
     }
   }, [open, needsAttentionRuns, expandedRunId]);
 
-  // Auto-open popover when a run transitions to needing attention
+  // Auto-open dialog when a run transitions to needing attention
   useEffect(() => {
     if (needsAttentionRuns.length > 0) {
       setOpen(true);
       setExpandedRunId((prev) => prev ?? needsAttentionRuns[0].id);
     }
   }, [needsAttentionRuns.length]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Close popover on outside click
-  useEffect(() => {
-    if (!open) return;
-    const handler = (e: MouseEvent) => {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(e.target as Node)
-      ) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, [open]);
 
   // Reset state when closed
   useEffect(() => {
@@ -410,229 +399,224 @@ export function RunsBellPopover({
   }, [open]);
 
   return (
-    <div className="relative" ref={containerRef}>
-      {/* Bell button */}
-      <button
-        onClick={() => setOpen((v) => !v)}
-        className="relative flex items-center justify-center w-9 h-9 rounded-xl bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300 transition-colors shadow-sm size-10 "
-        title={`${runs.length} auto-apply runs`}
-        aria-label="Auto-apply runs"
-      >
-        <BellIcon className="size-5" />
-        {activeBadgeCount > 0 && (
-          <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] bg-indigo-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1 leading-none">
-            {activeBadgeCount}
-          </span>
-        )}
-        {/* Pulsing red dot when attention is needed */}
-        {needsAttentionRuns.length > 0 && (
-          <span className="absolute -bottom-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse border-2 border-white" />
-        )}
-      </button>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        {/* Bell button */}
+        <button
+          className="relative flex items-center justify-center w-9 h-9 rounded-xl bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300 transition-colors shadow-sm size-10"
+          title={`${runs.length} auto-apply runs`}
+          aria-label="Auto-apply runs"
+        >
+          <BellIcon className="size-5" />
+          {activeBadgeCount > 0 && (
+            <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] bg-indigo-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1 leading-none">
+              {activeBadgeCount}
+            </span>
+          )}
+          {needsAttentionRuns.length > 0 && (
+            <span className="absolute -bottom-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse border-2 border-white" />
+          )}
+        </button>
+      </DialogTrigger>
 
-      {/* Popover */}
-      {open && (
-        <div className="absolute right-0 top-11 w-[480px] z-50">
-          <Card className="rounded-2xl shadow-xl border border-gray-100">
-            <CardContent className="p-6">
-              {/* Header */}
-              <div className="flex items-center justify-between mb-5">
-                <h2 className="text-base font-semibold text-gray-900">
-                  Active ({runs.length})
-                </h2>
-                <span className="text-sm text-gray-400">{pct}% completion</span>
-              </div>
+      <DialogContent className="w-full sm:max-w-[480px] max-h-[90vh] flex flex-col gap-0 p-0 overflow-hidden">
+        {/* Header */}
+        <DialogHeader className="px-6 pt-6 pb-4 border-b border-gray-100 shrink-0">
+          <div className="flex items-center justify-between">
+            <DialogTitle className="text-base font-semibold text-gray-900">
+              Active ({runs.length})
+            </DialogTitle>
+            <span className="text-sm text-gray-400">{pct}% completion</span>
+          </div>
+        </DialogHeader>
 
-              {/* Run list */}
-              {runs.length === 0 ? (
-                <p className="text-sm text-gray-400 text-center py-6">
-                  No runs yet. Apply to a job to get started.
-                </p>
-              ) : (
-                <div>
-                  {visibleRuns.map((run) => {
-                    const title = run.job?.title ?? "Job";
-                    const company = run.job?.company ?? "";
-                    const isActive = [
-                      "loading",
-                      "running",
-                      "awaiting_user_input",
-                    ].includes(run.status);
-                    const liveAction =
-                      isActive && !run.blockedMessage
-                        ? lastInterestingAction(run)
-                        : null;
-                    const isAutoApply =
-                      run.openMode === "window" || run.openMode === "iframe";
-                    const isPopupMode = run.openMode === "window";
-                    const isTerminal = [
-                      "submitted",
-                      "complete",
-                      "applied",
-                    ].includes(run.status);
-                    // Runs that are done but need the user to see why (error, blocked, stopped)
-                    const isDead = [
-                      "error",
-                      "blocked",
-                      "stopped",
-                      "max_turns",
-                    ].includes(run.status);
-                    const needsAttention =
-                      run.status === "awaiting_user_input" ||
-                      run.status === "awaiting_submit_approval";
-                    const isExpanded = expandedRunId === run.id;
-                    // Popup-mode runs that are dead should expand logs inline —
-                    // their window is closed so there is nothing to focus.
-                    const expandsLogs = isPopupMode && isDead;
+        {/* Scrollable run list */}
+        <div className="flex-1 overflow-y-auto px-6 py-2">
+          {runs.length === 0 ? (
+            <p className="text-sm text-gray-400 text-center py-6">
+              No runs yet. Apply to a job to get started.
+            </p>
+          ) : (
+            <div>
+              {visibleRuns.map((run) => {
+                const title = run.job?.title ?? "Job";
+                const company = run.job?.company ?? "";
+                const isActive = [
+                  "loading",
+                  "running",
+                  "awaiting_user_input",
+                ].includes(run.status);
+                const liveAction =
+                  isActive && !run.blockedMessage
+                    ? lastInterestingAction(run)
+                    : null;
+                const isAutoApply =
+                  run.openMode === "window" || run.openMode === "iframe";
+                const isPopupMode = run.openMode === "window";
+                const isTerminal = [
+                  "submitted",
+                  "complete",
+                  "applied",
+                ].includes(run.status);
+                const isDead = [
+                  "error",
+                  "blocked",
+                  "stopped",
+                  "max_turns",
+                ].includes(run.status);
+                const needsAttention =
+                  run.status === "awaiting_user_input" ||
+                  run.status === "awaiting_submit_approval";
+                const isExpanded = expandedRunId === run.id;
+                const expandsLogs = isPopupMode && isDead;
 
-                    return (
-                      <div
-                        key={run.id}
-                        className={`py-3.5 border-b last:border-none -mx-2 px-2 rounded-xl transition-colors ${
-                          needsAttention
-                            ? "bg-amber-50/60"
-                            : "hover:bg-gray-50 cursor-pointer"
-                        } group`}
-                        onClick={() => {
-                          if (needsAttention || expandsLogs) {
-                            setExpandedRunId((prev) =>
-                              prev === run.id ? null : run.id,
-                            );
-                            return;
-                          }
-                          setOpen(false);
-                          if (isTerminal && run.applicationId) {
-                            router.push(
-                              `/dashboard/jobs/${run.applicationId}/application-details`,
-                            );
-                          } else {
-                            onOpenRun(run.id);
-                          }
-                        }}
-                      >
-                        {/* Row: avatar + title + status + dismiss */}
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3 min-w-0">
-                            <CompanyAvatar company={company} />
-                            <div className="min-w-0">
-                              <div className="flex items-center gap-2 flex-wrap">
-                                <span className="text-sm font-medium text-gray-800 truncate capitalize">
-                                  {title}
-                                  {company ? ` @${company}` : ""}
-                                </span>
-                                {isAutoApply && (
-                                  <div className="flex items-center gap-1 bg-indigo-100 text-indigo-600 px-2.5 py-0.5 rounded-full text-xs font-medium shrink-0">
-                                    <span>⚡</span>
-                                    Auto-apply
-                                  </div>
-                                )}
-                                {run?.jobUrl && (
-                                  <div className="flex items-center gap-1 bg-indigo-100 text-indigo-600 px-2.5 py-0.5 rounded-full text-xs font-medium shrink-0">
-                                    <Briefcase className="size-4" />
-                                    <a
-                                      href={run.jobUrl}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      onClick={(e) => e.stopPropagation()}
-                                      className="underline"
-                                    >
-                                      View job
-                                    </a>
-                                  </div>
-                                )}
+                return (
+                  <div
+                    key={run.id}
+                    className={`py-3.5 border-b last:border-none -mx-2 px-2 rounded-xl transition-colors ${
+                      needsAttention
+                        ? "bg-amber-50/60"
+                        : "hover:bg-gray-50 cursor-pointer"
+                    } group`}
+                    onClick={() => {
+                      if (needsAttention || expandsLogs) {
+                        setExpandedRunId((prev) =>
+                          prev === run.id ? null : run.id,
+                        );
+                        return;
+                      }
+                      setOpen(false);
+                      if (isTerminal && run.applicationId) {
+                        router.push(
+                          `/dashboard/jobs/${run.applicationId}/application-details`,
+                        );
+                      } else {
+                        onOpenRun(run.id);
+                      }
+                    }}
+                  >
+                    {/* Row: avatar + title + status + dismiss */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <CompanyAvatar company={company} />
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="text-sm font-medium text-gray-800 truncate capitalize">
+                              {title}
+                              {company ? ` @${company}` : ""}
+                            </span>
+                            {isAutoApply && (
+                              <div className="flex items-center gap-1 bg-indigo-100 text-indigo-600 px-2.5 py-0.5 rounded-full text-xs font-medium shrink-0">
+                                <span>⚡</span>
+                                Auto-apply
                               </div>
-                              {liveAction && (
-                                <p className="text-xs text-gray-400 truncate mt-0.5">
-                                  {liveAction}
-                                </p>
-                              )}
-                              {run.blockedMessage && (
-                                <p className="text-xs text-red-400 truncate mt-0.5">
-                                  {run.blockedMessage}
-                                </p>
-                              )}
-                              {needsAttention && !isExpanded && (
-                                <p className="text-xs text-amber-600 font-medium mt-0.5">
-                                  {run.status === "awaiting_user_input"
-                                    ? `${run.pendingBatch?.questions?.length ?? 0} question(s) need your answer — tap to expand`
-                                    : "Form filled and ready — tap to review & approve"}
-                                </p>
-                              )}
-                              {expandsLogs && !isExpanded && (
-                                <p className="text-xs text-gray-400 mt-0.5">
-                                  Tap to see full log
-                                </p>
-                              )}
-                            </div>
+                            )}
+                            {run?.jobUrl && (
+                              <div className="flex items-center gap-1 bg-indigo-100 text-indigo-600 px-2.5 py-0.5 rounded-full text-xs font-medium shrink-0">
+                                <Briefcase className="size-4" />
+                                <a
+                                  href={run.jobUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  onClick={(e) => e.stopPropagation()}
+                                  className="underline"
+                                >
+                                  View job
+                                </a>
+                              </div>
+                            )}
                           </div>
-
-                          <div className="flex items-center gap-3 shrink-0 ml-3">
-                            <Badge
-                              className={`rounded-full px-3.5 py-1 text-xs font-medium border-0 ${statusPillClass(run.status)}`}
-                            >
-                              {statusLabel(run.status)}
-                            </Badge>
-                            <button
-                              className="text-gray-300 hover:text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                onDismissRun(run.id);
-                              }}
-                              title="Dismiss"
-                              aria-label="Dismiss run"
-                            >
-                              <X size={15} />
-                            </button>
-                          </div>
+                          {liveAction && (
+                            <p className="text-xs text-gray-400 truncate mt-0.5">
+                              {liveAction}
+                            </p>
+                          )}
+                          {run.blockedMessage && (
+                            <p className="text-xs text-red-400 truncate mt-0.5">
+                              {run.blockedMessage}
+                            </p>
+                          )}
+                          {needsAttention && !isExpanded && (
+                            <p className="text-xs text-amber-600 font-medium mt-0.5">
+                              {run.status === "awaiting_user_input"
+                                ? `${run.pendingBatch?.questions?.length ?? 0} question(s) need your answer — tap to expand`
+                                : "Form filled and ready — tap to review & approve"}
+                            </p>
+                          )}
+                          {expandsLogs && !isExpanded && (
+                            <p className="text-xs text-gray-400 mt-0.5">
+                              Tap to see full log
+                            </p>
+                          )}
                         </div>
-
-                        {/* Inline interaction panel */}
-                        {isExpanded &&
-                          run.status === "awaiting_user_input" &&
-                          run.pendingBatch && (
-                            <BatchQuestionsPanel
-                              run={run}
-                              onClose={() => setExpandedRunId(null)}
-                            />
-                          )}
-                        {isExpanded &&
-                          run.status === "awaiting_submit_approval" &&
-                          run.pendingSubmit && (
-                            <SubmitApprovalPanel
-                              run={run}
-                              onClose={() => setExpandedRunId(null)}
-                            />
-                          )}
-                        {/* Log panel for popup-mode dead runs — window is closed, show logs inline */}
-                        {isExpanded && expandsLogs && <RunLogPanel run={run} />}
                       </div>
-                    );
-                  })}
-                </div>
-              )}
 
-              {/* Footer */}
-              {runs.length > 6 && (
-                <Button
-                  className="w-full mt-4 rounded-xl bg-gray-100 text-gray-700 hover:bg-gray-200 border-0 shadow-none font-medium text-sm"
-                  onClick={() => setShowAll((v) => !v)}
-                >
-                  {showAll ? "Show less" : `See all ${runs.length} runs`}
-                </Button>
-              )}
-              <Button
-                className="w-full mt-2 rounded-xl bg-gray-50 text-gray-700 hover:bg-gray-100 border-0 shadow-none font-medium text-sm"
-                onClick={() => {
-                  setOpen(false);
-                  router.push("/dashboard/jobs/job-queue");
-                }}
-              >
-                See all approvals
-              </Button>
-            </CardContent>
-          </Card>
+                      <div className="flex items-center gap-3 shrink-0 ml-3">
+                        <Badge
+                          className={`rounded-full px-3.5 py-1 text-xs font-medium border-0 ${statusPillClass(run.status)}`}
+                        >
+                          {statusLabel(run.status)}
+                        </Badge>
+                        <button
+                          className="text-gray-300 hover:text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onDismissRun(run.id);
+                          }}
+                          title="Dismiss"
+                          aria-label="Dismiss run"
+                        >
+                          <X size={15} />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Inline interaction panel */}
+                    {isExpanded &&
+                      run.status === "awaiting_user_input" &&
+                      run.pendingBatch && (
+                        <BatchQuestionsPanel
+                          run={run}
+                          onClose={() => setExpandedRunId(null)}
+                        />
+                      )}
+                    {isExpanded &&
+                      run.status === "awaiting_submit_approval" &&
+                      run.pendingSubmit && (
+                        <SubmitApprovalPanel
+                          run={run}
+                          onClose={() => setExpandedRunId(null)}
+                        />
+                      )}
+                    {isExpanded && expandsLogs && <RunLogPanel run={run} />}
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
-      )}
-    </div>
+
+        {/* Footer */}
+        <div className="px-6 pb-5 pt-3 border-t border-gray-100 shrink-0 flex flex-col gap-2">
+          {runs.length > 6 && (
+            <Button
+              className="w-full rounded-xl bg-gray-100 text-gray-700 hover:bg-gray-200 border-0 shadow-none font-medium text-sm"
+              onClick={() => setShowAll((v) => !v)}
+            >
+              {showAll ? "Show less" : `See all ${runs.length} runs`}
+            </Button>
+          )}
+          <Button
+            className="w-full rounded-xl bg-gray-50 text-gray-700 hover:bg-gray-100 border-0 shadow-none font-medium text-sm"
+            onClick={() => {
+              setOpen(false);
+              router.push("/dashboard/jobs/job-queue");
+            }}
+          >
+            See all approvals
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
