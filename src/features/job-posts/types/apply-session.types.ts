@@ -27,8 +27,8 @@ export interface ActiveRun {
   /** Raw status string from background.js: "loading" | "running" | "awaiting_user_input" |
    *  "awaiting_submit_approval" | "submitted" | "complete" | "stopped" | "blocked" | "error" */
   status: string;
-  /** "iframe" = embedded in this page; "window" = off-screen popup */
-  openMode?: "iframe" | "window";
+  /** "iframe" = embedded in this page; "window" = off-screen popup; "group_tab" = collapsed Chrome tab group */
+  openMode?: "iframe" | "window" | "group_tab";
   log?: RunLogEntry[];
   blockedMessage?: string;
   /** Agent is blocked waiting for user answers to these questions. */

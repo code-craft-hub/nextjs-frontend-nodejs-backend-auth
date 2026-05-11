@@ -6,10 +6,12 @@ import type { ExtensionProfile } from "./useExtension";
 
 // ─── Run mode ─────────────────────────────────────────────────────────────────
 // Change USE_IFRAME to true to embed job sites in a hidden iframe on this page.
-// false (default) opens each job in a minimised offscreen popup window instead.
+// false (default) opens each job in a collapsed Chrome tab group instead —
+// all automation tabs live inside one "cverai jobs" group pill in the tab bar
+// so the user's existing tabs stay uncluttered.
 //
-// Popup  → more reliable, works on every job board, no X-Frame-Options issues.
-// Iframe → faster startup, no extra Chrome window, but blocked by some sites.
+// Group tab → clean, no extra window, works on every job board (no iframe restrictions).
+// Iframe    → faster startup (no new tab), but blocked by sites with X-Frame-Options.
 const USE_IFRAME = false;
 
 // ─── Popup-host list ─────────────────────────────────────────────────────────
@@ -331,7 +333,7 @@ export function useRunManager(): UseRunManager {
             id: job.id,
             job: { id: job.id, title: job.title ?? "Job", company: job.company ?? "" },
             status: "queued",
-            openMode: shouldUsePopup(job.applyUrl ?? "") ? "window" : "iframe",
+            openMode: shouldUsePopup(job.applyUrl ?? "") ? "group_tab" : "iframe",
             log: [{ t: Date.now(), level: "info", text: "Waiting in queue…" }],
             provisional: true,
             createdAt: Date.now(),
@@ -492,8 +494,9 @@ export function useRunManager(): UseRunManager {
   );
 
   // ── startPopupApply ──────────────────────────────────────────────────────
-  // Opens an offscreen Chrome popup window (left: -10000, focused: false)
-  // instead of embedding an iframe. Used for sites that block iframing.
+  // Opens the job URL in a collapsed Chrome tab group (background tab) so the
+  // extension can automate without showing an extra window to the user.
+  // Falls back to a minimized popup window when the Tab Groups API is unavailable.
 
   const startPopupApply = useCallback(
     (
@@ -520,12 +523,12 @@ export function useRunManager(): UseRunManager {
             location: job.location ?? undefined,
           },
           status: "loading",
-          openMode: "window",
+          openMode: "group_tab",
           log: [
             {
               t: Date.now(),
               level: "info",
-              text: `Opening ${jobUrl} in offscreen popup — site doesn't render in iframe.`,
+              text: `Opening ${jobUrl} in background tab — will appear in collapsed "cverai jobs" group.`,
             },
           ],
           provisional: true,
@@ -636,8 +639,9 @@ export function useRunManager(): UseRunManager {
     const run = runsRef.current.get(runId);
     if (!run) return;
 
-    // Popup-mode runs live in a separate browser window — focus it instead.
-    if (run.openMode === "window") {
+    // Group-tab and popup-mode runs live outside this page —
+    // ask the extension to expand the group / restore the window.
+    if (run.openMode === "window" || run.openMode === "group_tab") {
       window.postMessage(
         { source: "cverai", type: "focus_run_window", runId },
         "*",
@@ -709,9 +713,9 @@ export function useRunManager(): UseRunManager {
         window.postMessage({ source: "cverai", type: "stop_run", runId }, "*");
       }
 
-      // For popup-mode runs, close the background Chrome window so it doesn't
-      // stay open consuming memory after the user dismisses from the bell.
-      if (run?.openMode === "window") {
+      // For group-tab and popup-mode runs, close the background tab/window so it
+      // doesn't stay open consuming memory after the user dismisses from the bell.
+      if (run?.openMode === "window" || run?.openMode === "group_tab") {
         window.postMessage({ source: "cverai", type: "close_run_window", runId }, "*");
       }
 

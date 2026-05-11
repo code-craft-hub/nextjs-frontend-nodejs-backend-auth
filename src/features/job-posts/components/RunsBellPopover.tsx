@@ -451,8 +451,8 @@ export function RunsBellPopover({
                     ? lastInterestingAction(run)
                     : null;
                 const isAutoApply =
-                  run.openMode === "window" || run.openMode === "iframe";
-                const isPopupMode = run.openMode === "window";
+                  run.openMode === "window" || run.openMode === "iframe" || run.openMode === "group_tab";
+                const isPopupMode = run.openMode === "window" || run.openMode === "group_tab";
                 const isTerminal = [
                   "submitted",
                   "complete",

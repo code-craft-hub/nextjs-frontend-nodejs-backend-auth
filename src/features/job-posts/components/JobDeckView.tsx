@@ -1,7 +1,11 @@
 "use client";
 import JobsAppliedBanner from "./JobsAppliedBanner";
 import { useState, useCallback, useEffect, useMemo } from "react";
-import { useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useInfiniteQuery,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { JobPost } from "@/features/job-posts";
 import { Card } from "@/components/ui/card";
@@ -77,7 +81,12 @@ function toJobRowFromPost(post: JobPost): JobPost & {
   recommendationId: string;
   rankPosition: null;
 } {
-  return { ...post, matchPercentage: undefined, recommendationId: post.id, rankPosition: null };
+  return {
+    ...post,
+    matchPercentage: undefined,
+    recommendationId: post.id,
+    rankPosition: null,
+  };
 }
 
 function GeneratingBanner({ message }: { message?: string }) {
@@ -202,12 +211,7 @@ interface JobDeckCardProps {
   onApply: () => void;
 }
 
-function JobDeckCard({
-  job,
-  stackIndex,
-  onSkip,
-  onApply,
-}: JobDeckCardProps) {
+function JobDeckCard({ job, stackIndex, onSkip, onApply }: JobDeckCardProps) {
   const [descOpen, setDescOpen] = useState(false);
 
   const scale = stackIndex === 0 ? 1 : stackIndex === 1 ? 0.96 : 0.92;
@@ -275,10 +279,7 @@ function JobDeckCard({
                 />
               </a>
             ) : (
-              <ExternalLink
-                className="size-4 text-[#7a7a7a]"
-                strokeWidth={2}
-              />
+              <ExternalLink className="size-4 text-[#7a7a7a]" strokeWidth={2} />
             )}
           </div>
         </div>
@@ -357,7 +358,10 @@ function JobDeckCard({
 
           <button
             className="mt-2 text-xs font-semibold text-[#2f6df6]"
-            onClick={(e) => { e.stopPropagation(); setDescOpen(true); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              setDescOpen(true);
+            }}
           >
             See full description
           </button>
@@ -434,19 +438,30 @@ export function JobDeckView({
   const { data: prefsData } = useQuery(jobPreferencesQueries.detail());
   const prefs = prefsData?.data;
 
-  const hasFilters = prefs !== undefined && !!(
-    prefs.keywords?.trim() ||
-    prefs.employmentTypes?.length ||
-    prefs.workArrangements?.length ||
-    prefs.preferredLocations?.length
-  );
+  const hasFilters =
+    prefs !== undefined &&
+    !!(
+      prefs.keywords?.trim() ||
+      prefs.employmentTypes?.length ||
+      prefs.workArrangements?.length ||
+      prefs.preferredLocations?.length
+    );
 
-  const searchParams = useMemo(() => ({
-    q: prefs?.keywords?.trim() || undefined,
-    employmentTypes: prefs?.employmentTypes?.length ? prefs.employmentTypes.join(",") : undefined,
-    workArrangements: prefs?.workArrangements?.length ? prefs.workArrangements.join(",") : undefined,
-    preferredLocations: prefs?.preferredLocations?.length ? prefs.preferredLocations.join(",") : undefined,
-  }), [prefs]);
+  const searchParams = useMemo(
+    () => ({
+      q: prefs?.keywords?.trim() || undefined,
+      employmentTypes: prefs?.employmentTypes?.length
+        ? prefs.employmentTypes.join(",")
+        : undefined,
+      workArrangements: prefs?.workArrangements?.length
+        ? prefs.workArrangements.join(",")
+        : undefined,
+      preferredLocations: prefs?.preferredLocations?.length
+        ? prefs.preferredLocations.join(",")
+        : undefined,
+    }),
+    [prefs],
+  );
 
   // ── Recommendations query (active when no filters) ───────────────────────
   const {
@@ -479,15 +494,21 @@ export function JobDeckView({
   const hasNextPage = hasFilters ? searchHasNext : recsHasNext;
   const isFetchingNextPage = hasFilters ? searchFetchingNext : recsFetchingNext;
 
-  const lastRecsPage = (recsData?.pages?.[recsData.pages.length - 1] as any)?.data;
+  const lastRecsPage = (recsData?.pages?.[recsData.pages.length - 1] as any)
+    ?.data;
   const pipelineStatus = hasFilters ? undefined : lastRecsPage?.status;
-  const isGenerating = hasFilters ? false : (lastRecsPage?.isGenerating ?? false);
+  const isGenerating = hasFilters
+    ? false
+    : (lastRecsPage?.isGenerating ?? false);
   const missingFields = hasFilters ? undefined : lastRecsPage?.missingFields;
   const generatingMessage = hasFilters ? undefined : lastRecsPage?.message;
 
   const allJobs = useMemo(() => {
     if (hasFilters) {
-      return searchData?.pages.flatMap((page) => page.items.map(toJobRowFromPost)) ?? [];
+      return (
+        searchData?.pages.flatMap((page) => page.items.map(toJobRowFromPost)) ??
+        []
+      );
     }
     return (
       recsData?.pages.flatMap((page) =>
@@ -543,7 +564,11 @@ export function JobDeckView({
 
       // Register in the bell immediately so the user sees it while it runs
       const log: RunLogEntry[] = [
-        { t: Date.now(), level: "info", text: "Generating cover letter and resume…" },
+        {
+          t: Date.now(),
+          level: "info",
+          text: "Generating cover letter and resume…",
+        },
       ];
       setEmailRuns((prev) => {
         const next = new Map(prev);
@@ -592,7 +617,11 @@ export function JobDeckView({
         patchEmailRun(runId, {
           log: [
             ...log,
-            { t: Date.now(), level: "action", text: "Sending email application…" },
+            {
+              t: Date.now(),
+              level: "action",
+              text: "Sending email application…",
+            },
           ],
         });
 
@@ -636,7 +665,9 @@ export function JobDeckView({
         setTimeout(() => removeEmailRun(runId), 6000);
 
         await Promise.all([
-          queryClient.invalidateQueries({ queryKey: queryKeys.recommendations.user() }),
+          queryClient.invalidateQueries({
+            queryKey: queryKeys.recommendations.user(),
+          }),
           invalidateEmailApplicationQueries(queryClient),
           invalidateResumeQueries(queryClient),
           invalidateCoverLetterQueries(queryClient),
@@ -783,49 +814,25 @@ export function JobDeckView({
   }
 
   // ── Empty — no results ───────────────────────────────────────────────────
-  if (allJobs.length === 0 && !isLoading) {
-    return (
-      <div className="flex flex-col items-center justify-center py-24 text-gray-400 gap-2">
-        <span className="text-4xl">📭</span>
-        <p className="text-sm">
-          {hasFilters
-            ? "No jobs match your current filters. Try adjusting your preferences."
-            : "No recommendations yet. Check back soon."}
-        </p>
-      </div>
-    );
-  }
+  // if (allJobs.length === 0 && !isLoading) {
+  //   return (
 
-  // ── Deck empty but more pages incoming — show skeleton, not "done" ──────
-  if (deck.length === 0 && (isFetchingNextPage || hasNextPage)) {
-    return (
-      <div className="flex flex-col items-center justify-center py-24 gap-3">
-        <div className="w-full max-w-245 h-90 bg-gray-100 rounded-[60px] animate-pulse" />
-        <p className="text-sm text-gray-400 animate-pulse">
-          Loading more jobs…
-        </p>
-      </div>
-    );
-  }
+  //   );
+  // }
+
+  // // ── Deck empty but more pages incoming — show skeleton, not "done" ──────
+  // if () {
+  //   return (
+
+  //   );
+  // }
 
   // ── Deck truly exhausted ────────────────────────────────────────────────
-  if (deck.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center py-24 gap-3">
-        <span className="text-4xl">🎉</span>
-        <p className="font-medium text-gray-700">You've reviewed all jobs!</p>
-        <p className="text-xs text-gray-400">
-          {appliedIds.size} applied · {skippedIds.size} skipped
-        </p>
-        <button
-          onClick={handleReset}
-          className="mt-1 px-4 py-2 bg-gray-100 text-gray-700 text-sm rounded-xl hover:bg-gray-200 transition-colors"
-        >
-          Start over
-        </button>
-      </div>
-    );
-  }
+  // if (deck.length === 0) {
+  //   return (
+
+  //   );
+  // }
 
   // ── Deck ────────────────────────────────────────────────────────────────
   const visibleCards = deck.slice(0, 3);
@@ -856,31 +863,67 @@ export function JobDeckView({
       {/* Card stack — CSS grid stacking: all cards share [grid-area:1/1] so the
            container height matches the top card's content on every screen size.
            pb-8 absorbs the 24px translateY peek of back cards. */}
-      <div className="grid w-full max-w-245 pb-8">
-        {[...visibleCards].reverse().map((job, reversedIdx) => {
-          const stackIndex = (visibleCards.length - 1 - reversedIdx) as
-            | 0
-            | 1
-            | 2;
-          const isTop = stackIndex === 0;
-          return (
-            <div
-              key={job.id}
-              className={[
-                "[grid-area:1/1] transition-all duration-300",
-                isTop ? topSwipeClass : "",
-              ].join(" ")}
+      {deck.length === 0 ? (
+        deck.length === 0 && (isFetchingNextPage || hasNextPage) ? (
+          <div className="flex flex-col items-center justify-center py-24 gap-3">
+            <div className="w-full max-w-245 h-90 bg-gray-100 rounded-[60px] animate-pulse" />
+            <p className="text-sm text-gray-400 animate-pulse">
+              Loading more jobs…
+            </p>
+          </div>
+        ) : allJobs.length === 0 && !isLoading ? (
+          <div className="flex flex-col items-center justify-center py-24 text-gray-400 gap-2">
+            <span className="text-4xl">📭</span>
+            <p className="text-sm">
+              {hasFilters
+                ? "No jobs match your current filters. Try adjusting your preferences."
+                : "No recommendations yet. Check back soon."}
+            </p>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center py-24 gap-3">
+            <span className="text-4xl">🎉</span>
+            <p className="font-medium text-gray-700">
+              You've reviewed all jobs!
+            </p>
+            <p className="text-xs text-gray-400">
+              {appliedIds.size} applied · {skippedIds.size} skipped
+            </p>
+            <button
+              onClick={handleReset}
+              className="mt-1 px-4 py-2 bg-gray-100 text-gray-700 text-sm rounded-xl hover:bg-gray-200 transition-colors"
             >
-              <JobDeckCard
-                job={job}
-                stackIndex={stackIndex}
-                onSkip={handleSkip}
-                onApply={handleApply}
-              />
-            </div>
-          );
-        })}
-      </div>
+              Start over
+            </button>
+          </div>
+        )
+      ) : (
+        <div className="grid w-full max-w-245 pb-8">
+          {[...visibleCards].reverse().map((job, reversedIdx) => {
+            const stackIndex = (visibleCards.length - 1 - reversedIdx) as
+              | 0
+              | 1
+              | 2;
+            const isTop = stackIndex === 0;
+            return (
+              <div
+                key={job.id}
+                className={[
+                  "[grid-area:1/1] transition-all duration-300",
+                  isTop ? topSwipeClass : "",
+                ].join(" ")}
+              >
+                <JobDeckCard
+                  job={job}
+                  stackIndex={stackIndex}
+                  onSkip={handleSkip}
+                  onApply={handleApply}
+                />
+              </div>
+            );
+          })}
+        </div>
+      )}
       <div className="w-full flex items-center justify-center">
         <Button
           onClick={() => {
