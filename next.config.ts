@@ -27,6 +27,17 @@ const nextConfig: NextConfig = {
         source: "/api/:path*",
         destination: "http://127.0.0.1:8080/api/:path*",
       });
+    } else {
+      // Prod: proxy API calls through Next.js so the browser extension
+      // (which uses the frontend origin as its server URL) can reach the
+      // Express backend without a cross-origin request.
+      const backendBase =
+        process.env.NEXT_PUBLIC_AUTH_API_URL?.replace(/\/api$/, "") ??
+        "https://api.cverai.com";
+      rules.push({
+        source: "/api/:path*",
+        destination: `${backendBase}/api/:path*`,
+      });
     }
 
     // PostHog reverse proxy — routes PostHog traffic through our own domain so
