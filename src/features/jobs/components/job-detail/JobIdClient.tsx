@@ -1,10 +1,8 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import {
-  ArrowLeft,
   Facebook,
   Twitter,
   Instagram,
@@ -13,6 +11,7 @@ import {
   Wallet,
   MapPin,
 } from "lucide-react";
+import { BackButton } from "@/components/shared/BackButton";
 import { Button } from "@/components/ui/button";
 import { jobsQueries } from "@/features/jobs/queries/jobs.queries";
 import { useApplyJob } from "@/features/jobs/hooks/useApplyJob";
@@ -24,6 +23,7 @@ import { ContactRow } from "./ContactRow";
 import { SocialButton } from "./SocialButton";
 import { JobDescriptionSkeleton, JobTitleSkeleton } from "./JobSkeletons";
 import { ApplicationSnapshot } from "./ApplicationSnapshot";
+import EmptyState from "@/components/EmptyState";
 
 function decodeHtml(encoded: string): string {
   if (typeof window === "undefined") return encoded;
@@ -46,47 +46,35 @@ export function JobIdClient({
   jobId: string;
   referrer: string;
 }) {
-  const router = useRouter();
   const { data, isLoading, isError } = useQuery(jobsQueries.detail(jobId));
   const { applyToJob } = useApplyJob();
 
   const job = data?.data;
   const backUrl = REFERRER_URLS[referrer] ?? "/dashboard/jobs";
 
-  if (isError || (!isLoading && !job)) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center gap-4">
-        <button
-          onClick={() => router.push(backUrl)}
-          className="absolute top-8 left-8 flex items-center text-blue-600 font-medium hover:text-blue-700"
-        >
-          <ArrowLeft className="w-5 h-5 mr-2" />
-          Back
-        </button>
-        <p className="text-2xl font-semibold text-gray-700">Job not found</p>
-        <p className="text-sm text-gray-500">This job may have been removed or is no longer available.</p>
-      </div>
-    );
-  }
-
-
   useEffect(() => {
     if (job?.id) {
       Analytics.jobView(job.id, job.title ?? undefined);
     }
   }, [job?.id]);
-  
+
+  if (isError || (!isLoading && !job)) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center gap-4 relative">
+        <BackButton href={backUrl} className="absolute top-8 left-8" />
+        <EmptyState
+          title="Job not found"
+          description="This job may have been removed or is no longer available."
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-6xl mx-auto px-4 sm:px-8 py-8">
         {/* Back button */}
-        <button
-          onClick={() => router.push(backUrl)}
-          className="flex items-center hover:cursor-pointer text-blue-600 font-medium hover:text-blue-700"
-        >
-          <ArrowLeft className="w-5 h-5 mr-2" />
-          Back
-        </button>
+        <BackButton href={backUrl} />
 
         <h1 className="text-2xl sm:text-4xl font-bold text-center my-8">
           Job Details
@@ -143,7 +131,9 @@ export function JobIdClient({
                 <div className="text-gray-600 leading-relaxed space-y-3">
                   {job?.descriptionHtml ? (
                     <div
-                      dangerouslySetInnerHTML={{ __html: decodeHtml(job.descriptionHtml) }}
+                      dangerouslySetInnerHTML={{
+                        __html: decodeHtml(job.descriptionHtml),
+                      }}
                     />
                   ) : (
                     <div>{job?.descriptionText}</div>
@@ -191,9 +181,7 @@ export function JobIdClient({
                   value={job?.salary ?? "N/A"}
                 />
                 <JobInfoCell
-                  icon={
-                    <img src="/briefcase.svg" className="w-5 h-5" alt="" />
-                  }
+                  icon={<img src="/briefcase.svg" className="w-5 h-5" alt="" />}
                   label="Employment Type"
                   value={job?.employmentType ?? "N/A"}
                 />
@@ -216,7 +204,11 @@ export function JobIdClient({
                   icon="/Envelope.svg"
                   label="Recruiter Email"
                   value={job?.recruiterEmail ?? "N/A"}
-                  href={job?.recruiterEmail ? `mailto:${job.recruiterEmail}` : undefined}
+                  href={
+                    job?.recruiterEmail
+                      ? `mailto:${job.recruiterEmail}`
+                      : undefined
+                  }
                   bordered
                 />
               </div>

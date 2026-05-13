@@ -19,6 +19,7 @@ import { jobApplicationsApi } from "@/features/analytics/api/job-applications.ap
 import { queryKeys } from "@/shared/query/keys";
 import { formatDistanceToNow } from "date-fns";
 import type { JobApplication } from "@/shared/types";
+import { BackButton } from "@/components/shared/BackButton";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -224,6 +225,8 @@ export default function ApprovalQueue() {
   return (
     <div className="w-full min-h-screen bg-white px-4 sm:px-6 lg:px-10 py-8">
       {/* Header */}
+      <BackButton href={"/dashboard/home"} className="mb-6" />
+
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-6">
         <div>
           <h1 className="text-[32px] sm:text-[40px] lg:text-[48px] font-normal text-black leading-none">
@@ -235,12 +238,12 @@ export default function ApprovalQueue() {
         </div>
 
         <div className="flex items-center gap-3 shrink-0">
-          <Button className="h-[40px] sm:h-[44px] px-5 sm:px-8 rounded-md bg-[#3b82f6] hover:bg-[#3b82f6]/90 text-white text-[14px] sm:text-[16px] font-medium shadow-none">
+          <Button className="h-10 px-5 sm:px-8 rounded-md bg-[#3b82f6] hover:bg-[#3b82f6]/90 text-white text-[14px] sm:text-[16px] font-medium shadow-none">
             Approve all
           </Button>
           <Button
             variant="outline"
-            className="h-[40px] sm:h-[44px] px-5 sm:px-8 rounded-md border border-[#ef4444] text-[#ef4444] hover:bg-transparent hover:text-[#ef4444] text-[14px] sm:text-[16px] font-medium shadow-none"
+            className="h-10 px-5 sm:px-8 rounded-md border border-[#ef4444] text-[#ef4444] hover:bg-transparent hover:text-[#ef4444] text-[14px] sm:text-[16px] font-medium shadow-none"
           >
             Decline selected
           </Button>
