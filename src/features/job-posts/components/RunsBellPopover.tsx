@@ -1,13 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Briefcase, X, Send, CheckCircle } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { Briefcase, Send, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
@@ -22,67 +20,6 @@ import BellIcon from "@/components/icons/BellIcon";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-function prettyStatus(s: string): string {
-  switch (s) {
-    case "queued":
-      return "In queue";
-    case "loading":
-      return "Starting";
-    case "running":
-      return "Processing";
-    case "awaiting_user_input":
-    case "awaiting_submit_approval":
-      return "Attention";
-    case "blocked":
-      return "Blocked";
-    case "submitted":
-    case "complete":
-      return "Applied";
-    case "stopped":
-      return "Stopped";
-    case "error":
-      return "Error";
-    default:
-      return "Queued";
-  }
-}
-
-function statusLabel(s: string): string {
-  switch (s) {
-    case "queued":
-      return "In queue";
-    case "loading":
-      return "Starting…";
-    case "running":
-      return "Processing...";
-    case "awaiting_user_input":
-      return "Needs answers";
-    case "awaiting_submit_approval":
-      return "Ready to submit";
-    case "blocked":
-      return "Can't automate";
-    case "submitted":
-    case "complete":
-      return "Applied";
-    case "stopped":
-      return "Stopped";
-    case "error":
-      return "Error";
-    default:
-      return "Queued";
-  }
-}
-
-function statusPillClass(s: string): string {
-  const key = prettyStatus(s);
-  if (key === "Applied") return "bg-green-100 text-green-700";
-  if (key === "Processing") return "bg-yellow-100 text-yellow-700";
-  if (key === "Attention") return "bg-red-100 text-red-600";
-  if (key === "Blocked") return "bg-amber-100 text-amber-700";
-  if (key === "Error") return "bg-red-100 text-red-600";
-  return "bg-gray-200 text-gray-600";
-}
-
 function lastInterestingAction(run: ActiveRun): string | null {
   if (!run.log) return null;
   for (let i = run.log.length - 1; i >= 0; i--) {
@@ -95,7 +32,7 @@ function lastInterestingAction(run: ActiveRun): string | null {
 function CompanyAvatar({ company }: { company: string }) {
   const letter = company?.charAt(0)?.toUpperCase() || "?";
   return (
-    <div className="w-10 h-10 rounded-full bg-black flex items-center justify-center text-yellow-400 font-bold shrink-0 text-sm">
+    <div className="h-9 w-9 rounded-full bg-neutral-900 flex items-center justify-center text-yellow-400 font-bold shrink-0 text-sm">
       {letter}
     </div>
   );
@@ -134,7 +71,6 @@ function BatchQuestionsPanel({
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
 
-  // Listen for ack from content-trigger so we can confirm delivery
   useEffect(() => {
     const handler = (e: MessageEvent) => {
       const d = e.data as Record<string, unknown> | null;
@@ -152,7 +88,6 @@ function BatchQuestionsPanel({
   function handleSend() {
     setSending(true);
     sendAnswerBatch(run.id, answers);
-    // Fallback: if no ack within 3 s, close anyway
     setTimeout(() => {
       setSending(false);
       onClose();
@@ -230,7 +165,6 @@ function SubmitApprovalPanel({
     onClose();
   }
 
-  // summary may be an array of { field, value } objects, a JSON string, or a plain string
   let summaryItems: Array<{ field: string; value: string }> | null = null;
   if (Array.isArray(summary)) {
     summaryItems = summary as Array<{ field: string; value: string }>;
@@ -304,7 +238,7 @@ function SubmitApprovalPanel({
 
 function RunLogPanel({ run }: { run: ActiveRun }) {
   const entries = run.log ?? [];
-  const reversed = [...entries].reverse(); // newest first
+  const reversed = [...entries].reverse();
 
   function levelColor(level: string) {
     if (level === "error") return "text-red-500";
@@ -331,9 +265,7 @@ function RunLogPanel({ run }: { run: ActiveRun }) {
                   second: "2-digit",
                 })}
               </span>
-              <span
-                className={`break-words min-w-0 ${levelColor(entry.level)}`}
-              >
+              <span className={`break-words min-w-0 ${levelColor(entry.level)}`}>
                 {entry.text}
               </span>
             </div>
@@ -341,6 +273,80 @@ function RunLogPanel({ run }: { run: ActiveRun }) {
         </div>
       )}
     </div>
+  );
+}
+
+// ─── New UI sub-components ────────────────────────────────────────────────────
+
+type DisplayStatus =
+  | "applied"
+  | "queued"
+  | "processing"
+  | "attention"
+  | "blocked"
+  | "error"
+  | "stopped";
+
+function toDisplayStatus(s: string): DisplayStatus {
+  if (["submitted", "complete", "applied"].includes(s)) return "applied";
+  if (["queued", "loading"].includes(s)) return "queued";
+  if (s === "running") return "processing";
+  if (["awaiting_user_input", "awaiting_submit_approval"].includes(s)) return "attention";
+  if (s === "blocked") return "blocked";
+  if (s === "error") return "error";
+  if (s === "stopped") return "stopped";
+  return "queued";
+}
+
+function StatusBadge({ status }: { status: DisplayStatus }) {
+  const map: Record<DisplayStatus, { label: string; classes: string }> = {
+    applied:    { label: "Applied",           classes: "bg-emerald-100 text-emerald-700" },
+    queued:     { label: "Queued",            classes: "bg-slate-200 text-slate-500" },
+    processing: { label: "Processing…",  classes: "bg-amber-100 text-amber-700" },
+    attention:  { label: "Attention needed",  classes: "bg-rose-100 text-rose-600" },
+    blocked:    { label: "Blocked",           classes: "bg-amber-100 text-amber-700" },
+    error:      { label: "Error",             classes: "bg-rose-100 text-rose-600" },
+    stopped:    { label: "Stopped",           classes: "bg-slate-200 text-slate-500" },
+  };
+  const { label, classes } = map[status] ?? map.queued;
+  return (
+    <span
+      className={`inline-flex h-7 items-center justify-center rounded-full px-3 text-[13px] font-semibold whitespace-nowrap ${classes}`}
+    >
+      {label}
+    </span>
+  );
+}
+
+function AutoApplyBadge() {
+  return (
+    <span className="inline-flex h-7 items-center gap-1 rounded-full bg-indigo-100 px-2.5 text-[12px] font-semibold text-indigo-700 shrink-0">
+      <svg
+        viewBox="0 0 24 24"
+        className="h-3.5 w-3.5 fill-indigo-600"
+        aria-hidden="true"
+      >
+        <path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z" />
+      </svg>
+      Auto-apply
+    </span>
+  );
+}
+
+function CloseIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-4 w-4"
+      aria-hidden="true"
+    >
+      <path d="M6 6l12 12M18 6L6 18" />
+    </svg>
   );
 }
 
@@ -360,8 +366,6 @@ export function RunsBellPopover({
   const [open, setOpen] = useState(false);
   const [showAll, setShowAll] = useState(false);
   const [expandedRunId, setExpandedRunId] = useState<string | null>(null);
-  // Track which group_tab run the user last clicked to view so we can
-  // re-collapse its tab group when the bell dialog closes.
   const exposedRunIdRef = useRef<string | null>(null);
   const router = useRouter();
 
@@ -441,25 +445,28 @@ export function RunsBellPopover({
         </button>
       </DialogTrigger>
 
-      <DialogContent className="w-full sm:max-w-[480px] max-h-[90vh] flex flex-col gap-0 p-0 overflow-hidden">
+      <DialogContent className="w-full sm:max-w-[760px] max-h-[90vh] flex flex-col gap-0 p-6 overflow-hidden rounded-3xl">
         {/* Header */}
-        <DialogHeader className="px-6 pt-6 pb-4 border-b border-gray-100 shrink-0">
-          <div className="flex items-center justify-between">
-            <DialogTitle className="text-base font-semibold text-gray-900">
-              Active ({runs.length})
-            </DialogTitle>
-            <span className="text-sm text-gray-400">{pct}% completion</span>
-          </div>
-        </DialogHeader>
+        <div className="flex items-center justify-between pb-4">
+          <DialogTitle className="text-[20px] font-extrabold tracking-tight text-neutral-900">
+            Active ({runs.length})
+          </DialogTitle>
+          <span className="text-[14px] font-semibold text-neutral-500">
+            {pct}% completion
+          </span>
+        </div>
+
+        {/* Divider */}
+        <div className="border-t border-slate-200" />
 
         {/* Scrollable run list */}
-        <div className="flex-1 overflow-y-auto px-6 py-2">
+        <div className="flex-1 overflow-y-auto">
           {runs.length === 0 ? (
             <p className="text-sm text-gray-400 text-center py-6">
               No runs yet. Apply to a job to get started.
             </p>
           ) : (
-            <div>
+            <ul className="flex flex-col">
               {visibleRuns.map((run) => {
                 const title = run.job?.title ?? "Job";
                 const company = run.job?.company ?? "";
@@ -473,8 +480,11 @@ export function RunsBellPopover({
                     ? lastInterestingAction(run)
                     : null;
                 const isAutoApply =
-                  run.openMode === "window" || run.openMode === "iframe" || run.openMode === "group_tab";
-                const isPopupMode = run.openMode === "window" || run.openMode === "group_tab";
+                  run.openMode === "window" ||
+                  run.openMode === "iframe" ||
+                  run.openMode === "group_tab";
+                const isPopupMode =
+                  run.openMode === "window" || run.openMode === "group_tab";
                 const isTerminal = [
                   "submitted",
                   "complete",
@@ -491,13 +501,13 @@ export function RunsBellPopover({
                   run.status === "awaiting_user_input" ||
                   run.status === "awaiting_submit_approval";
                 const isExpanded = expandedRunId === run.id;
-                // All dead runs (not just popup mode) can expand to show log
                 const expandsLogs = isDead;
+                const displayStatus = toDisplayStatus(run.status);
 
                 return (
-                  <div
+                  <li
                     key={run.id}
-                    className={`py-3.5 border-b last:border-none -mx-2 px-2 rounded-xl transition-colors ${
+                    className={`flex flex-col py-3.5 border-b last:border-none ${
                       needsAttention
                         ? "bg-amber-50/60"
                         : isBlocked
@@ -517,71 +527,66 @@ export function RunsBellPopover({
                           `/dashboard/jobs/${run.applicationId}/application-details`,
                         );
                       } else {
-                        // For group_tab runs, track so we can re-collapse on bell close.
                         if (isPopupMode) exposedRunIdRef.current = run.id;
                         onOpenRun(run.id);
                       }
                     }}
                   >
-                    {/* Row: avatar + title + status + dismiss */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3 min-w-0">
-                        <CompanyAvatar company={company} />
-                        <div className="min-w-0">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <span className="text-sm font-medium text-gray-800 truncate capitalize">
-                              {title}
-                              {company ? ` @${company}` : ""}
-                            </span>
-                            {isAutoApply && (
-                              <div className="flex items-center gap-1 bg-indigo-100 text-indigo-600 px-2.5 py-0.5 rounded-full text-xs font-medium shrink-0">
-                                <span>⚡</span>
-                                Auto-apply
-                              </div>
-                            )}
-                            {run?.jobUrl && (
-                              <div className="flex items-center gap-1 bg-indigo-100 text-indigo-600 px-2.5 py-0.5 rounded-full text-xs font-medium shrink-0">
-                                <Briefcase className="size-4" />
-                                <a
-                                  href={run.jobUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  onClick={(e) => e.stopPropagation()}
-                                  className="underline"
-                                >
-                                  View job
-                                </a>
-                              </div>
-                            )}
-                          </div>
-                          {liveAction && (
-                            <p className="text-xs text-gray-400 truncate mt-0.5">
-                              {liveAction}
-                            </p>
-                          )}
-                          {run.blockedMessage && (
-                            <p className={`text-xs truncate mt-0.5 ${isBlocked ? "text-amber-600" : "text-red-400"}`}>
-                              {run.blockedMessage}
-                            </p>
-                          )}
-                          {needsAttention && !isExpanded && (
-                            <p className="text-xs text-amber-600 font-medium mt-0.5">
-                              {run.status === "awaiting_user_input"
-                                ? `${run.pendingBatch?.questions?.length ?? 0} question(s) need your answer — tap to expand`
-                                : "Form filled and ready — tap to review & approve"}
-                            </p>
-                          )}
-                          {isPopupMode && isActive && !needsAttention && (
-                            <p className="text-xs text-indigo-400 mt-0.5">
-                              Tap to view in browser tab →
-                            </p>
-                          )}
-                          {expandsLogs && !isExpanded && (
-                            <p className="text-xs text-gray-400 mt-0.5">
-                              Tap to see full log
-                            </p>
+                    {/* Main row */}
+                    <div className="flex items-center gap-3">
+                      <CompanyAvatar company={company} />
+
+                      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="truncate text-[15px] font-bold text-neutral-900">
+                            {title}
+                            {company ? ` @${company}` : ""}
+                          </span>
+                          {isAutoApply && <AutoApplyBadge />}
+                          {run?.jobUrl && (
+                            <a
+                              href={run.jobUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={(e) => e.stopPropagation()}
+                              className="inline-flex items-center gap-1 bg-indigo-100 text-indigo-600 px-2.5 py-0.5 rounded-full text-xs font-medium shrink-0 underline"
+                            >
+                              <Briefcase className="size-3.5" />
+                              View job
+                            </a>
                           )}
                         </div>
+                        {liveAction && (
+                          <p className="text-xs text-gray-400 truncate">
+                            {liveAction}
+                          </p>
+                        )}
+                        {run.blockedMessage && (
+                          <p
+                            className={`text-xs truncate ${
+                              isBlocked ? "text-amber-600" : "text-red-400"
+                            }`}
+                          >
+                            {run.blockedMessage}
+                          </p>
+                        )}
+                        {needsAttention && !isExpanded && (
+                          <p className="text-xs text-amber-600 font-medium">
+                            {run.status === "awaiting_user_input"
+                              ? `${run.pendingBatch?.questions?.length ?? 0} question(s) need your answer — tap to expand`
+                              : "Form filled and ready — tap to review & approve"}
+                          </p>
+                        )}
+                        {isPopupMode && isActive && !needsAttention && (
+                          <p className="text-xs text-indigo-400">
+                            Tap to view in browser tab →
+                          </p>
+                        )}
+                        {expandsLogs && !isExpanded && (
+                          <p className="text-xs text-gray-400">
+                            Tap to see full log
+                          </p>
+                        )}
                       </div>
 
                       <div className="flex items-center gap-2 shrink-0 ml-3">
@@ -597,27 +602,30 @@ export function RunsBellPopover({
                             Apply manually →
                           </a>
                         )}
-                        {isPopupMode && !isTerminal && !isBlocked && run.status !== "queued" && (
-                          <button
-                            className="text-xs text-indigo-500 hover:text-indigo-700 px-2 py-1 rounded-lg hover:bg-indigo-50 transition-colors font-medium shrink-0"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              exposedRunIdRef.current = run.id;
-                              onOpenRun(run.id);
-                              setOpen(false);
-                            }}
-                            title="View this job's tab in the browser"
-                          >
-                            View tab →
-                          </button>
-                        )}
-                        <Badge
-                          className={`rounded-full px-3.5 py-1 text-xs font-medium border-0 ${statusPillClass(run.status)}`}
-                        >
-                          {statusLabel(run.status)}
-                        </Badge>
+                        {isPopupMode &&
+                          !isTerminal &&
+                          !isBlocked &&
+                          run.status !== "queued" && (
+                            <button
+                              className="text-xs text-indigo-500 hover:text-indigo-700 px-2 py-1 rounded-lg hover:bg-indigo-50 transition-colors font-medium shrink-0"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                exposedRunIdRef.current = run.id;
+                                onOpenRun(run.id);
+                                setOpen(false);
+                              }}
+                              title="View this job's tab in the browser"
+                            >
+                              View tab →
+                            </button>
+                          )}
+                        <StatusBadge status={displayStatus} />
                         <button
-                          className={`text-gray-300 hover:text-gray-600 transition-opacity ${isBlocked || isDead ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}
+                          className={`inline-flex h-7 w-7 items-center justify-center rounded-full text-neutral-500 transition hover:bg-slate-100 hover:text-neutral-900 ${
+                            isBlocked || isDead
+                              ? "opacity-100"
+                              : "opacity-0 group-hover:opacity-100"
+                          }`}
                           onClick={(e) => {
                             e.stopPropagation();
                             onDismissRun(run.id);
@@ -625,12 +633,12 @@ export function RunsBellPopover({
                           title="Dismiss"
                           aria-label="Dismiss run"
                         >
-                          <X size={15} />
+                          <CloseIcon />
                         </button>
                       </div>
                     </div>
 
-                    {/* Inline interaction panel */}
+                    {/* Inline interaction panels */}
                     {isExpanded &&
                       run.status === "awaiting_user_input" &&
                       run.pendingBatch && (
@@ -653,15 +661,15 @@ export function RunsBellPopover({
                         />
                       )}
                     {isExpanded && expandsLogs && <RunLogPanel run={run} />}
-                  </div>
+                  </li>
                 );
               })}
-            </div>
+            </ul>
           )}
         </div>
 
         {/* Footer */}
-        <div className="px-6 pb-5 pt-3 border-t border-gray-100 shrink-0 flex flex-col gap-2">
+        <div className="pt-3 flex flex-col gap-2">
           {runs.length > 6 && (
             <Button
               className="w-full rounded-xl bg-gray-100 text-gray-700 hover:bg-gray-200 border-0 shadow-none font-medium text-sm"
@@ -670,15 +678,16 @@ export function RunsBellPopover({
               {showAll ? "Show less" : `See all ${runs.length} runs`}
             </Button>
           )}
-          <Button
-            className="w-full rounded-xl bg-gray-50 text-gray-700 hover:bg-gray-100 border-0 shadow-none font-medium text-sm"
+          <button
+            type="button"
+            className="h-12 w-full rounded-xl bg-slate-200/80 text-[15px] font-semibold text-neutral-900 transition hover:bg-slate-200"
             onClick={() => {
               setOpen(false);
               router.push("/dashboard/jobs/job-queue");
             }}
           >
-            See all approvals
-          </Button>
+            see all approvals
+          </button>
         </div>
       </DialogContent>
     </Dialog>
