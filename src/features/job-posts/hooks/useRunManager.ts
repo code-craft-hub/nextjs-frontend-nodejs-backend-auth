@@ -765,6 +765,14 @@ export function useRunManager(): UseRunManager {
         next.delete(runId);
         return next;
       });
+
+      // Free the concurrency slot if this run was actively occupying one.
+      // Normally the slot is freed when a terminal run_update arrives, but
+      // dismissedRunIds causes us to skip those messages — so release the
+      // slot here so queued jobs can proceed.
+      if (run?.job?.id && activeJobIdsRef.current.delete(run.job.id)) {
+        setTimeout(() => tryProcessNextRef.current(), 0);
+      }
     },
     [setRuns, closeRunModal],
   );
