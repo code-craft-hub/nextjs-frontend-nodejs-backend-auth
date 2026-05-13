@@ -47,11 +47,27 @@ export function JobIdClient({
   referrer: string;
 }) {
   const router = useRouter();
-  const { data, isLoading } = useQuery(jobsQueries.detail(jobId));
+  const { data, isLoading, isError } = useQuery(jobsQueries.detail(jobId));
   const { applyToJob } = useApplyJob();
 
   const job = data?.data;
   const backUrl = REFERRER_URLS[referrer] ?? "/dashboard/jobs";
+
+  if (isError || (!isLoading && !job)) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center gap-4">
+        <button
+          onClick={() => router.push(backUrl)}
+          className="absolute top-8 left-8 flex items-center text-blue-600 font-medium hover:text-blue-700"
+        >
+          <ArrowLeft className="w-5 h-5 mr-2" />
+          Back
+        </button>
+        <p className="text-2xl font-semibold text-gray-700">Job not found</p>
+        <p className="text-sm text-gray-500">This job may have been removed or is no longer available.</p>
+      </div>
+    );
+  }
 
 
   useEffect(() => {
