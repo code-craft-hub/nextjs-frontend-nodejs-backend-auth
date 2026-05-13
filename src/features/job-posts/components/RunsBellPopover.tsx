@@ -17,6 +17,7 @@ import type {
 } from "../types/apply-session.types";
 import { useRouter } from "next/navigation";
 import BellIcon from "@/components/icons/BellIcon";
+import { decodeHtml } from "@/lib/utils";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -29,12 +30,16 @@ function lastInterestingAction(run: ActiveRun): string | null {
   return null;
 }
 
-function CompanyAvatar({ company }: { company: string }) {
-  const letter = company?.charAt(0)?.toUpperCase() || "?";
+function CompanyAvatar({ company, logo }: { company: string; logo?: string }) {
   return (
-    <div className="h-9 w-9 rounded-full bg-neutral-900 flex items-center justify-center text-yellow-400 font-bold shrink-0 text-sm">
-      {letter}
-    </div>
+    <img
+      src={logo || "/placeholder.jpg"}
+      alt={company || "Company"}
+      className="h-9 w-9 rounded-full shrink-0 object-cover bg-neutral-100"
+      onError={(e) => {
+        (e.currentTarget as HTMLImageElement).src = "/placeholder.jpg";
+      }}
+    />
   );
 }
 
@@ -448,7 +453,7 @@ export function RunsBellPopover({
       <DialogContent className="w-full sm:max-w-[760px] max-h-[90vh] flex flex-col gap-0 p-6 overflow-hidden rounded-3xl">
         {/* Header */}
         <div className="flex items-center justify-between pb-4">
-          <DialogTitle className="text-[20px] font-extrabold tracking-tight text-neutral-900">
+          <DialogTitle className="text-[20px] font-semibold tracking-tight text-neutral-900">
             Active ({runs.length})
           </DialogTitle>
           <span className="text-[14px] font-semibold text-neutral-500">
@@ -470,6 +475,7 @@ export function RunsBellPopover({
               {visibleRuns.map((run) => {
                 const title = run.job?.title ?? "Job";
                 const company = run.job?.company ?? "";
+                const logo = run.job?.logo;
                 const isActive = [
                   "loading",
                   "running",
@@ -534,12 +540,12 @@ export function RunsBellPopover({
                   >
                     {/* Main row */}
                     <div className="flex items-center gap-3">
-                      <CompanyAvatar company={company} />
+                      <CompanyAvatar company={company} logo={logo} />
 
                       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className="truncate text-[15px] font-bold text-neutral-900">
-                            {title}
+                          <span className="truncate text-[15px] font-semibold text-neutral-900 capitalize">
+                            {decodeHtml(title)}
                             {company ? ` @${company}` : ""}
                           </span>
                           {isAutoApply && <AutoApplyBadge />}

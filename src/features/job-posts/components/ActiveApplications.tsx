@@ -119,7 +119,7 @@ const ActiveApplications: React.FC<ActiveApplicationsProps> = ({
 }) => {
   return (
     <div
-      className={`w-full max-w-[760px] rounded-3xl bg-white p-6 shadow-[0_1px_2px_rgba(15,23,42,0.04)] ring-1 ring-slate-100 ${className}`}
+      className={`w-full max-w-190 rounded-3xl bg-white p-6 shadow-[0_1px_2px_rgba(15,23,42,0.04)] ring-1 ring-slate-100 ${className}`}
     >
       {/* Header */}
       <div className="flex items-center justify-between pb-4">

@@ -24,19 +24,19 @@ const EmptyState: React.FC<EmptyStateProps> = ({
     <div
       className={`flex min-h-screen w-full items-start justify-center bg-white pt-30 ${className}`}
     >
-      <div className="flex max-w-[520px] flex-col items-center text-center">
+      <div className="flex max-w-130 flex-col items-center text-center">
         <img
           src={image}
           alt={imageAlt}
           draggable={false}
-          className="mb-8 h-auto w-[232px] select-none pointer-events-none"
+          className="mb-8 h-auto w-58 select-none pointer-events-none"
         />
 
         <h2 className="m-0 text-[22px] font-medium leading-tight tracking-tight text-[#0b1220]">
           {title}
         </h2>
 
-        <p className="mt-2.5 mb-0 max-w-[420px] text-[15px]  leading-[1.55] text-[#8a91a3]">
+        <p className="mt-2.5 mb-0 max-w-105 text-[15px]  leading-[1.55] text-[#8a91a3]">
           {description}
         </p>
       </div>

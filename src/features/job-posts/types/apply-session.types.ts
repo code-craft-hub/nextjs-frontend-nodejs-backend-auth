@@ -21,7 +21,7 @@ export interface RunBatchQuestion {
 
 export interface ActiveRun {
   id: string;
-  job?: { id: string; title: string; company: string; location?: string };
+  job?: { id: string; title: string; company: string; location?: string; logo?: string };
   /** The job application URL — used to recreate the iframe if missing. */
   jobUrl?: string;
   /** Raw status string from background.js: "loading" | "running" | "awaiting_user_input" |

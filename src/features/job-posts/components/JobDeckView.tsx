@@ -44,6 +44,7 @@ import { invalidateUserQueries } from "@features/user";
 import { queryKeys } from "@/shared/query/keys";
 import type { ActiveRun, RunLogEntry } from "../types/apply-session.types";
 import type { ExtensionState } from "../hooks/useExtension";
+import { decodeHtml } from "@/lib/utils";
 export type ViewType = "deck" | "list";
 
 // const CWS_URL =
@@ -137,16 +138,6 @@ function IncompleteProfileBanner({
 }
 
 type SwipeDir = "left" | "right" | null;
-
-function decodeHtml(html: string): string {
-  return html
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&quot;/g, '"')
-    .replace(/&#039;/g, "'")
-    .replace(/&nbsp;/g, " ");
-}
 
 /**
  * Converts a raw (possibly plain-text) job description into readable HTML.
@@ -341,7 +332,9 @@ function JobDeckCard({ job, stackIndex, onSkip, onApply }: JobDeckCardProps) {
             {job.location && (
               <div className="mt- flex items-center gap-1 text-[#8a8a8a] text-md font-medium">
                 <MapPin className="size-3" strokeWidth={2} />
-                <span className="text-xs max-w-sm line-clamp-1 text-nowrap truncate">{job.location}</span>
+                <span className="text-xs max-w-sm line-clamp-1 text-nowrap truncate">
+                  {job.location}
+                </span>
               </div>
             )}
           </div>
@@ -813,26 +806,6 @@ export function JobDeckView({
     );
   }
 
-  // ── Empty — no results ───────────────────────────────────────────────────
-  // if (allJobs.length === 0 && !isLoading) {
-  //   return (
-
-  //   );
-  // }
-
-  // // ── Deck empty but more pages incoming — show skeleton, not "done" ──────
-  // if () {
-  //   return (
-
-  //   );
-  // }
-
-  // ── Deck truly exhausted ────────────────────────────────────────────────
-  // if (deck.length === 0) {
-  //   return (
-
-  //   );
-  // }
 
   // ── Deck ────────────────────────────────────────────────────────────────
   const visibleCards = deck.slice(0, 3);
