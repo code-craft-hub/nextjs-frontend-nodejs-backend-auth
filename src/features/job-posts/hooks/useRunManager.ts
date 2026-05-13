@@ -289,6 +289,21 @@ export function useRunManager(): UseRunManager {
           // the next job's "Loading…" replaces it in the bell.
           setTimeout(() => tryProcessNextRef.current(), 1500);
         }
+
+        // Blocked runs auto-dismiss from the bell after 45s — the background
+        // tab is already closed by this point, so this just cleans up the UI.
+        if (run.status === "blocked") {
+          setTimeout(() => {
+            if (runsRef.current.get(run.id)?.status === "blocked") {
+              dismissedRunIds.current.add(run.id);
+              setRuns((prev) => {
+                const next = new Map(prev);
+                next.delete(run.id);
+                return next;
+              });
+            }
+          }, 45_000);
+        }
       }
     };
 

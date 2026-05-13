@@ -32,8 +32,9 @@ function prettyStatus(s: string): string {
       return "Processing";
     case "awaiting_user_input":
     case "awaiting_submit_approval":
-    case "blocked":
       return "Attention";
+    case "blocked":
+      return "Blocked";
     case "submitted":
     case "complete":
       return "Applied";
@@ -59,7 +60,7 @@ function statusLabel(s: string): string {
     case "awaiting_submit_approval":
       return "Ready to submit";
     case "blocked":
-      return "Attention needed";
+      return "Can't automate";
     case "submitted":
     case "complete":
       return "Applied";
@@ -77,6 +78,7 @@ function statusPillClass(s: string): string {
   if (key === "Applied") return "bg-green-100 text-green-700";
   if (key === "Processing") return "bg-yellow-100 text-yellow-700";
   if (key === "Attention") return "bg-red-100 text-red-600";
+  if (key === "Blocked") return "bg-amber-100 text-amber-700";
   if (key === "Error") return "bg-red-100 text-red-600";
   return "bg-gray-200 text-gray-600";
 }
@@ -478,6 +480,7 @@ export function RunsBellPopover({
                   "complete",
                   "applied",
                 ].includes(run.status);
+                const isBlocked = run.status === "blocked";
                 const isDead = [
                   "error",
                   "blocked",
@@ -488,7 +491,8 @@ export function RunsBellPopover({
                   run.status === "awaiting_user_input" ||
                   run.status === "awaiting_submit_approval";
                 const isExpanded = expandedRunId === run.id;
-                const expandsLogs = isPopupMode && isDead;
+                // All dead runs (not just popup mode) can expand to show log
+                const expandsLogs = isDead;
 
                 return (
                   <div
@@ -496,6 +500,8 @@ export function RunsBellPopover({
                     className={`py-3.5 border-b last:border-none -mx-2 px-2 rounded-xl transition-colors ${
                       needsAttention
                         ? "bg-amber-50/60"
+                        : isBlocked
+                        ? "bg-orange-50/40 hover:bg-orange-50/70 cursor-pointer"
                         : "hover:bg-gray-50 cursor-pointer"
                     } group`}
                     onClick={() => {
@@ -554,7 +560,7 @@ export function RunsBellPopover({
                             </p>
                           )}
                           {run.blockedMessage && (
-                            <p className="text-xs text-red-400 truncate mt-0.5">
+                            <p className={`text-xs truncate mt-0.5 ${isBlocked ? "text-amber-600" : "text-red-400"}`}>
                               {run.blockedMessage}
                             </p>
                           )}
@@ -579,7 +585,19 @@ export function RunsBellPopover({
                       </div>
 
                       <div className="flex items-center gap-2 shrink-0 ml-3">
-                        {isPopupMode && !isTerminal && (
+                        {isBlocked && run.jobUrl && (
+                          <a
+                            href={run.jobUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs text-amber-600 hover:text-amber-800 px-2 py-1 rounded-lg hover:bg-amber-50 transition-colors font-medium shrink-0 whitespace-nowrap"
+                            onClick={(e) => e.stopPropagation()}
+                            title="Open job in a new tab to apply manually"
+                          >
+                            Apply manually →
+                          </a>
+                        )}
+                        {isPopupMode && !isTerminal && !isBlocked && (
                           <button
                             className="text-xs text-indigo-500 hover:text-indigo-700 px-2 py-1 rounded-lg hover:bg-indigo-50 transition-colors font-medium shrink-0"
                             onClick={(e) => {
@@ -599,7 +617,7 @@ export function RunsBellPopover({
                           {statusLabel(run.status)}
                         </Badge>
                         <button
-                          className="text-gray-300 hover:text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity"
+                          className={`text-gray-300 hover:text-gray-600 transition-opacity ${isBlocked || isDead ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}
                           onClick={(e) => {
                             e.stopPropagation();
                             onDismissRun(run.id);
