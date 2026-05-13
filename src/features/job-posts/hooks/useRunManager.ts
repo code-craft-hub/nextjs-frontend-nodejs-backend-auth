@@ -606,14 +606,18 @@ export function useRunManager(): UseRunManager {
     const watchedJobId = item.id;
     setTimeout(() => {
       if (!activeJobIdsRef.current.has(watchedJobId)) return; // already cleared
-      const stuck = runsRef.current.get(watchedJobId);
+      // After auto_apply_response the provisional run is moved from the token
+      // key (job.id) to the real runId key — resolve whichever key is current.
+      const mappedRunId = tokenToRunIdRef.current.get(watchedJobId);
+      const lookupKey = mappedRunId ?? watchedJobId;
+      const stuck = runsRef.current.get(lookupKey);
       if (!stuck || stuck.status !== "loading") return; // progressed — OK
       console.warn(`[RunManager] trigger timeout for job ${watchedJobId} — releasing slot`);
       setRuns((prev) => {
         const next = new Map(prev);
-        const r = next.get(watchedJobId);
+        const r = next.get(lookupKey);
         if (r?.status === "loading") {
-          next.set(watchedJobId, {
+          next.set(lookupKey, {
             ...r,
             status: "error",
             blockedMessage:
