@@ -32,6 +32,7 @@ interface PreviewProps {
   jobDescription: string;
   autoApplyId: string;
   masterCvId?: string;
+  readOnly?: boolean;
 }
 
 const Preview = ({
@@ -41,8 +42,9 @@ const Preview = ({
   jobDescription,
   autoApplyId,
   masterCvId,
+  readOnly = false,
 }: PreviewProps) => {
-  const [activeStep, setActiveStep] = useState(3);
+  const [activeStep, setActiveStep] = useState(readOnly ? 4 : 3);
   const [openModal, setOpenModal] = useState(false);
   const [editResume, setEditResume] = useState(false);
 
@@ -173,22 +175,31 @@ const Preview = ({
 
         <div className="flex gap-2">
           <DocTypeFeedbackModal docType="resume" resourceId={resumeId ?? ""} />
-          <Button
-            className="text-2xs"
-            variant="destructive"
-            disabled={isSubmitting}
-            onClick={handleCoverLetterDelete}
-          >
-            <Trash className="size-4" />
-          </Button>
-          <Button
-            disabled={isSubmitting}
-            variant="outline"
-            className="text-xs"
-            onClick={handleSubmit}
-          >
-            {isSubmitting ? <Loader className="animate-spin" /> : <Send />}
-          </Button>
+          {!readOnly && (
+            <>
+              <Button
+                className="text-2xs"
+                variant="destructive"
+                disabled={isSubmitting}
+                onClick={handleCoverLetterDelete}
+              >
+                <Trash className="size-4" />
+              </Button>
+              <Button
+                disabled={isSubmitting}
+                variant="outline"
+                className="text-xs"
+                onClick={handleSubmit}
+              >
+                {isSubmitting ? <Loader className="animate-spin" /> : <Send />}
+              </Button>
+            </>
+          )}
+          {readOnly && (
+            <span className="text-sm text-green-600 font-medium flex items-center gap-1">
+              ✓ Application sent
+            </span>
+          )}
         </div>
       </div>
       <TailorCoverLetterDisplay
@@ -220,11 +231,13 @@ const Preview = ({
           )}
         </>
       )}
-      <div className="flex items-center justify-center max-sm:fixed w-full h-16 bottom-4 left-0 ">
-        <Button disabled={isSubmitting} onClick={handleSubmit} className="w-64">
-          Submit <Sparkles className="ml-2 h-4 w-4" />
-        </Button>
-      </div>
+      {!readOnly && (
+        <div className="flex items-center justify-center max-sm:fixed w-full h-16 bottom-4 left-0 ">
+          <Button disabled={isSubmitting} onClick={handleSubmit} className="w-64">
+            Submit <Sparkles className="ml-2 h-4 w-4" />
+          </Button>
+        </div>
+      )}
       <AuthorizeGoogle hidden={true} />
     </div>
   );

@@ -100,7 +100,11 @@ function ApprovalRow({ app, selected, onSelect }: RowProps) {
       className="cursor-pointer hover:bg-gray-50 transition-colors"
       onClick={(e) => {
         if ((e.target as HTMLElement).closest("[data-checkbox]")) return;
-        window.location.href = `/dashboard/jobs/${app.id}/application-details`;
+        const dest =
+          applicationType === "email"
+            ? `/dashboard/jobs/${app.id}/email-preview`
+            : `/dashboard/jobs/${app.id}/application-details`;
+        window.location.href = dest;
       }}
     >
       {/* Checkbox */}
@@ -125,7 +129,11 @@ function ApprovalRow({ app, selected, onSelect }: RowProps) {
       <TableCell>
         <div className="flex flex-col gap-0.5 min-w-0">
           <Link
-            href={`/dashboard/jobs/${app.id}/application-details`}
+            href={
+              applicationType === "email"
+                ? `/dashboard/jobs/${app.id}/email-preview`
+                : `/dashboard/jobs/${app.id}/application-details`
+            }
             className="text-[15px] font-semibold text-black truncate capitalize hover:underline max-w-xs"
             onClick={(e) => e.stopPropagation()}
           >

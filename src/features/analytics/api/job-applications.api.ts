@@ -107,6 +107,8 @@ export interface ApplicationDetail {
   coverLetterId: string | null;
   coverLetterContent: string | null;
   coverLetterTitle: string | null;
+  // contact
+  recruiterEmail: string | null;
 }
 
 export interface ApplicationDetailEnvelope {

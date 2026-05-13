@@ -257,7 +257,7 @@ function JobDeckCard({ job, stackIndex, onSkip, onApply }: JobDeckCardProps) {
         {/* Header */}
         <div className="flex items-center justify-between">
           <h1 className="text-lg capitalize  font-bold font-poppins">
-            {job.title}
+            {decodeHtml(job.title)}
           </h1>
 
           <div className="hidden sm:flex ml-8 items-center gap-2">
@@ -292,7 +292,7 @@ function JobDeckCard({ job, stackIndex, onSkip, onApply }: JobDeckCardProps) {
             </div>
           )}
           {job.location && (
-            <div className="rounded-full bg-[#f2f2f2] px-3 py-2 text-2xs font-semibold text-black">
+            <div className="rounded-full bg-[#f2f2f2] px-3 py-2 text-2xs font-semibold text-black max-w-64 line-clamp-1 text-nowrap truncate">
               {job.location}
             </div>
           )}
@@ -341,7 +341,7 @@ function JobDeckCard({ job, stackIndex, onSkip, onApply }: JobDeckCardProps) {
             {job.location && (
               <div className="mt- flex items-center gap-1 text-[#8a8a8a] text-md font-medium">
                 <MapPin className="size-3" strokeWidth={2} />
-                <span className="text-xs">{job.location}</span>
+                <span className="text-xs max-w-sm line-clamp-1 text-nowrap truncate">{job.location}</span>
               </div>
             )}
           </div>
@@ -372,7 +372,7 @@ function JobDeckCard({ job, stackIndex, onSkip, onApply }: JobDeckCardProps) {
           <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col">
             <DialogHeader>
               <DialogTitle className="text-lg font-bold font-poppins capitalize">
-                {job.title}
+                {decodeHtml(job.title)}
               </DialogTitle>
               <p className="text-sm text-[#7a7a7a] font-medium">
                 {job.companyName ?? job.company ?? "Unknown Company"}
