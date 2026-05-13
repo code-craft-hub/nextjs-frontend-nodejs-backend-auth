@@ -41,6 +41,9 @@ export interface ActiveRun {
   provisional?: boolean;
   dismissed?: boolean;
   createdAt?: number;
+  /** Chrome tab ID of the background automation tab — carried so dismissRun can
+   *  close the tab even after the service worker restarts (runs Map wiped). */
+  targetTabId?: number | null;
 }
 
 // ─── Strategy ─────────────────────────────────────────────────────────────────

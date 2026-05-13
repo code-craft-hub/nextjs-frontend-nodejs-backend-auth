@@ -736,8 +736,15 @@ export function useRunManager(): UseRunManager {
 
       // For group-tab and popup-mode runs, close the background tab/window so it
       // doesn't stay open consuming memory after the user dismisses from the bell.
+      // targetTabId is included so background.js can close the tab even after
+      // an SW restart has wiped its runs Map.
       if (run?.openMode === "window" || run?.openMode === "group_tab") {
-        window.postMessage({ source: "cverai", type: "close_run_window", runId }, "*");
+        window.postMessage({
+          source: "cverai",
+          type: "close_run_window",
+          runId,
+          targetTabId: run.targetTabId ?? null,
+        }, "*");
       }
 
       // For iframe-mode runs, remove the DOM element from the stage.

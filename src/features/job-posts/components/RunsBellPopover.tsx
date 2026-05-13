@@ -597,7 +597,7 @@ export function RunsBellPopover({
                             Apply manually →
                           </a>
                         )}
-                        {isPopupMode && !isTerminal && !isBlocked && (
+                        {isPopupMode && !isTerminal && !isBlocked && run.status !== "queued" && (
                           <button
                             className="text-xs text-indigo-500 hover:text-indigo-700 px-2 py-1 rounded-lg hover:bg-indigo-50 transition-colors font-medium shrink-0"
                             onClick={(e) => {
