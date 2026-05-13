@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Briefcase, X, Send, CheckCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -207,9 +207,11 @@ function BatchQuestionsPanel({
 function SubmitApprovalPanel({
   run,
   onClose,
+  onViewTab,
 }: {
   run: ActiveRun;
   onClose: () => void;
+  onViewTab: () => void;
 }) {
   const summary: Array<{ field: string; value: string }> | string | undefined =
     run.pendingSubmit?.summary;
@@ -273,6 +275,14 @@ function SubmitApprovalPanel({
           onClick={handleStop}
         >
           Stop
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          className="flex-1 border-indigo-200 text-indigo-600 hover:bg-indigo-50 rounded-lg"
+          onClick={onViewTab}
+        >
+          View in tab →
         </Button>
         <Button
           size="sm"
@@ -348,6 +358,9 @@ export function RunsBellPopover({
   const [open, setOpen] = useState(false);
   const [showAll, setShowAll] = useState(false);
   const [expandedRunId, setExpandedRunId] = useState<string | null>(null);
+  // Track which group_tab run the user last clicked to view so we can
+  // re-collapse its tab group when the bell dialog closes.
+  const exposedRunIdRef = useRef<string | null>(null);
   const router = useRouter();
 
   const activeBadgeCount = runs?.filter((r) =>
@@ -390,11 +403,18 @@ export function RunsBellPopover({
     }
   }, [needsAttentionRuns.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Reset state when closed
+  // Reset state when closed; re-collapse any tab group the user opened to view.
   useEffect(() => {
     if (!open) {
       setShowAll(false);
       setExpandedRunId(null);
+      if (exposedRunIdRef.current) {
+        window.postMessage(
+          { source: "cverai", type: "recollapse_group", runId: exposedRunIdRef.current },
+          "*",
+        );
+        exposedRunIdRef.current = null;
+      }
     }
   }, [open]);
 
@@ -491,6 +511,8 @@ export function RunsBellPopover({
                           `/dashboard/jobs/${run.applicationId}/application-details`,
                         );
                       } else {
+                        // For group_tab runs, track so we can re-collapse on bell close.
+                        if (isPopupMode) exposedRunIdRef.current = run.id;
                         onOpenRun(run.id);
                       }
                     }}
@@ -543,6 +565,11 @@ export function RunsBellPopover({
                                 : "Form filled and ready — tap to review & approve"}
                             </p>
                           )}
+                          {isPopupMode && isActive && !needsAttention && (
+                            <p className="text-xs text-indigo-400 mt-0.5">
+                              Tap to view in browser tab →
+                            </p>
+                          )}
                           {expandsLogs && !isExpanded && (
                             <p className="text-xs text-gray-400 mt-0.5">
                               Tap to see full log
@@ -551,7 +578,21 @@ export function RunsBellPopover({
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-3 shrink-0 ml-3">
+                      <div className="flex items-center gap-2 shrink-0 ml-3">
+                        {isPopupMode && !isTerminal && (
+                          <button
+                            className="text-xs text-indigo-500 hover:text-indigo-700 px-2 py-1 rounded-lg hover:bg-indigo-50 transition-colors font-medium shrink-0"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              exposedRunIdRef.current = run.id;
+                              onOpenRun(run.id);
+                              setOpen(false);
+                            }}
+                            title="View this job's tab in the browser"
+                          >
+                            View tab →
+                          </button>
+                        )}
                         <Badge
                           className={`rounded-full px-3.5 py-1 text-xs font-medium border-0 ${statusPillClass(run.status)}`}
                         >
@@ -586,6 +627,11 @@ export function RunsBellPopover({
                         <SubmitApprovalPanel
                           run={run}
                           onClose={() => setExpandedRunId(null)}
+                          onViewTab={() => {
+                            exposedRunIdRef.current = run.id;
+                            onOpenRun(run.id);
+                            setOpen(false);
+                          }}
                         />
                       )}
                     {isExpanded && expandsLogs && <RunLogPanel run={run} />}

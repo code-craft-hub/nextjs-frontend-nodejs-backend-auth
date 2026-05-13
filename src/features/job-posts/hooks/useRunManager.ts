@@ -436,6 +436,7 @@ export function useRunManager(): UseRunManager {
           },
           status: "loading",
           openMode: "iframe",
+          jobUrl,
           log: [{ t: Date.now(), level: "info", text: `Loading ${jobUrl}…` }],
           provisional: true,
           createdAt: Date.now(),
@@ -524,6 +525,7 @@ export function useRunManager(): UseRunManager {
           },
           status: "loading",
           openMode: "group_tab",
+          jobUrl,
           log: [
             {
               t: Date.now(),
