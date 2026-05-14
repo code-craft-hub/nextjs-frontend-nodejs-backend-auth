@@ -371,14 +371,14 @@ export const humanDate = (input: any): string => {
     return "Invalid date";
   }
 };
-export function monthYear(input: Date | string) {
-  const validDate = validateOrCreateDate(input);
-  return String(
-    validDate?.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-    }),
-  );
+export function monthYear(input: Date | string | null | undefined): string | null {
+  if (input == null || input === "") return null;
+  const date = new Date(input as string | Date);
+  // new Date(null) produces the Unix epoch (Jan 1 1970) which is a valid Date
+  // but almost always means the parser failed to extract a real date.
+  // Treat any date before 1971 as "not set" so callers can hide it.
+  if (isNaN(date.getTime()) || date.getFullYear() < 1971) return null;
+  return date.toLocaleDateString("en-US", { year: "numeric", month: "short" });
 }
 
 export const formatFirestoreDate = (

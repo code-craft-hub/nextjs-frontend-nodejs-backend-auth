@@ -83,7 +83,7 @@ export default function ResumeFormLayout({
   }
 
   return (
-    <div className=" flex items-start justify-center">
+    <div className=" p-4 rounded-2xl flex items-start justify-center">
       <div className="w-full max-w-6xl flex flex-col md:flex-row gap-6">
         {/* ── Sidebar ──────────────────────────────────────────── */}
         <aside className="flex flex-col gap-4 sm:gap-8 w-full md:w-70 shrink-0">

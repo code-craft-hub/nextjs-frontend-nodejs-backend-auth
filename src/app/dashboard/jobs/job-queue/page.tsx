@@ -22,6 +22,7 @@ import type { JobApplication } from "@/shared/types";
 import { BackButton } from "@/components/shared/BackButton";
 import { decodeHtml } from "@/lib/utils";
 import EmptyState from "@/components/EmptyState";
+import { useRouter } from "next/navigation";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -89,6 +90,8 @@ function ApprovalRow({ app, checked, onToggle }: RowProps) {
   const location = (app as any).location ?? "";
   const applicationType = (app as any).applicationType ?? null;
 
+  const router = useRouter();
+  
   const subtitle = [employmentType, location]
     .filter(Boolean)
     .map((s) =>
@@ -106,7 +109,7 @@ function ApprovalRow({ app, checked, onToggle }: RowProps) {
       className="h-20 cursor-pointer hover:bg-slate-50 transition-colors"
       onClick={(e) => {
         if ((e.target as HTMLElement).closest("[data-checkbox]")) return;
-        window.location.href = dest;
+       router.push(dest);
       }}
     >
       <TableCell className="pl-6">

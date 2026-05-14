@@ -176,12 +176,15 @@ export const PreviewResume = ({
                       {work?.jobTitle || "Position"} -{" "}
                       {work?.companyName || "Company"}
                     </h3>
-                    {(work?.startDate || work?.endDate) && (
-                      <span className="text-sm text-gray-500 font-merriweather">
-                        {work?.startDate ? monthYear(work.startDate) : "Present"}{" "}
-                        - {work?.endDate ? monthYear(work.endDate) : "Present"}
-                      </span>
-                    )}
+                    {(() => {
+                      const s = monthYear(work?.startDate);
+                      const e = monthYear(work?.endDate);
+                      return (s || e) ? (
+                        <span className="text-sm text-gray-500 font-merriweather">
+                          {s ?? "Present"} - {e ?? "Present"}
+                        </span>
+                      ) : null;
+                    })()}
                   </div>
                   {work?.location && (
                     <p className="text-gray-600 font-merriweather">
@@ -228,15 +231,15 @@ export const PreviewResume = ({
                   <p className="font-bold font-merriweather">
                     {edu?.fieldOfStudy || "Field of Study"}
                   </p>
-                  {(edu?.startDate || edu?.endDate) && (
-                    <span className="text-sm text-gray-500 font-merriweather">
-                      {edu?.startDate ? monthYear(edu.startDate) : ""}{" "}
-                      -{" "}
-                      {edu?.endDate
-                        ? monthYear(edu.endDate)
-                        : "Present"}
-                    </span>
-                  )}
+                  {(() => {
+                    const s = monthYear(edu?.startDate);
+                    const e = monthYear(edu?.endDate);
+                    return (s || e) ? (
+                      <span className="text-sm text-gray-500 font-merriweather">
+                        {s ?? ""} - {e ?? "Present"}
+                      </span>
+                    ) : null;
+                  })()}
                 </div>
                 <p className="text-sm text-gray-600 font-merriweather">
                   {edu?.degree || "Degree"} -{" "}
