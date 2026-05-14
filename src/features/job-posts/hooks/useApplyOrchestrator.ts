@@ -17,6 +17,7 @@ import {
 import { useUpdateJobApplicationHistoryMutation } from "@/features/jobs/mutations/jobs.mutations";
 import { gmailApi } from "@/features/email-application/api/gmail.api";
 import { buildAutoApplyStartUrl } from "@/lib/utils/ai-apply-navigation";
+import { aiSettingsQueries } from "@/features/ai-settings/queries/ai-settings.queries";
 import {
   useExtension,
   type ExtensionState,
@@ -249,6 +250,30 @@ export function useApplyOrchestrator(
     retry: false,
   });
   const defaultResumeFileUrl = defaultResumeData?.data?.fileUrl ?? null;
+
+  // ── CV Strategy (from AI Apply settings) ────────────────────────────────
+  // useMasterCv=true  → always upload the user's original uploaded CV file
+  // useMasterCv=false → extension generates a Gemini-tailored CV per job
+  const { data: aiSettingsData } = useQuery(aiSettingsQueries.detail());
+  const useMasterCv = aiSettingsData?.data?.useMasterCv ?? false;
+  const generateTailoredCv = aiSettingsData?.data?.generateTailoredCv ?? true;
+  const masterCvId = aiSettingsData?.data?.masterCvId ?? null;
+
+  // When useMasterCv is on, fetch that specific resume's GCS fileUrl.
+  const { data: masterCvResume } = useQuery({
+    queryKey: queryKeys.resumes.detail(masterCvId!),
+    queryFn: () => resumeApi.getResume(masterCvId!),
+    enabled: useMasterCv && !!masterCvId,
+    staleTime: 5 * 60 * 1000,
+    retry: false,
+  });
+
+  // The URL actually passed to the extension:
+  //   useMasterCv → master CV's fileUrl (falls back to default if not yet loaded)
+  //   tailored    → default resume URL; extension will generate a tailored copy
+  const cvUrl = useMasterCv
+    ? ((masterCvResume as any)?.fileUrl ?? defaultResumeFileUrl)
+    : defaultResumeFileUrl;
 
   // ── Core state ───────────────────────────────────────────────────────────
 
@@ -679,7 +704,9 @@ export function useApplyOrchestrator(
         const profile = cachedUser
           ? {
               ...buildExtensionProfile(cachedUser),
-              cv_url: defaultResumeFileUrl,
+              cv_url: cvUrl,
+              useMasterCv,
+              generateTailoredCv,
             }
           : null;
         if (!profile) {

@@ -45,6 +45,13 @@ export interface ExtensionProfile {
   profileSummary?: string;
   /** Direct URL to the user's CV/resume file. Used by the agent's upload tool. */
   cv_url?: string | null;
+  /**
+   * When true the agent uploads cv_url as-is (the user's original master CV).
+   * When false the extension pre-generates a Gemini-tailored version before uploading.
+   */
+  useMasterCv?: boolean;
+  /** Mirror of the user's "Generate Tailored CV" AI-apply setting. */
+  generateTailoredCv?: boolean;
 }
 
 /**
