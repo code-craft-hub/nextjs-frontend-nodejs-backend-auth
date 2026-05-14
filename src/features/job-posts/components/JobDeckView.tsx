@@ -767,16 +767,6 @@ export function JobDeckView({
     [emailRuns, removeEmailRun, onDismissRun],
   );
 
-  // ── Loading skeleton ────────────────────────────────────────────────────
-  if (isLoading) {
-    return (
-      <div className="flex flex-col items-center justify-center py-24 gap-3">
-        <div className="w-full max-w-245 h-90 bg-gray-100 rounded-[60px] animate-pulse" />
-        <p className="text-sm text-gray-400 animate-pulse">Loading jobs…</p>
-      </div>
-    );
-  }
-
   // ── Incomplete profile — can't generate recs ────────────────────────────
   if (pipelineStatus === "incomplete_profile" && !isLoading) {
     return (
@@ -805,7 +795,6 @@ export function JobDeckView({
       </div>
     );
   }
-
 
   // ── Deck ────────────────────────────────────────────────────────────────
   const visibleCards = deck.slice(0, 3);
@@ -836,7 +825,12 @@ export function JobDeckView({
       {/* Card stack — CSS grid stacking: all cards share [grid-area:1/1] so the
            container height matches the top card's content on every screen size.
            pb-8 absorbs the 24px translateY peek of back cards. */}
-      {deck.length === 0 ? (
+      {isLoading ? (
+        <div className="flex flex-col items-center justify-center py gap-3">
+          <div className="w-full max-w-245 h-90 bg-gray-100 rounded-[60px] animate-pulse" />
+          <p className="text-sm text-gray-400 animate-pulse">Loading jobs…</p>
+        </div>
+      ) : deck.length === 0 ? (
         deck.length === 0 && (isFetchingNextPage || hasNextPage) ? (
           <div className="flex flex-col items-center justify-center py-24 gap-3">
             <div className="w-full max-w-245 h-90 bg-gray-100 rounded-[60px] animate-pulse" />
