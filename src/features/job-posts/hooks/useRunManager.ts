@@ -664,7 +664,7 @@ export function useRunManager(): UseRunManager {
     // ask the extension to expand the group / restore the window.
     if (run.openMode === "window" || run.openMode === "group_tab") {
       window.postMessage(
-        { source: "cverai", type: "focus_run_window", runId },
+        { source: "cverai", type: "focus_run_window", runId, targetTabId: run.targetTabId ?? null },
         "*",
       );
       return;
