@@ -255,9 +255,9 @@ export function useApplyOrchestrator(
   // useMasterCv=true  → always upload the user's original uploaded CV file
   // useMasterCv=false → extension generates a Gemini-tailored CV per job
   const { data: aiSettingsData } = useQuery(aiSettingsQueries.detail());
-  const useMasterCv = aiSettingsData?.data?.useMasterCv ?? false;
-  const generateTailoredCv = aiSettingsData?.data?.generateTailoredCv ?? true;
-  const masterCvId = aiSettingsData?.data?.masterCvId ?? null;
+  const useMasterCv = aiSettingsData?.useMasterCv ?? false;
+  const generateTailoredCv = aiSettingsData?.generateTailoredCv ?? true;
+  const masterCvId = aiSettingsData?.masterCvId ?? null;
 
   // When useMasterCv is on, fetch that specific resume's GCS fileUrl.
   const { data: masterCvResume } = useQuery({
