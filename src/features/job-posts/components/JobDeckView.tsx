@@ -742,11 +742,11 @@ export function JobDeckView({
     }, 360);
   }, [deck]);
 
-  const handleReset = useCallback(() => {
-    setAppliedIds(new Set());
-    setSkippedIds(new Set());
-    setSwipeDir(null);
-  }, []);
+  // const handleReset = useCallback(() => {
+  //   setAppliedIds(new Set());
+  //   setSkippedIds(new Set());
+  //   setSwipeDir(null);
+  // }, []);
 
   const handleOpenRun = useCallback(
     (runId: string) => {
@@ -856,12 +856,7 @@ export function JobDeckView({
             <p className="text-xs text-gray-400">
               {appliedIds.size} applied · {skippedIds.size} skipped
             </p>
-            {/* <button
-              onClick={handleReset}
-              className="mt-1 px-4 py-2 bg-gray-100 text-gray-700 text-sm rounded-xl hover:bg-gray-200 transition-colors"
-            >
-              Start over
-            </button> */}
+           
           </div>
         )
       ) : (
