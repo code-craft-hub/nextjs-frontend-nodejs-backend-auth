@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Card } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -20,50 +20,9 @@ import { queryKeys } from "@/shared/query/keys";
 import { formatDistanceToNow } from "date-fns";
 import type { JobApplication } from "@/shared/types";
 import { BackButton } from "@/components/shared/BackButton";
+import { decodeHtml } from "@/lib/utils";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-
-function humanStatus(status: string): string {
-  const map: Record<string, string> = {
-    submitted: "Submitted",
-    under_review: "Under Review",
-    interviewing: "Interviewing",
-    offered: "Offered",
-    accepted: "Accepted",
-    rejected: "Rejected",
-    withdrawn: "Withdrawn",
-    expired: "Expired",
-    draft: "Draft",
-    awaiting_human: "Needs Attention",
-  };
-  return (
-    map[status] ??
-    status.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
-  );
-}
-
-function applicationTypeLabel(type: string | null | undefined): string {
-  if (type === "email") return "Email";
-  if (type === "company_website" || type === "form") return "External";
-  if (type === "in_person") return "In Person";
-  return "External";
-}
-
-function applicationTypeBadgeClass(type: string | null | undefined): string {
-  if (type === "email") return "bg-blue-100 text-blue-700";
-  return "bg-violet-100 text-violet-700";
-}
-
-function statusBadgeClass(status: string): string {
-  if (["submitted", "accepted", "offered"].includes(status))
-    return "bg-[#dcfce7] text-[#15803d]";
-  if (["under_review", "interviewing"].includes(status))
-    return "bg-blue-100 text-blue-700";
-  if (["rejected", "withdrawn", "expired"].includes(status))
-    return "bg-red-100 text-red-600";
-  if (status === "awaiting_human") return "bg-amber-100 text-amber-700";
-  return "bg-gray-100 text-gray-600";
-}
 
 function relativeTime(date: string | Date | null): string {
   if (!date) return "—";
@@ -74,104 +33,111 @@ function relativeTime(date: string | Date | null): string {
   }
 }
 
+// ─── Status badge ─────────────────────────────────────────────────────────────
+
+type ApplicationStatus = "completed" | "in-progress" | "queued" | "failed";
+
+function toDisplayStatus(status: string): ApplicationStatus {
+  if (["submitted", "accepted", "offered"].includes(status)) return "completed";
+  if (["under_review", "interviewing", "awaiting_human"].includes(status)) return "in-progress";
+  if (["rejected", "withdrawn", "expired"].includes(status)) return "failed";
+  return "queued";
+}
+
+const STATUS_LABEL: Record<ApplicationStatus, string> = {
+  completed: "Completed",
+  "in-progress": "In progress",
+  queued: "Queued",
+  failed: "Failed",
+};
+
+const STATUS_CLASSES: Record<ApplicationStatus, string> = {
+  completed:    "border-transparent bg-emerald-100 text-emerald-700 hover:bg-emerald-100",
+  "in-progress": "border-transparent bg-amber-100 text-amber-700 hover:bg-amber-100",
+  queued:       "border-transparent bg-slate-200 text-slate-600 hover:bg-slate-200",
+  failed:       "border-transparent bg-rose-100 text-rose-600 hover:bg-rose-100",
+};
+
+function StatusBadge({ status }: { status: string }) {
+  const display = toDisplayStatus(status);
+  return (
+    <Badge
+      variant="outline"
+      className={`rounded-full px-3 py-1 text-xs font-semibold ${STATUS_CLASSES[display]}`}
+    >
+      {STATUS_LABEL[display]}
+    </Badge>
+  );
+}
+
 // ─── Row ─────────────────────────────────────────────────────────────────────
 
 interface RowProps {
   app: JobApplication & { jobId?: string };
-  selected: boolean;
-  onSelect: (id: string, checked: boolean) => void;
+  checked: boolean;
+  onToggle: (id: string, checked: boolean) => void;
 }
 
-function ApprovalRow({ app, selected, onSelect }: RowProps) {
+function ApprovalRow({ app, checked, onToggle }: RowProps) {
   const title = (app as any).title ?? (app as any).jobTitle ?? "Job";
   const company = (app as any).companyName ?? "—";
   const employmentType = (app as any).employmentType ?? "";
-  const classification = (app as any).classification ?? "";
+  const location = (app as any).location ?? "";
   const applicationType = (app as any).applicationType ?? null;
 
-  const subtitle = [employmentType, classification]
+  const subtitle = [employmentType, location]
     .filter(Boolean)
-    .map((s) =>
-      s.replace(/_/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase()),
-    )
-    .join(" · ");
+    .map((s) => s.replace(/_/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase()))
+    .join(" • ");
+
+  const dest =
+    applicationType === "email"
+      ? `/dashboard/jobs/${app.id}/email-preview`
+      : `/dashboard/jobs/${app.id}/application-details`;
 
   return (
     <TableRow
-      className="cursor-pointer hover:bg-gray-50 transition-colors"
+      className="h-20 cursor-pointer hover:bg-slate-50 transition-colors"
       onClick={(e) => {
         if ((e.target as HTMLElement).closest("[data-checkbox]")) return;
-        const dest =
-          applicationType === "email"
-            ? `/dashboard/jobs/${app.id}/email-preview`
-            : `/dashboard/jobs/${app.id}/application-details`;
         window.location.href = dest;
       }}
     >
-      {/* Checkbox */}
-      <TableCell className="w-[52px]">
+      <TableCell className="pl-6">
         <div
-          className="flex items-center justify-center"
           data-checkbox
-          onClick={(e) => {
-            e.stopPropagation();
-            onSelect(app.id, !selected);
-          }}
+          onClick={(e) => e.stopPropagation()}
         >
           <Checkbox
-            checked={selected}
-            className="h-[18px] w-[18px] rounded-[4px] border-[#c7c7c7]"
-            onCheckedChange={(v) => onSelect(app.id, !!v)}
+            checked={checked}
+            onCheckedChange={(v) => onToggle(app.id, Boolean(v))}
+            aria-label={`Select ${title}`}
           />
         </div>
       </TableCell>
 
-      {/* Job title */}
       <TableCell>
-        <div className="flex flex-col gap-0.5 min-w-0">
-          <Link
-            href={
-              applicationType === "email"
-                ? `/dashboard/jobs/${app.id}/email-preview`
-                : `/dashboard/jobs/${app.id}/application-details`
-            }
-            className="text-[15px] font-semibold text-black truncate capitalize hover:underline max-w-xs"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {title}
-          </Link>
-          {subtitle && (
-            <span className="text-[13px] text-[#6b7280]">{subtitle}</span>
-          )}
-        </div>
-      </TableCell>
-
-      {/* Company — hidden on small screens */}
-      <TableCell className="text-[15px] text-black font-normal truncate max-w-[160px]">
-        {company}
-      </TableCell>
-
-      {/* Type — hidden on xs screens */}
-      <TableCell className="">
-        <span
-          className={`inline-flex items-center justify-center px-3 py-[5px] rounded-full text-[12px] font-medium whitespace-nowrap ${applicationTypeBadgeClass(applicationType)}`}
+        <Link
+          href={dest}
+          className="font-semibold text-slate-900 hover:underline capitalize w-64 overflow-hidden"
+          onClick={(e) => e.stopPropagation()}
         >
-          {applicationTypeLabel(applicationType)}
-        </span>
+          
+          {decodeHtml(title)}
+        </Link>
+        {subtitle && (
+          <div className="mt-0.5 truncate w-64 text-sm text-slate-500">{subtitle}</div>
+        )}
       </TableCell>
 
-      {/* Submitted — hidden on small screens */}
-      <TableCell className=" text-[15px] text-[#6b7280] font-normal whitespace-nowrap">
+      <TableCell className="text-slate-700">{company}</TableCell>
+
+      <TableCell className="text-slate-700">
         {relativeTime(app.appliedAt ?? null)}
       </TableCell>
 
-      {/* Status */}
       <TableCell>
-        <span
-          className={`inline-flex items-center justify-center px-3 py-[5px] rounded-full text-[12px] font-medium whitespace-nowrap ${statusBadgeClass(app.status)}`}
-        >
-          {humanStatus(app.status)}
-        </span>
+        <StatusBadge status={app.status} />
       </TableCell>
     </TableRow>
   );
@@ -180,7 +146,7 @@ function ApprovalRow({ app, selected, onSelect }: RowProps) {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function ApprovalQueue() {
-  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [selected, setSelected] = useState<string[]>([]);
 
   const {
     data,
@@ -203,29 +169,23 @@ export default function ApprovalQueue() {
 
   const applications = data?.pages.flatMap((p) => p.data) ?? [];
 
-  const allSelected =
-    applications.length > 0 && applications.every((a) => selected.has(a.id));
+  const allChecked = applications.length > 0 && selected.length === applications.length;
+  const someChecked = selected.length > 0 && !allChecked;
 
   function toggleAll(checked: boolean) {
-    if (checked) {
-      setSelected(new Set(applications.map((a) => a.id)));
-    } else {
-      setSelected(new Set());
-    }
+    setSelected(checked ? applications.map((a) => a.id) : []);
   }
 
   function toggleOne(id: string, checked: boolean) {
-    setSelected((prev) => {
-      const next = new Set(prev);
-      checked ? next.add(id) : next.delete(id);
-      return next;
-    });
+    setSelected((prev) =>
+      checked ? [...prev, id] : prev.filter((x) => x !== id),
+    );
   }
 
   return (
     <div className="w-full min-h-screen bg-white px-4 sm:px-6 lg:px-10 py-8">
       {/* Header */}
-      <BackButton href={"/dashboard/home"} className="mb-6" />
+      <BackButton href="/dashboard/home" className="mb-6" />
 
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-6">
         <div>
@@ -266,62 +226,55 @@ export default function ApprovalQueue() {
 
       {!isPending && !isError && (
         <>
-          <Card className="mt-8 border border-[#e5e7eb] rounded-lg shadow-none overflow-hidden">
-            <div className="grid grid-cols-1">
-              <Table>
-                <TableHeader>
-                  <TableRow className="bg-white hover:bg-white border-b border-[#e5e7eb]">
-                    <TableHead className="w-[52px]">
-                      <div className="flex items-center justify-center">
-                        <Checkbox
-                          className="h-[18px] w-[18px] rounded-[4px] border-[#c7c7c7]"
-                          checked={allSelected}
-                          onCheckedChange={(v) => toggleAll(!!v)}
-                        />
-                      </div>
-                    </TableHead>
-                    <TableHead className="text-[13px] font-medium tracking-widest text-[#374151] uppercase">
-                      Job Title
-                    </TableHead>
-                    <TableHead className=" text-[13px] font-medium tracking-widest text-[#374151] uppercase">
-                      Company
-                    </TableHead>
-                    <TableHead className=" text-[13px] font-medium tracking-widest text-[#374151] uppercase">
-                      Type
-                    </TableHead>
-                    <TableHead className="text-[13px] font-medium tracking-widest text-[#374151] uppercase">
-                      Submitted
-                    </TableHead>
-                    <TableHead className="text-[13px] font-medium tracking-widest text-[#374151] uppercase">
-                      Status
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
+          <div className="mt-8 border border-[#e5e7eb] rounded-lg grid grid-cols-1">
+            <Table>
+              <TableHeader className="bg-slate-50">
+                <TableRow className="hover:bg-slate-50 border-b border-[#e5e7eb]">
+                  <TableHead className="w-12 pl-6">
+                    <Checkbox
+                      checked={allChecked ? true : someChecked ? "indeterminate" : false}
+                      onCheckedChange={(v) => toggleAll(Boolean(v))}
+                      aria-label="Select all rows"
+                    />
+                  </TableHead>
+                  <TableHead className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">
+                    Job Title
+                  </TableHead>
+                  <TableHead className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">
+                    Company
+                  </TableHead>
+                  <TableHead className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">
+                    Submitted
+                  </TableHead>
+                  <TableHead className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">
+                    Status
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
 
-                <TableBody>
-                  {applications.length === 0 ? (
-                    <TableRow>
-                      <TableCell
-                        colSpan={6}
-                        className="py-16 text-center text-[#6b7280] text-sm"
-                      >
-                        No applications yet.
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    applications.map((app) => (
-                      <ApprovalRow
-                        key={app.id}
-                        app={app as any}
-                        selected={selected.has(app.id)}
-                        onSelect={toggleOne}
-                      />
-                    ))
-                  )}
-                </TableBody>
-              </Table>
-            </div>
-          </Card>
+              <TableBody>
+                {applications.length === 0 ? (
+                  <TableRow>
+                    <TableCell
+                      colSpan={5}
+                      className="py-16 text-center text-[#6b7280] text-sm"
+                    >
+                      No applications yet.
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  applications.map((app) => (
+                    <ApprovalRow
+                      key={app.id}
+                      app={app as any}
+                      checked={selected.includes(app.id)}
+                      onToggle={toggleOne}
+                    />
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
 
           {/* Load more */}
           {hasNextPage && (
