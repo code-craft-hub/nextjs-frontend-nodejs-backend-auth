@@ -3,6 +3,7 @@
 import { useRef, useState, type ReactNode } from "react";
 import { ArrowRight, CheckCircle, Clock, Paperclip, X } from "lucide-react";
 import { SUPPORT_CATEGORIES, type SupportCategory } from "../constants";
+import { API_URL } from "@/shared/api/client";
 
 type SupportFormState = {
   name: string;
@@ -80,18 +81,44 @@ export const SupportContactForm = () => {
 
     setState("submitting");
     try {
-      await fetch("/api/support", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: form.name,
-          email: form.email,
+      let body: BodyInit;
+      let headers: HeadersInit | undefined;
+
+      if (form.attachment) {
+        const fd = new FormData();
+        fd.append("name", form.name.trim());
+        fd.append("email", form.email.trim().toLowerCase());
+        fd.append("category", form.category);
+        if (form.subject.trim()) fd.append("subject", form.subject.trim());
+        fd.append("message", form.message.trim());
+        fd.append("attachment", form.attachment);
+        body = fd;
+        // let the browser set multipart boundary automatically
+      } else {
+        body = JSON.stringify({
+          name: form.name.trim(),
+          email: form.email.trim().toLowerCase(),
           category: form.category,
-          subject: form.subject,
-          message: form.message,
-        }),
+          subject: form.subject.trim() || undefined,
+          message: form.message.trim(),
+        });
+        headers = { "Content-Type": "application/json" };
+      }
+
+      const res = await fetch(`${API_URL}/support/tickets`, {
+        method: "POST",
+        credentials: "include",
+        headers,
+        body,
       });
-      setTicket(`CVR-${Math.floor(100000 + Math.random() * 900000)}`);
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data?.error ?? "Submission failed");
+      }
+
+      const data = await res.json();
+      setTicket(data?.data?.ticketRef ?? "");
       setState("success");
     } catch {
       setState("idle");
@@ -124,7 +151,7 @@ export const SupportContactForm = () => {
             <p className="text-2xs uppercase tracking-wider text-gray-400 font-poppins">
               Ticket
             </p>
-            <p className="font-medium text-gray-900 font-poppins">#{ticket}</p>
+            <p className="font-medium text-gray-900 font-poppins">{ticket}</p>
           </div>
           <div className="bg-[#F5F7FA] rounded-xl p-4">
             <p className="text-2xs uppercase tracking-wider text-gray-400 font-poppins">
