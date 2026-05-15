@@ -7,7 +7,6 @@ import {
   Headphones,
   Mail,
   MessageCircle,
-  Settings,
   Shield,
   Sparkles,
   type LucideIcon,
