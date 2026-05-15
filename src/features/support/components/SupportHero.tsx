@@ -67,7 +67,7 @@ export const SupportHero = ({ query, setQuery }: Props) => {
               onChange={(e) => setQuery(e.target.value)}
               onFocus={() => setFocus(true)}
               onBlur={() => setTimeout(() => setFocus(false), 150)}
-              placeholder="Try ‘cancel subscription’ or ‘auto‑apply credits’"
+              placeholder="Try 'cancel subscription' or 'auto‑apply credits'"
               className="flex-1 bg-transparent outline-none font-poppins text-gray-900 placeholder:text-gray-400"
             />
             {query && (

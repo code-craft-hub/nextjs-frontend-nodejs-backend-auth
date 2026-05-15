@@ -10,8 +10,8 @@ type ContactRow = {
 };
 
 const ROWS: ContactRow[] = [
-  { icon: Mail, label: "Email", value: "info@cverai.com" },
-  { icon: Phone, label: "WhatsApp", value: "+234 000 000 0000" },
+  { icon: Mail, label: "Email", value: "hello@cverai.com" },
+  { icon: Phone, label: "WhatsApp", value: "+43 676 739 1022" },
   { icon: Clock, label: "Hours", value: "Mon–Fri · 9am–6pm WAT" },
 ];
 
@@ -29,7 +29,7 @@ export const SupportContactSection = () => (
           Send us a message — we read every one.
         </h2>
         <p className="text-gray-600 font-poppins mb-8">
-          Tell us what’s going on and we’ll route you to the right person. Most
+          Tell us what's going on and we'll route you to the right person. Most
           replies come back the same working day.
         </p>
         <div className="space-y-4">

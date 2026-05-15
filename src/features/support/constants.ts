@@ -31,16 +31,16 @@ export const SUPPORT_CHANNELS: SupportChannel[] = [
     cta: "Open WhatsApp",
     icon: MessageCircle,
     bg: "bg-[#56CDAD]",
-    href: "https://wa.me/2340000000000",
+    href: "https://wa.me/+436767391022",
   },
   {
     title: "Email us",
     desc: "Write to support — we reply within a day.",
-    meta: "info@cverai.com",
+    meta: "hello@cverai.com",
     cta: "Send email",
     icon: Mail,
     bg: "bg-[#4680EE]",
-    href: "mailto:info@cverai.com",
+    href: "mailto:hello@cverai.com",
   },
   {
     title: "Live chat",
@@ -151,7 +151,7 @@ export const SUPPORT_FAQS: SupportFaq[] = [
     cat: "Account",
     question: "How do I cancel or pause my subscription?",
     answer:
-      "Go to Account → Billing → Manage plan. You can pause for up to 60 days or cancel immediately — you keep Pro features until the end of the current period and won’t be charged again.",
+      "Go to Account → Billing → Manage plan. You can pause for up to 60 days or cancel immediately — you keep Pro features until the end of the current period and won't be charged again.",
   },
   {
     cat: "Resume",
@@ -163,7 +163,7 @@ export const SUPPORT_FAQS: SupportFaq[] = [
     cat: "AI Apply",
     question: "Why did an application fail?",
     answer:
-      "Common reasons: the listing was already closed, the portal requires a specific assessment, or it asked a custom question we couldn’t auto‑answer. We never charge a credit for a failed application and you’ll see the exact reason in your Applications log.",
+      "Common reasons: the listing was already closed, the portal requires a specific assessment, or it asked a custom question we couldn't auto‑answer. We never charge a credit for a failed application and you'll see the exact reason in your Applications log.",
   },
 ];
 

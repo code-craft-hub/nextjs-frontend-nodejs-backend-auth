@@ -91,7 +91,7 @@ const Policy = () => {
         </p>
         <p className="text-start w-full">
           Our Data Protection Officer can be contacted by email at
-          info@cverai.com
+          hello@cverai.com
         </p>
 
         <p className="text-start w-full">
@@ -206,7 +206,7 @@ const Policy = () => {
           <span className="font-bold text-xl"> Marketing</span> <br />
           We strive to provide you with choices regarding certain personal data
           uses, particularly around marketing and advertising. You can contact
-          our Data Protection Officer at info@cverai.com to make any chances on
+          our Data Protection Officer at hello@cverai.com to make any chances on
           your marketing choices. Where you opt out of receiving these marketing
           messages, this will not apply to personal data provided to us as a
           result.
@@ -329,7 +329,7 @@ const Policy = () => {
           Contacting Us
           <br />
           If you have any questions about Our Site or this Privacy Policy,
-          please contact Us by email at info@cverai.com Please ensure that your
+          please contact Us by email at hello@cverai.com Please ensure that your
           query is clear, particularly if it is a request for information about
           the data We hold about you.
         </p>

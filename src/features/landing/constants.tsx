@@ -30,6 +30,11 @@ export const navItems = [
     url: "#blog",
     icon: <UserIcon />,
   },
+  {
+    name: "Support",
+    url: "/support",
+    icon: <UserIcon />,
+  },
 ];
 
 export const TAB_ITEMS = [

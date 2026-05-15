@@ -80,9 +80,17 @@ export const SupportContactForm = () => {
 
     setState("submitting");
     try {
-      // TODO: replace with real submit, e.g.:
-      // await fetch("/api/support", { method: "POST", body: JSON.stringify(form) });
-      await new Promise((r) => setTimeout(r, 900));
+      await fetch("/api/support", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: form.name,
+          email: form.email,
+          category: form.category,
+          subject: form.subject,
+          message: form.message,
+        }),
+      });
       setTicket(`CVR-${Math.floor(100000 + Math.random() * 900000)}`);
       setState("success");
     } catch {

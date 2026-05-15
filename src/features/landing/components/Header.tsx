@@ -33,6 +33,12 @@ export const Header = () => {
   ) => {
     e.preventDefault();
 
+    // Full-path links (e.g. /support) navigate directly
+    if (!navUrl.startsWith("#")) {
+      router.push(navUrl);
+      return;
+    }
+
     // Check if we're on the homepage
     const isHomepage = pathname === "/" || pathname === "";
 
