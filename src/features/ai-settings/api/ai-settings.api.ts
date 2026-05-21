@@ -7,7 +7,7 @@ export interface AIApplySettings {
   userId?: string;
   autoApplyEnabled: boolean;
   autoSendApplications: boolean;
-  saveAsDrafts: boolean;
+  reviewBeforeSubmit: boolean;
   generateTailoredCv: boolean;
   useMasterCv: boolean;
   masterCvId?: string | null;
@@ -28,7 +28,7 @@ export interface AIApplySettings {
 export interface CreateAISettingsData {
   autoApplyEnabled?: boolean;
   autoSendApplications?: boolean;
-  saveAsDrafts?: boolean;
+  reviewBeforeSubmit?: boolean;
   generateTailoredCv?: boolean;
   useMasterCv?: boolean;
   masterCvId?: string | null;
@@ -47,7 +47,7 @@ export interface CreateAISettingsData {
 export interface UpdateAISettingsData {
   autoApplyEnabled?: boolean;
   autoSendApplications?: boolean;
-  saveAsDrafts?: boolean;
+  reviewBeforeSubmit?: boolean;
   generateTailoredCv?: boolean;
   useMasterCv?: boolean;
   masterCvId?: string | null;
@@ -80,7 +80,7 @@ export const aiSettingsApi = {
   getSettings: async (token?: string) => {
     const response = await api.get<ApiResponse<AIApplySettings>>(
       `${AI_SETTINGS_BASE}`,
-      { token }
+      { token },
     );
     if (response?.success) return response.data;
     throw new Error("Failed to fetch AI settings");
@@ -112,7 +112,7 @@ export const aiSettingsApi = {
     api.patch<ApiResponse<AIApplySettings>>(
       `${AI_SETTINGS_BASE}/toggle-auto-apply`,
       { enabled },
-      { token }
+      { token },
     ),
 
   /**
@@ -122,6 +122,6 @@ export const aiSettingsApi = {
   deleteSettings: (token?: string) =>
     api.delete<ApiResponse<{ id: string; message: string }>>(
       `${AI_SETTINGS_BASE}`,
-      { token }
+      { token },
     ),
 };

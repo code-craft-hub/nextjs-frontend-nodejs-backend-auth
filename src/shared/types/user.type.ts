@@ -91,7 +91,6 @@ export interface DataSource {
   title: string;
   defaultDataSource: boolean;
   email: string;
-
 }
 
 export interface AiApplyPreferences {
@@ -99,7 +98,7 @@ export interface AiApplyPreferences {
   autoSendApplications: boolean;
   enableAutoApply: boolean;
   generateTailoredCV: boolean;
-  saveAsDrafts: boolean;
+  reviewBeforeSubmit: boolean;
 }
 
 export interface Analytics {

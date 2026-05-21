@@ -42,7 +42,7 @@ type AiApplyPreferences =
   | "autoApplyEnabled"
   | "autoSendApplications"
   | "enableWhatsAppApplications"
-  | "saveAsDrafts"
+  | "reviewBeforeSubmit"
   | "generateTailoredCv"
   | "useMasterCv";
 
@@ -141,20 +141,41 @@ export const AiApplyPreferences: React.FC = () => {
       ],
     },
     {
-      child: true,
+      section: "Auto-apply Method",
+      heading: true,
       options: [
         {
-          label: "Auto-send Applications",
-          description: "Automatically send applications via email",
+          label: "Review Before Submit",
+          description:
+            "AI fills forms but waits for your approval before submitting.",
+          type: "toggle",
+          key: "reviewBeforeSubmit",
+        },
+        {
+          label: "Auto Sumbit",
+          description:
+            "AI automatically submits applications after filing forms.",
           type: "toggle",
           key: "autoSendApplications",
         },
       ],
     },
+    // {
+    //   child: true,
+    //   options: [
+    //     {
+    //       label: "Auto-send Applications",
+    //       description: "Automatically send applications via email",
+    //       type: "toggle",
+    //       key: "autoSendApplications",
+    //     },
+    //   ],
+    // },
     {
       section: "WhatsApp Integration",
       img: "/message.svg",
-      subTitle: "Connect your WhatsApp for job applications outside the platform",
+      subTitle:
+        "Connect your WhatsApp for job applications outside the platform",
       options: [
         {
           label: "WhatsApp Connection",
@@ -177,7 +198,7 @@ export const AiApplyPreferences: React.FC = () => {
       autoApplyEnabled: false,
       autoSendApplications: false,
       enableWhatsAppApplications: false,
-      saveAsDrafts: false,
+      reviewBeforeSubmit: false,
       generateTailoredCv: false,
       useMasterCv: false,
     };
@@ -195,8 +216,8 @@ export const AiApplyPreferences: React.FC = () => {
       const updated = { ...prev, [key]: checked };
 
       if (key === "autoSendApplications") {
-        updated.saveAsDrafts = !checked;
-      } else if (key === "saveAsDrafts") {
+        updated.reviewBeforeSubmit = !checked;
+      } else if (key === "reviewBeforeSubmit") {
         updated.autoSendApplications = !checked;
       }
 
@@ -256,7 +277,8 @@ export const AiApplyPreferences: React.FC = () => {
     </div>
   );
 
-  const getSwitchState = (key: AiApplyPreferences): boolean => switchStates[key] || false;
+  const getSwitchState = (key: AiApplyPreferences): boolean =>
+    switchStates[key] || false;
 
   return (
     <div className="">
@@ -279,46 +301,53 @@ export const AiApplyPreferences: React.FC = () => {
             )}
 
             <div className="space-y-4">
-              {setting.options?.map((option: SettingOption, optionIndex: number) => (
-                <div
-                  key={`${option.label}-${optionIndex}`}
-                  className="flex items-center justify-between"
-                >
-                  <div>
-                    <Label
-                      htmlFor={option.key || option.label}
-                      className="font-medium text-base block"
-                    >
-                      {option.label}
-                    </Label>
-                    <p className="text-gray-600 text-sm mt-1">{option.description}</p>
-                  </div>
+              {setting.options?.map(
+                (option: SettingOption, optionIndex: number) => (
+                  <div
+                    key={`${option.label}-${optionIndex}`}
+                    className="flex items-center justify-between"
+                  >
+                    <div>
+                      <Label
+                        htmlFor={option.key || option.label}
+                        className="font-medium text-base block"
+                      >
+                        {option.label}
+                      </Label>
+                      <p className="text-gray-600 text-sm mt-1">
+                        {option.description}
+                      </p>
+                    </div>
 
-                  <div>
-                    {option.type === "toggle" && option.key ? (
-                      <Switch
-                        id={option.key}
-                        checked={getSwitchState(option.key as AiApplyPreferences)}
-                        onCheckedChange={(checked: boolean) =>
-                          handleSwitchChange(option.key!, checked)
-                        }
-                      />
-                    ) : option.type === "buttons" && option.actions ? (
-                      renderButtons(option.actions)
-                    ) : option.type === "custom" && option.actions ? (
-                      <div id="gmail-authorize-toggle">
-                        <div className="flex gap-2">
-                          <AuthorizeGoogle checkAuth={checkAuth} />
+                    <div>
+                      {option.type === "toggle" && option.key ? (
+                        <Switch
+                          id={option.key}
+                          checked={getSwitchState(
+                            option.key as AiApplyPreferences,
+                          )}
+                          onCheckedChange={(checked: boolean) =>
+                            handleSwitchChange(option.key!, checked)
+                          }
+                        />
+                      ) : option.type === "buttons" && option.actions ? (
+                        renderButtons(option.actions)
+                      ) : option.type === "custom" && option.actions ? (
+                        <div id="gmail-authorize-toggle">
+                          <div className="flex gap-2">
+                            <AuthorizeGoogle checkAuth={checkAuth} />
+                          </div>
                         </div>
-                      </div>
-                    ) : null}
+                      ) : null}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ),
+              )}
 
-              {setting.section === "Auto Apply Configuration" && switchStates.autoApplyEnabled && (
-                <>
-                  {/* <AutoSendConfigPanel
+              {setting.section === "Auto Apply Configuration" &&
+                switchStates.autoApplyEnabled && (
+                  <>
+                    {/* <AutoSendConfigPanel
                     accountTier={accountTier}
                     tierCap={tierCap}
                     config={autoSendConfig}
@@ -328,8 +357,8 @@ export const AiApplyPreferences: React.FC = () => {
                     onSave={saveAutoSendConfig}
                   /> */}
 
-                  {/* ── Quota status & manual trigger ─────────────────── */}
-                  {/* <div className="mt-4 pt-4 border-t flex items-center justify-between gap-4">
+                    {/* ── Quota status & manual trigger ─────────────────── */}
+                    {/* <div className="mt-4 pt-4 border-t flex items-center justify-between gap-4">
                     <div>
                       <p className="font-medium text-sm">Today's usage</p>
                       {quota ? (
@@ -368,8 +397,8 @@ export const AiApplyPreferences: React.FC = () => {
                       {triggerAutoApply.isPending ? "Running…" : "Run Now"}
                     </button>
                   </div> */}
-                </>
-              )}
+                  </>
+                )}
             </div>
           </div>
         ))}
