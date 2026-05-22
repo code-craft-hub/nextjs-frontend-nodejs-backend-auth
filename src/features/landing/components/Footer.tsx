@@ -1,6 +1,7 @@
 "use client";
 
 import { capitalize } from "lodash";
+import Image from "next/image";
 import { social } from "@/shared/constants/data";
 import Link from "next/link";
 import { smoothlyScrollToView } from "@/lib/utils/helpers";
@@ -14,10 +15,12 @@ export const Footer = () => {
           {/* Brand + Social */}
           <div className="w-full md:w-5/12">
             <div>
-              <img
+              <Image
                 src="/assets/images/CVER Logo.png"
-                className="w-[30%]"
+                width={180}
+                height={54}
                 alt="CverAI Logo"
+                className="w-[30%] h-auto"
               />
             </div>
             <p className="mt-8 mb-4 font-bold text-slate-500">Follow us:</p>

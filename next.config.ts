@@ -7,16 +7,26 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "storage.googleapis.com",
-        port: "",
         pathname: "/**",
       },
       {
         protocol: "https",
         hostname: "images.pexels.com",
-        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "media.licdn.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "logo.clearbit.com",
         pathname: "/**",
       },
     ],
+    // Serve WebP/AVIF for all optimized images
+    formats: ["image/avif", "image/webp"],
   },
   async rewrites() {
     const rules = [];

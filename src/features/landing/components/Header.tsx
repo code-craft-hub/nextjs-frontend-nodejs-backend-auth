@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import {
   Sheet,
   SheetClose,
@@ -57,7 +58,7 @@ export const Header = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 z-50">
             <div className="flex items-center space-x-2">
-              <img src="/cverai-logo.png" className="w-28 h-8" alt="" />
+              <Image src="/cverai-logo.png" width={112} height={32} alt="Cver AI" priority />
             </div>
 
             <nav className="hidden lg:flex items-center space-x-8 z-50">
@@ -108,7 +109,7 @@ export const Header = () => {
                   aria-describedby="Mobile Sidebar"
                 ></SheetDescription>
                 <div className="flex items-center space-x-2 ml-4 mt-4">
-                  <img src="/cverai-logo.png" className="w-28 h-8" alt="" />
+                  <Image src="/cverai-logo.png" width={112} height={32} alt="Cver AI" priority />
                 </div>
 
                 <SheetClose className="">

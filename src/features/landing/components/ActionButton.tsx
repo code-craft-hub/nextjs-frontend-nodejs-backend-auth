@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 import Link from "next/link";
 import { memo, useState } from "react";
 import { ActionOption } from "../constants";
@@ -20,9 +21,11 @@ export const ActionButton = memo(
             "text-black! sm:w-32 gap-2 p-3"
           )}
         >
-          <img
+          <Image
             src={option.icon}
             alt={option.name}
+            width={16}
+            height={16}
             className="max-xs4:size-3 size-4"
           />
           <span className="max-xs4:text-[0.6rem] text-xs text-nowrap">

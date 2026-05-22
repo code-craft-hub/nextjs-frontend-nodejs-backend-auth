@@ -16,35 +16,72 @@ import {
 import { Metadata } from "next";
 import Script from "next/script";
 
+// Primary font — preloaded (used in landing page headings and body)
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-poppins",
+  display: "swap",
+});
+
+// Secondary fonts — preload: false prevents 9 extra font <link> tags from
+// competing with the primary font and critical images on initial page load.
 const ebGaramond = EB_Garamond({
   subsets: ["latin"],
   variable: "--font-garamond",
+  display: "swap",
+  preload: false,
 });
 const geist = Geist({
   subsets: ["latin"],
   variable: "--font-geist",
+  display: "swap",
+  preload: false,
 });
-const epilogue = Epilogue({ subsets: ["latin"], variable: "--font-epilogue" });
+const epilogue = Epilogue({
+  subsets: ["latin"],
+  variable: "--font-epilogue",
+  display: "swap",
+  preload: false,
+});
 const instrumentSans = Instrument_Sans({
   subsets: ["latin"],
   variable: "--font-instrument",
+  display: "swap",
+  preload: false,
 });
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+  preload: false,
+});
 const merriweather = Merriweather({
   subsets: ["latin"],
+  weight: ["400", "700"],
   variable: "--font-merriweather",
+  display: "swap",
+  preload: false,
 });
-const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
+const outfit = Outfit({
+  subsets: ["latin"],
+  variable: "--font-outfit",
+  display: "swap",
+  preload: false,
+});
 const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
   variable: "--font-jakarta",
+  display: "swap",
+  preload: false,
 });
-const poppins = Poppins({
+const roboto = Roboto({
   subsets: ["latin"],
-  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
-  variable: "--font-poppins",
+  weight: ["400", "500", "700"],
+  variable: "--font-roboto",
+  display: "swap",
+  preload: false,
 });
-const roboto = Roboto({ subsets: ["latin"], variable: "--font-roboto" });
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.cverai.com"),
@@ -95,23 +132,25 @@ export default function RootLayout({
       suppressHydrationWarning={true}
     >
       <head>
-        <link rel="preconnect" href="https://identitytoolkit.googleapis.com" />
-        <link
-          rel="dns-prefetch"
-          href="https://identitytoolkit.googleapis.com"
-        />
+        {/* Firebase Auth — used on login/register/dashboard routes */}
+        <link rel="dns-prefetch" href="https://identitytoolkit.googleapis.com" />
+        {/* YouTube — embedded in VideoModal on the landing page */}
+        <link rel="preconnect" href="https://www.youtube.com" />
+        <link rel="dns-prefetch" href="https://i.ytimg.com" />
+        {/* PostHog analytics — routed through /ingest but assets load from CDN */}
+        <link rel="dns-prefetch" href="https://us-assets.i.posthog.com" />
       </head>
       <body>
-        {/* Google Analytics */}
+        {/* Google Analytics — lazyOnload defers until page is idle */}
         {GA_MEASUREMENT_ID && (
           <>
             <Script
-              strategy="afterInteractive"
+              strategy="lazyOnload"
               src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
             />
             <Script
               id="google-analytics"
-              strategy="afterInteractive"
+              strategy="lazyOnload"
               dangerouslySetInnerHTML={{
                 __html: `
                   window.dataLayer = window.dataLayer || [];

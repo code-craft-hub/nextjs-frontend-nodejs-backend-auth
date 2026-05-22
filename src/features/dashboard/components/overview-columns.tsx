@@ -1,9 +1,7 @@
 import { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown, Calendar, DollarSign, MapPin } from "lucide-react";
+import { ArrowUpDown, Bookmark, Briefcase, Calendar, DollarSign, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { FaRegBookmark, FaBookmark } from "react-icons/fa";
 import { JobType } from "@/shared/types";
-import { PiOfficeChairFill } from "react-icons/pi";
 
 export const overviewColumns: ColumnDef<JobType>[] = [
   {
@@ -50,7 +48,7 @@ export const overviewColumns: ColumnDef<JobType>[] = [
             <span className="text-2xs"> {row.original.location}</span>
           </p>
           <p className="flex gap-1 text-gray-400 items-center">
-            <PiOfficeChairFill className="size-3" />
+            <Briefcase className="size-3" />
             <span className="text-2xs">{row.original.companyName}</span>
           </p>
           {!!row.original?.salary && (
@@ -81,10 +79,10 @@ export const overviewColumns: ColumnDef<JobType>[] = [
         <div className="flex justify-end">
           {row.original.isBookmarked ? (
             <div>
-              <FaBookmark className="size-4" />
+              <Bookmark className="size-4 fill-current" />
             </div>
           ) : (
-            <FaRegBookmark className="size-4 text-gray-400" />
+            <Bookmark className="size-4 text-gray-400" />
           )}
         </div>
       );

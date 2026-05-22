@@ -1,6 +1,6 @@
 "use client";
 
-import { BsExclamationCircle } from "react-icons/bs";
+import { AlertCircle } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -115,7 +115,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           >
             <div className="bg-primary text-white p-4 rounded-2xl">
               <div className="rounded-full bg-white p-2 w-fit">
-                <BsExclamationCircle className="rotate-180 size-6 text-primary " />
+                <AlertCircle className="rotate-180 size-6 text-primary " />
               </div>
               <h1 className="font-medium my-2">Upgrade</h1>
               <p className="text-sm">

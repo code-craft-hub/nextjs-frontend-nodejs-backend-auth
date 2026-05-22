@@ -1,11 +1,11 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import {
   BookmarkIcon,
+  Briefcase,
   Calendar,
   DollarSign,
   MapPin,
 } from "lucide-react";
-import { PiOfficeChairFill } from "react-icons/pi";
 import { Button } from "@/components/ui/button";
 import { Toggle } from "@/components/ui/toggle";
 import { formatAppliedDate } from "@/lib/utils/helpers";
@@ -76,7 +76,7 @@ export function getJobColumns({
                 </span>
               </p>
               <p className="flex gap-1 text-gray-400 items-center">
-                <PiOfficeChairFill className="size-3" />
+                <Briefcase className="size-3" />
                 <span className="text-2xs">{job.companyName}</span>
               </p>
               {salary && (

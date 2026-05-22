@@ -87,12 +87,14 @@ export const FeatureJobs = () => {
               </div>
               <div className="flex items-center gap-4">
                 <div className="rounded-sm flex items-center justify-center text-2xl shrink-0">
+                  {/* External company logos use plain img — domains are unpredictable */}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={
-                      !!job?.companyLogo ? job?.companyLogo : "/placeholder.jpg"
-                    }
+                    src={job?.companyLogo || "/placeholder.jpg"}
                     alt="company logo"
-                    className="size-12"
+                    width={48}
+                    height={48}
+                    className="size-12 object-contain"
                   />
                 </div>
                 <div className="">

@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import "../glass.css";
@@ -82,7 +83,7 @@ export const LandingPageClient = () => {
                         item.color,
                       )}
                     >
-                      <img src={item.icons} alt={item.title} />
+                      <Image src={item.icons} alt={item.title} width={32} height={32} />
                     </div>
                     <h3 className="font-semibold text-gray-900 mb-2">
                       {item.title}
@@ -113,10 +114,13 @@ export const LandingPageClient = () => {
       <section id="features" className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 gap-16 items-center">
-            <img
+            <Image
               src="/core-features.png"
               alt="Core Features"
-              className="hidden md:grid"
+              width={600}
+              height={490}
+              className="hidden md:block w-full h-auto"
+              sizes="50vw"
             />
             <div>
               <h2 className="text-3xl font-bold text-gray-900 mb-8">
@@ -129,7 +133,7 @@ export const LandingPageClient = () => {
                     className="flex items-start space-x-4 sm:space-x-8"
                   >
                     <div className="size-20 shrink-0 bg-[#F1F6FF] rounded-xl flex items-center justify-center">
-                      <img src={feature.icon} alt="" />
+                      <Image src={feature.icon} alt="" width={40} height={40} />
                     </div>
                     <div>
                       <h3 className="font-semibold text-gray-900 mb-2">
@@ -213,8 +217,14 @@ export const LandingPageClient = () => {
                 } bg-white rounded-2xl p-6 shadow-2xl shadow-blue-100 h-fit space-y-4 w-75`}
               >
                 <div className="flex items-center mb-4">
-                  <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-2xl mr-4">
-                    <img src={testimonial.avatar} alt={testimonial.name} />
+                  <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-2xl mr-4 overflow-hidden">
+                    <Image
+                      src={testimonial.avatar}
+                      alt={testimonial.name}
+                      width={48}
+                      height={48}
+                      className="rounded-full object-cover"
+                    />
                   </div>
                 </div>
 

@@ -2,14 +2,13 @@
 
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Toggle } from "@/components/ui/toggle";
-import { BookmarkIcon, Calendar, DollarSign, MapPin } from "lucide-react";
+import { BookmarkIcon, Briefcase, Calendar, DollarSign, MapPin } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { PiOfficeChairFill } from "react-icons/pi";
 import { formatAppliedDate, stripUrlProtocol } from "@/lib/utils/helpers";
 import type { JobPost } from "@/features/job-posts";
 import type { ExtensionState } from "@/features/job-posts/hooks/useExtension";
@@ -141,7 +140,7 @@ export function JobsTableRow({
               </span>
             </p>
             <p className="flex gap-1 text-gray-400 items-center min-w-0">
-              <PiOfficeChairFill className="size-3 shrink-0" />
+              <Briefcase className="size-3 shrink-0" />
               <span className="text-2xs truncate">{job?.companyName}</span>
             </p>
             {job?.salary && (

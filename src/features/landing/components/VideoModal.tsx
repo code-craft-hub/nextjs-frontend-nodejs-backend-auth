@@ -1,9 +1,8 @@
-import { useState, useCallback } from "react";
+"use client";
 
-/**
- * Enterprise-grade video player component with animated borders and play overlay
- * Optimized for performance and maintainability
- */
+import { useState, useCallback } from "react";
+import Image from "next/image";
+
 export const VideoModal: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [videoSrc, setVideoSrc] = useState<string>(
@@ -24,7 +23,7 @@ export const VideoModal: React.FC = () => {
 
   return (
     <div className="relative overflow-hidden max-w-screen-2xl w-full mx-auto">
-      <div className="max-w-screen-xl mx-auto ">
+      <div className="max-w-7xl mx-auto">
         <div className="relative mt-0 overflow-hidden rounded-xl bg-transparent p-0.5 lg:h-[80svh] md:w-[70svw] 2xl:h-full 2xl:w-full max-lg:mb-16 mx-auto">
           {/* Animated Border Container */}
           <div className="absolute inset-0 pointer-events-none">
@@ -50,11 +49,13 @@ export const VideoModal: React.FC = () => {
           <div className="relative w-full overflow-hidden rounded-xl aspect-video">
             {/* Cover Image */}
             {!isPlaying && (
-              <img
-                alt="Cver AI - Video Cover"
-                loading="eager"
-                className="w-full h-full object-cover block"
+              <Image
+                alt="Cver AI - Demo Video"
+                priority
+                fill
+                className="object-cover"
                 src="/thumbnail.png"
+                sizes="(max-width: 768px) 100vw, 70vw"
               />
             )}
 

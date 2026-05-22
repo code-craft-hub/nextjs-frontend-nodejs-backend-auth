@@ -14,13 +14,13 @@ import {
 import { ColumnDef } from "@tanstack/react-table";
 import {
   BookmarkIcon,
+  Briefcase,
   Calendar,
   DollarSign,
   FolderOpen,
   MapPin,
   Sparkles,
 } from "lucide-react";
-import { PiOfficeChairFill } from "react-icons/pi";
 import { formatAppliedDate } from "@/lib/utils/helpers";
 import { JobApplication } from "@/shared/types";
 
@@ -82,7 +82,7 @@ export const OverviewColumn = ({
               <span className="text-2xs">{row.original.location}</span>
             </p>
             <p className="flex gap-1 text-gray-400 items-center">
-              <PiOfficeChairFill className="size-3" />
+              <Briefcase className="size-3" />
               <span className="text-2xs">{row.original.companyName}</span>
             </p>
             {row.original.salary && (
@@ -209,7 +209,7 @@ export const ApplicationHistoryColumn = ({
             <span className="text-2xs">{row.original.location}</span>
           </p>
           <p className="flex gap-1 text-gray-400 items-center">
-            <PiOfficeChairFill className="size-3" />
+            <Briefcase className="size-3" />
             <span className="text-2xs">{row.original.companyName}</span>
           </p>
           {row.original.salary && (

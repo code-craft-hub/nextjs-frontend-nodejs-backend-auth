@@ -1,5 +1,4 @@
-import { X } from "lucide-react";
-import { FaCircleCheck } from "react-icons/fa6";
+import { CheckCircle2, X } from "lucide-react";
 import { UploadedFile } from "@/shared/types";
 import { isEmpty } from "lodash";
 
@@ -68,7 +67,7 @@ export const FileUploadForm = ({
                         </span>
 
                         <div className="flex flex-row items-center gap-[4.85px]">
-                          <FaCircleCheck
+                          <CheckCircle2
                             className="w-[11.63px] h-[11.63px] flex-none"
                             style={{ color: "#3EBF8F" }}
                             fill="#3EBF8F"

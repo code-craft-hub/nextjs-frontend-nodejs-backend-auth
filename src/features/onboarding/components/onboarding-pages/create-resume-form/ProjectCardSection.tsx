@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Trash2, Link2, Plus } from "lucide-react";
+import { Trash2, Link2, Plus, Briefcase } from "lucide-react";
 import { useResumeForm } from "./ResumeFormContext";
 import { CloseEditButton } from "@/components/shared/CloseEditButton";
 import {
@@ -21,7 +21,6 @@ import {
   useUpdateProjectMutation,
   useDeleteProjectMutation,
 } from "@/features/resume/mutations/resume.mutations";
-import { PiOfficeChair } from "react-icons/pi";
 
 // ─── Schema ────────────────────────────────────────────────────────
 
@@ -272,7 +271,7 @@ export default function ProjectsForm({
       />
       <div className="flex items-start gap-4 mb-4">
         <span className="flex items-center justify-center size-12 rounded-full bg-purple-100 text-purple-500 shrink-0 mt-0.5">
-          <PiOfficeChair className="w-5 h-5" />
+          <Briefcase className="w-5 h-5" />
         </span>
         <div>
           <h1 className="text-2xl font-bold text-gray-900 leading-tight">

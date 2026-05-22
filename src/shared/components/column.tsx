@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { ColumnDef } from "@tanstack/react-table";
 import {
   BookmarkIcon,
+  Briefcase,
   Calendar,
   DollarSign,
   FolderOpen,
@@ -14,7 +15,6 @@ import { formatAppliedDate } from "@/lib/utils/helpers";
 import { JobType } from "@/shared/types";
 import { Toggle } from "@/components/ui/toggle";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import { PiOfficeChairFill } from "react-icons/pi";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Empty,
@@ -82,7 +82,7 @@ export const OverviewColumn = ({
               <span className="text-2xs">{row.original.location}</span>
             </p>
             <p className="flex gap-1 text-gray-400 items-center">
-              <PiOfficeChairFill className="size-3" />
+              <Briefcase className="size-3" />
               <span className="text-2xs">{row.original.companyName}</span>
             </p>
             {!!row.original?.salary && (
