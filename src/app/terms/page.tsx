@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Footer } from "@/components/landing-page/Footer";
+import { Footer } from "@features/landing/components/Footer";
 import { Header } from "@/features/landing/components/Header";
 
 export const metadata: Metadata = {

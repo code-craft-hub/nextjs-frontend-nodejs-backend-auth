@@ -1,4 +1,3 @@
-// components/jobs/job-filters-panel.tsx
 'use client';
 
 import type { JobFilters } from '@/shared/types/jobs.types';
@@ -22,7 +21,6 @@ export function JobFiltersPanel({
 }: JobFiltersPanelProps) {
   const [search, setSearch] = useState(filters.search || '');
 
-  // Debounce search
   useEffect(() => {
     const timer = setTimeout(() => {
       if (search !== filters.search) {
@@ -36,11 +34,8 @@ export function JobFiltersPanel({
     <div className="bg-white rounded-lg border p-4 sticky top-24">
       <h3 className="font-semibold text-lg mb-4">Filters</h3>
 
-      {/* Search */}
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Search
-        </label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Search</label>
         <input
           type="text"
           value={search}
@@ -50,11 +45,8 @@ export function JobFiltersPanel({
         />
       </div>
 
-      {/* Status */}
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Status
-        </label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
         <select
           value={filters.status || ''}
           onChange={(e) => onFilterChange({ status: e.target.value as any || undefined })}
@@ -68,11 +60,8 @@ export function JobFiltersPanel({
         </select>
       </div>
 
-      {/* Location Type */}
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Location Type
-        </label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Location Type</label>
         <select
           value={filters.locationType || ''}
           onChange={(e) => onFilterChange({ locationType: e.target.value as any || undefined })}
@@ -85,11 +74,8 @@ export function JobFiltersPanel({
         </select>
       </div>
 
-      {/* Employment Type */}
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Employment Type
-        </label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Employment Type</label>
         <select
           value={filters.employmentType || ''}
           onChange={(e) => onFilterChange({ employmentType: e.target.value as any || undefined })}
@@ -103,11 +89,8 @@ export function JobFiltersPanel({
         </select>
       </div>
 
-      {/* Experience Level */}
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Experience Level
-        </label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Experience Level</label>
         <select
           value={filters.experienceLevel || ''}
           onChange={(e) => onFilterChange({ experienceLevel: e.target.value as any || undefined })}
@@ -122,12 +105,9 @@ export function JobFiltersPanel({
         </select>
       </div>
 
-      {/* Company */}
       {filterOptions?.companies && filterOptions.companies.length > 0 && (
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Company
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Company</label>
           <select
             value={filters.company || ''}
             onChange={(e) => onFilterChange({ company: e.target.value || undefined })}
@@ -135,19 +115,14 @@ export function JobFiltersPanel({
           >
             <option value="">All Companies</option>
             {filterOptions.companies.map((company) => (
-              <option key={company} value={company}>
-                {company}
-              </option>
+              <option key={company} value={company}>{company}</option>
             ))}
           </select>
         </div>
       )}
 
-      {/* Salary Range */}
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Min Salary
-        </label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Min Salary</label>
         <input
           type="number"
           value={filters.salaryMin || ''}
@@ -158,9 +133,7 @@ export function JobFiltersPanel({
       </div>
 
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Max Salary
-        </label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Max Salary</label>
         <input
           type="number"
           value={filters.salaryMax || ''}
@@ -170,7 +143,6 @@ export function JobFiltersPanel({
         />
       </div>
 
-      {/* Clear Filters */}
       <button
         onClick={() => {
           setSearch('');

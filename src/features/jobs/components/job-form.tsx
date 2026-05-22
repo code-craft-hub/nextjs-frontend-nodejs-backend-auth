@@ -1,4 +1,3 @@
-// components/jobs/job-form.tsx
 "use client";
 
 import type { Job, CreateJobData } from "@/shared/types/jobs.types";
@@ -89,53 +88,31 @@ export function JobForm({ job, onSubmit, onClose, isPending }: JobFormProps) {
           <h2 className="text-2xl font-bold">
             {job ? "Edit Job" : "Create New Job"}
           </h2>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
-          >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          {/* Basic Info */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Job Title *
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Job Title *</label>
               <input
                 type="text"
                 value={formData.title}
-                onChange={(e) =>
-                  setFormData({ ...formData, title: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 required
                 className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Company *
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Company *</label>
               <input
                 type="text"
                 value={formData.company}
-                onChange={(e) =>
-                  setFormData({ ...formData, company: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, company: e.target.value })}
                 required
                 className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
               />
@@ -144,32 +121,21 @@ export function JobForm({ job, onSubmit, onClose, isPending }: JobFormProps) {
 
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Location *
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Location *</label>
               <input
                 type="text"
                 value={formData.location}
-                onChange={(e) =>
-                  setFormData({ ...formData, location: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                 required
                 placeholder="e.g., San Francisco, CA"
                 className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Location Type *
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Location Type *</label>
               <select
                 value={formData.locationType}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    locationType: e.target.value as any,
-                  })
-                }
+                onChange={(e) => setFormData({ ...formData, locationType: e.target.value as any })}
                 className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
               >
                 <option value="remote">Remote</option>
@@ -178,17 +144,10 @@ export function JobForm({ job, onSubmit, onClose, isPending }: JobFormProps) {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Employment Type *
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Employment Type *</label>
               <select
                 value={formData.employmentType}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    employmentType: e.target.value as any,
-                  })
-                }
+                onChange={(e) => setFormData({ ...formData, employmentType: e.target.value as any })}
                 className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
               >
                 <option value="full-time">Full-time</option>
@@ -201,17 +160,10 @@ export function JobForm({ job, onSubmit, onClose, isPending }: JobFormProps) {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Experience Level *
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Experience Level *</label>
               <select
                 value={formData.experienceLevel}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    experienceLevel: e.target.value as any,
-                  })
-                }
+                onChange={(e) => setFormData({ ...formData, experienceLevel: e.target.value as any })}
                 className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
               >
                 <option value="entry">Entry</option>
@@ -222,14 +174,10 @@ export function JobForm({ job, onSubmit, onClose, isPending }: JobFormProps) {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Status
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
               <select
                 value={formData.status}
-                onChange={(e) =>
-                  setFormData({ ...formData, status: e.target.value as any })
-                }
+                onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
                 className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
               >
                 <option value="draft">Draft</option>
@@ -240,27 +188,19 @@ export function JobForm({ job, onSubmit, onClose, isPending }: JobFormProps) {
             </div>
           </div>
 
-          {/* Description */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Job Description *
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Job Description *</label>
             <textarea
               value={formData.description}
-              onChange={(e) =>
-                setFormData({ ...formData, description: e.target.value })
-              }
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               required
               rows={5}
               className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
-          {/* Requirements */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Requirements
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Requirements</label>
             <div className="flex gap-2 mb-2">
               <input
                 type="text"
@@ -269,11 +209,7 @@ export function JobForm({ job, onSubmit, onClose, isPending }: JobFormProps) {
                 onKeyPress={(e) => {
                   if (e.key === "Enter") {
                     e.preventDefault();
-                    addItem(
-                      "requirements",
-                      requirementInput,
-                      setRequirementInput
-                    );
+                    addItem("requirements", requirementInput, setRequirementInput);
                   }
                 }}
                 placeholder="Add a requirement and press Enter"
@@ -281,9 +217,7 @@ export function JobForm({ job, onSubmit, onClose, isPending }: JobFormProps) {
               />
               <button
                 type="button"
-                onClick={() =>
-                  addItem("requirements", requirementInput, setRequirementInput)
-                }
+                onClick={() => addItem("requirements", requirementInput, setRequirementInput)}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
               >
                 Add
@@ -291,10 +225,7 @@ export function JobForm({ job, onSubmit, onClose, isPending }: JobFormProps) {
             </div>
             <div className="space-y-2">
               {formData.requirements?.map((req, index) => (
-                <div
-                  key={index}
-                  className="flex items-center gap-2 bg-gray-50 p-2 rounded"
-                >
+                <div key={index} className="flex items-center gap-2 bg-gray-50 p-2 rounded">
                   <span className="flex-1">{req}</span>
                   <button
                     type="button"
@@ -308,11 +239,8 @@ export function JobForm({ job, onSubmit, onClose, isPending }: JobFormProps) {
             </div>
           </div>
 
-          {/* Responsibilities */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Responsibilities
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Responsibilities</label>
             <div className="flex gap-2 mb-2">
               <input
                 type="text"
@@ -321,11 +249,7 @@ export function JobForm({ job, onSubmit, onClose, isPending }: JobFormProps) {
                 onKeyPress={(e) => {
                   if (e.key === "Enter") {
                     e.preventDefault();
-                    addItem(
-                      "responsibilities",
-                      responsibilityInput,
-                      setResponsibilityInput
-                    );
+                    addItem("responsibilities", responsibilityInput, setResponsibilityInput);
                   }
                 }}
                 placeholder="Add a responsibility and press Enter"
@@ -333,13 +257,7 @@ export function JobForm({ job, onSubmit, onClose, isPending }: JobFormProps) {
               />
               <button
                 type="button"
-                onClick={() =>
-                  addItem(
-                    "responsibilities",
-                    responsibilityInput,
-                    setResponsibilityInput
-                  )
-                }
+                onClick={() => addItem("responsibilities", responsibilityInput, setResponsibilityInput)}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
               >
                 Add
@@ -347,10 +265,7 @@ export function JobForm({ job, onSubmit, onClose, isPending }: JobFormProps) {
             </div>
             <div className="space-y-2">
               {formData.responsibilities?.map((resp, index) => (
-                <div
-                  key={index}
-                  className="flex items-center gap-2 bg-gray-50 p-2 rounded"
-                >
+                <div key={index} className="flex items-center gap-2 bg-gray-50 p-2 rounded">
                   <span className="flex-1">{resp}</span>
                   <button
                     type="button"
@@ -364,11 +279,8 @@ export function JobForm({ job, onSubmit, onClose, isPending }: JobFormProps) {
             </div>
           </div>
 
-          {/* Tags */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Tags
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Tags</label>
             <div className="flex gap-2 mb-2">
               <input
                 type="text"
@@ -380,7 +292,7 @@ export function JobForm({ job, onSubmit, onClose, isPending }: JobFormProps) {
                     addItem("tags", tagInput, setTagInput);
                   }
                 }}
-                placeholder="Add tags (e.g.,  TypeScript)"
+                placeholder="Add tags (e.g., TypeScript)"
                 className="flex-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
               />
               <button
@@ -393,10 +305,7 @@ export function JobForm({ job, onSubmit, onClose, isPending }: JobFormProps) {
             </div>
             <div className="flex flex-wrap gap-2">
               {formData.tags?.map((tag, index) => (
-                <span
-                  key={index}
-                  className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm flex items-center gap-2"
-                >
+                <span key={index} className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm flex items-center gap-2">
                   {tag}
                   <button
                     type="button"
@@ -410,37 +319,27 @@ export function JobForm({ job, onSubmit, onClose, isPending }: JobFormProps) {
             </div>
           </div>
 
-          {/* Optional Fields */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Department
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Department</label>
               <input
                 type="text"
                 value={formData.department || ""}
-                onChange={(e) =>
-                  setFormData({ ...formData, department: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, department: e.target.value })}
                 className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Application URL
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Application URL</label>
               <input
                 type="url"
                 value={formData.applicationUrl || ""}
-                onChange={(e) =>
-                  setFormData({ ...formData, applicationUrl: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, applicationUrl: e.target.value })}
                 className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
               />
             </div>
           </div>
 
-          {/* Form Actions */}
           <div className="flex justify-end gap-3 pt-4 border-t">
             <button
               type="button"

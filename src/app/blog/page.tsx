@@ -6,7 +6,7 @@ import { blogQueries } from "@/features/blog/queries/blog.queries";
 import { getCookiesToken } from "@/lib/auth.utils";
 import { BlogListClient } from "@/features/blog/components/BlogListClient";
 import { Header } from "@/features/landing/components/Header";
-import { Footer } from "@/components/landing-page/Footer";
+import { Footer } from "@features/landing/components/Footer";
 
 export const metadata: Metadata = {
   title: "Blog | Cver AI",

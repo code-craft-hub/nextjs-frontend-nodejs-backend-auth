@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Footer } from "@/components/landing-page/Footer";
+import { Footer } from "@features/landing/components/Footer";
 import { Header } from "@/features/landing/components/Header";
 import { SupportHero } from "./SupportHero";
 import { SupportQuickChannels } from "./SupportQuickChannels";

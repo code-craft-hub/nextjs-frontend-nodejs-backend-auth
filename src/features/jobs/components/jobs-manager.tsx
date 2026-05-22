@@ -1,4 +1,3 @@
-// components/jobs/jobs-manager.tsx - Enterprise-grade jobs management
 'use client';
 
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -26,19 +25,15 @@ export function JobsManager({ initialFilters }: JobsManagerProps) {
   const router = useRouter();
   const queryClient = useQueryClient();
 
-  // State
   const [filters, setFilters] = useState<JobFilters>(initialFilters);
   const [selectedJobs, setSelectedJobs] = useState<Set<string>>(new Set());
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingJob, setEditingJob] = useState<Job | null>(null);
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
 
-  // Queries - all instantly load from SSR cache
   const { data: jobs, isLoading } = useQuery(jobsQueries.all(filters));
   const { data: stats } = useQuery(jobsQueries.stats());
-  // const { data: filterOptions } = useQuery(jobsQueries.filters());
 
-  // Mutations
   const createMutation = useCreateJobMutation();
   const updateMutation = useUpdateJobMutation();
   const deleteMutation = useDeleteJobMutation();
@@ -46,7 +41,6 @@ export function JobsManager({ initialFilters }: JobsManagerProps) {
   const bulkStatusMutation = useBulkChangeStatusMutation();
   const duplicateMutation = useDuplicateJobMutation();
 
-  // Update URL when filters change (FAANG pattern)
   const updateFiltersInUrl = useCallback((newFilters: JobFilters) => {
     const params = new URLSearchParams();
     Object.entries(newFilters).forEach(([key, value]) => {
@@ -57,19 +51,12 @@ export function JobsManager({ initialFilters }: JobsManagerProps) {
     router.push(`/jobs?${params.toString()}`, { scroll: false });
   }, [router]);
 
-  // const handleFilterChange = useCallback((newFilters: Partial<JobFilters>) => {
-  //   const updated = { ...filters, ...newFilters, page: 1 };
-  //   setFilters(updated);
-  //   updateFiltersInUrl(updated);
-  // }, [filters, updateFiltersInUrl]);
-
   const handlePageChange = useCallback((page: number) => {
     const updated = { ...filters, page };
     setFilters(updated);
     updateFiltersInUrl(updated);
   }, [filters, updateFiltersInUrl]);
 
-  // Selection handlers
   const toggleSelection = (id: string) => {
     const newSelection = new Set(selectedJobs);
     if (newSelection.has(id)) {
@@ -88,7 +75,6 @@ export function JobsManager({ initialFilters }: JobsManagerProps) {
 
   const clearSelection = () => setSelectedJobs(new Set());
 
-  // CRUD operations
   const handleCreate = async (data: any) => {
     await createMutation.mutateAsync(data);
     setIsFormOpen(false);
@@ -132,10 +118,8 @@ export function JobsManager({ initialFilters }: JobsManagerProps) {
     setIsFormOpen(true);
   };
 
-  // Prefetch on hover (FAANG optimization)
   const prefetchJob = useCallback((id: string) => {
     queryClient.prefetchQuery(jobsQueries.detail(id));
-    // queryClient.prefetchQuery(jobsQueries.similar(id));
   }, [queryClient]);
 
   const allSelected = jobs?.data && selectedJobs.size === jobs.data.length;
@@ -143,37 +127,28 @@ export function JobsManager({ initialFilters }: JobsManagerProps) {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
       <div className="bg-white border-b sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Jobs</h1>
-              <p className="text-sm text-gray-500 mt-1">
-                {jobs?.total || 0} total jobs
-              </p>
+              <p className="text-sm text-gray-500 mt-1">{jobs?.total || 0} total jobs</p>
             </div>
             <div className="flex items-center gap-3">
-              {/* View Mode Toggle */}
               <div className="flex bg-gray-100 rounded-lg p-1">
                 <button
                   onClick={() => setViewMode('list')}
-                  className={`px-3 py-1 rounded ${
-                    viewMode === 'list' ? 'bg-white shadow' : ''
-                  }`}
+                  className={`px-3 py-1 rounded ${viewMode === 'list' ? 'bg-white shadow' : ''}`}
                 >
                   List
                 </button>
                 <button
                   onClick={() => setViewMode('grid')}
-                  className={`px-3 py-1 rounded ${
-                    viewMode === 'grid' ? 'bg-white shadow' : ''
-                  }`}
+                  className={`px-3 py-1 rounded ${viewMode === 'grid' ? 'bg-white shadow' : ''}`}
                 >
                   Grid
                 </button>
               </div>
-
               <button
                 onClick={() => {
                   setEditingJob(null);
@@ -186,12 +161,9 @@ export function JobsManager({ initialFilters }: JobsManagerProps) {
             </div>
           </div>
 
-          {/* Bulk Actions Bar */}
           {selectedJobs.size > 0 && (
             <div className="mt-4 flex items-center justify-between bg-blue-50 border border-blue-200 rounded-lg px-4 py-3">
-              <span className="text-sm font-medium text-blue-900">
-                {selectedJobs.size} selected
-              </span>
+              <span className="text-sm font-medium text-blue-900">{selectedJobs.size} selected</span>
               <div className="flex gap-2">
                 <button
                   onClick={() => handleBulkStatusChange('active')}
@@ -225,20 +197,9 @@ export function JobsManager({ initialFilters }: JobsManagerProps) {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Stats Dashboard */}
         {stats && <JobStats stats={stats} />}
 
         <div className="mt-8 flex gap-6">
-          {/* Filters Sidebar *
-          <aside className="w-64 flex-shrink-0">
-            <JobFiltersPanel
-              filters={filters}
-              filterOptions={filterOptions}
-              onFilterChange={handleFilterChange}
-            />
-          </aside>/}
-
-          {/* Jobs List/Grid */}
           <main className="flex-1">
             {isLoading ? (
               <div className="text-center py-12">
@@ -256,7 +217,6 @@ export function JobsManager({ initialFilters }: JobsManagerProps) {
               </div>
             ) : (
               <>
-                {/* Select All Checkbox */}
                 <div className="mb-4 flex items-center gap-2">
                   <input
                     type="checkbox"
@@ -273,19 +233,10 @@ export function JobsManager({ initialFilters }: JobsManagerProps) {
                     }}
                     className="h-4 w-4 rounded border-gray-300"
                   />
-                  <label className="text-sm text-gray-700">
-                    Select all on this page
-                  </label>
+                  <label className="text-sm text-gray-700">Select all on this page</label>
                 </div>
 
-                {/* Jobs Display */}
-                <div
-                  className={
-                    viewMode === 'grid'
-                      ? 'grid grid-cols-1 md:grid-cols-2 gap-4'
-                      : 'space-y-4'
-                  }
-                >
+                <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 gap-4' : 'space-y-4'}>
                   {jobs?.data.map((job) => (
                     <JobCard
                       key={job.id}
@@ -301,7 +252,6 @@ export function JobsManager({ initialFilters }: JobsManagerProps) {
                   ))}
                 </div>
 
-                {/* Pagination */}
                 {jobs && jobs.totalPages > 1 && (
                   <div className="mt-8 flex items-center justify-between">
                     <button
@@ -319,9 +269,7 @@ export function JobsManager({ initialFilters }: JobsManagerProps) {
                             key={page}
                             onClick={() => handlePageChange(page)}
                             className={`px-3 py-1 rounded ${
-                              filters.page === page
-                                ? 'bg-blue-600 text-white'
-                                : 'hover:bg-gray-100'
+                              filters.page === page ? 'bg-blue-600 text-white' : 'hover:bg-gray-100'
                             }`}
                           >
                             {page}
@@ -344,7 +292,6 @@ export function JobsManager({ initialFilters }: JobsManagerProps) {
         </div>
       </div>
 
-      {/* Job Form Modal */}
       {isFormOpen && (
         <JobForm
           job={editingJob}

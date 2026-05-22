@@ -56,7 +56,7 @@ export default defineConfig({
       "@": resolve(__dirname, "./src"),
       "@features": resolve(__dirname, "./src/features"),
       "@shared": resolve(__dirname, "./src/shared"),
-      "@module": resolve(__dirname, "./src/features"),
+
     },
   },
 });

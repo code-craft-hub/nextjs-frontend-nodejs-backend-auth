@@ -1,4 +1,3 @@
-// components/search/smart-search.tsx - Debounced search with instant results
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
@@ -10,7 +9,6 @@ export function SmartSearch() {
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
 
-  // Debounce search term
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(searchTerm);
@@ -19,12 +17,11 @@ export function SmartSearch() {
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
-  // Query updates automatically when debouncedSearch changes
   const { data, isLoading } = useQuery({
     queryKey: [...queryKeys.coverLetters.lists(), { search: debouncedSearch }],
     queryFn: () => coverLetterApi.getCoverLetters({ search: debouncedSearch }),
     enabled: debouncedSearch.length > 0,
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: 2 * 60 * 1000,
   });
 
   return (

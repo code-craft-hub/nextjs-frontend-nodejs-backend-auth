@@ -1,4 +1,3 @@
-// components/jobs/job-card.tsx
 'use client';
 
 import type { Job } from '@/shared/types/jobs.types';
@@ -23,15 +22,7 @@ export function JobCard({
   onDelete,
   onDuplicate,
   onHover,
-  // viewMode,
 }: JobCardProps) {
-  // const statusColors = {
-  //   draft: 'bg-gray-100 text-gray-800',
-  //   active: 'bg-green-100 text-green-800',
-  //   closed: 'bg-red-100 text-red-800',
-  //   archived: 'bg-yellow-100 text-yellow-800',
-  // };
-
   return (
     <div
       onMouseEnter={() => onHover(job.id)}
@@ -80,7 +71,7 @@ export function JobCard({
             </span>
           )}
         </div>
-        
+
         <div className="flex gap-2">
           <button
             onClick={() => onEdit(job)}

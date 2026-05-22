@@ -1,4 +1,3 @@
-// components/blogs/blog-detail.tsx - Client component with mutations
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
@@ -16,10 +15,8 @@ export function BlogDetail({ id }: BlogDetailProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({ title: '', descriptionHtml: '' });
 
-  // Data loads instantly from SSR cache
   const { data: blog } = useQuery(blogQueries.detail(id));
 
-  // Mutations with optimistic updates
   const updateMutation = useUpdateBlogMutation();
   const deleteMutation = useDeleteBlogMutation();
   const togglePublishMutation = useTogglePublishBlogMutation();
@@ -32,19 +29,16 @@ export function BlogDetail({ id }: BlogDetailProps) {
       data: editData,
     });
     setIsEditing(false);
-    // UI updates instantly via optimistic update, no spinner needed
   };
 
   const handleDelete = async () => {
     await deleteMutation.mutateAsync(id);
     router.push('/blogs');
-    // Optimistic update removes blog from lists instantly
   };
 
   const handleTogglePublish = async () => {
     if (!blog) return;
     await togglePublishMutation.mutateAsync({ id, currentStatus: blog.status });
-    // Toggle happens instantly in UI before server confirms
   };
 
   if (isEditing) {

@@ -6,7 +6,7 @@ import { blogQueries } from "@/features/blog/queries/blog.queries";
 import { getCookiesToken } from "@/lib/auth.utils";
 import { BlogDetailClient } from "@/features/blog/components/BlogDetailClient";
 import { Header } from "@/features/landing/components/Header";
-import { Footer } from "@/components/landing-page/Footer";
+import { Footer } from "@features/landing/components/Footer";
 
 interface BlogPostPageProps {
   params: Promise<{ id: string }>;

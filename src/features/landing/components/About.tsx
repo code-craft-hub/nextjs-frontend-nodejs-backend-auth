@@ -1,5 +1,5 @@
 import { useRouter } from "next/navigation";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 
 const About = () => {
   const router = useRouter();
@@ -20,7 +20,6 @@ const About = () => {
                 attention-grabbing resume that reflects your uniqueness and
                 boosts your chances of landing your dream job
               </p>
-              {/* <LandingPageButton title="Create my resume"/> */}
               <Button
                 onClick={() =>
                   router.push(`/dashboard/resume`)

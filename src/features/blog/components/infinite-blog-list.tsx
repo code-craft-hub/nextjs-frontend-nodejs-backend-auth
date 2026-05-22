@@ -1,4 +1,3 @@
-// components/blogs/infinite-blog-list.tsx - Infinite scroll implementation
 'use client';
 
 import { useInfiniteQuery } from '@tanstack/react-query';
@@ -28,7 +27,6 @@ export function InfiniteBlogList() {
     staleTime: 5 * 60 * 1000,
   });
 
-  // Intersection Observer for infinite scroll
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -79,7 +77,6 @@ export function InfiniteBlogList() {
         </div>
       ))}
 
-      {/* Loading indicator and intersection observer target */}
       <div ref={observerTarget} className="py-4 text-center">
         {isFetchingNextPage ? (
           <div className="text-gray-600">Loading more...</div>
