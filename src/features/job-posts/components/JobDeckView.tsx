@@ -703,9 +703,11 @@ export function JobDeckView({
 
     // External-apply: requires the cverai Chrome extension
     if (extState === "not_capable") {
-      toast.info(
-        "Auto-apply via browser extension requires Chrome or Edge on desktop.",
-      );
+      toast.info("Switch to desktop to auto-apply.", {
+        description:
+          "Auto-apply requires the CverAI Chrome extension, which only works on Chrome or Edge on a desktop computer.",
+        duration: 6000,
+      });
       return;
     }
     if (extState !== "installed") {
