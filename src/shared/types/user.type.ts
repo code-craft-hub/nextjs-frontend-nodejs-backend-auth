@@ -127,7 +127,6 @@ export interface UserProfile {
   firestoreProfileImage: string;
 
   userAPIkey: string;
-  password: string;
   emailVerified: boolean;
 
   referralCode: string;

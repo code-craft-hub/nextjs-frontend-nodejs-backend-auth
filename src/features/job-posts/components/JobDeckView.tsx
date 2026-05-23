@@ -47,9 +47,6 @@ import type { ExtensionState } from "../hooks/useExtension";
 import { decodeHtml } from "@/lib/utils";
 export type ViewType = "deck" | "list";
 
-// const CWS_URL =
-//   "https://chrome.google.com/webstore/detail/cverai-auto-apply/EXTENSION_ID_PLACEHOLDER";
-
 interface JobDeckViewProps {
   /** Called when the user swipes/taps Apply on a card. */
   onApply: (job: JobPost) => void;
@@ -712,16 +709,24 @@ export function JobDeckView({
       return;
     }
     if (extState !== "installed") {
-      toast("Install the cverai extension to auto-apply on external sites.", {
+      toast("Install the CverAI extension to auto-apply on external sites.", {
         description:
           "Our bot will fill and submit the application on your behalf — no manual work needed.",
-        // action: {
-        //   label: "Get extension",
-        //   onClick: () => window.open(CWS_URL, "_blank"),
-        // },
-        // duration: 8000,
+        action: {
+          label: "Install extension",
+          onClick: () =>
+            window.open(
+              "https://chromewebstore.google.com/detail/hdhehckjajimiocpjkkmnmfipcbihapd",
+              "_blank",
+              "noopener,noreferrer",
+            ),
+        },
+        classNames: {
+          actionButton: "!bg-blue-600 hover:!bg-blue-700 !text-white !h-8",
+        },
+        duration: 8000,
       });
-      // return;
+      return;
     }
 
     setSwipeDir("right");
@@ -742,11 +747,6 @@ export function JobDeckView({
     }, 360);
   }, [deck]);
 
-  // const handleReset = useCallback(() => {
-  //   setAppliedIds(new Set());
-  //   setSkippedIds(new Set());
-  //   setSwipeDir(null);
-  // }, []);
 
   const handleOpenRun = useCallback(
     (runId: string) => {

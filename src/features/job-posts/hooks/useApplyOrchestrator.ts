@@ -730,34 +730,30 @@ export function useApplyOrchestrator(
         return;
       }
 
+      // Nudge Chromium users who could use the extension but haven't installed it.
+      if (isChromiumDesktop() && extState !== "installed") {
+        toast.info("Get faster applications with our Chrome extension", {
+          description:
+            "The extension applies directly in your browser — no remote bot needed.",
+          action: {
+            label: "Install extension",
+            onClick: () =>
+              window.open(
+                "https://chromewebstore.google.com/detail/hdhehckjajimiocpjkkmnmfipcbihapd",
+                "_blank",
+                "noopener,noreferrer",
+              ),
+          },
+          duration: 8000,
+        });
+      }
       console.log("final fallback to cloud bot for job", job);
       window.open(
         job?.applyUrl ?? job.link ?? "",
         "_blank",
         "noopener,noreferrer",
       );
-      return;
-
-      // ── Cloud bot: POST to server, then open SSE stream ───────────────────
-      inflightRef.current.add(job.id);
-      setSessions((prev) => ({
-        ...prev,
-        [job.id]: {
-          jobId: job.id,
-          strategy: "cloud_bot",
-          status: "cloud:starting",
-          correlationId,
-          startedAt: Date.now(),
-          jobTitle: job.title ?? undefined,
-          jobCompany: job.companyName ?? job.company ?? undefined,
-        },
-      }));
-      // triggerCloudBot owns the API call, SSE open, and inflightRef cleanup.
-      triggerCloudBot(job.id);
     },
-    // `sessions` intentionally excluded — we read from sessionsRef instead,
-    // keeping `apply` stable across SSE-driven re-renders.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [extState, applyViaExtension, enqueueJob, triggerCloudBot, recordApplication, router],
   );
 
