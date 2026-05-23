@@ -528,10 +528,16 @@ export function RunsBellPopover({
                         return;
                       }
                       setOpen(false);
-                      if (isTerminal && run.applicationId) {
-                        router.push(
-                          `/dashboard/jobs/${run.applicationId}/application-details`,
-                        );
+                      if (isTerminal) {
+                        if (run.applicationId) {
+                          router.push(
+                            `/dashboard/jobs/${run.applicationId}/application-details`,
+                          );
+                        } else if (run.job?.id) {
+                          router.push(`/dashboard/jobs?jobId=${run.job.id}`);
+                        } else {
+                          router.push("/dashboard/jobs");
+                        }
                       } else {
                         if (isPopupMode) exposedRunIdRef.current = run.id;
                         onOpenRun(run.id);

@@ -75,7 +75,6 @@ const Preview = ({
     decodeURIComponent(coverLetterData?.recruiterEmail || recruiterEmail || ""),
   );
 
-
   const handleOpenModal = (value: boolean) => {
     setOpenModal(value);
   };
@@ -202,11 +201,13 @@ const Preview = ({
           )}
         </div>
       </div>
-      <TailorCoverLetterDisplay
-        user={user}
-        data={coverLetterData}
-        recruiterEmail={destinationEmail}
-      />
+      {!!coverLetterData && (
+        <TailorCoverLetterDisplay
+          user={user}
+          data={coverLetterData}
+          recruiterEmail={destinationEmail}
+        />
+      )}
       {settings?.useMasterCv && viewerSrc ? (
         <div className="h-[80svh] overflow-hidden">
           <iframe
@@ -233,7 +234,11 @@ const Preview = ({
       )}
       {!readOnly && (
         <div className="flex items-center justify-center max-sm:fixed w-full h-16 bottom-4 left-0 ">
-          <Button disabled={isSubmitting} onClick={handleSubmit} className="w-64">
+          <Button
+            disabled={isSubmitting}
+            onClick={handleSubmit}
+            className="w-64"
+          >
             Submit <Sparkles className="ml-2 h-4 w-4" />
           </Button>
         </div>

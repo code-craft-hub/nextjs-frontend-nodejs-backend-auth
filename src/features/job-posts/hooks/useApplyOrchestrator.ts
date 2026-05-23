@@ -32,7 +32,7 @@ import {
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const MANUAL_DOMAINS = ["linkedin.com", "glassdoor.com", "indeed.com"];
+const MANUAL_DOMAINS: string[] = [];
 
 // ─── Pure utilities (no hooks) ────────────────────────────────────────────────
 
@@ -87,7 +87,7 @@ function isManualDomain(url: string): boolean {
  *
  * Priority (highest → fallback):
  *   1. email      — job.emailApply is set (recruiter-direct compose)
- *   2. manual     — apply URL is LinkedIn / Glassdoor / Indeed (must open in browser)
+ *   2. manual     — apply URL matches a domain in MANUAL_DOMAINS (currently none)
  *   3. extension  — Chromium desktop AND extension confirmed installed
  *   4. cloud_bot  — default: backend browser-use cloud session
  */
