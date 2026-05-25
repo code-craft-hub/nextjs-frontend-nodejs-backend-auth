@@ -226,10 +226,7 @@ function JobDeckCard({ job, stackIndex, onSkip, onApply }: JobDeckCardProps) {
 
   const descriptionText =
     job.descriptionHtml ?? job.descriptionText ?? job.companyText ?? "No description available.";
-  const preview =
-    descriptionText.length > 300
-      ? descriptionText.slice(0, 300) + "...."
-      : descriptionText;
+  const preview = descriptionText.slice(0, 300) + (descriptionText.length > 300 ? "…" : "");
 
   return (
     <div
