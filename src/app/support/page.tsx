@@ -12,8 +12,6 @@ export const metadata: Metadata = {
   },
 };
 
-export const dynamic = "force-dynamic";
-
 const SupportPage = () => {
   return <SupportPageClient />;
 };

@@ -15,7 +15,6 @@ export const metadata: Metadata = {
 };
 
 export const dynamic = "force-dynamic";
-export const revalidate = 0;
 
 const PreviewPage = async ({ searchParams }: any) => {
   const token = (await getCookiesToken()) ?? "";
