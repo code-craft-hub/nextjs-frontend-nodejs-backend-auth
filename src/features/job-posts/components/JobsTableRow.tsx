@@ -2,7 +2,13 @@
 
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Toggle } from "@/components/ui/toggle";
-import { BookmarkIcon, Briefcase, Calendar, DollarSign, MapPin } from "lucide-react";
+import {
+  BookmarkIcon,
+  Briefcase,
+  Calendar,
+  DollarSign,
+  MapPin,
+} from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -44,37 +50,6 @@ export function JobsTableRow({
   onRowClick,
 }: Props) {
   const link = job?.applyUrl || job?.link || job?.emailApply;
-
-  function extractDomain(link?: string | null): string | null {
-    if (!link || typeof link !== "string") return null;
-
-    try {
-      // Provide a base to support relative URLs
-      const url = new URL(link, "http://example.com");
-
-      const hostname = url.hostname || "";
-      return hostname.replace(/^www\./i, "");
-    } catch {
-      return null;
-    }
-  }
-
-  const domain = extractDomain(link ?? "") ?? "";
-
-  const blockList = [
-    "linkedin.com",
-    "glassdoor.com",
-    "indeed.com",
-    "simplyhired.com",
-    "pinpointhq.com",
-    "marriott.com",
-    "successfactors.eu",
-    "seek.com",
-    "careerone.com.au"
-  ];
-  const isBlockList = blockList.some((blocked) => domain.includes(blocked));
-
-  if (isBlockList) return null;
 
   return (
     <TableRow
