@@ -3,6 +3,7 @@ import JobsAppliedBanner from "./JobsAppliedBanner";
 import { useState, useCallback, useEffect, useMemo } from "react";
 import {
   useInfiniteQuery,
+  useMutation,
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
@@ -28,7 +29,7 @@ import { Button } from "@/components/ui/button";
 import recommendationsQueries from "@/features/recommendations/queries/recommendations.queries";
 import { jobPreferencesQueries } from "@/features/job-preferences/queries/job-preferences.queries";
 import { jobPostsQueries } from "@/features/job-posts/queries/job-posts.query";
-import type { JobRecommendation } from "@/features/recommendations/api/recommendations.api";
+import { recommendationsApi, type JobRecommendation } from "@/features/recommendations/api/recommendations.api";
 import { coverLetterApi } from "@/features/cover-letter/api/cover-letter.api";
 import { resumeApi } from "@/features/resume/api/resume.api";
 import { autoApplyApi } from "@/features/auto-apply/api/auto-apply.api";
@@ -475,6 +476,21 @@ export function JobDeckView({
   const { data: settings } = useQuery(aiSettingsQueries.detail());
   const useMasterCv = !!(settings?.useMasterCv && settings?.masterCvId);
 
+  // ── Trigger a fresh recommendation generation bypassing the rate-limit gate ─
+  const generateMoreMutation = useMutation({
+    mutationFn: () => recommendationsApi.generateMore(),
+    onSuccess: () => {
+      // Invalidate so the query re-fetches immediately and flips to "queued" status,
+      // which activates the 3-second polling loop in recommendationsQueries.
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.recommendations.user(),
+      });
+    },
+    onError: () => {
+      toast.error("Failed to start recommendation generation. Please try again.");
+    },
+  });
+
   // ── Unified derived state ────────────────────────────────────────────────
   const isLoading = hasFilters ? searchLoading : recsLoading;
   const fetchNextPage = hasFilters ? searchFetchNext : recsFetchNext;
@@ -838,13 +854,30 @@ export function JobDeckView({
             </p>
           </div>
         ) : allJobs.length === 0 && !isLoading ? (
-          <div className="flex flex-col items-center justify-center py-24 text-gray-400 gap-2">
+          <div className="flex flex-col items-center justify-center py-24 text-gray-400 gap-4">
             <span className="text-4xl">📭</span>
-            <p className="text-sm">
+            <p className="text-sm text-center">
               {hasFilters
                 ? "No jobs match your current filters. Try adjusting your preferences."
-                : "No recommendations yet. Check back soon."}
+                : "No recommendations yet."}
             </p>
+            {!hasFilters && (
+              <Button
+                size="sm"
+                className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl px-5"
+                disabled={generateMoreMutation.isPending}
+                onClick={() => generateMoreMutation.mutate()}
+              >
+                {generateMoreMutation.isPending ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 mr-2 animate-spin" />
+                    Finding jobs…
+                  </>
+                ) : (
+                  "Find matching jobs"
+                )}
+              </Button>
+            )}
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-24 gap-3">
