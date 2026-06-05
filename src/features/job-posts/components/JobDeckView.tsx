@@ -29,7 +29,10 @@ import { Button } from "@/components/ui/button";
 import recommendationsQueries from "@/features/recommendations/queries/recommendations.queries";
 import { jobPreferencesQueries } from "@/features/job-preferences/queries/job-preferences.queries";
 import { jobPostsQueries } from "@/features/job-posts/queries/job-posts.query";
-import { recommendationsApi, type JobRecommendation } from "@/features/recommendations/api/recommendations.api";
+import {
+  recommendationsApi,
+  type JobRecommendation,
+} from "@/features/recommendations/api/recommendations.api";
 import { coverLetterApi } from "@/features/cover-letter/api/cover-letter.api";
 import { resumeApi } from "@/features/resume/api/resume.api";
 import { autoApplyApi } from "@/features/auto-apply/api/auto-apply.api";
@@ -91,7 +94,7 @@ function toJobRowFromPost(post: JobPost): JobPost & {
 function GeneratingBanner({ message }: { message?: string }) {
   return (
     <div className="flex items-center gap-3 rounded-xl border border-blue-100 bg-blue-50 px-5 py-4 text-blue-700">
-      <Loader2 className="size-4 shrink-0 animate-spin" />
+      <Loader2 className="size-3.5 shrink-0 animate-spin" />
       <p className="text-sm">
         {message ??
           "Finding the best job matches for you. New recommendations will appear shortly…"}
@@ -226,8 +229,12 @@ function JobDeckCard({ job, stackIndex, onSkip, onApply }: JobDeckCardProps) {
       : null);
 
   const descriptionText =
-    job.descriptionHtml ?? job.descriptionText ?? job.companyText ?? "No description available.";
-  const preview = descriptionText.slice(0, 300) + (descriptionText.length > 300 ? "…" : "");
+    job.descriptionHtml ??
+    job.descriptionText ??
+    job.companyText ??
+    "No description available.";
+  const preview =
+    descriptionText.slice(0, 300) + (descriptionText.length > 300 ? "…" : "");
 
   return (
     <div
@@ -242,13 +249,13 @@ function JobDeckCard({ job, stackIndex, onSkip, onApply }: JobDeckCardProps) {
       <Card className="relative w-full rounded-[30px] bg-white shadow-xl border-0  gap-2 p-8 max-w-2xl">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <h1 className="text-lg capitalize  font-bold font-poppins">
+          <h1 className="text-md capitalize  font-bold font-poppins">
             {decodeHtml(job.title)}
           </h1>
 
           <div className="hidden sm:flex ml-8 items-center gap-2">
             <div className="flex items-center gap-2 text-[#7a7a7a] font-medium text-sm">
-              <Clock className="size-4" strokeWidth={2} />
+              <Clock className="size-3.5" strokeWidth={2} />
               <span>{timeAgo(job.postedAt ?? job.createdAt)}</span>
             </div>
 
@@ -260,12 +267,15 @@ function JobDeckCard({ job, stackIndex, onSkip, onApply }: JobDeckCardProps) {
                 onClick={(e) => e.stopPropagation()}
               >
                 <ExternalLink
-                  className="size-4 text-[#7a7a7a]"
+                  className="size-3.5 text-[#7a7a7a]"
                   strokeWidth={2}
                 />
               </a>
             ) : (
-              <ExternalLink className="size-4 text-[#7a7a7a]" strokeWidth={2} />
+              <ExternalLink
+                className="size-3.5 text-[#7a7a7a]"
+                strokeWidth={2}
+              />
             )}
           </div>
         </div>
@@ -305,10 +315,16 @@ function JobDeckCard({ job, stackIndex, onSkip, onApply }: JobDeckCardProps) {
 
         {/* Company */}
         <div className=" flex items-center gap-3 my-2">
-          <div className="size-14 rounded-full overflow-hidden bg-gray-200 shrink-0">
-            {(job.companyLogo ?? job.companyIcon) ? (
+          <div className="size-12 rounded-full overflow-hidden bg-gray-200 shrink-0">
+            {(job.companyLogo ?? job.companyIcon) ?   (
               <img
-                src={job.companyLogo ?? job.companyIcon ?? ""}
+                src={
+                  !!job.companyLogo
+                    ? job.companyLogo
+                    : !!job.companyIcon
+                      ? job.companyIcon
+                      : "/placeholder.jpg"
+                }
                 alt={job.companyName ?? job.company ?? ""}
                 className="w-full h-full object-cover"
               />
@@ -320,14 +336,14 @@ function JobDeckCard({ job, stackIndex, onSkip, onApply }: JobDeckCardProps) {
           </div>
 
           <div className="flex flex-col">
-            <div className="text-xl font-semibold text-black leading-none">
+            <div className="text-md font-semibold text-black leading-none">
               {job.companyName ?? job.company ?? "Unknown Company"}
             </div>
 
             {job.location && (
-              <div className="mt- flex items-center gap-1 text-[#8a8a8a] text-md font-medium">
+              <div className="mt-1 flex items-center gap-1 text-[#8a8a8a] text-md font-medium">
                 <MapPin className="size-3" strokeWidth={2} />
-                <span className="text-xs max-w-sm line-clamp-1 text-nowrap truncate">
+                <span className="text-2xs max-w-sm line-clamp-1 text-nowrap truncate">
                   {job.location}
                 </span>
               </div>
@@ -337,7 +353,9 @@ function JobDeckCard({ job, stackIndex, onSkip, onApply }: JobDeckCardProps) {
 
         {/* Description */}
         <div className="mb-1">
-          <div className="text-[#9a9a9a] text-md font-medium">Description</div>
+          <div className="text-[#9a9a9a] text-sm font-medium mb-1">
+            Description
+          </div>
 
           <div
             className=" text-[#2b2b2b] text-xs max-w-215 [&_strong]:font-bold [&_br]:block [&_p]:mt-1"
@@ -487,7 +505,9 @@ export function JobDeckView({
       });
     },
     onError: () => {
-      toast.error("Failed to start recommendation generation. Please try again.");
+      toast.error(
+        "Failed to start recommendation generation. Please try again.",
+      );
     },
   });
 
@@ -762,7 +782,6 @@ export function JobDeckView({
     }, 360);
   }, [deck]);
 
-
   const handleOpenRun = useCallback(
     (runId: string) => {
       if (emailRuns.has(runId)) return; // email runs have no drawer to open
@@ -888,7 +907,6 @@ export function JobDeckView({
             <p className="text-xs text-gray-400">
               {appliedIds.size} applied · {skippedIds.size} skipped
             </p>
-           
           </div>
         )
       ) : (
