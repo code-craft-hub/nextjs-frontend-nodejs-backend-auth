@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Briefcase, Send, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -62,28 +62,54 @@ function sendStopRun(runId: string) {
 
 // ─── Batch-question panel (inline inside popover row) ─────────────────────────
 
+interface PreviousSubmission {
+  sig: string;
+  answers: Record<string, string>;
+  at: number;
+}
+
 function BatchQuestionsPanel({
   run,
   onClose,
+  previousSubmission,
+  onSubmitted,
 }: {
   run: ActiveRun;
   onClose: () => void;
+  previousSubmission: PreviousSubmission | null;
+  onSubmitted: (sig: string, answers: Record<string, string>) => void;
 }) {
   const questions: RunBatchQuestion[] = run.pendingBatch?.questions ?? [];
-  const [answers, setAnswers] = useState<Record<string, string>>(() =>
-    Object.fromEntries(questions.map((q) => [q.id, ""])),
-  );
+  const currentSig = questions.map((q) => q.id).join("|");
+
+  // Pre-fill with previously submitted answers if the bot re-asked the same batch
+  const sameAsLastTime = !!previousSubmission && previousSubmission.sig === currentSig;
+  const [answers, setAnswers] = useState<Record<string, string>>(() => {
+    if (sameAsLastTime && previousSubmission) return previousSubmission.answers;
+    return Object.fromEntries(questions.map((q) => [q.id, ""]));
+  });
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
+  const [sendError, setSendError] = useState<string | null>(null);
+  const sentRef = useRef(false);
 
   useEffect(() => {
     const handler = (e: MessageEvent) => {
       const d = e.data as Record<string, unknown> | null;
       if (!d || d.source !== "cverai-extension") return;
       if (d.type === "answer_batch_ack" && d.runId === run.id) {
-        setSending(false);
-        setSent(true);
-        setTimeout(onClose, 1200);
+        if (d.ok === false) {
+          setSending(false);
+          setSendError(
+            (d.error as string | undefined) ||
+              "The agent session was lost (extension restarted). Please dismiss this run and start a new application.",
+          );
+        } else {
+          setSending(false);
+          setSent(true);
+          sentRef.current = true;
+          setTimeout(onClose, 1200);
+        }
       }
     };
     window.addEventListener("message", handler);
@@ -92,11 +118,15 @@ function BatchQuestionsPanel({
 
   function handleSend() {
     setSending(true);
+    onSubmitted(currentSig, answers);
     sendAnswerBatch(run.id, answers);
+    // Fallback close if extension never sends ack
     setTimeout(() => {
-      setSending(false);
-      onClose();
-    }, 3000);
+      if (!sentRef.current) {
+        setSending(false);
+        onClose();
+      }
+    }, 5000);
   }
 
   const allFilled = questions.every((q) => answers[q.id]?.trim());
@@ -112,6 +142,16 @@ function BatchQuestionsPanel({
 
   return (
     <div className="mt-2 space-y-3" onClick={(e) => e.stopPropagation()}>
+      {sameAsLastTime && previousSubmission && (
+        <div className="flex items-start gap-2 rounded-lg bg-amber-50 border border-amber-200 px-3 py-2">
+          <span className="text-amber-500 text-sm mt-0.5">⚠</span>
+          <p className="text-xs text-amber-700">
+            You already answered this{" "}
+            {Math.round((Date.now() - previousSubmission.at) / 1000)}s ago — the bot
+            re-asked. Your previous answers are pre-filled. Re-send or modify them.
+          </p>
+        </div>
+      )}
       <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">
         The bot needs your answers to continue
       </p>
@@ -138,8 +178,11 @@ function BatchQuestionsPanel({
         onClick={handleSend}
       >
         <Send className="w-3.5 h-3.5" />
-        {sending ? "Sending…" : "Send answers"}
+        {sending ? "Sending…" : sameAsLastTime ? "Re-send answers" : "Send answers"}
       </Button>
+      {sendError && (
+        <p className="text-xs text-red-600 mt-1">{sendError}</p>
+      )}
     </div>
   );
 }
@@ -372,7 +415,16 @@ export function RunsBellPopover({
   const [showAll, setShowAll] = useState(false);
   const [expandedRunId, setExpandedRunId] = useState<string | null>(null);
   const exposedRunIdRef = useRef<string | null>(null);
+  // Persists submitted answers per run across re-mounts of BatchQuestionsPanel
+  const submittedAnswersRef = useRef<Map<string, PreviousSubmission>>(new Map());
   const router = useRouter();
+
+  const handleAnswerSubmitted = useCallback(
+    (runId: string, sig: string, answers: Record<string, string>) => {
+      submittedAnswersRef.current.set(runId, { sig, answers, at: Date.now() });
+    },
+    [],
+  );
 
   const activeBadgeCount = runs?.filter((r) =>
     [
@@ -657,6 +709,8 @@ export function RunsBellPopover({
                         <BatchQuestionsPanel
                           run={run}
                           onClose={() => setExpandedRunId(null)}
+                          previousSubmission={submittedAnswersRef.current.get(run.id) ?? null}
+                          onSubmitted={(sig, answers) => handleAnswerSubmitted(run.id, sig, answers)}
                         />
                       )}
                     {isExpanded &&
