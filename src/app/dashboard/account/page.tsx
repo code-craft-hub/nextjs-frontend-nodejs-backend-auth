@@ -22,27 +22,38 @@ const AccountPage = async ({ searchParams }: any) => {
   const tab = resolvedParams?.tab as string | undefined;
   const event = resolvedParams?.event as string | undefined;
   const reference = resolvedParams?.reference as string | undefined;
+  const sessionId = resolvedParams?.session_id as string | undefined;
   const phoneNumber = resolvedParams?.phoneNumber as string | undefined;
   const referrer = resolvedParams?.referrer as string | undefined;
-
 
   const token = (await getCookiesToken()) ?? "";
   const queryClient = createServerQueryClient();
 
   let paymentData: VerifyPaymentData | undefined;
 
+  // ── Paystack return: ?reference=txn_xxx ──────────────────────────────────
   if (reference) {
     try {
-      // NOTE: This is the server-side verify call.
-      // The webhook is the authoritative payment processor; this is for immediate UI feedback.
       const { data } = await api.get<{ data: VerifyPaymentData }>(
         `/paystack/payments/verify/${reference}`,
         { token },
       );
       paymentData = data;
     } catch {
-      // Verification failed — non-fatal. The webhook will still process the payment.
-      // The user can refresh the billing page once the webhook completes.
+      // Non-fatal — webhook is the authoritative processor
+    }
+  }
+
+  // ── Stripe return: ?session_id=cs_xxx ────────────────────────────────────
+  if (sessionId && !paymentData?.isProUser) {
+    try {
+      const { data } = await api.get<{ data: VerifyPaymentData }>(
+        `/stripe/checkout/verify/${sessionId}`,
+        { token },
+      );
+      paymentData = data;
+    } catch {
+      // Non-fatal — webhook will process the payment
     }
   }
 
@@ -50,10 +61,8 @@ const AccountPage = async ({ searchParams }: any) => {
   const currentPeriodEnd = paymentData?.currentPeriodEnd;
   const isExpired = currentPeriodEnd ? new Date(currentPeriodEnd) < new Date() : true;
 
-  // After a successful payment, redirect to a clean URL to:
-  // 1. Prevent re-verification on browser refresh
-  // 2. Show the confetti/success modal via the `event` param
-  if (isProUser && !isExpired && reference) {
+  // Redirect to clean URL after successful payment (prevents re-verification on refresh)
+  if (isProUser && !isExpired && (reference || sessionId)) {
     redirect(
       `/dashboard/account?tab=${tab ?? "billing"}&event=subscription_success`,
     );
@@ -66,6 +75,7 @@ const AccountPage = async ({ searchParams }: any) => {
           tab={tab ?? ""}
           event={event ?? ""}
           reference={reference ?? ""}
+          stripeSessionId={sessionId ?? ""}
           phoneNumber={phoneNumber}
           referrer={referrer}
         />

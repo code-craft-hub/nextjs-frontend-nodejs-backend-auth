@@ -9,7 +9,13 @@ import { ReferralCard } from "./ReferralCard";
 import { UpgradeBanner } from "./UpgradeBanner";
 import { Analytics } from "@/lib/analytics";
 
-export const Billing = ({ reference }: { reference: string }) => {
+export const Billing = ({
+  reference,
+  stripeSessionId,
+}: {
+  reference: string;
+  stripeSessionId?: string;
+}) => {
   const { data: user } = useQuery(userQueries.detail());
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [_justUpgraded, setJustUpgraded] = useState(false);
@@ -38,6 +44,7 @@ export const Billing = ({ reference }: { reference: string }) => {
     return (
       <UpgradeModal
         trxReference={reference}
+        stripeSessionId={stripeSessionId}
         handleStateChange={(value: boolean) => {
           if (value) setJustUpgraded(true);
         }}

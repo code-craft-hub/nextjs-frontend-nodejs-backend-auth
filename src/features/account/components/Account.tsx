@@ -16,12 +16,14 @@ export const AccountClient = ({
   tab,
   event,
   reference,
+  stripeSessionId,
   phoneNumber,
   referrer,
 }: {
   tab: string;
   event: string;
   reference: string;
+  stripeSessionId?: string;
   phoneNumber?: string;
   referrer?: string;
 }) => {
@@ -79,7 +81,7 @@ export const AccountClient = ({
       {currentTab === "account" || currentTab === undefined ? (
         <UserProfileForm phoneNumber={phoneNumber} referrer={referrer} />
       ) : currentTab === "billing" ? (
-        <Billing reference={reference} />
+        <Billing reference={reference} stripeSessionId={stripeSessionId} />
       ) : (
         <PasswordUpdateForm />
       )}
