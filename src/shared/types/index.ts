@@ -116,6 +116,10 @@ export interface IUser {
   /** The date the current subscription period ends (next billing date) */
   currentPeriodEnd: Date | null;
 
+  // ─── Payment provider ──────────────────────────────────────
+  /** Non-null when the user subscribed via Stripe; null = Paystack */
+  stripeCustomerId: string | null;
+
   // ─── Credits (from userCredits table) ──────────────────────
   creditBalance: number | null;
 

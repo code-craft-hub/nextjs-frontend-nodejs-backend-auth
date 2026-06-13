@@ -1,34 +1,106 @@
+"use client";
 import { useState } from "react";
 import { Switch } from "@/components/ui/switch";
 import { userQueries } from "@features/user";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { daysFromToday, formatAppliedDate } from "@/lib/utils/helpers";
 import { cn } from "@/lib/utils";
 import { useConfirm } from "@/shared/hooks/use-confirm";
 import { toast } from "sonner";
+import { api, API_URL } from "@/shared/api/client";
 
 export function PremiumUserPage() {
-  const [autoRenewal, setAutoRenewal] = useState(true);
   const { data: user } = useQuery(userQueries.detail());
+  const qc = useQueryClient();
 
-  const cancelSubscription = async () => {
-    const ok = await confirm();
+  const isStripeUser = !!user?.stripeCustomerId;
 
-    if (!ok) {
-      toast.success("Subscription cancelled", {
-        description: `Your subscription has been cancelled. You will retain access until the end of your billing period.`,
-      });
-    } else {
-      toast.info("Cancellation aborted", {
-        description: `Your subscription is still active.`,
-      });
-    }
-  };
+  const [autoRenewal, setAutoRenewal] = useState(true);
+  const [loading, setLoading] = useState<"cancel" | "portal" | "autoRenewal" | null>(null);
+
+  const displayAmount = isStripeUser ? "$10.00/month" : "₦4,999.00/month";
 
   const [ConfirmDialog, confirm] = useConfirm(
     "Cancel Subscription",
-    "Are you sure you want to cancel your subscription?"
+    `Are you sure you want to cancel? You'll keep access until ${formatAppliedDate(user?.currentPeriodEnd as any)}, then lose Pro features.`,
   );
+
+  const handleCancelSubscription = async () => {
+    const confirmed = await confirm();
+    if (!confirmed) return;
+
+    if (!isStripeUser) {
+      toast.info("Contact support to cancel your Paystack subscription.", {
+        description: "Email us at support@cverai.com",
+      });
+      return;
+    }
+
+    setLoading("cancel");
+    try {
+      await api.post(`${API_URL}/stripe/checkout/cancel`);
+      toast.success("Subscription cancelled", {
+        description: `You'll retain access until ${formatAppliedDate(user?.currentPeriodEnd as any)}.`,
+      });
+      await qc.invalidateQueries({ queryKey: userQueries.detail().queryKey });
+    } catch {
+      toast.error("Failed to cancel subscription. Please try again.");
+    } finally {
+      setLoading(null);
+    }
+  };
+
+  const handleUpdatePaymentMethod = async () => {
+    if (!isStripeUser) {
+      toast.info("Contact support to update your payment method.", {
+        description: "Email us at support@cverai.com",
+      });
+      return;
+    }
+
+    setLoading("portal");
+    try {
+      const data = await api.post<{ data: { url: string } }>(
+        `${API_URL}/stripe/checkout/portal`,
+      );
+      if (data?.data?.url) {
+        window.location.href = data.data.url;
+      }
+    } catch {
+      toast.error("Failed to open billing portal. Please try again.");
+    } finally {
+      setLoading(null);
+    }
+  };
+
+  const handleAutoRenewalToggle = async (enabled: boolean) => {
+    if (!isStripeUser) {
+      setAutoRenewal(enabled);
+      toast.info("Auto-renewal management is available for Stripe subscriptions only.");
+      return;
+    }
+
+    setLoading("autoRenewal");
+    const previous = autoRenewal;
+    setAutoRenewal(enabled);
+    try {
+      await api.post(`${API_URL}/stripe/checkout/auto-renewal`, { enabled });
+      toast.success(
+        enabled ? "Auto-renewal enabled" : "Auto-renewal disabled",
+        {
+          description: enabled
+            ? "Your subscription will renew automatically."
+            : `Your subscription will end on ${formatAppliedDate(user?.currentPeriodEnd as any)}.`,
+        },
+      );
+    } catch {
+      setAutoRenewal(previous);
+      toast.error("Failed to update auto-renewal. Please try again.");
+    } finally {
+      setLoading(null);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
       <ConfirmDialog />
@@ -36,17 +108,7 @@ export function PremiumUserPage() {
         {/* Pro Plan Card */}
         <div className="bg-[#2D60FF] rounded-2xl p-4 sm:p-8 text-white shadow-lg">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-            {/* Left Section */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
-              {/* <SegmentedProgress
-                percentage={99}
-                size={64}
-                bgColor="bg-blue-600"
-                segmentColor="white"
-                textColor="text-white"
-                fontSize="text-lg"
-              /> */}
-
               <div className="space-y-1">
                 <div className="flex items-center gap-3">
                   <h1 className="text-2xl font-bold">Pro Plan</h1>
@@ -54,10 +116,7 @@ export function PremiumUserPage() {
                     Active
                   </span>
                 </div>
-                <p className="text-white/80 text-sm">
-                  Full access to all features
-                </p>
-
+                <p className="text-white/80 text-sm">Full access to all features</p>
                 <div className="pt-4 space-y-0.5">
                   <p className="font-semibold">
                     Next billing date:{" "}
@@ -70,14 +129,11 @@ export function PremiumUserPage() {
               </div>
             </div>
 
-            {/* Right Section - Days Counter */}
             <div className="bg-white/20 rounded-xl px-6 py-4 text-center sm:min-w-35">
               <div className="text-4xl font-bold">
                 {daysFromToday(user?.currentPeriodEnd)}
               </div>
-              <div className="text-sm text-white/80 mt-1">
-                days until renewal
-              </div>
+              <div className="text-sm text-white/80 mt-1">days until renewal</div>
             </div>
           </div>
         </div>
@@ -90,51 +146,41 @@ export function PremiumUserPage() {
             </h2>
 
             <div className="space-y-0">
-              {/* Plan Type */}
               <div className="flex items-center justify-between py-5 border-b border-gray-200">
                 <span className="text-[#667085] font-medium">Plan Type</span>
                 <span className="text-[#344054] font-semibold">Pro Plan</span>
               </div>
 
-              {/* Billing Cycle */}
               <div className="flex items-center justify-between py-5 border-b border-gray-200">
-                <span className="text-[#667085] font-medium">
-                  Billing Cycle
-                </span>
+                <span className="text-[#667085] font-medium">Billing Cycle</span>
                 <span className="text-[#344054] font-semibold">Monthly</span>
               </div>
 
-              {/* Amount */}
               <div className="flex items-center justify-between py-5 border-b border-gray-200">
                 <span className="text-[#667085] font-medium">Amount</span>
-                <span className="text-[#344054] font-semibold">
-                  N4,999.00/month
-                </span>
+                <span className="text-[#344054] font-semibold">{displayAmount}</span>
               </div>
 
-              {/* Payment Method */}
               <div className="flex items-center justify-between py-5 border-b border-gray-200">
-                <span className="text-[#667085] font-medium">
-                  Payment Method
-                </span>
+                <span className="text-[#667085] font-medium">Payment Method</span>
                 <span className="text-[#344054] font-semibold">
-                  •••• •••• •••• ••••
+                  {isStripeUser ? "•••• •••• •••• ••••" : "Paystack"}
                 </span>
               </div>
 
-              {/* Auto-Renewal */}
               <div className="flex items-center justify-between py-5">
                 <span className="text-[#667085] font-medium">Auto-Renewal</span>
                 <div className="flex items-center gap-3">
                   <Switch
                     checked={autoRenewal}
-                    onCheckedChange={setAutoRenewal}
+                    onCheckedChange={handleAutoRenewalToggle}
+                    disabled={loading === "autoRenewal"}
                     className="data-[state=checked]:bg-[#2D60FF]"
                   />
                   <span
                     className={cn(
                       autoRenewal ? "text-green-500" : "text-[#DC2626]",
-                      "font-semibold"
+                      "font-semibold",
                     )}
                   >
                     {autoRenewal ? "Enabled" : "Disabled"}
@@ -144,23 +190,20 @@ export function PremiumUserPage() {
             </div>
           </div>
 
-          {/* Action Buttons */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-6 sm:p-8 pt-0">
             <button
-              onClick={() => {
-                toast.success("Your account details is update to date.");
-              }}
-              className="px-6 py-3 border-2 border-gray-300 rounded-lg text-[#344054] font-semibold hover:bg-gray-50 transition-colors"
+              onClick={handleUpdatePaymentMethod}
+              disabled={loading === "portal"}
+              className="px-6 py-3 border-2 border-gray-300 rounded-lg text-[#344054] font-semibold hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Update Payment Method
+              {loading === "portal" ? "Opening portal…" : "Update Payment Method"}
             </button>
             <button
-              onClick={() => {
-                cancelSubscription();
-              }}
-              className="px-6 py-3 border-2 border-[#FECACA] rounded-lg text-[#DC2626] font-semibold hover:bg-red-50 transition-colors"
+              onClick={handleCancelSubscription}
+              disabled={loading === "cancel"}
+              className="px-6 py-3 border-2 border-[#FECACA] rounded-lg text-[#DC2626] font-semibold hover:bg-red-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Cancel Subscription
+              {loading === "cancel" ? "Cancelling…" : "Cancel Subscription"}
             </button>
           </div>
         </div>
@@ -169,29 +212,16 @@ export function PremiumUserPage() {
         <div className="bg-[#FFFBEB] border border-[#FEE685] rounded-xl p-5 flex gap-4">
           <div className="shrink-0">
             <div className="w-6 h-6 rounded-full bg-[#F59E0B] flex items-center justify-center">
-              <svg
-                className="w-4 h-4 text-white"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
+              <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
           </div>
           <div className="flex-1">
-            <h3 className="text-[#92400E] font-semibold mb-1">
-              Cancellation Policy
-            </h3>
+            <h3 className="text-[#92400E] font-semibold mb-1">Cancellation Policy</h3>
             <p className="text-[#92400E] text-sm leading-relaxed">
-              If you cancel your subscription, you&apos;ll continue to have
-              access until the end of your current billing period (Nov 23,
-              2025). No refunds are provided for partial months.
+              If you cancel your subscription, you&apos;ll continue to have access until{" "}
+              {formatAppliedDate(user?.currentPeriodEnd as any)}. No refunds are provided for partial months.
             </p>
           </div>
         </div>
