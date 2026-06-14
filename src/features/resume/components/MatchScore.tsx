@@ -1,5 +1,3 @@
-// MatchScore.tsx
-import React from "react";
 
 interface MatchScoreProps {
   percentage: number;
@@ -19,7 +17,7 @@ export function MatchScore({
 
   return (
     <div className="flex flex-col items-center justify-center">
-      <div className="relative w-[180px] ">
+      <div className="relative w-45 ">
         <svg
           viewBox="0 0 100 100"
           className="-rotate-90 h-full w-full"

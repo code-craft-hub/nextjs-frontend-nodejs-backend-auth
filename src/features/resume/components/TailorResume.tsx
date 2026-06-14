@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { useResumeStream } from "@/features/resume/hooks/stream-resume-hook";
-import { useGapAnalysis } from "@/features/resume/hooks/use-gap-analysis";
+// import { useGapAnalysis } from "@/features/resume/hooks/use-gap-analysis";
 import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -18,10 +18,10 @@ import { buildResumeUpdateUrl } from "@/lib/utils/ai-apply-navigation";
 import CreateUserResume from "@/features/onboarding/components/onboarding-pages/create-resume-form/CreateUserResume";
 import { useFireworksConfetti } from "@/components/ui/confetti";
 import { ViewResume } from "./ViewResume";
-import { GapAnalysisPanel } from "./GapAnalysisPanel";
+// import { GapAnalysisPanel } from "./GapAnalysisPanel";
 import { useDeleteResumeMutation } from "@/features/resume/mutations/resume.mutations";
 import { DocTypeFeedbackModal } from "@/shared/components/doc-type-feedback-modal";
-import JobCard from "./JobCard";
+// import JobCard from "./JobCard";
 
 /**
  * Normalize API response data to match the expected UI schema
@@ -74,12 +74,12 @@ export const TailorResume = () => {
   const { streamData, streamStatus, startStream, documentId } =
     useResumeStream();
 
-  const {
-    result: gapResult,
-    isLoading: gapLoading,
-    error: gapError,
-    analyze: runGapAnalysis,
-  } = useGapAnalysis();
+  // const {
+  //   result: gapResult,
+  //   isLoading: gapLoading,
+  //   error: gapError,
+  //   analyze: runGapAnalysis,
+  // } = useGapAnalysis();
 
   // Update resumeId when documentId is generated
   useEffect(() => {
@@ -146,9 +146,9 @@ export const TailorResume = () => {
 
       // Pipeline B: fire gap analysis after the resume is ready.
       // Runs in background — the panel renders progressively as data arrives.
-      if (jobDescription) {
-        runGapAnalysis(jobDescription);
-      }
+      // if (jobDescription) {
+      //   runGapAnalysis(jobDescription);
+      // }
     }
   }, [resumeId, streamStatus.isComplete, router]);
 
@@ -177,7 +177,7 @@ export const TailorResume = () => {
         <ResumeLoadingSkeleton />
       ) : (
         <>
-        <JobCard logoSrc="/placeholder.jpg" onApply={() => {}} onAskOrion={() => {}} />
+        {/* <JobCard logoSrc="/placeholder.jpg" onApply={() => {}} onAskOrion={() => {}} /> */}
           <div className="flex w-full gap-3 items-center  p-4  bg-white justify-between">
             <p className="text-xl font-medium font-inter">Tailored Resume</p>
             <div className="flex gap-2">
@@ -207,7 +207,7 @@ export const TailorResume = () => {
                 data={displayResumeData}
                 handleEditClick={handleEditClick}
               />
-              {/* Pipeline B: gap analysis panel — fires after generation completes */}
+              {/* Pipeline B: gap analysis panel — fires after generation completes 
               {(gapLoading || gapResult || gapError) && (
                 <div className="px-4 pb-8">
                   <GapAnalysisPanel
@@ -216,7 +216,7 @@ export const TailorResume = () => {
                     error={gapError}
                   />
                 </div>
-              )}
+              )}*/}
             </>
           )}
         </>
