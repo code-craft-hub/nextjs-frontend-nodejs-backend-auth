@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Switch } from "@/components/ui/switch";
 import { userQueries } from "@features/user";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -15,7 +15,14 @@ export function PremiumUserPage() {
 
   const isStripeUser = !!user?.stripeCustomerId;
 
+  // Derived from server: cancelAtPeriodEnd=true means renewal is OFF
   const [autoRenewal, setAutoRenewal] = useState(true);
+  useEffect(() => {
+    if (user?.cancelAtPeriodEnd !== undefined && user.cancelAtPeriodEnd !== null) {
+      setAutoRenewal(!user.cancelAtPeriodEnd);
+    }
+  }, [user?.cancelAtPeriodEnd]);
+
   const [loading, setLoading] = useState<"cancel" | "portal" | "autoRenewal" | null>(null);
 
   const displayAmount = isStripeUser ? "$10.00/month" : "₦4,999.00/month";
@@ -85,6 +92,7 @@ export function PremiumUserPage() {
     setAutoRenewal(enabled);
     try {
       await api.post("/stripe/checkout/auto-renewal", { enabled });
+      await qc.invalidateQueries({ queryKey: userQueries.detail().queryKey });
       toast.success(
         enabled ? "Auto-renewal enabled" : "Auto-renewal disabled",
         {

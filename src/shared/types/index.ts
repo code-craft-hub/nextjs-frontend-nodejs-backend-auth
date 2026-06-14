@@ -115,6 +115,8 @@ export interface IUser {
   subscriptionStatus: string | null;
   /** The date the current subscription period ends (next billing date) */
   currentPeriodEnd: Date | null;
+  /** true = subscription will not renew (cancel_at_period_end on Stripe) */
+  cancelAtPeriodEnd: boolean | null;
 
   // ─── Payment provider ──────────────────────────────────────
   /** Non-null when the user subscribed via Stripe; null = Paystack */
