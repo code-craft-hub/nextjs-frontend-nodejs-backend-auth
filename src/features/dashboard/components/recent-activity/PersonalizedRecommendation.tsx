@@ -25,8 +25,6 @@ export const PersonalizedRecommendation = memo(
 
     const recommendations = jobs?.data?.recommendations ?? [];
 
-    console.log("RECOMMENDATIONS : ", jobs?.data)
-
     const isBuildingRecommendations = isEmpty(recommendations) && !isLoading;
 
     const renderContent = () => {

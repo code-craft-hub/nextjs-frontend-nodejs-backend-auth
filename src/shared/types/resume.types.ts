@@ -75,6 +75,41 @@ export interface SkillEntry {
   value: string;
 }
 
+// ─── Gap Analysis (Pipeline B) ────────────────────────────────────────────────
+
+export interface GapSkillSuggestion {
+  label: string;
+  category: "hard" | "soft";
+  reason: string;
+  priority: "high" | "medium" | "low";
+  /** true = user likely has this skill but didn't list it; false = needs to acquire it */
+  actionable: boolean;
+}
+
+export interface GapCertificationSuggestion {
+  name: string;
+  issuer: string | null;
+  reason: string;
+  priority: "high" | "medium" | "low";
+}
+
+export interface GapExperienceItem {
+  area: string;
+  suggestion: string;
+}
+
+export interface GapAnalysisResult {
+  matchScore: number;
+  summary: string;
+  skills: {
+    toAdd: GapSkillSuggestion[];
+  };
+  certifications: GapCertificationSuggestion[];
+  /** ATS keywords present in the JD but absent from the profile (max 10) */
+  keywords: string[];
+  experienceGaps: GapExperienceItem[];
+}
+
 export interface ResumeAggregate {
   id: string;
   userId: string;

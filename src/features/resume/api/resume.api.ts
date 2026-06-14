@@ -4,6 +4,7 @@ import type {
   EducationEntry,
   ProjectEntry,
   CertificationEntry,
+  GapAnalysisResult,
 } from "@/shared/types/resume.types";
 import { api } from "@/shared/api/client";
 import type {
@@ -293,6 +294,19 @@ export const resumeApi = {
     api.delete<ApiResponse<CertificationEntry>>(
       `${RESUME_BASE}/${resumeId}/certifications/${id}`,
       { token },
+    ),
+
+  // ─── Pipeline B: Gap Analysis ─────────────────────────────────
+
+  /**
+   * POST /resumes/gap-analysis
+   * Compares the user's default resume against a job description.
+   * Returns an advisory suggestion list — never auto-applied to the resume.
+   */
+  analyzeGap: (payload: { jobDescription: string }) =>
+    api.post<ApiResponse<GapAnalysisResult>>(
+      `${RESUME_BASE}/gap-analysis`,
+      payload,
     ),
 
   // ─── Skills ───────────────────────────────────────────────────

@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { useResumeStream } from "@/features/resume/hooks/stream-resume-hook";
+import { useGapAnalysis } from "@/features/resume/hooks/use-gap-analysis";
 import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -17,6 +18,7 @@ import { buildResumeUpdateUrl } from "@/lib/utils/ai-apply-navigation";
 import CreateUserResume from "@/features/onboarding/components/onboarding-pages/create-resume-form/CreateUserResume";
 import { useFireworksConfetti } from "@/components/ui/confetti";
 import { ViewResume } from "./ViewResume";
+import { GapAnalysisPanel } from "./GapAnalysisPanel";
 import { useDeleteResumeMutation } from "@/features/resume/mutations/resume.mutations";
 import { DocTypeFeedbackModal } from "@/shared/components/doc-type-feedback-modal";
 
@@ -70,6 +72,13 @@ export const TailorResume = () => {
 
   const { streamData, streamStatus, startStream, documentId } =
     useResumeStream();
+
+  const {
+    result: gapResult,
+    isLoading: gapLoading,
+    error: gapError,
+    analyze: runGapAnalysis,
+  } = useGapAnalysis();
 
   // Update resumeId when documentId is generated
   useEffect(() => {
@@ -126,13 +135,19 @@ export const TailorResume = () => {
     : null;
   const displayResumeData = normalizedExistingResume || streamData;
 
-  // Update URL with actual resumeId after generation completes
+  // Update URL with actual resumeId after generation completes, then run gap analysis
   useEffect(() => {
     if (resumeId && streamStatus.isComplete) {
       const newUrl = buildResumeUpdateUrl(resumeId);
       router.replace(newUrl);
       startConfetti();
       queryClient.invalidateQueries({ queryKey: queryKeys.users.all });
+
+      // Pipeline B: fire gap analysis after the resume is ready.
+      // Runs in background — the panel renders progressively as data arrives.
+      if (jobDescription) {
+        runGapAnalysis(jobDescription);
+      }
     }
   }, [resumeId, streamStatus.isComplete, router]);
 
@@ -190,6 +205,16 @@ export const TailorResume = () => {
                 data={displayResumeData}
                 handleEditClick={handleEditClick}
               />
+              {/* Pipeline B: gap analysis panel — fires after generation completes */}
+              {(gapLoading || gapResult || gapError) && (
+                <div className="px-4 pb-8">
+                  <GapAnalysisPanel
+                    result={gapResult}
+                    isLoading={gapLoading}
+                    error={gapError}
+                  />
+                </div>
+              )}
             </>
           )}
         </>
