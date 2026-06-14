@@ -7,7 +7,7 @@ import { daysFromToday, formatAppliedDate } from "@/lib/utils/helpers";
 import { cn } from "@/lib/utils";
 import { useConfirm } from "@/shared/hooks/use-confirm";
 import { toast } from "sonner";
-import { api, API_URL } from "@/shared/api/client";
+import { api } from "@/shared/api/client";
 
 export function PremiumUserPage() {
   const { data: user } = useQuery(userQueries.detail());
@@ -38,7 +38,7 @@ export function PremiumUserPage() {
 
     setLoading("cancel");
     try {
-      await api.post(`${API_URL}/stripe/checkout/cancel`);
+      await api.post("/stripe/checkout/cancel");
       toast.success("Subscription cancelled", {
         description: `You'll retain access until ${formatAppliedDate(user?.currentPeriodEnd as any)}.`,
       });
@@ -61,7 +61,7 @@ export function PremiumUserPage() {
     setLoading("portal");
     try {
       const data = await api.post<{ data: { url: string } }>(
-        `${API_URL}/stripe/checkout/portal`,
+        "/stripe/checkout/portal",
       );
       if (data?.data?.url) {
         window.location.href = data.data.url;
@@ -84,7 +84,7 @@ export function PremiumUserPage() {
     const previous = autoRenewal;
     setAutoRenewal(enabled);
     try {
-      await api.post(`${API_URL}/stripe/checkout/auto-renewal`, { enabled });
+      await api.post("/stripe/checkout/auto-renewal", { enabled });
       toast.success(
         enabled ? "Auto-renewal enabled" : "Auto-renewal disabled",
         {
