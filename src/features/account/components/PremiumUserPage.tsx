@@ -15,6 +15,9 @@ export function PremiumUserPage() {
 
   const isStripeUser = !!user?.stripeCustomerId;
 
+  // cancelAtPeriodEnd=true → user has cancelled; still active until period end
+  const isCancelled = !!user?.cancelAtPeriodEnd;
+
   // Derived from server: cancelAtPeriodEnd=true means renewal is OFF
   const [autoRenewal, setAutoRenewal] = useState(true);
   useEffect(() => {
@@ -23,7 +26,7 @@ export function PremiumUserPage() {
     }
   }, [user?.cancelAtPeriodEnd]);
 
-  const [loading, setLoading] = useState<"cancel" | "portal" | "autoRenewal" | null>(null);
+  const [loading, setLoading] = useState<"cancel" | "portal" | "autoRenewal" | "reactivate" | null>(null);
 
   const displayAmount = isStripeUser ? "$10.00/month" : "₦4,999.00/month";
 
@@ -109,29 +112,71 @@ export function PremiumUserPage() {
     }
   };
 
+  const handleReactivate = async () => {
+    if (!isStripeUser) {
+      toast.info("Contact support to reactivate your Paystack subscription.", {
+        description: "Email us at support@cverai.com",
+      });
+      return;
+    }
+
+    setLoading("reactivate");
+    setAutoRenewal(true);
+    try {
+      await api.post("/stripe/checkout/auto-renewal", { enabled: true });
+      await qc.invalidateQueries({ queryKey: userQueries.detail().queryKey });
+      toast.success("Subscription reactivated", {
+        description: "Your subscription will now renew automatically.",
+      });
+    } catch {
+      setAutoRenewal(false);
+      toast.error("Failed to reactivate subscription. Please try again.");
+    } finally {
+      setLoading(null);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
       <ConfirmDialog />
       <div className="max-w-5xl mx-auto space-y-6">
         {/* Pro Plan Card */}
-        <div className="bg-[#2D60FF] rounded-2xl p-4 sm:p-8 text-white shadow-lg">
+        <div
+          className={cn(
+            "rounded-2xl p-4 sm:p-8 text-white shadow-lg",
+            isCancelled ? "bg-[#92400E]" : "bg-[#2D60FF]",
+          )}
+        >
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
               <div className="space-y-1">
                 <div className="flex items-center gap-3">
                   <h1 className="text-2xl font-bold">Pro Plan</h1>
-                  <span className="px-3 py-1 bg-white/20 rounded-full text-sm font-medium">
-                    Active
+                  <span
+                    className={cn(
+                      "px-3 py-1 rounded-full text-sm font-medium",
+                      isCancelled
+                        ? "bg-amber-200/30 text-amber-100"
+                        : "bg-white/20",
+                    )}
+                  >
+                    {isCancelled ? "Cancelling" : "Active"}
                   </span>
                 </div>
-                <p className="text-white/80 text-sm">Full access to all features</p>
+                <p className="text-white/80 text-sm">
+                  {isCancelled
+                    ? "Access remains until the end of your billing period"
+                    : "Full access to all features"}
+                </p>
                 <div className="pt-4 space-y-0.5">
                   <p className="font-semibold">
-                    Next billing date:{" "}
+                    {isCancelled ? "Access ends: " : "Next billing date: "}
                     {formatAppliedDate(user?.currentPeriodEnd as any)}
                   </p>
                   <p className="text-white/70 text-sm">
-                    Your subscription will automatically renew
+                    {isCancelled
+                      ? "Your subscription will not renew — toggle Auto-Renewal to reactivate"
+                      : "Your subscription will automatically renew"}
                   </p>
                 </div>
               </div>
@@ -141,7 +186,9 @@ export function PremiumUserPage() {
               <div className="text-4xl font-bold">
                 {daysFromToday(user?.currentPeriodEnd)}
               </div>
-              <div className="text-sm text-white/80 mt-1">days until renewal</div>
+              <div className="text-sm text-white/80 mt-1">
+                {isCancelled ? "days remaining" : "days until renewal"}
+              </div>
             </div>
           </div>
         </div>
@@ -199,20 +246,33 @@ export function PremiumUserPage() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-6 sm:p-8 pt-0">
-            <button
-              onClick={handleUpdatePaymentMethod}
-              disabled={loading === "portal"}
-              className="px-6 py-3 border-2 border-gray-300 rounded-lg text-[#344054] font-semibold hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading === "portal" ? "Opening portal…" : "Update Payment Method"}
-            </button>
-            <button
-              onClick={handleCancelSubscription}
-              disabled={loading === "cancel"}
-              className="px-6 py-3 border-2 border-[#FECACA] rounded-lg text-[#DC2626] font-semibold hover:bg-red-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading === "cancel" ? "Cancelling…" : "Cancel Subscription"}
-            </button>
+            {isCancelled ? (
+              /* Cancelled state: full-width reactivate, no payment update */
+              <button
+                onClick={handleReactivate}
+                disabled={loading === "reactivate"}
+                className="col-span-1 sm:col-span-2 px-6 py-3 rounded-lg bg-[#2D60FF] text-white font-semibold hover:bg-[#2451d6] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading === "reactivate" ? "Reactivating…" : "Reactivate Subscription"}
+              </button>
+            ) : (
+              <>
+                <button
+                  onClick={handleUpdatePaymentMethod}
+                  disabled={loading === "portal"}
+                  className="px-6 py-3 border-2 border-gray-300 rounded-lg text-[#344054] font-semibold hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {loading === "portal" ? "Opening portal…" : "Update Payment Method"}
+                </button>
+                <button
+                  onClick={handleCancelSubscription}
+                  disabled={loading === "cancel"}
+                  className="px-6 py-3 border-2 border-[#FECACA] rounded-lg text-[#DC2626] font-semibold hover:bg-red-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {loading === "cancel" ? "Cancelling…" : "Cancel Subscription"}
+                </button>
+              </>
+            )}
           </div>
         </div>
 
