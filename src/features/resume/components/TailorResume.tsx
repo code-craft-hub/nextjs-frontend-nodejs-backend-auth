@@ -21,6 +21,7 @@ import { ViewResume } from "./ViewResume";
 import { GapAnalysisPanel } from "./GapAnalysisPanel";
 import { useDeleteResumeMutation } from "@/features/resume/mutations/resume.mutations";
 import { DocTypeFeedbackModal } from "@/shared/components/doc-type-feedback-modal";
+import JobCard from "./JobCard";
 
 /**
  * Normalize API response data to match the expected UI schema
@@ -176,6 +177,7 @@ export const TailorResume = () => {
         <ResumeLoadingSkeleton />
       ) : (
         <>
+        <JobCard logoSrc="/placeholder.jpg" onApply={() => {}} onAskOrion={() => {}} />
           <div className="flex w-full gap-3 items-center  p-4  bg-white justify-between">
             <p className="text-xl font-medium font-inter">Tailored Resume</p>
             <div className="flex gap-2">
