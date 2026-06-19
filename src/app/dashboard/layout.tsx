@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import { AppSidebar } from "@/components/app-sidebar";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -15,6 +16,7 @@ import { HydrationBoundary } from "@/components/hydration-boundary";
 import { dehydrate } from "@tanstack/react-query";
 import { getCookiesToken, getSessionFromCookies } from "@/lib/auth.utils";
 import { DashboardOnboardingProvider } from "@/components/DashboardOnboardingProvider";
+import { APIError } from "@/shared/api/client";
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -33,9 +35,19 @@ const DashboardLayout = async ({ children }: DashboardLayoutProps) => {
   const authUser = await getSessionFromCookies();
 
   if (token) {
-    await queryClient.fetchQuery(userQueries.detail(token));
+    try {
+      await queryClient.fetchQuery(userQueries.detail(token));
+    } catch (err) {
+      // requireOnboarding() above already verified this access token is
+      // cryptographically valid and unexpired — so a 404 here can only mean
+      // the JWT's `sub` no longer resolves to a user row (account deleted).
+      // Any other error is a real failure and should surface normally.
+      if (err instanceof APIError && err.status === 404) {
+        redirect("/api/auth/force-logout");
+      }
+      throw err;
+    }
   }
-  // await queryClient.prefetchQuery(userQueries.detail(token));
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <SidebarProvider>
