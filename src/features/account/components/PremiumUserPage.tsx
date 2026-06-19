@@ -18,6 +18,12 @@ export function PremiumUserPage() {
   // cancelAtPeriodEnd=true → user has cancelled; still active until period end
   const isCancelled = !!user?.cancelAtPeriodEnd;
 
+  // Force-refetch on every mount — catches state changes made via Stripe/Paystack
+  // portal while the user was away (e.g. cancelled from Stripe billing portal).
+  useEffect(() => {
+    qc.invalidateQueries({ queryKey: userQueries.detail().queryKey });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Derived from server: cancelAtPeriodEnd=true means renewal is OFF
   const [autoRenewal, setAutoRenewal] = useState(true);
   useEffect(() => {
