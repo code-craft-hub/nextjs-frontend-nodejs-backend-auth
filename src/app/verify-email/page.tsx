@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { requireAuth } from "@/lib/server-auth";
+import { requireAuth, fetchCurrentUserOrLogout } from "@/lib/server-auth";
 
 export const metadata: Metadata = {
   title: "Verify Email",
@@ -8,7 +8,6 @@ export const metadata: Metadata = {
 import { redirect } from "next/navigation";
 import { VerifyEmailClient } from "@/features/auth/components/verify-email-client";
 import { createServerQueryClient } from "@/shared/query/prefetch";
-import { userQueries } from "@features/user";
 import { authQueries } from "@/features/auth";
 import { HydrationBoundary } from "@/components/hydration-boundary";
 import { dehydrate } from "@tanstack/react-query";
@@ -29,7 +28,7 @@ export default async function VerifyEmailPage() {
 
   const queryClient = createServerQueryClient();
   await Promise.all([
-    token ? queryClient.fetchQuery(userQueries.detail(token)) : Promise.resolve(),
+    token ? fetchCurrentUserOrLogout(queryClient, token) : Promise.resolve(),
     queryClient.fetchQuery(authQueries.verificationTokenStatus(token ?? undefined)),
   ]);
 
