@@ -50,29 +50,7 @@ function scoreBarColour(score: number): string {
   return "[&>div]:bg-red-500";
 }
 
-// ─── Sub-components ───────────────────────────────────────────────────────────
 
-function SectionHeader({
-  icon,
-  title,
-  count,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  count: number;
-}) {
-  return (
-    <div className="flex items-center gap-2 mb-3">
-      <span className="text-slate-500">{icon}</span>
-      <h4 className="font-semibold text-slate-800 text-sm">{title}</h4>
-      {count > 0 && (
-        <span className="ml-auto text-xs font-medium text-slate-400">
-          {count} item{count !== 1 ? "s" : ""}
-        </span>
-      )}
-    </div>
-  );
-}
 
 function SkillCard({ skill }: { skill: GapSkillSuggestion }) {
   return (
