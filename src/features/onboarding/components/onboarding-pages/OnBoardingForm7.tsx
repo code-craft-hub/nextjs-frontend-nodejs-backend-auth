@@ -69,6 +69,7 @@ export const OnBoardingForm7 = ({
     api
       .get<PaymentProviderResponse>("/payments/provider")
       .then((res) => {
+        console.log("Payment provider response:", res);
         if (cancelled) return;
         setProvider(res.data.provider);
         setDisplayAmount(res.data.displayAmount);
