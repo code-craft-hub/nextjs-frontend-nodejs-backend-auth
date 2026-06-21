@@ -27,6 +27,7 @@ export default function InsufficientCreditsModal() {
   const { data: user, isLoading } = useQuery(userQueries.detail());
 
   const hasActiveSubscription = isSubscriptionActive(user?.currentPeriodEnd);
+  const hasValidCredit = Number(user?.creditBalance) > 0;
 
   useEffect(() => {
     if (!user?.isEligibleForReward) return;
@@ -41,7 +42,7 @@ export default function InsufficientCreditsModal() {
   }, [user?.isEligibleForReward, startConfetti, queryClient]);
 
   // Don't render while loading to avoid a flash of the modal.
-  if (isLoading || hasActiveSubscription) return null;
+  if (isLoading || hasActiveSubscription || hasValidCredit) return null;
 
   const handleUpgrade = () => router.push("/dashboard/account?tab=billing");
 

@@ -83,7 +83,7 @@ export const Header = () => {
                 </Button>
               ) : (
                 <Button
-                  onClick={() => router.push(`/register`)}
+                  onClick={() => router.push(`/login`)}
                   className="bg-blue-600 hover:bg-blue-700 text-white px-6 rounded-lg"
                 >
                   Get started
