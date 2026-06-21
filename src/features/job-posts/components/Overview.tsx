@@ -80,15 +80,29 @@ export default function Overview() {
   // "filter appears empty, then jobs show up" race from CT-192 checkpoint 1.
   const hasUserInteractedRef = useRef(searchParams.size > 0);
 
-  const updateUrlParam = useCallback(
-    (key: string, value: string | undefined) => {
+  // True while `localizedTo` reflects the profile auto-default rather than
+  // an explicit pick. Relocation listings are tagged by destination country,
+  // not the user's home country, so a silently auto-defaulted home-country
+  // filter (e.g. Nigeria, the platform's home market) would hide every
+  // relocation result and look like a broken filter — see handleClassificationChange.
+  const isCountryAutoDefaultedRef = useRef(false);
+
+  const updateUrlParams = useCallback(
+    (updates: Record<string, string | undefined>) => {
       const params = new URLSearchParams(searchParams.toString());
-      if (value) params.set(key, value);
-      else params.delete(key);
+      for (const [key, value] of Object.entries(updates)) {
+        if (value) params.set(key, value);
+        else params.delete(key);
+      }
       const qs = params.toString();
       router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
     },
     [pathname, router, searchParams],
+  );
+
+  const updateUrlParam = useCallback(
+    (key: string, value: string | undefined) => updateUrlParams({ [key]: value }),
+    [updateUrlParams],
   );
 
   const { data: user } = useQuery(userQueries.detail());
@@ -110,6 +124,7 @@ export default function Overview() {
     if (defaultCountry && !countryInitialized && !hasUserInteractedRef.current) {
       setLocalizedTo(defaultCountry);
       setCountryInitialized(true);
+      isCountryAutoDefaultedRef.current = true;
       updateUrlParam(PARAM_COUNTRY, defaultCountry);
     }
   }, [defaultCountry, countryInitialized, updateUrlParam]);
@@ -128,6 +143,7 @@ export default function Overview() {
   const handleCountryChange = useCallback(
     (value: string) => {
       hasUserInteractedRef.current = true;
+      isCountryAutoDefaultedRef.current = false;
       const next = value.length ? value : undefined;
       setLocalizedTo(next);
       setCountryInitialized(true);
@@ -141,9 +157,21 @@ export default function Overview() {
       hasUserInteractedRef.current = true;
       const next = value.length ? value : undefined;
       setClassification(next);
+
+      // Relocation listings are tagged by destination country, not the
+      // user's home country — clear an auto-defaulted (never explicitly
+      // chosen) country filter so it doesn't silently zero out every result.
+      if (next === "relocation" && isCountryAutoDefaultedRef.current && localizedTo) {
+        isCountryAutoDefaultedRef.current = false;
+        setLocalizedTo(undefined);
+        setCountryInitialized(true);
+        updateUrlParams({ [PARAM_CLASSIFICATION]: next, [PARAM_COUNTRY]: undefined });
+        return;
+      }
+
       updateUrlParam(PARAM_CLASSIFICATION, next);
     },
-    [updateUrlParam],
+    [updateUrlParam, updateUrlParams, localizedTo],
   );
 
   const handleWorkArrangementChange = useCallback(
@@ -222,6 +250,8 @@ export default function Overview() {
   const modalRun = modalRunId ? (runs.get(modalRunId) ?? null) : null;
 
   const { open } = useSidebar();
+
+  console.count("Overview render");
 
   return (
     <div className={cn(!open && "flex flex-row gap-4")}>

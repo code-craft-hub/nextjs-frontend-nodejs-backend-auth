@@ -89,7 +89,7 @@ const SearchBox = ({
                   <FormControl>
                     <input
                       className="border-none focus:border-none focus:outline-none w-full bg-white! focus:bg-white! h-14"
-                      placeholder="Job title / Company name / Location"
+                      placeholder="Job title / Company name"
                       {...field}
                     />
                   </FormControl>
