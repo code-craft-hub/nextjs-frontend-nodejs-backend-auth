@@ -24,13 +24,7 @@ import { SocialButton } from "./SocialButton";
 import { JobDescriptionSkeleton, JobTitleSkeleton } from "./JobSkeletons";
 import { ApplicationSnapshot } from "./ApplicationSnapshot";
 import EmptyState from "@/components/EmptyState";
-
-function decodeHtml(encoded: string): string {
-  if (typeof window === "undefined") return encoded;
-  const el = document.createElement("textarea");
-  el.innerHTML = encoded;
-  return el.value;
-}
+import JobDescriptionRenderer from "./JobDescriptionRenderer";
 
 const REFERRER_URLS: Record<string, string> = {
   dashboard: "/dashboard/home",
@@ -59,7 +53,7 @@ export function JobIdClient({
   const backUrl =
     from && from.startsWith("/dashboard/jobs")
       ? from
-      : REFERRER_URLS[referrer] ?? "/dashboard/jobs";
+      : (REFERRER_URLS[referrer] ?? "/dashboard/jobs");
 
   useEffect(() => {
     if (job?.id) {
@@ -139,11 +133,7 @@ export function JobIdClient({
               ) : (
                 <div className="text-gray-600 leading-relaxed space-y-3">
                   {job?.descriptionHtml ? (
-                    <div
-                      dangerouslySetInnerHTML={{
-                        __html: decodeHtml(job.descriptionHtml),
-                      }}
-                    />
+                    <JobDescriptionRenderer html={job.descriptionHtml} />
                   ) : (
                     <div>{job?.descriptionText}</div>
                   )}
