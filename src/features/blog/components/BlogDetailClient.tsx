@@ -63,7 +63,7 @@ function AuthorCard({
   if (!authorName) return null;
 
   return (
-    <div className="mt-16 flex items-center gap-4 rounded-2xl bg-muted/60 p-6 max-w-md mx-auto">
+    <div className="mt-16 flex items-center gap-4 rounded-2xl bg-muted p-6 max-w-md mx-auto">
       <div className="relative size-16 shrink-0 overflow-hidden rounded-full">
         {authorAvatar ? (
           <Image
@@ -149,11 +149,11 @@ export function BlogDetailClient({
     );
   }
 
-  const thumbnail = blog.bigThumbnail ?? blog.blogCover ?? "";
+  const thumbnail = !!blog.bigThumbnail ? blog.bigThumbnail : blog.blogCover;
   const readTime = estimateReadTime(blog.descriptionHtml);
 
   return (
-    <article className="max-w-3xl mx-auto px-4 sm:px-8 pb-16 space-y-8">
+    <article className="max-w-5xl mx-auto px-4 sm:px-8 pb-16 space-y-8">
       {/* Back nav */}
       <Link
         href="/blog"
@@ -217,6 +217,8 @@ export function BlogDetailClient({
       </header>
 
       {/* Cover image */}
+
+
       {thumbnail && (
         <div className="relative aspect-video w-full overflow-hidden rounded-2xl">
           <Image
@@ -233,7 +235,7 @@ export function BlogDetailClient({
       {/* Body */}
       {blog.descriptionHtml && (
         <div
-          className="prose prose-sm sm:prose max-w-none prose-headings:font-poppins prose-img:rounded-xl prose-a:text-primary hover:prose-a:underline dark:prose-invert"
+          className="lexical-root"
           dangerouslySetInnerHTML={{ __html: blog.descriptionHtml }}
         />
       )}
