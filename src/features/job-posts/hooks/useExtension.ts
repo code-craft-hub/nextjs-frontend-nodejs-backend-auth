@@ -111,7 +111,6 @@ export function useExtension() {
 
   useEffect(() => {
     const capable = isExtensionCapable();
-    console.log("[CverAI] isExtensionCapable:", capable, "| UA:", navigator.userAgent);
 
     if (!capable) {
       setState("not_capable");
@@ -124,7 +123,6 @@ export function useExtension() {
     // if the script loads after this hook mounts.
     const checkInstalled = () => {
       const marker = document.documentElement.getAttribute("data-cverai-ext");
-      console.log("[CverAI] DOM marker check → data-cverai-ext:", marker);
       setState(marker ? "installed" : "not_installed");
     };
 
@@ -146,7 +144,6 @@ export function useExtension() {
         status: ExtQuickJobStatus;
         stuckReason?: string;
       }>).detail;
-      console.log("[CverAI] cverai:ext-update received:", { jobId, status, stuckReason });
       setExtJobStatuses((prev) => ({ ...prev, [jobId]: { status, stuckReason } }));
     };
 
@@ -156,7 +153,6 @@ export function useExtension() {
     // cverai:ready. Guards against the case where data-cverai-ext is set after
     // the MutationObserver check on mount.
     const onExtReady = () => {
-      console.log("[CverAI] cverai:ready received → state = installed");
       setState("installed");
     };
     window.addEventListener("cverai:ready", onExtReady);
@@ -200,9 +196,6 @@ export function useExtension() {
           runId?: string;
           error?: string;
         };
-        console.log(
-          `[CverAI] auto_apply_response | jobId=${jobId} ok=${ok} runId=${runId ?? "—"}`,
-        );
         if (ok && runId) {
           // Keep the jobId → runId map so focusExtTab can use it later.
           jobRunIdsRef.current[jobId] = runId;
@@ -238,10 +231,7 @@ export function useExtension() {
           run.status === "error" ? (blockedMessage ?? lastLog?.text ?? "Unknown error") :
           undefined;
 
-        console.log(
-          `[CverAI] run_update | jobId=${jobId} status=${run.status}`,
-          stuckReason ?? "",
-        );
+    
 
         // Re-dispatch as cverai:ext-update so the orchestrator's existing
         // listener picks it up without caring about the postMessage layer.
@@ -258,7 +248,6 @@ export function useExtension() {
     // Ping the content script. If it's already loaded it replies immediately
     // with cverai:ready → onExtReady above sets state=installed. If it loads
     // later, the MutationObserver catches data-cverai-ext being set.
-    console.log("[CverAI] dispatching cverai:ping…");
     window.dispatchEvent(new CustomEvent("cverai:ping", { bubbles: false }));
 
     return () => {
@@ -315,9 +304,7 @@ export function useExtension() {
       profile: job.profile ?? null,
     };
 
-    console.log(
-      `[CverAI] applyViaExtension | jobId=${job.id} url=${payload.jobUrl} correlationId=${job.correlationId}`,
-    );
+ 
 
     // token = job.id so that the auto_apply_response message can be mapped back
     // to a React session (content-trigger.js echoes the token in the response).
@@ -342,7 +329,6 @@ export function useExtension() {
       );
       return;
     }
-    console.log(`[CverAI] focusExtTab | jobId=${jobId} runId=${runId}`);
     // content-trigger.js handles "focus_run_window" and forwards it to background
     // as "page_focus_run_window", which calls chrome.windows.update(focused:true).
     window.postMessage({ source: "cverai", type: "focus_run_window", runId }, "*");

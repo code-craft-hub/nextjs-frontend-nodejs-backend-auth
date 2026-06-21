@@ -50,6 +50,58 @@ const PARAM_CLASSIFICATION = "relocation";
 /** Work location, independent of classification: "remote" | "hybrid" | "onsite". */
 const PARAM_WORK_ARRANGEMENT = "workType";
 
+// Owns useApplyOrchestrator (sessions ticks on every extension/cloud-bot
+// status update) so that state lives right above JobList instead of in
+// OverviewContent — only the list re-renders when a session updates, not
+// the search form / sidebar / report card.
+function JobListSection({
+  query,
+  localizedTo,
+  classification,
+  workArrangement,
+}: {
+  query?: string;
+  localizedTo?: string;
+  classification?: string;
+  workArrangement?: string;
+}) {
+  const { enqueueJob, openRunModal, getRuns } = useRunManagerContext();
+
+  // Pass enqueueJob so the extension strategy routes through the serial
+  // queue instead of spawning multiple simultaneous iframes/windows.
+  const orchestrator = useApplyOrchestrator({ enqueueJob });
+
+  // Override focusExtTab so that when the agent is stuck in iframe mode the
+  // "Help bot finish →" button opens the run modal rather than trying to
+  // focus an offscreen window (which doesn't exist for iframe runs).
+  const enhancedOrchestrator = useMemo(
+    () => ({
+      ...orchestrator,
+      focusExtTab: (jobId: string) => {
+        const iframeRun = Array.from(getRuns().values()).find(
+          (r) => r.job?.id === jobId,
+        );
+        if (iframeRun) {
+          openRunModal(iframeRun.id);
+        } else {
+          orchestrator.focusExtTab(jobId);
+        }
+      },
+    }),
+    [orchestrator, openRunModal, getRuns],
+  );
+
+  return (
+    <JobList
+      query={query}
+      localizedTo={localizedTo}
+      classification={classification}
+      workArrangement={workArrangement}
+      orchestrator={enhancedOrchestrator}
+    />
+  );
+}
+
 function OverviewContent() {
   const router = useRouter();
   const pathname = usePathname();
@@ -192,17 +244,6 @@ function OverviewContent() {
     }
   }, [user?.firstName]);
 
-  // ── Run manager (iframe-mode deck applies + bell + modal) ─────────────────
-  // The ticking state itself (runs/modalRunId/etc.) lives in RunManagerProvider,
-  // not here — only the stable bits we need are read from context, so this
-  // component no longer re-renders on every run_update broadcast.
-  const { enqueueJob, openRunModal, getRuns } = useRunManagerContext();
-
-  // ── Apply orchestrator (cloud bot + extension sessions for the list view) ──
-  // Pass enqueueJob so the extension strategy routes through the serial queue
-  // instead of spawning multiple simultaneous iframes/windows.
-  const orchestrator = useApplyOrchestrator({ enqueueJob });
-
   // ── Sync profile to DOM so content-trigger.js can attach it ──────────────
   useEffect(() => {
     if (!user) return;
@@ -219,31 +260,6 @@ function OverviewContent() {
       delete document.body.dataset.cverProfile;
     };
   }, [user, defaultResumeFileUrl]);
-
-  // ── Enhanced orchestrator for the list view ──────────────────────────────
-  // Override focusExtTab so that when the agent is stuck in iframe mode the
-  // "Help bot finish →" button opens the run modal rather than trying to
-  // focus an offscreen window (which doesn't exist for iframe runs).
-  // Memoized on [orchestrator, openRunModal, getRuns] — all stable unless
-  // orchestrator's own state (sessions/extState/qaJobId) actually changes —
-  // so this doesn't get rebuilt on the run-tracking ticks owned by
-  // RunManagerProvider; getRuns reads the latest runs only when called.
-  const enhancedOrchestrator = useMemo(
-    () => ({
-      ...orchestrator,
-      focusExtTab: (jobId: string) => {
-        const iframeRun = Array.from(getRuns().values()).find(
-          (r) => r.job?.id === jobId,
-        );
-        if (iframeRun) {
-          openRunModal(iframeRun.id);
-        } else {
-          orchestrator.focusExtTab(jobId);
-        }
-      },
-    }),
-    [orchestrator, openRunModal, getRuns],
-  );
 
   const { open } = useSidebar();
 
@@ -272,12 +288,11 @@ function OverviewContent() {
           </div>
         </div>
 
-        <JobList
+        <JobListSection
           query={query}
           localizedTo={localizedTo}
           classification={classification}
           workArrangement={workArrangement}
-          orchestrator={enhancedOrchestrator}
         />
       </div>
     </div>

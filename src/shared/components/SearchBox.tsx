@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/form";
 import { cn } from "@/lib/utils";
 import { X } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 
 const SearchBox = ({
@@ -62,13 +62,26 @@ const SearchBox = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialQuery]);
 
+  // Always-current mirror of `onSubmit` so the debounce timer below calls the
+  // latest handler (avoids writing a request built from a stale searchParams
+  // snapshot) without putting `onSubmit` in that effect's deps — onSubmit is
+  // a new reference on every parent render (it closes over searchParams),
+  // and including it there previously restarted the timer on every render
+  // instead of only when the user typed, creating a self-sustaining loop:
+  // fire → onSubmit → router.replace → new searchParams → new onSubmit →
+  // effect deps change → fire again, forever.
+  const onSubmitRef = useRef(onSubmit);
+  useEffect(() => {
+    onSubmitRef.current = onSubmit;
+  }, [onSubmit]);
+
   useEffect(() => {
     const handler = setTimeout(() => {
-      onSubmit(watched?.trim() ?? "");
+      onSubmitRef.current(watched?.trim() ?? "");
     }, 500); // debounce 500ms
 
     return () => clearTimeout(handler);
-  }, [watched, onSubmit]);
+  }, [watched]);
 
   return (
     <div className="bg-white shadow-lg px-2 grid grid-cols-1 sm:flex max-sm:pb-4 gap-4 justify-between rounded-lg items-center">

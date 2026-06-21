@@ -747,7 +747,6 @@ export function useApplyOrchestrator(
           duration: 8000,
         });
       }
-      console.log("final fallback to cloud bot for job", job);
       window.open(
         job?.applyUrl ?? job.link ?? "",
         "_blank",
