@@ -1,23 +1,26 @@
 "use client";
 import { useIntersectionObserver } from "../hooks/useIntersectionObserver";
-import { useCallback } from "react";
+import { useScrollRestoration } from "../hooks/useScrollRestoration";
+import { memo, useCallback } from "react";
 import JobsTable from "./JobsTable";
 import { useInfiniteJobs } from "../queries/job-posts.query";
 import { Loader } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { UseApplyOrchestrator } from "@/features/job-posts/hooks/useApplyOrchestrator";
 
-export function JobList({
+function JobListImpl({
   query,
   location,
   localizedTo,
   classification,
+  workArrangement,
   orchestrator,
 }: {
   query?: string;
   location?: string;
   localizedTo?: string;
   classification?: string;
+  workArrangement?: string;
   orchestrator: UseApplyOrchestrator;
 }) {
   const {
@@ -26,7 +29,11 @@ export function JobList({
     hasNextPage,
     isFetchingNextPage,
     isPlaceholderData,
-  } = useInfiniteJobs(query, location, localizedTo, classification);
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useInfiniteJobs(query, location, localizedTo, classification, workArrangement);
 
   const handleIntersect = useCallback(() => {
     if (!isFetchingNextPage && hasNextPage) {
@@ -40,6 +47,43 @@ export function JobList({
   );
 
   const allJobs = data?.pages ?? [];
+
+  // Only restore scroll once real (non-placeholder) data for this exact
+  // filter combo has rendered — restoring against placeholder/stale rows
+  // would scroll to the wrong height.
+  useScrollRestoration(!isLoading && !isPlaceholderData && allJobs.length > 0);
+
+  // First-ever fetch for this filter combination — no cached/placeholder
+  // data to show yet. Distinguish this from "zero matches" below.
+  if (isLoading) {
+    return (
+      <div className="flex justify-center my-12 text-muted-foreground">
+        <Loader className="size-5 animate-spin mr-2" />
+        Loading jobs…
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex flex-col items-center gap-3 my-12 text-center">
+        <p className="text-destructive">
+          Couldn't load jobs{error instanceof Error ? `: ${error.message}` : "."}
+        </p>
+        <Button variant="outline" onClick={() => refetch()}>
+          Retry
+        </Button>
+      </div>
+    );
+  }
+
+  if (allJobs.length === 0) {
+    return (
+      <div className="flex justify-center my-12 text-muted-foreground">
+        No jobs match your filters.
+      </div>
+    );
+  }
 
   return (
     <div
@@ -66,3 +110,5 @@ export function JobList({
     </div>
   );
 }
+
+export const JobList = memo(JobListImpl);

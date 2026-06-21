@@ -212,3 +212,68 @@ body.modal-open [data-sidebar],
 body.modal-open nav {
   z-index: 0 !important;
 }
+
+.lexical-root {
+  max-width: 680px;
+  padding: 1.5rem 0;
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--color-text-primary);
+}
+
+/* Paragraphs */
+.lexical-root .PlaygroundEditorTheme__paragraph {
+  margin: 0 0 1rem;
+}
+
+/* Headings */
+.lexical-root .PlaygroundEditorTheme__h2 {
+  font-size: 18px;
+  font-weight: 500;
+  margin: 2rem 0 0.75rem;
+}
+.lexical-root .PlaygroundEditorTheme__h3 {
+  font-size: 16px;
+  font-weight: 500;
+  margin: 1.5rem 0 0.5rem;
+}
+
+/* Lists */
+.lexical-root .PlaygroundEditorTheme__ul {
+  margin: 0 0 1rem 1.25rem;
+  padding: 0;
+}
+.lexical-root .PlaygroundEditorTheme__listItem {
+  margin-bottom: 0.4rem;
+}
+
+/* Inline text formats */
+.lexical-root .PlaygroundEditorTheme__textItalic   { font-style: italic; }
+.lexical-root .PlaygroundEditorTheme__textBold     { font-weight: 500; }
+.lexical-root .PlaygroundEditorTheme__textUnderline { text-decoration: underline; }
+.lexical-root .PlaygroundEditorTheme__textStrikethrough { text-decoration: line-through; }
+.lexical-root .PlaygroundEditorTheme__textCode {
+  font-family: monospace;
+  font-size: 14px;
+  background: #f4f4f4;
+  padding: 1px 4px;
+  border-radius: 4px;
+}
+
+/* Links */
+.lexical-root .PlaygroundEditorTheme__link {
+  color: #1a6fdd;
+  text-decoration: underline;
+}
+
+/* Dividers */
+.lexical-root hr {
+  border: none;
+  border-top: 1px solid #e5e5e5;
+  margin: 1.75rem 0;
+}
+
+/* Override Lexical's pre-wrap spans so text flows normally */
+.lexical-root span[style*="white-space: pre-wrap"] {
+  white-space: normal;
+}

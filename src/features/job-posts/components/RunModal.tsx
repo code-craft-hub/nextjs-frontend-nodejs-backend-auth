@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import type { ActiveRun, RunBatchQuestion, RunLogEntry } from "../types/apply-session.types";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -215,7 +215,7 @@ interface RunModalProps {
   onLogsToggle: (showLogs: boolean) => void;
 }
 
-export function RunModal({ run, onClose, onStop, onLogsToggle }: RunModalProps) {
+function RunModalImpl({ run, onClose, onStop, onLogsToggle }: RunModalProps) {
   const [showLogs, setShowLogs] = useState(false);
 
   // Add body class while modal is open so underlying content doesn't
@@ -390,3 +390,5 @@ export function RunModal({ run, onClose, onStop, onLogsToggle }: RunModalProps) 
     </>
   );
 }
+
+export const RunModal = memo(RunModalImpl);

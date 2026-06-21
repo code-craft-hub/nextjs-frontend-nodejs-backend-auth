@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { dehydrate } from "@tanstack/react-query";
 import Overview from "@/features/job-posts/components/Overview";
 import { createServerQueryClient } from "@/shared/query/prefetch";
@@ -21,7 +22,9 @@ const JobListingsPage = async () => {
   return (
     <div className="p-4 sm:p-8">
       <HydrationBoundary state={dehydrate(queryClient)}>
-        <Overview />
+        <Suspense>
+          <Overview />
+        </Suspense>
       </HydrationBoundary>
     </div>
   );

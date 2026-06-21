@@ -86,14 +86,25 @@ export function JobsTableRow({
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
-            <div className="bg-blue-50 rounded text-blue-600 px-2 py-1 shrink-0">
-              <span className="text-2xs whitespace-nowrap">
-                {job?.jobType ||
-                  job?.employmentType ||
-                  job?.classification ||
-                  job?.localizedTo}
-              </span>
-            </div>
+            {(job?.employmentType || job?.jobType) && (
+              <div className="bg-blue-50 rounded text-blue-600 px-2 py-1 shrink-0">
+                <span className="text-2xs whitespace-nowrap capitalize">
+                  {(job?.employmentType || job?.jobType)?.replace("_", " ")}
+                </span>
+              </div>
+            )}
+            {job?.workArrangement && (
+              <div className="bg-blue-50 rounded text-blue-600 px-2 py-1 shrink-0">
+                <span className="text-2xs whitespace-nowrap capitalize">
+                  {job.workArrangement}
+                </span>
+              </div>
+            )}
+            {job?.classification === "relocation" && (
+              <div className="bg-amber-50 rounded text-amber-700 px-2 py-1 shrink-0">
+                <span className="text-2xs whitespace-nowrap">Relocation</span>
+              </div>
+            )}
             <div
               onClick={(e) => {
                 e.stopPropagation();
