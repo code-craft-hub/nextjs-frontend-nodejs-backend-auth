@@ -57,6 +57,7 @@ export default function Overview() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
+  console.count("Overview mount");
   const [query, setQuery] = useState<string | undefined>(
     () => searchParams.get(PARAM_QUERY) ?? undefined,
   );
@@ -211,6 +212,14 @@ export default function Overview() {
   // instead of spawning multiple simultaneous iframes/windows.
   const orchestrator = useApplyOrchestrator({ enqueueJob });
 
+  // Always-current mirror of `runs` for use inside focusExtTab below, so that
+  // closure doesn't need `runs` as a dependency — `runs` changes on every
+  // run_update broadcast (roughly once a second during an active automation
+  // run), and depending on it directly would rebuild enhancedOrchestrator
+  // every tick, defeating React.memo on JobList/JobsTable downstream.
+  const runsRef = useRef(runs);
+  runsRef.current = runs;
+
   // ── Sync profile to DOM so content-trigger.js can attach it ──────────────
   useEffect(() => {
     if (!user) return;
@@ -232,26 +241,30 @@ export default function Overview() {
   // Override focusExtTab so that when the agent is stuck in iframe mode the
   // "Help bot finish →" button opens the run modal rather than trying to
   // focus an offscreen window (which doesn't exist for iframe runs).
-  const enhancedOrchestrator = {
-    ...orchestrator,
-    focusExtTab: (jobId: string) => {
-      const iframeRun = Array.from(runs.values()).find(
-        (r) => r.job?.id === jobId,
-      );
-      if (iframeRun) {
-        openRunModal(iframeRun.id);
-      } else {
-        orchestrator.focusExtTab(jobId);
-      }
-    },
-  };
+  // Memoized on [orchestrator, openRunModal] only (not `runs`) so its identity
+  // stays stable across the run_update re-renders ticking through Overview —
+  // focusExtTab reads the latest runs via runsRef when actually called.
+  const enhancedOrchestrator = useMemo(
+    () => ({
+      ...orchestrator,
+      focusExtTab: (jobId: string) => {
+        const iframeRun = Array.from(runsRef.current.values()).find(
+          (r) => r.job?.id === jobId,
+        );
+        if (iframeRun) {
+          openRunModal(iframeRun.id);
+        } else {
+          orchestrator.focusExtTab(jobId);
+        }
+      },
+    }),
+    [orchestrator, openRunModal],
+  );
 
   // ── Modal run ─────────────────────────────────────────────────────────────
   const modalRun = modalRunId ? (runs.get(modalRunId) ?? null) : null;
 
   const { open } = useSidebar();
-
-  console.count("Overview render");
 
   return (
     <div className={cn(!open && "flex flex-row gap-4")}>

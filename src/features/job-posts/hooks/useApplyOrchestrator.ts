@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -806,16 +806,34 @@ export function useApplyOrchestrator(
     [router],
   );
 
-  return {
-    sessions,
-    extState,
-    qaJobId,
-    apply,
-    resume,
-    viewQA,
-    dismissQA,
-    dismissSession,
-    focusExtTab,
-    handleEmailApply,
-  };
+  // Memoized so consumers (e.g. Overview's enhancedOrchestrator) don't see a
+  // new object identity on every render — only when one of these actually
+  // changes (sessions/extState/qaJobId are the only non-stable members; the
+  // callbacks are all useCallback-wrapped with stable deps).
+  return useMemo<UseApplyOrchestrator>(
+    () => ({
+      sessions,
+      extState,
+      qaJobId,
+      apply,
+      resume,
+      viewQA,
+      dismissQA,
+      dismissSession,
+      focusExtTab,
+      handleEmailApply,
+    }),
+    [
+      sessions,
+      extState,
+      qaJobId,
+      apply,
+      resume,
+      viewQA,
+      dismissQA,
+      dismissSession,
+      focusExtTab,
+      handleEmailApply,
+    ],
+  );
 }

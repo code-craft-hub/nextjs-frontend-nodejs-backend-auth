@@ -1,7 +1,8 @@
 "use client";
+import { memo } from "react";
 import SearchBox from "@/shared/components/SearchBox";
 
-export function JobSearchForm({
+function JobSearchFormImpl({
   onSubmit,
   onLocationChange,
   onClassificationChange,
@@ -33,3 +34,5 @@ export function JobSearchForm({
     />
   );
 }
+
+export const JobSearchForm = memo(JobSearchFormImpl);

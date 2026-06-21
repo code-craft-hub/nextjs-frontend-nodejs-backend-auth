@@ -1,14 +1,14 @@
 "use client";
 import { useIntersectionObserver } from "../hooks/useIntersectionObserver";
 import { useScrollRestoration } from "../hooks/useScrollRestoration";
-import { useCallback } from "react";
+import { memo, useCallback } from "react";
 import JobsTable from "./JobsTable";
 import { useInfiniteJobs } from "../queries/job-posts.query";
 import { Loader } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { UseApplyOrchestrator } from "@/features/job-posts/hooks/useApplyOrchestrator";
 
-export function JobList({
+function JobListImpl({
   query,
   location,
   localizedTo,
@@ -110,3 +110,5 @@ export function JobList({
     </div>
   );
 }
+
+export const JobList = memo(JobListImpl);
