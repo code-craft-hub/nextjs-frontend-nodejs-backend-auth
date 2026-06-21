@@ -47,7 +47,10 @@ function resolveCountry(input?: string | null): SupportedCountry | undefined {
 // navigation/refresh (Checkpoint 3). Read once on mount; pushed on change.
 const PARAM_QUERY = "q";
 const PARAM_COUNTRY = "country";
-const PARAM_TYPE = "type";
+/** Relocation/visa-sponsorship status: "onsite" | "relocation". */
+const PARAM_CLASSIFICATION = "relocation";
+/** Work location, independent of classification: "remote" | "hybrid" | "onsite". */
+const PARAM_WORK_ARRANGEMENT = "workType";
 
 export default function Overview() {
   const router = useRouter();
@@ -61,7 +64,10 @@ export default function Overview() {
     () => searchParams.get(PARAM_COUNTRY) ?? undefined,
   );
   const [classification, setClassification] = useState<string | undefined>(
-    () => searchParams.get(PARAM_TYPE) ?? undefined,
+    () => searchParams.get(PARAM_CLASSIFICATION) ?? undefined,
+  );
+  const [workArrangement, setWorkArrangement] = useState<string | undefined>(
+    () => searchParams.get(PARAM_WORK_ARRANGEMENT) ?? undefined,
   );
   const [countryInitialized, setCountryInitialized] = useState(
     () => searchParams.get(PARAM_COUNTRY) !== null,
@@ -135,7 +141,17 @@ export default function Overview() {
       hasUserInteractedRef.current = true;
       const next = value.length ? value : undefined;
       setClassification(next);
-      updateUrlParam(PARAM_TYPE, next);
+      updateUrlParam(PARAM_CLASSIFICATION, next);
+    },
+    [updateUrlParam],
+  );
+
+  const handleWorkArrangementChange = useCallback(
+    (value: string) => {
+      hasUserInteractedRef.current = true;
+      const next = value.length ? value : undefined;
+      setWorkArrangement(next);
+      updateUrlParam(PARAM_WORK_ARRANGEMENT, next);
     },
     [updateUrlParam],
   );
@@ -223,9 +239,11 @@ export default function Overview() {
               onSubmit={handleSearch}
               onLocationChange={handleCountryChange}
               onClassificationChange={handleClassificationChange}
+              onWorkArrangementChange={handleWorkArrangementChange}
               initialQuery={query}
               country={localizedTo}
               classification={classification}
+              workArrangement={workArrangement}
             />
           </div>
         </div>
@@ -234,6 +252,7 @@ export default function Overview() {
           query={query}
           localizedTo={localizedTo}
           classification={classification}
+          workArrangement={workArrangement}
           orchestrator={enhancedOrchestrator}
         />
       </div>

@@ -13,12 +13,14 @@ export function JobList({
   location,
   localizedTo,
   classification,
+  workArrangement,
   orchestrator,
 }: {
   query?: string;
   location?: string;
   localizedTo?: string;
   classification?: string;
+  workArrangement?: string;
   orchestrator: UseApplyOrchestrator;
 }) {
   const {
@@ -31,7 +33,7 @@ export function JobList({
     isError,
     error,
     refetch,
-  } = useInfiniteJobs(query, location, localizedTo, classification);
+  } = useInfiniteJobs(query, location, localizedTo, classification, workArrangement);
 
   const handleIntersect = useCallback(() => {
     if (!isFetchingNextPage && hasNextPage) {

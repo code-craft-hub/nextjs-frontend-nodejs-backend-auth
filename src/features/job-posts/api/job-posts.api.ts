@@ -17,11 +17,13 @@ export const jobPostsApi = {
       location?: string;
       /** Canonical country name to filter by, e.g. "Nigeria", "United States". */
       localizedTo?: string;
-      /** Scraper classification: "remote" | "relocate". */
+      /** Relocation/visa-sponsorship status: "onsite" | "relocation". */
       classification?: string;
+      /** Exact-match work location, independent of classification: "remote" | "hybrid" | "onsite". */
+      workArrangement?: string;
       /** Comma-separated employment types, e.g. "full_time,contract". */
       employmentTypes?: string;
-      /** Comma-separated work arrangements, e.g. "remote,hybrid". */
+      /** Comma-separated work arrangements (loose location-text heuristic, unrelated to workArrangement above). */
       workArrangements?: string;
       /** Comma-separated preferred locations, e.g. "Lagos,London". */
       preferredLocations?: string;

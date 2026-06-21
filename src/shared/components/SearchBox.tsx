@@ -24,19 +24,26 @@ const SearchBox = ({
   onSubmit,
   onLocationChange,
   onClassificationChange,
+  onWorkArrangementChange,
   initialQuery,
   country,
   classification,
+  workArrangement,
 }: {
   onSubmit: (data: any) => void;
   onLocationChange?: (location: string) => void;
+  /** Relocation/visa-sponsorship status: "onsite" | "relocation". */
   onClassificationChange?: (classification: string) => void;
+  /** Work location, independent of classification: "remote" | "hybrid" | "onsite". */
+  onWorkArrangementChange?: (workArrangement: string) => void;
   /** Pre-fills the search input — used to restore state from the URL. */
   initialQuery?: string;
   /** Controls the country select — used to restore state from the URL. */
   country?: string;
-  /** Controls the job-type select — used to restore state from the URL. */
+  /** Controls the relocation select — used to restore state from the URL. */
   classification?: string;
+  /** Controls the work-arrangement select — used to restore state from the URL. */
+  workArrangement?: string;
 }) => {
   const form = useForm<any>({
     defaultValues: {
@@ -108,6 +115,10 @@ const SearchBox = ({
       </div>
 
       <FilterLocation value={country} onValueChange={onLocationChange} />
+      <FilterWorkArrangement
+        value={workArrangement}
+        onValueChange={onWorkArrangementChange}
+      />
       <FilterClassification
         value={classification}
         onValueChange={onClassificationChange}
@@ -162,7 +173,8 @@ export function FilterLocation({
   );
 }
 
-export function FilterClassification({
+/** Work location — independent of relocation status (see FilterClassification). */
+export function FilterWorkArrangement({
   value,
   onValueChange,
 }: {
@@ -175,14 +187,43 @@ export function FilterClassification({
       onValueChange={(val) => onValueChange?.(val === "all" ? "" : val)}
     >
       <SelectTrigger className="w-full sm:max-w-40 sm:border-0 sm:shadow-none">
-        <SelectValue placeholder="Type" />
+        <SelectValue placeholder="Work Type" />
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>
-          <SelectLabel>Job Type</SelectLabel>
-          <SelectItem value="all">All Types</SelectItem>
+          <SelectLabel>Work Type</SelectLabel>
+          <SelectItem value="all">All Work Types</SelectItem>
           <SelectItem value="remote">Remote</SelectItem>
-          <SelectItem value="relocate">Relocate</SelectItem>
+          <SelectItem value="hybrid">Hybrid</SelectItem>
+          <SelectItem value="onsite">Onsite</SelectItem>
+        </SelectGroup>
+      </SelectContent>
+    </Select>
+  );
+}
+
+/** Relocation/visa-sponsorship status — independent of FilterWorkArrangement. */
+export function FilterClassification({
+  value,
+  onValueChange,
+}: {
+  value?: string;
+  onValueChange?: (value: string) => void;
+}) {
+  return (
+    <Select
+      value={value || "all"}
+      onValueChange={(val) => onValueChange?.(val === "all" ? "" : val)}
+    >
+      <SelectTrigger className="w-full sm:max-w-44 sm:border-0 sm:shadow-none">
+        <SelectValue placeholder="Relocation" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectGroup>
+          <SelectLabel>Relocation</SelectLabel>
+          <SelectItem value="all">Any Relocation Status</SelectItem>
+          <SelectItem value="relocation">Relocation Offered</SelectItem>
+          <SelectItem value="onsite">No Relocation</SelectItem>
         </SelectGroup>
       </SelectContent>
     </Select>
