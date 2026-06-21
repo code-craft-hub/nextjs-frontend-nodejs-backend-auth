@@ -11,9 +11,7 @@ import { JobList } from "@/features/job-posts";
 import { JobSearchForm } from "@/features/job-posts/components/JobSearchForm";
 import { useSidebar } from "@/components/ui/sidebar";
 import LeftMenu from "./LeftMenu";
-import { RunModal } from "./RunModal";
-import { IframeStage } from "./IframeStage";
-import { useRunManager } from "../hooks/useRunManager";
+import { RunManagerProvider, useRunManagerContext } from "./RunManagerProvider";
 import {
   buildExtensionProfile,
   useApplyOrchestrator,
@@ -52,7 +50,7 @@ const PARAM_CLASSIFICATION = "relocation";
 /** Work location, independent of classification: "remote" | "hybrid" | "onsite". */
 const PARAM_WORK_ARRANGEMENT = "workType";
 
-export default function Overview() {
+function OverviewContent() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -195,30 +193,15 @@ export default function Overview() {
   }, [user?.firstName]);
 
   // ── Run manager (iframe-mode deck applies + bell + modal) ─────────────────
-
-  const {
-    runs,
-    modalRunId,
-    iframeStageRef,
-    enqueueJob,
-    openRunModal,
-    closeRunModal,
-    repositionIframe,
-    stopRun,
-  } = useRunManager();
+  // The ticking state itself (runs/modalRunId/etc.) lives in RunManagerProvider,
+  // not here — only the stable bits we need are read from context, so this
+  // component no longer re-renders on every run_update broadcast.
+  const { enqueueJob, openRunModal, getRuns } = useRunManagerContext();
 
   // ── Apply orchestrator (cloud bot + extension sessions for the list view) ──
   // Pass enqueueJob so the extension strategy routes through the serial queue
   // instead of spawning multiple simultaneous iframes/windows.
   const orchestrator = useApplyOrchestrator({ enqueueJob });
-
-  // Always-current mirror of `runs` for use inside focusExtTab below, so that
-  // closure doesn't need `runs` as a dependency — `runs` changes on every
-  // run_update broadcast (roughly once a second during an active automation
-  // run), and depending on it directly would rebuild enhancedOrchestrator
-  // every tick, defeating React.memo on JobList/JobsTable downstream.
-  const runsRef = useRef(runs);
-  runsRef.current = runs;
 
   // ── Sync profile to DOM so content-trigger.js can attach it ──────────────
   useEffect(() => {
@@ -241,14 +224,15 @@ export default function Overview() {
   // Override focusExtTab so that when the agent is stuck in iframe mode the
   // "Help bot finish →" button opens the run modal rather than trying to
   // focus an offscreen window (which doesn't exist for iframe runs).
-  // Memoized on [orchestrator, openRunModal] only (not `runs`) so its identity
-  // stays stable across the run_update re-renders ticking through Overview —
-  // focusExtTab reads the latest runs via runsRef when actually called.
+  // Memoized on [orchestrator, openRunModal, getRuns] — all stable unless
+  // orchestrator's own state (sessions/extState/qaJobId) actually changes —
+  // so this doesn't get rebuilt on the run-tracking ticks owned by
+  // RunManagerProvider; getRuns reads the latest runs only when called.
   const enhancedOrchestrator = useMemo(
     () => ({
       ...orchestrator,
       focusExtTab: (jobId: string) => {
-        const iframeRun = Array.from(runsRef.current.values()).find(
+        const iframeRun = Array.from(getRuns().values()).find(
           (r) => r.job?.id === jobId,
         );
         if (iframeRun) {
@@ -258,11 +242,8 @@ export default function Overview() {
         }
       },
     }),
-    [orchestrator, openRunModal],
+    [orchestrator, openRunModal, getRuns],
   );
-
-  // ── Modal run ─────────────────────────────────────────────────────────────
-  const modalRun = modalRunId ? (runs.get(modalRunId) ?? null) : null;
 
   const { open } = useSidebar();
 
@@ -299,18 +280,14 @@ export default function Overview() {
           orchestrator={enhancedOrchestrator}
         />
       </div>
-
-      {/* Hidden iframe stage — iframes appended here imperatively by useRunManager */}
-      <IframeStage stageRef={iframeStageRef} />
-
-      {/* Run modal overlay — renders the top bar + log panel; iframe is
-          positioned by useRunManager's CSS helpers (not inside this tree) */}
-      <RunModal
-        run={modalRun}
-        onClose={closeRunModal}
-        onStop={stopRun}
-        onLogsToggle={repositionIframe}
-      />
     </div>
+  );
+}
+
+export default function Overview() {
+  return (
+    <RunManagerProvider>
+      <OverviewContent />
+    </RunManagerProvider>
   );
 }
