@@ -22,7 +22,10 @@ export interface JobPost {
   } | null;
   postedAt: string;
   localizedTo: string;
+  /** Relocation status: "onsite" | "relocation". */
   classification?: string | null;
+  /** Work location: "remote" | "hybrid" | "onsite". */
+  workArrangement?: string | null;
   descriptionHtml?: string | null;
   descriptionText?: string | null;
   applyUrl?: string | null;
