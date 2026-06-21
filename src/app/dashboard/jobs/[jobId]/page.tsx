@@ -8,7 +8,7 @@ import { jobApplicationsApi } from "@/features/analytics/api/job-applications.ap
 
 interface JobIdPageProps {
   params: Promise<{ jobId: string }>;
-  searchParams: Promise<{ referrer: string }>;
+  searchParams: Promise<{ referrer: string; from?: string }>;
 }
 
 async function resolveToJobId(id: string, token: string): Promise<string> {
@@ -46,16 +46,19 @@ export async function generateMetadata({ params }: JobIdPageProps): Promise<Meta
 
 const JobIdPage = async ({ params, searchParams }: JobIdPageProps) => {
   const { jobId } = await params;
-  const { referrer } = await searchParams;
+  const { referrer, from } = await searchParams;
   const token = (await getCookiesToken()) ?? "";
   const resolvedId = await resolveToJobId(jobId, token);
 
   if (resolvedId !== jobId) {
-    const qs = referrer ? `?referrer=${referrer}` : "";
-    redirect(`/dashboard/jobs/${resolvedId}${qs}`);
+    const qp = new URLSearchParams();
+    if (referrer) qp.set("referrer", referrer);
+    if (from) qp.set("from", from);
+    const qs = qp.toString();
+    redirect(`/dashboard/jobs/${resolvedId}${qs ? `?${qs}` : ""}`);
   }
 
-  return <JobIdClient jobId={jobId} referrer={referrer} />;
+  return <JobIdClient jobId={jobId} referrer={referrer} from={from} />;
 };
 
 export default JobIdPage;

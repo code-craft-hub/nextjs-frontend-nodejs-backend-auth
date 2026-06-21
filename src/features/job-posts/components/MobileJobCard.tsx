@@ -101,9 +101,14 @@ export default function MobileJobCard({
             {job.employmentType.replace("_", " ")}
           </span>
         )}
-        {job.classification && (
+        {job.workArrangement && (
           <span className="bg-green-50 text-green-700 px-2 py-0.5 rounded-full capitalize">
-            {job.classification}
+            {job.workArrangement}
+          </span>
+        )}
+        {job.classification === "relocation" && (
+          <span className="bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full">
+            Relocation
           </span>
         )}
       </div>

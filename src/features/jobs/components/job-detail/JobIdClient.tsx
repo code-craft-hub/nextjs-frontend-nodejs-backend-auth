@@ -24,13 +24,7 @@ import { SocialButton } from "./SocialButton";
 import { JobDescriptionSkeleton, JobTitleSkeleton } from "./JobSkeletons";
 import { ApplicationSnapshot } from "./ApplicationSnapshot";
 import EmptyState from "@/components/EmptyState";
-
-function decodeHtml(encoded: string): string {
-  if (typeof window === "undefined") return encoded;
-  const el = document.createElement("textarea");
-  el.innerHTML = encoded;
-  return el.value;
-}
+import JobDescriptionRenderer from "./JobDescriptionRenderer";
 
 const REFERRER_URLS: Record<string, string> = {
   dashboard: "/dashboard/home",
@@ -42,15 +36,24 @@ const REFERRER_URLS: Record<string, string> = {
 export function JobIdClient({
   jobId,
   referrer,
+  from,
 }: {
   jobId: string;
   referrer: string;
+  /** Exact filtered dashboard URL the user came from — restores filters/results on back. */
+  from?: string;
 }) {
   const { data, isLoading, isError } = useQuery(jobsQueries.detail(jobId));
   const { applyToJob } = useApplyJob();
 
   const job = data?.data;
-  const backUrl = REFERRER_URLS[referrer] ?? "/dashboard/jobs";
+  // Only trust `from` as a same-origin relative dashboard path — it's
+  // round-tripped through a URL param, so validate before using it as a
+  // navigation target.
+  const backUrl =
+    from && from.startsWith("/dashboard/jobs")
+      ? from
+      : (REFERRER_URLS[referrer] ?? "/dashboard/jobs");
 
   useEffect(() => {
     if (job?.id) {
@@ -130,11 +133,7 @@ export function JobIdClient({
               ) : (
                 <div className="text-gray-600 leading-relaxed space-y-3">
                   {job?.descriptionHtml ? (
-                    <div
-                      dangerouslySetInnerHTML={{
-                        __html: decodeHtml(job.descriptionHtml),
-                      }}
-                    />
+                    <JobDescriptionRenderer html={job.descriptionHtml} />
                   ) : (
                     <div>{job?.descriptionText}</div>
                   )}

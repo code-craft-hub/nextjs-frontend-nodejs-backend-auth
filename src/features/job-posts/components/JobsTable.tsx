@@ -36,8 +36,24 @@ export default function JobsTable({
   const qaSession = qaJobId ? sessions[qaJobId] : null;
   const qaJob = qaJobId ? allJobs.find((j) => j.id === qaJobId) : null;
 
-  const jobUrl = (job: JobPost) =>
-    `/dashboard/jobs/${job?.id}?referrer=${referrer ?? "jobs"}&title=${encodeURIComponent(job?.title ?? "")}`;
+  const jobUrl = (job: JobPost) => {
+    const from =
+      typeof window !== "undefined"
+        ? window.location.pathname + window.location.search
+        : "/dashboard/jobs";
+    return `/dashboard/jobs/${job?.id}?referrer=${referrer ?? "jobs"}&title=${encodeURIComponent(job?.title ?? "")}&from=${encodeURIComponent(from)}`;
+  };
+
+  // Snapshot scroll position under the exact filtered URL we're leaving, so
+  // returning here (via the job-detail back button) can restore it. Consumed
+  // once on the next mount — see useScrollRestoration.
+  const goToJob = (job: JobPost) => {
+    if (typeof window !== "undefined") {
+      const key = `jobs-scroll:${window.location.pathname}${window.location.search}`;
+      sessionStorage.setItem(key, String(window.scrollY));
+    }
+    router.push(jobUrl(job));
+  };
 
   return (
     <div className="w-full flex flex-col gap-4">
@@ -62,7 +78,7 @@ export default function JobsTable({
                     isBookmarked: job?.isBookmarked ?? false,
                   })
                 }
-                onRowClick={() => router.push(jobUrl(job))}
+                onRowClick={() => goToJob(job)}
               />
             ))}
           </TableBody>
@@ -87,7 +103,7 @@ export default function JobsTable({
                   isBookmarked: job?.isBookmarked ?? false,
                 })
               }
-              onRowClick={() => router.push(jobUrl(job))}
+              onRowClick={() => goToJob(job)}
             />
           ))}
         </div>

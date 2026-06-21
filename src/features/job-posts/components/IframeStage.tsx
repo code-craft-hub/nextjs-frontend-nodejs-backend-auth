@@ -1,4 +1,4 @@
-import type { RefObject } from "react";
+import { memo, type RefObject } from "react";
 
 /**
  * A fixed, zero-size container that holds all hidden run iframes.
@@ -7,7 +7,7 @@ import type { RefObject } from "react";
  * component only supplies the mount point. The stage is invisible but
  * present so Chrome doesn't throttle background-running frames.
  */
-export function IframeStage({
+function IframeStageImpl({
   stageRef,
 }: {
   stageRef: RefObject<HTMLDivElement | null>;
@@ -28,3 +28,5 @@ export function IframeStage({
     />
   );
 }
+
+export const IframeStage = memo(IframeStageImpl);

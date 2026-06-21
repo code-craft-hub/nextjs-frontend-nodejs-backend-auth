@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { userQueries } from "@features/user";
 import { cn } from "@/lib/utils";
@@ -74,7 +75,7 @@ function CardItem({
   );
 }
 
-export const ReportCard = () => {
+const ReportCardImpl = () => {
   const router = useRouter();
   const { data: user } = useQuery(userQueries.detail());
 
@@ -120,3 +121,5 @@ export const ReportCard = () => {
     </div>
   );
 };
+
+export const ReportCard = memo(ReportCardImpl);
