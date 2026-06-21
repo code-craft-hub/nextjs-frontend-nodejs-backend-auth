@@ -42,15 +42,24 @@ const REFERRER_URLS: Record<string, string> = {
 export function JobIdClient({
   jobId,
   referrer,
+  from,
 }: {
   jobId: string;
   referrer: string;
+  /** Exact filtered dashboard URL the user came from — restores filters/results on back. */
+  from?: string;
 }) {
   const { data, isLoading, isError } = useQuery(jobsQueries.detail(jobId));
   const { applyToJob } = useApplyJob();
 
   const job = data?.data;
-  const backUrl = REFERRER_URLS[referrer] ?? "/dashboard/jobs";
+  // Only trust `from` as a same-origin relative dashboard path — it's
+  // round-tripped through a URL param, so validate before using it as a
+  // navigation target.
+  const backUrl =
+    from && from.startsWith("/dashboard/jobs")
+      ? from
+      : REFERRER_URLS[referrer] ?? "/dashboard/jobs";
 
   useEffect(() => {
     if (job?.id) {

@@ -24,19 +24,36 @@ const SearchBox = ({
   onSubmit,
   onLocationChange,
   onClassificationChange,
+  initialQuery,
+  country,
+  classification,
 }: {
   onSubmit: (data: any) => void;
   onLocationChange?: (location: string) => void;
   onClassificationChange?: (classification: string) => void;
+  /** Pre-fills the search input — used to restore state from the URL. */
+  initialQuery?: string;
+  /** Controls the country select — used to restore state from the URL. */
+  country?: string;
+  /** Controls the job-type select — used to restore state from the URL. */
+  classification?: string;
 }) => {
   const form = useForm<any>({
     defaultValues: {
-      searchValue: "",
+      searchValue: initialQuery ?? "",
     },
   });
 
   const { watch, reset } = form;
   const watched = watch("searchValue");
+
+  // Re-hydrate the input when the caller's restored value changes (e.g. on
+  // back-navigation), without fighting the user's own keystrokes — only
+  // applies when the field hasn't been touched away from the restored value.
+  useEffect(() => {
+    reset({ searchValue: initialQuery ?? "" });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialQuery]);
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -90,8 +107,11 @@ const SearchBox = ({
         </Form>
       </div>
 
-      <FilterLocation onValueChange={onLocationChange} />
-      <FilterClassification onValueChange={onClassificationChange} />
+      <FilterLocation value={country} onValueChange={onLocationChange} />
+      <FilterClassification
+        value={classification}
+        onValueChange={onClassificationChange}
+      />
     </div>
   );
 };
@@ -113,12 +133,17 @@ const SUPPORTED_COUNTRIES = [
 ] as const;
 
 export function FilterLocation({
+  value,
   onValueChange,
 }: {
+  value?: string;
   onValueChange?: (value: string) => void;
 }) {
   return (
-    <Select onValueChange={(val) => onValueChange?.(val === "all" ? "" : val)}>
+    <Select
+      value={value || "all"}
+      onValueChange={(val) => onValueChange?.(val === "all" ? "" : val)}
+    >
       <SelectTrigger className="w-full sm:max-w-48 sm:border-0 sm:shadow-none">
         <SelectValue placeholder="Country" />
       </SelectTrigger>
@@ -138,12 +163,17 @@ export function FilterLocation({
 }
 
 export function FilterClassification({
+  value,
   onValueChange,
 }: {
+  value?: string;
   onValueChange?: (value: string) => void;
 }) {
   return (
-    <Select onValueChange={(val) => onValueChange?.(val === "all" ? "" : val)}>
+    <Select
+      value={value || "all"}
+      onValueChange={(val) => onValueChange?.(val === "all" ? "" : val)}
+    >
       <SelectTrigger className="w-full sm:max-w-40 sm:border-0 sm:shadow-none">
         <SelectValue placeholder="Type" />
       </SelectTrigger>

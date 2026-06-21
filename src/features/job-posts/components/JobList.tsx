@@ -1,5 +1,6 @@
 "use client";
 import { useIntersectionObserver } from "../hooks/useIntersectionObserver";
+import { useScrollRestoration } from "../hooks/useScrollRestoration";
 import { useCallback } from "react";
 import JobsTable from "./JobsTable";
 import { useInfiniteJobs } from "../queries/job-posts.query";
@@ -26,6 +27,10 @@ export function JobList({
     hasNextPage,
     isFetchingNextPage,
     isPlaceholderData,
+    isLoading,
+    isError,
+    error,
+    refetch,
   } = useInfiniteJobs(query, location, localizedTo, classification);
 
   const handleIntersect = useCallback(() => {
@@ -40,6 +45,43 @@ export function JobList({
   );
 
   const allJobs = data?.pages ?? [];
+
+  // Only restore scroll once real (non-placeholder) data for this exact
+  // filter combo has rendered — restoring against placeholder/stale rows
+  // would scroll to the wrong height.
+  useScrollRestoration(!isLoading && !isPlaceholderData && allJobs.length > 0);
+
+  // First-ever fetch for this filter combination — no cached/placeholder
+  // data to show yet. Distinguish this from "zero matches" below.
+  if (isLoading) {
+    return (
+      <div className="flex justify-center my-12 text-muted-foreground">
+        <Loader className="size-5 animate-spin mr-2" />
+        Loading jobs…
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex flex-col items-center gap-3 my-12 text-center">
+        <p className="text-destructive">
+          Couldn't load jobs{error instanceof Error ? `: ${error.message}` : "."}
+        </p>
+        <Button variant="outline" onClick={() => refetch()}>
+          Retry
+        </Button>
+      </div>
+    );
+  }
+
+  if (allJobs.length === 0) {
+    return (
+      <div className="flex justify-center my-12 text-muted-foreground">
+        No jobs match your filters.
+      </div>
+    );
+  }
 
   return (
     <div

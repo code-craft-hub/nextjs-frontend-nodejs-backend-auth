@@ -1,7 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { sendGTMEvent } from "@next/third-parties/google";
 import { cn } from "@/lib/utils";
 import { userQueries } from "@features/user";
@@ -42,13 +43,47 @@ function resolveCountry(input?: string | null): SupportedCountry | undefined {
   return SUPPORTED_COUNTRIES.find((c) => c.toLowerCase() === normalized);
 }
 
+// URL search param names — source of truth for filter state across
+// navigation/refresh (Checkpoint 3). Read once on mount; pushed on change.
+const PARAM_QUERY = "q";
+const PARAM_COUNTRY = "country";
+const PARAM_TYPE = "type";
+
 export default function Overview() {
-  const [query, setQuery] = useState<string | undefined>(undefined);
-  const [localizedTo, setLocalizedTo] = useState<string | undefined>(undefined);
-  const [classification, setClassification] = useState<string | undefined>(
-    undefined,
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const [query, setQuery] = useState<string | undefined>(
+    () => searchParams.get(PARAM_QUERY) ?? undefined,
   );
-  const [countryInitialized, setCountryInitialized] = useState(false);
+  const [localizedTo, setLocalizedTo] = useState<string | undefined>(
+    () => searchParams.get(PARAM_COUNTRY) ?? undefined,
+  );
+  const [classification, setClassification] = useState<string | undefined>(
+    () => searchParams.get(PARAM_TYPE) ?? undefined,
+  );
+  const [countryInitialized, setCountryInitialized] = useState(
+    () => searchParams.get(PARAM_COUNTRY) !== null,
+  );
+
+  // Personalization (auto-default country from the user's profile) must
+  // never override a filter the user has actually touched — previously this
+  // only checked countryInitialized, so picking "Remote" before the profile
+  // query resolved would get silently clobbered once it did, producing the
+  // "filter appears empty, then jobs show up" race from CT-192 checkpoint 1.
+  const hasUserInteractedRef = useRef(searchParams.size > 0);
+
+  const updateUrlParam = useCallback(
+    (key: string, value: string | undefined) => {
+      const params = new URLSearchParams(searchParams.toString());
+      if (value) params.set(key, value);
+      else params.delete(key);
+      const qs = params.toString();
+      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+    },
+    [pathname, router, searchParams],
+  );
 
   const { data: user } = useQuery(userQueries.detail());
 
@@ -66,25 +101,44 @@ export default function Overview() {
   );
 
   useEffect(() => {
-    if (defaultCountry && !countryInitialized) {
+    if (defaultCountry && !countryInitialized && !hasUserInteractedRef.current) {
       setLocalizedTo(defaultCountry);
       setCountryInitialized(true);
+      updateUrlParam(PARAM_COUNTRY, defaultCountry);
     }
-  }, [defaultCountry, countryInitialized]);
+  }, [defaultCountry, countryInitialized, updateUrlParam]);
 
-  const handleSearch = useCallback((value: string) => {
-    const trimmed = value.trim();
-    setQuery(trimmed.length ? trimmed : undefined);
-  }, []);
+  const handleSearch = useCallback(
+    (value: string) => {
+      hasUserInteractedRef.current = true;
+      const trimmed = value.trim();
+      const next = trimmed.length ? trimmed : undefined;
+      setQuery(next);
+      updateUrlParam(PARAM_QUERY, next);
+    },
+    [updateUrlParam],
+  );
 
-  const handleCountryChange = useCallback((value: string) => {
-    setLocalizedTo(value.length ? value : undefined);
-    setCountryInitialized(true);
-  }, []);
+  const handleCountryChange = useCallback(
+    (value: string) => {
+      hasUserInteractedRef.current = true;
+      const next = value.length ? value : undefined;
+      setLocalizedTo(next);
+      setCountryInitialized(true);
+      updateUrlParam(PARAM_COUNTRY, next);
+    },
+    [updateUrlParam],
+  );
 
-  const handleClassificationChange = useCallback((value: string) => {
-    setClassification(value.length ? value : undefined);
-  }, []);
+  const handleClassificationChange = useCallback(
+    (value: string) => {
+      hasUserInteractedRef.current = true;
+      const next = value.length ? value : undefined;
+      setClassification(next);
+      updateUrlParam(PARAM_TYPE, next);
+    },
+    [updateUrlParam],
+  );
 
   useEffect(() => {
     if (user?.firstName) {
@@ -169,6 +223,9 @@ export default function Overview() {
               onSubmit={handleSearch}
               onLocationChange={handleCountryChange}
               onClassificationChange={handleClassificationChange}
+              initialQuery={query}
+              country={localizedTo}
+              classification={classification}
             />
           </div>
         </div>
