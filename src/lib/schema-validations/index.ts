@@ -35,7 +35,10 @@ export const lastNameSchema = z
   )
   .transform((val) => val.trim());
 
-export const referralCodeSchema = z.string().optional();
+// Codes are generated/stored uppercase (server/src/modules/referral) — trim
+// + uppercase here so a pasted/typed code in a different case still matches
+// on the backend's exact-match lookup.
+export const referralCodeSchema = z.string().trim().toUpperCase().optional();
 
 export const phoneSchema = z
   .string()
