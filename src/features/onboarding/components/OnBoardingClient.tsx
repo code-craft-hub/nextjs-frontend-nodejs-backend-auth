@@ -17,12 +17,17 @@ import { useUserLocation } from "@/shared/hooks/useUserLocation";
 import { OnBoardingForm8 } from "./onboarding-pages/OnBoardingForm8";
 import { Analytics } from "@/lib/analytics";
 
-export default function OnboardingClient() {
+interface OnboardingClientProps {
+  initialStep?: number;
+}
+
+export default function OnboardingClient({
+  initialStep = 0,
+}: OnboardingClientProps) {
   const deleteAccount = useDeleteAccountMutation();
   useUserLocation();
   const isDev = process.env.NODE_ENV === "development";
 
-  const [currentStep, setCurrentStep] = useState(0);
   const steps = [
     OnBoardingForm0,
     OnBoardingForm1,
@@ -35,6 +40,10 @@ export default function OnboardingClient() {
     OnBoardingForm8,
   ];
   const totalSteps = steps.length;
+
+  const [currentStep, setCurrentStep] = useState(() =>
+    Math.min(Math.max(initialStep, 0), totalSteps - 1),
+  );
 
   const router = useRouter();
   const handleDeleteAccount = async () => {

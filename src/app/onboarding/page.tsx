@@ -22,9 +22,16 @@ export default async function OnboardingPage() {
     redirect("/dashboard/home");
   }
 
+  // Resume where the user left off: onboardingStep is the last *completed*
+  // step, so the next screen to show is one past it. 0 means nothing has
+  // been completed yet, so stay on the welcome screen instead of skipping it.
+  const user = queryClient.getQueryData(userQueries.detail(token).queryKey);
+  const completedStep = user?.onboardingStep ?? 0;
+  const initialStep = completedStep === 0 ? 0 : completedStep + 1;
+
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <OnboardingClient />
+      <OnboardingClient initialStep={initialStep} />
     </HydrationBoundary>
   );
 }
