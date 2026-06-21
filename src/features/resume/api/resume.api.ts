@@ -99,6 +99,20 @@ export const resumeApi = {
       },
     ),
 
+  /**
+   * Generate a user's FIRST resume from a short text/voice description.
+   * Used by onboarding — unlike autoNewResume, never requires an existing
+   * default resume to tailor against.
+   */
+  generateFirstResume: (content: string, token?: string) =>
+    api.post<ApiResponse<ResumeAggregate>>(
+      RESUME_BASE + "/generate-first",
+      { content },
+      {
+        token,
+      },
+    ),
+
   getResumes: (params?: ResumeFilters, token?: string) =>
     api.get<PaginatedResponse<ResumeAggregate>>(
       `${RESUME_BASE}?` +

@@ -133,7 +133,11 @@ export default function PersonalInfoForm({
 
     toast.success(`Auto-generating your resume title: ${title}`);
     onboardingResumeUploadCompleted?.();
-    await resumeApi.autoNewResume(title);
+    try {
+      await resumeApi.generateFirstResume(title);
+    } catch {
+      toast.error("Failed to generate resume. Please try again.");
+    }
   };
   return (
     <div className="w-full bg-white rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-6 relative">

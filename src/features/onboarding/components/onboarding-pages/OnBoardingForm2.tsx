@@ -28,7 +28,7 @@ export const OnBoardingForm2 = ({ onNext, children }: OnboardingFormProps) => {
     setIsSpeechSubmitting(true);
     try {
       onNext();
-      await resumeApi.autoNewResume(speechText.trim());
+      await resumeApi.generateFirstResume(speechText.trim());
       toast.success("Your resume is being generated!");
     } catch {
       toast.error("Failed to generate resume. Please try again.");
