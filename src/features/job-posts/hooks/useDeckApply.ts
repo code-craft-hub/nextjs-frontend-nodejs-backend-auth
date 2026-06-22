@@ -6,6 +6,7 @@ import { userQueries } from "@features/user";
 import { resumeApi } from "@/features/resume/api/resume.api";
 import { queryKeys } from "@/shared/query/keys";
 import { buildExtensionProfile } from "./useApplyOrchestrator";
+import { useLogApplicationEventMutation } from "../mutations/application-events.mutation";
 import type { JobPost } from "@/features/job-posts";
 import type { ExtensionProfile } from "./useExtension";
 
@@ -43,6 +44,7 @@ export function useDeckApply({
     retry: false,
   });
   const defaultResumeFileUrl = defaultResumeData?.data?.fileUrl ?? null;
+  const { mutate: logApplicationEvent } = useLogApplicationEventMutation();
 
   return useCallback(
     (job: JobPost) => {
@@ -57,8 +59,18 @@ export function useDeckApply({
           const w = window.open(url, "_blank");
           if (w) { w.blur(); window.focus(); }
         }
+        // No extension installed — this is a plain manual apply, same as
+        // useApplyOrchestrator's fallback branch. Record it here since
+        // nothing else in the deck-swipe flow logs this submission.
+        logApplicationEvent({
+          jobId: job.id,
+          jobTitleSnapshot: job.title ?? "Untitled Position",
+          companySnapshot: job.companyName ?? null,
+          applicationType: "manual_click",
+          submittedAt: new Date().toISOString(),
+        });
       }
     },
-    [extState, user, defaultResumeFileUrl, enqueueJob],
+    [extState, user, defaultResumeFileUrl, enqueueJob, logApplicationEvent],
   );
 }

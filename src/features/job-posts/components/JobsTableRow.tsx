@@ -31,7 +31,7 @@ interface Props {
   onApply: () => void;
   onResume: () => void;
   onViewQA: () => void;
-  onEmailApply: (recruiterEmail: string) => void;
+  onEmailApply: (recruiterEmail: string, jobId?: string) => void;
   onFocusExtTab: () => void;
   onBookmark: () => void;
   onRowClick: () => void;

@@ -22,7 +22,7 @@ interface Props {
   onApply: () => void;
   onResume: () => void;
   onViewQA: () => void;
-  onEmailApply: (recruiterEmail: string) => void;
+  onEmailApply: (recruiterEmail: string, jobId?: string) => void;
   onBookmark: () => void;
   onRowClick: () => void;
 }
@@ -134,7 +134,7 @@ interface ApplyAreaProps {
   onApply: () => void;
   onResume: () => void;
   onViewQA: () => void;
-  onEmailApply: (recruiterEmail: string) => void;
+  onEmailApply: (recruiterEmail: string, jobId?: string) => void;
 }
 
 function MobileApplyArea({ job, session: s, onApply, onResume, onViewQA, onEmailApply }: ApplyAreaProps) {
@@ -290,7 +290,7 @@ function MobileApplyArea({ job, session: s, onApply, onResume, onViewQA, onEmail
             </p>
           )}
           <button
-            onClick={(e) => { e.stopPropagation(); s.recruiterEmail && onEmailApply(s.recruiterEmail); }}
+            onClick={(e) => { e.stopPropagation(); s.recruiterEmail && onEmailApply(s.recruiterEmail, job.id); }}
             className="w-full py-2.5 rounded-xl text-sm font-semibold bg-indigo-600 text-white active:bg-indigo-700"
           >
             Send Email Application ✦

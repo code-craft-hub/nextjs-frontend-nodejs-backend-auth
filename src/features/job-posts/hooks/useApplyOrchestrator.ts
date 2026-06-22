@@ -15,6 +15,7 @@ import {
   type BotStatusEvent,
 } from "@/features/browser-automation";
 import { useUpdateJobApplicationHistoryMutation } from "@/features/jobs/mutations/jobs.mutations";
+import { useLogApplicationEventMutation } from "../mutations/application-events.mutation";
 import { gmailApi } from "@/features/email-application/api/gmail.api";
 import { buildAutoApplyStartUrl } from "@/lib/utils/ai-apply-navigation";
 import { aiSettingsQueries } from "@/features/ai-settings/queries/ai-settings.queries";
@@ -223,7 +224,7 @@ export interface UseApplyOrchestrator {
    * Triggered when the user clicks "Send Email Application" after the cloud
    * bot discovers a recruiter email instead of a public form.
    */
-  handleEmailApply: (recruiterEmail: string) => void;
+  handleEmailApply: (recruiterEmail: string, jobId?: string) => void;
 }
 
 export function useApplyOrchestrator(
@@ -239,6 +240,7 @@ export function useApplyOrchestrator(
   const { mutate: resumeApplication } = useResumeBrowserApplicationMutation();
   const { mutate: recordApplication } =
     useUpdateJobApplicationHistoryMutation();
+  const { mutate: logApplicationEvent } = useLogApplicationEventMutation();
 
   // ── Default resume for cv_url ────────────────────────────────────────────
   // Fetched once on mount; staleTime prevents redundant network calls.
@@ -747,13 +749,31 @@ export function useApplyOrchestrator(
           duration: 8000,
         });
       }
+      // Regular manual apply — the user is taken straight to the listing's
+      // own application page. No other code path logs this submission, so
+      // record it here at the exact moment the tab opens.
+      logApplicationEvent({
+        jobId: job.id,
+        jobTitleSnapshot: job.title ?? "Untitled Position",
+        companySnapshot: job.companyName ?? null,
+        applicationType: "manual_click",
+        submittedAt: new Date().toISOString(),
+      });
       window.open(
         job?.applyUrl ?? job.link ?? "",
         "_blank",
         "noopener,noreferrer",
       );
     },
-    [extState, applyViaExtension, enqueueJob, triggerCloudBot, recordApplication, router],
+    [
+      extState,
+      applyViaExtension,
+      enqueueJob,
+      triggerCloudBot,
+      recordApplication,
+      logApplicationEvent,
+      router,
+    ],
   );
 
   // ── Public: resume ────────────────────────────────────────────────────────
@@ -795,10 +815,11 @@ export function useApplyOrchestrator(
   // ── Public: handleEmailApply (cloud-bot discovered recruiter email) ────────
 
   const handleEmailApply = useCallback(
-    (recruiterEmail: string) => {
+    (recruiterEmail: string, jobId?: string) => {
       const startUrl = buildAutoApplyStartUrl(
         JSON.stringify(""),
         encodeURIComponent(recruiterEmail),
+        jobId,
       );
       router.push(startUrl);
     },

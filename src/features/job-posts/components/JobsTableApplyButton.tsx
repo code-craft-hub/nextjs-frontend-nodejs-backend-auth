@@ -12,7 +12,7 @@ interface Props {
   onApply: () => void;
   onResume: () => void;
   onViewQA: () => void;
-  onEmailApply: (recruiterEmail: string) => void;
+  onEmailApply: (recruiterEmail: string, jobId?: string) => void;
   onFocusExtTab: () => void;
 }
 
@@ -226,7 +226,7 @@ export function JobsTableApplyButton({
             <p className="text-2xs text-blue-600 font-mono truncate text-right">{s.recruiterEmail}</p>
           )}
           <button
-            onClick={(e) => { e.stopPropagation(); s.recruiterEmail && onEmailApply(s.recruiterEmail); }}
+            onClick={(e) => { e.stopPropagation(); s.recruiterEmail && onEmailApply(s.recruiterEmail, job.id); }}
             className="w-full py-1.5 px-3 rounded-xl text-2xs font-medium bg-indigo-600 text-white hover:bg-indigo-700 whitespace-nowrap"
           >
             Send Email Application ✦
