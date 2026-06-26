@@ -26,11 +26,22 @@ function Spinner() {
   );
 }
 
-function SpinnerButton({ label, color }: { label: string; color: string }) {
+function SpinnerButton({
+  label,
+  color,
+  onClick,
+}: {
+  label: string;
+  color: string;
+  /** When provided, the button focuses the hidden automation tab on click. */
+  onClick?: () => void;
+}) {
   return (
     <button
-      disabled
-      className={`w-full py-2 px-3 rounded-xl text-xs font-semibold text-white flex items-center justify-center gap-2 whitespace-nowrap opacity-90 ${color}`}
+      disabled={!onClick}
+      onClick={onClick ? (e) => { e.stopPropagation(); onClick(); } : undefined}
+      title={onClick ? "Click to view the bot's tab" : undefined}
+      className={`w-full py-2 px-3 rounded-xl text-xs font-semibold text-white flex items-center justify-center gap-2 whitespace-nowrap opacity-90 ${color} ${onClick ? "cursor-pointer hover:opacity-100" : ""}`}
     >
       <Spinner />
       {label}
@@ -53,12 +64,21 @@ function LivePulse({ color = "bg-green-400" }: { color?: string }) {
  * "Filling form…" label. Falls back to `fallback` until the first action
  * lands (run.lastStepReason is empty for a brief moment at the very start).
  */
-function LiveStepBadge({ text, fallback }: { text?: string; fallback: string }) {
+function LiveStepBadge({
+  text,
+  fallback,
+  onClick,
+}: {
+  text?: string;
+  fallback: string;
+  /** Focuses the hidden automation tab so the user can watch it live. */
+  onClick: () => void;
+}) {
   return (
     <button
-      disabled
-      title={text || fallback}
-      className="w-full py-2 px-3 rounded-xl text-white flex items-center justify-center gap-2 whitespace-nowrap opacity-90 bg-cyan-600"
+      onClick={(e) => { e.stopPropagation(); onClick(); }}
+      title={`${text || fallback} — click to view the bot's tab`}
+      className="w-full py-2 px-3 rounded-xl text-white flex items-center justify-center gap-2 whitespace-nowrap opacity-90 hover:opacity-100 cursor-pointer bg-cyan-600"
     >
       <Spinner />
       <span className="text-2xs font-medium truncate">{text || fallback}</span>
@@ -109,18 +129,24 @@ export function JobsTableApplyButton({
     case "routing":
       return <SpinnerButton label="Starting…" color="bg-indigo-500" />;
 
-    // ── Extension path ──────────────────────────────────────────────────────
+    // ── Extension path — clickable to bring the hidden tab into view ────────
     case "ext:queued":
-      return <SpinnerButton label="Sending to bot…" color="bg-indigo-500" />;
+      return <SpinnerButton label="Sending to bot…" color="bg-indigo-500" onClick={onFocusExtTab} />;
 
     case "ext:navigating":
-      return <SpinnerButton label="Opening page…" color="bg-indigo-500" />;
+      return <SpinnerButton label="Opening page…" color="bg-indigo-500" onClick={onFocusExtTab} />;
 
     case "ext:analyzing":
-      return <SpinnerButton label="Analyzing form…" color="bg-violet-600" />;
+      return <SpinnerButton label="Analyzing form…" color="bg-violet-600" onClick={onFocusExtTab} />;
 
     case "ext:filling":
-      return <LiveStepBadge text={s.lastStepSummary} fallback="Filling form…" />;
+      return (
+        <LiveStepBadge
+          text={s.lastStepSummary}
+          fallback="Filling form…"
+          onClick={onFocusExtTab}
+        />
+      );
 
     case "ext:awaiting_answers":
       return (

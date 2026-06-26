@@ -25,6 +25,8 @@ interface Props {
   onEmailApply: (recruiterEmail: string, jobId?: string) => void;
   /** Ask the bell to open pre-expanded on the run for this job. */
   onAttention: () => void;
+  /** Bring the extension's hidden automation tab to the foreground. */
+  onFocusExtTab: () => void;
   onBookmark: () => void;
   onRowClick: () => void;
 }
@@ -43,6 +45,7 @@ export default function MobileJobCard({
   onViewQA,
   onEmailApply,
   onAttention,
+  onFocusExtTab,
   onBookmark,
   onRowClick,
 }: Props) {
@@ -125,6 +128,7 @@ export default function MobileJobCard({
         onViewQA={onViewQA}
         onEmailApply={onEmailApply}
         onAttention={onAttention}
+        onFocusExtTab={onFocusExtTab}
       />
     </div>
   );
@@ -140,9 +144,10 @@ interface ApplyAreaProps {
   onViewQA: () => void;
   onEmailApply: (recruiterEmail: string, jobId?: string) => void;
   onAttention: () => void;
+  onFocusExtTab: () => void;
 }
 
-function MobileApplyArea({ job, session: s, onApply, onResume, onViewQA, onEmailApply, onAttention }: ApplyAreaProps) {
+function MobileApplyArea({ job, session: s, onApply, onResume, onViewQA, onEmailApply, onAttention, onFocusExtTab }: ApplyAreaProps) {
   // No session — default CTA
   if (!s) {
     return (
@@ -156,11 +161,8 @@ function MobileApplyArea({ job, session: s, onApply, onResume, onViewQA, onEmail
   }
 
   switch (s.status) {
-    // ── Any pre-flight / extension spinner ──────────────────────────────────
+    // ── Pre-flight: strategy not chosen yet / cloud bot has no tab ──────────
     case "routing":
-    case "ext:queued":
-    case "ext:navigating":
-    case "ext:analyzing":
     case "cloud:starting":
       return (
         <button
@@ -172,13 +174,28 @@ function MobileApplyArea({ job, session: s, onApply, onResume, onViewQA, onEmail
         </button>
       );
 
-    // ── Filling — live, step-by-step status instead of a static label ───────
+    // ── Extension spinner — clickable to bring the hidden tab into view ─────
+    case "ext:queued":
+    case "ext:navigating":
+    case "ext:analyzing":
+      return (
+        <button
+          onClick={(e) => { e.stopPropagation(); onFocusExtTab(); }}
+          title="Click to view the bot's tab"
+          className="w-full py-2.5 rounded-xl text-sm font-semibold bg-indigo-500 text-white flex items-center justify-center gap-2 opacity-90 active:opacity-100"
+        >
+          <Spinner />
+          Working…
+        </button>
+      );
+
+    // ── Filling — live, step-by-step status; clickable to view the bot's tab ─
     case "ext:filling":
       return (
         <button
-          disabled
-          title={s.lastStepSummary || "Filling form…"}
-          className="w-full py-2.5 rounded-xl bg-cyan-600 text-white flex items-center justify-center gap-2 opacity-90"
+          onClick={(e) => { e.stopPropagation(); onFocusExtTab(); }}
+          title={`${s.lastStepSummary || "Filling form…"} — click to view the bot's tab`}
+          className="w-full py-2.5 rounded-xl bg-cyan-600 text-white flex items-center justify-center gap-2 opacity-90 active:opacity-100"
         >
           <Spinner />
           <span className="text-xs font-medium truncate">

@@ -102,6 +102,7 @@ export default function JobsTable({
               onViewQA={() => viewQA(job.id)}
               onEmailApply={handleEmailApply}
               onAttention={() => onAttention(job.id)}
+              onFocusExtTab={() => focusExtTab(job.id)}
               onBookmark={() =>
                 toggleBookmark.mutate({
                   jobId: job?.id,
