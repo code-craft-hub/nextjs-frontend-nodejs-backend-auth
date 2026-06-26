@@ -64,7 +64,7 @@ export type ApplyStrategy = "extension" | "cloud_bot" | "manual" | "email";
  * State machine (happy path):
  *
  *   Extension:  routing → ext:queued → ext:navigating → ext:analyzing
- *               → ext:filling → [ext:reviewing] → applied
+ *               → ext:filling → [ext:awaiting_answers | ext:awaiting_submit] → applied
  *
  *   Cloud bot:  routing → cloud:starting → cloud:running
  *               → [cloud:paused → cloud:resuming] → applied
@@ -82,7 +82,8 @@ export type ApplyStatus =
   | "ext:navigating" // tab open; LLM agent navigating to the application form
   | "ext:analyzing"  // form found; Gemini generating answers + match score
   | "ext:filling"    // bot typing Gemini answers into form fields
-  | "ext:reviewing"  // autoSubmit=false; user must confirm in sidepanel
+  | "ext:awaiting_answers" // bot is blocked on user-supplied answers to continue
+  | "ext:awaiting_submit"  // form filled; user must approve before the bot submits
   | "ext:stuck"      // form open but submit failed; needs human help
   // ── Cloud-bot path (browser-use cloud) ───────────────────────────────────
   | "cloud:starting"  // POST /submit-application in flight

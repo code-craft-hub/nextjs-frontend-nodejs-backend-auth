@@ -15,6 +15,7 @@ function JobListImpl({
   classification,
   workArrangement,
   orchestrator,
+  onAttention,
 }: {
   query?: string;
   location?: string;
@@ -22,6 +23,12 @@ function JobListImpl({
   classification?: string;
   workArrangement?: string;
   orchestrator: UseApplyOrchestrator;
+  /**
+   * Ask the bell to open pre-expanded on the run for this job. Optional —
+   * pages that embed JobList without RunManagerProvider (no bell to focus)
+   * can omit it.
+   */
+  onAttention?: (jobId: string) => void;
 }) {
   const {
     data,
@@ -92,7 +99,12 @@ function JobListImpl({
         transition: "opacity 0.2s",
       }}
     >
-      <JobsTable allJobs={allJobs} referrer="jobs" orchestrator={orchestrator} />
+      <JobsTable
+        allJobs={allJobs}
+        referrer="jobs"
+        orchestrator={orchestrator}
+        onAttention={onAttention ?? (() => {})}
+      />
 
       <div ref={sentinelRef} />
 

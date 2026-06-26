@@ -6,11 +6,13 @@ import {
   useContext,
   useMemo,
   useRef,
+  useState,
   type ReactNode,
 } from "react";
 import { useRunManager, type UseRunManager } from "../hooks/useRunManager";
 import { IframeStage } from "./IframeStage";
 import { RunModal } from "./RunModal";
+import { RunsBellPopover } from "./RunsBellPopover";
 
 interface RunManagerContextValue {
   enqueueJob: UseRunManager["enqueueJob"];
@@ -23,6 +25,12 @@ interface RunManagerContextValue {
    * elsewhere on the page don't re-render every tick.
    */
   getRuns: () => UseRunManager["runs"];
+  /**
+   * Ask the bell (rendered by this provider) to open pre-expanded on the
+   * run attached to this job — e.g. a table row whose status needs human
+   * input. No-ops if no run for this job is currently tracked.
+   */
+  requestBellFocus: (jobId: string) => void;
 }
 
 const RunManagerContext = createContext<RunManagerContextValue | null>(null);
@@ -56,6 +64,7 @@ export function RunManagerProvider({ children }: { children: ReactNode }) {
     openRunModal,
     closeRunModal,
     repositionIframe,
+    dismissRun,
     stopRun,
   } = useRunManager();
 
@@ -63,9 +72,25 @@ export function RunManagerProvider({ children }: { children: ReactNode }) {
   runsRef.current = runs;
   const getRuns = useCallback(() => runsRef.current, []);
 
+  // One-shot request for the bell to open pre-expanded on a specific job's
+  // run. `nonce` changes on every call so a repeat click on the same run
+  // re-triggers the bell's focus effect even though focusRunId is unchanged.
+  const [focusRequest, setFocusRequest] = useState<{
+    runId: string;
+    nonce: number;
+  } | null>(null);
+
+  const requestBellFocus = useCallback((jobId: string) => {
+    const run = Array.from(runsRef.current.values()).find(
+      (r) => r.job?.id === jobId,
+    );
+    if (!run) return;
+    setFocusRequest({ runId: run.id, nonce: Date.now() });
+  }, []);
+
   const value = useMemo<RunManagerContextValue>(
-    () => ({ enqueueJob, openRunModal, getRuns }),
-    [enqueueJob, openRunModal, getRuns],
+    () => ({ enqueueJob, openRunModal, getRuns, requestBellFocus }),
+    [enqueueJob, openRunModal, getRuns, requestBellFocus],
   );
 
   const modalRun = modalRunId ? (runs.get(modalRunId) ?? null) : null;
@@ -85,6 +110,21 @@ export function RunManagerProvider({ children }: { children: ReactNode }) {
         onStop={stopRun}
         onLogsToggle={repositionIframe}
       />
+
+      {/* Floating bell — only takes up screen space once there's something
+          to track. Pages that want their own bell placement (the deck view
+          calls useRunManager directly, bypassing this provider) are unaffected. */}
+      {runs.size > 0 && (
+        <div className="fixed bottom-6 right-6 z-40">
+          <RunsBellPopover
+            runs={[...runs.values()]}
+            onOpenRun={openRunModal}
+            onDismissRun={dismissRun}
+            focusRunId={focusRequest?.runId ?? null}
+            focusNonce={focusRequest?.nonce}
+          />
+        </div>
+      )}
     </RunManagerContext.Provider>
   );
 }

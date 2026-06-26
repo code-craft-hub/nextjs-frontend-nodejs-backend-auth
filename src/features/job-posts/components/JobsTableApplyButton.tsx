@@ -14,6 +14,8 @@ interface Props {
   onViewQA: () => void;
   onEmailApply: (recruiterEmail: string, jobId?: string) => void;
   onFocusExtTab: () => void;
+  /** Ask the bell to open pre-expanded on the run for this job. */
+  onAttention: () => void;
 }
 
 // ─── Shared sub-components ────────────────────────────────────────────────────
@@ -56,6 +58,7 @@ export function JobsTableApplyButton({
   onViewQA,
   onEmailApply,
   onFocusExtTab,
+  onAttention,
 }: Props) {
   // ── No session yet — show the initial "Apply Now" CTA ────────────────────
   if (!s) {
@@ -100,8 +103,27 @@ export function JobsTableApplyButton({
     case "ext:filling":
       return <SpinnerButton label="Filling form…" color="bg-cyan-600" />;
 
-    case "ext:reviewing":
-      return <SpinnerButton label="Awaiting confirm…" color="bg-amber-500" />;
+    case "ext:awaiting_answers":
+      return (
+        <button
+          onClick={(e) => { e.stopPropagation(); onAttention(); }}
+          className="w-full py-2 px-3 rounded-xl text-xs font-semibold bg-amber-500 text-white hover:bg-amber-600 transition-colors flex items-center justify-center gap-1.5 whitespace-nowrap"
+        >
+          <span className="w-2 h-2 rounded-full bg-white animate-pulse shrink-0" />
+          Questions need answers →
+        </button>
+      );
+
+    case "ext:awaiting_submit":
+      return (
+        <button
+          onClick={(e) => { e.stopPropagation(); onAttention(); }}
+          className="w-full py-2 px-3 rounded-xl text-xs font-semibold bg-amber-500 text-white hover:bg-amber-600 transition-colors flex items-center justify-center gap-1.5 whitespace-nowrap"
+        >
+          <span className="w-2 h-2 rounded-full bg-white animate-pulse shrink-0" />
+          Form filled — approve →
+        </button>
+      );
 
     case "ext:stuck":
       return (

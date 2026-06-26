@@ -13,10 +13,13 @@ export default function JobsTable({
   allJobs,
   referrer,
   orchestrator,
+  onAttention,
 }: {
   allJobs: JobPost[];
   referrer: string;
   orchestrator: UseApplyOrchestrator;
+  /** Ask the bell to open pre-expanded on the run for this job. */
+  onAttention: (jobId: string) => void;
 }) {
   const router = useRouter();
   const toggleBookmark = useToggleBookmarkByJobMutation();
@@ -72,6 +75,7 @@ export default function JobsTable({
                 onViewQA={() => viewQA(job.id)}
                 onEmailApply={handleEmailApply}
                 onFocusExtTab={() => focusExtTab(job.id)}
+                onAttention={() => onAttention(job.id)}
                 onBookmark={() =>
                   toggleBookmark.mutate({
                     jobId: job?.id,
@@ -97,6 +101,7 @@ export default function JobsTable({
               onResume={() => resume(job.id)}
               onViewQA={() => viewQA(job.id)}
               onEmailApply={handleEmailApply}
+              onAttention={() => onAttention(job.id)}
               onBookmark={() =>
                 toggleBookmark.mutate({
                   jobId: job?.id,

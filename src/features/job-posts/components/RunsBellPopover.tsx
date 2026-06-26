@@ -404,16 +404,32 @@ interface RunsBellPopoverProps {
   runs: ActiveRun[];
   onOpenRun: (runId: string) => void;
   onDismissRun: (runId: string) => void;
+  /**
+   * External request to open the dialog pre-expanded on a specific run —
+   * e.g. the jobs table page's apply button asking the bell to surface the
+   * run it's attached to. `focusNonce` must change (a timestamp/counter)
+   * for the effect to re-fire on a repeat click of the same run.
+   */
+  focusRunId?: string | null;
+  focusNonce?: number;
 }
 
 export function RunsBellPopover({
   runs,
   onOpenRun,
   onDismissRun,
+  focusRunId,
+  focusNonce,
 }: RunsBellPopoverProps) {
   const [open, setOpen] = useState(false);
   const [showAll, setShowAll] = useState(false);
   const [expandedRunId, setExpandedRunId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (focusNonce === undefined || !focusRunId) return;
+    setOpen(true);
+    setExpandedRunId(focusRunId);
+  }, [focusNonce, focusRunId]);
   const exposedRunIdRef = useRef<string | null>(null);
   // Persists submitted answers per run across re-mounts of BatchQuestionsPanel
   const submittedAnswersRef = useRef<Map<string, PreviousSubmission>>(new Map());

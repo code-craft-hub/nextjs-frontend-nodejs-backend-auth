@@ -23,6 +23,8 @@ interface Props {
   onResume: () => void;
   onViewQA: () => void;
   onEmailApply: (recruiterEmail: string, jobId?: string) => void;
+  /** Ask the bell to open pre-expanded on the run for this job. */
+  onAttention: () => void;
   onBookmark: () => void;
   onRowClick: () => void;
 }
@@ -40,6 +42,7 @@ export default function MobileJobCard({
   onResume,
   onViewQA,
   onEmailApply,
+  onAttention,
   onBookmark,
   onRowClick,
 }: Props) {
@@ -121,6 +124,7 @@ export default function MobileJobCard({
         onResume={onResume}
         onViewQA={onViewQA}
         onEmailApply={onEmailApply}
+        onAttention={onAttention}
       />
     </div>
   );
@@ -135,9 +139,10 @@ interface ApplyAreaProps {
   onResume: () => void;
   onViewQA: () => void;
   onEmailApply: (recruiterEmail: string, jobId?: string) => void;
+  onAttention: () => void;
 }
 
-function MobileApplyArea({ job, session: s, onApply, onResume, onViewQA, onEmailApply }: ApplyAreaProps) {
+function MobileApplyArea({ job, session: s, onApply, onResume, onViewQA, onEmailApply, onAttention }: ApplyAreaProps) {
   // No session — default CTA
   if (!s) {
     return (
@@ -157,7 +162,6 @@ function MobileApplyArea({ job, session: s, onApply, onResume, onViewQA, onEmail
     case "ext:navigating":
     case "ext:analyzing":
     case "ext:filling":
-    case "ext:reviewing":
     case "cloud:starting":
       return (
         <button
@@ -166,6 +170,21 @@ function MobileApplyArea({ job, session: s, onApply, onResume, onViewQA, onEmail
         >
           <Spinner />
           {s.status === "cloud:starting" ? "Starting bot…" : "Working…"}
+        </button>
+      );
+
+    // ── Bot needs human input ────────────────────────────────────────────────
+    case "ext:awaiting_answers":
+    case "ext:awaiting_submit":
+      return (
+        <button
+          onClick={(e) => { e.stopPropagation(); onAttention(); }}
+          className="w-full py-2.5 rounded-xl text-sm font-semibold bg-amber-500 text-white active:bg-amber-600 flex items-center justify-center gap-2"
+        >
+          <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
+          {s.status === "ext:awaiting_answers"
+            ? "Questions need answers →"
+            : "Form filled — approve →"}
         </button>
       );
 

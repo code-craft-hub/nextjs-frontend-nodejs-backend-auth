@@ -65,7 +65,8 @@ function JobListSection({
   classification?: string;
   workArrangement?: string;
 }) {
-  const { enqueueJob, openRunModal, getRuns } = useRunManagerContext();
+  const { enqueueJob, openRunModal, getRuns, requestBellFocus } =
+    useRunManagerContext();
 
   // Pass enqueueJob so the extension strategy routes through the serial
   // queue instead of spawning multiple simultaneous iframes/windows.
@@ -98,6 +99,7 @@ function JobListSection({
       classification={classification}
       workArrangement={workArrangement}
       orchestrator={enhancedOrchestrator}
+      onAttention={requestBellFocus}
     />
   );
 }

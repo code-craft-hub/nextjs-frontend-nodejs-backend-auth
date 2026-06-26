@@ -33,6 +33,8 @@ interface Props {
   onViewQA: () => void;
   onEmailApply: (recruiterEmail: string, jobId?: string) => void;
   onFocusExtTab: () => void;
+  /** Ask the bell to open pre-expanded on the run for this job. */
+  onAttention: () => void;
   onBookmark: () => void;
   onRowClick: () => void;
 }
@@ -46,6 +48,7 @@ export function JobsTableRow({
   onViewQA,
   onEmailApply,
   onFocusExtTab,
+  onAttention,
   onBookmark,
   onRowClick,
 }: Props) {
@@ -179,6 +182,7 @@ export function JobsTableRow({
             onViewQA={onViewQA}
             onEmailApply={onEmailApply}
             onFocusExtTab={onFocusExtTab}
+            onAttention={onAttention}
           />
         </div>
       </TableCell>

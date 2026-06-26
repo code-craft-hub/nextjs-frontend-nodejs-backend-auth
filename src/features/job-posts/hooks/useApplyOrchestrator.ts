@@ -149,9 +149,9 @@ function mapExtStatus(raw: string): ApplyStatus {
     case "running":
       return "ext:filling";
     case "awaiting_user_input":
-      return "ext:reviewing";
+      return "ext:awaiting_answers";
     case "awaiting_submit_approval":
-      return "ext:reviewing";
+      return "ext:awaiting_submit";
     case "submitted":
       return "applied";
     case "complete":
