@@ -623,6 +623,8 @@ export function JobDeckView({
           recruiterEmail,
           jobDescription,
           jobId,
+          jobTitle: (job as any).title,
+          companyName: (job as any).companyName ?? (job as any).company,
         });
 
         // Mark bell entry as done, then auto-dismiss after 6 s

@@ -349,6 +349,8 @@ export interface CoverLetter {
   type: string;
   generatedAt: string;
   recruiterEmail: string;
+  jobId?: string;
+  companyName?: string;
 }
 
 export interface QAItem {

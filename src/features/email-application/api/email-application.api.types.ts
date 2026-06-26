@@ -10,6 +10,9 @@ export interface SendEmailApplicationPayload {
   recruiterEmail: string;
   jobDescription: string;
   jobId?: string;
+  /** Already known client-side — skips a live job_posts re-query on the backend */
+  jobTitle?: string;
+  companyName?: string;
 }
 
 export interface SendEmailApplicationResponse {

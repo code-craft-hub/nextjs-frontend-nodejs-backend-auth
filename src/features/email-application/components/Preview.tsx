@@ -103,6 +103,9 @@ const Preview = ({
         resumeId,
         recruiterEmail: destinationEmail,
         jobDescription,
+        jobId: coverLetterData?.jobId,
+        jobTitle: coverLetterData?.title,
+        companyName: coverLetterData?.companyName,
       });
       setActiveStep(4);
       startConfetti();
