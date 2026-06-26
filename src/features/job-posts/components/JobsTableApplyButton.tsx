@@ -47,6 +47,25 @@ function LivePulse({ color = "bg-green-400" }: { color?: string }) {
   );
 }
 
+/**
+ * Live, step-by-step status — shows the agent's own one-sentence explanation
+ * of what it's doing right now (e.g. "Filling email") instead of a static
+ * "Filling form…" label. Falls back to `fallback` until the first action
+ * lands (run.lastStepReason is empty for a brief moment at the very start).
+ */
+function LiveStepBadge({ text, fallback }: { text?: string; fallback: string }) {
+  return (
+    <button
+      disabled
+      title={text || fallback}
+      className="w-full py-2 px-3 rounded-xl text-white flex items-center justify-center gap-2 whitespace-nowrap opacity-90 bg-cyan-600"
+    >
+      <Spinner />
+      <span className="text-2xs font-medium truncate">{text || fallback}</span>
+    </button>
+  );
+}
+
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export function JobsTableApplyButton({
@@ -101,7 +120,7 @@ export function JobsTableApplyButton({
       return <SpinnerButton label="Analyzing form…" color="bg-violet-600" />;
 
     case "ext:filling":
-      return <SpinnerButton label="Filling form…" color="bg-cyan-600" />;
+      return <LiveStepBadge text={s.lastStepSummary} fallback="Filling form…" />;
 
     case "ext:awaiting_answers":
       return (

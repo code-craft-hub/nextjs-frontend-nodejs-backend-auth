@@ -231,13 +231,19 @@ export function useExtension() {
           run.status === "error" ? (blockedMessage ?? lastLog?.text ?? "Unknown error") :
           undefined;
 
-    
+        // The model's own short, plain-English explanation of its most recent
+        // action (set by agent.js on run.lastStepReason) — e.g. "Filling email",
+        // "Uploading resume". Lets the table's live-status badge show exactly
+        // what the bot is doing right now instead of a generic "Filling form…".
+        const lastStepSummary = typeof run.lastStepReason === "string"
+          ? run.lastStepReason
+          : undefined;
 
         // Re-dispatch as cverai:ext-update so the orchestrator's existing
         // listener picks it up without caring about the postMessage layer.
         window.dispatchEvent(
           new CustomEvent("cverai:ext-update", {
-            detail: { jobId, status: run.status, stuckReason },
+            detail: { jobId, status: run.status, stuckReason, lastStepSummary },
           }),
         );
       }

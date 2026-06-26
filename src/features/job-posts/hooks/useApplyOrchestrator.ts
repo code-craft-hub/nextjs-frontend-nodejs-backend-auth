@@ -432,10 +432,11 @@ export function useApplyOrchestrator(
           jobId: string;
           status: string;
           stuckReason?: string;
+          lastStepSummary?: string;
         }>
       ).detail;
 
-      const { jobId, status: rawStatus, stuckReason } = detail;
+      const { jobId, status: rawStatus, stuckReason, lastStepSummary } = detail;
 
       // Automatic cloud-bot fallback: extension gave up after all retry attempts.
       // We transparently switch strategy, preserving the correlationId.
@@ -539,7 +540,12 @@ export function useApplyOrchestrator(
         if (!s || s.strategy !== "extension") return prev;
         return {
           ...prev,
-          [jobId]: { ...s, status, stuckReason: stuckReason ?? undefined },
+          [jobId]: {
+            ...s,
+            status,
+            stuckReason: stuckReason ?? undefined,
+            lastStepSummary: lastStepSummary ?? s.lastStepSummary,
+          },
         };
       });
 

@@ -161,7 +161,6 @@ function MobileApplyArea({ job, session: s, onApply, onResume, onViewQA, onEmail
     case "ext:queued":
     case "ext:navigating":
     case "ext:analyzing":
-    case "ext:filling":
     case "cloud:starting":
       return (
         <button
@@ -170,6 +169,21 @@ function MobileApplyArea({ job, session: s, onApply, onResume, onViewQA, onEmail
         >
           <Spinner />
           {s.status === "cloud:starting" ? "Starting bot…" : "Working…"}
+        </button>
+      );
+
+    // ── Filling — live, step-by-step status instead of a static label ───────
+    case "ext:filling":
+      return (
+        <button
+          disabled
+          title={s.lastStepSummary || "Filling form…"}
+          className="w-full py-2.5 rounded-xl bg-cyan-600 text-white flex items-center justify-center gap-2 opacity-90"
+        >
+          <Spinner />
+          <span className="text-xs font-medium truncate">
+            {s.lastStepSummary || "Filling form…"}
+          </span>
         </button>
       );
 
