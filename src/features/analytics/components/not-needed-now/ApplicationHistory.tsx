@@ -67,8 +67,12 @@ export const ApplicationHistory = ({ children }: { children?: ReactNode }) => {
 
   const columns = ApplicationHistoryColumn({
     prefetchJob,
-    onViewDetails: (jobId) =>
-      router.push(`/dashboard/jobs/${jobId}?referrer=application-history`),
+    // The id is the APPLICATION id — the details page resolves it to the live
+    // job, or renders from the application snapshot when the listing is gone.
+    onViewDetails: (applicationId) =>
+      router.push(
+        `/dashboard/jobs/${applicationId}?referrer=application-history`,
+      ),
   });
   const table = useJobsTable(allJobs ?? [], columns);
 
@@ -114,7 +118,7 @@ export const ApplicationHistory = ({ children }: { children?: ReactNode }) => {
             skeletonCount={5}
             onRowClick={(row) =>
               router.push(
-                `/dashboard/jobs/${row.original.jobId}?referrer=application-history&title=${encodeURIComponent(row.original.title ?? "")}`,
+                `/dashboard/jobs/${row.original.id}?referrer=application-history&title=${encodeURIComponent(row.original.title ?? "")}`,
               )
             }
           />

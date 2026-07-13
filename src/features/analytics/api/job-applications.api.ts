@@ -87,7 +87,6 @@ export interface ApplicationDetail {
   notes: string | null;
   applicationUrl: string | null;
   snapshot: unknown;
-  // job
   jobId: string | null;
   jobTitle: string | null;
   companyName: string | null;
@@ -96,6 +95,16 @@ export interface ApplicationDetail {
   employmentType: string | null;
   companyLogo: string | null;
   applyUrl: string | null;
+  link: string | null;
+  descriptionHtml: string | null;
+  descriptionText: string | null;
+  postedAt: string | null;
+  salaryInfo: {
+    min?: number;
+    max?: number;
+    currency?: string;
+    period?: string;
+  } | null;
   // resume
   resumeId: string | null;
   resumeFileName: string | null;

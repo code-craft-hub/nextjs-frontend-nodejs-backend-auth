@@ -204,14 +204,16 @@ export const ApplicationHistoryColumn = ({
           </div>
         </div>
         <div className="flex gap-x-4 mt-1">
-          <p className="flex gap-1 text-gray-400 items-center">
+          {!!row.original.location && <p className="flex gap-1 text-gray-400 items-center">
             <MapPin className="size-3" />
             <span className="text-2xs">{row.original.location}</span>
-          </p>
-          <p className="flex gap-1 text-gray-400 items-center">
-            <Briefcase className="size-3" />
-            <span className="text-2xs">{row.original.companyName}</span>
-          </p>
+          </p>}
+          {!!row.original.companyName && (
+            <p className="flex gap-1 text-gray-400 items-center">
+              <Briefcase className="size-3" />
+              <span className="text-2xs">{row.original.companyName}</span>
+            </p>
+          )}
           {row.original.salary && (
             <p className="flex gap-1 text-gray-400 items-center">
               <DollarSign className="size-3" />
@@ -231,11 +233,15 @@ export const ApplicationHistoryColumn = ({
     cell: ({ row }) => (
       <div className="font-medium text-xs">
         {formatAppliedDate(
-          !!row.original.appliedDate
-            ? row.original.appliedDate
-            : !!row.original.postedAt
-              ? row.original.postedAt
-              : row.original.updatedAt,
+          // The server sends the application date as `appliedAt` (always set
+          // for history rows). `appliedDate` was never in the payload, so this
+          // used to fall through to the job's `postedAt` — the posting date,
+          // not the apply date — and to epoch (Jan 1 1970) for applications
+          // whose job listing is no longer in job_posts.
+          row.original.appliedAt ??
+            row.original.appliedDate ??
+            row.original.postedAt ??
+            row.original.updatedAt,
         )}
       </div>
     ),
@@ -249,11 +255,19 @@ export const ApplicationHistoryColumn = ({
           className="w-full bg-[#F1F2F4] hover:bg-[#E2E4E8] text-primary border-0"
           onClick={(e) => {
             e.stopPropagation();
-            onViewDetails?.(row.original.jobId);
+            // Navigate by APPLICATION id, not jobId — an application whose job
+            // listing was purged has jobId=null (which produced /jobs/null).
+            // The details page resolves an application id to its job (or renders
+            // from the application snapshot when the listing is gone).
+            onViewDetails?.(row.original.id);
           }}
           variant="outline"
-          onMouseEnter={() => prefetchJob?.(row.original.jobId)}
-          onFocus={() => prefetchJob?.(row.original.jobId)}
+          onMouseEnter={() =>
+            row.original.jobId && prefetchJob?.(row.original.jobId)
+          }
+          onFocus={() =>
+            row.original.jobId && prefetchJob?.(row.original.jobId)
+          }
         >
           View Details
         </Button>

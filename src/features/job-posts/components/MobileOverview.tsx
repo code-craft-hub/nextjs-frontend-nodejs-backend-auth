@@ -106,7 +106,7 @@ const MobileOverview = memo(function MobileOverview({
                     <Calendar className="size-3" />
                     <span className="text-xs whitespace-nowrap">
                       {formatAppliedDate(
-                        job?.postedAt || job?.updatedAt,
+                        job?.appliedAt || job?.postedAt || job?.updatedAt,
                       )}
                     </span>
                   </div>

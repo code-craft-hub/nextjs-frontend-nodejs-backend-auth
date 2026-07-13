@@ -39,6 +39,12 @@ export interface JobPost {
   qualityScore?: number | null;
   createdAt: string;
   updatedAt: string;
+  /**
+   * When this row represents an application (application-history feed), the
+   * date the user actually applied. Absent on plain job listings — use it in
+   * preference to postedAt for the "Applied Date" column.
+   */
+  appliedAt?: string;
   recruiterEmail?: string | null;
   /** Populated by the backend when the request is authenticated. */
   isBookmarked?: boolean;

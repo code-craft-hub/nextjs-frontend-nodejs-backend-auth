@@ -14,6 +14,10 @@ import {
 import { BackButton } from "@/components/shared/BackButton";
 import { Button } from "@/components/ui/button";
 import { jobsQueries } from "@/features/jobs/queries/jobs.queries";
+import { jobApplicationsApi } from "@/features/analytics/api/job-applications.api";
+import type { ApplicationDetail } from "@/features/analytics/api/job-applications.api";
+import { queryKeys } from "@/shared/query/keys";
+import type { JobPost } from "@/features/job-posts";
 import { useApplyJob } from "@/features/jobs/hooks/useApplyJob";
 import { postedDate } from "@/lib/utils/helpers";
 import { Analytics } from "@/lib/analytics";
@@ -22,7 +26,7 @@ import { JobInfoCell } from "./JobInfoCell";
 import { ContactRow } from "./ContactRow";
 import { SocialButton } from "./SocialButton";
 import { JobDescriptionSkeleton, JobTitleSkeleton } from "./JobSkeletons";
-import { ApplicationSnapshot } from "./ApplicationSnapshot";
+import { FormattedBlockText } from "@/lib/utils/format-block-text";
 import EmptyState from "@/components/EmptyState";
 import JobDescriptionRenderer from "./JobDescriptionRenderer";
 
@@ -32,6 +36,40 @@ const REFERRER_URLS: Record<string, string> = {
   "saved-jobs": "/dashboard/jobs/category?tab=saved-jobs",
   "application-history": "/dashboard/jobs/category?tab=application-history",
 };
+
+/**
+ * Adapt an application-with-details into the job shape this page renders. Used
+ * when the route id is an application whose job listing is no longer in
+ * job_posts (e.g. an expired listing applied to via email) — the job fields
+ * are served from the application's captured snapshot, so "View Details" from
+ * Application History still shows the role, company, and description.
+ */
+function applicationToJob(app: ApplicationDetail): JobPost {
+  return {
+    id: app.jobId ?? app.id,
+    title: app.jobTitle ?? "",
+    companyName: app.companyName,
+    companyLogo: app.companyLogo,
+    location: app.location,
+    employmentType: app.employmentType,
+    classification: app.classification,
+    descriptionHtml: app.descriptionHtml,
+    descriptionText: app.descriptionText,
+    link: app.link ?? app.applyUrl,
+    applyUrl: app.applyUrl,
+    recruiterEmail: app.recruiterEmail,
+    salaryInfo: app.salaryInfo,
+    // No posting date for a purged listing — fall back to the apply date so
+    // the "Date posted" cell shows something meaningful rather than N/A.
+    postedAt: app.postedAt ?? app.appliedAt ?? "",
+    localizedTo: "",
+    createdAt: app.appliedAt ?? "",
+    updatedAt: app.appliedAt ?? "",
+    // Email applies carry a recruiter address; surfacing it re-enables the
+    // "Auto Apply" affordance and the Contact card.
+    emailApply: app.recruiterEmail,
+  };
+}
 
 export function JobIdClient({
   jobId,
@@ -43,10 +81,25 @@ export function JobIdClient({
   /** Exact filtered dashboard URL the user came from — restores filters/results on back. */
   from?: string;
 }) {
-  const { data, isLoading, isError } = useQuery(jobsQueries.detail(jobId));
+  // Primary source: the id is a job_posts id.
+  const jobQuery = useQuery(jobsQueries.detail(jobId));
+  const jobData = jobQuery.data?.data;
+
+  // Fallback: the id is an application id whose job listing is gone (orphan
+  // application). Only fires once the job lookup has resolved with nothing —
+  // for a real job id this never runs.
+  const appQuery = useQuery({
+    queryKey: queryKeys.jobApplications.detail(jobId),
+    queryFn: () => jobApplicationsApi.getDetails(jobId),
+    enabled: !!jobId && !jobQuery.isLoading && !jobData,
+    staleTime: 5 * 60 * 1000,
+  });
+
   const { applyToJob } = useApplyJob();
 
-  const job = data?.data;
+  const job = jobData ?? (appQuery.data?.data ? applicationToJob(appQuery.data.data) : undefined);
+  const isLoading = jobQuery.isLoading || appQuery.isLoading;
+  const isError = jobQuery.isError && appQuery.isError;
   // Only trust `from` as a same-origin relative dashboard path — it's
   // round-tripped through a URL param, so validate before using it as a
   // navigation target.
@@ -135,7 +188,7 @@ export function JobIdClient({
                   {job?.descriptionHtml ? (
                     <JobDescriptionRenderer html={job.descriptionHtml} />
                   ) : (
-                    <div>{job?.descriptionText}</div>
+                    <FormattedBlockText text={job?.descriptionText} />
                   )}
                 </div>
               )}
@@ -245,8 +298,6 @@ export function JobIdClient({
             </JobQualityFeedbackModal>
           </div>
         </div>
-
-        <ApplicationSnapshot jobId={jobId} />
       </div>
     </div>
   );
