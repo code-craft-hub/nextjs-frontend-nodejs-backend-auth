@@ -33,7 +33,6 @@ const SECTION_HEADINGS = [
   "role overview",
   "position summary",
   "job summary",
-  "job description",
   "the opportunity",
   "responsibilities",
   "key responsibilities",
@@ -43,6 +42,7 @@ const SECTION_HEADINGS = [
   "day-to-day",
   "day to day",
   "requirements",
+  "other requirements",
   "qualifications",
   "minimum qualifications",
   "required qualifications",
@@ -54,6 +54,8 @@ const SECTION_HEADINGS = [
   "nice to have",
   "good to have",
   "bonus points",
+  "key skills",
+  "skills",
   "benefits",
   "perks",
   "perks & benefits",
@@ -125,94 +127,135 @@ function cleanScrapedText(raw: string): string {
   return s;
 }
 
-/** Capitalize the first letter only — "hiring process" -> "Hiring process". */
-function sentenceCase(s: string): string {
-  const t = s.trim();
-  return t.charAt(0).toUpperCase() + t.slice(1);
-}
+// A section heading = a curated keyword, optionally wrapped in Title-Case /
+// "& / and / of / the" connectors so compound labels are caught too
+// ("Education & Experience Requirements", "Remuneration & Benefits").
+const HEADING_ALTERNATION = [...SECTION_HEADINGS]
+  .sort((a, b) => b.length - a.length)
+  .map(escapeRegExp)
+  .join("|");
+const HEADING_RE = new RegExp(
+  `^((?:(?:[A-Z][A-Za-z']+|&|and|of|the|for|to)\\s+){0,4}(?:${HEADING_ALTERNATION})(?:\\s+(?:&|and)\\s+[A-Z][A-Za-z']+)*)(?=$|:|\\s+[A-Z0-9])`,
+  "i",
+);
+// An inline "Short Label: content" lead (e.g. "Curriculum Delivery: Plan …").
+const LABEL_RE = /^([A-Z][A-Za-z][^:.!?]{0,40}):\s+(\S.*)$/;
+// A bare dangling label with no content ("Note:").
+const BARE_LABEL_RE = /^[A-Za-z0-9 &/'-]{1,45}:$/;
+const SENTENCE_SEP = String.fromCharCode(1);
 
 /**
- * Split a run of prose into sentence-grouped paragraphs so no single block
- * is an unbroken wall. Groups sentences until a target length is reached.
+ * Split prose into sentences WITHOUT losing any text. Uses a sentinel after
+ * sentence-ending punctuation that is followed by whitespace + a capital /
+ * digit / opener — so abbreviations ("B.Ed.", "B.Tech.") and emails
+ * ("hr@x.org") are never split on, and (critically) no characters are dropped
+ * the way a `.match()`-based splitter silently drops period-heavy runs.
  */
-function paragraphize(text: string, targetChars = 280): string[] {
+function splitSentences(text: string): string[] {
   const clean = text.replace(/\s+/g, " ").trim();
   if (!clean) return [];
+  return clean
+    .replace(/([.!?])\s+(?=[A-Z0-9("])/g, `$1${SENTENCE_SEP}`)
+    .split(SENTENCE_SEP)
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
 
-  const sentences =
-    clean.match(/[^.!?]+[.!?]+(?=\s|$)|[^.!?]+$/g)?.map((s) => s.trim()).filter(Boolean) ??
-    [clean];
-
-  const paragraphs: string[] = [];
-  let current = "";
-  for (const sentence of sentences) {
-    current = current ? `${current} ${sentence}` : sentence;
-    if (current.length >= targetChars) {
-      paragraphs.push(current);
-      current = "";
-    }
-  }
-  if (current) paragraphs.push(current);
-  return paragraphs;
+/** Drop a leading "Job Description" label — the page already renders that title. */
+function stripLeadingJobDescription(s: string): string {
+  return s.replace(/^\s*job\s+description\s*[:\-]?\s*/i, "");
 }
 
 /**
- * Rebuild structure in a newline-less wall of text: emit a `## Heading`
- * marker before each recognized section label, then paragraph-break the
- * body of every section. Returns a newline-delimited string that
- * `formatPlainText` knows how to style.
+ * Rebuild structure in a newline-less wall of scraped text:
+ *  - promote embedded section labels to `## Headings` (incl. "&" compounds),
+ *  - turn "Label: content" leads into **bold**-led items,
+ *  - group remaining prose into paragraphs,
+ *  - drop duplicated blocks (scrapes repeat instructions verbatim).
+ * Returns a newline-delimited string for `formatPlainText` to style. Text that
+ * already has real line breaks is trusted as-is and passed straight through.
  */
 function structureBlockText(raw: string): string {
   const text = (raw ?? "").replace(/\r\n?/g, "\n").trim();
   if (!text) return "";
 
-  // If the text already has real structure, trust it — don't re-segment.
   const newlineCount = (text.match(/\n/g) ?? []).length;
   if (newlineCount >= 4) return text;
 
-  // Collapse whatever little whitespace exists into a single run.
-  let s = text.replace(/\s+/g, " ").trim();
-
-  // Promote embedded section headings that sit at a sentence boundary.
-  // Longest-first so "preferred qualifications" beats "qualifications".
-  const alternation = [...SECTION_HEADINGS]
-    .sort((a, b) => b.length - a.length)
-    .map(escapeRegExp)
-    .join("|");
-
-  // Heading = keyword after start/sentence-end, followed by either ":" or a
-  // space then an uppercase letter / digit (the section body). The
-  // uppercase/digit guard keeps mid-prose words from being promoted.
-  const headingRe = new RegExp(
-    `(^|[.!?]\\s+)(${alternation})(?::\\s+|\\s+(?=[A-Z0-9]))`,
-    "gi",
+  const collapsed = stripLeadingJobDescription(
+    text.replace(/\s+/g, " ").trim(),
   );
+  const sentences = splitSentences(collapsed);
 
-  s = s.replace(headingRe, (_match, pre: string, keyword: string) => {
-    const boundary = pre.replace(/\s+$/, ""); // keep the preceding "."
-    return `${boundary}\n\n## ${sentenceCase(keyword)}\n`;
-  });
-
-  // Paragraph-break each block (heading bodies and the intro alike).
-  const blocks = s.split(/\n{2,}/).map((b) => b.trim()).filter(Boolean);
+  const seen = new Set<string>();
+  const seenLong: string[] = [];
   const out: string[] = [];
-  for (const block of blocks) {
-    if (block.startsWith("## ")) {
-      const newlineIdx = block.indexOf("\n");
-      const heading = newlineIdx === -1 ? block : block.slice(0, newlineIdx);
-      let body = newlineIdx === -1 ? "" : block.slice(newlineIdx + 1);
-      // Scrapes sometimes repeat the label into the body
-      // ("Method of Application Method of Application …") — drop the echo.
-      const label = heading.replace(/^##\s*/, "").trim();
-      body = body
-        .replace(new RegExp(`^${escapeRegExp(label)}[:\\s]+`, "i"), "")
+  let paraBuf: string[] = [];
+
+  const flush = () => {
+    if (!paraBuf.length) return;
+    let current = "";
+    for (const s of paraBuf) {
+      current = current ? `${current} ${s}` : s;
+      if (current.length >= 280) {
+        out.push(current);
+        current = "";
+      }
+    }
+    if (current) out.push(current);
+    paraBuf = [];
+  };
+
+  const isDuplicate = (norm: string): boolean => {
+    if (seen.has(norm)) return true;
+    // Scraped pages repeat whole instruction blocks — also drop a long
+    // sentence that contains, or is contained by, one already emitted.
+    if (norm.length >= 60) {
+      for (const s of seenLong) {
+        if (s.includes(norm) || norm.includes(s)) return true;
+      }
+    }
+    return false;
+  };
+
+  for (let sentence of sentences) {
+    let heading: string | null = null;
+    const hm = sentence.match(HEADING_RE);
+    if (hm) {
+      heading = hm[1].trim().replace(/^(.+?)\s+\1$/i, "$1").trim(); // collapse "X X"
+      sentence = sentence.slice(hm[0].length).replace(/^[:\s]+/, "").trim();
+      // Strip the heading if the scrape echoed it into the body.
+      sentence = sentence
+        .replace(new RegExp(`^(?:${escapeRegExp(heading)}[:\\s]+)+`, "i"), "")
         .trim();
-      out.push(heading);
-      out.push(...paragraphize(body));
+    }
+
+    if (heading) {
+      const key = `h:${heading.toLowerCase()}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        flush();
+        out.push(`## ${heading}`);
+      }
+    }
+
+    if (!sentence) continue;
+    if (BARE_LABEL_RE.test(sentence)) continue; // dangling label with no body
+
+    const norm = sentence.toLowerCase().replace(/\s+/g, " ").trim();
+    if (isDuplicate(norm)) continue;
+    seen.add(norm);
+    if (norm.length >= 60) seenLong.push(norm);
+
+    const lm = sentence.match(LABEL_RE);
+    if (lm) {
+      flush();
+      out.push(`**${lm[1].trim()}:** ${lm[2].trim()}`);
     } else {
-      out.push(...paragraphize(block));
+      paraBuf.push(sentence);
     }
   }
+  flush();
 
   return out.join("\n\n");
 }
