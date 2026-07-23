@@ -118,6 +118,8 @@ export const jobPostsQueries = {
     employmentTypes?: string;
     workArrangements?: string;
     preferredLocations?: string;
+    /** Apply-channel filter: "external" | "email" (omit for "all"). */
+    applyMode?: "external" | "email";
   }) =>
     infiniteQueryOptions<
       InfiniteJobsResponse,
@@ -134,6 +136,7 @@ export const jobPostsQueries = {
           employmentTypes: params.employmentTypes,
           workArrangements: params.workArrangements,
           preferredLocations: params.preferredLocations,
+          applyMode: params.applyMode,
         }),
       initialPageParam: undefined,
       getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,

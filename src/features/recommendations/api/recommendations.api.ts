@@ -1,6 +1,7 @@
 import { JobType } from "@/shared/types";
 import { api } from "@/shared/api/client";
 import type { PaginatedResponse } from "@/shared/types/lib.types";
+import type { ApplyMode } from "@/features/job-preferences/api/job-preferences.api.types";
 
 const JOB_RECOMMENDATION_API = `/recommendations`;
 
@@ -60,13 +61,18 @@ export const recommendationsApi = {
    * When no recommendations exist, queues background generation and returns status.
    */
   getUserRecommendations: (
-    params?: { page?: number; limit?: number },
+    params?: { page?: number; limit?: number; applyMode?: ApplyMode },
     token?: string,
   ) =>
     api.get<{ data: RecommendationsResponse }>(JOB_RECOMMENDATION_API, {
       params: {
         page: params?.page,
         limit: params?.limit,
+        // Omit the filter entirely for "all" so it stays out of the query.
+        applyMode:
+          params?.applyMode && params.applyMode !== "all"
+            ? params.applyMode
+            : undefined,
       },
       token,
     }),

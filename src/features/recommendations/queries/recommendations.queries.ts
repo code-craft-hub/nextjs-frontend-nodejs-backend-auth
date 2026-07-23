@@ -1,6 +1,7 @@
 import { infiniteQueryOptions, queryOptions } from "@tanstack/react-query";
 import { recommendationsApi, RecommendationsResponse } from "@/features/recommendations/api/recommendations.api";
 import { queryKeys } from "@/shared/query/keys";
+import type { ApplyMode } from "@/features/job-preferences/api/job-preferences.api.types";
 
 const POLLING_INTERVAL_MS = 3_000;
 
@@ -14,12 +15,18 @@ export const recommendationsQueries = {
    *    OR while `isGenerating` is true (covers the "recommend more" flow).
    *  - Polling stops automatically once the pipeline goes idle.
    */
-  userRecommendations: () =>
+  userRecommendations: (applyMode: ApplyMode = "all") =>
     infiniteQueryOptions({
-      queryKey: queryKeys.recommendations.user(),
+      // applyMode is part of the key so switching channels caches independently
+      // and refetches from page 1. Prefix still matches recommendations.user()
+      // so existing invalidations continue to cover every channel variant.
+      queryKey: [...queryKeys.recommendations.user(), applyMode] as const,
       initialPageParam: 1,
       queryFn: ({ pageParam }) =>
-        recommendationsApi.getUserRecommendations({ page: pageParam as number }),
+        recommendationsApi.getUserRecommendations({
+          page: pageParam as number,
+          applyMode,
+        }),
       getNextPageParam: (lastPage) => {
         const d = lastPage.data;
         return d.hasMore ? d.page + 1 : undefined;

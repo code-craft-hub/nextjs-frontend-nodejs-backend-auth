@@ -10,7 +10,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { jobPreferencesApi } from "@/features/job-preferences/api/job-preferences.api";
 import { jobPreferencesQueries, JOB_PREFERENCES_KEY } from "@/features/job-preferences/queries/job-preferences.queries";
-import type { JobPreferences } from "@/features/job-preferences/api/job-preferences.api.types";
+import type { JobPreferences, ApplyMode } from "@/features/job-preferences/api/job-preferences.api.types";
 import { queryKeys } from "@/shared/query/keys";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -24,7 +24,14 @@ const EMPTY: JobPreferences = {
   preferredLocations: [],
   openToRelocation: false,
   keywords: "",
+  applyMode: "all",
 };
+
+const APPLY_MODE_OPTIONS: { value: ApplyMode; label: string; hint: string }[] = [
+  { value: "all", label: "All", hint: "Show every job, however you apply." },
+  { value: "external", label: "External", hint: "Only jobs you apply to on an external site." },
+  { value: "email", label: "Email", hint: "Only jobs you can apply to by email." },
+];
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
 
@@ -54,6 +61,52 @@ function Section({ title, children }: { title: string; children: React.ReactNode
     <div className="mt-6">
       <h3 className="text-[18px] font-semibold text-gray-900 mb-2">{title}</h3>
       <div>{children}</div>
+    </div>
+  );
+}
+
+/**
+ * Mutually-exclusive apply-channel selector (All / External / Email).
+ * A segmented control — not three switches — because the options are
+ * single-choice: exactly one channel is active at a time.
+ */
+function ApplyModeSelector({
+  value,
+  onChange,
+}: {
+  value: ApplyMode;
+  onChange: (mode: ApplyMode) => void;
+}) {
+  const active = APPLY_MODE_OPTIONS.find((o) => o.value === value) ?? APPLY_MODE_OPTIONS[0];
+  return (
+    <div>
+      <div
+        role="radiogroup"
+        aria-label="Apply method"
+        className="grid grid-cols-3 gap-1 rounded-xl bg-gray-100 p-1"
+      >
+        {APPLY_MODE_OPTIONS.map((opt) => {
+          const isActive = opt.value === value;
+          return (
+            <button
+              key={opt.value}
+              type="button"
+              role="radio"
+              aria-checked={isActive}
+              onClick={() => onChange(opt.value)}
+              className={cn(
+                "rounded-lg py-2 text-[14px] font-medium transition-colors",
+                isActive
+                  ? "bg-black text-white shadow-sm"
+                  : "text-gray-600 hover:bg-gray-200",
+              )}
+            >
+              {opt.label}
+            </button>
+          );
+        })}
+      </div>
+      <p className="mt-1.5 text-[12px] text-gray-400">{active.hint}</p>
     </div>
   );
 }
@@ -157,6 +210,19 @@ export default function RecommendationPreferences() {
     autoSaveMutation.mutate(newForm);
   }
 
+  function setApplyMode(mode: ApplyMode) {
+    if (mode === form.applyMode) return;
+    const newForm = { ...form, applyMode: mode };
+    setForm(newForm);
+    // The feed reads applyMode from the shared preferences cache, so update it
+    // optimistically — this flips the recommendation/job query key to the new
+    // channel immediately, without waiting on the autosave round-trip.
+    queryClient.setQueryData(JOB_PREFERENCES_KEY, (prev: any) =>
+      prev?.data ? { ...prev, data: { ...prev.data, applyMode: mode } } : prev,
+    );
+    autoSaveMutation.mutate(newForm);
+  }
+
   // ── Render ─────────────────────────────────────────────────────────────────
 
   const isBusy = saveMutation.isPending || clearMutation.isPending;
@@ -198,6 +264,11 @@ export default function RecommendationPreferences() {
               onCheckedChange={() => toggleEmp(type)}
             />
           ))}
+        </Section>
+
+        {/* Apply Method */}
+        <Section title="Apply Method">
+          <ApplyModeSelector value={form.applyMode} onChange={setApplyMode} />
         </Section>
 
         {/* Location Preferences */}

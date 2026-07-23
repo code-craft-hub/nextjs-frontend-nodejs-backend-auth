@@ -12,6 +12,7 @@ import { Loader2, RefreshCw, UserCircle } from "lucide-react";
 import { sendGTMEvent } from "@next/third-parties/google";
 
 import { userQueries } from "@features/user";
+import { jobPreferencesQueries } from "@/features/job-preferences/queries/job-preferences.queries";
 import { useUpdateJobMutation } from "@/features/jobs/mutations/jobs.mutations";
 import { useApplyJob } from "@/features/jobs/hooks/useApplyJob";
 import { queryKeys } from "@/shared/query/keys";
@@ -133,6 +134,10 @@ export const AIRecommendations = ({ children }: { children?: ReactNode }) => {
   const updateJobs = useUpdateJobMutation();
   const { applyToJob: handleApply } = useApplyJob();
 
+  // Apply-channel filter is persisted in preferences; drive the feed from it.
+  const { data: prefsData } = useQuery(jobPreferencesQueries.detail());
+  const applyMode = prefsData?.data?.applyMode ?? "all";
+
   // ── Data fetching with auto-polling ──────────────────────────────────────
   const {
     data,
@@ -142,7 +147,7 @@ export const AIRecommendations = ({ children }: { children?: ReactNode }) => {
     isFetchingNextPage,
     isFetching,
   } = useInfiniteQuery({
-    ...recommendationsQueries.userRecommendations(),
+    ...recommendationsQueries.userRecommendations(applyMode),
     initialPageParam: 1,
   });
 

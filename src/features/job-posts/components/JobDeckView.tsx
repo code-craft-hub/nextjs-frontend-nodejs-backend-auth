@@ -407,6 +407,12 @@ export function JobDeckView({
       prefs.preferredLocations?.length
     );
 
+  // Apply-channel filter, persisted in preferences. Orthogonal to hasFilters:
+  // when set alone it narrows the recommendations feed; alongside other
+  // filters it narrows the preference search. "all" is omitted from queries.
+  const applyMode = prefs?.applyMode ?? "all";
+  const applyModeParam = applyMode === "all" ? undefined : applyMode;
+
   const searchParams = useMemo(
     () => ({
       q: prefs?.keywords?.trim() || undefined,
@@ -419,8 +425,9 @@ export function JobDeckView({
       preferredLocations: prefs?.preferredLocations?.length
         ? prefs.preferredLocations.join(",")
         : undefined,
+      applyMode: applyModeParam,
     }),
-    [prefs],
+    [prefs, applyModeParam],
   );
 
   // ── Recommendations query (active when no filters) ───────────────────────
@@ -431,7 +438,7 @@ export function JobDeckView({
     hasNextPage: recsHasNext,
     isFetchingNextPage: recsFetchingNext,
   } = useInfiniteQuery({
-    ...recommendationsQueries.userRecommendations(),
+    ...recommendationsQueries.userRecommendations(applyMode),
     enabled: !hasFilters,
     initialPageParam: 1,
   });

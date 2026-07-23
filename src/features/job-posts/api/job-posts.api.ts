@@ -27,6 +27,8 @@ export const jobPostsApi = {
       workArrangements?: string;
       /** Comma-separated preferred locations, e.g. "Lagos,London". */
       preferredLocations?: string;
+      /** Apply-channel filter: "external" | "email" (omit for "all"). */
+      applyMode?: "external" | "email";
       limit?: number;
     },
     token?: string,
