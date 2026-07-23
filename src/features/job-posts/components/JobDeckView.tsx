@@ -140,8 +140,6 @@ function IncompleteProfileBanner({
 
 type SwipeDir = "left" | "right" | null;
 
-
-
 function timeAgo(dateStr: string): string {
   const diffMs = Date.now() - new Date(dateStr).getTime();
   const h = Math.floor(diffMs / 3_600_000);
@@ -203,7 +201,7 @@ function JobDeckCard({ job, stackIndex, onSkip, onApply }: JobDeckCardProps) {
       <Card className="relative w-full rounded-[30px] bg-white shadow-xl border-0  gap-2 p-8 max-w-2xl">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <h1 className="text-md capitalize  font-bold font-poppins">
+          <h1 className="text-md capitalize line-clamp-1 font-bold font-poppins">
             {decodeHtml(job.title)}
           </h1>
 
@@ -270,7 +268,7 @@ function JobDeckCard({ job, stackIndex, onSkip, onApply }: JobDeckCardProps) {
         {/* Company */}
         <div className=" flex items-center gap-3 my-2">
           <div className="size-12 rounded-full overflow-hidden bg-gray-200 shrink-0">
-            {(job.companyLogo ?? job.companyIcon) ?   (
+            {(job.companyLogo ?? job.companyIcon) ? (
               <img
                 src={
                   !!job.companyLogo
@@ -311,10 +309,12 @@ function JobDeckCard({ job, stackIndex, onSkip, onApply }: JobDeckCardProps) {
             Description
           </div>
 
-          <div
-            className=" text-[#2b2b2b] text-xs max-w-215 [&_strong]:font-bold [&_br]:block [&_p]:mt-1"
-            dangerouslySetInnerHTML={{ __html: decodeHtml(preview) }}
-          />
+          <div className="sm:h-16 overflow-hidden">
+            <div
+              className=" text-[#2b2b2b] text-xs max-w-215 [&_strong]:font-bold [&_br]:block [&_p]:mt-1"
+              dangerouslySetInnerHTML={{ __html: decodeHtml(preview) }}
+            />
+          </div>
 
           <button
             className="mt-2 text-xs font-semibold text-[#2f6df6]"
