@@ -130,7 +130,7 @@ function IncompleteProfileBanner({
         variant="outline"
         size="sm"
         className="border-orange-300 text-orange-700 hover:bg-orange-100"
-        onClick={() => (window.location.href = "/dashboard/profile")}
+        onClick={() => (window.location.href = "/dashboard/settings")}
       >
         Complete Profile
       </Button>
@@ -540,11 +540,31 @@ export function JobDeckView({
 
   const handleEmailApply = useCallback(
     (job: JobPost) => {
-      const jobDescription =
-        (job as any).descriptionText ?? (job as any).companyText ?? "";
+      // Mirror the card's fallback chain: the description lives in
+      // descriptionHtml far more often than descriptionText (the search-path
+      // projection doesn't even select descriptionText). Reading only
+      // descriptionText here sent an empty jobDescription to the cover-letter
+      // generator, which made Gemini refuse with "job description is missing".
+      const rawDescription =
+        (job as any).descriptionText ||
+        (job as any).descriptionHtml ||
+        (job as any).companyText ||
+        "";
+      const jobDescription = decodeHtml(rawDescription.replace(/<[^>]+>/g, " "))
+        .replace(/\s+/g, " ")
+        .trim();
       const recruiterEmail = (job as any).emailApply ?? "";
       const jobId = job.id;
       const runId = `email-${job.id}-${Date.now()}`;
+
+      // Guard: without a description the generator can only refuse. Fail fast
+      // with a clear message instead of a confusing AI error mid-flow.
+      if (!jobDescription) {
+        toast.error(
+          "This job has no description available, so we can't generate a tailored application.",
+        );
+        return;
+      }
 
       // Register in the bell immediately so the user sees it while it runs
       const log: RunLogEntry[] = [

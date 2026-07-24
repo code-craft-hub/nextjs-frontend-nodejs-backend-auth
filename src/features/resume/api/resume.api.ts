@@ -68,6 +68,16 @@ export interface DefaultResumeForApply {
 
 // ─── API Client ───────────────────────────────────────────────────
 
+export interface IngestionStatus {
+  ingestionId: string;
+  status: "pending" | "processing" | "ready" | "failed";
+  step: string | null;
+  progress: number;
+  resumeId: string | null;
+  /** User-safe message when failed; otherwise null. */
+  error: string | null;
+}
+
 export const RESUME_BASE = `/resumes`;
 
 export const resumeApi = {
@@ -155,6 +165,21 @@ export const resumeApi = {
 
   fetchOriginalResume: (resumeId: string, token?: string) =>
     api.get<Blob>(`${RESUME_BASE}/${resumeId}/download-original`, { token }),
+
+  /** Poll the status of an async resume ingestion. */
+  getIngestionStatus: (ingestionId: string, token?: string) =>
+    api.get<{ success: boolean; data: IngestionStatus }>(
+      `${RESUME_BASE}/ingestion/${ingestionId}`,
+      { token },
+    ),
+
+  /** Re-run a failed ingestion (owner-scoped, capped). */
+  retryIngestion: (ingestionId: string, token?: string) =>
+    api.post<{ success: boolean; data: { ingestionId: string; status: string } }>(
+      `${RESUME_BASE}/ingestion/${ingestionId}/retry`,
+      {},
+      { token },
+    ),
 
   deleteResume: (id: string, token?: string) =>
     api.delete<void>(`${RESUME_BASE}/${id}`, { token }),

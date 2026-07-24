@@ -18,6 +18,37 @@ type ActionState = "idle" | "downloading" | "previewing" | "downloading-original
 //   return res.blob();
 // }
 
+// Only these can be rendered inside a browser tab. Anything else (Word, RTF,
+// ODT, …) must be downloaded — window.open would show a broken/blank viewer.
+const INLINE_PREVIEWABLE = /^(application\/pdf|image\/|text\/)/i;
+
+const EXT_BY_MIME: Record<string, string> = {
+  "application/pdf": "pdf",
+  "application/msword": "doc",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+    "docx",
+  "application/rtf": "rtf",
+  "text/rtf": "rtf",
+  "application/vnd.oasis.opendocument.text": "odt",
+  "text/plain": "txt",
+};
+
+function extForBlob(blob: Blob): string {
+  const type = blob.type.split(";")[0].trim().toLowerCase();
+  return EXT_BY_MIME[type] ?? "bin";
+}
+
+function saveBlob(blob: Blob, filename: string): void {
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  window.URL.revokeObjectURL(url);
+}
+
 export function useResumeDownload() {
   const [state, setState] = useState<ActionState>("idle");
   const [error, setError] = useState<string | null>(null);
@@ -89,17 +120,22 @@ export function useResumeDownload() {
     }
   };
 
-  const previewOriginal = async (resumeId: string) => {
+  const previewOriginal = async (resumeId: string, filename?: string) => {
     setState("previewing-original");
     setError(null);
 
     try {
       const blob = await resumeApi.fetchOriginalResume(resumeId);
-      const url = window.URL.createObjectURL(blob);
 
-      window.open(url, "_blank");
-
-      setTimeout(() => window.URL.revokeObjectURL(url), 60_000);
+      if (INLINE_PREVIEWABLE.test(blob.type)) {
+        const url = window.URL.createObjectURL(blob);
+        window.open(url, "_blank");
+        setTimeout(() => window.URL.revokeObjectURL(url), 60_000);
+      } else {
+        // Word/RTF/ODT can't render in a tab — download instead of showing a
+        // blank viewer. Use the real name when we have it, else a typed default.
+        saveBlob(blob, filename || `original-resume.${extForBlob(blob)}`);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to preview original resume");
     } finally {

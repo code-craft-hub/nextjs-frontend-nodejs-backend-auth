@@ -106,7 +106,7 @@ function IncompleteProfileBanner({
         variant="outline"
         size="sm"
         className="border-orange-300 text-orange-700 hover:bg-orange-100"
-        onClick={() => (window.location.href = "/dashboard/profile")}
+        onClick={() => (window.location.href = "/dashboard/settings")}
       >
         Complete Profile
       </Button>
