@@ -13,19 +13,12 @@ import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { userQueries } from "@features/user";
 import { useLogoutMutation } from "@/features/auth";
-import { useEffect, useState } from "react";
 
 export const UserMenu = ({ role }: { role?: string }) => {
   const { data: user } = useQuery(userQueries.detail());
-  const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const router = useRouter();
 
-  // const isAdmin = role === "admin";
-
-  useEffect(() => {
-    console.log("User role:", role, user?.role);
-    setIsAdmin(user?.role === "admin");
-  }, [user?.role]);
+  const isAdmin = role === "admin";
 
   const logout = useLogoutMutation();
 
