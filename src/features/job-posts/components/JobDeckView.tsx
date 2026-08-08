@@ -27,7 +27,12 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import recommendationsQueries from "@/features/recommendations/queries/recommendations.queries";
-import { jobPreferencesQueries } from "@/features/job-preferences/queries/job-preferences.queries";
+import {
+  jobPreferencesQueries,
+  JOB_PREFERENCES_KEY,
+} from "@/features/job-preferences/queries/job-preferences.queries";
+import { jobPreferencesApi } from "@/features/job-preferences/api/job-preferences.api";
+import { APIError } from "@/shared/api/client";
 import { jobPostsQueries } from "@/features/job-posts/queries/job-posts.query";
 import {
   recommendationsApi,
@@ -455,20 +460,87 @@ export function JobDeckView({
   const { data: settings } = useQuery(aiSettingsQueries.detail());
   const useMasterCv = !!(settings?.useMasterCv && settings?.masterCvId);
 
+  // Blocking reason returned by POST /recommendations/more, surfaced inline
+  // under the empty state. A generic toast isn't enough here: the common
+  // failure is an incomplete profile, which the user can only fix by going to
+  // settings — so we keep the reason on screen with an action, not in a toast
+  // that disappears after 4 seconds.
+  const [genBlocked, setGenBlocked] = useState<{
+    message: string;
+    missingFields?: string[];
+  } | null>(null);
+
   // ── Trigger a fresh recommendation generation bypassing the rate-limit gate ─
   const generateMoreMutation = useMutation({
     mutationFn: () => recommendationsApi.generateMore(),
-    onSuccess: () => {
+    onMutate: () => setGenBlocked(null),
+    onSuccess: (res) => {
+      // The endpoint answers 202 for both outcomes — "queued" (a new job was
+      // enqueued) and "processing" (one was already running). Echo the server's
+      // own message so the second case doesn't read as a no-op.
+      const { status, message } = (res as any)?.data ?? {};
+      toast.success(
+        message ??
+          "Finding job matches for you. New recommendations will appear shortly.",
+        { duration: status === "processing" ? 6000 : 4000 },
+      );
+
       // Invalidate so the query re-fetches immediately and flips to "queued" status,
       // which activates the 3-second polling loop in recommendationsQueries.
       queryClient.invalidateQueries({
         queryKey: queryKeys.recommendations.user(),
       });
     },
+    onError: (err) => {
+      // 400 + missingFields = incomplete profile. Anything else keeps its
+      // server-supplied message where one exists.
+      if (err instanceof APIError) {
+        const missingFields = (err.data as { missingFields?: string[] })
+          ?.missingFields;
+        const message = APIError.extractMessage(
+          err.data,
+          "Failed to start recommendation generation. Please try again.",
+        );
+        setGenBlocked({ message, missingFields });
+        toast.error(message);
+        return;
+      }
+      const message =
+        "Failed to start recommendation generation. Please try again.";
+      setGenBlocked({ message });
+      toast.error(message);
+    },
+  });
+
+  // ── Clear the preference filters that are narrowing the feed ─────────────
+  // Uses save() rather than the DELETE endpoint on purpose: clear() nulls the
+  // whole jobPreferences JSON blob, which would also reset applyMode and
+  // openToRelocation. applyMode is orthogonal to these filters (it picks the
+  // apply channel, not the job set), so wiping it here would silently undo a
+  // separate choice the user made.
+  const clearFiltersMutation = useMutation({
+    mutationFn: () => {
+      if (!prefs) throw new Error("Preferences not loaded");
+      return jobPreferencesApi.save({
+        ...prefs,
+        keywords: "",
+        employmentTypes: [],
+        workArrangements: [],
+        preferredLocations: [],
+      });
+    },
+    onSuccess: () => {
+      // Dropping the filters flips hasFilters to false, which enables the
+      // recommendations query — and that endpoint queues generation itself
+      // when the user has none saved.
+      queryClient.invalidateQueries({ queryKey: JOB_PREFERENCES_KEY });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.recommendations.user(),
+      });
+      toast.success("Filters cleared — showing your recommendations.");
+    },
     onError: () => {
-      toast.error(
-        "Failed to start recommendation generation. Please try again.",
-      );
+      toast.error("Couldn't clear your filters. Please try again.");
     },
   });
 
@@ -858,27 +930,81 @@ export function JobDeckView({
         ) : allJobs.length === 0 && !isLoading ? (
           <div className="flex flex-col items-center justify-center py-24 text-gray-400 gap-4">
             <span className="text-4xl">📭</span>
-            <p className="text-sm text-center">
+            <p className="text-sm text-center max-w-sm">
               {hasFilters
-                ? "No jobs match your current filters. Try adjusting your preferences."
+                ? "No jobs match your current filters."
                 : "No recommendations yet."}
             </p>
-            {!hasFilters && (
-              <Button
-                size="sm"
-                className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl px-5"
-                disabled={generateMoreMutation.isPending}
-                onClick={() => generateMoreMutation.mutate()}
-              >
-                {generateMoreMutation.isPending ? (
-                  <>
-                    <Loader2 className="w-3.5 h-3.5 mr-2 animate-spin" />
-                    Finding jobs…
-                  </>
+
+            {hasFilters ? (
+              <div className="flex flex-col items-center gap-2">
+                <Button
+                  size="sm"
+                  className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl px-5"
+                  disabled={clearFiltersMutation.isPending}
+                  onClick={() => clearFiltersMutation.mutate()}
+                >
+                  {clearFiltersMutation.isPending ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 mr-2 animate-spin" />
+                      Clearing…
+                    </>
+                  ) : (
+                    "Clear filters"
+                  )}
+                </Button>
+                <p className="text-xs text-center text-gray-400 max-w-xs">
+                  Removes your keyword, location, employment-type and work-
+                  arrangement filters so your recommendations can show.
+                </p>
+              </div>
+            ) : (
+              <>
+                {/* An incomplete profile can't be fixed from here — the banner
+                    carries its own link to settings, so it replaces the retry
+                    button rather than sitting beside it. */}
+                {genBlocked?.missingFields?.length ? (
+                  <div className="w-full max-w-md">
+                    <IncompleteProfileBanner
+                      missingFields={genBlocked.missingFields}
+                    />
+                  </div>
                 ) : (
-                  "Find matching jobs"
+                  <div className="flex flex-col items-center gap-2">
+                    <Button
+                      size="sm"
+                      className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl px-5"
+                      disabled={generateMoreMutation.isPending}
+                      onClick={() => generateMoreMutation.mutate()}
+                    >
+                      {generateMoreMutation.isPending ? (
+                        <>
+                          <Loader2 className="w-3.5 h-3.5 mr-2 animate-spin" />
+                          Finding jobs…
+                        </>
+                      ) : genBlocked ? (
+                        "Try again"
+                      ) : (
+                        "Find matching jobs"
+                      )}
+                    </Button>
+                    {genBlocked && (
+                      <p className="text-xs text-center text-red-500 max-w-xs">
+                        {genBlocked.message}
+                      </p>
+                    )}
+                  </div>
                 )}
-              </Button>
+
+                <button
+                  className="text-xs font-semibold text-[#2f6df6] hover:underline"
+                  onClick={() =>
+                    (window.location.href = "/dashboard/home?tab=find-jobs")
+                  }
+                >
+                  Browse all jobs instead
+                </button>
+              </>
             )}
           </div>
         ) : (

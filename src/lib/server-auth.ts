@@ -9,6 +9,7 @@ export async function getServerSession() {
   return await getSessionFromCookies();
 }
 
+
 // Server-side auth guards
 export async function requireAuth() {
   const session = await getServerSession();

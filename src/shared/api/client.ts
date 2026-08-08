@@ -35,6 +35,8 @@ function resolveBaseUrl(): string {
 
   const envUrl = process.env.NEXT_PUBLIC_AUTH_API_URL;
 
+  console.log("Staging : ", envUrl);
+
   if (!envUrl) {
     const message =
       "[api-client] NEXT_PUBLIC_AUTH_API_URL is not set. " +
