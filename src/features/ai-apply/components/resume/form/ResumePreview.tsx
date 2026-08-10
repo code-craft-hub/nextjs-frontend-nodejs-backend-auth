@@ -6,6 +6,7 @@ import { ProjectEditForm } from "./ProjectEditForm";
 import { CertificationEditForm } from "./CertificationEditForm";
 import { SkillEditForm } from "./SkillEditForm";
 import { useCallback } from "react";
+import { certLabel, renderableCertifications } from "@/lib/utils/helpers";
 import { ResumeField, ResumePreviewProps } from "@/shared/types";
 import { ContactEditForm } from "./ContactEditForm";
 
@@ -256,27 +257,31 @@ export const ResumePreview: React.FC<ResumePreviewProps> = ({
                 <h2 className="text-xl font-semibold text-gray-900">
                   Certifications
                 </h2>
-                {data.certification.map((cert: any) => (
-                  <div key={cert.certificationId} className="space-y-1">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h3 className="font-semibold text-gray-900">
-                          {cert.title}
-                        </h3>
-                        <p className="text-gray-600">{cert.issuer}</p>
-                        {cert.description && (
-                          <p className="text-sm text-gray-500 mt-1">
-                            {cert.description}
-                          </p>
-                        )}
-                      </div>
-                      <div className="text-right text-sm text-gray-500">
-                        <p>Issued: {cert.issueDate}</p>
-                        {cert.expiryDate && <p>Expires: {cert.expiryDate}</p>}
+                {renderableCertifications<any>(data.certification).map(
+                  (cert: any) => (
+                    <div key={cert.certificationId} className="space-y-1">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h3 className="font-semibold text-gray-900">
+                            {certLabel(cert)}
+                          </h3>
+                          {cert.issuer && (
+                            <p className="text-gray-600">{cert.issuer}</p>
+                          )}
+                          {cert.description && (
+                            <p className="text-sm text-gray-500 mt-1">
+                              {cert.description}
+                            </p>
+                          )}
+                        </div>
+                        <div className="text-right text-sm text-gray-500">
+                          {cert.issueDate && <p>Issued: {cert.issueDate}</p>}
+                          {cert.expiryDate && <p>Expires: {cert.expiryDate}</p>}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ),
+                )}
               </div>
             }
             title="Edit Certifications"

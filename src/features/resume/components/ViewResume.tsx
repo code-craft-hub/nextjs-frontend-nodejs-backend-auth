@@ -1,5 +1,6 @@
 import { Card } from "@/components/ui/card";
 import {
+  certLabel,
   coalesceString,
   formatAppliedDate,
   isValidArray,
@@ -7,6 +8,7 @@ import {
   normalize,
   normalizeToString,
   parseResponsibilities,
+  renderableCertifications,
 } from "@/lib/utils/helpers";
 import { PreviewResumeProps } from "@/shared/types";
 import { useRef } from "react";
@@ -53,7 +55,11 @@ export const ViewResume: React.FC<ViewResumeProps> = ({
 
   const hasWorkExperience = isValidArray(data?.workExperience);
   const hasEducation = isValidArray(data?.education);
-  const hasCertifications = isValidArray(data?.certification);
+  // Only certifications with a real label — see certLabel.
+  const certifications = renderableCertifications<
+    NonNullable<typeof data.certification>[number]
+  >(data?.certification);
+  const hasCertifications = certifications.length > 0;
   const hasProjects = isValidArray(data?.project);
   const hasSoftSkills = isValidArray(data?.softSkill);
   const hasHardSkills = isValidArray(data?.hardSkill);
@@ -207,14 +213,14 @@ export const ViewResume: React.FC<ViewResumeProps> = ({
           </h2>
           <div className="space-y-4">
             {hasCertifications ? (
-              data.certification?.map((cert, index) => (
+              certifications.map((cert, index) => (
                 <div
-                  key={`cert-${index}-${cert?.title || ""}`}
+                  key={`cert-${index}-${certLabel(cert)}`}
                   className="space-y-1"
                 >
                   <div className="flex justify-between">
                     <p className="font-bold font-merriweather">
-                      {cert?.title || ""}
+                      {certLabel(cert)}
                     </p>
                     {cert?.issueDate && (
                       <p className="text-sm text-gray-500 font-merriweather">

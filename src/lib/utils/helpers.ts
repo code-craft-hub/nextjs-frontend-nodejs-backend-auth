@@ -549,6 +549,32 @@ export const isValidArray = (arr: any): arr is any[] => {
 };
 
 /**
+ * The display label for a certification.
+ *
+ * The `certifications` table carries `title` (canonical) AND a legacy `name`
+ * column for the same concept. New writes normalise both, but rows written
+ * before that fix may have populated only one — so every read path consults
+ * both, or the entry renders blank.
+ *
+ * Returns "" when neither is usable. Callers MUST skip such entries rather than
+ * substituting placeholder text: a résumé is a document the user sends to
+ * employers, and rendering the literal word "Certification" where their own
+ * text belongs is worse than omitting the line.
+ *
+ * Mirrors `certLabel` in server/src/utils/helpers.ts — keep the two in sync.
+ */
+export const certLabel = (cert: unknown): string => {
+  const c = cert as { title?: unknown; name?: unknown } | null | undefined;
+  const title = typeof c?.title === "string" ? c.title.trim() : "";
+  if (title) return title;
+  return typeof c?.name === "string" ? c.name.trim() : "";
+};
+
+/** Certifications that have a real label, in input order. */
+export const renderableCertifications = <T,>(certs: unknown): T[] =>
+  Array.isArray(certs) ? certs.filter((c) => certLabel(c)) : [];
+
+/**
  * Parse responsibilities into array format
  */
 export const parseResponsibilities = (responsibilities: any): string[] => {

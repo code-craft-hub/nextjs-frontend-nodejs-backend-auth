@@ -2,7 +2,12 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { userQueries } from "@features/user";
 import { cn } from "@/lib/utils";
-import { monthYear, normalizeToString } from "@/lib/utils/helpers";
+import {
+  certLabel,
+  monthYear,
+  normalizeToString,
+  renderableCertifications,
+} from "@/lib/utils/helpers";
 import { ResumeFormData } from "@/lib/schema-validations/resume.schema";
 import { useQuery } from "@tanstack/react-query";
 import { memo } from "react";
@@ -102,7 +107,13 @@ export const PreviewResume = ({
 
   const hasWorkExperience = isValidArray(data?.workExperience);
   const hasEducation = isValidArray(data?.education);
-  const hasCertifications = isValidArray(data?.certification);
+  // Only certifications with a real label. An entry whose label is missing
+  // renders as nothing useful, and we no longer substitute the literal word
+  // "Certification" for it — see certLabel.
+  const certifications = renderableCertifications<
+    NonNullable<typeof data.certification>[number]
+  >(data?.certification);
+  const hasCertifications = certifications.length > 0;
   const hasProjects = isValidArray(data?.project);
   const hasSoftSkills = isValidArray(data?.softSkill);
   const hasHardSkills = isValidArray(data?.hardSkill);
@@ -268,14 +279,14 @@ export const PreviewResume = ({
           </h2>
           <div className="space-y-4">
             {hasCertifications ? (
-              data.certification!.map((cert, index) => (
+              certifications.map((cert, index) => (
                 <div
-                  key={`cert-${index}-${cert?.title || ""}`}
+                  key={`cert-${index}-${certLabel(cert)}`}
                   className="space-y-1"
                 >
                   <div className="flex justify-between">
                     <p className="font-bold font-merriweather">
-                      {cert?.title || "Certification"}
+                      {certLabel(cert)}
                     </p>
                     {cert?.issueDate && (
                       <p className="text-sm text-gray-500 font-merriweather">

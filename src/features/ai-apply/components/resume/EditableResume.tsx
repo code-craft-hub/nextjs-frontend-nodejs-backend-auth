@@ -1,11 +1,13 @@
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import {
+  certLabel,
   coalesceString,
   isValidArray,
   monthYear,
   normalizeToString,
   parseResponsibilities,
+  renderableCertifications,
 } from "@/lib/utils/helpers";
 import { PreviewResumeProps, ResumeField } from "@/shared/types";
 import { memo, useCallback, useRef } from "react";
@@ -98,7 +100,11 @@ export const EditableResume: React.FC<PreviewResumeProps> = ({
 
   const hasWorkExperience = isValidArray(displayData?.workExperience);
   const hasEducation = isValidArray(displayData?.education);
-  const hasCertifications = isValidArray(displayData?.certification);
+  // Only certifications with a real label — see certLabel.
+  const certifications = renderableCertifications<
+    NonNullable<typeof displayData.certification>[number]
+  >(displayData?.certification);
+  const hasCertifications = certifications.length > 0;
   const hasProjects = isValidArray(displayData?.project);
   const hasSoftSkills = isValidArray(displayData?.softSkill);
   const hasHardSkills = isValidArray(displayData?.hardSkill);
@@ -384,14 +390,14 @@ export const EditableResume: React.FC<PreviewResumeProps> = ({
                 </h2>
                 <div className="space-y-4">
                   {hasCertifications ? (
-                    displayData.certification?.map((cert, index) => (
+                    certifications.map((cert, index) => (
                       <div
-                        key={`cert-${index}-${cert?.title || ""}`}
+                        key={`cert-${index}-${certLabel(cert)}`}
                         className="space-y-1"
                       >
                         <div className="flex justify-between">
                           <p className="font-bold font-merriweather">
-                            {cert?.title || ""}
+                            {certLabel(cert)}
                           </p>
                           {cert?.issueDate && (
                             <p className="text-sm text-gray-500 font-merriweather">
