@@ -52,8 +52,11 @@ describe("certLabel", () => {
   });
 
   it("tolerates non-string column values", () => {
-    expect(certLabel({ title: 42, name: "Fallback" })).toBe("Fallback");
+    // A finite number renders, consistent with every other résumé field. Only
+    // values with no sensible text form are treated as absent.
+    expect(certLabel({ title: 42, name: "Fallback" })).toBe("42");
     expect(certLabel({ title: {}, name: [] })).toBe("");
+    expect(certLabel({ title: NaN, name: "Fallback" })).toBe("Fallback");
   });
 });
 

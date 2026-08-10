@@ -27,6 +27,24 @@ const eslintConfig = [
       "@typescript-eslint/no-empty-object-type": "off",
     },
   },
+
+  {
+    files: [
+      "src/features/resume/components/**/*.tsx",
+      "src/features/ai-apply/components/resume/**/*.tsx",
+    ],
+    rules: {
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector:
+            "LogicalExpression[operator=/^(\\|\\||\\?\\?)$/] > Literal.right[value=/^[A-Z][A-Za-z]/]",
+          message:
+            "Placeholder text in a résumé fabricates user data. Use displayText/firstText/joinParts/dateRangeText from @/lib/utils/helpers and omit the element when empty.",
+        },
+      ],
+    },
+  },
 ];
 
 export default eslintConfig;

@@ -565,9 +565,61 @@ export const isValidArray = (arr: any): arr is any[] => {
  */
 export const certLabel = (cert: unknown): string => {
   const c = cert as { title?: unknown; name?: unknown } | null | undefined;
-  const title = typeof c?.title === "string" ? c.title.trim() : "";
-  if (title) return title;
-  return typeof c?.name === "string" ? c.name.trim() : "";
+  return firstText(c?.title, c?.name);
+};
+
+/**
+ * ─── Résumé text primitives ──────────────────────────────────────────────────
+ *
+ * Every value in a résumé comes from the user, so a MISSING value has exactly
+ * one correct rendering: nothing. Substituting a placeholder ("Position",
+ * "Company", "Degree") produces a document that looks filled in but describes a
+ * person who does not exist. All three return "" for "no data" — the signal to
+ * skip the surrounding element.
+ *
+ * Mirrors displayText/firstText/joinParts in server/src/utils/helpers.ts.
+ */
+
+/** A user-supplied value as display text, or "" when there is nothing to show. */
+export const displayText = (v: unknown): string => {
+  if (typeof v === "string") return v.trim();
+  if (typeof v === "number" && Number.isFinite(v)) return String(v);
+  return "";
+};
+
+/** The first value that has renderable text, or "". */
+export const firstText = (...values: unknown[]): string => {
+  for (const v of values) {
+    const t = displayText(v);
+    if (t) return t;
+  }
+  return "";
+};
+
+/**
+ * Join the parts of a composite label ("Job Title - Company"), dropping the
+ * parts that have no data — so a missing half cannot leave a dangling
+ * separator, which is the thing placeholders were papering over.
+ */
+export const joinParts = (parts: unknown[], separator = " - "): string =>
+  parts.map(displayText).filter(Boolean).join(separator);
+
+/**
+ * A résumé date range.
+ *
+ * Replaces `{start ?? "Present"} - {end ?? "Present"}`, which rendered
+ * "Present - Present" for an entry with no dates at all and, worse, claimed a
+ * role was current whenever only its START date was missing.
+ *
+ * "Present" is inferred ONLY from a real start date with no end — that is a
+ * fact about the data, not a placeholder standing in for absent data.
+ */
+export const dateRangeText = (start: unknown, end: unknown): string => {
+  const s = displayText(start);
+  const e = displayText(end);
+  if (s && e) return `${s} - ${e}`;
+  if (s) return `${s} - Present`;
+  return e;
 };
 
 /** Certifications that have a real label, in input order. */

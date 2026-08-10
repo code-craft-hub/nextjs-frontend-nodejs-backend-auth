@@ -4,6 +4,9 @@ import { userQueries } from "@features/user";
 import { cn } from "@/lib/utils";
 import {
   certLabel,
+  dateRangeText,
+  displayText,
+  joinParts,
   monthYear,
   normalizeToString,
   renderableCertifications,
@@ -183,19 +186,22 @@ export const PreviewResume = ({
                   className="mb-5"
                 >
                   <div className="flex justify-between items-center">
-                    <h3 className="font-bold font-merriweather">
-                      {work?.jobTitle || "Position"} -{" "}
-                      {work?.companyName || "Company"}
-                    </h3>
-                    {(() => {
-                      const s = monthYear(work?.startDate);
-                      const e = monthYear(work?.endDate);
-                      return (s || e) ? (
-                        <span className="text-sm text-gray-500 font-merriweather">
-                          {s ?? "Present"} - {e ?? "Present"}
-                        </span>
-                      ) : null;
-                    })()}
+                    {joinParts([work?.jobTitle, work?.companyName]) && (
+                      <h3 className="font-bold font-merriweather">
+                        {joinParts([work?.jobTitle, work?.companyName])}
+                      </h3>
+                    )}
+                    {dateRangeText(
+                      monthYear(work?.startDate),
+                      monthYear(work?.endDate),
+                    ) && (
+                      <span className="text-sm text-gray-500 font-merriweather">
+                        {dateRangeText(
+                          monthYear(work?.startDate),
+                          monthYear(work?.endDate),
+                        )}
+                      </span>
+                    )}
                   </div>
                   {work?.location && (
                     <p className="text-gray-600 font-merriweather">
@@ -239,23 +245,28 @@ export const PreviewResume = ({
                 className="mb-4"
               >
                 <div className="flex justify-between">
-                  <p className="font-bold font-merriweather">
-                    {edu?.fieldOfStudy || "Field of Study"}
-                  </p>
-                  {(() => {
-                    const s = monthYear(edu?.startDate);
-                    const e = monthYear(edu?.endDate);
-                    return (s || e) ? (
-                      <span className="text-sm text-gray-500 font-merriweather">
-                        {s ?? ""} - {e ?? "Present"}
-                      </span>
-                    ) : null;
-                  })()}
+                  {displayText(edu?.fieldOfStudy) && (
+                    <p className="font-bold font-merriweather">
+                      {displayText(edu?.fieldOfStudy)}
+                    </p>
+                  )}
+                  {dateRangeText(
+                    monthYear(edu?.startDate),
+                    monthYear(edu?.endDate),
+                  ) && (
+                    <span className="text-sm text-gray-500 font-merriweather">
+                      {dateRangeText(
+                        monthYear(edu?.startDate),
+                        monthYear(edu?.endDate),
+                      )}
+                    </span>
+                  )}
                 </div>
-                <p className="text-sm text-gray-600 font-merriweather">
-                  {edu?.degree || "Degree"} -{" "}
-                  {edu?.location || "Location"}
-                </p>
+                {joinParts([edu?.degree, edu?.location]) && (
+                  <p className="text-sm text-gray-600 font-merriweather">
+                    {joinParts([edu?.degree, edu?.location])}
+                  </p>
+                )}
                 {edu?.academicAchievements && (
                   <p className="text-sm text-gray-600 font-merriweather mt-1">
                     {edu.academicAchievements}
