@@ -109,7 +109,6 @@ function OverviewContent() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  console.count("Overview mount");
   const [query, setQuery] = useState<string | undefined>(
     () => searchParams.get(PARAM_QUERY) ?? undefined,
   );
