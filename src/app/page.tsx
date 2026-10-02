@@ -2,6 +2,7 @@ import { MarketingHeader } from '@/components/landing/MarketingHeader'
 import { TrustStrip } from '@/components/landing/TrustStrip'
 import { SwipeCardDeck } from '@/components/landing/SwipeCardDeck'
 import { WaitlistForm } from '@/components/landing/WaitlistForm'
+import { WaitlistProvider } from '@/components/landing/WaitlistProvider'
 import { cn } from '@/lib/utils'
 import { LANDING_UPDATES, type LandingUpdate } from '@/data/landing'
 import { Card, CardContent } from '@/components/ui/card'
@@ -163,7 +164,10 @@ function LandingHero() {
 export default function LandingPage() {
   return (
     <div className="relative overflow-x-clip bg-background font-marketing">
-      <LandingHero />
+      {/* The header CTA and the hero form submit the same signup. */}
+      <WaitlistProvider>
+        <LandingHero />
+      </WaitlistProvider>
 
       <div className="relative z-10 bg-background pt-20 pb-14 sm:pt-24 sm:pb-16">
         <img

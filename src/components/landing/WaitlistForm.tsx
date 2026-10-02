@@ -1,19 +1,17 @@
 'use client'
 
 import { ArrowRight, CircleCheck } from 'lucide-react'
-import { useActionState, useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
+import {
+  WAITLIST_FORM_ID,
+  useWaitlist,
+} from '@/components/landing/WaitlistProvider'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-import { joinWaitlist, type WaitlistState } from '@/lib/waitlist'
 
-/** Target of in-page links to the form, such as the header CTA. */
-export const WAITLIST_ID = 'waitlist'
-/** The first field — the header CTA puts the cursor here. */
-export const WAITLIST_NAME_INPUT_ID = 'waitlist-name'
-
+const NAME_INPUT_ID = 'waitlist-name'
 const EMAIL_INPUT_ID = 'waitlist-email'
 const ERROR_ID = 'waitlist-error'
-const INITIAL_STATE: WaitlistState = { status: 'idle' }
 
 /**
  * Below `sm` each field is its own pill; from `sm` up both fields sit inside
@@ -25,13 +23,11 @@ const fieldClass =
 
 /**
  * The hero's waitlist signup. A successful signup swaps the form for a
- * confirmation.
+ * confirmation. Its state lives in `WaitlistProvider` because the header CTA
+ * submits this same form.
  */
 export function WaitlistForm({ className }: { className?: string }) {
-  const [state, formAction, isPending] = useActionState(
-    joinWaitlist,
-    INITIAL_STATE,
-  )
+  const { state, formAction, isPending } = useWaitlist()
   const nameRef = useRef<HTMLInputElement>(null)
   const emailRef = useRef<HTMLInputElement>(null)
   const confirmationRef = useRef<HTMLParagraphElement>(null)
@@ -50,7 +46,7 @@ export function WaitlistForm({ className }: { className?: string }) {
   const error = state.status === 'error' ? state : null
 
   return (
-    <div id={WAITLIST_ID} className={cn('w-full max-w-xl', className)}>
+    <div className={cn('w-full max-w-xl', className)}>
       {state.status === 'success' ? (
         <p
           ref={confirmationRef}
@@ -69,16 +65,17 @@ export function WaitlistForm({ className }: { className?: string }) {
         </p>
       ) : (
         <form
+          id={WAITLIST_FORM_ID}
           action={formAction}
           aria-label="Join the waitlist"
           className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-0 sm:rounded-full sm:bg-card sm:p-1.5 sm:shadow-lg sm:shadow-primary/5 sm:ring-1 sm:ring-foreground/10 sm:transition-shadow sm:focus-within:ring-2 sm:focus-within:ring-primary/40"
         >
-          <label htmlFor={WAITLIST_NAME_INPUT_ID} className="sr-only">
+          <label htmlFor={NAME_INPUT_ID} className="sr-only">
             Name
           </label>
           <input
             ref={nameRef}
-            id={WAITLIST_NAME_INPUT_ID}
+            id={NAME_INPUT_ID}
             name="name"
             type="text"
             autoComplete="name"

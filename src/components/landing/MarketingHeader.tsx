@@ -1,10 +1,10 @@
 import Link from 'next/link'
-import { JoinWaitlistLink } from '@/components/landing/JoinWaitlistLink'
+import { JoinWaitlistButton } from '@/components/landing/JoinWaitlistButton'
 
 /**
  * The marketing header. While Cver AI is waitlist-only it carries just the
  * logo and the waitlist CTA — no section nav, so no mobile menu either, and
- * the CTA shows at every breakpoint.
+ * the CTA shows at every breakpoint. Render it inside `WaitlistProvider`.
  */
 export function MarketingHeader() {
   return (
@@ -18,7 +18,7 @@ export function MarketingHeader() {
           <img src="/cver-logo.png" alt="Cver AI" className="w-20" />
         </Link>
 
-        <JoinWaitlistLink />
+        <JoinWaitlistButton />
       </div>
     </header>
   )

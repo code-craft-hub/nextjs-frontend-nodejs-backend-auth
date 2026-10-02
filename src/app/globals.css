@@ -301,7 +301,7 @@
   }
 }
 
-/* The header CTA's animated aurora ring (JoinWaitlistLink), drawn around a
+/* The header CTA's animated aurora ring (JoinWaitlistButton), drawn around a
    shadow-free white button core. */
 .live-feed-ring {
   background: linear-gradient(
